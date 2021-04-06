@@ -98,7 +98,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private List<String> locations;
 
-  private IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+  private final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
   private boolean showLocation = true;
 

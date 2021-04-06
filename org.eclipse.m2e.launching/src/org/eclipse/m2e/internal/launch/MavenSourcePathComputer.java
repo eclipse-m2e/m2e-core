@@ -50,7 +50,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * Computes Maven launch configuration default source lookup path. Default source lookup includes Maven core libraries
  * only. It does not (and cannot) include entries for any Maven plugins which are loaded dynamically at runtime.
- * 
+ *
  * @author Eugene Kuleshov
  */
 @SuppressWarnings({"restriction", "deprecation"})
@@ -181,8 +181,8 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
           return file;
         }
       } catch(CoreException ex) {
-        // artifact not found, most likely... 
-        // TODO add special status code so it is possible to know for sure 
+        // artifact not found, most likely...
+        // TODO add special status code so it is possible to know for sure
       }
     }
 

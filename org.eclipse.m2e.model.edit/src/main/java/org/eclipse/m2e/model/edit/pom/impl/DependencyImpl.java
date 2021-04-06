@@ -46,14 +46,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.DependencyImpl#getOptional <em> Optional</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -63,7 +63,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -73,7 +73,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -83,7 +83,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -93,7 +93,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -103,7 +103,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -113,7 +113,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getType() <em>Type</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getType()
    * @generated
    * @ordered
@@ -122,7 +122,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * The cached value of the '{@link #getType() <em>Type</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getType()
    * @generated
    * @ordered
@@ -131,7 +131,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * This is true if the Type attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -140,7 +140,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getClassifier() <em>Classifier</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getClassifier()
    * @generated
    * @ordered
@@ -150,7 +150,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getClassifier() <em>Classifier</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getClassifier()
    * @generated
    * @ordered
@@ -160,7 +160,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getScope() <em>Scope</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getScope()
    * @generated
    * @ordered
@@ -170,7 +170,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getScope() <em>Scope</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getScope()
    * @generated
    * @ordered
@@ -180,7 +180,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getSystemPath() <em>System Path</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getSystemPath()
    * @generated
    * @ordered
@@ -190,7 +190,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getSystemPath() <em>System Path</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getSystemPath()
    * @generated
    * @ordered
@@ -200,7 +200,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getExclusions() <em>Exclusions</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getExclusions()
    * @generated
    * @ordered
@@ -210,7 +210,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The default value of the '{@link #getOptional() <em>Optional</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getOptional()
    * @generated
    * @ordered
@@ -220,7 +220,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
   /**
    * The cached value of the '{@link #getOptional() <em>Optional</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getOptional()
    * @generated
    * @ordered
@@ -229,7 +229,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * This is true if the Optional attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -237,7 +237,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DependencyImpl() {
@@ -246,7 +246,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -256,7 +256,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -265,7 +265,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -277,7 +277,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -286,7 +286,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -299,7 +299,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -308,7 +308,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -320,7 +320,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getType() {
@@ -329,7 +329,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setType(String newType) {
@@ -343,7 +343,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetType() {
@@ -358,7 +358,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetType() {
@@ -367,7 +367,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getClassifier() {
@@ -376,7 +376,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setClassifier(String newClassifier) {
@@ -389,7 +389,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getScope() {
@@ -398,7 +398,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setScope(String newScope) {
@@ -410,7 +410,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getSystemPath() {
@@ -419,7 +419,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSystemPath(String newSystemPath) {
@@ -432,7 +432,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Exclusion> getExclusions() {
@@ -445,7 +445,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetExclusions() {
@@ -455,7 +455,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetExclusions() {
@@ -464,7 +464,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getOptional() {
@@ -473,7 +473,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setOptional(String newOptional) {
@@ -488,7 +488,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetOptional() {
@@ -503,7 +503,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetOptional() {
@@ -512,7 +512,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -526,7 +526,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -556,7 +556,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -597,7 +597,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -636,7 +636,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -666,7 +666,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

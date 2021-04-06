@@ -39,7 +39,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
  */
 public class MavenVersionDecorator implements ILabelDecorator {
 
-  private Map<ILabelProviderListener, IMavenProjectChangedListener> listeners = new HashMap<>();
+  private final Map<ILabelProviderListener, IMavenProjectChangedListener> listeners = new HashMap<>();
 
   public Image decorateImage(Image image, Object element) {
     return null;

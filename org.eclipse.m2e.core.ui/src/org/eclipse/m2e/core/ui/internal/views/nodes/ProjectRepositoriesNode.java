@@ -31,9 +31,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class ProjectRepositoriesNode implements IMavenRepositoryNode {
 
-  private NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
+  private final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
 
-  private IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
+  private final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   public Object[] getChildren() {
     ArrayList<Object> nodes = new ArrayList<>();

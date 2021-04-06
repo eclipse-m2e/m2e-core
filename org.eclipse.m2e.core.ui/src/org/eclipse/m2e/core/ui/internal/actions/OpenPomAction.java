@@ -386,7 +386,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   }
 
   private static class MavenStorage implements IStorage {
-    private String name;
+    private final String name;
 
     private final String path;
 

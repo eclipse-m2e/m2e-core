@@ -39,14 +39,14 @@ public interface IMavenProjectRegistry {
    * to load the pom if the pom is not found in the cache. In the latter case, workspace resolution is assumed to be
    * enabled for the pom but the pom will not be added to the cache.
    */
-  public IMavenProjectFacade create(IFile pom, boolean load, IProgressMonitor monitor);
+  IMavenProjectFacade create(IFile pom, boolean load, IProgressMonitor monitor);
 
-  public IMavenProjectFacade create(IProject project, IProgressMonitor monitor);
+  IMavenProjectFacade create(IProject project, IProgressMonitor monitor);
 
   /**
    * Performs requested Maven project update asynchronously, using background job. This method returns immediately.
    */
-  public void refresh(MavenUpdateRequest request);
+  void refresh(MavenUpdateRequest request);
 
   /**
    * Performs requested Maven project update synchronously. In other words, this method does not return until all
@@ -56,8 +56,7 @@ public interface IMavenProjectRegistry {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #refresh(Collection, IProgressMonitor)} instead.
    */
-  @Deprecated
-  public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
+  @Deprecated void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Performs requested Maven project update synchronously. In other words, this method does not return until all
@@ -66,47 +65,45 @@ public interface IMavenProjectRegistry {
    *
    * @since 1.4
    */
-  public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException;
+  void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Returns IMavenProjectFacade for all opened Maven workspace projects.
    */
-  public IMavenProjectFacade[] getProjects();
+  IMavenProjectFacade[] getProjects();
 
   /**
    * @return IMavenProjectFacade cached IMavenProjectFacade corresponding to the project or null if there is no cache
    *         entry for the project.
    */
-  public IMavenProjectFacade getProject(IProject project);
+  IMavenProjectFacade getProject(IProject project);
 
   /**
    * Returns IMavenProjectFacade of the Maven workspace project that has given (groupId,artifactId,version) coordinates.
    *
    * @TODO decide what to do if multiple workspace projects have the same g/a/v.
    */
-  public IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version);
+  IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version);
 
   /**
    * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
-  @Deprecated
-  public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
+  @Deprecated MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
-  @Deprecated
-  public MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
+  @Deprecated MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
       throws CoreException;
 
   /**
    * @since 1.4
    */
-  public <V> V execute(IMavenProjectFacade facade, ICallable<V> callable, IProgressMonitor monitor)
+  <V> V execute(IMavenProjectFacade facade, ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException;
 
-  public void addMavenProjectChangedListener(IMavenProjectChangedListener listener);
+  void addMavenProjectChangedListener(IMavenProjectChangedListener listener);
 
-  public void removeMavenProjectChangedListener(IMavenProjectChangedListener listener);
+  void removeMavenProjectChangedListener(IMavenProjectChangedListener listener);
 }

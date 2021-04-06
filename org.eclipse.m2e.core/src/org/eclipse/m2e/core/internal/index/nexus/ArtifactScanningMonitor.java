@@ -37,7 +37,7 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
 
   private long timestamp = System.currentTimeMillis();
 
-  private File repositoryDir;
+  private final File repositoryDir;
 
   ArtifactScanningMonitor(File repositoryDir, IProgressMonitor monitor) {
     //this.indexInfo = indexInfo;

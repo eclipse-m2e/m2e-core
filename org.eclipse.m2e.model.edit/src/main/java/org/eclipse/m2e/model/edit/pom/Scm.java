@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Scm#getUrl <em>Url</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getScm()
  * @model extendedMetaData="name='Scm' kind='elementOnly'"
  * @generated
@@ -41,7 +41,7 @@ public interface Scm extends EObject {
    * href="http://maven.apache.org/scm/scm-url-format.html"&gt;URL format&lt;/a&gt; and &lt;a
    * href="http://maven.apache.org/scm/scms-overview.html"&gt;list of supported SCMs&lt;/a&gt;. This connection is
    * read-only. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Connection</em>' attribute.
    * @see #setConnection(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getScm_Connection()
@@ -54,7 +54,7 @@ public interface Scm extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Scm#getConnection <em>Connection</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Connection</em>' attribute.
    * @see #getConnection()
    * @generated
@@ -65,7 +65,7 @@ public interface Scm extends EObject {
    * Returns the value of the '<em><b>Developer Connection</b></em>' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc --> <!-- begin-model-doc --> 4.0.0 Just like &lt;code&gt;connection&lt;/code&gt;, but for developers,
    * i.e. this scm connection will not be read only. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Developer Connection</em>' attribute.
    * @see #setDeveloperConnection(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getScm_DeveloperConnection()
@@ -78,7 +78,7 @@ public interface Scm extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Scm#getDeveloperConnection
    * <em>Developer Connection</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Developer Connection</em>' attribute.
    * @see #getDeveloperConnection()
    * @generated
@@ -89,7 +89,7 @@ public interface Scm extends EObject {
    * Returns the value of the '<em><b>Tag</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The tag of current code. By default, it's set to HEAD during development. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Tag</em>' attribute.
    * @see #isSetTag()
    * @see #unsetTag()
@@ -104,7 +104,7 @@ public interface Scm extends EObject {
   /**
    * Sets the value of the '{@link org.eclipse.m2e.model.edit.pom.Scm#getTag <em>Tag</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Tag</em>' attribute.
    * @see #isSetTag()
    * @see #unsetTag()
@@ -116,7 +116,7 @@ public interface Scm extends EObject {
   /**
    * Unsets the value of the '{@link org.eclipse.m2e.model.edit.pom.Scm#getTag <em>Tag</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetTag()
    * @see #getTag()
    * @see #setTag(String)
@@ -127,7 +127,7 @@ public interface Scm extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Scm#getTag <em>Tag</em>}' attribute is
    * set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Tag</em>' attribute is set.
    * @see #unsetTag()
    * @see #getTag()
@@ -140,7 +140,7 @@ public interface Scm extends EObject {
    * Returns the value of the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The URL to the project's browsable SCM repository, such as ViewVC or Fisheye. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Url</em>' attribute.
    * @see #setUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getScm_Url()
@@ -153,7 +153,7 @@ public interface Scm extends EObject {
   /**
    * Sets the value of the '{@link org.eclipse.m2e.model.edit.pom.Scm#getUrl <em>Url</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Url</em>' attribute.
    * @see #getUrl()
    * @generated

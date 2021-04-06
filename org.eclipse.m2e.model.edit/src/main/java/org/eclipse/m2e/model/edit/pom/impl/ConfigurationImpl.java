@@ -38,7 +38,7 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl#getConfigurationNode <em>Configuration Node</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated NOT
  */
 public class ConfigurationImpl extends EObjectImpl implements Configuration {
@@ -46,7 +46,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ConfigurationImpl() {
@@ -55,7 +55,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -65,7 +65,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Node getConfigurationNode() {
@@ -74,7 +74,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setConfigurationNode(Node newConfigurationNode) {
@@ -83,7 +83,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -240,7 +240,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
   }
 
   public void doNotify(int eventType, Object changedFeature, Object oldValue, Object newValue) {
-    // A catch-all notificator. 
+    // A catch-all notificator.
     // The configuration section can differ with every plugin, so we cannot really have a
     // static EMF model. So we'll just notify the subscribers and let them act accordingly.
     if(eNotificationRequired())

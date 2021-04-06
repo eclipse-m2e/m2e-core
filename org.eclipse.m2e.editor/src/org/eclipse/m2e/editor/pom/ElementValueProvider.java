@@ -9,7 +9,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 
 public final class ElementValueProvider {
 
-  private String[] path;
+  private final String[] path;
 
   private String defaultValue;
 

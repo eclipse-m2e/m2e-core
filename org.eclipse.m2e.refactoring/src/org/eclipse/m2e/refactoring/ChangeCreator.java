@@ -43,13 +43,13 @@ import org.eclipse.text.edits.TextEditGroup;
 public class ChangeCreator {
   private static final Logger log = LoggerFactory.getLogger(ChangeCreator.class);
 
-  private String label;
+  private final String label;
 
-  private IDocument oldDocument;
+  private final IDocument oldDocument;
 
-  private IDocument newDocument;
+  private final IDocument newDocument;
 
-  private IFile oldFile;
+  private final IFile oldFile;
 
   public ChangeCreator(IFile oldFile, IDocument oldDocument, IDocument newDocument, String label) {
     this.newDocument = newDocument;

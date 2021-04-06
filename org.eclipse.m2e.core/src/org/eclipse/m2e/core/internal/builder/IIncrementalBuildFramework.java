@@ -31,29 +31,29 @@ public interface IIncrementalBuildFramework {
    * @experimental this interface is part of work in progress and can be changed or removed without notice.
    * @since 1.6
    */
-  public static interface BuildResultCollector {
+  public interface BuildResultCollector {
 
-    public void refresh(File file);
+    void refresh(File file);
 
-    public void addMessage(File file, int line, int column, String message, int severity, Throwable cause);
+    void addMessage(File file, int line, int column, String message, int severity, Throwable cause);
 
-    public void removeMessages(File file);
+    void removeMessages(File file);
 
     /**
      * @since 1.6.2
      */
-    public Set<File> getFiles();
+    Set<File> getFiles();
   }
 
   /**
    * @experimental this interface is part of work in progress and can be changed or removed without notice.
    * @since 1.6
    */
-  public static interface BuildContext {
-    public void release();
+  public interface BuildContext {
+    void release();
   }
 
-  public BuildContext setupProjectBuildContext(IProject project, int kind, IResourceDelta delta,
+  BuildContext setupProjectBuildContext(IProject project, int kind, IResourceDelta delta,
       BuildResultCollector results) throws CoreException;
 
 }

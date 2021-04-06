@@ -31,14 +31,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.OrganizationImpl#getUrl <em>Url </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class OrganizationImpl extends EObjectImpl implements Organization {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -47,7 +47,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -56,7 +56,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -65,7 +65,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -74,7 +74,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected OrganizationImpl() {
@@ -83,7 +83,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -93,7 +93,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -102,7 +102,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -114,7 +114,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -123,7 +123,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -135,7 +135,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -151,7 +151,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -169,7 +169,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -187,7 +187,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -203,7 +203,7 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

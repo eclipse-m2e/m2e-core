@@ -53,7 +53,7 @@ public class CacheManager {
 
 	private volatile boolean invalidated;
 
-	private File folder;
+	private final File folder;
 
 	private CacheManager(File folder) {
 		this.folder = folder;
@@ -189,7 +189,7 @@ public class CacheManager {
 	 *
 	 * @param <T> the return type
 	 */
-	public static interface CacheConsumer<T> {
+	public interface CacheConsumer<T> {
 		T consume(File file) throws Exception;
 	}
 

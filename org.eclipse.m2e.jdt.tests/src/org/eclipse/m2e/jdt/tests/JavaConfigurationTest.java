@@ -48,7 +48,7 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
       stream.read(bytes);
     }
     String contents = new String(bytes);
-    contents = contents.replaceAll("1\\.8", "11");
+    contents = contents.replace("1.8", "11");
     pomFileWS.setContents(new ByteArrayInputStream(contents.getBytes()), true, false, null);
     waitForJobsToComplete();
     assertEquals("11", javaProject.getOption(JavaCore.COMPILER_SOURCE, false));

@@ -21,7 +21,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 public interface IClasspathManagerDelegate {
 
-  public void populateClasspath(IClasspathDescriptor classpath, IMavenProjectFacade projectFacade, int kind,
+  void populateClasspath(IClasspathDescriptor classpath, IMavenProjectFacade projectFacade, int kind,
       IProgressMonitor monitor) throws CoreException;
 
 }

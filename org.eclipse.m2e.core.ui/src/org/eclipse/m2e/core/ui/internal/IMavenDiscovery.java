@@ -18,5 +18,5 @@ import org.eclipse.swt.widgets.Shell;
 
 public interface IMavenDiscovery {
 
-  public void launch(Shell shell);
+  void launch(Shell shell);
 }

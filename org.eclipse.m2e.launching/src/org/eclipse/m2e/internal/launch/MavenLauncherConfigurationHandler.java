@@ -40,7 +40,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * MavenLauncherConfigurationHandler
- * 
+ *
  * @author Igor Fedorenko
  */
 public class MavenLauncherConfigurationHandler implements IMavenLauncherConfiguration {
@@ -49,7 +49,7 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
 
   private String mainRealm;
 
-  private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<>();
+  private final LinkedHashMap<String, List<String>> realms = new LinkedHashMap<>();
 
   private List<String> curEntries;
 
@@ -84,7 +84,7 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
             // workspace resource
             addArchiveEntry(resource.getLocation().toOSString());
           } else {
-            // external 
+            // external
             File file = cpe.getPath().toFile();
             if(file.exists()) {
               addArchiveEntry(file.getAbsolutePath());

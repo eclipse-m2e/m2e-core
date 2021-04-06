@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 
 /**
  * MavenLaunchUtils
- * 
+ *
  * @author Igor Fedorenko
  */
 @SuppressWarnings("restriction")
@@ -57,7 +57,7 @@ public class MavenLaunchUtils {
     if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
       resolverBundleId = "org.eclipse.m2e.workspace.cli"; //$NON-NLS-1$
     } else {
-      return Collections.emptyList(); // unsupported version of maven 
+      return Collections.emptyList(); // unsupported version of maven
     }
     Bundle resolver = Bundles.findDependencyBundle(MavenLaunchPlugin.getDefault().getBundle(), resolverBundleId);
     return Bundles.getClasspathEntries(resolver);

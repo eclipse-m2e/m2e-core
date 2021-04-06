@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.ui.internal.views.build;
 
 interface Node {
 
-  public String getName();
+  String getName();
 
-  public int getBuildCount();
+  int getBuildCount();
 }

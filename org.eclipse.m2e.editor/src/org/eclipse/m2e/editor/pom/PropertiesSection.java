@@ -67,15 +67,15 @@ public class PropertiesSection {
 
   private final MavenPomEditorPage page;
 
-  private FormToolkit toolkit;
+  private final FormToolkit toolkit;
 
-  private Composite composite;
+  private final Composite composite;
 
   private Section propertiesSection;
 
   ListEditorComposite<PropertyElement> propertiesEditor;
 
-  private VerifyListener listener = e -> e.doit = XMLChar.isValidName(e.text);
+  private final VerifyListener listener = e -> e.doit = XMLChar.isValidName(e.text);
 
   private GridData propertiesSectionData;
 

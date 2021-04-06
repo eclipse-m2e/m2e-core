@@ -22,9 +22,9 @@ import java.util.List;
  */
 public class MojoParameter {
 
-  private String name;
+  private final String name;
 
-  private String type;
+  private final String type;
 
   private boolean required;
 
@@ -34,7 +34,7 @@ public class MojoParameter {
 
   private String defaultValue;
 
-  private List<MojoParameter> nested;
+  private final List<MojoParameter> nested;
 
   private boolean multiple;
 
@@ -149,10 +149,6 @@ public class MojoParameter {
     while(param != null && i < path.length) {
       param = param.getNestedParameter(path[i]);
       i++ ;
-    }
-
-    if(param == null) {
-      return null;
     }
 
     return param;

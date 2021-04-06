@@ -62,15 +62,15 @@ public class LifecycleMappingOperation implements Operation {
 
   private static final String LIFECYCLE_PLUGIN_GROUPID = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_GROUPID;
 
-  private String version;
+  private final String version;
 
-  private String groupId;
+  private final String groupId;
 
-  private String artifactId;
+  private final String artifactId;
 
-  private PluginExecutionAction action;
+  private final PluginExecutionAction action;
 
-  private String[] goals;
+  private final String[] goals;
 
   /**
    * If set to true, then the lifecycle mapping metadata is created at the top level of the file, rather than within a

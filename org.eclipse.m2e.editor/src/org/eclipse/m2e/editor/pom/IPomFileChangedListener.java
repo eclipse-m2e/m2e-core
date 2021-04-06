@@ -15,6 +15,6 @@ package org.eclipse.m2e.editor.pom;
 
 public interface IPomFileChangedListener {
 
-  public void fileChanged();
+  void fileChanged();
 
 }

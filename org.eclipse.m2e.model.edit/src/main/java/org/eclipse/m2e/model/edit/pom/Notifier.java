@@ -33,7 +33,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Notifier#getConfiguration <em> Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getNotifier()
  * @model extendedMetaData="name='Notifier' kind='elementOnly'"
  * @generated
@@ -42,7 +42,7 @@ public interface Notifier extends EObject {
   /**
    * Returns the value of the '<em><b>Type</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The mechanism used to deliver notifications. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Type</em>' attribute.
    * @see #isSetType()
    * @see #unsetType()
@@ -57,7 +57,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getType <em>Type</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Type</em>' attribute.
    * @see #isSetType()
    * @see #unsetType()
@@ -69,7 +69,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getType <em>Type</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetType()
    * @see #getType()
    * @see #setType(String)
@@ -80,7 +80,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getType <em>Type</em>}' attribute
    * is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Type</em>' attribute is set.
    * @see #unsetType()
    * @see #getType()
@@ -93,7 +93,7 @@ public interface Notifier extends EObject {
    * Returns the value of the '<em><b>Send On Error</b></em>' attribute. The default value is <code>"true"</code>. <!--
    * begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Whether to send notifications on error.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Send On Error</em>' attribute.
    * @see #isSetSendOnError()
    * @see #unsetSendOnError()
@@ -108,7 +108,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnError <em>Send On Error</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Send On Error</em>' attribute.
    * @see #isSetSendOnError()
    * @see #unsetSendOnError()
@@ -120,7 +120,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnError <em>Send On Error</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetSendOnError()
    * @see #getSendOnError()
    * @see #setSendOnError(String)
@@ -131,7 +131,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnError
    * <em>Send On Error</em>}' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Send On Error</em>' attribute is set.
    * @see #unsetSendOnError()
    * @see #getSendOnError()
@@ -144,7 +144,7 @@ public interface Notifier extends EObject {
    * Returns the value of the '<em><b>Send On Failure</b></em>' attribute. The default value is <code>"true"</code>.
    * <!-- begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Whether to send notifications on
    * failure. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Send On Failure</em>' attribute.
    * @see #isSetSendOnFailure()
    * @see #unsetSendOnFailure()
@@ -159,7 +159,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnFailure <em>Send On Failure</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Send On Failure</em>' attribute.
    * @see #isSetSendOnFailure()
    * @see #unsetSendOnFailure()
@@ -171,7 +171,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnFailure <em>Send On Failure</em>}
    * ' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetSendOnFailure()
    * @see #getSendOnFailure()
    * @see #setSendOnFailure(String)
@@ -182,7 +182,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnFailure
    * <em>Send On Failure</em>}' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Send On Failure</em>' attribute is set.
    * @see #unsetSendOnFailure()
    * @see #getSendOnFailure()
@@ -195,7 +195,7 @@ public interface Notifier extends EObject {
    * Returns the value of the '<em><b>Send On Success</b></em>' attribute. The default value is <code>"true"</code>.
    * <!-- begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Whether to send notifications on
    * success. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Send On Success</em>' attribute.
    * @see #isSetSendOnSuccess()
    * @see #unsetSendOnSuccess()
@@ -210,7 +210,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnSuccess <em>Send On Success</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Send On Success</em>' attribute.
    * @see #isSetSendOnSuccess()
    * @see #unsetSendOnSuccess()
@@ -222,7 +222,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnSuccess <em>Send On Success</em>}
    * ' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetSendOnSuccess()
    * @see #getSendOnSuccess()
    * @see #setSendOnSuccess(String)
@@ -233,7 +233,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnSuccess
    * <em>Send On Success</em>}' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Send On Success</em>' attribute is set.
    * @see #unsetSendOnSuccess()
    * @see #getSendOnSuccess()
@@ -246,7 +246,7 @@ public interface Notifier extends EObject {
    * Returns the value of the '<em><b>Send On Warning</b></em>' attribute. The default value is <code>"true"</code>.
    * <!-- begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Whether to send notifications on
    * warning. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Send On Warning</em>' attribute.
    * @see #isSetSendOnWarning()
    * @see #unsetSendOnWarning()
@@ -261,7 +261,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnWarning <em>Send On Warning</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Send On Warning</em>' attribute.
    * @see #isSetSendOnWarning()
    * @see #unsetSendOnWarning()
@@ -273,7 +273,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnWarning <em>Send On Warning</em>}
    * ' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetSendOnWarning()
    * @see #getSendOnWarning()
    * @see #setSendOnWarning(String)
@@ -284,7 +284,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnWarning
    * <em>Send On Warning</em>}' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Send On Warning</em>' attribute is set.
    * @see #unsetSendOnWarning()
    * @see #getSendOnWarning()
@@ -297,7 +297,7 @@ public interface Notifier extends EObject {
    * Returns the value of the '<em><b>Address</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 &lt;b&gt;Deprecated&lt;/b&gt;. Where to send the notification to - eg email address. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Address</em>' attribute.
    * @see #setAddress(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getNotifier_Address()
@@ -310,7 +310,7 @@ public interface Notifier extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getAddress <em>Address</em>} ' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Address</em>' attribute.
    * @see #getAddress()
    * @generated
@@ -325,7 +325,7 @@ public interface Notifier extends EObject {
    * of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Configuration</em>' containment reference list.
    * @see #isSetConfiguration()
    * @see #unsetConfiguration()
@@ -338,7 +338,7 @@ public interface Notifier extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getConfiguration <em>Configuration</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetConfiguration()
    * @see #getConfiguration()
    * @generated
@@ -348,7 +348,7 @@ public interface Notifier extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Notifier#getConfiguration
    * <em>Configuration</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Configuration</em>' containment reference list is set.
    * @see #unsetConfiguration()
    * @see #getConfiguration()

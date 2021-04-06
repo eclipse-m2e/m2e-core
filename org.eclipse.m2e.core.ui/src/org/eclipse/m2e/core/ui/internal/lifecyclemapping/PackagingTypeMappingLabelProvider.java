@@ -32,9 +32,9 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
 @SuppressWarnings("restriction")
 public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
-  private PackagingTypeMappingConfiguration element;
+  private final PackagingTypeMappingConfiguration element;
 
-  private ProjectLifecycleMappingConfiguration prjconf;
+  private final ProjectLifecycleMappingConfiguration prjconf;
 
   public PackagingTypeMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf,
       PackagingTypeMappingConfiguration element) {

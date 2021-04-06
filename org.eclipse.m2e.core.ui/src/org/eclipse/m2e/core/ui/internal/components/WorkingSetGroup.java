@@ -119,7 +119,7 @@ public class WorkingSetGroup {
       }
     });
     workingsetComboViewer.setLabelProvider(new LabelProvider() {
-      private ResourceManager images = new LocalResourceManager(JFaceResources.getResources());
+      private final ResourceManager images = new LocalResourceManager(JFaceResources.getResources());
 
       @SuppressWarnings("deprecation")
       public Image getImage(Object element) {

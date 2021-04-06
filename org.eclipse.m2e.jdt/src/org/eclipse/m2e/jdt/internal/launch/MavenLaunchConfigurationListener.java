@@ -73,7 +73,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
    * As the test source folder can't have a second module-info.java in its package fragment root all launch
    * configurations with a main class in the source folder won't find the module definition. Thus the module name
    * derived from the project is set here for the launch configuration.
-   * 
+   *
    * @param javaProject
    * @param configuration
    * @throws CoreException

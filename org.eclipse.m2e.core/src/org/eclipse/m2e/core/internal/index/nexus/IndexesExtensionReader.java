@@ -61,7 +61,7 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
       for(IExtension extension : indexesExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_INDEX)) {
+          if(ELEMENT_INDEX.equals(element.getName())) {
             processIndexElement(registry, element, monitor);
           }
         }
@@ -73,7 +73,7 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
       throws CoreException {
     String indexId = element.getAttribute(ATTR_INDEX_ID);
     String repositoryUrl = element.getAttribute(ATTR_REPOSITORY_URL);
-    boolean isShort = Boolean.valueOf(element.getAttribute(ATTR_IS_SHORT)).booleanValue();
+    boolean isShort = Boolean.parseBoolean(element.getAttribute(ATTR_IS_SHORT));
 
 //    String indexUpdateUrl = element.getAttribute(ATTR_UPDATE_URL);
 //    String archive = element.getAttribute(ATTR_INDEX_ARCHIVE);

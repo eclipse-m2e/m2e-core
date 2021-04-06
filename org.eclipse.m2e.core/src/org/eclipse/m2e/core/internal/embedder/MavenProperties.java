@@ -97,7 +97,7 @@ public class MavenProperties {
       msg += " (";
       msg += (rev != null ? rev : "");
       if(StringUtils.isNotBlank(timestamp)) {
-        String ts = formatTimestamp(Long.valueOf(timestamp));
+        String ts = formatTimestamp(Long.parseLong(timestamp));
         msg += (rev != null ? "; " : "") + ts;
       }
       msg += ")";

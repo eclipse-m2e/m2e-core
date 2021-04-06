@@ -32,7 +32,7 @@ import org.eclipse.m2e.core.ui.internal.WorkingSets;
  */
 public class MavenProjectWorkspaceAssigner implements IProjectCreationListener {
 
-  private List<IWorkingSet> workingSets;
+  private final List<IWorkingSet> workingSets;
 
   public MavenProjectWorkspaceAssigner(List<IWorkingSet> workingSets) {
     this.workingSets = workingSets;

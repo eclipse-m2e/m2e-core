@@ -26,8 +26,8 @@ public class BNDInstructions {
 
 	private static final String BND_DEFAULT_PROPERTIES_PATH = "bnd-default.properties";
 	public static final BNDInstructions EMPTY = new BNDInstructions("", null);
-	private String key;
-	private String instructions;
+	private final String key;
+	private final String instructions;
 
 	public BNDInstructions(String key, String instructions) {
 		this.key = key;

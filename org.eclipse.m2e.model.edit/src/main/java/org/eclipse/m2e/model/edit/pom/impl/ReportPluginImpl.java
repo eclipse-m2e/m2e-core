@@ -45,14 +45,14 @@ import org.eclipse.m2e.model.edit.pom.ReportSet;
  * {@link org.eclipse.m2e.model.edit.pom.impl.ReportPluginImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -62,7 +62,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -71,7 +71,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * This is true if the Group Id attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -80,7 +80,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -90,7 +90,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -100,7 +100,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -110,7 +110,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -120,7 +120,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The default value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -130,7 +130,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -140,7 +140,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getReportSets() <em>Report Sets</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getReportSets()
    * @generated
    * @ordered
@@ -150,7 +150,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
   /**
    * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getConfiguration()
    * @generated
    * @ordered
@@ -159,7 +159,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportPluginImpl() {
@@ -168,7 +168,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -178,7 +178,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -187,7 +187,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -202,7 +202,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetGroupId() {
@@ -217,7 +217,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetGroupId() {
@@ -226,7 +226,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -235,7 +235,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -248,7 +248,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -257,7 +257,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -269,7 +269,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getInherited() {
@@ -278,7 +278,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setInherited(String newInherited) {
@@ -291,7 +291,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<ReportSet> getReportSets() {
@@ -304,7 +304,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetReportSets() {
@@ -314,7 +314,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetReportSets() {
@@ -323,7 +323,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration getConfiguration() {
@@ -341,7 +341,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration basicGetConfiguration() {
@@ -350,7 +350,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setConfiguration(Configuration newConfiguration) {
@@ -363,7 +363,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -377,7 +377,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -403,7 +403,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -435,7 +435,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -465,7 +465,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -489,7 +489,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

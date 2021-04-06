@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class MavenDebugOutputAction extends Action {
 
-  private IPropertyChangeListener listener = event -> {
+  private final IPropertyChangeListener listener = event -> {
     if(MavenPreferenceConstants.P_DEBUG_OUTPUT.equals(event.getProperty())) {
       setChecked(isDebug());
     }

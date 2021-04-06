@@ -27,6 +27,6 @@ public interface IRepositoryDiscoverer {
   /**
    * Called during updateRegistry operation.
    */
-  public void addRepositories(RepositoryRegistry registry, IProgressMonitor monitor) throws CoreException;
+  void addRepositories(RepositoryRegistry registry, IProgressMonitor monitor) throws CoreException;
 
 }

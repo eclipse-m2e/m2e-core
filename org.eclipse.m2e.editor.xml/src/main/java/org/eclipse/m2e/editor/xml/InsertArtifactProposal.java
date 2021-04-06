@@ -76,15 +76,15 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(InsertArtifactProposal.class);
 
-  private ITextViewer sourceViewer;
+  private final ITextViewer sourceViewer;
 
-  private Region region;
+  private final Region region;
 
   private int generatedLength = 0;
 
   private int generatedOffset;
 
-  private Configuration config;
+  private final Configuration config;
 
   public InsertArtifactProposal(ITextViewer sourceViewer, Region region, Configuration config) {
     this.sourceViewer = sourceViewer;
@@ -291,7 +291,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
    *
    * @author mkleint
    */
-  public static enum SearchType {
+  public enum SearchType {
 
     PARENT(IIndex.SEARCH_PARENTS, Messages.InsertArtifactProposal_searchDialog_title,
         Messages.InsertArtifactProposal_display_name, MvnImages.IMG_OPEN_POM,
@@ -312,7 +312,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
 
     private final String additionalInfo;
 
-    private SearchType(String type, String windowTitle, String dn, Image img, String addInfo) {
+    SearchType(String type, String windowTitle, String dn, Image img, String addInfo) {
       this.type = type;
       this.windowTitle = windowTitle;
       this.displayName = dn;

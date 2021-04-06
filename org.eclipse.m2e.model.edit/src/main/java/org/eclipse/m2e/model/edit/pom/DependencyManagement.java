@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.DependencyManagement#getDependencies <em>Dependencies</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDependencyManagement()
  * @model extendedMetaData="name='DependencyManagement' kind='elementOnly'"
  * @generated
@@ -39,7 +39,7 @@ public interface DependencyManagement extends EObject {
    * begin-model-doc --> 4.0.0 The dependencies specified here are not used until they are referenced in a POM within
    * the group. This allows the specification of a "standard" version for a particular dependency. <!-- end-model-doc
    * -->
-   * 
+   *
    * @return the value of the '<em>Dependencies</em>' containment reference list.
    * @see #isSetDependencies()
    * @see #unsetDependencies()
@@ -53,7 +53,7 @@ public interface DependencyManagement extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.DependencyManagement#getDependencies
    * <em>Dependencies</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetDependencies()
    * @see #getDependencies()
    * @generated
@@ -63,7 +63,7 @@ public interface DependencyManagement extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.DependencyManagement#getDependencies
    * <em>Dependencies</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Dependencies</em>' containment reference list is set.
    * @see #unsetDependencies()
    * @see #getDependencies()

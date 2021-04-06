@@ -520,7 +520,7 @@ public abstract class AbstractMavenProjectTestCase {
     }
     if(waitForJobsToComplete) {
       // emulate behavior when autobuild was not honored by ProjectRegistryRefreshJob
-      if(!isAutoBuilding() && file.getParent().getType() == IResource.PROJECT && file.getName().equals("pom.xml")) {
+      if(!isAutoBuilding() && file.getParent().getType() == IResource.PROJECT && "pom.xml".equals(file.getName())) {
         refreshMavenProject(project);
       }
       waitForJobsToComplete();

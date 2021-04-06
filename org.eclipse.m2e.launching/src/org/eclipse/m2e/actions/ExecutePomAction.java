@@ -72,7 +72,7 @@ import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
 
 /**
  * Maven launch shortcut
- * 
+ *
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
  */
@@ -181,7 +181,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
             return folder;
           }
         } else if(dir.getType() == IResource.FILE) {
-          if(((IFile) dir).getName().equals(IMavenConstants.POM_FILE_NAME)) {
+          if(IMavenConstants.POM_FILE_NAME.equals(((IFile) dir).getName())) {
             return dir.getParent();
           }
         }
@@ -240,7 +240,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     }
   }
 
-  // TODO ideally it should use MavenProject, but it is faster to scan IJavaProjects 
+  // TODO ideally it should use MavenProject, but it is faster to scan IJavaProjects
   private IPath getJREContainerPath(IContainer basedir) throws CoreException {
     IProject project = basedir.getProject();
     if(project != null && project.hasNature(JavaCore.NATURE_ID)) {
@@ -307,7 +307,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
           return matchingConfigs.get(0);
         } else if(matchingConfigs.size() > 1) {
           final IDebugModelPresentation labelProvider = DebugUITools.newDebugModelPresentation();
-          ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), // 
+          ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), //
               new ILabelProvider() {
                 public Image getImage(Object element) {
                   return labelProvider.getImage(element);
@@ -344,7 +344,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
               });
           dialog.setElements(matchingConfigs.toArray(new ILaunchConfiguration[matchingConfigs.size()]));
           dialog.setTitle(Messages.ExecutePomAction_dialog_title);
-          if(mode.equals(ILaunchManager.DEBUG_MODE)) {
+          if(ILaunchManager.DEBUG_MODE.equals(mode)) {
             dialog.setMessage(Messages.ExecutePomAction_dialog_debug_message);
           } else {
             dialog.setMessage(Messages.ExecutePomAction_dialog_run_message);

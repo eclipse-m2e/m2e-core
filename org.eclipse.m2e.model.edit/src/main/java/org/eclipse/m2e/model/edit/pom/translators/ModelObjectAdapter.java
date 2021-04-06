@@ -45,13 +45,13 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
  * @author Mike Poindexter
  */
 public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, INodeAdapter {
-  private SSESyncResource resource;
+  private final SSESyncResource resource;
 
-  private EObject eobject;
+  private final EObject eobject;
 
   private Notifier target;
 
-  private Map<EStructuralFeature, TranslatorAdapter> childAdapters = new LinkedHashMap<>();
+  private final Map<EStructuralFeature, TranslatorAdapter> childAdapters = new LinkedHashMap<>();
 
   public ModelObjectAdapter(SSESyncResource resource, EObject eobject, Element node) {
     super(resource);

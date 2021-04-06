@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Extension#getVersion <em>Version </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getExtension()
  * @model extendedMetaData="name='Extension' kind='elementOnly'"
  * @generated
@@ -36,7 +36,7 @@ public interface Extension extends EObject {
   /**
    * Returns the value of the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The group ID of the extension's artifact. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Group Id</em>' attribute.
    * @see #setGroupId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getExtension_GroupId()
@@ -49,7 +49,7 @@ public interface Extension extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Extension#getGroupId <em>Group Id</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Group Id</em>' attribute.
    * @see #getGroupId()
    * @generated
@@ -59,7 +59,7 @@ public interface Extension extends EObject {
   /**
    * Returns the value of the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 4.0.0 The artifact ID of the extension. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Artifact Id</em>' attribute.
    * @see #setArtifactId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getExtension_ArtifactId()
@@ -72,7 +72,7 @@ public interface Extension extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Extension#getArtifactId <em>Artifact Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Artifact Id</em>' attribute.
    * @see #getArtifactId()
    * @generated
@@ -82,7 +82,7 @@ public interface Extension extends EObject {
   /**
    * Returns the value of the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The version of the extension. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Version</em>' attribute.
    * @see #setVersion(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getExtension_Version()
@@ -95,7 +95,7 @@ public interface Extension extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Extension#getVersion <em>Version</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Version</em>' attribute.
    * @see #getVersion()
    * @generated

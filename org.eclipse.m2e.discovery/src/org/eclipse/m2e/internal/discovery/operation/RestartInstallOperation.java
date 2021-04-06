@@ -43,7 +43,7 @@ public class RestartInstallOperation extends InstallOperation {
 
   private final IRunnableWithProgress postInstallHook;
 
-  private Collection<String> projectsToConfigure;
+  private final Collection<String> projectsToConfigure;
 
   public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall,
       IRunnableWithProgress postInstallHook) {
@@ -97,11 +97,11 @@ public class RestartInstallOperation extends InstallOperation {
    */
   private static class UpdateMavenConfigurationProvisioningJob extends ProfileModificationJob {
 
-    private ProfileModificationJob job;
+    private final ProfileModificationJob job;
 
     private final IRunnableWithProgress postInstallHook;
 
-    private Collection<String> projectsToConfigure;
+    private final Collection<String> projectsToConfigure;
 
     public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session,
         IRunnableWithProgress postInstallHook, Collection<String> projectsToConfigure) {

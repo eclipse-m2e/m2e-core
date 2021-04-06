@@ -40,7 +40,7 @@ public class ChangedFileOutputStream extends OutputStream {
 
   private final OutputStream os;
 
-  private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+  private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
   public ChangedFileOutputStream(File file) throws FileNotFoundException {
     this(file, null);

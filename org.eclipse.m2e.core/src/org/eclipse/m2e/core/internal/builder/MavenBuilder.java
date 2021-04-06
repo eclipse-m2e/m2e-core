@@ -160,7 +160,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   }
 
-  private BuildMethod<IProject[]> methodBuild = new BuildMethod<IProject[]>() {
+  private final BuildMethod<IProject[]> methodBuild = new BuildMethod<IProject[]>() {
     @Override
     protected IProject[] method(IMavenExecutionContext context, IMavenProjectFacade projectFacade,
         Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey, int kind,
@@ -177,7 +177,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   };
 
-  private BuildMethod<Void> methodClean = new BuildMethod<Void>() {
+  private final BuildMethod<Void> methodClean = new BuildMethod<Void>() {
     @Override
     protected Void method(IMavenExecutionContext context, IMavenProjectFacade projectFacade,
         Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey, int kind,

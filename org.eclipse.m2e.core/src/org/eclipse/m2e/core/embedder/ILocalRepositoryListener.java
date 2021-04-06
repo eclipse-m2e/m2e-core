@@ -27,6 +27,6 @@ public interface ILocalRepositoryListener {
   /**
    * New artifact has been downloaded or installed to maven local repository
    */
-  public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
+  void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
       File artifactFile);
 }

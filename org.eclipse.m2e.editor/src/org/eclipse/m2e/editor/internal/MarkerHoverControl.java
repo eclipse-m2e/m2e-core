@@ -570,7 +570,7 @@ public class MarkerHoverControl extends AbstractInformationControl
 
     private final IInformationControl infoControl;
 
-    private String prefsId;
+    private final String prefsId;
 
     public OpenPreferencesAction(IInformationControl infoControl, ImageDescriptor imageDesc, String tooltip,
         String prefsId) {

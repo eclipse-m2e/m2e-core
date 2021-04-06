@@ -27,9 +27,9 @@ public class InputHistory {
   protected IDialogSettings dialogSettings;
 
   /** the Map of field ids to List of comboboxes that share the same history */
-  private Map<String, List<ControlWrapper>> comboMap;
+  private final Map<String, List<ControlWrapper>> comboMap;
 
-  private List<String> privileged;
+  private final List<String> privileged;
 
   public InputHistory(String sectionName) {
     this(sectionName, new String[0]);
@@ -166,7 +166,7 @@ public class InputHistory {
   }
 
   private class ComboWrapper extends ControlWrapper {
-    private Combo combo;
+    private final Combo combo;
 
     protected ComboWrapper(Combo combo) {
       super(combo);
@@ -194,7 +194,7 @@ public class InputHistory {
   }
 
   private class CComboWrapper extends ControlWrapper {
-    private CCombo combo;
+    private final CCombo combo;
 
     protected CComboWrapper(CCombo combo) {
       super(combo);

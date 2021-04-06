@@ -86,14 +86,14 @@ import org.eclipse.m2e.model.edit.pom.Scm;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ModelImpl#getModules <em>Modules </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getParent() <em>Parent</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getParent()
    * @generated
    * @ordered
@@ -102,7 +102,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Parent containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -111,7 +111,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getModelVersion() <em>Model Version</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getModelVersion()
    * @generated
    * @ordered
@@ -121,7 +121,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getModelVersion() <em>Model Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getModelVersion()
    * @generated
    * @ordered
@@ -131,7 +131,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -141,7 +141,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -151,7 +151,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -161,7 +161,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -171,7 +171,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getPackaging() <em>Packaging</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getPackaging()
    * @generated
    * @ordered
@@ -181,7 +181,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getPackaging() <em>Packaging</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getPackaging()
    * @generated
    * @ordered
@@ -190,7 +190,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Packaging attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -199,7 +199,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -208,7 +208,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -218,7 +218,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -228,7 +228,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -238,7 +238,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDescription()
    * @generated
    * @ordered
@@ -248,7 +248,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDescription()
    * @generated
    * @ordered
@@ -257,7 +257,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -266,7 +266,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -276,7 +276,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getPrerequisites() <em>Prerequisites</em>}' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPrerequisites()
    * @generated
    * @ordered
@@ -285,7 +285,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Prerequisites containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -294,7 +294,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getIssueManagement() <em>Issue Management</em>}' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getIssueManagement()
    * @generated
    * @ordered
@@ -304,7 +304,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * This is true if the Issue Management containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -313,7 +313,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getCiManagement() <em>Ci Management</em>}' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getCiManagement()
    * @generated
    * @ordered
@@ -322,7 +322,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Ci Management containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -331,7 +331,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The default value of the '{@link #getInceptionYear() <em>Inception Year</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getInceptionYear()
    * @generated
    * @ordered
@@ -341,7 +341,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getInceptionYear() <em>Inception Year</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getInceptionYear()
    * @generated
    * @ordered
@@ -351,7 +351,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getMailingLists() <em>Mailing Lists</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getMailingLists()
    * @generated
    * @ordered
@@ -361,7 +361,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getDevelopers() <em>Developers</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDevelopers()
    * @generated
    * @ordered
@@ -371,7 +371,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getContributors() <em>Contributors</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getContributors()
    * @generated
    * @ordered
@@ -381,7 +381,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getLicenses() <em>Licenses</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getLicenses()
    * @generated
    * @ordered
@@ -391,7 +391,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getScm() <em>Scm</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getScm()
    * @generated
    * @ordered
@@ -400,7 +400,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Scm containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -409,7 +409,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getOrganization() <em>Organization</em>} ' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getOrganization()
    * @generated
    * @ordered
@@ -418,7 +418,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Organization containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -427,7 +427,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getBuild() <em>Build</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getBuild()
    * @generated
    * @ordered
@@ -436,7 +436,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Build containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -445,7 +445,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getProfiles() <em>Profiles</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getProfiles()
    * @generated
    * @ordered
@@ -455,7 +455,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getRepositories() <em>Repositories</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getRepositories()
    * @generated
    * @ordered
@@ -465,7 +465,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getPluginRepositories() <em>Plugin Repositories</em>}' containment reference list.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPluginRepositories()
    * @generated
    * @ordered
@@ -475,7 +475,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getDependencies() <em>Dependencies</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDependencies()
    * @generated
    * @ordered
@@ -485,7 +485,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getReporting() <em>Reporting</em>}' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getReporting()
    * @generated
    * @ordered
@@ -494,7 +494,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * This is true if the Reporting containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -503,7 +503,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getDependencyManagement() <em>Dependency Management</em>}' containment reference.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDependencyManagement()
    * @generated
    * @ordered
@@ -513,7 +513,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * This is true if the Dependency Management containment reference has been set. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -522,7 +522,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getDistributionManagement() <em>Distribution Management</em>}' containment
    * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDistributionManagement()
    * @generated
    * @ordered
@@ -532,7 +532,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * This is true if the Distribution Management containment reference has been set. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -541,7 +541,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getProperties() <em>Properties</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getProperties()
    * @generated
    * @ordered
@@ -551,7 +551,7 @@ public class ModelImpl extends EObjectImpl implements Model {
   /**
    * The cached value of the '{@link #getModules() <em>Modules</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getModules()
    * @generated
    * @ordered
@@ -560,7 +560,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ModelImpl() {
@@ -569,7 +569,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -579,7 +579,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Parent getParent() {
@@ -588,7 +588,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetParent(Parent newParent, NotificationChain msgs) {
@@ -609,7 +609,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setParent(Parent newParent) {
@@ -635,7 +635,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetParent(NotificationChain msgs) {
@@ -656,7 +656,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetParent() {
@@ -677,7 +677,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetParent() {
@@ -686,7 +686,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getModelVersion() {
@@ -695,7 +695,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setModelVersion(String newModelVersion) {
@@ -708,7 +708,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -717,7 +717,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -729,7 +729,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -738,7 +738,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -750,7 +750,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getPackaging() {
@@ -759,7 +759,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setPackaging(String newPackaging) {
@@ -774,7 +774,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPackaging() {
@@ -789,7 +789,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPackaging() {
@@ -798,7 +798,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -807,7 +807,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -819,7 +819,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -828,7 +828,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -840,7 +840,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getDescription() {
@@ -849,7 +849,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDescription(String newDescription) {
@@ -861,7 +861,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -870,7 +870,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -882,7 +882,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Prerequisites getPrerequisites() {
@@ -891,7 +891,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetPrerequisites(Prerequisites newPrerequisites, NotificationChain msgs) {
@@ -912,7 +912,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setPrerequisites(Prerequisites newPrerequisites) {
@@ -938,7 +938,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetPrerequisites(NotificationChain msgs) {
@@ -959,7 +959,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPrerequisites() {
@@ -981,7 +981,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPrerequisites() {
@@ -990,7 +990,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public IssueManagement getIssueManagement() {
@@ -999,7 +999,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetIssueManagement(IssueManagement newIssueManagement, NotificationChain msgs) {
@@ -1020,7 +1020,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setIssueManagement(IssueManagement newIssueManagement) {
@@ -1046,7 +1046,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetIssueManagement(NotificationChain msgs) {
@@ -1067,7 +1067,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetIssueManagement() {
@@ -1089,7 +1089,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetIssueManagement() {
@@ -1098,7 +1098,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public CiManagement getCiManagement() {
@@ -1107,7 +1107,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetCiManagement(CiManagement newCiManagement, NotificationChain msgs) {
@@ -1128,7 +1128,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setCiManagement(CiManagement newCiManagement) {
@@ -1154,7 +1154,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetCiManagement(NotificationChain msgs) {
@@ -1175,7 +1175,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetCiManagement() {
@@ -1197,7 +1197,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetCiManagement() {
@@ -1206,7 +1206,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getInceptionYear() {
@@ -1215,7 +1215,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setInceptionYear(String newInceptionYear) {
@@ -1228,7 +1228,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<MailingList> getMailingLists() {
@@ -1241,7 +1241,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetMailingLists() {
@@ -1251,7 +1251,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetMailingLists() {
@@ -1260,7 +1260,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Developer> getDevelopers() {
@@ -1273,7 +1273,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDevelopers() {
@@ -1283,7 +1283,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDevelopers() {
@@ -1292,7 +1292,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Contributor> getContributors() {
@@ -1305,7 +1305,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetContributors() {
@@ -1315,7 +1315,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetContributors() {
@@ -1324,7 +1324,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<License> getLicenses() {
@@ -1336,7 +1336,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Scm getScm() {
@@ -1345,7 +1345,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetScm(Scm newScm, NotificationChain msgs) {
@@ -1366,7 +1366,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setScm(Scm newScm) {
@@ -1389,7 +1389,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetScm(NotificationChain msgs) {
@@ -1410,7 +1410,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetScm() {
@@ -1430,7 +1430,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetScm() {
@@ -1439,7 +1439,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Organization getOrganization() {
@@ -1448,7 +1448,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetOrganization(Organization newOrganization, NotificationChain msgs) {
@@ -1469,7 +1469,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setOrganization(Organization newOrganization) {
@@ -1495,7 +1495,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetOrganization(NotificationChain msgs) {
@@ -1516,7 +1516,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetOrganization() {
@@ -1538,7 +1538,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetOrganization() {
@@ -1547,7 +1547,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Build getBuild() {
@@ -1556,7 +1556,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetBuild(Build newBuild, NotificationChain msgs) {
@@ -1577,7 +1577,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setBuild(Build newBuild) {
@@ -1603,7 +1603,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetBuild(NotificationChain msgs) {
@@ -1624,7 +1624,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetBuild() {
@@ -1645,7 +1645,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetBuild() {
@@ -1654,7 +1654,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Profile> getProfiles() {
@@ -1666,7 +1666,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetProfiles() {
@@ -1676,7 +1676,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetProfiles() {
@@ -1685,7 +1685,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Repository> getRepositories() {
@@ -1698,7 +1698,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetRepositories() {
@@ -1708,7 +1708,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetRepositories() {
@@ -1717,7 +1717,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Repository> getPluginRepositories() {
@@ -1730,7 +1730,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPluginRepositories() {
@@ -1740,7 +1740,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPluginRepositories() {
@@ -1749,7 +1749,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Dependency> getDependencies() {
@@ -1762,7 +1762,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDependencies() {
@@ -1772,7 +1772,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDependencies() {
@@ -1781,7 +1781,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Reporting getReporting() {
@@ -1790,7 +1790,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetReporting(Reporting newReporting, NotificationChain msgs) {
@@ -1811,7 +1811,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setReporting(Reporting newReporting) {
@@ -1837,7 +1837,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetReporting(NotificationChain msgs) {
@@ -1858,7 +1858,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetReporting() {
@@ -1880,7 +1880,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetReporting() {
@@ -1889,7 +1889,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DependencyManagement getDependencyManagement() {
@@ -1898,7 +1898,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetDependencyManagement(DependencyManagement newDependencyManagement,
@@ -1921,7 +1921,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDependencyManagement(DependencyManagement newDependencyManagement) {
@@ -1947,7 +1947,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetDependencyManagement(NotificationChain msgs) {
@@ -1968,7 +1968,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDependencyManagement() {
@@ -1990,7 +1990,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDependencyManagement() {
@@ -1999,7 +1999,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DistributionManagement getDistributionManagement() {
@@ -2008,7 +2008,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetDistributionManagement(DistributionManagement newDistributionManagement,
@@ -2031,7 +2031,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDistributionManagement(DistributionManagement newDistributionManagement) {
@@ -2057,7 +2057,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetDistributionManagement(NotificationChain msgs) {
@@ -2078,7 +2078,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDistributionManagement() {
@@ -2100,7 +2100,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDistributionManagement() {
@@ -2109,7 +2109,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<PropertyElement> getProperties() {
@@ -2122,7 +2122,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetProperties() {
@@ -2132,7 +2132,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetProperties() {
@@ -2141,7 +2141,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<String> getModules() {
@@ -2153,7 +2153,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -2203,7 +2203,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -2273,7 +2273,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -2383,7 +2383,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -2482,7 +2482,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -2552,7 +2552,7 @@ public class ModelImpl extends EObjectImpl implements Model {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

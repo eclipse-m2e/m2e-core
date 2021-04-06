@@ -69,17 +69,17 @@ public class MavenArtifactComponent extends Composite {
 
   private ModifyListener modifyingListener;
 
-  private Label groupIdlabel;
+  private final Label groupIdlabel;
 
-  private Label artifactIdLabel;
+  private final Label artifactIdLabel;
 
-  private Label versionLabel;
+  private final Label versionLabel;
 
-  private Label packagingLabel;
+  private final Label packagingLabel;
 
-  private Label nameLabel;
+  private final Label nameLabel;
 
-  private Label descriptionLabel;
+  private final Label descriptionLabel;
 
   /** Creates a new component. */
   public MavenArtifactComponent(Composite parent, int styles) {

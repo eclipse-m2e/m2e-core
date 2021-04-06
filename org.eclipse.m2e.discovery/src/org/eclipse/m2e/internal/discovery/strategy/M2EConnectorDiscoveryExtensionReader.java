@@ -40,7 +40,7 @@ import org.eclipse.m2e.internal.discovery.Messages;
 @SuppressWarnings("restriction")
 public class M2EConnectorDiscoveryExtensionReader extends ConnectorDiscoveryExtensionReader {
 
-  private Map<String, Tag> tagById = new HashMap<>();
+  private final Map<String, Tag> tagById = new HashMap<>();
 
   public Set<Tag> getTags() {
     return new HashSet<>(tagById.values());

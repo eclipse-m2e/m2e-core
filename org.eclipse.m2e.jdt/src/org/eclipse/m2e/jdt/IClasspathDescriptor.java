@@ -32,56 +32,56 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public interface IClasspathDescriptor {
 
-  public static interface EntryFilter {
-    public boolean accept(IClasspathEntryDescriptor descriptor);
+  public interface EntryFilter {
+    boolean accept(IClasspathEntryDescriptor descriptor);
   }
 
   /**
    * @return true if classpath contains entry with specified path, false otherwise.
    */
-  public boolean containsPath(IPath path);
+  boolean containsPath(IPath path);
 
   /**
    * Convenience method, equivalent to
    * <code>addSourceEntry(sourcePath, outputLocation, new IPath[0], new IPath[0], generated)</code>
    */
-  public IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, boolean generated);
+  IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, boolean generated);
 
   /**
    * Adds project source folder to the classpath. The source folder must exist in the workspace unless generated is
    * true. In the latter case, the source classpath entry will be marked as optional.
    */
-  public IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion,
+  IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion,
       IPath[] exclusion, boolean generated);
 
   /**
    * Adds fully populated IClasspathEntry instance to the classpath.
    */
-  public IClasspathEntryDescriptor addEntry(IClasspathEntry entry);
+  IClasspathEntryDescriptor addEntry(IClasspathEntry entry);
 
   /**
    * Removes entry from stale entries list.
    *
    * @since 1.7
    */
-  public void touchEntry(IPath entryPath);
+  void touchEntry(IPath entryPath);
 
   /**
    * Replaces a single ClasspathEntry instance matched by filter. Returns null if none were replaced.
    *
    * @since 1.6
    */
-  public IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry entry);
+  IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry entry);
 
   /**
    * Adds and returns new project classpath entry.
    */
-  public IClasspathEntryDescriptor addProjectEntry(IPath entryPath);
+  IClasspathEntryDescriptor addProjectEntry(IPath entryPath);
 
   /**
    * Adds and returns new library entry to the classpath
    */
-  public IClasspathEntryDescriptor addLibraryEntry(IPath entryPath);
+  IClasspathEntryDescriptor addLibraryEntry(IPath entryPath);
 
   /**
    * Removes entry with specified path from the classpath. That this can remove multiple entries because classpath does
@@ -89,27 +89,27 @@ public interface IClasspathDescriptor {
    *
    * @TODO should really be removeEntries (i.e. plural)
    */
-  public List<IClasspathEntryDescriptor> removeEntry(IPath path);
+  List<IClasspathEntryDescriptor> removeEntry(IPath path);
 
   /**
    * Removes entries that match EntryFilter (i.e. EntryFilter#accept(entry) returns true) from the classpath
    *
    * @TODO should really be removeEntries (i.e. plural)
    */
-  public List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter);
+  List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter);
 
   /**
    * Renders classpath as IClasspathEntry[] array
    *
    * @TODO should really be toEntriesArray
    */
-  public IClasspathEntry[] getEntries();
+  IClasspathEntry[] getEntries();
 
   /**
    * Returns underlying "live" list of IClasspathEntryDescriptor instances. Changes to the list will be immediately
    * reflected in the classpath.
    */
-  public List<IClasspathEntryDescriptor> getEntryDescriptors();
+  List<IClasspathEntryDescriptor> getEntryDescriptors();
 
   // deprecated, to be removed before 1.0
 
@@ -118,14 +118,12 @@ public interface IClasspathDescriptor {
    *
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
-  @Deprecated
-  public IClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl);
+  @Deprecated IClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl);
 
   /**
    * Adds worksapce Maven project dependency to the classpath
    *
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
-  @Deprecated
-  public IClasspathEntryDescriptor addProjectEntry(Artifact artifact, IMavenProjectFacade projectFacade);
+  @Deprecated IClasspathEntryDescriptor addProjectEntry(Artifact artifact, IMavenProjectFacade projectFacade);
 }

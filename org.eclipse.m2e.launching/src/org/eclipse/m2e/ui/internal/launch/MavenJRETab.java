@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 @SuppressWarnings("restriction")
 public class MavenJRETab extends JavaJRETab {
 
-  private VMArgumentsBlock vmArgumentsBlock = new VMArgumentsBlock();
+  private final VMArgumentsBlock vmArgumentsBlock = new VMArgumentsBlock();
 
   /* (non-Javadoc)
    * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)

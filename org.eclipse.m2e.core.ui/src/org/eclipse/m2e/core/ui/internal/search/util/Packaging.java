@@ -28,7 +28,7 @@ public enum Packaging {
 
   private final String text;
 
-  private Packaging(String text) {
+  Packaging(String text) {
     this.text = text;
   }
 

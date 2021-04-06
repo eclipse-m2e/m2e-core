@@ -117,11 +117,11 @@ public interface IProjectConfigurationManager {
   /**
    * PROVISIONAL
    */
-  public ResolverConfiguration getResolverConfiguration(IProject project);
+  ResolverConfiguration getResolverConfiguration(IProject project);
 
   /**
    * PROVISIONAL
    */
-  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
+  boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
 
 }

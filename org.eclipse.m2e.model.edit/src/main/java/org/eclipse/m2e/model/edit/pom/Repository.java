@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Repository#getLayout <em>Layout</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRepository()
  * @model extendedMetaData="name='Repository' kind='elementOnly'"
  * @generated
@@ -41,7 +41,7 @@ public interface Repository extends EObject {
    * Returns the value of the '<em><b>Releases</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc --> <!-- begin-model-doc --> 4.0.0 How to handle downloading of releases from this repository. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Releases</em>' containment reference.
    * @see #isSetReleases()
    * @see #unsetReleases()
@@ -56,7 +56,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getReleases <em>Releases</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Releases</em>' containment reference.
    * @see #isSetReleases()
    * @see #unsetReleases()
@@ -68,7 +68,7 @@ public interface Repository extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getReleases <em>Releases</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetReleases()
    * @see #getReleases()
    * @see #setReleases(RepositoryPolicy)
@@ -79,7 +79,7 @@ public interface Repository extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getReleases <em>Releases</em>}'
    * containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Releases</em>' containment reference is set.
    * @see #unsetReleases()
    * @see #getReleases()
@@ -92,7 +92,7 @@ public interface Repository extends EObject {
    * Returns the value of the '<em><b>Snapshots</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc --> <!-- begin-model-doc --> 4.0.0 How to handle downloading of snapshots from this repository. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Snapshots</em>' containment reference.
    * @see #isSetSnapshots()
    * @see #unsetSnapshots()
@@ -107,7 +107,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getSnapshots <em>Snapshots</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Snapshots</em>' containment reference.
    * @see #isSetSnapshots()
    * @see #unsetSnapshots()
@@ -119,7 +119,7 @@ public interface Repository extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getSnapshots <em>Snapshots</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetSnapshots()
    * @see #getSnapshots()
    * @see #setSnapshots(RepositoryPolicy)
@@ -130,7 +130,7 @@ public interface Repository extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getSnapshots
    * <em>Snapshots</em>}' containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Snapshots</em>' containment reference is set.
    * @see #unsetSnapshots()
    * @see #getSnapshots()
@@ -143,7 +143,7 @@ public interface Repository extends EObject {
    * Returns the value of the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 A unique identifier for a repository. This is used to match the repository to
    * configuration in the &lt;code&gt;settings.xml&lt;/code&gt; file, for example. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Id</em>' attribute.
    * @see #setId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRepository_Id()
@@ -156,7 +156,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getId <em>Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Id</em>' attribute.
    * @see #getId()
    * @generated
@@ -166,7 +166,7 @@ public interface Repository extends EObject {
   /**
    * Returns the value of the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Human readable name of the repository. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Name</em>' attribute.
    * @see #setName(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRepository_Name()
@@ -179,7 +179,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getName <em>Name</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Name</em>' attribute.
    * @see #getName()
    * @generated
@@ -190,7 +190,7 @@ public interface Repository extends EObject {
    * Returns the value of the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The url of the repository, in the form &lt;code&gt;protocol://hostname/path&lt;/code&gt;.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Url</em>' attribute.
    * @see #setUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRepository_Url()
@@ -203,7 +203,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getUrl <em>Url</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Url</em>' attribute.
    * @see #getUrl()
    * @generated
@@ -214,7 +214,7 @@ public interface Repository extends EObject {
    * Returns the value of the '<em><b>Layout</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The type of layout this repository uses for locating and storing artifacts - can be
    * &lt;code&gt;legacy&lt;/code&gt; or &lt;code&gt;default&lt;/code&gt;. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Layout</em>' attribute.
    * @see #isSetLayout()
    * @see #unsetLayout()
@@ -229,7 +229,7 @@ public interface Repository extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getLayout <em>Layout</em>} ' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Layout</em>' attribute.
    * @see #isSetLayout()
    * @see #unsetLayout()
@@ -241,7 +241,7 @@ public interface Repository extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getLayout <em>Layout</em>} ' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetLayout()
    * @see #getLayout()
    * @see #setLayout(String)
@@ -252,7 +252,7 @@ public interface Repository extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Repository#getLayout <em>Layout</em>} '
    * attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Layout</em>' attribute is set.
    * @see #unsetLayout()
    * @see #getLayout()

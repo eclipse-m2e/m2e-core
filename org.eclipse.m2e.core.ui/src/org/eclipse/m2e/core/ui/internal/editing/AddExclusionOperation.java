@@ -35,9 +35,9 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 public class AddExclusionOperation implements Operation {
   private static final Logger log = LoggerFactory.getLogger(AddExclusionOperation.class);
 
-  private Dependency dependency;
+  private final Dependency dependency;
 
-  private ArtifactKey exclusion;
+  private final ArtifactKey exclusion;
 
   public AddExclusionOperation(Dependency dependency, ArtifactKey exclusion) {
     this.dependency = dependency;

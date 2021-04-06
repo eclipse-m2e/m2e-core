@@ -33,7 +33,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Plugin#getConfiguration <em> Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPlugin()
  * @model extendedMetaData="name='Plugin' kind='elementOnly'"
  * @generated
@@ -42,7 +42,7 @@ public interface Plugin extends EObject {
   /**
    * Returns the value of the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The group ID of the plugin in the repository. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Group Id</em>' attribute.
    * @see #isSetGroupId()
    * @see #unsetGroupId()
@@ -57,7 +57,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getGroupId <em>Group Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Group Id</em>' attribute.
    * @see #isSetGroupId()
    * @see #unsetGroupId()
@@ -69,7 +69,7 @@ public interface Plugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getGroupId <em>Group Id</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetGroupId()
    * @see #getGroupId()
    * @see #setGroupId(String)
@@ -80,7 +80,7 @@ public interface Plugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getGroupId <em>Group Id</em>}'
    * attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Group Id</em>' attribute is set.
    * @see #unsetGroupId()
    * @see #getGroupId()
@@ -92,7 +92,7 @@ public interface Plugin extends EObject {
   /**
    * Returns the value of the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 4.0.0 The artifact ID of the plugin in the repository. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Artifact Id</em>' attribute.
    * @see #setArtifactId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPlugin_ArtifactId()
@@ -105,7 +105,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getArtifactId <em>Artifact Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Artifact Id</em>' attribute.
    * @see #getArtifactId()
    * @generated
@@ -115,7 +115,7 @@ public interface Plugin extends EObject {
   /**
    * Returns the value of the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The version (or valid range of verisons) of the plugin to be used. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Version</em>' attribute.
    * @see #setVersion(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPlugin_Version()
@@ -128,7 +128,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getVersion <em>Version</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Version</em>' attribute.
    * @see #getVersion()
    * @generated
@@ -140,7 +140,7 @@ public interface Plugin extends EObject {
    * begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Whether to load Maven extensions (such as
    * packaging and type handlers) from this plugin. For performance reasons, this should only be enabled when necessary.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Extensions</em>' attribute.
    * @see #isSetExtensions()
    * @see #unsetExtensions()
@@ -155,7 +155,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getExtensions <em>Extensions</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Extensions</em>' attribute.
    * @see #isSetExtensions()
    * @see #unsetExtensions()
@@ -167,7 +167,7 @@ public interface Plugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getExtensions <em>Extensions</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetExtensions()
    * @see #getExtensions()
    * @see #setExtensions(String)
@@ -178,7 +178,7 @@ public interface Plugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getExtensions <em>Extensions</em>}'
    * attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Extensions</em>' attribute is set.
    * @see #unsetExtensions()
    * @see #getExtensions()
@@ -192,7 +192,7 @@ public interface Plugin extends EObject {
    * {@link org.eclipse.m2e.model.edit.pom.PluginExecution}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Multiple specifications of a set of goals to execute during the build lifecycle, each
    * having (possibly) different configuration. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Executions</em>' containment reference list.
    * @see #isSetExecutions()
    * @see #unsetExecutions()
@@ -206,7 +206,7 @@ public interface Plugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getExecutions <em>Executions</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetExecutions()
    * @see #getExecutions()
    * @generated
@@ -216,7 +216,7 @@ public interface Plugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getExecutions <em>Executions</em>}'
    * containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Executions</em>' containment reference list is set.
    * @see #unsetExecutions()
    * @see #getExecutions()
@@ -229,7 +229,7 @@ public interface Plugin extends EObject {
    * {@link org.eclipse.m2e.model.edit.pom.Dependency}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Additional dependencies that this project needs to introduce to the plugin's classloader.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Dependencies</em>' containment reference list.
    * @see #isSetDependencies()
    * @see #unsetDependencies()
@@ -243,7 +243,7 @@ public interface Plugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getDependencies <em>Dependencies</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetDependencies()
    * @see #getDependencies()
    * @generated
@@ -253,7 +253,7 @@ public interface Plugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getDependencies
    * <em>Dependencies</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Dependencies</em>' containment reference list is set.
    * @see #unsetDependencies()
    * @see #getDependencies()
@@ -264,7 +264,7 @@ public interface Plugin extends EObject {
   /**
    * Returns the value of the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Whether any configuration should be propagated to child POMs. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Inherited</em>' attribute.
    * @see #setInherited(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPlugin_Inherited()
@@ -277,7 +277,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getInherited <em>Inherited</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Inherited</em>' attribute.
    * @see #getInherited()
    * @generated
@@ -291,7 +291,7 @@ public interface Plugin extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Configuration</em>' reference.
    * @see #setConfiguration(Configuration)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPlugin_Configuration()
@@ -303,7 +303,7 @@ public interface Plugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Plugin#getConfiguration <em>Configuration</em>}'
    * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Configuration</em>' reference.
    * @see #getConfiguration()
    * @generated

@@ -35,7 +35,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * Maven file editor input
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenFileEditorInput implements IStorageEditorInput {

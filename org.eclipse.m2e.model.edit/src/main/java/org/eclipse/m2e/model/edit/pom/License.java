@@ -30,7 +30,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.License#getComments <em>Comments </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getLicense()
  * @model extendedMetaData="name='License' kind='elementOnly'"
  * @generated
@@ -39,7 +39,7 @@ public interface License extends EObject {
   /**
    * Returns the value of the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The full legal name of the license. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Name</em>' attribute.
    * @see #setName(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getLicense_Name()
@@ -52,7 +52,7 @@ public interface License extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.License#getName <em>Name</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Name</em>' attribute.
    * @see #getName()
    * @generated
@@ -62,7 +62,7 @@ public interface License extends EObject {
   /**
    * Returns the value of the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The official url for the license text. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Url</em>' attribute.
    * @see #setUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getLicense_Url()
@@ -75,7 +75,7 @@ public interface License extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.License#getUrl <em>Url</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Url</em>' attribute.
    * @see #getUrl()
    * @generated
@@ -88,7 +88,7 @@ public interface License extends EObject {
    * &lt;dt&gt;repo&lt;/dt&gt; &lt;dd&gt;may be downloaded from the Maven repository&lt;/dd&gt;
    * &lt;dt&gt;manual&lt;/dt&gt; &lt;dd&gt;user must manually download and install the dependency.&lt;/dd&gt;
    * &lt;/dl&gt; <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Distribution</em>' attribute.
    * @see #setDistribution(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getLicense_Distribution()
@@ -101,7 +101,7 @@ public interface License extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.License#getDistribution <em>Distribution</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Distribution</em>' attribute.
    * @see #getDistribution()
    * @generated
@@ -111,7 +111,7 @@ public interface License extends EObject {
   /**
    * Returns the value of the '<em><b>Comments</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ Addendum information pertaining to this license. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Comments</em>' attribute.
    * @see #setComments(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getLicense_Comments()
@@ -124,7 +124,7 @@ public interface License extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.License#getComments <em>Comments</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Comments</em>' attribute.
    * @see #getComments()
    * @generated

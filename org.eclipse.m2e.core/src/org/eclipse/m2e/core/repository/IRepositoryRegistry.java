@@ -35,33 +35,33 @@ public interface IRepositoryRegistry {
   /**
    *
    */
-  public static final int SCOPE_UNKNOWN = 1;
+  int SCOPE_UNKNOWN = 1;
 
   /**
    * Maven local repositories.
    */
-  public static final int SCOPE_LOCAL = 1 << 1;
+  int SCOPE_LOCAL = 1 << 1;
 
   /**
    * Eclipse workspace repository
    */
-  public static final int SCOPE_WORKSPACE = 1 << 2;
+  int SCOPE_WORKSPACE = 1 << 2;
 
   /**
    * Repositories defined in settings.xml file.
    */
-  public static final int SCOPE_SETTINGS = 1 << 3;
+  int SCOPE_SETTINGS = 1 << 3;
 
   /**
    * Repositories defined in pom.xml files of workspace Maven projects
    */
-  public static final int SCOPE_PROJECT = 1 << 4;
+  int SCOPE_PROJECT = 1 << 4;
 
-  public List<IRepository> getRepositories(int scope);
+  List<IRepository> getRepositories(int scope);
 
-  public IRepository getWorkspaceRepository();
+  IRepository getWorkspaceRepository();
 
-  public IRepository getLocalRepository();
+  IRepository getLocalRepository();
 
-  public IRepository getRepository(ArtifactRepositoryRef repositoryRef);
+  IRepository getRepository(ArtifactRepositoryRef repositoryRef);
 }

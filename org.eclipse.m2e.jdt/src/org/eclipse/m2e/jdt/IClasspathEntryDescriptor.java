@@ -33,93 +33,93 @@ public interface IClasspathEntryDescriptor {
 
   // classpath entry getters and setters (open a bug if you need any of the missing getters/setters)
 
-  public IPath getPath();
+  IPath getPath();
 
-  public void setPath(IPath path);
+  void setPath(IPath path);
 
-  public int getEntryKind();
+  int getEntryKind();
 
-  public void setEntryKind(int entryKind);
+  void setEntryKind(int entryKind);
 
-  public void setSourceAttachment(IPath srcPath, IPath srcRoot);
+  void setSourceAttachment(IPath srcPath, IPath srcRoot);
 
-  public void setJavadocUrl(String javaDocUrl);
+  void setJavadocUrl(String javaDocUrl);
 
-  public IPath getSourceAttachmentPath();
+  IPath getSourceAttachmentPath();
 
-  public IPath getSourceAttachmentRootPath();
+  IPath getSourceAttachmentRootPath();
 
-  public String getJavadocUrl();
+  String getJavadocUrl();
 
-  public void setOutputLocation(IPath outputLocation);
+  void setOutputLocation(IPath outputLocation);
 
-  public void addInclusionPattern(IPath pattern);
+  void addInclusionPattern(IPath pattern);
 
-  public void removeInclusionPattern(IPath pattern);
+  void removeInclusionPattern(IPath pattern);
 
-  public void setInclusionPatterns(IPath[] inclusionPatterns);
+  void setInclusionPatterns(IPath[] inclusionPatterns);
 
-  public IPath[] getInclusionPatterns();
+  IPath[] getInclusionPatterns();
 
-  public void addExclusionPattern(IPath pattern);
+  void addExclusionPattern(IPath pattern);
 
-  public void removeExclusionPattern(IPath pattern);
+  void removeExclusionPattern(IPath pattern);
 
-  public void setExclusionPatterns(IPath[] exclusionPatterns);
+  void setExclusionPatterns(IPath[] exclusionPatterns);
 
-  public IPath[] getExclusionPatterns();
+  IPath[] getExclusionPatterns();
 
-  public void setExported(boolean exported);
+  void setExported(boolean exported);
 
-  public boolean isExported();
+  boolean isExported();
 
-  public IPath getOutputLocation();
+  IPath getOutputLocation();
 
-  public void setClasspathAttribute(String name, String value);
+  void setClasspathAttribute(String name, String value);
 
-  public Map<String, String> getClasspathAttributes();
+  Map<String, String> getClasspathAttributes();
 
-  public void addAccessRule(IAccessRule rule);
+  void addAccessRule(IAccessRule rule);
 
-  public List<IAccessRule> getAccessRules();
+  List<IAccessRule> getAccessRules();
 
-  public void setCombineAccessRules(boolean combineAccessRules);
+  void setCombineAccessRules(boolean combineAccessRules);
 
-  public boolean combineAccessRules();
+  boolean combineAccessRules();
 
   // maven-specific getters and setters
 
   /**
    * Short for getArtifactKey().getGroupId(), with appropriate null check
    */
-  public String getGroupId();
+  String getGroupId();
 
   /**
    * Short for getArtifactKey().getArtifactId(), with appropriate null check
    */
-  public String getArtifactId();
+  String getArtifactId();
 
-  public ArtifactKey getArtifactKey();
+  ArtifactKey getArtifactKey();
 
-  public void setArtifactKey(ArtifactKey artifactKey);
+  void setArtifactKey(ArtifactKey artifactKey);
 
   /**
    * @return true if this entry corresponds to an optional maven dependency, false otherwise
    */
-  public boolean isOptionalDependency();
+  boolean isOptionalDependency();
 
-  public void setOptionalDependency(boolean optional);
+  void setOptionalDependency(boolean optional);
 
-  public String getScope();
+  String getScope();
 
-  public void setScope(String scope);
+  void setScope(String scope);
 
   //
 
   /**
    * Create IClasspathEntry with information collected in this descriptor
    */
-  public IClasspathEntry toClasspathEntry();
+  IClasspathEntry toClasspathEntry();
 
   /**
    * Returns <code>true</code> if this classpath entry was derived from pom.xml and <code>false</code> otherwise. <br/>
@@ -128,7 +128,7 @@ public interface IClasspathEntryDescriptor {
    * @see #setPomDerived(boolean)
    * @since 1.1
    */
-  public boolean isPomDerived();
+  boolean isPomDerived();
 
   /**
    * Marks classpath entry as derived from pom.xml (<code>true</code>) or not (<code>false</code>).
@@ -146,5 +146,5 @@ public interface IClasspathEntryDescriptor {
    *
    * @since 1.1
    */
-  public void setPomDerived(boolean derived);
+  void setPomDerived(boolean derived);
 }

@@ -61,51 +61,8 @@
     <system>Bugzilla</system>
   </issueManagement>
 
-  <repositories>
-    <repository>
-      <id>platform</id>
-      <layout>p2</layout>
-      <url>${eclipse-repo.url}</url>
-    </repository>
-    <repository>
-      <id>simrel</id>
-      <layout>p2</layout>
-      <url>${eclipse-simrel.url}</url>
-    </repository>
-    <repository>
-      <id>eclipse-license</id>
-      <layout>p2</layout>
-      <url>https://download.eclipse.org/cbi/updates/license</url>
-    </repository>
-    <repository>
-      <id>Orbit 2021-03</id>
-      <layout>p2</layout>
-      <url>https://download.eclipse.org/tools/orbit/downloads/drops/S20210216215844/repository/</url>
-    </repository>
-    <repository>
-	    <id>Wild Web Developer</id>
-	    <layout>p2</layout>
-	    <url>https://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
-    </repository>
-    <repository>
-    <id>BND</id>
-    <layout>p2</layout>
-    <url>https://bndtools.jfrog.io/bndtools/update-latest</url>
-    </repository>
-  </repositories>
-  <!-- To use when building with Tycho Snapshots
-  <pluginRepositories>
-    <pluginRepository>
-      <id>tycho-snapshots</id>
-      <url>https://oss.sonatype.org/content/groups/staging</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  -->
-
   <modules>
+    <module>target-platform</module>
     <module>org.eclipse.m2e.model.edit</module>
     <module>org.eclipse.m2e.core</module>
     <module>org.eclipse.m2e.core.ui</module>
@@ -156,6 +113,7 @@
 
 
   <dependencies>
+    <!-- Thos dependencies cannot be captured by the target-platform -->
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.archetype.common</artifactId>
@@ -174,12 +132,7 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-      <version>1.16.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>io.takari.m2e.workspace</groupId>
-      <artifactId>org.eclipse.m2e.workspace.cli</artifactId>
-      <version>0.3.1</version>
+      <version>1.18.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -196,8 +149,14 @@
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <configuration>
+          <target>
+            <artifact>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>target-platform</artifactId>
+              <version>1.16.0-SNAPSHOT</version>
+            </artifact>
+          </target>
           <pomDependencies>consider</pomDependencies>
-          <executionEnvironment>JavaSE-11</executionEnvironment>
           <filters>
             <filter>
               <!-- Remove as it may come as an undesired transitive dep from p2 under Java 11 -->
@@ -278,7 +237,11 @@
             <sourceReferences>
             	<generate>true</generate>
             </sourceReferences>
+            <!-- resources whose changes usually don't affect the binary output -->
             <jgit.ignore>
+              .project
+              .classpath
+              .settings/
               .polyglot.*
               pom.xml
             </jgit.ignore>

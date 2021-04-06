@@ -221,8 +221,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     }
 
     if(scope == IClasspathManager.CLASSPATH_TEST
-        && configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, "") //$NON-NLS-1$
-            .equals(TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5)) {
+        && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5 //$NON-NLS-1$
+            .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
       addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
     }
   }
@@ -231,7 +231,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IJavaProject javaProject) throws CoreException {
     IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), monitor);
     MavenProject mavenProject = facade.getMavenProject(monitor);
-    if(Boolean.valueOf(mavenProject.getProperties()
+    if(Boolean.parseBoolean(mavenProject.getProperties()
         .getProperty(PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES, "false"))) { //$NON-NLS-1$
       return;
     }
@@ -266,7 +266,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
           ARTIFACT_JUNIT_PLATFORM_LAUNCHER, mavenProject, monitor);
     }
-    // required for junit-platform-launcher, but might be already present if pom contains engine  
+    // required for junit-platform-launcher, but might be already present if pom contains engine
     if(platformCommonsArtifact != null && platformEngineArtifact == null) {
       addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
           ARTIFACT_JUNIT_PLATFORM_ENGINE, mavenProject, monitor);

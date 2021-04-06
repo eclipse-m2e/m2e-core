@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Relocation#getMessage <em>Message </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRelocation()
  * @model extendedMetaData="name='Relocation' kind='elementOnly'"
  * @generated
@@ -38,7 +38,7 @@ public interface Relocation extends EObject {
   /**
    * Returns the value of the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The group ID the artifact has moved to. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Group Id</em>' attribute.
    * @see #setGroupId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRelocation_GroupId()
@@ -51,7 +51,7 @@ public interface Relocation extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Relocation#getGroupId <em>Group Id</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Group Id</em>' attribute.
    * @see #getGroupId()
    * @generated
@@ -61,7 +61,7 @@ public interface Relocation extends EObject {
   /**
    * Returns the value of the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 4.0.0 The new artifact ID of the artifact. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Artifact Id</em>' attribute.
    * @see #setArtifactId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRelocation_ArtifactId()
@@ -74,7 +74,7 @@ public interface Relocation extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Relocation#getArtifactId <em>Artifact Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Artifact Id</em>' attribute.
    * @see #getArtifactId()
    * @generated
@@ -84,7 +84,7 @@ public interface Relocation extends EObject {
   /**
    * Returns the value of the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The new version of the artifact. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Version</em>' attribute.
    * @see #setVersion(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRelocation_Version()
@@ -97,7 +97,7 @@ public interface Relocation extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Relocation#getVersion <em>Version</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Version</em>' attribute.
    * @see #getVersion()
    * @generated
@@ -108,7 +108,7 @@ public interface Relocation extends EObject {
    * Returns the value of the '<em><b>Message</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 An additional message to show the user about the move, such as the reason. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Message</em>' attribute.
    * @see #setMessage(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getRelocation_Message()
@@ -121,7 +121,7 @@ public interface Relocation extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Relocation#getMessage <em>Message</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Message</em>' attribute.
    * @see #getMessage()
    * @generated

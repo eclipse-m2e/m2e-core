@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Reporting#getPlugins <em>Plugins </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReporting()
  * @model extendedMetaData="name='Reporting' kind='elementOnly'"
  * @generated
@@ -38,7 +38,7 @@ public interface Reporting extends EObject {
    * Returns the value of the '<em><b>Exclude Defaults</b></em>' attribute. The default value is <code>"false"</code>.
    * <!-- begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 If true, then the default reports are
    * not included in the site generation. This includes the reports in the "Project Info" menu. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Exclude Defaults</em>' attribute.
    * @see #isSetExcludeDefaults()
    * @see #unsetExcludeDefaults()
@@ -53,7 +53,7 @@ public interface Reporting extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getExcludeDefaults
    * <em>Exclude Defaults</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Exclude Defaults</em>' attribute.
    * @see #isSetExcludeDefaults()
    * @see #unsetExcludeDefaults()
@@ -65,7 +65,7 @@ public interface Reporting extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getExcludeDefaults
    * <em>Exclude Defaults</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetExcludeDefaults()
    * @see #getExcludeDefaults()
    * @see #setExcludeDefaults(String)
@@ -76,7 +76,7 @@ public interface Reporting extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getExcludeDefaults
    * <em>Exclude Defaults</em>}' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Exclude Defaults</em>' attribute is set.
    * @see #unsetExcludeDefaults()
    * @see #getExcludeDefaults()
@@ -89,7 +89,7 @@ public interface Reporting extends EObject {
    * Returns the value of the '<em><b>Output Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * --> <!-- begin-model-doc --> 4.0.0 Where to store all of the generated reports. The default is
    * &lt;code&gt;${project.build.directory}/site&lt;/code&gt; . <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Output Directory</em>' attribute.
    * @see #setOutputDirectory(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReporting_OutputDirectory()
@@ -102,7 +102,7 @@ public interface Reporting extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getOutputDirectory
    * <em>Output Directory</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Output Directory</em>' attribute.
    * @see #getOutputDirectory()
    * @generated
@@ -113,7 +113,7 @@ public interface Reporting extends EObject {
    * Returns the value of the '<em><b>Plugins</b></em>' containment reference list. The list contents are of type
    * {@link org.eclipse.m2e.model.edit.pom.ReportPlugin}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The reporting plugins to use and their configuration. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Plugins</em>' containment reference list.
    * @see #isSetPlugins()
    * @see #unsetPlugins()
@@ -127,7 +127,7 @@ public interface Reporting extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getPlugins <em>Plugins</em>}' containment
    * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetPlugins()
    * @see #getPlugins()
    * @generated
@@ -137,7 +137,7 @@ public interface Reporting extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getPlugins <em>Plugins</em>}'
    * containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Plugins</em>' containment reference list is set.
    * @see #unsetPlugins()
    * @see #getPlugins()

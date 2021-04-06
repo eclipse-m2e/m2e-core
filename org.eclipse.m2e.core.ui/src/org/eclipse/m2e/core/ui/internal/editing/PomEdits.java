@@ -650,7 +650,7 @@ public class PomEdits {
    *
    * @author mkleint
    */
-  public static interface Operation {
+  public interface Operation {
     void process(Document document);
   }
 
@@ -679,7 +679,7 @@ public class PomEdits {
    *
    * @author mkleint
    */
-  public static interface Matcher {
+  public interface Matcher {
     /**
      * returns true if the given element matches the condition.
      *

@@ -37,7 +37,7 @@ public interface IMavenMarkerManager {
    * @param pomFile the pom file to attach markers to.
    * @param result containing messages to be addedd as markers
    */
-  public void addMarkers(IResource pomFile, String type, MavenExecutionResult result);
+  void addMarkers(IResource pomFile, String type, MavenExecutionResult result);
 
   /**
    * Add a Maven marker to a resource
@@ -47,35 +47,35 @@ public interface IMavenMarkerManager {
    * @param lineNumber : the resource line to attach the marker to.
    * @param severity : the severity of the marker.
    */
-  public IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity);
+  IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity);
 
   /**
    * Delete all Maven markers of the specified type (including subtypes) from an IResource
    */
-  public void deleteMarkers(IResource resource, String type) throws CoreException;
+  void deleteMarkers(IResource resource, String type) throws CoreException;
 
   /**
    * Delete all Maven markers of the specified type from an IResource
    */
-  public void deleteMarkers(IResource resource, boolean includeSubtypes, String type) throws CoreException;
+  void deleteMarkers(IResource resource, boolean includeSubtypes, String type) throws CoreException;
 
   /**
    * Delete all Maven markers that have the specified type and attribute from an IResource
    */
-  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue) throws CoreException;
+  void deleteMarkers(IResource resource, String type, String attrName, String attrValue) throws CoreException;
 
   /**
    * Transform an exception into an error marker on an IResource
    *
    * @since 1.5
    */
-  public void addErrorMarkers(IResource resource, String type, Throwable ex);
+  void addErrorMarkers(IResource resource, String type, Throwable ex);
 
   /**
    * Transform an exception into an error marker on an IResource. This method is used by mavenarchiver and likely other
    * configurations. Removing it is binary incompatible change (but is source compatible).
    */
-  public void addErrorMarkers(IResource resource, String type, Exception ex);
+  void addErrorMarkers(IResource resource, String type, Exception ex);
 
   void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException;
 

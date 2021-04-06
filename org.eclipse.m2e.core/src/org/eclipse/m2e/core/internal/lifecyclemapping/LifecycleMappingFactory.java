@@ -973,7 +973,7 @@ public class LifecycleMappingFactory {
       for(IExtension extension : configuratorExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_LIFECYCLE_MAPPING)) {
+          if(ELEMENT_LIFECYCLE_MAPPING.equals(element.getName())) {
             mappings.put(element.getAttribute(ATTR_ID), element);
           }
         }
@@ -985,7 +985,7 @@ public class LifecycleMappingFactory {
 
   private static AbstractLifecycleMapping getLifecycleMapping(String mappingId) {
     IConfigurationElement element = getLifecycleMappingExtensions().get(mappingId);
-    if(element != null && element.getName().equals(ELEMENT_LIFECYCLE_MAPPING)) {
+    if(element != null && ELEMENT_LIFECYCLE_MAPPING.equals(element.getName())) {
       if(mappingId.equals(element.getAttribute(ATTR_ID))) {
         return createLifecycleMapping(element);
       }
@@ -1025,7 +1025,7 @@ public class LifecycleMappingFactory {
       for(IExtension extension : configuratorExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
+          if(ELEMENT_CONFIGURATOR.equals(element.getName())) {
             extensions.put(element.getAttribute(AbstractProjectConfigurator.ATTR_ID), element);
           }
         }
@@ -1040,7 +1040,7 @@ public class LifecycleMappingFactory {
       return null;
     }
     IConfigurationElement element = elements.get(configuratorId);
-    if(element != null && element.getName().equals(ELEMENT_CONFIGURATOR)) {
+    if(element != null && ELEMENT_CONFIGURATOR.equals(element.getName())) {
       if(configuratorId.equals(element.getAttribute(AbstractProjectConfigurator.ATTR_ID))) {
         return element;
       }

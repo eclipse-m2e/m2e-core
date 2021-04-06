@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 @SuppressWarnings("restriction")
 public class IndexedArtifactFileNode extends PlatformObject implements IMavenRepositoryNode, IArtifactNode, IAdaptable {
 
-  private IndexedArtifactFile artifactFile;
+  private final IndexedArtifactFile artifactFile;
 
   public IndexedArtifactFileNode(IndexedArtifactFile artifactFile) {
     this.artifactFile = artifactFile;

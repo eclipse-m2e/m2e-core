@@ -28,12 +28,12 @@ public interface IMutableIndex extends IIndex {
 
   // index content manipulation
 
-  public void addArtifact(File pomFile, ArtifactKey artifactKey);
+  void addArtifact(File pomFile, ArtifactKey artifactKey);
 
-  public void removeArtifact(File pomFile, ArtifactKey artifactKey);
+  void removeArtifact(File pomFile, ArtifactKey artifactKey);
 
   // reindexing
 
-  public void updateIndex(boolean force, IProgressMonitor monitor) throws CoreException;
+  void updateIndex(boolean force, IProgressMonitor monitor) throws CoreException;
 
 }

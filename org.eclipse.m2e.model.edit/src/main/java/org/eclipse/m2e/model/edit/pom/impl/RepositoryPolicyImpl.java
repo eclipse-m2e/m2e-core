@@ -35,14 +35,14 @@ import org.eclipse.m2e.model.edit.pom.RepositoryPolicy;
  * {@link org.eclipse.m2e.model.edit.pom.impl.RepositoryPolicyImpl#getChecksumPolicy <em>Checksum Policy</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolicy {
   /**
    * The default value of the '{@link #getEnabled() <em>Enabled</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getEnabled()
    * @generated
    * @ordered
@@ -52,7 +52,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
   /**
    * The cached value of the '{@link #getEnabled() <em>Enabled</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getEnabled()
    * @generated
    * @ordered
@@ -61,7 +61,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * This is true if the Enabled attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -70,7 +70,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
   /**
    * The default value of the '{@link #getUpdatePolicy() <em>Update Policy</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getUpdatePolicy()
    * @generated
    * @ordered
@@ -80,7 +80,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
   /**
    * The cached value of the '{@link #getUpdatePolicy() <em>Update Policy</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getUpdatePolicy()
    * @generated
    * @ordered
@@ -90,7 +90,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
   /**
    * The default value of the '{@link #getChecksumPolicy() <em>Checksum Policy</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getChecksumPolicy()
    * @generated
    * @ordered
@@ -100,7 +100,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
   /**
    * The cached value of the '{@link #getChecksumPolicy() <em>Checksum Policy</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getChecksumPolicy()
    * @generated
    * @ordered
@@ -109,7 +109,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RepositoryPolicyImpl() {
@@ -118,7 +118,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -128,7 +128,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getEnabled() {
@@ -137,7 +137,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setEnabled(String newEnabled) {
@@ -152,7 +152,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetEnabled() {
@@ -167,7 +167,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetEnabled() {
@@ -176,7 +176,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUpdatePolicy() {
@@ -185,7 +185,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUpdatePolicy(String newUpdatePolicy) {
@@ -198,7 +198,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getChecksumPolicy() {
@@ -207,7 +207,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setChecksumPolicy(String newChecksumPolicy) {
@@ -220,7 +220,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -238,7 +238,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -259,7 +259,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -280,7 +280,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -299,7 +299,7 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -62,13 +62,13 @@ import org.eclipse.m2e.model.edit.pom.Repository;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ProfileImpl#getReporting <em> Reporting</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The default value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -77,7 +77,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * The cached value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -87,7 +87,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getActivation() <em>Activation</em>}' containment reference. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getActivation()
    * @generated
    * @ordered
@@ -96,7 +96,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * This is true if the Activation containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -105,7 +105,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getBuild() <em>Build</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getBuild()
    * @generated
    * @ordered
@@ -114,7 +114,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * This is true if the Build containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -123,7 +123,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getRepositories() <em>Repositories</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getRepositories()
    * @generated
    * @ordered
@@ -133,7 +133,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getPluginRepositories() <em>Plugin Repositories</em>}' containment reference list.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPluginRepositories()
    * @generated
    * @ordered
@@ -143,7 +143,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getDependencies() <em>Dependencies</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDependencies()
    * @generated
    * @ordered
@@ -153,7 +153,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getReports() <em>Reports</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getReports()
    * @generated
    * @ordered
@@ -163,7 +163,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getDependencyManagement() <em>Dependency Management</em>}' containment reference.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDependencyManagement()
    * @generated
    * @ordered
@@ -173,7 +173,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * This is true if the Dependency Management containment reference has been set. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -182,7 +182,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getDistributionManagement() <em>Distribution Management</em>}' containment
    * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDistributionManagement()
    * @generated
    * @ordered
@@ -192,7 +192,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * This is true if the Distribution Management containment reference has been set. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -201,7 +201,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getProperties() <em>Properties</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getProperties()
    * @generated
    * @ordered
@@ -211,7 +211,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getModules() <em>Modules</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getModules()
    * @generated
    * @ordered
@@ -221,7 +221,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
   /**
    * The cached value of the '{@link #getReporting() <em>Reporting</em>}' reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getReporting()
    * @generated
    * @ordered
@@ -230,7 +230,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ProfileImpl() {
@@ -239,7 +239,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -249,7 +249,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getId() {
@@ -258,7 +258,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setId(String newId) {
@@ -270,7 +270,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Activation getActivation() {
@@ -279,7 +279,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetActivation(Activation newActivation, NotificationChain msgs) {
@@ -300,7 +300,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setActivation(Activation newActivation) {
@@ -326,7 +326,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetActivation(NotificationChain msgs) {
@@ -347,7 +347,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetActivation() {
@@ -369,7 +369,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetActivation() {
@@ -378,7 +378,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public BuildBase getBuild() {
@@ -387,7 +387,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetBuild(BuildBase newBuild, NotificationChain msgs) {
@@ -408,7 +408,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setBuild(BuildBase newBuild) {
@@ -434,7 +434,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetBuild(NotificationChain msgs) {
@@ -455,7 +455,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetBuild() {
@@ -476,7 +476,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetBuild() {
@@ -485,7 +485,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Repository> getRepositories() {
@@ -498,7 +498,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetRepositories() {
@@ -508,7 +508,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetRepositories() {
@@ -517,7 +517,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Repository> getPluginRepositories() {
@@ -530,7 +530,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPluginRepositories() {
@@ -540,7 +540,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPluginRepositories() {
@@ -549,7 +549,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Dependency> getDependencies() {
@@ -562,7 +562,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDependencies() {
@@ -572,7 +572,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDependencies() {
@@ -581,7 +581,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<ReportPlugin> getReports() {
@@ -594,7 +594,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetReports() {
@@ -604,7 +604,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetReports() {
@@ -613,7 +613,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DependencyManagement getDependencyManagement() {
@@ -622,7 +622,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetDependencyManagement(DependencyManagement newDependencyManagement,
@@ -645,7 +645,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDependencyManagement(DependencyManagement newDependencyManagement) {
@@ -671,7 +671,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetDependencyManagement(NotificationChain msgs) {
@@ -692,7 +692,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDependencyManagement() {
@@ -714,7 +714,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDependencyManagement() {
@@ -723,7 +723,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DistributionManagement getDistributionManagement() {
@@ -732,7 +732,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetDistributionManagement(DistributionManagement newDistributionManagement,
@@ -755,7 +755,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDistributionManagement(DistributionManagement newDistributionManagement) {
@@ -781,7 +781,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetDistributionManagement(NotificationChain msgs) {
@@ -802,7 +802,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDistributionManagement() {
@@ -824,7 +824,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDistributionManagement() {
@@ -833,7 +833,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<PropertyElement> getProperties() {
@@ -846,7 +846,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetProperties() {
@@ -856,7 +856,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetProperties() {
@@ -865,7 +865,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<String> getModules() {
@@ -877,7 +877,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Reporting getReporting() {
@@ -895,7 +895,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Reporting basicGetReporting() {
@@ -904,7 +904,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setReporting(Reporting newReporting) {
@@ -916,7 +916,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -946,7 +946,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -984,7 +984,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -1039,7 +1039,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -1087,7 +1087,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -1123,7 +1123,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

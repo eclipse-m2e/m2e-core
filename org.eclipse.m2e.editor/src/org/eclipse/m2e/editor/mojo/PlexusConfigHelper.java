@@ -59,7 +59,7 @@ public class PlexusConfigHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PlexusConfigHelper.class);
 
-  private Map<Class<?>, List<MojoParameter>> processedClasses;
+  private final Map<Class<?>, List<MojoParameter>> processedClasses;
 
   public PlexusConfigHelper() {
     processedClasses = new HashMap<>();
@@ -399,7 +399,7 @@ public class PlexusConfigHelper {
     }
     // remove common package names
     String pkg = name.substring(0, idx);
-    if(pkg.equals("java.lang") || pkg.equals("java.util") || pkg.equals("java.io")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    if("java.lang".equals(pkg) || "java.util".equals(pkg) || "java.io".equals(pkg)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       return clazz.getSimpleName();
     }
     return name;

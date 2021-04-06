@@ -45,14 +45,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.BuildImpl#getExtensions <em> Extensions</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The default value of the '{@link #getSourceDirectory() <em>Source Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getSourceDirectory()
    * @generated
    * @ordered
@@ -62,7 +62,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getSourceDirectory() <em>Source Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getSourceDirectory()
    * @generated
    * @ordered
@@ -72,7 +72,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The default value of the '{@link #getScriptSourceDirectory() <em>Script Source Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getScriptSourceDirectory()
    * @generated
    * @ordered
@@ -82,7 +82,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getScriptSourceDirectory() <em>Script Source Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getScriptSourceDirectory()
    * @generated
    * @ordered
@@ -92,7 +92,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The default value of the '{@link #getTestSourceDirectory() <em>Test Source Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getTestSourceDirectory()
    * @generated
    * @ordered
@@ -102,7 +102,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getTestSourceDirectory() <em>Test Source Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getTestSourceDirectory()
    * @generated
    * @ordered
@@ -112,7 +112,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The default value of the '{@link #getOutputDirectory() <em>Output Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getOutputDirectory()
    * @generated
    * @ordered
@@ -122,7 +122,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getOutputDirectory() <em>Output Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getOutputDirectory()
    * @generated
    * @ordered
@@ -132,7 +132,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The default value of the '{@link #getTestOutputDirectory() <em>Test Output Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getTestOutputDirectory()
    * @generated
    * @ordered
@@ -142,7 +142,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getTestOutputDirectory() <em>Test Output Directory</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getTestOutputDirectory()
    * @generated
    * @ordered
@@ -152,7 +152,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
   /**
    * The cached value of the '{@link #getExtensions() <em>Extensions</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getExtensions()
    * @generated
    * @ordered
@@ -161,7 +161,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected BuildImpl() {
@@ -170,7 +170,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -180,7 +180,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getSourceDirectory() {
@@ -189,7 +189,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSourceDirectory(String newSourceDirectory) {
@@ -202,7 +202,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getScriptSourceDirectory() {
@@ -211,7 +211,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setScriptSourceDirectory(String newScriptSourceDirectory) {
@@ -224,7 +224,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getTestSourceDirectory() {
@@ -233,7 +233,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setTestSourceDirectory(String newTestSourceDirectory) {
@@ -246,7 +246,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getOutputDirectory() {
@@ -255,7 +255,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setOutputDirectory(String newOutputDirectory) {
@@ -268,7 +268,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getTestOutputDirectory() {
@@ -277,7 +277,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setTestOutputDirectory(String newTestOutputDirectory) {
@@ -290,7 +290,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Extension> getExtensions() {
@@ -303,7 +303,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetExtensions() {
@@ -313,7 +313,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetExtensions() {
@@ -322,7 +322,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -336,7 +336,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -360,7 +360,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -392,7 +392,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -422,7 +422,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -451,7 +451,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

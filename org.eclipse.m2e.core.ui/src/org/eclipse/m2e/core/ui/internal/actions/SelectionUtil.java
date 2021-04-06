@@ -370,7 +370,7 @@ public class SelectionUtil {
           if(input instanceof IFileEditorInput) {
             IFileEditorInput fileInput = (IFileEditorInput) input;
             file = fileInput.getFile();
-            if(file.getName().equals(IMavenConstants.POM_FILE_NAME)) {
+            if(IMavenConstants.POM_FILE_NAME.equals(file.getName())) {
               return file;
             }
           }

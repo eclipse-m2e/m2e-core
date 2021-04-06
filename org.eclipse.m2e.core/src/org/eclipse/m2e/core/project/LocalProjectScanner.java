@@ -50,7 +50,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   private final boolean basedirRemameRequired;
 
-  private Set<File> scannedFolders = new HashSet<>();
+  private final Set<File> scannedFolders = new HashSet<>();
 
   private final MavenModelManager modelManager;
 

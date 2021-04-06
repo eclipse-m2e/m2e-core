@@ -73,7 +73,7 @@ public class ModuleSupport {
 
   /**
    * Sets <code>module</code> flag to <code>true</code> to classpath dependencies declared in module-info.java
-   * 
+   *
    * @param facade a Maven facade project
    * @param classpath a classpath descriptor
    * @param monitor a progress monitor

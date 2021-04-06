@@ -29,10 +29,9 @@ For more information, please see the Eclipse Committer Handbook:
 
 Eclipse m2e use mainly 2 channels for strategical and technical discussions
 
-* 📧 Mailing-list: Join the m2e-dev@eclipse.org mailing-list and browse archive at [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
-* 🐞 Issue management: m2e project uses Bugzilla to track ongoing development and issues.
-    * Search for issues: [https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e](https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e)
-    * Create a new report: [https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e](https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e)
+* 🐞 View and report issues through uses GitHub Issues at https://github.com/eclipse-m2e/m2e-core/issues. _📜 Migration to GitHub tracker took place in March 2021, for older tickets, see https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e 📜_
+* 📧 Join the m2e-dev@eclipse.org mailing-list to get in touch with other contributors aboantiqueut project organizationa and planning, and browse archive at 📜 [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
+
 
 ## 🆕 Trying latest builds
 
@@ -40,14 +39,30 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 ## 🧑‍💻 Developer resources
 
- <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a>  
+### Source repositories
 
-* Development Environment: [https://www.eclipse.org/m2e/documentation/m2e-development-environment.html](https://www.eclipse.org/m2e/documentation/m2e-development-environment.html) (documentation currently on wiki, but contributions to move it back into this Git repo are welcome!)
-* m2e only accepts contributions via GitHub Pull Requests against [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) repository.
+Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
+
+Some tests are in a separate repository, that you should clone as well: see https://github.com/tesla/m2e-core-tests/
+
+### ⌨️ Setting up the Development Environment
+
+* Use latest release of the Eclipse SDK or Eclipse IDE with the Plugin Development Environment installed.
+* Make sure m2e is installed in this IDE, including the "m2e PDE" feature,
+* _File > Open Projects from Filesystem..._ , select the path to m2e-core Git repo and the relevant children projects you want to import; approve m2e connectors installation if prompted
+* Depending on the task you're planning to work on, multiple workflows are available to configure the [target-platform](https://help.eclipse.org/2021-03/topic/org.eclipse.pde.doc.user/concepts/target.htm?cp=4_1_5)
+    * In many cases, this simplest workflow will be sufficient: Install latest m2e snapshot in your target-platform (can be your current IDE), or
+    * If you don't want to mix versions of m2e, open  __target-platform/dev-worksace.target__  and  _Set as Target-Platform_  from the editor, or
+    * In case you're working on the content of the `m2e-maven-runtime` folder, then run `mvn install -f m2e-maven-runtime/` after your changes to deploy them locally and then tweak the  _target-platform/dev-worksace.target_  to reference the versions of those artifacts you build locally and reload this target platform
+* Open the project modules you want to work on (right-click > Open project) and their dependencies; approve m2e connectors installation if prompted
+* Happy coding!
+
+
+If you're going to hack the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` as a preliminary step and to hack your target-platform to include the output of the build.
 
 ### 🏗️ Build
 
-First `mvn install` from the _m2e-maven-runtime_ folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to yur command in order to run them.
+First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them.
 
 ### ⬆️ Version bump
 
@@ -65,3 +80,7 @@ The delta for version bumps are:
 * `+0.1.0` (next minor) for an API addition
 * `+1.0.0` (next major) for an API breakage (needs to be discussed on the mailing-list first)
 * If some "smaller" bump already took place, you can replace it with your "bigger one". Eg, if last release has org.eclipse.m2e.editor 1.16.1; and someone already bumped version to 1.16.2 (for an internal change) and you're adding a new API, then you need to change version to 1.17.0
+
+### ➕ Submit changes
+
+m2e only accepts contributions via GitHub Pull Requests against [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) repository.

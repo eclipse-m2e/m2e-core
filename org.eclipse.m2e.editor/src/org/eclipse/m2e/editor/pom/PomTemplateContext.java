@@ -594,11 +594,11 @@ public enum PomTemplateContext {
 
   private final String contextSuffix;
 
-  private PomTemplateContext(String nodeName) {
+  PomTemplateContext(String nodeName) {
     this(nodeName, nodeName);
   }
 
-  private PomTemplateContext(String nodeName, String contextSuffix) {
+  PomTemplateContext(String nodeName, String contextSuffix) {
     this.nodeName = nodeName;
     this.contextSuffix = contextSuffix;
   }
@@ -759,7 +759,7 @@ public enum PomTemplateContext {
     Node moduleNode = node;
     if(moduleNode != null) {
       Node modulesNode;
-      if(moduleNode.getLocalName().equals("modules")) {
+      if("modules".equals(moduleNode.getLocalName())) {
         modulesNode = moduleNode;
       } else {
         modulesNode = moduleNode.getParentNode();

@@ -289,7 +289,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
 
   class CatalogsLabelProvider implements ITableLabelProvider, IColorProvider {
 
-    private Color disabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
+    private final Color disabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 
     public String getColumnText(Object element, int columnIndex) {
       ArchetypeCatalogFactory factory = (ArchetypeCatalogFactory) element;

@@ -44,7 +44,7 @@ public class ProjectImportConfiguration {
   private static final String NAME = "\\[name\\]"; //$NON-NLS-1$
 
   /** resolver configuration bean */
-  private ResolverConfiguration resolverConfiguration;
+  private final ResolverConfiguration resolverConfiguration;
 
   /** the project name template */
   private String projectNameTemplate = ""; //$NON-NLS-1$

@@ -64,13 +64,13 @@ import org.eclipse.m2e.model.edit.pom.Site;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
   /**
    * Creates the default factory implementation. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public static PomFactory init() {
@@ -88,7 +88,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * Creates an instance of the factory. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomFactoryImpl() {
@@ -97,7 +97,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -189,7 +189,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Activation createActivation() {
@@ -199,7 +199,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationFile createActivationFile() {
@@ -209,7 +209,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationOS createActivationOS() {
@@ -219,7 +219,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationProperty createActivationProperty() {
@@ -229,7 +229,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Build createBuild() {
@@ -239,7 +239,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public BuildBase createBuildBase() {
@@ -249,7 +249,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public CiManagement createCiManagement() {
@@ -259,7 +259,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Contributor createContributor() {
@@ -269,7 +269,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Dependency createDependency() {
@@ -279,7 +279,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DependencyManagement createDependencyManagement() {
@@ -289,7 +289,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DeploymentRepository createDeploymentRepository() {
@@ -299,7 +299,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Developer createDeveloper() {
@@ -309,7 +309,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DistributionManagement createDistributionManagement() {
@@ -319,7 +319,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DocumentRoot createDocumentRoot() {
@@ -329,7 +329,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Exclusion createExclusion() {
@@ -339,7 +339,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Extension createExtension() {
@@ -349,7 +349,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public IssueManagement createIssueManagement() {
@@ -359,7 +359,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public License createLicense() {
@@ -369,7 +369,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public MailingList createMailingList() {
@@ -379,7 +379,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Model createModel() {
@@ -389,7 +389,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Notifier createNotifier() {
@@ -399,7 +399,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Organization createOrganization() {
@@ -409,7 +409,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Parent createParent() {
@@ -419,7 +419,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Plugin createPlugin() {
@@ -429,7 +429,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PluginExecution createPluginExecution() {
@@ -439,7 +439,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PluginManagement createPluginManagement() {
@@ -449,7 +449,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Prerequisites createPrerequisites() {
@@ -459,7 +459,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Profile createProfile() {
@@ -469,7 +469,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Relocation createRelocation() {
@@ -479,7 +479,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Reporting createReporting() {
@@ -489,7 +489,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ReportPlugin createReportPlugin() {
@@ -499,7 +499,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ReportSet createReportSet() {
@@ -509,7 +509,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Repository createRepository() {
@@ -519,7 +519,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public RepositoryPolicy createRepositoryPolicy() {
@@ -529,7 +529,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Resource createResource() {
@@ -539,7 +539,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Scm createScm() {
@@ -549,7 +549,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Site createSite() {
@@ -559,7 +559,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PropertyElement createPropertyElement() {
@@ -569,7 +569,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration createConfiguration() {
@@ -579,7 +579,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomPackage getPomPackage() {
@@ -588,7 +588,7 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @deprecated
    * @generated
    */

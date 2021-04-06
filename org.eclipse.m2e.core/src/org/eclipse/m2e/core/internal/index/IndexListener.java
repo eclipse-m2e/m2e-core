@@ -23,12 +23,12 @@ import org.eclipse.m2e.core.repository.IRepository;
  */
 public interface IndexListener {
 
-  public void indexAdded(IRepository repository);
+  void indexAdded(IRepository repository);
 
-  public void indexRemoved(IRepository repository);
+  void indexRemoved(IRepository repository);
 
-  public void indexChanged(IRepository repository);
+  void indexChanged(IRepository repository);
 
-  public void indexUpdating(IRepository repository);
+  void indexUpdating(IRepository repository);
 
 }

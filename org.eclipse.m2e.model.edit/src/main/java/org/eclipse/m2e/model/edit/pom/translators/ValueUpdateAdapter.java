@@ -39,9 +39,9 @@ class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
   /**
      *
      */
-  private EObject modelObject;
+  private final EObject modelObject;
 
-  private EStructuralFeature feature;
+  private final EStructuralFeature feature;
 
   private List<Node> linkedWhitespaceNodes = Collections.emptyList();
 

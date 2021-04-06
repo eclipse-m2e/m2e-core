@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.widgets.Section;
 public class SectionExpansionAdapter extends ExpansionAdapter {
   private boolean inProgress = false;
 
-  private Section[] sections;
+  private final Section[] sections;
 
   public SectionExpansionAdapter(Section[] sections) {
     this.sections = sections;

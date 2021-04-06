@@ -83,9 +83,9 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
   private boolean initialized = false;
 
-  private LifecycleMappingDiscoveryRequest mappingDiscoveryRequest;
+  private final LifecycleMappingDiscoveryRequest mappingDiscoveryRequest;
 
-  private Collection<IProject> projects;
+  private final Collection<IProject> projects;
 
   private IMavenDiscoveryUI pageFactory;
 

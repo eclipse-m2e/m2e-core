@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Parent#getRelativePath <em>Relative Path</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getParent()
  * @model extendedMetaData="name='Parent' kind='elementOnly'"
  * @generated
@@ -37,7 +37,7 @@ public interface Parent extends EObject {
   /**
    * Returns the value of the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 4.0.0 The artifact id of the parent project to inherit from. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Artifact Id</em>' attribute.
    * @see #setArtifactId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getParent_ArtifactId()
@@ -50,7 +50,7 @@ public interface Parent extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Parent#getArtifactId <em>Artifact Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Artifact Id</em>' attribute.
    * @see #getArtifactId()
    * @generated
@@ -60,7 +60,7 @@ public interface Parent extends EObject {
   /**
    * Returns the value of the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The group id of the parent project to inherit from. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Group Id</em>' attribute.
    * @see #setGroupId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getParent_GroupId()
@@ -73,7 +73,7 @@ public interface Parent extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Parent#getGroupId <em>Group Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Group Id</em>' attribute.
    * @see #getGroupId()
    * @generated
@@ -83,7 +83,7 @@ public interface Parent extends EObject {
   /**
    * Returns the value of the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The version of the parent project to inherit. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Version</em>' attribute.
    * @see #setVersion(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getParent_Version()
@@ -96,7 +96,7 @@ public interface Parent extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Parent#getVersion <em>Version</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Version</em>' attribute.
    * @see #getVersion()
    * @generated
@@ -113,7 +113,7 @@ public interface Parent extends EObject {
    * ID and version are still required, and must match the file in the location given or it will revert to the
    * repository for the POM. This feature is only for enhancing the development in a local checkout of that project.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Relative Path</em>' attribute.
    * @see #setRelativePath(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getParent_RelativePath()
@@ -126,7 +126,7 @@ public interface Parent extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Parent#getRelativePath <em>Relative Path</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Relative Path</em>' attribute.
    * @see #getRelativePath()
    * @generated

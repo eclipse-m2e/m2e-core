@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.MailingList#getOtherArchives <em> Other Archives</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList()
  * @model extendedMetaData="name='MailingList' kind='elementOnly'"
  * @generated
@@ -41,7 +41,7 @@ public interface MailingList extends EObject {
   /**
    * Returns the value of the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The name of the mailing list. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Name</em>' attribute.
    * @see #setName(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList_Name()
@@ -54,7 +54,7 @@ public interface MailingList extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getName <em>Name</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Name</em>' attribute.
    * @see #getName()
    * @generated
@@ -66,7 +66,7 @@ public interface MailingList extends EObject {
    * begin-model-doc --> 3.0.0+ The email address or link that can be used to subscribe to the mailing list. If this is
    * an email address, a &lt;code&gt;mailto:&lt;/code&gt; link will automatically be created when the documentation is
    * created. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Subscribe</em>' attribute.
    * @see #setSubscribe(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList_Subscribe()
@@ -79,7 +79,7 @@ public interface MailingList extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getSubscribe <em>Subscribe</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Subscribe</em>' attribute.
    * @see #getSubscribe()
    * @generated
@@ -91,7 +91,7 @@ public interface MailingList extends EObject {
    * <!-- begin-model-doc --> 3.0.0+ The email address or link that can be used to unsubscribe to the mailing list. If
    * this is an email address, a &lt;code&gt;mailto:&lt;/code&gt; link will automatically be created when the
    * documentation is created. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Unsubscribe</em>' attribute.
    * @see #setUnsubscribe(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList_Unsubscribe()
@@ -104,7 +104,7 @@ public interface MailingList extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getUnsubscribe <em>Unsubscribe</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Unsubscribe</em>' attribute.
    * @see #getUnsubscribe()
    * @generated
@@ -116,7 +116,7 @@ public interface MailingList extends EObject {
    * begin-model-doc --> 3.0.0+ The email address or link that can be used to post to the mailing list. If this is an
    * email address, a &lt;code&gt;mailto:&lt;/code&gt; link will automatically be created when the documentation is
    * created. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Post</em>' attribute.
    * @see #setPost(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList_Post()
@@ -129,7 +129,7 @@ public interface MailingList extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getPost <em>Post</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Post</em>' attribute.
    * @see #getPost()
    * @generated
@@ -139,7 +139,7 @@ public interface MailingList extends EObject {
   /**
    * Returns the value of the '<em><b>Archive</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The link to a URL where you can browse the mailing list archive. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Archive</em>' attribute.
    * @see #setArchive(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getMailingList_Archive()
@@ -152,7 +152,7 @@ public interface MailingList extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getArchive <em>Archive</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Archive</em>' attribute.
    * @see #getArchive()
    * @generated
@@ -167,7 +167,7 @@ public interface MailingList extends EObject {
    * description here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Other Archives</em>' attribute list.
    * @see #isSetOtherArchives()
    * @see #unsetOtherArchives()
@@ -180,7 +180,7 @@ public interface MailingList extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getOtherArchives
    * <em>Other Archives</em>}' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetOtherArchives()
    * @see #getOtherArchives()
    * @generated
@@ -190,7 +190,7 @@ public interface MailingList extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.MailingList#getOtherArchives
    * <em>Other Archives</em>}' attribute list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Other Archives</em>' attribute list is set.
    * @see #unsetOtherArchives()
    * @see #getOtherArchives()

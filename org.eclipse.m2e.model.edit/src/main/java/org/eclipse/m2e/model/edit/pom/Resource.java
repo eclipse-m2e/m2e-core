@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Resource#getExcludes <em>Excludes </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getResource()
  * @model extendedMetaData="name='Resource' kind='elementOnly'"
  * @generated
@@ -43,7 +43,7 @@ public interface Resource extends EObject {
    * in a specific package (&lt;code&gt;org.apache.maven.messages&lt;/code&gt;), you must specify this element with this
    * value: &lt;code&gt;org/apache/maven/messages&lt;/code&gt;. This is not required if you simply put the resources in
    * that directory structure at the source, however. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Target Path</em>' attribute.
    * @see #setTargetPath(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getResource_TargetPath()
@@ -56,7 +56,7 @@ public interface Resource extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Resource#getTargetPath <em>Target Path</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Target Path</em>' attribute.
    * @see #getTargetPath()
    * @generated
@@ -68,7 +68,7 @@ public interface Resource extends EObject {
    * begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc --> 3.0.0+ Whether resources are filtered to replace
    * tokens with parameterised values or not. The values are taken from the &lt;code&gt;properties&lt;/code&gt; element
    * and from the properties in the files listed in the &lt;code&gt;filters&lt;/code&gt; element. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Filtering</em>' attribute.
    * @see #isSetFiltering()
    * @see #unsetFiltering()
@@ -83,7 +83,7 @@ public interface Resource extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Resource#getFiltering <em>Filtering</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Filtering</em>' attribute.
    * @see #isSetFiltering()
    * @see #unsetFiltering()
@@ -95,7 +95,7 @@ public interface Resource extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Resource#getFiltering <em>Filtering</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetFiltering()
    * @see #getFiltering()
    * @see #setFiltering(String)
@@ -106,7 +106,7 @@ public interface Resource extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Resource#getFiltering <em>Filtering</em>}'
    * attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Filtering</em>' attribute is set.
    * @see #unsetFiltering()
    * @see #getFiltering()
@@ -119,7 +119,7 @@ public interface Resource extends EObject {
    * Returns the value of the '<em><b>Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ Describe the directory where the resources are stored. The path is relative to the POM.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Directory</em>' attribute.
    * @see #setDirectory(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getResource_Directory()
@@ -132,7 +132,7 @@ public interface Resource extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Resource#getDirectory <em>Directory</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Directory</em>' attribute.
    * @see #getDirectory()
    * @generated
@@ -147,7 +147,7 @@ public interface Resource extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Includes</em>' attribute list.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getResource_Includes()
    * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
@@ -163,7 +163,7 @@ public interface Resource extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Excludes</em>' attribute list.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getResource_Excludes()
    * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"

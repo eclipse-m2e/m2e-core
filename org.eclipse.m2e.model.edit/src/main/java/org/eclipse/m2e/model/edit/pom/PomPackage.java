@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EReference;
  * <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomFactory
  * @model kind="package"
  * @generated
@@ -36,28 +36,28 @@ import org.eclipse.emf.ecore.EReference;
 public interface PomPackage extends EPackage {
   /**
    * The package name. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   String eNAME = "pom"; //$NON-NLS-1$
 
   /**
    * The package namespace URI. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   String eNS_URI = "http://maven.apache.org/POM/4.0.0"; //$NON-NLS-1$
 
   /**
    * The package namespace name. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   String eNS_PREFIX = "pom"; //$NON-NLS-1$
 
   /**
    * The singleton instance of the package. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   PomPackage eINSTANCE = org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl.init();
@@ -65,7 +65,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ActivationImpl <em>Activation</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ActivationImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivation()
    * @generated
@@ -74,7 +74,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Active By Default</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -82,7 +82,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Jdk</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -90,7 +90,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Os</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -99,7 +99,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Property</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -107,7 +107,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>File</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -115,7 +115,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Activation</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -124,7 +124,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationFileImpl <em>Activation File</em>}
    * ' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ActivationFileImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationFile()
    * @generated
@@ -133,7 +133,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Missing</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -141,7 +141,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Exists</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -150,7 +150,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Activation File</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -159,7 +159,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ActivationOSImpl <em>Activation OS</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ActivationOSImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationOS()
    * @generated
@@ -168,7 +168,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -176,7 +176,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Family</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -184,7 +184,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Arch</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -192,7 +192,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -201,7 +201,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Activation OS</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -210,7 +210,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationPropertyImpl
    * <em>Activation Property</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ActivationPropertyImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationProperty()
    * @generated
@@ -219,7 +219,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -227,7 +227,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Value</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -236,7 +236,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Activation Property</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -245,7 +245,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.BuildBaseImpl <em>Build Base</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.BuildBaseImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getBuildBase()
    * @generated
@@ -254,7 +254,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Default Goal</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -263,7 +263,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Resources</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -272,7 +272,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Test Resources</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -280,7 +280,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -288,7 +288,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Final Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -297,7 +297,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugin Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -306,7 +306,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugins</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -314,7 +314,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Filters</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -322,7 +322,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Build Base</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -331,7 +331,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.BuildImpl <em>Build</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.BuildImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getBuild()
    * @generated
@@ -340,7 +340,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Default Goal</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -349,7 +349,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Resources</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -358,7 +358,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Test Resources</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -366,7 +366,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -374,7 +374,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Final Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -383,7 +383,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugin Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -392,7 +392,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugins</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -400,7 +400,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Filters</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -408,7 +408,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Source Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -417,7 +417,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Script Source Directory</b></em>' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -426,7 +426,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Test Source Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -434,7 +434,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Output Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -443,7 +443,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Test Output Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -452,7 +452,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Extensions</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -460,7 +460,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Build</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -469,7 +469,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.CiManagementImpl <em>Ci Management</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.CiManagementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getCiManagement()
    * @generated
@@ -478,7 +478,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>System</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -486,7 +486,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -495,7 +495,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Notifiers</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -504,7 +504,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Ci Management</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -513,7 +513,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ContributorImpl <em>Contributor</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ContributorImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getContributor()
    * @generated
@@ -522,7 +522,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -530,7 +530,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Email</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -538,7 +538,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -546,7 +546,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Organization</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -554,7 +554,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Organization Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -562,7 +562,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Timezone</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -571,7 +571,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Properties</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -579,7 +579,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Roles</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -588,7 +588,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Contributor</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -597,7 +597,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.DependencyImpl <em>Dependency</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DependencyImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDependency()
    * @generated
@@ -606,7 +606,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -614,7 +614,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -622,7 +622,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -630,7 +630,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Type</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -638,7 +638,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Classifier</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -646,7 +646,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Scope</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -654,7 +654,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>System Path</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -663,7 +663,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Exclusions</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -671,7 +671,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Optional</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -679,7 +679,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Dependency</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -688,7 +688,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.DependencyManagementImpl
    * <em>Dependency Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DependencyManagementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDependencyManagement()
    * @generated
@@ -698,7 +698,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependencies</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -707,7 +707,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Dependency Management</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -716,7 +716,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.DeploymentRepositoryImpl
    * <em>Deployment Repository</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DeploymentRepositoryImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDeploymentRepository()
    * @generated
@@ -725,7 +725,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Unique Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -733,7 +733,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -741,7 +741,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -749,7 +749,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -757,7 +757,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Layout</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -766,7 +766,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Deployment Repository</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -775,7 +775,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.DeveloperImpl <em>Developer</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DeveloperImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDeveloper()
    * @generated
@@ -784,7 +784,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -792,7 +792,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -800,7 +800,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Email</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -808,7 +808,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -816,7 +816,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Organization</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -824,7 +824,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Organization Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -832,7 +832,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Timezone</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -841,7 +841,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Properties</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -849,7 +849,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Roles</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -857,7 +857,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Developer</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -866,7 +866,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.DistributionManagementImpl
    * <em>Distribution Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DistributionManagementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDistributionManagement()
    * @generated
@@ -876,7 +876,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Repository</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -885,7 +885,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Snapshot Repository</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -893,7 +893,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Site</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -901,7 +901,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Download Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -910,7 +910,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Relocation</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -918,7 +918,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Status</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -927,7 +927,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Distribution Management</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -936,7 +936,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.DocumentRootImpl <em>Document Root</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.DocumentRootImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDocumentRoot()
    * @generated
@@ -945,7 +945,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Mixed</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -953,7 +953,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>XMLNS Prefix Map</b></em>' map. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -961,7 +961,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>XSI Schema Location</b></em>' map. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -970,7 +970,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Project</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -979,7 +979,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Document Root</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -988,7 +988,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ExclusionImpl <em>Exclusion</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ExclusionImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getExclusion()
    * @generated
@@ -997,7 +997,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1005,7 +1005,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1013,7 +1013,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Exclusion</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1022,7 +1022,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ExtensionImpl <em>Extension</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ExtensionImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getExtension()
    * @generated
@@ -1031,7 +1031,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1039,7 +1039,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1047,7 +1047,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1055,7 +1055,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Extension</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1064,7 +1064,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.IssueManagementImpl
    * <em>Issue Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.IssueManagementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getIssueManagement()
    * @generated
@@ -1073,7 +1073,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>System</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1081,7 +1081,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1090,7 +1090,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Issue Management</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1099,7 +1099,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.LicenseImpl <em>License</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.LicenseImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getLicense()
    * @generated
@@ -1108,7 +1108,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1116,7 +1116,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1124,7 +1124,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Distribution</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1132,7 +1132,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Comments</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1140,7 +1140,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>License</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1149,7 +1149,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.MailingListImpl <em>Mailing List</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.MailingListImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getMailingList()
    * @generated
@@ -1158,7 +1158,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1166,7 +1166,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Subscribe</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1174,7 +1174,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Unsubscribe</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1182,7 +1182,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Post</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1190,7 +1190,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Archive</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1199,7 +1199,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Other Archives</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1208,7 +1208,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Mailing List</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1217,7 +1217,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ModelImpl <em>Model</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ModelImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getModel()
    * @generated
@@ -1227,7 +1227,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Parent</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1235,7 +1235,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Model Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1243,7 +1243,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1251,7 +1251,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1259,7 +1259,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Packaging</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1267,7 +1267,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1275,7 +1275,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1283,7 +1283,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Description</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1291,7 +1291,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1300,7 +1300,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Prerequisites</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1309,7 +1309,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Issue Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1318,7 +1318,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Ci Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1326,7 +1326,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Inception Year</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1335,7 +1335,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Mailing Lists</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1344,7 +1344,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Developers</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1353,7 +1353,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Contributors</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1362,7 +1362,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Licenses</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1370,7 +1370,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Scm</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1379,7 +1379,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Organization</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1387,7 +1387,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Build</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1396,7 +1396,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Profiles</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1405,7 +1405,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Repositories</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1414,7 +1414,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugin Repositories</b></em>' containment reference list. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1423,7 +1423,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependencies</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1432,7 +1432,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Reporting</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1441,7 +1441,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependency Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1450,7 +1450,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Distribution Management</b></em>' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1459,7 +1459,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Properties</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1467,7 +1467,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Modules</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1475,7 +1475,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Model</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1484,7 +1484,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.NotifierImpl <em>Notifier</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.NotifierImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getNotifier()
    * @generated
@@ -1493,7 +1493,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Type</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1501,7 +1501,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Send On Error</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1509,7 +1509,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Send On Failure</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1517,7 +1517,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Send On Success</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1525,7 +1525,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Send On Warning</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1533,7 +1533,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Address</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1542,7 +1542,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Configuration</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1550,7 +1550,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Notifier</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1559,7 +1559,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.OrganizationImpl <em>Organization</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.OrganizationImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getOrganization()
    * @generated
@@ -1568,7 +1568,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1576,7 +1576,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1585,7 +1585,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Organization</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1594,7 +1594,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ParentImpl <em>Parent</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ParentImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getParent()
    * @generated
@@ -1603,7 +1603,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1611,7 +1611,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1619,7 +1619,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1627,7 +1627,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Relative Path</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1635,7 +1635,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Parent</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1644,7 +1644,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginImpl <em>Plugin</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.PluginImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPlugin()
    * @generated
@@ -1653,7 +1653,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1661,7 +1661,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1669,7 +1669,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1677,7 +1677,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Extensions</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1686,7 +1686,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Executions</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1695,7 +1695,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependencies</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1703,7 +1703,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1711,7 +1711,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Configuration</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1719,7 +1719,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Plugin</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1728,7 +1728,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginExecutionImpl
    * <em>Plugin Execution</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.PluginExecutionImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPluginExecution()
    * @generated
@@ -1737,7 +1737,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1745,7 +1745,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Phase</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1753,7 +1753,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1761,7 +1761,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Goals</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1769,7 +1769,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Configuration</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1778,7 +1778,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Plugin Execution</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1787,7 +1787,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginManagementImpl
    * <em>Plugin Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.PluginManagementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPluginManagement()
    * @generated
@@ -1797,7 +1797,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugins</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1806,7 +1806,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Plugin Management</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1815,7 +1815,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.PrerequisitesImpl <em>Prerequisites</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.PrerequisitesImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPrerequisites()
    * @generated
@@ -1824,7 +1824,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Maven</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1833,7 +1833,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Prerequisites</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1842,7 +1842,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ProfileImpl <em>Profile</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ProfileImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getProfile()
    * @generated
@@ -1851,7 +1851,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1860,7 +1860,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Activation</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1868,7 +1868,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Build</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1877,7 +1877,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Repositories</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1886,7 +1886,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugin Repositories</b></em>' containment reference list. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1895,7 +1895,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependencies</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1904,7 +1904,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Reports</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1913,7 +1913,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Dependency Management</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1922,7 +1922,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Distribution Management</b></em>' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1931,7 +1931,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Properties</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1939,7 +1939,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Modules</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1947,7 +1947,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Reporting</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1955,7 +1955,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Profile</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1964,7 +1964,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.RelocationImpl <em>Relocation</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.RelocationImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRelocation()
    * @generated
@@ -1973,7 +1973,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1981,7 +1981,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1989,7 +1989,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -1997,7 +1997,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Message</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2005,7 +2005,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Relocation</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2014,7 +2014,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ReportingImpl <em>Reporting</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ReportingImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReporting()
    * @generated
@@ -2023,7 +2023,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Exclude Defaults</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2031,7 +2031,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Output Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2040,7 +2040,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Plugins</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2048,7 +2048,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Reporting</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2057,7 +2057,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ReportPluginImpl <em>Report Plugin</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ReportPluginImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReportPlugin()
    * @generated
@@ -2066,7 +2066,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2074,7 +2074,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2082,7 +2082,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2090,7 +2090,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2099,7 +2099,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Report Sets</b></em>' containment reference list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2107,7 +2107,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Configuration</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2116,7 +2116,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Report Plugin</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2125,7 +2125,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ReportSetImpl <em>Report Set</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ReportSetImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReportSet()
    * @generated
@@ -2134,7 +2134,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2142,7 +2142,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2150,7 +2150,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Reports</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2158,7 +2158,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Configuration</b></em>' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2166,7 +2166,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Report Set</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2175,7 +2175,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.RepositoryImpl <em>Repository</em>}' class.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.RepositoryImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRepository()
    * @generated
@@ -2185,7 +2185,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Releases</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2194,7 +2194,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Snapshots</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2202,7 +2202,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2210,7 +2210,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2218,7 +2218,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2226,7 +2226,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Layout</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2234,7 +2234,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Repository</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2243,7 +2243,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.RepositoryPolicyImpl
    * <em>Repository Policy</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.RepositoryPolicyImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRepositoryPolicy()
    * @generated
@@ -2252,7 +2252,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Enabled</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2260,7 +2260,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Update Policy</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2268,7 +2268,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Checksum Policy</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2277,7 +2277,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Repository Policy</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2286,7 +2286,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ResourceImpl <em>Resource</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ResourceImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getResource()
    * @generated
@@ -2295,7 +2295,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Target Path</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2303,7 +2303,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Filtering</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2311,7 +2311,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Directory</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2319,7 +2319,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Includes</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2327,7 +2327,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Excludes</b></em>' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2335,7 +2335,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Resource</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2344,7 +2344,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.ScmImpl <em>Scm</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ScmImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getScm()
    * @generated
@@ -2353,7 +2353,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Connection</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2362,7 +2362,7 @@ public interface PomPackage extends EPackage {
   /**
    * The feature id for the '<em><b>Developer Connection</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2370,7 +2370,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Tag</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2378,7 +2378,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2386,7 +2386,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Scm</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2395,7 +2395,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.SiteImpl <em>Site</em>}' class. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.SiteImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getSite()
    * @generated
@@ -2404,7 +2404,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2412,7 +2412,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2420,7 +2420,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2428,7 +2428,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The number of structural features of the '<em>Site</em>' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2437,7 +2437,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the '{@link org.eclipse.m2e.model.edit.pom.impl.PropertyElementImpl
    * <em>Property Element</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.PropertyElementImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPropertyElement()
    * @generated
@@ -2446,7 +2446,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2454,7 +2454,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * The feature id for the '<em><b>Value</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2463,7 +2463,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Property Element</em>' class. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2472,7 +2472,7 @@ public interface PomPackage extends EPackage {
   /**
    * The meta object id for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl <em>Configuration</em>}'
    * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl
    * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getConfiguration()
    * @generated
@@ -2482,7 +2482,7 @@ public interface PomPackage extends EPackage {
   /**
    * The number of structural features of the '<em>Configuration</em>' class. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -2491,7 +2491,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Activation <em>Activation</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Activation</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation
    * @generated
@@ -2501,7 +2501,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Activation#getActiveByDefault
    * <em>Active By Default</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Active By Default</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation#getActiveByDefault()
    * @see #getActivation()
@@ -2512,7 +2512,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Activation#getJdk <em>Jdk</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Jdk</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation#getJdk()
    * @see #getActivation()
@@ -2523,7 +2523,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference ' {@link org.eclipse.m2e.model.edit.pom.Activation#getOs
    * <em>Os</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Os</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation#getOs()
    * @see #getActivation()
@@ -2535,7 +2535,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Activation#getProperty <em>Property</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Property</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation#getProperty()
    * @see #getActivation()
@@ -2546,7 +2546,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Activation#getFile
    * <em>File</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>File</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Activation#getFile()
    * @see #getActivation()
@@ -2557,7 +2557,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.ActivationFile <em>Activation File</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Activation File</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationFile
    * @generated
@@ -2567,7 +2567,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationFile#getMissing
    * <em>Missing</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Missing</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationFile#getMissing()
    * @see #getActivationFile()
@@ -2578,7 +2578,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationFile#getExists
    * <em>Exists</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Exists</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationFile#getExists()
    * @see #getActivationFile()
@@ -2589,7 +2589,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.ActivationOS <em>Activation OS</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Activation OS</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS
    * @generated
@@ -2599,7 +2599,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationOS#getName
    * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS#getName()
    * @see #getActivationOS()
@@ -2610,7 +2610,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationOS#getFamily
    * <em>Family</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Family</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS#getFamily()
    * @see #getActivationOS()
@@ -2621,7 +2621,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationOS#getArch
    * <em>Arch</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Arch</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS#getArch()
    * @see #getActivationOS()
@@ -2632,7 +2632,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationOS#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS#getVersion()
    * @see #getActivationOS()
@@ -2643,7 +2643,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.ActivationProperty
    * <em>Activation Property</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Activation Property</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationProperty
    * @generated
@@ -2653,7 +2653,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationProperty#getName
    * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationProperty#getName()
    * @see #getActivationProperty()
@@ -2664,7 +2664,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ActivationProperty#getValue
    * <em>Value</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Value</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ActivationProperty#getValue()
    * @see #getActivationProperty()
@@ -2675,7 +2675,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Build <em>Build</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Build</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build
    * @generated
@@ -2685,7 +2685,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Build#getSourceDirectory
    * <em>Source Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Source Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getSourceDirectory()
    * @see #getBuild()
@@ -2696,7 +2696,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Build#getScriptSourceDirectory
    * <em>Script Source Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Script Source Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getScriptSourceDirectory()
    * @see #getBuild()
@@ -2707,7 +2707,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Build#getTestSourceDirectory
    * <em>Test Source Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Test Source Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getTestSourceDirectory()
    * @see #getBuild()
@@ -2718,7 +2718,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Build#getOutputDirectory
    * <em>Output Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Output Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getOutputDirectory()
    * @see #getBuild()
@@ -2729,7 +2729,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Build#getTestOutputDirectory
    * <em>Test Output Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Test Output Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getTestOutputDirectory()
    * @see #getBuild()
@@ -2741,7 +2741,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Build#getExtensions <em>Extensions</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Extensions</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Build#getExtensions()
    * @see #getBuild()
@@ -2752,7 +2752,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.BuildBase <em>Build Base</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Build Base</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase
    * @generated
@@ -2762,7 +2762,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.BuildBase#getDefaultGoal
    * <em>Default Goal</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Default Goal</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getDefaultGoal()
    * @see #getBuildBase()
@@ -2774,7 +2774,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.BuildBase#getResources <em>Resources</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Resources</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getResources()
    * @see #getBuildBase()
@@ -2786,7 +2786,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.BuildBase#getTestResources <em>Test Resources</em>}'. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Test Resources</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getTestResources()
    * @see #getBuildBase()
@@ -2797,7 +2797,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.BuildBase#getDirectory
    * <em>Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getDirectory()
    * @see #getBuildBase()
@@ -2808,7 +2808,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.BuildBase#getFinalName
    * <em>Final Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Final Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getFinalName()
    * @see #getBuildBase()
@@ -2820,7 +2820,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.BuildBase#getPluginManagement <em>Plugin Management</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference ' <em>Plugin Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getPluginManagement()
    * @see #getBuildBase()
@@ -2832,7 +2832,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.BuildBase#getPlugins <em>Plugins</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Plugins</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getPlugins()
    * @see #getBuildBase()
@@ -2843,7 +2843,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.BuildBase#getFilters
    * <em>Filters</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Filters</em>'.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase#getFilters()
    * @see #getBuildBase()
@@ -2854,7 +2854,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.CiManagement <em>Ci Management</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Ci Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.CiManagement
    * @generated
@@ -2864,7 +2864,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.CiManagement#getSystem
    * <em>System</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>System</em>'.
    * @see org.eclipse.m2e.model.edit.pom.CiManagement#getSystem()
    * @see #getCiManagement()
@@ -2875,7 +2875,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.CiManagement#getUrl <em>Url</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.CiManagement#getUrl()
    * @see #getCiManagement()
@@ -2887,7 +2887,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.CiManagement#getNotifiers <em>Notifiers</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Notifiers</em>'.
    * @see org.eclipse.m2e.model.edit.pom.CiManagement#getNotifiers()
    * @see #getCiManagement()
@@ -2898,7 +2898,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Contributor <em>Contributor</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Contributor</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor
    * @generated
@@ -2908,7 +2908,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Contributor#getName <em>Name</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getName()
    * @see #getContributor()
@@ -2919,7 +2919,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Contributor#getEmail
    * <em>Email</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Email</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getEmail()
    * @see #getContributor()
@@ -2930,7 +2930,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Contributor#getUrl <em>Url</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getUrl()
    * @see #getContributor()
@@ -2941,7 +2941,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Contributor#getOrganization
    * <em>Organization</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Organization</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getOrganization()
    * @see #getContributor()
@@ -2952,7 +2952,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getOrganizationUrl
    * <em>Organization Url</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Organization Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getOrganizationUrl()
    * @see #getContributor()
@@ -2963,7 +2963,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Contributor#getTimezone
    * <em>Timezone</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Timezone</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getTimezone()
    * @see #getContributor()
@@ -2975,7 +2975,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Contributor#getProperties <em>Properties</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Properties</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getProperties()
    * @see #getContributor()
@@ -2986,7 +2986,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Contributor#getRoles
    * <em>Roles</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Roles</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Contributor#getRoles()
    * @see #getContributor()
@@ -2997,7 +2997,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Dependency <em>Dependency</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Dependency</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency
    * @generated
@@ -3007,7 +3007,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getGroupId()
    * @see #getDependency()
@@ -3018,7 +3018,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getArtifactId()
    * @see #getDependency()
@@ -3029,7 +3029,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getVersion()
    * @see #getDependency()
@@ -3040,7 +3040,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getType <em>Type</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Type</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getType()
    * @see #getDependency()
@@ -3051,7 +3051,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getClassifier
    * <em>Classifier</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Classifier</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getClassifier()
    * @see #getDependency()
@@ -3062,7 +3062,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getScope
    * <em>Scope</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Scope</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getScope()
    * @see #getDependency()
@@ -3073,7 +3073,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getSystemPath
    * <em>System Path</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>System Path</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getSystemPath()
    * @see #getDependency()
@@ -3085,7 +3085,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Dependency#getExclusions <em>Exclusions</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Exclusions</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getExclusions()
    * @see #getDependency()
@@ -3096,7 +3096,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Dependency#getOptional
    * <em>Optional</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Optional</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Dependency#getOptional()
    * @see #getDependency()
@@ -3107,7 +3107,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.DependencyManagement
    * <em>Dependency Management</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Dependency Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DependencyManagement
    * @generated
@@ -3118,7 +3118,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.DependencyManagement#getDependencies <em>Dependencies</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Dependencies</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DependencyManagement#getDependencies()
    * @see #getDependencyManagement()
@@ -3129,7 +3129,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.DeploymentRepository
    * <em>Deployment Repository</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Deployment Repository</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository
    * @generated
@@ -3140,7 +3140,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the attribute '
    * {@link org.eclipse.m2e.model.edit.pom.DeploymentRepository#getUniqueVersion <em>Unique Version</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Unique Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository#getUniqueVersion()
    * @see #getDeploymentRepository()
@@ -3151,7 +3151,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.DeploymentRepository#getId
    * <em>Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository#getId()
    * @see #getDeploymentRepository()
@@ -3162,7 +3162,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.DeploymentRepository#getName
    * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository#getName()
    * @see #getDeploymentRepository()
@@ -3173,7 +3173,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.DeploymentRepository#getUrl
    * <em>Url</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository#getUrl()
    * @see #getDeploymentRepository()
@@ -3184,7 +3184,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.DeploymentRepository#getLayout
    * <em>Layout</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Layout</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository#getLayout()
    * @see #getDeploymentRepository()
@@ -3195,7 +3195,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Developer <em>Developer</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Developer</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer
    * @generated
@@ -3205,7 +3205,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Developer#getId <em>Id</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getId()
    * @see #getDeveloper()
@@ -3216,7 +3216,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Developer#getName <em>Name</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getName()
    * @see #getDeveloper()
@@ -3227,7 +3227,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Developer#getEmail <em>Email</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Email</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getEmail()
    * @see #getDeveloper()
@@ -3238,7 +3238,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Developer#getUrl <em>Url</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getUrl()
    * @see #getDeveloper()
@@ -3249,7 +3249,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Developer#getOrganization
    * <em>Organization</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Organization</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getOrganization()
    * @see #getDeveloper()
@@ -3260,7 +3260,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Developer#getOrganizationUrl
    * <em>Organization Url</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Organization Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getOrganizationUrl()
    * @see #getDeveloper()
@@ -3271,7 +3271,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Developer#getTimezone
    * <em>Timezone</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Timezone</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getTimezone()
    * @see #getDeveloper()
@@ -3283,7 +3283,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Developer#getProperties <em>Properties</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Properties</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getProperties()
    * @see #getDeveloper()
@@ -3294,7 +3294,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Developer#getRoles
    * <em>Roles</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Roles</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Developer#getRoles()
    * @see #getDeveloper()
@@ -3305,7 +3305,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.DistributionManagement
    * <em>Distribution Management</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Distribution Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement
    * @generated
@@ -3316,7 +3316,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getRepository <em>Repository</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Repository</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getRepository()
    * @see #getDistributionManagement()
@@ -3328,7 +3328,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getSnapshotRepository <em>Snapshot Repository</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference ' <em>Snapshot Repository</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getSnapshotRepository()
    * @see #getDistributionManagement()
@@ -3340,7 +3340,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getSite <em>Site</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Site</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getSite()
    * @see #getDistributionManagement()
@@ -3352,7 +3352,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the attribute '
    * {@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getDownloadUrl <em>Download Url</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Download Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getDownloadUrl()
    * @see #getDistributionManagement()
@@ -3364,7 +3364,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getRelocation <em>Relocation</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Relocation</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getRelocation()
    * @see #getDistributionManagement()
@@ -3375,7 +3375,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.DistributionManagement#getStatus
    * <em>Status</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Status</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement#getStatus()
    * @see #getDistributionManagement()
@@ -3386,7 +3386,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.DocumentRoot <em>Document Root</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Document Root</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot
    * @generated
@@ -3396,7 +3396,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getMixed
    * <em>Mixed</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Mixed</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot#getMixed()
    * @see #getDocumentRoot()
@@ -3407,7 +3407,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the map ' {@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getXMLNSPrefixMap
    * <em>XMLNS Prefix Map</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the map '<em>XMLNS Prefix Map</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot#getXMLNSPrefixMap()
    * @see #getDocumentRoot()
@@ -3418,7 +3418,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the map ' {@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getXSISchemaLocation
    * <em>XSI Schema Location</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the map '<em>XSI Schema Location</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot#getXSISchemaLocation()
    * @see #getDocumentRoot()
@@ -3430,7 +3430,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getProject <em>Project</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Project</em>'.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot#getProject()
    * @see #getDocumentRoot()
@@ -3441,7 +3441,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Exclusion <em>Exclusion</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Exclusion</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Exclusion
    * @generated
@@ -3451,7 +3451,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Exclusion#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Exclusion#getArtifactId()
    * @see #getExclusion()
@@ -3462,7 +3462,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Exclusion#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Exclusion#getGroupId()
    * @see #getExclusion()
@@ -3473,7 +3473,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Extension <em>Extension</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Extension</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Extension
    * @generated
@@ -3483,7 +3483,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Extension#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Extension#getGroupId()
    * @see #getExtension()
@@ -3494,7 +3494,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Extension#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Extension#getArtifactId()
    * @see #getExtension()
@@ -3505,7 +3505,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Extension#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Extension#getVersion()
    * @see #getExtension()
@@ -3516,7 +3516,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.IssueManagement
    * <em>Issue Management</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Issue Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.IssueManagement
    * @generated
@@ -3526,7 +3526,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.IssueManagement#getSystem
    * <em>System</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>System</em>'.
    * @see org.eclipse.m2e.model.edit.pom.IssueManagement#getSystem()
    * @see #getIssueManagement()
@@ -3537,7 +3537,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.IssueManagement#getUrl
    * <em>Url</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.IssueManagement#getUrl()
    * @see #getIssueManagement()
@@ -3548,7 +3548,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.License <em>License</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>License</em>'.
    * @see org.eclipse.m2e.model.edit.pom.License
    * @generated
@@ -3558,7 +3558,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.License#getName <em>Name</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.License#getName()
    * @see #getLicense()
@@ -3569,7 +3569,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.License#getUrl <em>Url</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.License#getUrl()
    * @see #getLicense()
@@ -3580,7 +3580,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.License#getDistribution
    * <em>Distribution</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Distribution</em>'.
    * @see org.eclipse.m2e.model.edit.pom.License#getDistribution()
    * @see #getLicense()
@@ -3591,7 +3591,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.License#getComments
    * <em>Comments</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Comments</em>'.
    * @see org.eclipse.m2e.model.edit.pom.License#getComments()
    * @see #getLicense()
@@ -3602,7 +3602,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.MailingList <em>Mailing List</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Mailing List</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList
    * @generated
@@ -3612,7 +3612,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.MailingList#getName <em>Name</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getName()
    * @see #getMailingList()
@@ -3623,7 +3623,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.MailingList#getSubscribe
    * <em>Subscribe</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Subscribe</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getSubscribe()
    * @see #getMailingList()
@@ -3634,7 +3634,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.MailingList#getUnsubscribe
    * <em>Unsubscribe</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Unsubscribe</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getUnsubscribe()
    * @see #getMailingList()
@@ -3645,7 +3645,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.MailingList#getPost <em>Post</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Post</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getPost()
    * @see #getMailingList()
@@ -3656,7 +3656,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.MailingList#getArchive
    * <em>Archive</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Archive</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getArchive()
    * @see #getMailingList()
@@ -3667,7 +3667,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.MailingList#getOtherArchives
    * <em>Other Archives</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Other Archives</em>'.
    * @see org.eclipse.m2e.model.edit.pom.MailingList#getOtherArchives()
    * @see #getMailingList()
@@ -3678,7 +3678,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Model <em>Model</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Model</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model
    * @generated
@@ -3688,7 +3688,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Model#getParent
    * <em>Parent</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Parent</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getParent()
    * @see #getModel()
@@ -3699,7 +3699,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getModelVersion
    * <em>Model Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Model Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getModelVersion()
    * @see #getModel()
@@ -3710,7 +3710,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getGroupId()
    * @see #getModel()
@@ -3721,7 +3721,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getArtifactId()
    * @see #getModel()
@@ -3732,7 +3732,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getPackaging
    * <em>Packaging</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Packaging</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getPackaging()
    * @see #getModel()
@@ -3743,7 +3743,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Model#getName <em>Name</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getName()
    * @see #getModel()
@@ -3754,7 +3754,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getVersion <em>Version</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getVersion()
    * @see #getModel()
@@ -3765,7 +3765,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getDescription
    * <em>Description</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Description</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getDescription()
    * @see #getModel()
@@ -3776,7 +3776,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Model#getUrl <em>Url</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getUrl()
    * @see #getModel()
@@ -3788,7 +3788,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getPrerequisites <em>Prerequisites</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Prerequisites</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getPrerequisites()
    * @see #getModel()
@@ -3800,7 +3800,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getIssueManagement <em>Issue Management</em>}'. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference ' <em>Issue Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getIssueManagement()
    * @see #getModel()
@@ -3811,7 +3811,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Model#getCiManagement
    * <em>Ci Management</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Ci Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getCiManagement()
    * @see #getModel()
@@ -3822,7 +3822,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Model#getInceptionYear
    * <em>Inception Year</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Inception Year</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getInceptionYear()
    * @see #getModel()
@@ -3834,7 +3834,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getMailingLists <em>Mailing Lists</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Mailing Lists</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getMailingLists()
    * @see #getModel()
@@ -3846,7 +3846,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getDevelopers <em>Developers</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Developers</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getDevelopers()
    * @see #getModel()
@@ -3858,7 +3858,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getContributors <em>Contributors</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Contributors</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getContributors()
    * @see #getModel()
@@ -3870,7 +3870,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getLicenses <em>Licenses</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Licenses</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getLicenses()
    * @see #getModel()
@@ -3881,7 +3881,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference ' {@link org.eclipse.m2e.model.edit.pom.Model#getScm
    * <em>Scm</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Scm</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getScm()
    * @see #getModel()
@@ -3892,7 +3892,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Model#getOrganization
    * <em>Organization</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Organization</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getOrganization()
    * @see #getModel()
@@ -3903,7 +3903,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference ' {@link org.eclipse.m2e.model.edit.pom.Model#getBuild
    * <em>Build</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Build</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getBuild()
    * @see #getModel()
@@ -3915,7 +3915,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getProfiles <em>Profiles</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Profiles</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getProfiles()
    * @see #getModel()
@@ -3927,7 +3927,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getRepositories <em>Repositories</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Repositories</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getRepositories()
    * @see #getModel()
@@ -3939,7 +3939,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getPluginRepositories <em>Plugin Repositories</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list ' <em>Plugin Repositories</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getPluginRepositories()
    * @see #getModel()
@@ -3951,7 +3951,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getDependencies <em>Dependencies</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Dependencies</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getDependencies()
    * @see #getModel()
@@ -3962,7 +3962,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Model#getReporting
    * <em>Reporting</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Reporting</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getReporting()
    * @see #getModel()
@@ -3974,7 +3974,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getDependencyManagement <em>Dependency Management</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Dependency Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getDependencyManagement()
    * @see #getModel()
@@ -3986,7 +3986,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getDistributionManagement <em>Distribution Management</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Distribution Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getDistributionManagement()
    * @see #getModel()
@@ -3998,7 +3998,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Model#getProperties <em>Properties</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Properties</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getProperties()
    * @see #getModel()
@@ -4009,7 +4009,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Model#getModules
    * <em>Modules</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Modules</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Model#getModules()
    * @see #getModel()
@@ -4020,7 +4020,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Notifier <em>Notifier</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Notifier</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier
    * @generated
@@ -4030,7 +4030,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getType <em>Type</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Type</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getType()
    * @see #getNotifier()
@@ -4041,7 +4041,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnError
    * <em>Send On Error</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Send On Error</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getSendOnError()
    * @see #getNotifier()
@@ -4052,7 +4052,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnFailure
    * <em>Send On Failure</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Send On Failure</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getSendOnFailure()
    * @see #getNotifier()
@@ -4063,7 +4063,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnSuccess
    * <em>Send On Success</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Send On Success</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getSendOnSuccess()
    * @see #getNotifier()
@@ -4074,7 +4074,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getSendOnWarning
    * <em>Send On Warning</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Send On Warning</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getSendOnWarning()
    * @see #getNotifier()
@@ -4085,7 +4085,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Notifier#getAddress
    * <em>Address</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Address</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getAddress()
    * @see #getNotifier()
@@ -4097,7 +4097,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Notifier#getConfiguration <em>Configuration</em>}'. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Notifier#getConfiguration()
    * @see #getNotifier()
@@ -4108,7 +4108,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Organization <em>Organization</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Organization</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Organization
    * @generated
@@ -4118,7 +4118,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Organization#getName
    * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Organization#getName()
    * @see #getOrganization()
@@ -4129,7 +4129,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Organization#getUrl <em>Url</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Organization#getUrl()
    * @see #getOrganization()
@@ -4140,7 +4140,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Parent <em>Parent</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Parent</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Parent
    * @generated
@@ -4150,7 +4150,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Parent#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Parent#getArtifactId()
    * @see #getParent()
@@ -4161,7 +4161,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Parent#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Parent#getGroupId()
    * @see #getParent()
@@ -4172,7 +4172,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Parent#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Parent#getVersion()
    * @see #getParent()
@@ -4183,7 +4183,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Parent#getRelativePath
    * <em>Relative Path</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Relative Path</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Parent#getRelativePath()
    * @see #getParent()
@@ -4194,7 +4194,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Plugin <em>Plugin</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Plugin</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin
    * @generated
@@ -4204,7 +4204,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Plugin#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getGroupId()
    * @see #getPlugin()
@@ -4215,7 +4215,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Plugin#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getArtifactId()
    * @see #getPlugin()
@@ -4226,7 +4226,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Plugin#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getVersion()
    * @see #getPlugin()
@@ -4237,7 +4237,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Plugin#getExtensions
    * <em>Extensions</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Extensions</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getExtensions()
    * @see #getPlugin()
@@ -4249,7 +4249,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Plugin#getExecutions <em>Executions</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Executions</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getExecutions()
    * @see #getPlugin()
@@ -4261,7 +4261,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Plugin#getDependencies <em>Dependencies</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Dependencies</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getDependencies()
    * @see #getPlugin()
@@ -4272,7 +4272,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Plugin#getInherited
    * <em>Inherited</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Inherited</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getInherited()
    * @see #getPlugin()
@@ -4283,7 +4283,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the reference '{@link org.eclipse.m2e.model.edit.pom.Plugin#getConfiguration
    * <em>Configuration</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the reference '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Plugin#getConfiguration()
    * @see #getPlugin()
@@ -4294,7 +4294,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution
    * <em>Plugin Execution</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Plugin Execution</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution
    * @generated
@@ -4304,7 +4304,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getId <em>Id</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution#getId()
    * @see #getPluginExecution()
@@ -4315,7 +4315,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getPhase
    * <em>Phase</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Phase</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution#getPhase()
    * @see #getPluginExecution()
@@ -4326,7 +4326,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getInherited
    * <em>Inherited</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Inherited</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution#getInherited()
    * @see #getPluginExecution()
@@ -4337,7 +4337,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getGoals
    * <em>Goals</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Goals</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution#getGoals()
    * @see #getPluginExecution()
@@ -4348,7 +4348,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the reference '{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getConfiguration
    * <em>Configuration</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the reference '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution#getConfiguration()
    * @see #getPluginExecution()
@@ -4359,7 +4359,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.PluginManagement
    * <em>Plugin Management</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Plugin Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginManagement
    * @generated
@@ -4370,7 +4370,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.PluginManagement#getPlugins <em>Plugins</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Plugins</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PluginManagement#getPlugins()
    * @see #getPluginManagement()
@@ -4381,7 +4381,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Prerequisites <em>Prerequisites</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Prerequisites</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Prerequisites
    * @generated
@@ -4391,7 +4391,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Prerequisites#getMaven
    * <em>Maven</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Maven</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Prerequisites#getMaven()
    * @see #getPrerequisites()
@@ -4402,7 +4402,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Profile <em>Profile</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Profile</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile
    * @generated
@@ -4412,7 +4412,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Profile#getId <em>Id</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getId()
    * @see #getProfile()
@@ -4423,7 +4423,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Profile#getActivation
    * <em>Activation</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Activation</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getActivation()
    * @see #getProfile()
@@ -4434,7 +4434,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the containment reference '{@link org.eclipse.m2e.model.edit.pom.Profile#getBuild
    * <em>Build</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Build</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getBuild()
    * @see #getProfile()
@@ -4446,7 +4446,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getRepositories <em>Repositories</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Repositories</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getRepositories()
    * @see #getProfile()
@@ -4458,7 +4458,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getPluginRepositories <em>Plugin Repositories</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list ' <em>Plugin Repositories</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getPluginRepositories()
    * @see #getProfile()
@@ -4470,7 +4470,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencies <em>Dependencies</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Dependencies</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getDependencies()
    * @see #getProfile()
@@ -4482,7 +4482,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getReports <em>Reports</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Reports</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getReports()
    * @see #getProfile()
@@ -4494,7 +4494,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencyManagement <em>Dependency Management</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Dependency Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getDependencyManagement()
    * @see #getProfile()
@@ -4506,7 +4506,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getDistributionManagement <em>Distribution Management</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Distribution Management</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getDistributionManagement()
    * @see #getProfile()
@@ -4518,7 +4518,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Profile#getProperties <em>Properties</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Properties</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getProperties()
    * @see #getProfile()
@@ -4529,7 +4529,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Profile#getModules
    * <em>Modules</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Modules</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getModules()
    * @see #getProfile()
@@ -4540,7 +4540,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the reference '{@link org.eclipse.m2e.model.edit.pom.Profile#getReporting
    * <em>Reporting</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the reference '<em>Reporting</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Profile#getReporting()
    * @see #getProfile()
@@ -4551,7 +4551,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Relocation <em>Relocation</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Relocation</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Relocation
    * @generated
@@ -4561,7 +4561,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Relocation#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Relocation#getGroupId()
    * @see #getRelocation()
@@ -4572,7 +4572,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Relocation#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Relocation#getArtifactId()
    * @see #getRelocation()
@@ -4583,7 +4583,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Relocation#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Relocation#getVersion()
    * @see #getRelocation()
@@ -4594,7 +4594,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Relocation#getMessage
    * <em>Message</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Message</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Relocation#getMessage()
    * @see #getRelocation()
@@ -4605,7 +4605,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Reporting <em>Reporting</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Reporting</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Reporting
    * @generated
@@ -4615,7 +4615,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getExcludeDefaults
    * <em>Exclude Defaults</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Exclude Defaults</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Reporting#getExcludeDefaults()
    * @see #getReporting()
@@ -4626,7 +4626,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Reporting#getOutputDirectory
    * <em>Output Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Output Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Reporting#getOutputDirectory()
    * @see #getReporting()
@@ -4638,7 +4638,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.Reporting#getPlugins <em>Plugins</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Plugins</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Reporting#getPlugins()
    * @see #getReporting()
@@ -4649,7 +4649,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin <em>Report Plugin</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Report Plugin</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin
    * @generated
@@ -4659,7 +4659,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getGroupId
    * <em>Group Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Group Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getGroupId()
    * @see #getReportPlugin()
@@ -4670,7 +4670,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getArtifactId
    * <em>Artifact Id</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Artifact Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getArtifactId()
    * @see #getReportPlugin()
@@ -4681,7 +4681,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getVersion
    * <em>Version</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Version</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getVersion()
    * @see #getReportPlugin()
@@ -4692,7 +4692,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getInherited
    * <em>Inherited</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Inherited</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getInherited()
    * @see #getReportPlugin()
@@ -4704,7 +4704,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference list '
    * {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getReportSets <em>Report Sets</em>}'. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference list '<em>Report Sets</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getReportSets()
    * @see #getReportPlugin()
@@ -4715,7 +4715,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the reference '{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getConfiguration
    * <em>Configuration</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the reference '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin#getConfiguration()
    * @see #getReportPlugin()
@@ -4726,7 +4726,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.ReportSet <em>Report Set</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Report Set</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet
    * @generated
@@ -4736,7 +4736,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.ReportSet#getId <em>Id</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet#getId()
    * @see #getReportSet()
@@ -4747,7 +4747,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.ReportSet#getInherited
    * <em>Inherited</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Inherited</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet#getInherited()
    * @see #getReportSet()
@@ -4758,7 +4758,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.ReportSet#getReports
    * <em>Reports</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Reports</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet#getReports()
    * @see #getReportSet()
@@ -4769,7 +4769,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the reference '{@link org.eclipse.m2e.model.edit.pom.ReportSet#getConfiguration
    * <em>Configuration</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the reference '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet#getConfiguration()
    * @see #getReportSet()
@@ -4780,7 +4780,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Repository <em>Repository</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Repository</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository
    * @generated
@@ -4791,7 +4791,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Repository#getReleases <em>Releases</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Releases</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getReleases()
    * @see #getRepository()
@@ -4803,7 +4803,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the containment reference '
    * {@link org.eclipse.m2e.model.edit.pom.Repository#getSnapshots <em>Snapshots</em>}'. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @return the meta object for the containment reference '<em>Snapshots</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getSnapshots()
    * @see #getRepository()
@@ -4814,7 +4814,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Repository#getId <em>Id</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getId()
    * @see #getRepository()
@@ -4825,7 +4825,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Repository#getName <em>Name</em>}
    * '. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getName()
    * @see #getRepository()
@@ -4836,7 +4836,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Repository#getUrl <em>Url</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getUrl()
    * @see #getRepository()
@@ -4847,7 +4847,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Repository#getLayout
    * <em>Layout</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Layout</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Repository#getLayout()
    * @see #getRepository()
@@ -4858,7 +4858,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy
    * <em>Repository Policy</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Repository Policy</em>'.
    * @see org.eclipse.m2e.model.edit.pom.RepositoryPolicy
    * @generated
@@ -4868,7 +4868,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getEnabled
    * <em>Enabled</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Enabled</em>'.
    * @see org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getEnabled()
    * @see #getRepositoryPolicy()
@@ -4879,7 +4879,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getUpdatePolicy
    * <em>Update Policy</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Update Policy</em>'.
    * @see org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getUpdatePolicy()
    * @see #getRepositoryPolicy()
@@ -4891,7 +4891,7 @@ public interface PomPackage extends EPackage {
    * Returns the meta object for the attribute '
    * {@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getChecksumPolicy <em>Checksum Policy</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Checksum Policy</em>'.
    * @see org.eclipse.m2e.model.edit.pom.RepositoryPolicy#getChecksumPolicy()
    * @see #getRepositoryPolicy()
@@ -4902,7 +4902,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Resource <em>Resource</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Resource</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource
    * @generated
@@ -4912,7 +4912,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Resource#getTargetPath
    * <em>Target Path</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Target Path</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource#getTargetPath()
    * @see #getResource()
@@ -4923,7 +4923,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Resource#getFiltering
    * <em>Filtering</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Filtering</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource#getFiltering()
    * @see #getResource()
@@ -4934,7 +4934,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Resource#getDirectory
    * <em>Directory</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Directory</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource#getDirectory()
    * @see #getResource()
@@ -4945,7 +4945,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Resource#getIncludes
    * <em>Includes</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Includes</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource#getIncludes()
    * @see #getResource()
@@ -4956,7 +4956,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute list '{@link org.eclipse.m2e.model.edit.pom.Resource#getExcludes
    * <em>Excludes</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute list '<em>Excludes</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Resource#getExcludes()
    * @see #getResource()
@@ -4967,7 +4967,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Scm <em>Scm</em>}'. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Scm</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Scm
    * @generated
@@ -4977,7 +4977,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Scm#getConnection
    * <em>Connection</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Connection</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Scm#getConnection()
    * @see #getScm()
@@ -4988,7 +4988,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.Scm#getDeveloperConnection
    * <em>Developer Connection</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Developer Connection</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Scm#getDeveloperConnection()
    * @see #getScm()
@@ -4999,7 +4999,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Scm#getTag <em>Tag</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Tag</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Scm#getTag()
    * @see #getScm()
@@ -5010,7 +5010,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Scm#getUrl <em>Url</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Scm#getUrl()
    * @see #getScm()
@@ -5021,7 +5021,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.Site <em>Site</em>}'. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Site</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Site
    * @generated
@@ -5031,7 +5031,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Site#getId <em>Id</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Id</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Site#getId()
    * @see #getSite()
@@ -5042,7 +5042,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Site#getName <em>Name</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Site#getName()
    * @see #getSite()
@@ -5053,7 +5053,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute ' {@link org.eclipse.m2e.model.edit.pom.Site#getUrl <em>Url</em>}'. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Url</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Site#getUrl()
    * @see #getSite()
@@ -5064,7 +5064,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class ' {@link org.eclipse.m2e.model.edit.pom.PropertyElement
    * <em>Property Element</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Property Element</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PropertyElement
    * @generated
@@ -5074,7 +5074,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.PropertyElement#getName
    * <em>Name</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Name</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PropertyElement#getName()
    * @see #getPropertyElement()
@@ -5085,7 +5085,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for the attribute '{@link org.eclipse.m2e.model.edit.pom.PropertyElement#getValue
    * <em>Value</em>}'. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for the attribute '<em>Value</em>'.
    * @see org.eclipse.m2e.model.edit.pom.PropertyElement#getValue()
    * @see #getPropertyElement()
@@ -5096,7 +5096,7 @@ public interface PomPackage extends EPackage {
   /**
    * Returns the meta object for class '{@link org.eclipse.m2e.model.edit.pom.Configuration <em>Configuration</em>}'.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the meta object for class '<em>Configuration</em>'.
    * @see org.eclipse.m2e.model.edit.pom.Configuration
    * @generated
@@ -5105,7 +5105,7 @@ public interface PomPackage extends EPackage {
 
   /**
    * Returns the factory that creates the instances of the model. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the factory that creates the instances of the model.
    * @generated
    */
@@ -5120,14 +5120,14 @@ public interface PomPackage extends EPackage {
    * <li>and each data type</li>
    * </ul>
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   interface Literals {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationImpl <em>Activation</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ActivationImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivation()
      * @generated
@@ -5137,7 +5137,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Active By Default</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION__ACTIVE_BY_DEFAULT = eINSTANCE.getActivation_ActiveByDefault();
@@ -5145,7 +5145,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Jdk</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION__JDK = eINSTANCE.getActivation_Jdk();
@@ -5153,7 +5153,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Os</b></em>' containment reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference ACTIVATION__OS = eINSTANCE.getActivation_Os();
@@ -5161,7 +5161,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Property</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference ACTIVATION__PROPERTY = eINSTANCE.getActivation_Property();
@@ -5169,7 +5169,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>File</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference ACTIVATION__FILE = eINSTANCE.getActivation_File();
@@ -5177,7 +5177,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationFileImpl
      * <em>Activation File</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ActivationFileImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationFile()
      * @generated
@@ -5187,7 +5187,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Missing</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_FILE__MISSING = eINSTANCE.getActivationFile_Missing();
@@ -5195,7 +5195,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Exists</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_FILE__EXISTS = eINSTANCE.getActivationFile_Exists();
@@ -5203,7 +5203,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationOSImpl
      * <em>Activation OS</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ActivationOSImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationOS()
      * @generated
@@ -5213,7 +5213,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_OS__NAME = eINSTANCE.getActivationOS_Name();
@@ -5221,7 +5221,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Family</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_OS__FAMILY = eINSTANCE.getActivationOS_Family();
@@ -5229,7 +5229,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Arch</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_OS__ARCH = eINSTANCE.getActivationOS_Arch();
@@ -5237,7 +5237,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_OS__VERSION = eINSTANCE.getActivationOS_Version();
@@ -5245,7 +5245,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ActivationPropertyImpl
      * <em>Activation Property</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ActivationPropertyImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getActivationProperty()
      * @generated
@@ -5255,7 +5255,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_PROPERTY__NAME = eINSTANCE.getActivationProperty_Name();
@@ -5263,7 +5263,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Value</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ACTIVATION_PROPERTY__VALUE = eINSTANCE.getActivationProperty_Value();
@@ -5271,7 +5271,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.BuildImpl <em>Build</em>}' class.
      * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.BuildImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getBuild()
      * @generated
@@ -5281,7 +5281,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Source Directory</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD__SOURCE_DIRECTORY = eINSTANCE.getBuild_SourceDirectory();
@@ -5289,7 +5289,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' <em><b>Script Source Directory</b></em>' attribute feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD__SCRIPT_SOURCE_DIRECTORY = eINSTANCE.getBuild_ScriptSourceDirectory();
@@ -5297,7 +5297,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' <em><b>Test Source Directory</b></em>' attribute feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD__TEST_SOURCE_DIRECTORY = eINSTANCE.getBuild_TestSourceDirectory();
@@ -5305,7 +5305,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Output Directory</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD__OUTPUT_DIRECTORY = eINSTANCE.getBuild_OutputDirectory();
@@ -5313,7 +5313,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' <em><b>Test Output Directory</b></em>' attribute feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD__TEST_OUTPUT_DIRECTORY = eINSTANCE.getBuild_TestOutputDirectory();
@@ -5321,7 +5321,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Extensions</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference BUILD__EXTENSIONS = eINSTANCE.getBuild_Extensions();
@@ -5329,7 +5329,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.BuildBaseImpl <em>Build Base</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.BuildBaseImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getBuildBase()
      * @generated
@@ -5339,7 +5339,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Default Goal</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD_BASE__DEFAULT_GOAL = eINSTANCE.getBuildBase_DefaultGoal();
@@ -5347,7 +5347,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Resources</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference BUILD_BASE__RESOURCES = eINSTANCE.getBuildBase_Resources();
@@ -5355,7 +5355,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Test Resources</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference BUILD_BASE__TEST_RESOURCES = eINSTANCE.getBuildBase_TestResources();
@@ -5363,7 +5363,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Directory</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD_BASE__DIRECTORY = eINSTANCE.getBuildBase_Directory();
@@ -5371,7 +5371,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Final Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD_BASE__FINAL_NAME = eINSTANCE.getBuildBase_FinalName();
@@ -5379,7 +5379,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugin Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference BUILD_BASE__PLUGIN_MANAGEMENT = eINSTANCE.getBuildBase_PluginManagement();
@@ -5387,7 +5387,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugins</b></em>' containment reference list feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference BUILD_BASE__PLUGINS = eINSTANCE.getBuildBase_Plugins();
@@ -5395,7 +5395,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Filters</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute BUILD_BASE__FILTERS = eINSTANCE.getBuildBase_Filters();
@@ -5403,7 +5403,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.CiManagementImpl
      * <em>Ci Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.CiManagementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getCiManagement()
      * @generated
@@ -5413,7 +5413,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>System</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CI_MANAGEMENT__SYSTEM = eINSTANCE.getCiManagement_System();
@@ -5421,7 +5421,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CI_MANAGEMENT__URL = eINSTANCE.getCiManagement_Url();
@@ -5429,7 +5429,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Notifiers</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference CI_MANAGEMENT__NOTIFIERS = eINSTANCE.getCiManagement_Notifiers();
@@ -5437,7 +5437,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ContributorImpl <em>Contributor</em>}
      * ' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ContributorImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getContributor()
      * @generated
@@ -5447,7 +5447,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__NAME = eINSTANCE.getContributor_Name();
@@ -5455,7 +5455,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Email</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__EMAIL = eINSTANCE.getContributor_Email();
@@ -5463,7 +5463,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__URL = eINSTANCE.getContributor_Url();
@@ -5471,7 +5471,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Organization</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__ORGANIZATION = eINSTANCE.getContributor_Organization();
@@ -5479,7 +5479,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Organization Url</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__ORGANIZATION_URL = eINSTANCE.getContributor_OrganizationUrl();
@@ -5487,7 +5487,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Timezone</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__TIMEZONE = eINSTANCE.getContributor_Timezone();
@@ -5495,7 +5495,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Properties</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference CONTRIBUTOR__PROPERTIES = eINSTANCE.getContributor_Properties();
@@ -5503,7 +5503,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Roles</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute CONTRIBUTOR__ROLES = eINSTANCE.getContributor_Roles();
@@ -5511,7 +5511,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.DependencyImpl <em>Dependency</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DependencyImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDependency()
      * @generated
@@ -5521,7 +5521,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__GROUP_ID = eINSTANCE.getDependency_GroupId();
@@ -5529,7 +5529,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__ARTIFACT_ID = eINSTANCE.getDependency_ArtifactId();
@@ -5537,7 +5537,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__VERSION = eINSTANCE.getDependency_Version();
@@ -5545,7 +5545,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Type</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__TYPE = eINSTANCE.getDependency_Type();
@@ -5553,7 +5553,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Classifier</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__CLASSIFIER = eINSTANCE.getDependency_Classifier();
@@ -5561,7 +5561,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Scope</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__SCOPE = eINSTANCE.getDependency_Scope();
@@ -5569,7 +5569,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>System Path</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__SYSTEM_PATH = eINSTANCE.getDependency_SystemPath();
@@ -5577,7 +5577,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Exclusions</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DEPENDENCY__EXCLUSIONS = eINSTANCE.getDependency_Exclusions();
@@ -5585,7 +5585,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Optional</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPENDENCY__OPTIONAL = eINSTANCE.getDependency_Optional();
@@ -5593,7 +5593,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.DependencyManagementImpl
      * <em>Dependency Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DependencyManagementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDependencyManagement()
      * @generated
@@ -5603,7 +5603,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependencies</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DEPENDENCY_MANAGEMENT__DEPENDENCIES = eINSTANCE.getDependencyManagement_Dependencies();
@@ -5611,7 +5611,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.DeploymentRepositoryImpl
      * <em>Deployment Repository</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DeploymentRepositoryImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDeploymentRepository()
      * @generated
@@ -5621,7 +5621,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Unique Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPLOYMENT_REPOSITORY__UNIQUE_VERSION = eINSTANCE.getDeploymentRepository_UniqueVersion();
@@ -5629,7 +5629,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPLOYMENT_REPOSITORY__ID = eINSTANCE.getDeploymentRepository_Id();
@@ -5637,7 +5637,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPLOYMENT_REPOSITORY__NAME = eINSTANCE.getDeploymentRepository_Name();
@@ -5645,7 +5645,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPLOYMENT_REPOSITORY__URL = eINSTANCE.getDeploymentRepository_Url();
@@ -5653,7 +5653,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Layout</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEPLOYMENT_REPOSITORY__LAYOUT = eINSTANCE.getDeploymentRepository_Layout();
@@ -5661,7 +5661,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.DeveloperImpl <em>Developer</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DeveloperImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDeveloper()
      * @generated
@@ -5671,7 +5671,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__ID = eINSTANCE.getDeveloper_Id();
@@ -5679,7 +5679,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__NAME = eINSTANCE.getDeveloper_Name();
@@ -5687,7 +5687,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Email</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__EMAIL = eINSTANCE.getDeveloper_Email();
@@ -5695,7 +5695,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__URL = eINSTANCE.getDeveloper_Url();
@@ -5703,7 +5703,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Organization</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__ORGANIZATION = eINSTANCE.getDeveloper_Organization();
@@ -5711,7 +5711,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Organization Url</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__ORGANIZATION_URL = eINSTANCE.getDeveloper_OrganizationUrl();
@@ -5719,7 +5719,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Timezone</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__TIMEZONE = eINSTANCE.getDeveloper_Timezone();
@@ -5727,7 +5727,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Properties</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DEVELOPER__PROPERTIES = eINSTANCE.getDeveloper_Properties();
@@ -5735,7 +5735,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Roles</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DEVELOPER__ROLES = eINSTANCE.getDeveloper_Roles();
@@ -5743,7 +5743,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.DistributionManagementImpl
      * <em>Distribution Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DistributionManagementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDistributionManagement()
      * @generated
@@ -5753,7 +5753,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Repository</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DISTRIBUTION_MANAGEMENT__REPOSITORY = eINSTANCE.getDistributionManagement_Repository();
@@ -5761,7 +5761,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Snapshot Repository</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DISTRIBUTION_MANAGEMENT__SNAPSHOT_REPOSITORY = eINSTANCE.getDistributionManagement_SnapshotRepository();
@@ -5769,7 +5769,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Site</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DISTRIBUTION_MANAGEMENT__SITE = eINSTANCE.getDistributionManagement_Site();
@@ -5777,7 +5777,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Download Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DISTRIBUTION_MANAGEMENT__DOWNLOAD_URL = eINSTANCE.getDistributionManagement_DownloadUrl();
@@ -5785,7 +5785,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Relocation</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DISTRIBUTION_MANAGEMENT__RELOCATION = eINSTANCE.getDistributionManagement_Relocation();
@@ -5793,7 +5793,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Status</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DISTRIBUTION_MANAGEMENT__STATUS = eINSTANCE.getDistributionManagement_Status();
@@ -5801,7 +5801,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.DocumentRootImpl
      * <em>Document Root</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.DocumentRootImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getDocumentRoot()
      * @generated
@@ -5811,7 +5811,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Mixed</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute DOCUMENT_ROOT__MIXED = eINSTANCE.getDocumentRoot_Mixed();
@@ -5819,7 +5819,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>XMLNS Prefix Map</b></em>' map feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DOCUMENT_ROOT__XMLNS_PREFIX_MAP = eINSTANCE.getDocumentRoot_XMLNSPrefixMap();
@@ -5827,7 +5827,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>XSI Schema Location</b></em>' map feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DOCUMENT_ROOT__XSI_SCHEMA_LOCATION = eINSTANCE.getDocumentRoot_XSISchemaLocation();
@@ -5835,7 +5835,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Project</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference DOCUMENT_ROOT__PROJECT = eINSTANCE.getDocumentRoot_Project();
@@ -5843,7 +5843,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ExclusionImpl <em>Exclusion</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ExclusionImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getExclusion()
      * @generated
@@ -5853,7 +5853,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute EXCLUSION__ARTIFACT_ID = eINSTANCE.getExclusion_ArtifactId();
@@ -5861,7 +5861,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute EXCLUSION__GROUP_ID = eINSTANCE.getExclusion_GroupId();
@@ -5869,7 +5869,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ExtensionImpl <em>Extension</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ExtensionImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getExtension()
      * @generated
@@ -5879,7 +5879,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute EXTENSION__GROUP_ID = eINSTANCE.getExtension_GroupId();
@@ -5887,7 +5887,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute EXTENSION__ARTIFACT_ID = eINSTANCE.getExtension_ArtifactId();
@@ -5895,7 +5895,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute EXTENSION__VERSION = eINSTANCE.getExtension_Version();
@@ -5903,7 +5903,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.IssueManagementImpl
      * <em>Issue Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.IssueManagementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getIssueManagement()
      * @generated
@@ -5913,7 +5913,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>System</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ISSUE_MANAGEMENT__SYSTEM = eINSTANCE.getIssueManagement_System();
@@ -5921,7 +5921,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ISSUE_MANAGEMENT__URL = eINSTANCE.getIssueManagement_Url();
@@ -5929,7 +5929,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.LicenseImpl <em>License</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.LicenseImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getLicense()
      * @generated
@@ -5939,7 +5939,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute LICENSE__NAME = eINSTANCE.getLicense_Name();
@@ -5947,7 +5947,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute LICENSE__URL = eINSTANCE.getLicense_Url();
@@ -5955,7 +5955,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Distribution</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute LICENSE__DISTRIBUTION = eINSTANCE.getLicense_Distribution();
@@ -5963,7 +5963,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Comments</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute LICENSE__COMMENTS = eINSTANCE.getLicense_Comments();
@@ -5971,7 +5971,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.MailingListImpl
      * <em>Mailing List</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.MailingListImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getMailingList()
      * @generated
@@ -5981,7 +5981,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__NAME = eINSTANCE.getMailingList_Name();
@@ -5989,7 +5989,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Subscribe</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__SUBSCRIBE = eINSTANCE.getMailingList_Subscribe();
@@ -5997,7 +5997,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Unsubscribe</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__UNSUBSCRIBE = eINSTANCE.getMailingList_Unsubscribe();
@@ -6005,7 +6005,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Post</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__POST = eINSTANCE.getMailingList_Post();
@@ -6013,7 +6013,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Archive</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__ARCHIVE = eINSTANCE.getMailingList_Archive();
@@ -6021,7 +6021,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Other Archives</b></em>' attribute list feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MAILING_LIST__OTHER_ARCHIVES = eINSTANCE.getMailingList_OtherArchives();
@@ -6029,7 +6029,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ModelImpl <em>Model</em>}' class.
      * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ModelImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getModel()
      * @generated
@@ -6039,7 +6039,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Parent</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__PARENT = eINSTANCE.getModel_Parent();
@@ -6047,7 +6047,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Model Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__MODEL_VERSION = eINSTANCE.getModel_ModelVersion();
@@ -6055,7 +6055,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__GROUP_ID = eINSTANCE.getModel_GroupId();
@@ -6063,7 +6063,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__ARTIFACT_ID = eINSTANCE.getModel_ArtifactId();
@@ -6071,7 +6071,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Packaging</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__PACKAGING = eINSTANCE.getModel_Packaging();
@@ -6079,7 +6079,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__NAME = eINSTANCE.getModel_Name();
@@ -6087,7 +6087,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__VERSION = eINSTANCE.getModel_Version();
@@ -6095,7 +6095,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Description</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__DESCRIPTION = eINSTANCE.getModel_Description();
@@ -6103,7 +6103,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__URL = eINSTANCE.getModel_Url();
@@ -6111,7 +6111,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Prerequisites</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__PREREQUISITES = eINSTANCE.getModel_Prerequisites();
@@ -6119,7 +6119,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Issue Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__ISSUE_MANAGEMENT = eINSTANCE.getModel_IssueManagement();
@@ -6127,7 +6127,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Ci Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__CI_MANAGEMENT = eINSTANCE.getModel_CiManagement();
@@ -6135,7 +6135,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Inception Year</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__INCEPTION_YEAR = eINSTANCE.getModel_InceptionYear();
@@ -6143,7 +6143,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Mailing Lists</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__MAILING_LISTS = eINSTANCE.getModel_MailingLists();
@@ -6151,7 +6151,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Developers</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__DEVELOPERS = eINSTANCE.getModel_Developers();
@@ -6159,7 +6159,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Contributors</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__CONTRIBUTORS = eINSTANCE.getModel_Contributors();
@@ -6167,7 +6167,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Licenses</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__LICENSES = eINSTANCE.getModel_Licenses();
@@ -6175,7 +6175,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Scm</b></em>' containment reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__SCM = eINSTANCE.getModel_Scm();
@@ -6183,7 +6183,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Organization</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__ORGANIZATION = eINSTANCE.getModel_Organization();
@@ -6191,7 +6191,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Build</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__BUILD = eINSTANCE.getModel_Build();
@@ -6199,7 +6199,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Profiles</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__PROFILES = eINSTANCE.getModel_Profiles();
@@ -6207,7 +6207,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Repositories</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__REPOSITORIES = eINSTANCE.getModel_Repositories();
@@ -6215,7 +6215,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugin Repositories</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__PLUGIN_REPOSITORIES = eINSTANCE.getModel_PluginRepositories();
@@ -6223,7 +6223,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependencies</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__DEPENDENCIES = eINSTANCE.getModel_Dependencies();
@@ -6231,7 +6231,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Reporting</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__REPORTING = eINSTANCE.getModel_Reporting();
@@ -6239,7 +6239,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependency Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__DEPENDENCY_MANAGEMENT = eINSTANCE.getModel_DependencyManagement();
@@ -6247,7 +6247,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Distribution Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__DISTRIBUTION_MANAGEMENT = eINSTANCE.getModel_DistributionManagement();
@@ -6255,7 +6255,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Properties</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference MODEL__PROPERTIES = eINSTANCE.getModel_Properties();
@@ -6263,7 +6263,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Modules</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute MODEL__MODULES = eINSTANCE.getModel_Modules();
@@ -6271,7 +6271,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.NotifierImpl <em>Notifier</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.NotifierImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getNotifier()
      * @generated
@@ -6281,7 +6281,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Type</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__TYPE = eINSTANCE.getNotifier_Type();
@@ -6289,7 +6289,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Send On Error</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__SEND_ON_ERROR = eINSTANCE.getNotifier_SendOnError();
@@ -6297,7 +6297,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Send On Failure</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__SEND_ON_FAILURE = eINSTANCE.getNotifier_SendOnFailure();
@@ -6305,7 +6305,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Send On Success</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__SEND_ON_SUCCESS = eINSTANCE.getNotifier_SendOnSuccess();
@@ -6313,7 +6313,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Send On Warning</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__SEND_ON_WARNING = eINSTANCE.getNotifier_SendOnWarning();
@@ -6321,7 +6321,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Address</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute NOTIFIER__ADDRESS = eINSTANCE.getNotifier_Address();
@@ -6329,7 +6329,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Configuration</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference NOTIFIER__CONFIGURATION = eINSTANCE.getNotifier_Configuration();
@@ -6337,7 +6337,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.OrganizationImpl
      * <em>Organization</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.OrganizationImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getOrganization()
      * @generated
@@ -6347,7 +6347,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ORGANIZATION__NAME = eINSTANCE.getOrganization_Name();
@@ -6355,7 +6355,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute ORGANIZATION__URL = eINSTANCE.getOrganization_Url();
@@ -6363,7 +6363,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ParentImpl <em>Parent</em>}' class.
      * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ParentImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getParent()
      * @generated
@@ -6373,7 +6373,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PARENT__ARTIFACT_ID = eINSTANCE.getParent_ArtifactId();
@@ -6381,7 +6381,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PARENT__GROUP_ID = eINSTANCE.getParent_GroupId();
@@ -6389,7 +6389,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PARENT__VERSION = eINSTANCE.getParent_Version();
@@ -6397,7 +6397,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Relative Path</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PARENT__RELATIVE_PATH = eINSTANCE.getParent_RelativePath();
@@ -6405,7 +6405,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginImpl <em>Plugin</em>}' class.
      * <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.PluginImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPlugin()
      * @generated
@@ -6415,7 +6415,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN__GROUP_ID = eINSTANCE.getPlugin_GroupId();
@@ -6423,7 +6423,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN__ARTIFACT_ID = eINSTANCE.getPlugin_ArtifactId();
@@ -6431,7 +6431,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN__VERSION = eINSTANCE.getPlugin_Version();
@@ -6439,7 +6439,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Extensions</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN__EXTENSIONS = eINSTANCE.getPlugin_Extensions();
@@ -6447,7 +6447,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Executions</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PLUGIN__EXECUTIONS = eINSTANCE.getPlugin_Executions();
@@ -6455,7 +6455,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependencies</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PLUGIN__DEPENDENCIES = eINSTANCE.getPlugin_Dependencies();
@@ -6463,7 +6463,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Inherited</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN__INHERITED = eINSTANCE.getPlugin_Inherited();
@@ -6471,7 +6471,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Configuration</b></em>' reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PLUGIN__CONFIGURATION = eINSTANCE.getPlugin_Configuration();
@@ -6479,7 +6479,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginExecutionImpl
      * <em>Plugin Execution</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.PluginExecutionImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPluginExecution()
      * @generated
@@ -6489,7 +6489,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN_EXECUTION__ID = eINSTANCE.getPluginExecution_Id();
@@ -6497,7 +6497,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Phase</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN_EXECUTION__PHASE = eINSTANCE.getPluginExecution_Phase();
@@ -6505,7 +6505,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Inherited</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN_EXECUTION__INHERITED = eINSTANCE.getPluginExecution_Inherited();
@@ -6513,7 +6513,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Goals</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PLUGIN_EXECUTION__GOALS = eINSTANCE.getPluginExecution_Goals();
@@ -6521,7 +6521,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Configuration</b></em>' reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PLUGIN_EXECUTION__CONFIGURATION = eINSTANCE.getPluginExecution_Configuration();
@@ -6529,7 +6529,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.PluginManagementImpl
      * <em>Plugin Management</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.PluginManagementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPluginManagement()
      * @generated
@@ -6539,7 +6539,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugins</b></em>' containment reference list feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PLUGIN_MANAGEMENT__PLUGINS = eINSTANCE.getPluginManagement_Plugins();
@@ -6547,7 +6547,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.PrerequisitesImpl
      * <em>Prerequisites</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.PrerequisitesImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPrerequisites()
      * @generated
@@ -6557,7 +6557,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Maven</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PREREQUISITES__MAVEN = eINSTANCE.getPrerequisites_Maven();
@@ -6565,7 +6565,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ProfileImpl <em>Profile</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ProfileImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getProfile()
      * @generated
@@ -6575,7 +6575,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute PROFILE__ID = eINSTANCE.getProfile_Id();
@@ -6583,7 +6583,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Activation</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__ACTIVATION = eINSTANCE.getProfile_Activation();
@@ -6591,7 +6591,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Build</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__BUILD = eINSTANCE.getProfile_Build();
@@ -6599,7 +6599,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Repositories</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__REPOSITORIES = eINSTANCE.getProfile_Repositories();
@@ -6607,7 +6607,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugin Repositories</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__PLUGIN_REPOSITORIES = eINSTANCE.getProfile_PluginRepositories();
@@ -6615,7 +6615,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependencies</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__DEPENDENCIES = eINSTANCE.getProfile_Dependencies();
@@ -6623,7 +6623,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Reports</b></em>' containment reference list feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__REPORTS = eINSTANCE.getProfile_Reports();
@@ -6631,7 +6631,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Dependency Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__DEPENDENCY_MANAGEMENT = eINSTANCE.getProfile_DependencyManagement();
@@ -6639,7 +6639,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Distribution Management</b></em>' containment reference feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__DISTRIBUTION_MANAGEMENT = eINSTANCE.getProfile_DistributionManagement();
@@ -6647,7 +6647,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Properties</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__PROPERTIES = eINSTANCE.getProfile_Properties();
@@ -6655,7 +6655,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Modules</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PROFILE__MODULES = eINSTANCE.getProfile_Modules();
@@ -6663,7 +6663,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Reporting</b></em>' reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference PROFILE__REPORTING = eINSTANCE.getProfile_Reporting();
@@ -6671,7 +6671,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.RelocationImpl <em>Relocation</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.RelocationImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRelocation()
      * @generated
@@ -6681,7 +6681,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RELOCATION__GROUP_ID = eINSTANCE.getRelocation_GroupId();
@@ -6689,7 +6689,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RELOCATION__ARTIFACT_ID = eINSTANCE.getRelocation_ArtifactId();
@@ -6697,7 +6697,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RELOCATION__VERSION = eINSTANCE.getRelocation_Version();
@@ -6705,7 +6705,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Message</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RELOCATION__MESSAGE = eINSTANCE.getRelocation_Message();
@@ -6713,7 +6713,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ReportingImpl <em>Reporting</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ReportingImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReporting()
      * @generated
@@ -6723,7 +6723,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Exclude Defaults</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORTING__EXCLUDE_DEFAULTS = eINSTANCE.getReporting_ExcludeDefaults();
@@ -6731,7 +6731,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Output Directory</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORTING__OUTPUT_DIRECTORY = eINSTANCE.getReporting_OutputDirectory();
@@ -6739,7 +6739,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Plugins</b></em>' containment reference list feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPORTING__PLUGINS = eINSTANCE.getReporting_Plugins();
@@ -6747,7 +6747,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ReportPluginImpl
      * <em>Report Plugin</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ReportPluginImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReportPlugin()
      * @generated
@@ -6757,7 +6757,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Group Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_PLUGIN__GROUP_ID = eINSTANCE.getReportPlugin_GroupId();
@@ -6765,7 +6765,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Artifact Id</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_PLUGIN__ARTIFACT_ID = eINSTANCE.getReportPlugin_ArtifactId();
@@ -6773,7 +6773,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Version</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_PLUGIN__VERSION = eINSTANCE.getReportPlugin_Version();
@@ -6781,7 +6781,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Inherited</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_PLUGIN__INHERITED = eINSTANCE.getReportPlugin_Inherited();
@@ -6789,7 +6789,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Report Sets</b></em>' containment reference list feature. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPORT_PLUGIN__REPORT_SETS = eINSTANCE.getReportPlugin_ReportSets();
@@ -6797,7 +6797,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Configuration</b></em>' reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPORT_PLUGIN__CONFIGURATION = eINSTANCE.getReportPlugin_Configuration();
@@ -6805,7 +6805,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ReportSetImpl <em>Report Set</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ReportSetImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getReportSet()
      * @generated
@@ -6815,7 +6815,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_SET__ID = eINSTANCE.getReportSet_Id();
@@ -6823,7 +6823,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Inherited</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_SET__INHERITED = eINSTANCE.getReportSet_Inherited();
@@ -6831,7 +6831,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Reports</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPORT_SET__REPORTS = eINSTANCE.getReportSet_Reports();
@@ -6839,7 +6839,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Configuration</b></em>' reference feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPORT_SET__CONFIGURATION = eINSTANCE.getReportSet_Configuration();
@@ -6847,7 +6847,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.RepositoryImpl <em>Repository</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.RepositoryImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRepository()
      * @generated
@@ -6857,7 +6857,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Releases</b></em>' containment reference feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPOSITORY__RELEASES = eINSTANCE.getRepository_Releases();
@@ -6865,7 +6865,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Snapshots</b></em>' containment reference feature. <!-- begin-user-doc
      * --> <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EReference REPOSITORY__SNAPSHOTS = eINSTANCE.getRepository_Snapshots();
@@ -6873,7 +6873,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY__ID = eINSTANCE.getRepository_Id();
@@ -6881,7 +6881,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY__NAME = eINSTANCE.getRepository_Name();
@@ -6889,7 +6889,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY__URL = eINSTANCE.getRepository_Url();
@@ -6897,7 +6897,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Layout</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY__LAYOUT = eINSTANCE.getRepository_Layout();
@@ -6905,7 +6905,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.RepositoryPolicyImpl
      * <em>Repository Policy</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.RepositoryPolicyImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getRepositoryPolicy()
      * @generated
@@ -6915,7 +6915,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Enabled</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY_POLICY__ENABLED = eINSTANCE.getRepositoryPolicy_Enabled();
@@ -6923,7 +6923,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Update Policy</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY_POLICY__UPDATE_POLICY = eINSTANCE.getRepositoryPolicy_UpdatePolicy();
@@ -6931,7 +6931,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Checksum Policy</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute REPOSITORY_POLICY__CHECKSUM_POLICY = eINSTANCE.getRepositoryPolicy_ChecksumPolicy();
@@ -6939,7 +6939,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the ' {@link org.eclipse.m2e.model.edit.pom.impl.ResourceImpl <em>Resource</em>}'
      * class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ResourceImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getResource()
      * @generated
@@ -6949,7 +6949,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Target Path</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RESOURCE__TARGET_PATH = eINSTANCE.getResource_TargetPath();
@@ -6957,7 +6957,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Filtering</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RESOURCE__FILTERING = eINSTANCE.getResource_Filtering();
@@ -6965,7 +6965,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Directory</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RESOURCE__DIRECTORY = eINSTANCE.getResource_Directory();
@@ -6973,7 +6973,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Includes</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RESOURCE__INCLUDES = eINSTANCE.getResource_Includes();
@@ -6981,7 +6981,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Excludes</b></em>' attribute list feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute RESOURCE__EXCLUDES = eINSTANCE.getResource_Excludes();
@@ -6989,7 +6989,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ScmImpl <em>Scm</em>}' class. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ScmImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getScm()
      * @generated
@@ -6999,7 +6999,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Connection</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SCM__CONNECTION = eINSTANCE.getScm_Connection();
@@ -7007,7 +7007,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Developer Connection</b></em>' attribute feature. <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SCM__DEVELOPER_CONNECTION = eINSTANCE.getScm_DeveloperConnection();
@@ -7015,7 +7015,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Tag</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SCM__TAG = eINSTANCE.getScm_Tag();
@@ -7023,7 +7023,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SCM__URL = eINSTANCE.getScm_Url();
@@ -7031,7 +7031,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.SiteImpl <em>Site</em>}' class. <!--
      * begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.SiteImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getSite()
      * @generated
@@ -7041,7 +7041,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Id</b></em>' attribute feature. <!-- begin-user-doc --> <!-- end-user-doc
      * -->
-     * 
+     *
      * @generated
      */
     EAttribute SITE__ID = eINSTANCE.getSite_Id();
@@ -7049,7 +7049,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SITE__NAME = eINSTANCE.getSite_Name();
@@ -7057,7 +7057,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Url</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute SITE__URL = eINSTANCE.getSite_Url();
@@ -7065,7 +7065,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.PropertyElementImpl
      * <em>Property Element</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.PropertyElementImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getPropertyElement()
      * @generated
@@ -7075,7 +7075,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PROPERTY_ELEMENT__NAME = eINSTANCE.getPropertyElement_Name();
@@ -7083,7 +7083,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '<em><b>Value</b></em>' attribute feature. <!-- begin-user-doc --> <!--
      * end-user-doc -->
-     * 
+     *
      * @generated
      */
     EAttribute PROPERTY_ELEMENT__VALUE = eINSTANCE.getPropertyElement_Value();
@@ -7091,7 +7091,7 @@ public interface PomPackage extends EPackage {
     /**
      * The meta object literal for the '{@link org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl
      * <em>Configuration</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc -->
-     * 
+     *
      * @see org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl
      * @see org.eclipse.m2e.model.edit.pom.impl.PomPackageImpl#getConfiguration()
      * @generated

@@ -28,17 +28,17 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Configuration#getNode <em>Node</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getConfiguration()
  * @model
  * @generated NOT
  */
 public interface Configuration extends EObject {
-  public Node getConfigurationNode();
+  Node getConfigurationNode();
 
-  public String getStringValue(String xpath);
+  String getStringValue(String xpath);
 
-  public void setStringValue(String xpath, String value);
+  void setStringValue(String xpath, String value);
 
   List<String> getListValue(String xpath);
 

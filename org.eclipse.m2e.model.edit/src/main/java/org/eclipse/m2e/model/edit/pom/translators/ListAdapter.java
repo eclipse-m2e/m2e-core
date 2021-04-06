@@ -39,7 +39,7 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
 public class ListAdapter extends TranslatorAdapter {
   protected List list;
 
-  private EClass elementType;
+  private final EClass elementType;
 
   public ListAdapter(SSESyncResource resc, Element containerNode, List<?> list, EClass elementType) {
     super(resc);
