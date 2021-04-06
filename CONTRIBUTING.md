@@ -39,7 +39,11 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 ## 🧑‍💻 Developer resources
 
- <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a>  
+### Source repositories
+
+Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
+
+Some tests are in a separate repository, that you should clone as well: see https://github.com/tesla/m2e-core-tests/
 
 ### ⌨️ Setting up the Development Environment
 
@@ -54,9 +58,11 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 * Happy coding!
 
 
+If you're going to hack the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` as a preliminary step and to hack your target-platform to include the output of the build.
+
 ### 🏗️ Build
 
-First `mvn install` from the _m2e-maven-runtime_ folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to yur command in order to run them.
+First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them.
 
 ### ⬆️ Version bump
 
