@@ -16,13 +16,16 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.m2e.pde.ui.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.provider.DependencyNodeLabelProvider;
 import org.eclipse.m2e.pde.ui.provider.MavenTargetTreeContentProvider;
+import org.eclipse.pde.ui.target.ITargetLocationHandler;
 
 public class DependencyNodeAdapterFactory implements IAdapterFactory {
 
 	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
 	public static final ILabelProvider LABEL_PROVIDER = new DependencyNodeLabelProvider();
+	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
 
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
@@ -31,6 +34,8 @@ public class DependencyNodeAdapterFactory implements IAdapterFactory {
 				return adapterType.cast(TREE_CONTENT_PROVIDER);
 			} else if (adapterType == ILabelProvider.class) {
 				return adapterType.cast(LABEL_PROVIDER);
+			} else if (adapterType == ITargetLocationHandler.class) {
+				return adapterType.cast(LOCATION_EDITOR);
 			}
 		}
 		return null;
@@ -38,7 +43,7 @@ public class DependencyNodeAdapterFactory implements IAdapterFactory {
 
 	@Override
 	public Class<?>[] getAdapterList() {
-		return new Class<?>[] { ITreeContentProvider.class, ILabelProvider.class };
+		return new Class<?>[] { ITreeContentProvider.class, ILabelProvider.class, ITargetLocationHandler.class };
 	}
 
 }

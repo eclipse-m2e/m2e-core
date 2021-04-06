@@ -13,6 +13,8 @@
 package org.eclipse.m2e.pde.ui.editor;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -238,15 +240,31 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	@Override
 	public boolean performFinish() {
 		List<BNDInstructions> list;
-		if (bndInstructions == null) {
-			list = Collections.emptyList();
+		Collection<String> excludes;
+		if (targetLocation == null) {
+			excludes = Collections.emptyList();
+			if (bndInstructions == null) {
+				list = Collections.emptyList();
+			} else {
+				list = Collections.singletonList(bndInstructions);
+			}
 		} else {
-			list = Collections.singletonList(bndInstructions);
+			excludes = targetLocation.getExcludes();
+			list = new ArrayList<BNDInstructions>();
+			for (BNDInstructions instruction : targetLocation.getInstructions()) {
+				if (instruction.getKey().isBlank()) {
+					continue;
+				}
+				list.add(instruction);
+			}
+			if (bndInstructions != null) {
+				list.add(bndInstructions);
+			}
 		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
 				version.getText(), type.getText(), classifier.getText(),
-				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list,
-				includeSource.getSelection());
+				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), includeSource.getSelection(),
+				list, excludes);
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {

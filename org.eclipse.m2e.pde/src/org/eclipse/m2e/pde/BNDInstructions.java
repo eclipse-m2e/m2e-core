@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Christoph Läubrich
+ * Copyright (c) 2020, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ public class BNDInstructions {
 
 	public BNDInstructions(String key, String instructions) {
 		this.key = key;
-		this.instructions = instructions;
+		this.instructions = instructions == null ? null : instructions.strip();
 	}
 
 	public String getKey() {
@@ -66,5 +66,9 @@ public class BNDInstructions {
 			throw new RuntimeException("conversion to properties failed", e);
 		}
 		return properties;
+	}
+
+	public boolean isEmpty() {
+		return instructions == null || instructions.isBlank();
 	}
 }

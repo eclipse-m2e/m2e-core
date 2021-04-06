@@ -37,6 +37,7 @@ public class MavenTargetBundle extends TargetBundle {
 	private IStatus status;
 	private final BundleInfo bundleInfo;
 	private boolean isWrapped;
+	private Artifact artifact;
 
 	@Override
 	public BundleInfo getBundleInfo() {
@@ -80,6 +81,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	public MavenTargetBundle(Artifact artifact, Properties bndInstructions, CacheManager cacheManager,
 			MissingMetadataMode metadataMode) {
+		this.artifact = artifact;
 		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
@@ -106,6 +108,10 @@ public class MavenTargetBundle extends TargetBundle {
 				status = Status.CANCEL_STATUS;
 			}
 		}
+	}
+
+	public Artifact getArtifact() {
+		return artifact;
 	}
 
 	public static TargetBundle getWrappedArtifact(Artifact artifact, Properties bndInstructions, File wrappedFile)
