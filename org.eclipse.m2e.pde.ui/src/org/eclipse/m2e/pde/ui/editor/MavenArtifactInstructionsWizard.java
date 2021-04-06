@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Christoph Läubrich
+ * Copyright (c) 2020, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -47,8 +47,10 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 	private static final String BND_PAGE = Messages.MavenArtifactInstructionsWizard_0;
 	private String instructions;
 	private boolean usedefaults;
+	private BNDInstructions bndInstructions;
 
 	public MavenArtifactInstructionsWizard(BNDInstructions bndInstructions) {
+		this.bndInstructions = bndInstructions;
 		this.instructions = bndInstructions.getInstructions();
 		this.usedefaults = instructions == null || instructions.isBlank();
 		setWindowTitle(Messages.MavenArtifactInstructionsWizard_1);
@@ -137,6 +139,13 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 		return true;
 	}
 
+	protected BNDInstructions getInstructions() {
+		if (usedefaults) {
+			return new BNDInstructions(bndInstructions.getKey(), null);
+		}
+		return new BNDInstructions(bndInstructions.getKey(), instructions);
+	}
+
 	/**
 	 * Open a wizard to edit the given instructions
 	 *
@@ -151,10 +160,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 		WizardDialog dialog = new WizardDialog(shell, wizard);
 		dialog.setMinimumPageSize(800, 600);
 		if (dialog.open() == Window.OK) {
-			if (wizard.usedefaults) {
-				return new BNDInstructions(instructions.getKey(), null);
-			}
-			return new BNDInstructions(instructions.getKey(), wizard.instructions);
+			return wizard.getInstructions();
 		}
 		return null;
 	}

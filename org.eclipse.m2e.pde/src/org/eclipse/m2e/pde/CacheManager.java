@@ -106,7 +106,7 @@ public class CacheManager {
 	 * @param metadataMode    the mode to use if this artifact is not a bundle
 	 * @return
 	 */
-	public TargetBundle getTargetBundle(Artifact artifact, BNDInstructions bndInstructions,
+	public MavenTargetBundle getTargetBundle(Artifact artifact, BNDInstructions bndInstructions,
 			MissingMetadataMode metadataMode) {
 		if (invalidated) {
 			throw new IllegalStateException("invalidated location");
