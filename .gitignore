@@ -1,5 +1,4 @@
 target/
 bin/
 .DS_Store
-/org.eclipse.m2e.binaryproject/
 .polyglot*
