@@ -1,4 +1,5 @@
 target/
 bin/
+src-gen/
 .DS_Store
 .polyglot*
