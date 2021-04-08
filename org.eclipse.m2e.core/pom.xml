@@ -30,7 +30,7 @@
 
     <resources>
       <resource>
-        <directory>${basedir}/src</directory>
+        <directory>${project.basedir}/src</directory>
         <includes>
           <include>**/*.properties</include>
         </includes>
@@ -50,6 +50,7 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
+              <outputDirectory>${project.basedir}/src-gen</outputDirectory>
               <version>1.0.0</version>
               <models>
                 <model>mdo/lifecycle-mapping-metadata-model.xml</model>
