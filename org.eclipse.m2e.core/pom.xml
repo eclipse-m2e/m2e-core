@@ -26,17 +26,6 @@
   </properties>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
-
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src</directory>
-        <includes>
-          <include>**/*.properties</include>
-        </includes>
-      </resource>
-    </resources>
-
     <plugins>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
