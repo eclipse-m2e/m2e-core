@@ -15,12 +15,13 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.io.FileUtils;
-import org.apache.maven.shared.utils.io.IOUtil;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
@@ -61,8 +62,11 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
         IMavenProjectFacade childFacade = MavenPlugin.getMavenProjectRegistry().getProject(child);
         MavenProject mavenProject = childFacade.getMavenProject(new NullProgressMonitor());
         assertEquals("bar", mavenProject.getProperties().get("foo"));
-        String content = IOUtil.toString(parent.getFile("pom.xml").getContents()).replace("bar", "lol");
-        parent.getFile("pom.xml").setContents(new ByteArrayInputStream(content.getBytes()), true, false, null);
+        
+		IFile pomXml = parent.getFile("pom.xml");
+		String content = Files.readString(Path.of(pomXml.getLocationURI())).replace("bar", "lol");
+		pomXml.setContents(new ByteArrayInputStream(content.getBytes()), true, false, null);
+		
         MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(child, monitor);
         waitForJobsToComplete();
         mavenProject = childFacade.getMavenProject(monitor);

@@ -12,6 +12,11 @@ package org.eclipse.m2e.editor.xml.sse.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -39,6 +44,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.junit.After;
 import org.junit.Test;
 
+@SuppressWarnings("restriction")
 public class WTPEditorTest {
 
 	private IWorkbenchPage page;
@@ -50,38 +56,50 @@ public class WTPEditorTest {
 		project.delete(true, null);
 	}
 
+	private static final String CURSOR_AFTER = "<version>0.0.1-SNAPSHOT</version>" + System.lineSeparator();
+
 	@Test
 	public void testXSDCompletion() throws Exception {
 		IPreferenceStore preferenceStore = M2EUIPluginActivator.getDefault().getPreferenceStore();
 		preferenceStore.setValue(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, true);
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject("test" + System.currentTimeMillis());
 		project.create(null);
 		project.open(null);
+
 		IFile pomFile = project.getFile("pom.xml");
-		pomFile.create(getClass().getResourceAsStream("pom.xml"), true, null);
-		ITextEditor editorPart = (ITextEditor) ((MavenPomEditor)IDE.openEditor(page, pomFile, MavenPomEditor.EDITOR_ID)).getActiveEditor();
-		editorPart.getSelectionProvider().setSelection(new TextSelection(359, 0));
+		String pomContent = toString(getClass().getResourceAsStream("pom.xml"));
+		pomFile.create(new ByteArrayInputStream(pomContent.getBytes(StandardCharsets.UTF_8)), true, null);
+
+		MavenPomEditor pomEditor = (MavenPomEditor) IDE.openEditor(page, pomFile, MavenPomEditor.EDITOR_ID);
+		ITextEditor editorPart = (ITextEditor) pomEditor.getActiveEditor();
+
+		// place the cursor after the artifact's-version element
+		int cursorLocation = pomContent.indexOf(CURSOR_AFTER) + CURSOR_AFTER.length();
+		editorPart.getSelectionProvider().setSelection(new TextSelection(cursorLocation, 0));
+
 		Set<Shell> beforeShells = new HashSet<Shell>(Arrays.asList(Display.getDefault().getShells()));
-		assertTrue(DisplayHelper.waitForCondition(editorPart.getSite().getShell().getDisplay(), 5000, () -> 
-			openCompletionTable(editorPart, beforeShells)
-				.map(Table::getItems)
-				.flatMap(items -> Arrays.stream(items).map(TableItem::getText).filter("groupId"::equals).findAny())
-				.isPresent()
-		));
+		assertTrue(DisplayHelper.waitForCondition(editorPart.getSite().getShell().getDisplay(), 5000,
+				() -> openCompletionTable(editorPart, beforeShells).map(Table::getItems).flatMap(items -> {
+					String proposalElementText = "groupId";
+					return Arrays.stream(items).map(TableItem::getText).filter(proposalElementText::equals).findAny();
+				}).isPresent()));
 	}
 
 	private Optional<Table> openCompletionTable(ITextEditor editorPart, Set<Shell> beforeShells) {
 		editorPart.getAction(ITextEditorActionConstants.CONTENT_ASSIST).run();
-		Set<Shell> afterShells = new HashSet<Shell>(Arrays.asList(Display.getDefault().getShells()));
-		afterShells.removeAll(beforeShells);
-		afterShells.removeIf(shell -> !shell.isVisible());
-		Shell completionShell = afterShells.iterator().next();
-		Optional<Table> table = Arrays.stream(completionShell.getChildren())
-			.filter(Table.class::isInstance)
-			.map(Table.class::cast)
-			.findAny();
-		return table;
+		return Arrays.stream(Display.getDefault().getShells()).distinct()
+				.filter(s -> !beforeShells.contains(s) && s.isVisible())
+				.flatMap(completionShell -> Arrays.stream(completionShell.getChildren()))
+				.filter(Table.class::isInstance).map(Table.class::cast).findAny();
 	}
 
+	private static String toString(InputStream inputStream) throws IOException {
+		try (inputStream) {
+			ByteArrayOutputStream arrayStream = new ByteArrayOutputStream();
+			inputStream.transferTo(arrayStream);
+			return arrayStream.toString(StandardCharsets.UTF_8);
+		}
+	}
 }
