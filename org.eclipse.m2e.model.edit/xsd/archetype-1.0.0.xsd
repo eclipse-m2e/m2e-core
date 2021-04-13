@@ -32,7 +32,7 @@
       <xs:element minOccurs="0" name="sources">
         <xs:annotation>
           <xs:documentation source="version">1.0.0</xs:documentation>
-          <xs:documentation source="description">Files that will go into &lt;code&gt;src/main/java&lt;/code&gt;.</xs:documentation>
+          <xs:documentation source="description">Files that will go into &lt;code&gt;src&lt;/code&gt;.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
