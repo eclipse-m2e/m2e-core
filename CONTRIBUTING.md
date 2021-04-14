@@ -43,10 +43,15 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
 
-Some tests are in a separate repository, that you should clone as well: see https://github.com/tesla/m2e-core-tests/
+Some tests are in a separate repository which is referenced as a Git submodule in the `m2e-core-tests` folder. You can use typical Git submodules comment to initialie the content of this folder.
+
+### 🏗️ Build
+
+First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them; adding `-DskipTests` will skip all tests.
 
 ### ⌨️ Setting up the Development Environment
 
+* Run a build via command-line as mentioned above, since m2e relies on some code-generation that's not well integrated in the Eclipse IDE.
 * Use latest release of the Eclipse SDK or Eclipse IDE with the Plugin Development Environment installed.
 * Make sure m2e is installed in this IDE, including the "m2e PDE" feature,
 * _File > Open Projects from Filesystem..._ , select the path to m2e-core Git repo and the relevant children projects you want to import; approve m2e connectors installation if prompted
@@ -59,10 +64,6 @@ Some tests are in a separate repository, that you should clone as well: see http
 
 
 If you're going to hack the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` as a preliminary step and to hack your target-platform to include the output of the build.
-
-### 🏗️ Build
-
-First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them.
 
 ### ⬆️ Version bump
 
