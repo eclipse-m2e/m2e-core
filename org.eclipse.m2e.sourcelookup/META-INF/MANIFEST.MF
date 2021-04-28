@@ -17,9 +17,9 @@ Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.16.0,2.0.0)",
  org.eclipse.debug.ui;bundle-version="3.10.0",
  org.eclipse.core.resources,
  com.google.guava;bundle-version="[27.1,28.0)",
- com.google.gson;bundle-version="2.2.4",
  org.eclipse.core.variables;bundle-version="3.2.0"
-Import-Package: org.slf4j;version="1.6.2"
+Import-Package: com.google.gson;version="[2.2.4,3.0.0)",
+ org.slf4j;version="1.6.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
