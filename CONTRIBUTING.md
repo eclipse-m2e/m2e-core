@@ -39,19 +39,31 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 ## 🧑‍💻 Developer resources
 
-### Source repositories
+### Prerequisites
 
-Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
+Java 11 and Maven 3.6.3 (only if you want to build from the command-line), or newer.
 
+### ⌨️ Setting up the Development Environment automatically, using the Eclipse Installer (Oomph)
+
+1. Download the [Eclipse Installer](https://wiki.eclipse.org/Eclipse_Installer).  
+	1. If you are already in the workspace of an Eclipse provisioned by Oomph, go to *File > Import... > Oomph > Projects from catalog* and continue with step 6.
+2. Start the installer using the `eclipse-inst` executable.
+3. On the first page (product selection), click the preference button in the top-right corner and select the *Advanced Mode* .
+4. If you are behind a proxy, at this point you might want to double check your network settings by clicking in the *Network Proxy Settings* at the bottom.
+5. Select *Eclipse IDE for Eclipse Committers* . Click *Next* .
+6. Under *Eclipse Projects* , double-click on *m2e-core* (single click is not enough!). Make sure that *m2e-core* is shown in the table on the bottom. Click *Next*.
+7. You can edit the *Installation Folder* , but you do not have to select the *Target Platform* here, this will be set later automatically. By choosing *Show all variables* at the bottom of the page, you are able to change other values as well but you do not have to. Click *Next* .
+8. Press *Finished* on the *Confirmation* page will start the installation process. 
+9. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclispe started, the progress bar in the status bar shows the progress of the overall setup.
+10. Once the *Executing startup task* job is finished you should have all the *m2-core*, *m2-core-tests* and *m2e-maven-runtime* projects imported into three working sets called *m2-core*, *m2-core-tests* and *m2e-maven-runtime*.
+11. Happy coding!
+
+### ⌨️ Setting up the Development Environment manually
+
+* Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
 Some tests are in a separate repository which is referenced as a Git submodule in the `m2e-core-tests` folder. You can use typical Git submodules comment to initialie the content of this folder.
 
-### 🏗️ Build
-
-First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them; adding `-DskipTests` will skip all tests.
-
-### ⌨️ Setting up the Development Environment
-
-* Run a build via command-line as mentioned above, since m2e relies on some code-generation that's not well integrated in the Eclipse IDE.
+* Run a build via command-line as mentioned below, since m2e relies on some code-generation that's not well integrated in the Eclipse IDE.
 * Use latest release of the Eclipse SDK or Eclipse IDE with the Plugin Development Environment installed.
 * Make sure m2e is installed in this IDE, including the "m2e PDE" feature,
 * _File > Open Projects from Filesystem..._ , select the path to m2e-core Git repo and the relevant children projects you want to import; approve m2e connectors installation if prompted
@@ -62,6 +74,10 @@ First `mvn install -f m2e-maven-runtime` folder, then `mvn clean verify` from th
 * Open the project modules you want to work on (right-click > Open project) and their dependencies; approve m2e connectors installation if prompted
 * Happy coding!
 
+
+### 🏗️ Build
+
+On the command line first run `mvn install -f m2e-maven-runtime`, then `mvn clean verify` both from the root of this repo's clone. Within the Eclipse-IDE both builds can be run using the Maven Launch-Configurations *m2e-maven-runtime--install* respectively *m2e-core--build*. The Launch-Configuration *m2e-core--build-all* runs both builds subsequently. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them; adding `-DskipTests` will skip all tests, within Eclipse one can run *m2e-core--build-with-integration-tests*.
 
 If you're going to hack the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` as a preliminary step and to hack your target-platform to include the output of the build.
 
