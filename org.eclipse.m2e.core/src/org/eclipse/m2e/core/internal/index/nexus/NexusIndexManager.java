@@ -525,10 +525,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     return className + " : " + packageName + " : " + group + " : " + artifact; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
-  private void purgeCurrentIndex(IndexingContext context) throws IOException {
-    context.purge();
-  }
-
   private void reindexLocalRepository(IRepository repository, boolean force, final IProgressMonitor monitor)
       throws CoreException {
     if(!force) {
@@ -538,9 +534,12 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       fireIndexUpdating(repository);
       //IndexInfo indexInfo = getIndexInfo(indexName);
       IndexingContext context = getIndexingContext(repository);
-      purgeCurrentIndex(context);
-      if(context.getRepository().isDirectory()) {
-        getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor), false);
+      if(context != null) {
+        context.purge();
+
+        if(context.getRepository().isDirectory()) {
+          getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor), false);
+        }
       }
       log.info("Updated local repository index");
     } catch(Exception ex) {
@@ -558,7 +557,10 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       return;
     try {
       IndexingContext context = getIndexingContext(workspaceRepository);
-      purgeCurrentIndex(context);
+      if(context != null) {
+        context.purge();
+      }
+
       for(IMavenProjectFacade facade : projectManager.getProjects()) {
         addDocument(workspaceRepository, facade.getPomFile(), //
             facade.getArtifactKey());
