@@ -42,20 +42,26 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 ### Prerequisites
 
 Java 11 and Maven 3.6.3 (only if you want to build from the command-line), or newer.
+Furthermore a local git installation is required and the git executable must be in the PATH environment variable.
 
 ### ⌨️ Setting up the Development Environment automatically, using the Eclipse Installer (Oomph)
 
 1. Download the [Eclipse Installer](https://wiki.eclipse.org/Eclipse_Installer).  
 	1. If you are already in the workspace of an Eclipse provisioned by Oomph, go to *File > Import... > Oomph > Projects from catalog* and continue with step 6.
 2. Start the installer using the `eclipse-inst` executable.
-3. On the first page (product selection), click the preference button in the top-right corner and select the *Advanced Mode* .
-4. If you are behind a proxy, at this point you might want to double check your network settings by clicking in the *Network Proxy Settings* at the bottom.
-5. Select *Eclipse IDE for Eclipse Committers* . Click *Next* .
-6. Under *Eclipse Projects* , double-click on *m2e-core* (single click is not enough!). Make sure that *m2e-core* is shown in the table on the bottom. Click *Next*.
-7. You can edit the *Installation Folder* , but you do not have to select the *Target Platform* here, this will be set later automatically. By choosing *Show all variables* at the bottom of the page, you are able to change other values as well but you do not have to. Click *Next* .
-8. Press *Finished* on the *Confirmation* page will start the installation process. 
-9. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclispe started, the progress bar in the status bar shows the progress of the overall setup.
-10. Once the *Executing startup task* job is finished you should have all the *m2-core*, *m2-core-tests* and *m2e-maven-runtime* projects imported into three working sets called *m2-core*, *m2-core-tests* and *m2e-maven-runtime*.
+3. On the first page (*Product*), click the preference button in the top-right corner and select the *Advanced Mode*.
+    1. If you are behind a proxy, at this point you might want to double check your network settings by clicking in the *Network proxy settings* at the bottom.
+    2. If an SSH key is required to access the git-repository, make sure that this key is known by clicking on the *SSH2 settings* at the bottom and verify that *SS2 home* has the correct value and the key is listed in *Private keys*.
+4. Select *Eclipse IDE for Eclipse Committers* (use *Product Version - latest* to use the latest builds of Eclipse). Click *Next* .
+5. On the *Projects*-page under *Eclipse Projects*, select *m2e*. Make sure that *m2e* is shown in the table on the bottom. Click *Next*.
+6. You can edit the *Installation location and folder name*, the *Workspace location and folder name* or the *Git clone location*, among others.
+    1. Only the latter is available if you came here via the Import-projects dialog.
+    2. By choosing *Show all variables* at the bottom of the page, you are able to change other values as well but you do not have to.
+    3. Click *Next* .
+7. Press *Finish* on the *Confirmation* page will start the installation process. 
+8. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclispe started, the progress bar in the status bar shows the progress of the overall setup.
+9. Once the *Executing startup task* job is finished you should have all the *m2-core*, *m2-core-tests* and *m2e-maven-runtime* projects imported into three working sets called *m2-core*, *m2-core-tests* and *m2e-maven-runtime*.
+10. Remaining errors are resolved after a restart of Eclipse.
 11. Happy coding!
 
 ### ⌨️ Setting up the Development Environment manually

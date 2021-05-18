@@ -63,6 +63,10 @@
     </content>
   </setupTask>
   <setupTask
+      xsi:type="setup:VariableTask"
+      name="eclipse.target.platform"
+      value="None"/>
+  <setupTask
       xsi:type="setup.p2:P2Task"
       label="m2e">
     <requirement
@@ -207,13 +211,12 @@
       xsi:type="pde:TargetPlatformTask"
       name="m2e-dev-workspace"/>
   <setupTask
+      xsi:type="launching:LaunchTask"
+      launcher="m2e-maven-runtime--install"/>
+  <setupTask
       xsi:type="projects:ProjectsBuildTask"
       refresh="true"
       clean="true"/>
-  <setupTask
-      xsi:type="launching:LaunchTask"
-      predecessor="//@setupTasks.11"
-      launcher="m2e-maven-runtime--install"/>
   <stream name="master"
       label="master"/>
   <logicalProjectContainer
