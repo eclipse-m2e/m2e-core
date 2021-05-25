@@ -164,7 +164,7 @@
   }
 
   private void checkAllFieldsSet() {
-    if (groupId==null || artifactId==null || versionRange==null || goals==null || goals.isEmpty() ){
+    if (groupId==null || artifactId==null || versionRange==null || goals==null ){
       throw new IllegalArgumentException(
       "Missing parameter for pluginExecutionFilter. " +
       "groupId, artifactId, versionRange and goals must be specificed, but found: "+this);
