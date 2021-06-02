@@ -105,6 +105,7 @@
 
     <!-- testing -->
     <module>org.eclipse.m2e.core.tests</module>
+    <module>org.eclipse.m2e.core.ui.tests</module>
     <module>org.eclipse.m2e.importer.tests</module>
     <module>org.eclipse.m2e.binaryproject.tests</module>
     <module>org.eclipse.m2e.editor.lemminx.tests</module>
