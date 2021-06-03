@@ -109,34 +109,9 @@
     <module>org.eclipse.m2e.importer.tests</module>
     <module>org.eclipse.m2e.binaryproject.tests</module>
     <module>org.eclipse.m2e.editor.lemminx.tests</module>
-	<module>org.eclipse.m2e.jdt.tests</module>
+    <module>org.eclipse.m2e.jdt.tests</module>
     <module>org.eclipse.m2e.editor.xml.sse.tests</module>
   </modules>
-
-
-  <dependencies>
-    <!-- Thos dependencies cannot be captured by the target-platform -->
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-      <version>1.18.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-      <version>1.18.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-      <version>1.18.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-      <version>1.18.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
@@ -171,7 +146,7 @@
               <type>eclipse-plugin</type>
               <id>org.apache.xerces</id>
               <restrictTo>
-                 <versionRange>[2.12.1,3.0.0)</versionRange>
+                <versionRange>[2.12.1,3.0.0)</versionRange>
               </restrictTo>
             </filter>
           </filters>
