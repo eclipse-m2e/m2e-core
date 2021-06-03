@@ -1,5 +1,8 @@
 # Eclipse IDE integration for Maven (Eclipse m2e project)
 
+ <a href="https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true"
+style="margin-left:2em;margin-top:1ex;margin-bottom:1ex;font-weight:bold;border:1px solid chocolate;background-color:darkorange;color:white;padding:0.25ex 0.25em;text-align:center;text-decoration:none" rel="nofollow">Create m2e Development Environment...</a>
+ or just 
  <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a>
 
 M2Eclipse provides tight integration for Apache Maven into the Eclipse IDE with the following features:
