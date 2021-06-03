@@ -155,9 +155,9 @@
             </_exportcontents>
 
             <Import-Package>
-              org.slf4j;version="1.6.2",
-              org.slf4j.spi;version="1.6.2",
-              org.slf4j.helpers;version="1.6.2",
+              org.slf4j;version="[1.6.2,2.0.0)",
+              org.slf4j.spi;version="[1.6.2,2.0.0)",
+              org.slf4j.helpers;version="[1.6.2,2.0.0)",
             </Import-Package>
             <Require-Bundle>
               org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",
