@@ -225,7 +225,7 @@
   </setupTask>
   <setupTask
       xsi:type="pde:TargetPlatformTask"
-      name="m2e-dev-workspace"/>
+      name="m2e-target-platform"/>
   <setupTask
       xsi:type="launching:LaunchTask"
       launcher="m2e-maven-runtime--install"/>

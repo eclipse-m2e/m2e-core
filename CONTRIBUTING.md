@@ -92,7 +92,8 @@ Some tests are in a separate repository which is referenced as a Git submodule i
 
 On the command line first run `mvn install -f m2e-maven-runtime`, then `mvn clean verify` both from the root of this repo's clone. Within the Eclipse-IDE both builds can be run using the Maven Launch-Configurations *m2e-maven-runtime--install* respectively *m2e-core--build*. The Launch-Configuration *m2e-core--build-all* runs both builds subsequently. The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them; adding `-DskipTests` will skip all tests, within Eclipse one can run *m2e-core--build-with-integration-tests*.
 
-If you're going to hack the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` as a preliminary step and to hack your target-platform to include the output of the build.
+If you're going to modify the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to run `mvn install -f m2e-maven-runtime` and subsequently reload the target-platform in order to make those components available as OSGi bundles for the other plugins.
+Those steps are necessary because the the Maven runtime components are originally pure Maven projects whose OSGi metadata are generated during build.
 
 ### ⬆️ Version bump
 
