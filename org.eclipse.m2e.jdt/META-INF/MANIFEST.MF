@@ -18,5 +18,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.jdt.MavenJdtPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
-Import-Package: org.slf4j;version="1.6.2"
+Import-Package: org.slf4j;version="[1.6.2,2.0.0)"
 Automatic-Module-Name: org.eclipse.m2e.jdt
