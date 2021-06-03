@@ -46,6 +46,13 @@ Furthermore a local git installation is required and the git executable must be 
 
 ### ⌨️ Setting up the Development Environment automatically, using the Eclipse Installer (Oomph)
 
+Quick-Link:
+
+ <a href="https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true"
+style="margin-left:2em;margin-top:1ex;margin-bottom:1ex;font-weight:bold;border:1px solid chocolate;background-color:darkorange;color:white;padding:0.25ex 0.25em;text-align:center;text-decoration:none" rel="nofollow">Create m2e Development Environment with Eclipse-Oomph...</a>
+
+Step by Step guide:
+
 1. Download the [Eclipse Installer](https://wiki.eclipse.org/Eclipse_Installer).  
 	1. If you are already in the workspace of an Eclipse provisioned by Oomph, go to *File > Import... > Oomph > Projects from catalog* and continue with step 6.
 2. Start the installer using the `eclipse-inst` executable.
