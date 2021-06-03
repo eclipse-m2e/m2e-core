@@ -20,6 +20,7 @@
 
   <artifactId>org.eclipse.m2e.archetype.common</artifactId>
   <packaging>bundle</packaging>
+  <version>1.18.0-SNAPSHOT</version>
 
   <name>Maven Archetype Common Bundle</name>
 
@@ -94,7 +95,7 @@
             <Import-Package>
               !*
             </Import-Package>
-            <Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.16.0,1.17.0)"</Require-Bundle>
+            <Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
           </instructions>
         </configuration>
       </plugin>
