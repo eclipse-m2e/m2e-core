@@ -33,7 +33,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Current target version of m2e, used to deduce some URL at verify and publish.
-    This should usually be sync'd with the main feature version -->
+    This should usually be sync'd with the main feature version.
+    Also change it in m2e-maven-runtime/pom.xml -->
     <m2e.version>1.18.0</m2e.version>
 
     <tycho-version>2.3.0</tycho-version>
@@ -117,7 +118,7 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-      <version>1.16.0-SNAPSHOT</version>
+      <version>1.18.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
@@ -127,7 +128,7 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-      <version>1.16.0-SNAPSHOT</version>
+      <version>1.18.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
