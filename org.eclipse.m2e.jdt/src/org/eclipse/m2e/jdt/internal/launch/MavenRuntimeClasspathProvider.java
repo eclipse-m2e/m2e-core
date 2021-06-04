@@ -16,6 +16,7 @@ package org.eclipse.m2e.jdt.internal.launch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -191,9 +192,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   private void addStandardClasspathEntries(Set<IRuntimeClasspathEntry> all, IRuntimeClasspathEntry entry,
       ILaunchConfiguration configuration) throws CoreException {
     IRuntimeClasspathEntry[] resolved = JavaRuntime.resolveRuntimeClasspathEntry(entry, configuration);
-    for(IRuntimeClasspathEntry element : resolved) {
-      all.add(element);
-    }
+    Collections.addAll(all, resolved);
   }
 
   private void addMavenClasspathEntries(Set<IRuntimeClasspathEntry> resolved,

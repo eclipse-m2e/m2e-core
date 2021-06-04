@@ -15,6 +15,7 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -183,9 +184,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     this.outputLocation = entry.getOutputLocation();
 
     this.accessRules = new ArrayList<>();
-    for(IAccessRule rule : entry.getAccessRules()) {
-      this.accessRules.add(rule);
-    }
+    Collections.addAll(this.accessRules, entry.getAccessRules());
 
     this.attributes = new LinkedHashMap<>();
     for(IClasspathAttribute attribute : entry.getExtraAttributes()) {
