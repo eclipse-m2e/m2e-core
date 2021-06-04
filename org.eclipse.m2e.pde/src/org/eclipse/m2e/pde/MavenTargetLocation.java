@@ -116,7 +116,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (targetBundles == null) {
 			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			ignoredArtifacts.clear();
-			targetBundles = new HashMap<Artifact, TargetBundle>();
+			targetBundles = new HashMap<>();
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),

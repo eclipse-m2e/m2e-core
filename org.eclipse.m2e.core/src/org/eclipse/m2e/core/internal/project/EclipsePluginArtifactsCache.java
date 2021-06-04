@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 @SuppressWarnings("synthetic-access")
 public class EclipsePluginArtifactsCache extends DefaultPluginArtifactsCache implements IManagedCache {
 
-  private final ProjectCachePlunger<Key> plunger = new ProjectCachePlunger<Key>() {
+  private final ProjectCachePlunger<Key> plunger = new ProjectCachePlunger<>() {
     protected void flush(Key cacheKey) {
       cache.remove(cacheKey);
     }

@@ -250,7 +250,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			}
 		} else {
 			excludes = targetLocation.getExcludes();
-			list = new ArrayList<BNDInstructions>();
+			list = new ArrayList<>();
 			for (BNDInstructions instruction : targetLocation.getInstructions()) {
 				if (instruction.getKey().isBlank()) {
 					continue;
