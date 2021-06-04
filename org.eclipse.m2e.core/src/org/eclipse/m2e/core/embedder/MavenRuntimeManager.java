@@ -78,9 +78,7 @@ public class MavenRuntimeManager {
 
   public List<MavenRuntime> getMavenRuntimes() {
     List<MavenRuntime> result = new ArrayList<>();
-    for(AbstractMavenRuntime runtime : impl.getMavenRuntimes()) {
-      result.add(runtime);
-    }
+    result.addAll(impl.getMavenRuntimes());
     return result;
   }
 

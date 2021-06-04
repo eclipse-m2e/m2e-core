@@ -568,9 +568,7 @@ public abstract class AbstractMavenProjectTestCase {
   @SafeVarargs
   protected static <T> void assertContainsOnly(Set<? extends T> actual, T... expected) {
     Set<T> expectedSet = new HashSet<>();
-    for(T item : expected) {
-      expectedSet.add(item);
-    }
+    Collections.addAll(expectedSet, expected);
     assertEquals(expectedSet, actual);
   }
 
