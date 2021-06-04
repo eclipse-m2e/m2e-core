@@ -27,13 +27,11 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.TextConsole;
 import org.junit.Test;
 
