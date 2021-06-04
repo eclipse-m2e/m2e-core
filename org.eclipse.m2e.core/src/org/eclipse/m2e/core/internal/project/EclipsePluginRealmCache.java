@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 @SuppressWarnings("synthetic-access")
 public class EclipsePluginRealmCache extends DefaultPluginRealmCache implements IManagedCache {
 
-  private final ProjectCachePlunger<Key> plunger = new ProjectCachePlunger<Key>() {
+  private final ProjectCachePlunger<Key> plunger = new ProjectCachePlunger<>() {
     protected void flush(Key cacheKey) {
       CacheRecord cacheRecord = cache.remove(cacheKey);
       if(cacheRecord != null) {

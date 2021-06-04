@@ -39,7 +39,7 @@ public abstract class AbstractBinaryProjectsImportJob extends Job {
     }
 
     if (!artifacts.isEmpty()) {
-      List<IStatus> errors = new ArrayList<IStatus>();
+      List<IStatus> errors = new ArrayList<>();
 
       for (ArtifactKey artifact : artifacts) {
         try {

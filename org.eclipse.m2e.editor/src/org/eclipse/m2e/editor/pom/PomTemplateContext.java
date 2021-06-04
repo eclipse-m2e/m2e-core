@@ -787,7 +787,7 @@ public enum PomTemplateContext {
       Path projectPath = pctx.projectDir.toPath().toRealPath();
       Path parentPath = pctx.parentDir.toPath().toRealPath();
 
-      FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+      FileVisitor<Path> visitor = new SimpleFileVisitor<>() {
 
         boolean submodulesSearch;
 

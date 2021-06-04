@@ -116,7 +116,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    *
    * @generated
    */
-  protected PomSwitch<Adapter> modelSwitch = new PomSwitch<Adapter>() {
+  protected PomSwitch<Adapter> modelSwitch = new PomSwitch<>() {
     @Override
     public Adapter caseActivation(Activation object) {
       return createActivationAdapter();
