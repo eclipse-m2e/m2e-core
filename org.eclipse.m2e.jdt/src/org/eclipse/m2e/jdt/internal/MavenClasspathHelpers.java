@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.project.MavenProject;
 
@@ -28,9 +31,29 @@ import org.eclipse.m2e.jdt.IClasspathManager;
 
 public class MavenClasspathHelpers {
 
+  public static IClasspathEntry getJREContainerEntry(IJavaProject javaProject) {
+    if(javaProject != null) {
+      try {
+        for(IClasspathEntry entry : javaProject.getRawClasspath()) {
+          if(MavenClasspathHelpers.isJREClasspathContainer(entry.getPath())) {
+            return entry;
+          }
+        }
+      } catch(JavaModelException ex) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   public static boolean isMaven2ClasspathContainer(IPath containerPath) {
     return containerPath != null && containerPath.segmentCount() > 0
         && IClasspathManager.CONTAINER_ID.equals(containerPath.segment(0));
+  }
+
+  public static boolean isJREClasspathContainer(IPath containerPath) {
+    return containerPath != null && containerPath.segmentCount() > 0
+        && JavaRuntime.JRE_CONTAINER.equals(containerPath.segment(0));
   }
 
   public static IClasspathEntry getDefaultContainerEntry() {
