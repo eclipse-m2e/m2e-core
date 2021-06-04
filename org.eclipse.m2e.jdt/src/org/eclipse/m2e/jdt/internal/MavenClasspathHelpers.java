@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.project.MavenProject;
 
@@ -31,6 +32,11 @@ public class MavenClasspathHelpers {
   public static boolean isMaven2ClasspathContainer(IPath containerPath) {
     return containerPath != null && containerPath.segmentCount() > 0
         && IClasspathManager.CONTAINER_ID.equals(containerPath.segment(0));
+  }
+
+  public static boolean isJREClasspathContainer(IPath containerPath) {
+    return containerPath != null && containerPath.segmentCount() > 0
+        && JavaRuntime.JRE_CONTAINER.equals(containerPath.segment(0));
   }
 
   public static IClasspathEntry getDefaultContainerEntry() {

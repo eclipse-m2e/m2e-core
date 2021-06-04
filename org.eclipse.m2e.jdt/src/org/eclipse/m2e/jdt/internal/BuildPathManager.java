@@ -173,6 +173,21 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return null;
   }
 
+  public static IClasspathEntry getJREContainerEntry(IJavaProject javaProject) {
+    if(javaProject != null) {
+      try {
+        for(IClasspathEntry entry : javaProject.getRawClasspath()) {
+          if(MavenClasspathHelpers.isJREClasspathContainer(entry.getPath())) {
+            return entry;
+          }
+        }
+      } catch(JavaModelException ex) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   public static IClasspathContainer getMaven2ClasspathContainer(IJavaProject project) throws JavaModelException {
     IClasspathEntry[] entries = project.getRawClasspath();
     for(IClasspathEntry entry : entries) {
@@ -932,8 +947,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       for(int i = 0; i < cp.length; i++ ) {
         IClasspathEntry entry = cp[i];
         if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind() && entry.equals(fragment.getRawClasspathEntry())) {
-          List<IClasspathAttribute> attributes = new ArrayList<>(
-              Arrays.asList(entry.getExtraAttributes()));
+          List<IClasspathAttribute> attributes = new ArrayList<>(Arrays.asList(entry.getExtraAttributes()));
 
           if(srcPath == null) {
             // configure javadocs if available

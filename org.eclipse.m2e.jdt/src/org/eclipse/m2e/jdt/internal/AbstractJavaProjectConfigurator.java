@@ -796,11 +796,98 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return new Path(relative.replace('\\', '/')); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
+  /**
+   * get all the arguments provided to the compiler per MojoExecution
+   * 
+   * @param mavenProject the current maven project
+   * @param execution the plugin execution
+   * @param monitor the progress monitor
+   * @return the arguments
+   */
+  private List<String> getCompilerArguments(MavenProject mavenProject, MojoExecution execution,
+      IProgressMonitor monitor) {
+
+    List<String> arguments = new ArrayList<>();
+
+    //1st, get the arguments in the compilerArgs list
+    try {
+      List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      if(args != null) {//$NON-NLS-1$
+        args.stream().filter(a -> a != null).forEach(a -> arguments.add(a.toString()));
+      }
+    } catch(Exception ex) {
+      //ignore
+    }
+
+    //2nd, get the compilerArgument String
+    try {
+      String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
+          monitor);
+      if(compilerArgument != null) {//$NON-NLS-1$
+        arguments.add(compilerArgument);
+      }
+    } catch(CoreException ex) {
+      //ignore
+    }
+
+    //Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
+
+    //3nd not ignoring <testCompilerArguments> Map, not deprecated
+    try {
+      Map<?, ?> args = maven.getMojoParameterValue(mavenProject, execution, "testCompilerArguments", Map.class, //$NON-NLS-1$
+          monitor);
+      if(args != null) {//$NON-NLS-1$
+        args.entrySet().stream().forEach((e) -> {
+          if(e.getKey() != null) {
+            arguments.add(e.getKey().toString());
+          }
+          if(e.getValue() != null) {
+            arguments.add(e.getValue().toString());
+          }
+        });
+      }
+    } catch(Exception ex) {
+      //ignore
+    }
+
+    return arguments;
+  }
+
+  /**
+   * get all the arguments provided to the compiler
+   * 
+   * @param facade
+   * @param monitor
+   * @return the arguments
+   * @throws CoreException
+   */
+  private List<String> getCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+    List<String> compilerArgs = new ArrayList<>();
+
+    List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
+
+    for(MojoExecution compile : executions) {
+      if(isCompileExecution(compile)) {
+        List<String> args = getCompilerArguments(facade.getMavenProject(), compile, monitor);
+        if(args != null) {
+          compilerArgs.addAll(args);
+        }
+      }
+    }
+
+    return compilerArgs;
+  }
+
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     ModuleSupport.configureClasspath(facade, classpath, monitor);
   }
 
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
-      IProgressMonitor monitor) {
+      IProgressMonitor monitor) throws CoreException {
+
+    List<String> compilerArgs = getCompilerArguments(request.getMavenProjectFacade(), monitor);
+
+    ModuleSupport.configureRawClasspath(request, classpath, monitor, compilerArgs);
   }
 }
