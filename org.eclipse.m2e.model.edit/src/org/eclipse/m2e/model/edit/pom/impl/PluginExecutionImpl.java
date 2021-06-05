@@ -139,7 +139,6 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
    * @generated
    */
   protected PluginExecutionImpl() {
-    super();
   }
 
   /**

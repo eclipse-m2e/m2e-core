@@ -136,7 +136,6 @@ public class ResourceImpl extends EObjectImpl implements Resource {
    * @generated
    */
   protected ResourceImpl() {
-    super();
   }
 
   /**

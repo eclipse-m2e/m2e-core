@@ -113,7 +113,6 @@ public class RepositoryPolicyImpl extends EObjectImpl implements RepositoryPolic
    * @generated
    */
   protected RepositoryPolicyImpl() {
-    super();
   }
 
   /**

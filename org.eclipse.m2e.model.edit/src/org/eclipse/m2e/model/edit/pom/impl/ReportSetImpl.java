@@ -115,7 +115,6 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
    * @generated
    */
   protected ReportSetImpl() {
-    super();
   }
 
   /**

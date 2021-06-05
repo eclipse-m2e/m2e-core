@@ -97,7 +97,6 @@ public class SiteImpl extends EObjectImpl implements Site {
    * @generated
    */
   protected SiteImpl() {
-    super();
   }
 
   /**

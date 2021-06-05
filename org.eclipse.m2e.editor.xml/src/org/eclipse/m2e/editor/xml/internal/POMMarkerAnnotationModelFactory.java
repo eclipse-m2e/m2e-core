@@ -28,7 +28,6 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModelFactory;
  */
 public class POMMarkerAnnotationModelFactory extends ResourceMarkerAnnotationModelFactory {
   public POMMarkerAnnotationModelFactory() {
-    super();
   }
 
   /*

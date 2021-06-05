@@ -172,7 +172,6 @@ public class PropertiesAdapter extends ListAdapter {
      * @param container
      */
     public PropertyChildAdapter(PropertyElement propertyElement, Element element) {
-      super();
       this.property = propertyElement;
       this.element = element;
     }

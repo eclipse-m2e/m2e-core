@@ -47,7 +47,6 @@ public class PomModelHandler extends ModelHandlerForXML {
   private static final String POM_XSD = "http://maven.apache.org/xsd/maven-4.0.0.xsd"; //$NON-NLS-1$
 
   public PomModelHandler() {
-    super();
     setAssociatedContentTypeId(ASSOCIATED_CONTENT_TYPE_ID);
   }
 

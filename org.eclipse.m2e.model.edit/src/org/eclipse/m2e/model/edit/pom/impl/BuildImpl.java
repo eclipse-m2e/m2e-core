@@ -165,7 +165,6 @@ public class BuildImpl extends BuildBaseImpl implements Build {
    * @generated
    */
   protected BuildImpl() {
-    super();
   }
 
   /**

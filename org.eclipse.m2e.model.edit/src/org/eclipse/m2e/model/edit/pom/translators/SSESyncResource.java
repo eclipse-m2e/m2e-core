@@ -56,7 +56,6 @@ public class SSESyncResource extends ResourceImpl {
   private Document doc;
 
   public SSESyncResource() {
-    super();
   }
 
   public SSESyncResource(URI uri) {

@@ -121,7 +121,6 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
    * @generated
    */
   protected ActivationOSImpl() {
-    super();
   }
 
   /**

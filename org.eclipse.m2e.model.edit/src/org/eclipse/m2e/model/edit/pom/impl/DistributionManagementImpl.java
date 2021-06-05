@@ -171,7 +171,6 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
    * @generated
    */
   protected DistributionManagementImpl() {
-    super();
   }
 
   /**

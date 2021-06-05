@@ -178,7 +178,6 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
    * @generated
    */
   protected BuildBaseImpl() {
-    super();
   }
 
   /**

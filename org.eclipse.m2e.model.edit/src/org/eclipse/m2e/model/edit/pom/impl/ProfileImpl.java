@@ -234,7 +234,6 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    * @generated
    */
   protected ProfileImpl() {
-    super();
   }
 
   /**

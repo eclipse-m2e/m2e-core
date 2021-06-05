@@ -213,7 +213,6 @@ public class DeveloperImpl extends EObjectImpl implements Developer {
    * @generated
    */
   protected DeveloperImpl() {
-    super();
   }
 
   /**

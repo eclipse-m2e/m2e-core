@@ -241,7 +241,6 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
    * @generated
    */
   protected DependencyImpl() {
-    super();
   }
 
   /**

@@ -127,7 +127,6 @@ public class ScmImpl extends EObjectImpl implements Scm {
    * @generated
    */
   protected ScmImpl() {
-    super();
   }
 
   /**

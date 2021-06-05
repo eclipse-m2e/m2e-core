@@ -78,7 +78,6 @@ public class OrganizationImpl extends EObjectImpl implements Organization {
    * @generated
    */
   protected OrganizationImpl() {
-    super();
   }
 
   /**

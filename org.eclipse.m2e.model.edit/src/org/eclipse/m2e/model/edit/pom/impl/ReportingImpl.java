@@ -110,7 +110,6 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
    * @generated
    */
   protected ReportingImpl() {
-    super();
   }
 
   /**

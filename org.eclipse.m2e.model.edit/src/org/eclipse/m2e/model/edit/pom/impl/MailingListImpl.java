@@ -159,7 +159,6 @@ public class MailingListImpl extends EObjectImpl implements MailingList {
    * @generated
    */
   protected MailingListImpl() {
-    super();
   }
 
   /**
