@@ -564,7 +564,6 @@ public class ModelImpl extends EObjectImpl implements Model {
    * @generated
    */
   protected ModelImpl() {
-    super();
   }
 
   /**

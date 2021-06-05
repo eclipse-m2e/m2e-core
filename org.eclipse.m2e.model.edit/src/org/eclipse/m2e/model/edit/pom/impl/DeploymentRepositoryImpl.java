@@ -159,7 +159,6 @@ public class DeploymentRepositoryImpl extends EObjectImpl implements DeploymentR
    * @generated
    */
   protected DeploymentRepositoryImpl() {
-    super();
   }
 
   /**

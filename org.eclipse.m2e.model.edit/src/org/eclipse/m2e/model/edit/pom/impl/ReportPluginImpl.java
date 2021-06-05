@@ -163,7 +163,6 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
    * @generated
    */
   protected ReportPluginImpl() {
-    super();
   }
 
   /**

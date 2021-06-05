@@ -81,7 +81,6 @@ public class PropertyElementImpl extends EObjectImpl implements PropertyElement 
    * @generated
    */
   protected PropertyElementImpl() {
-    super();
   }
 
   /**

@@ -68,7 +68,6 @@ public class PrerequisitesImpl extends EObjectImpl implements Prerequisites {
    * @generated
    */
   protected PrerequisitesImpl() {
-    super();
   }
 
   /**

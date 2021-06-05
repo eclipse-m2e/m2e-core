@@ -203,7 +203,6 @@ public class PluginImpl extends EObjectImpl implements Plugin {
    * @generated
    */
   protected PluginImpl() {
-    super();
   }
 
   /**

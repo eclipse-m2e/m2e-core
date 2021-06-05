@@ -98,7 +98,6 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
    * @generated
    */
   protected CiManagementImpl() {
-    super();
   }
 
   /**

@@ -120,7 +120,6 @@ public class LicenseImpl extends EObjectImpl implements License {
    * @generated
    */
   protected LicenseImpl() {
-    super();
   }
 
   /**

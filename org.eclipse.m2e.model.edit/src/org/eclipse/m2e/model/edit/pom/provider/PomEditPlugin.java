@@ -79,8 +79,6 @@ public final class PomEditPlugin extends EMFPlugin {
      * @generated
      */
     public Implementation() {
-      super();
-
       // Remember the static instance.
       //
       plugin = this;

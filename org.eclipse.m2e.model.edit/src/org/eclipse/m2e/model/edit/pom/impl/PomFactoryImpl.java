@@ -92,7 +92,6 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
    * @generated
    */
   public PomFactoryImpl() {
-    super();
   }
 
   /**

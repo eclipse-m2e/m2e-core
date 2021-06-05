@@ -82,7 +82,6 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
    * @generated
    */
   protected ActivationFileImpl() {
-    super();
   }
 
   /**

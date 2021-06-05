@@ -150,7 +150,6 @@ public class ActivationImpl extends EObjectImpl implements Activation {
    * @generated
    */
   protected ActivationImpl() {
-    super();
   }
 
   /**

@@ -83,7 +83,6 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
    * @generated
    */
   protected DocumentRootImpl() {
-    super();
   }
 
   /**

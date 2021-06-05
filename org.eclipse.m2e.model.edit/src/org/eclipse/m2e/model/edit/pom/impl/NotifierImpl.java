@@ -223,7 +223,6 @@ public class NotifierImpl extends EObjectImpl implements Notifier {
    * @generated
    */
   protected NotifierImpl() {
-    super();
   }
 
   /**

@@ -58,7 +58,6 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
    * @generated
    */
   protected DependencyManagementImpl() {
-    super();
   }
 
   /**

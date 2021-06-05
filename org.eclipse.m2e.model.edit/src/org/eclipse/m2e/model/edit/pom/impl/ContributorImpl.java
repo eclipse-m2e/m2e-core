@@ -194,7 +194,6 @@ public class ContributorImpl extends EObjectImpl implements Contributor {
    * @generated
    */
   protected ContributorImpl() {
-    super();
   }
 
   /**

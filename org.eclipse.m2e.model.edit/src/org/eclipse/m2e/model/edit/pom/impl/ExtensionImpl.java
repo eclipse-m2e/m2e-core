@@ -102,7 +102,6 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
    * @generated
    */
   protected ExtensionImpl() {
-    super();
   }
 
   /**

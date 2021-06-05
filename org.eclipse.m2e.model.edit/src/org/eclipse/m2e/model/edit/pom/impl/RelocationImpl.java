@@ -123,7 +123,6 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
    * @generated
    */
   protected RelocationImpl() {
-    super();
   }
 
   /**

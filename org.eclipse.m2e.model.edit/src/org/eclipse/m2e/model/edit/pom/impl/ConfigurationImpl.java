@@ -50,7 +50,6 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
    * @generated
    */
   protected ConfigurationImpl() {
-    super();
   }
 
   /**

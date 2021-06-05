@@ -81,7 +81,6 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
    * @generated
    */
   protected ActivationPropertyImpl() {
-    super();
   }
 
   /**

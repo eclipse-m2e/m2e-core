@@ -80,7 +80,6 @@ public class IssueManagementImpl extends EObjectImpl implements IssueManagement 
    * @generated
    */
   protected IssueManagementImpl() {
-    super();
   }
 
   /**

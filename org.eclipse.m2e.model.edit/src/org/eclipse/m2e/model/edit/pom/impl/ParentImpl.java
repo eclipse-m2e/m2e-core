@@ -123,7 +123,6 @@ public class ParentImpl extends EObjectImpl implements Parent {
    * @generated
    */
   protected ParentImpl() {
-    super();
   }
 
   /**

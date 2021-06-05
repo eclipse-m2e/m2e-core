@@ -57,7 +57,6 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
    * @generated
    */
   protected PluginManagementImpl() {
-    super();
   }
 
   /**

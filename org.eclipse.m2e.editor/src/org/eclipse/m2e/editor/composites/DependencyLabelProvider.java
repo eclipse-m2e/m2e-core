@@ -64,7 +64,6 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   }
 
   public DependencyLabelProvider(boolean showManagedOverlay) {
-    super();
     this.showManagedOverlay = showManagedOverlay;
   }
 
