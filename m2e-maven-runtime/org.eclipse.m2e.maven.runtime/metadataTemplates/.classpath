@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="output" path="target/classes"/>
+	${dependency.jars.lib.entries}
+	<!--
+	TODO: simply use the Maven-Classpath-Container entry. Then this does not need to be copied?! This should also include the sources?!  
+	And for the long term create a directory jars classpath container?! use JDTCore.newLibraryEntry to create an entry for each jar in a directory (think about the sources?!).
+	-->
+</classpath>

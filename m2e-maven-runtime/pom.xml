@@ -25,6 +25,8 @@
 
 	<properties>
 		<archetype-common.version>2.4</archetype-common.version>
+		<dependency.jars.folder>jars</dependency.jars.folder>
+		<metadata.templates.folder>metadataTemplates</metadata.templates.folder>
 	</properties>
 
 	<modules>
@@ -35,79 +37,32 @@
 	</modules>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-					<?m2e ignore?>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<phase>initialize</phase>
-						<configuration>
-							<executable>git</executable>
-							<commandlineArgs>log -1 --format='commitDate=%cd' --date=format:'%Y%m%d-%H%M' -- .</commandlineArgs>
-							<outputFile>${project.build.directory}/timestamp.properties</outputFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<executions>
-					<execution>
-						<?m2e ignore?>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<phase>initialize</phase>
-						<configuration>
-							<files>
-								<file>${project.build.directory}/timestamp.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.1</version>
-					<configuration>
-						<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-						<source>11</source>
-						<target>11</target>
-					</configuration>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.felix</groupId>
 					<artifactId>maven-bundle-plugin</artifactId>
 					<version>5.1.1</version>
 					<extensions>true</extensions>
 					<configuration>
+						<!-- PDE does not honor custom manifest location -->
+						<manifestLocation>META-INF</manifestLocation>
+						<supportedProjectTypes>eclipse-plugin</supportedProjectTypes>
 						<instructions>
 							<Embed-Transitive>true</Embed-Transitive>
-							<Embed-Directory>jars</Embed-Directory>
+							<Embed-Directory>${dependency.jars.folder}</Embed-Directory>
 
 							<_failok>true</_failok>
 							<_nouses>true</_nouses>
 							<_nodefaultversion>true</_nodefaultversion>
-							<_snapshot>${commitDate}</_snapshot>
+							<_snapshot>qualifier</_snapshot>
 
 							<Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
 							<Bundle-RequiredExecutionEnvironment>JavaSE-11</Bundle-RequiredExecutionEnvironment>
 							<Bundle-Name>%Bundle-Name</Bundle-Name>
 							<Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
 							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+							<Automatic-Module-Name>${project.name}</Automatic-Module-Name>
 
 							<Eclipse-BundleShape>dir</Eclipse-BundleShape>
 						</instructions>
@@ -116,63 +71,157 @@
 						</archive>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 
 	<profiles>
 		<profile>
-			<id>m2e</id>
-			<activation>
+			<id>generate-osgi-metadata</id>
+			<!-- TODO:
+				<activation>
+
 				<property>
-					<name>m2e.version</name>
+				<name>m2e.version</name>
 				</property>
-			</activation>
-			<properties>
-				<osgi-version-qualifier>qualifier</osgi-version-qualifier>
-			</properties>
+				</activation>
+			-->
 			<build>
 				<pluginManagement>
 					<plugins>
+						<!-- Disable Tycho plug-ins that would fail in the first pure Maven build -->
 						<plugin>
-							<groupId>org.apache.felix</groupId>
-							<artifactId>maven-bundle-plugin</artifactId>
-							<configuration>
-								<!-- PDE does not honour custom manifest location -->
-								<manifestLocation>META-INF</manifestLocation>
-							</configuration>
+							<groupId>org.eclipse.tycho</groupId>
+							<artifactId>tycho-packaging-plugin</artifactId>
+							<version>${tycho-version}</version>
+							<executions>
+								<execution>
+									<id>default-build-qualifier</id>
+									<phase>none</phase>
+								</execution>
+								<execution>
+									<id>default-validate-id</id>
+									<phase>none</phase>
+								</execution>
+								<execution>
+									<id>default-validate-version</id>
+									<phase>none</phase>
+								</execution>
+							</executions>
 						</plugin>
 					</plugins>
 				</pluginManagement>
-			</build>
-		</profile>
-		<profile>
-			<id>eclipse-sign</id>
-			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.eclipse.cbi.maven.plugins</groupId>
-						<artifactId>eclipse-jarsigner-plugin</artifactId>
+						<groupId>org.apache.felix</groupId>
+						<artifactId>maven-bundle-plugin</artifactId>
+						<configuration>
+						</configuration>
 						<executions>
 							<execution>
-								<id>sign</id>
 								<goals>
-									<goal>sign</goal>
+									<goal>bundle</goal>
 								</goals>
-								<phase>verify</phase>
+								<phase>generate-sources</phase>
 							</execution>
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-p2-plugin</artifactId>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>p2-metadata</id>
+								<id>unpack-jars-and-manifest-and-generate-classpathentires</id>
 								<goals>
-									<goal>p2-metadata</goal>
+									<goal>run</goal>
 								</goals>
-								<phase>package</phase>
+								<phase>generate-sources</phase>
+								<configuration>
+									<exportAntProperties>true</exportAntProperties>
+									<target>
+										<taskdef resource="net/sf/antcontrib/antlib.xml" />
+										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
+										<!-- and http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
+										<if>
+											<equals arg1="${project.packaging}" arg2="pom" /> <!-- only soncider children of m2e-maven-runtime project -->
+											<then>
+												<echo message="Skip pom project" />
+											</then>
+											<else>
+												<echo message="Delete generated files in '${project.basedir}'" level="info" />
+												<delete includeemptydirs="true" failonerror="false">
+													<fileset dir="${project.basedir}">
+														<include name="${dependency.jars.folder}/**/" />
+														<include name="META-INF/*" />
+														<include name=".classpath" />
+													</fileset>
+												</delete>
+												<unzip dest="${project.basedir}">
+													<fileset file="${project.build.directory}/${project.build.finalName}.jar" />
+													<patternset>
+														<include name="META-INF/*" />
+														<include name="${dependency.jars.folder}/*" />
+													</patternset>
+												</unzip>
+												<!-- create the property 'dependency.jars.lib.entries' that contains the classpath entries for all dependency
+													libs and that is exported from ant to maven and used when the .classpath template files are filtered. -->
+												<var name="dependency.jars.lib.entries" value="" />
+												<for param="jarFile"><!--Ant-contrib tasks already defined in calling script -->
+													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
+													<sequential>
+														<local name="jarFilename" />
+														<basename property="jarFilename" file="@{jarFile}" />
+														<local name="lib.entry" />
+														<property name="lib.entry"><![CDATA[<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}"/>]]></property>
+														<var name="dependency.jars.lib.entries" value="${dependency.jars.lib.entries}&#xA;&#x9;${lib.entry}" />
+													</sequential>
+												</for>
+											</else>
+										</if>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>ant-contrib</groupId>
+								<artifactId>ant-contrib</artifactId>
+								<version>1.0b3</version>
+								<exclusions>
+									<exclusion>
+										<groupId>ant</groupId>
+										<artifactId>ant</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.2.0</version>
+						<executions>
+							<execution>
+								<id>process-metadata-templates</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/${metadata.templates.folder}</directory>
+											<filtering>true</filtering>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+									<outputDirectory>${project.basedir}</outputDirectory>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>

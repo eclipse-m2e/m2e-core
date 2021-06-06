@@ -19,8 +19,8 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
-	<packaging>bundle</packaging>
+	<version>1.18.1-SNAPSHOT</version>
+	<packaging>eclipse-plugin</packaging>
 
 	<name>Embedded Maven Runtime Bundle</name>
 
@@ -131,37 +131,39 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<Embed-Dependency>
-							*;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api|javax.inject
-						</Embed-Dependency>
-						<_exportcontents>
-							META-INF.plexus;-noimport:=true,
-							META-INF.sisu;-noimport:=true,
-							org.apache.maven.*;provider=m2e;mandatory:=provider,
-							org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
-							org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
-							org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},
-							com.google.inject.*;provider=m2e;mandatory:=provider,
-							io.takari.*;provider=m2e;mandatory:=provider
-						</_exportcontents>
-						<Import-Package>
-							org.slf4j;version="[1.6.2,2.0.0)",
-							org.slf4j.spi;version="[1.6.2,2.0.0)",
-							org.slf4j.helpers;version="[1.6.2,2.0.0)",
-						</Import-Package>
-						<Require-Bundle>
-							org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",
-							javax.inject;bundle-version="1.0.0";visibility:=reexport
-						</Require-Bundle>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<configuration>
+						<instructions>
+							<Embed-Dependency>
+								*;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api|javax.inject
+							</Embed-Dependency>
+							<_exportcontents>
+								META-INF.plexus;-noimport:=true,
+								META-INF.sisu;-noimport:=true,
+								org.apache.maven.*;provider=m2e;mandatory:=provider,
+								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
+								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
+								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},
+								com.google.inject.*;provider=m2e;mandatory:=provider,
+								io.takari.*;provider=m2e;mandatory:=provider
+							</_exportcontents>
+							<Import-Package>
+								org.slf4j;version="[1.6.2,2.0.0)",
+								org.slf4j.spi;version="[1.6.2,2.0.0)",
+								org.slf4j.helpers;version="[1.6.2,2.0.0)",
+							</Import-Package>
+							<Require-Bundle>
+								org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",
+								javax.inject;bundle-version="1.0.0";visibility:=reexport
+							</Require-Bundle>
+						</instructions>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
