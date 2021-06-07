@@ -59,8 +59,7 @@ import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.AutomaticModuleNaming;
 import org.eclipse.jdt.internal.compiler.env.IModule;
-import org.eclipse.jdt.internal.compiler.env.IModule.IModuleReference;
-import org.eclipse.jdt.internal.core.NameLookup;
+import org.eclipse.jdt.internal.core.JrtPackageFragmentRoot;
 import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -356,31 +355,17 @@ public class ModuleSupport {
       return;
     }
 
-    JpmsArgs jpmsArgs = JpmsArgs.computeFromArgs(compilerArgs);
+    Optional<JpmsArgs> jpmsArgs = JpmsArgs.computeFromArgs(compilerArgs);
 
-    IClasspathEntry m2eEntry = BuildPathManager.getMavenContainerEntry(javaProject);
-    IClasspathEntry jreEntry = BuildPathManager.getJREContainerEntry(javaProject);
-
-    boolean fromScratch = false;
-    if(m2eEntry == null || jreEntry == null) { // .classpath has been deleted or do not exists
-      m2eEntry = findMavenContainerEntry(classpath);
-      jreEntry = findJreContainerEntry(classpath);
-      fromScratch = true;
+    if(jpmsArgs.isEmpty()) {
+      return;
     }
+
+    IClasspathEntry m2eEntry = findMavenContainerEntry(classpath);
+    IClasspathEntry jreEntry = findJreContainerEntry(classpath);
 
     IClasspathEntryDescriptor m2eEntryDescriptor = new ClasspathEntryDescriptor(m2eEntry);
     IClasspathEntryDescriptor jreEntryDescriptor = new ClasspathEntryDescriptor(jreEntry);
-
-    if(fromScratch) { // if .classpath does not exists
-      try {
-        // we need to set the java project to allow module resolution
-        javaProject.setRawClasspath(classpath.getEntries(), monitor);
-        // we request a classpath resolution to prevent some missing jre modules in the getRootModules call (50/70)
-        javaProject.getResolvedClasspath(false);
-      } catch(JavaModelException ex) {
-        log.error(ex.getMessage(), ex);
-      }
-    }
 
     // list all the modules managed in the jre container
     final List<String> availableModules = getRootModules(javaProject, jreEntry);
@@ -388,7 +373,7 @@ public class ModuleSupport {
 
     // iterate and add attributes to the matching container jre/m2e
     for(JpmsArgType argType : JpmsArgType.values()) {
-      List<JpmsArgValue> values = argType.getFromArgs(jpmsArgs);
+      List<JpmsArgValue> values = argType.getFromArgs(jpmsArgs.get());
 
       if(values != null && !values.isEmpty()) {
 
@@ -402,7 +387,7 @@ public class ModuleSupport {
         jreEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), null);
         if(jreValues != null && !jreValues.isEmpty()) {
 
-          String valuesAsString = jreValues.stream().map(JpmsArgValue::getValue)
+          String valuesAsString = jreValues.stream().map(JpmsArgValue::getValue).distinct()
               .collect(Collectors.joining(JpmsArgs.VALUE_SEPARATOR));
 
           jreEntryDescriptor.setClasspathAttribute(IClasspathAttribute.MODULE, "true");
@@ -412,7 +397,7 @@ public class ModuleSupport {
         m2eEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), null);
         if(m2eValues != null && !m2eValues.isEmpty()) {
 
-          String valuesAsString = m2eValues.stream().map(JpmsArgValue::getValue)
+          String valuesAsString = m2eValues.stream().map(JpmsArgValue::getValue).distinct()
               .collect(Collectors.joining(JpmsArgs.VALUE_SEPARATOR));
 
           //m2eEntryDescriptor.setClasspathAttribute(IClasspathAttribute.MODULE, "true");
@@ -452,25 +437,19 @@ public class ModuleSupport {
     Set<String> result = new HashSet<String>();
 
     try {
-      IPackageFragmentRoot[] fAllSystemRoots = javaProject.findUnfilteredPackageFragmentRoots(entry);
-      for(IPackageFragmentRoot pfr : fAllSystemRoots) {
+      for(IClasspathEntry entry2 : javaProject.getResolvedClasspath(false)) {
+        IPackageFragmentRoot[] fAllSystemRoots = javaProject.findUnfilteredPackageFragmentRoots(entry2);
+        for(IPackageFragmentRoot pfr : fAllSystemRoots) {
 
-        String moduleName = pfr.getElementName();
-        IModuleDescription module = javaProject.findModule(moduleName, null);
+          if(pfr instanceof JrtPackageFragmentRoot) {
+            String moduleName = pfr.getElementName();
+            IModuleDescription module = pfr.getModuleDescription();// javaProject.findModule(moduleName, null);
 
-        if(module == null) {
-          continue;
-        }
+            if(module == null) {
+              continue;
+            }
 
-        result.add(moduleName);
-        IModule mi = NameLookup.getModuleDescriptionInfo(module);
-
-        for(IModuleReference requiredModule : mi.requires()) {
-          String name = new String(requiredModule.name()).intern();
-          if(requiredModule.isTransitive()) {
-            result.addAll(getRootModules(javaProject, name));
-          } else {
-            result.add(name);
+            result.add(moduleName);
           }
         }
       }
@@ -480,36 +459,6 @@ public class ModuleSupport {
       log.error(ex.getMessage(), ex);
       return Collections.emptyList();
     }
-
-  }
-
-  private static List<String> getRootModules(IJavaProject javaProject, String moduleName) {
-    Set<String> result = new HashSet<String>();
-
-    try {
-      IModuleDescription module = javaProject.findModule(moduleName, null);
-
-      if(module == null) {
-        return Collections.emptyList();
-      }
-
-      result.add(moduleName);
-      IModule mi = NameLookup.getModuleDescriptionInfo(module);
-
-      for(IModuleReference requiredModule : mi.requires()) {
-        String name = new String(requiredModule.name()).intern();
-        if(requiredModule.isTransitive()) {
-          result.addAll(getRootModules(javaProject, name));
-        } else {
-          result.add(name);
-        }
-      }
-      return new ArrayList<String>(result);
-    } catch(JavaModelException ex) {
-      log.error(ex.getMessage(), ex);
-      return Collections.emptyList();
-    }
-
   }
 
   private static class JpmsArgValue {
@@ -559,8 +508,8 @@ public class ModuleSupport {
 
     private final List<JpmsArgValue> patchModule = new ArrayList<>();
 
-    protected static JpmsArgs computeFromArgs(List<String> args) {
-      JpmsArgs jpmsArgs = new JpmsArgs();
+    protected static Optional<JpmsArgs> computeFromArgs(List<String> args) {
+      JpmsArgs jpmsArgs = null;
 
       if(args != null) {
         ListIterator<String> it = args.listIterator();
@@ -581,11 +530,14 @@ public class ModuleSupport {
             continue;
           }
 
+          if(jpmsArgs == null) {
+            jpmsArgs = new JpmsArgs();
+          }
           argType.addToArgs(jpmsArgs, argValue);
         }
       }
 
-      return jpmsArgs;
+      return Optional.ofNullable(jpmsArgs);
     }
 
     /**
@@ -646,31 +598,25 @@ public class ModuleSupport {
 
   protected enum JpmsArgType {
     // @formatter:off
-    AddExports("--add-exports", IClasspathAttribute.ADD_EXPORTS, 
-        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"),
-        (a, v) -> a.toAddExports(v),
-        (a) -> a.getAddExports()), 
-    
-    AddOpens("--add-opens", IClasspathAttribute.ADD_OPENS, 
-        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"),
-        (a, v) -> a.toAddOpens(v),
-        (a) -> a.getAddOpens()), 
-    
+    AddExports("--add-exports", IClasspathAttribute.ADD_EXPORTS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddExports(v),
+        (a) -> a.getAddExports()),
+
+    AddOpens("--add-opens", IClasspathAttribute.ADD_OPENS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddOpens(v),
+        (a) -> a.getAddOpens()),
+
 //    AddModules("--add-modules", IClasspathAttribute."add-modules", //Not supported 
 //        Pattern.compile("^(()[A-Za-z0-9\\.$_\\-,]*)$"),
 //        (a, v) -> a.toAddModules(v),
 //        (a) -> a.getAddModules()), 
-    
-    AddReads("--add-reads", IClasspathAttribute.ADD_READS, 
-        Pattern.compile("^(([A-Za-z0-9\\.$_]*)=[A-Za-z0-9\\.$_-]*)$"),
-        (a, v) -> a.toAddReads(v),
+
+    AddReads("--add-reads", IClasspathAttribute.ADD_READS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddReads(v),
         (a) -> a.getAddReads()),
-    
-    PatchModule("--patch-module", IClasspathAttribute.PATCH_MODULE, 
-        Pattern.compile("^(([A-Za-z0-9\\.$_]*)=.*)$"), // maybe .* for jar name is too permissive
-        (a, v) -> a.toPatchModule(v),
-        (a) -> a.getPatchModule())
-    ; 
+
+    PatchModule("--patch-module", IClasspathAttribute.PATCH_MODULE, Pattern.compile("^(([A-Za-z0-9\\.$_]*)=.*)$"), // maybe .* for jar name is too permissive
+        (a, v) -> a.toPatchModule(v), (a) -> a.getPatchModule());
     // @formatter:on
 
     private String argumentName;

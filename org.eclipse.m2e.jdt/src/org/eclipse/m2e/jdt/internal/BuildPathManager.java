@@ -173,21 +173,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return null;
   }
 
-  public static IClasspathEntry getJREContainerEntry(IJavaProject javaProject) {
-    if(javaProject != null) {
-      try {
-        for(IClasspathEntry entry : javaProject.getRawClasspath()) {
-          if(MavenClasspathHelpers.isJREClasspathContainer(entry.getPath())) {
-            return entry;
-          }
-        }
-      } catch(JavaModelException ex) {
-        return null;
-      }
-    }
-    return null;
-  }
-
   public static IClasspathContainer getMaven2ClasspathContainer(IJavaProject project) throws JavaModelException {
     IClasspathEntry[] entries = project.getRawClasspath();
     for(IClasspathEntry entry : entries) {

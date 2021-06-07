@@ -163,6 +163,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     addCustomClasspathEntries(javaProject, classpath);
 
+    IContainer classesFolder = getOutputLocation(request, project);
+
+    // allow module resolution in invokeJavaProjectConfigurators step
+    javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
+
     invokeJavaProjectConfigurators(classpath, request, monitor);
 
     // now apply new configuration
@@ -172,8 +177,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     for(Map.Entry<String, String> option : options.entrySet()) {
       javaProject.setOption(option.getKey(), option.getValue());
     }
-
-    IContainer classesFolder = getOutputLocation(request, project);
 
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
 
@@ -797,7 +800,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   /**
-   * get all the arguments provided to the compiler per MojoExecution
+   * get all the arguments provided to the compiler for the provided {@link MojoExecution}
    * 
    * @param mavenProject the current maven project
    * @param execution the plugin execution
@@ -819,31 +822,28 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       //ignore
     }
 
-    //2nd, get the compilerArgument String
-    try {
-      String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
-          monitor);
-      if(compilerArgument != null) {//$NON-NLS-1$
-        arguments.add(compilerArgument);
-      }
-    } catch(CoreException ex) {
-      //ignore
-    }
+    // Let's ignore the <compilerArgument>, As the maven-compiler-plugin doc states all jpms arguments
+    // are in fact two arguments so no complete jpms argument can be provided using compilerArgument
 
-    //Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
+    // Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
 
-    //3nd not ignoring <testCompilerArguments> Map, not deprecated
+    //not ignoring <testCompilerArguments> Map, not deprecated
     try {
       Map<?, ?> args = maven.getMojoParameterValue(mavenProject, execution, "testCompilerArguments", Map.class, //$NON-NLS-1$
           monitor);
       if(args != null) {//$NON-NLS-1$
         args.entrySet().stream().forEach((e) -> {
-          if(e.getKey() != null) {
-            arguments.add(e.getKey().toString());
+          if(e.getKey() != null && e.getValue() != null) {
+            String values = e.getValue().toString();
+            String[] splitted = values.split("[,:]");
+
+            for(String splittedValue : splitted) {
+              String value = splittedValue.trim();
+              arguments.add("--" + e.getKey().toString());
+              arguments.add(value);
+            }
           }
-          if(e.getValue() != null) {
-            arguments.add(e.getValue().toString());
-          }
+
         });
       }
     } catch(Exception ex) {
@@ -861,14 +861,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * @return the arguments
    * @throws CoreException
    */
-  private List<String> getCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+  private List<String> getAllCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor)
+      throws CoreException {
     List<String> compilerArgs = new ArrayList<>();
 
     List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
 
     for(MojoExecution compile : executions) {
-      if(isCompileExecution(compile)) {
+      if(isCompileExecution(compile) || isTestCompileExecution(compile)) {
         List<String> args = getCompilerArguments(facade.getMavenProject(), compile, monitor);
         if(args != null) {
           compilerArgs.addAll(args);
@@ -886,7 +887,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
 
-    List<String> compilerArgs = getCompilerArguments(request.getMavenProjectFacade(), monitor);
+    List<String> compilerArgs = getAllCompilerArguments(request.getMavenProjectFacade(), monitor);
 
     ModuleSupport.configureRawClasspath(request, classpath, monitor, compilerArgs);
   }
