@@ -827,28 +827,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     // Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
 
-    //not ignoring <testCompilerArguments> Map, not deprecated
-    try {
-      Map<?, ?> args = maven.getMojoParameterValue(mavenProject, execution, "testCompilerArguments", Map.class, //$NON-NLS-1$
-          monitor);
-      if(args != null) {//$NON-NLS-1$
-        args.entrySet().stream().forEach((e) -> {
-          if(e.getKey() != null && e.getValue() != null) {
-            String values = e.getValue().toString();
-            String[] splitted = values.split("[,:]");
-
-            for(String splittedValue : splitted) {
-              String value = splittedValue.trim();
-              arguments.add("--" + e.getKey().toString());
-              arguments.add(value);
-            }
-          }
-
-        });
-      }
-    } catch(Exception ex) {
-      //ignore
-    }
+    // Let's ignore the <testCompilerArguments> Map because it don't suppport double dashed arguments
 
     return arguments;
   }
@@ -861,8 +840,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * @return the arguments
    * @throws CoreException
    */
-  private List<String> getAllCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor)
-      throws CoreException {
+  private List<String> getCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
     List<String> compilerArgs = new ArrayList<>();
 
     List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
@@ -887,7 +865,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
 
-    List<String> compilerArgs = getAllCompilerArguments(request.getMavenProjectFacade(), monitor);
+    List<String> compilerArgs = getCompilerArguments(request.getMavenProjectFacade(), monitor);
 
     ModuleSupport.configureRawClasspath(request, classpath, monitor, compilerArgs);
   }

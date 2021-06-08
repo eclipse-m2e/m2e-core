@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(value = Parameterized.class)
+
 public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
 	
   private static final String REPLACED_POM_STRING = "<!-- compilerArgs: replacedByArgsSets -->";
@@ -63,27 +63,14 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
   private static final String M2E_PATCH_MODULE_VALUE2 = "somemodule=somepath/some.jar";
   private static final String JRE_PATCH_MODULE_VALUE2 = "jdk.javadoc=somepath/some.jar";
   
-
-  @Parameter
-  public String argumentType;
-
-  //Single parameter, use Object[]
-  @Parameters(name = "{index}: argumentType - {0}")
-  public static Object[] data() {
-      return new Object[]{
-              "compilerArgs",
-              "testCompilerArguments"
-      };
-  }
-  
   @Test
   public void testFileChangeUpdatesJPMSSettings() throws CoreException, IOException, InterruptedException {
     ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
     setAutoBuilding(true);
     
     File pomFileFS = new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/pom.xml")).getFile());
-    File argsSet1FS= new File(FileLocator.toFileURL(getClass().getResource(String.format("/projects/compilerJpmsSettings/%sSet1.xml", argumentType))).getFile());
-    File argsSet2FS = new File(FileLocator.toFileURL(getClass().getResource(String.format("/projects/compilerJpmsSettings/%sSet2.xml", argumentType))).getFile());
+    File argsSet1FS= new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/compilerArgsSet1.xml")).getFile());
+    File argsSet2FS = new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/compilerArgsSet2.xml")).getFile());
     
     IProject project = importProject(pomFileFS.getAbsolutePath());
     waitForJobsToComplete();
