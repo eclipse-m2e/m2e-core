@@ -23,7 +23,7 @@ Contributors:
 
   <artifactId>org.eclipse.m2e.importer.tests</artifactId>
   <packaging>eclipse-test-plugin</packaging>
-  <version>1.16.0-SNAPSHOT</version>
+  <version>1.16.1-SNAPSHOT</version>
 
   <name>Tests for Maven Integration for Eclipse Importer framework</name>
 
