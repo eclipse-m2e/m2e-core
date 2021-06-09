@@ -3,7 +3,7 @@ Fragment-Host: org.eclipse.m2e.core;bundle-version="[1.16.0,2.0.0)"
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.core.tests
-Bundle-Version: 1.16.1.qualifier
+Bundle-Version: 1.16.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
