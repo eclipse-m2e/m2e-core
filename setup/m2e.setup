@@ -92,7 +92,7 @@
     <requirement
         name="org.eclipse.m2e.pde.feature.feature.group"/>
     <repository
-        url="https://download.eclipse.org/technology/m2e/snapshots/1.18.0/latest/"/>
+        url="https://download.eclipse.org/technology/m2e/snapshots/latest/"/>
     <description>Install the tools needed in the IDE to work with the source code for ${scope.project.label}</description>
   </setupTask>
   <setupTask
