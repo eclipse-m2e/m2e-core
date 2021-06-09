@@ -26,7 +26,8 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
  */
 public class MavenConsoleFactory implements IConsoleFactory {
 
-  public void openConsole() {
+    @Override
+    public void openConsole() {
     M2EUIPluginActivator.getDefault().getMavenConsole().showConsole();
   }
 

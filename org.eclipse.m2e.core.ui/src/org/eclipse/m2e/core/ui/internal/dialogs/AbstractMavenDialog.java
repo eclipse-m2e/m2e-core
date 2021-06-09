@@ -66,6 +66,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
     return settings;
   }
 
+  @Override
   protected Point getInitialSize() {
     Point result = super.getInitialSize();
     if(size != null) {
@@ -78,6 +79,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
     return result;
   }
 
+  @Override
   protected Point getInitialLocation(Point initialSize) {
     Point result = super.getInitialLocation(initialSize);
     if(location != null) {
@@ -96,6 +98,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
     return result;
   }
 
+  @Override
   public boolean close() {
     writeSettings();
     return super.close();

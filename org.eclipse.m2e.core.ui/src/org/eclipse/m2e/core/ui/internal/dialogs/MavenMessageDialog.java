@@ -53,6 +53,7 @@ public class MavenMessageDialog extends MessageDialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.dialogs.MessageDialog#createCustomArea(org.eclipse.swt.widgets.Composite)
    */
+  @Override
   protected Control createCustomArea(Composite parent) {
     // TODO Auto-generated method createCustomArea
     this.messageArea = new StyledText(parent, SWT.WRAP | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);

@@ -61,6 +61,7 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
 
   public static final String ID = "org.eclipse.m2e.addDependencyAction"; //$NON-NLS-1$
 
+  @Override
   public void run(IAction action) {
     IFile file = getPomFileFromPomEditorOrViewSelection();
 
@@ -128,9 +129,11 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
     }
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public void init(IWorkbenchWindow window) {
   }
 }

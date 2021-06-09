@@ -29,6 +29,7 @@ public class UpdateMavenProjectAction extends MavenProjectActionSupport {
   public UpdateMavenProjectAction() {
   }
 
+  @Override
   public void run(IAction action) {
     UpdateMavenProjectCommandHandler.openUpdateProjectsDialog(getShell(), getProjects());
   }

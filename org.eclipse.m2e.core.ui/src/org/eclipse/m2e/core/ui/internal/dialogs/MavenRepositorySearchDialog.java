@@ -223,6 +223,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     this.queryText = query;
   }
 
+  @Override
   protected Control createDialogArea(Composite parent) {
     readSettings();
 
@@ -385,6 +386,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   /* (non-Javadoc)
    * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
    */
+  @Override
   protected void computeResult() {
     if(showCoords) {
       computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),

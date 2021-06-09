@@ -48,6 +48,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
 
   public static final String ID = "org.eclipse.m2e.addPluginAction"; //$NON-NLS-1$
 
+  @Override
   public void run(IAction action) {
     IFile file = getPomFileFromPomEditorOrViewSelection();
 
@@ -81,9 +82,11 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
     }
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public void init(IWorkbenchWindow window) {
   }
 }

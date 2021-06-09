@@ -67,19 +67,23 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
     setInitializationData(null, null, option);
   }
 
+  @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     if(IMavenConstants.NO_WORKSPACE_PROJECTS.equals(data)) {
       this.workspaceProjects = false;
     }
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     this.selection = selection;
   }
 
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
   }
 
+  @Override
   public void run(IAction action) {
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
@@ -125,7 +129,8 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
     }
     Job job = new Job(Messages.EnableNatureAction_job_enable) {
 
-      protected IStatus run(IProgressMonitor monitor) {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
         try {
           ResolverConfiguration configuration = new ResolverConfiguration();
           configuration.setResolveWorkspaceProjects(workspaceProjects);

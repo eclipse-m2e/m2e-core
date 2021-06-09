@@ -24,9 +24,11 @@ public abstract class MavenProjectActionSupport extends MavenActionSupport imple
     return SelectionUtil.getProjects(selection, true);
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public void init(IWorkbenchWindow window) {
   }
 

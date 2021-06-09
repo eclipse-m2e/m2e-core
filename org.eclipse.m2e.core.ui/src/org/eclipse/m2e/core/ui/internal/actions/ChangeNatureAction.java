@@ -68,6 +68,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
   /* (non-Javadoc)
    * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
    */
+  @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     if(data != null) {
       if("enableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
@@ -79,13 +80,16 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     }
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     this.selection = selection;
   }
 
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
   }
 
+  @Override
   public void run(IAction action) {
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
@@ -128,6 +132,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
       this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     }
 
+    @Override
     public IStatus runInWorkspace(IProgressMonitor monitor) {
       MultiStatus status = null;
       for(IProject project : projects) {

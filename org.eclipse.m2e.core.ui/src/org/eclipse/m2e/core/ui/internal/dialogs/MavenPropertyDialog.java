@@ -61,6 +61,7 @@ public class MavenPropertyDialog extends Dialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
    */
+  @Override
   protected Control createDialogArea(Composite parent) {
     Composite comp = new Composite(parent, SWT.NONE);
     GridLayout gridLayout = new GridLayout(2, false);
@@ -129,6 +130,7 @@ public class MavenPropertyDialog extends Dialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
    */
+  @Override
   protected void buttonPressed(int buttonId) {
     if(buttonId == IDialogConstants.OK_ID) {
       name = nameText.getText();
@@ -143,6 +145,7 @@ public class MavenPropertyDialog extends Dialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
    */
+  @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     if(title != null) {
@@ -178,6 +181,7 @@ public class MavenPropertyDialog extends Dialog {
    *
    * @see org.eclipse.jface.window.Window#create()
    */
+  @Override
   public void create() {
     super.create();
     updateButtons();

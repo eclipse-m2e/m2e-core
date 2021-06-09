@@ -42,6 +42,7 @@ public class MavenDebugOutputAction extends Action {
     setChecked(isDebug());
   }
 
+  @Override
   public void run() {
     getPreferenceStore().setValue(MavenPreferenceConstants.P_DEBUG_OUTPUT, isChecked());
   }

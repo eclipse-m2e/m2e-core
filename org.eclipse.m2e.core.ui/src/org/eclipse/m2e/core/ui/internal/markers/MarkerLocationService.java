@@ -90,6 +90,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   public static final String ATTR_MANAGED_VERSION_LOCATION = "managedVersionLocation"; //$NON-NLS-1$
 
+  @Override
   public void findLocationForMarker(final IMarker marker) {
     IDOMModel domModel = null;
     try {
@@ -143,7 +144,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         final String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
         final String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
         XmlUtils.performOnRootElement((IFile) marker.getResource(), new NodeOperation<Element>() {
-          public void process(Element root, IStructuredDocument structuredDocument) {
+            @Override
+            public void process(Element root, IStructuredDocument structuredDocument) {
             Element build = findChild(root, PomEdits.BUILD);
             List<Element> candidates = new ArrayList<>();
             Element plugin = findPlugin(build, groupId, artifactId);
@@ -246,6 +248,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
+  @Override
   public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     checkForSchema(markerManager, pom, type);

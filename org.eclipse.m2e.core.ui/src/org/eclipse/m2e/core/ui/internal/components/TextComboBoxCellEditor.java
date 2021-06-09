@@ -39,12 +39,14 @@ public class TextComboBoxCellEditor extends CellEditor {
     super(parent, style);
   }
 
+  @Override
   protected Control createControl(Composite parent) {
     combo = new CCombo(parent, getStyle());
     combo.setFont(parent.getFont());
 
     combo.addKeyListener(new KeyAdapter() {
-      public void keyPressed(KeyEvent e) {
+        @Override
+        public void keyPressed(KeyEvent e) {
         keyReleaseOccured(e);
       }
     });
@@ -59,16 +61,19 @@ public class TextComboBoxCellEditor extends CellEditor {
     return combo;
   }
 
+  @Override
   protected Object doGetValue() {
     Assert.isNotNull(combo);
     return combo.getText();
   }
 
+  @Override
   protected void doSetFocus() {
     Assert.isNotNull(combo);
     combo.setFocus();
   }
 
+  @Override
   protected void doSetValue(Object value) {
     Assert.isNotNull(combo);
     combo.setText(String.valueOf(value));
@@ -89,6 +94,7 @@ public class TextComboBoxCellEditor extends CellEditor {
     }
   }
 
+  @Override
   protected void keyReleaseOccured(KeyEvent keyEvent) {
     if(keyEvent.character == SWT.ESC) {
       fireCancelEditor();

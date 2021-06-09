@@ -52,6 +52,7 @@ public class MavenPropertyTester extends PropertyTester {
 
   private static final String DEFAULT_BUILD_DIR = "target"; //$NON-NLS-1$
 
+  @Override
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
     if(WORKSPACE_RESULUTION_ENABLE.equals(property)) {
       boolean enableWorkspaceResolution = true;

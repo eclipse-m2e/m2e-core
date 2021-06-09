@@ -42,6 +42,7 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
 
   private static final String SHOW_ON_ERR_LBL = Messages.MavenConsolePageParticipant_error;
 
+  @Override
   public void init(IPageBookViewPage page, IConsole console) {
     this.consoleRemoveAction = new MavenConsoleRemoveAction();
     this.debugAction = new MavenDebugOutputAction();
@@ -60,17 +61,21 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
     mgr.appendToGroup(IConsoleConstants.OUTPUT_GROUP, showOnErrorAction);
   }
 
+  @Override
   public void dispose() {
     this.consoleRemoveAction = null;
     this.debugAction = null;
   }
 
+  @Override
   public void activated() {
   }
 
+  @Override
   public void deactivated() {
   }
 
+  @Override
   public <T> T getAdapter(Class<T> adapter) {
     return null;
   }
@@ -84,6 +89,7 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
     /* (non-Javadoc)
      * @see org.eclipse.m2e.ui.internal.MavenShowConsoleAction#getKey()
      */
+    @Override
     protected String getKey() {
       return MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR;
     }
@@ -102,6 +108,7 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
     /* (non-Javadoc)
      * @see org.eclipse.m2e.ui.internal.MavenShowConsoleAction#getKey()
      */
+    @Override
     protected String getKey() {
       return MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT;
     }

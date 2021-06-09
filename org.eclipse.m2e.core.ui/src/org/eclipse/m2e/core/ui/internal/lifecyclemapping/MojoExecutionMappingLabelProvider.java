@@ -46,6 +46,7 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
     this.prjconf = prjconf;
   }
 
+  @Override
   public String getMavenText() {
     MojoExecutionKey execution = element.getExecution();
     if("default".equals(execution.getExecutionId())) {
@@ -58,6 +59,7 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
+  @Override
   public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration) {
     ILifecycleMappingRequirement requirement = element.getLifecycleMappingRequirement();
     return LifecycleMappingFactory.isInterestingPhase(element.getMojoExecutionKey().getLifecyclePhase())
@@ -67,6 +69,7 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
    */
+  @Override
   public ILifecycleMappingRequirement getKey() {
     return element.getLifecycleMappingRequirement();
   }
@@ -74,6 +77,7 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getProjects()
    */
+  @Override
   public Collection<MavenProject> getProjects() {
     return Collections.singleton(prjconf.getMavenProject());
   }
