@@ -86,12 +86,12 @@ public class MavenRepositoryView extends ViewPart {
   /**
    *
    */
-  private static final String MENU_OPEN_GRP = "open";
+  private static final String MENU_OPEN_GRP = "open"; //$NON-NLS-1$
 
   /**
    *
    */
-  private static final String MENU_UPDATE_GRP = "update";
+  private static final String MENU_UPDATE_GRP = "update"; //$NON-NLS-1$
 
   private static final Logger log = LoggerFactory.getLogger(MavenRepositoryView.class);
 

@@ -77,7 +77,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
   @Override
   public void addMessage(File file, int line, int column, String message, int severity, Throwable cause) {
     if(currentParticipantId == null) {
-      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty"); //$NON-NLS-1$
     }
     List<Message> messageList = messages.get(currentParticipantId);
     if(messageList == null) {
@@ -90,7 +90,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
   @Override
   public void removeMessages(File file) {
     if(currentParticipantId == null) {
-      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty"); //$NON-NLS-1$
     }
     List<File> files = removeMessages.get(currentParticipantId);
     if(files == null) {

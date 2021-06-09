@@ -189,7 +189,7 @@ public abstract class ArchetypeCatalogFactory {
 
     private URL getEmbeddedUrl() {
       String path = getId();
-      if(path != null && path.startsWith("bundleentry://")) {
+      if(path != null && path.startsWith("bundleentry://")) { //$NON-NLS-1$
         try {
           return new URL(path);
         } catch(Exception ex) {
@@ -242,7 +242,7 @@ public abstract class ArchetypeCatalogFactory {
 
     public ArchetypeCatalog getArchetypeCatalog() {
       String url = getId();
-      int idx = url.lastIndexOf("/archetype-catalog.xml");
+      int idx = url.lastIndexOf("/archetype-catalog.xml"); //$NON-NLS-1$
       if(idx > -1) {
         url = url.substring(0, idx);
       }

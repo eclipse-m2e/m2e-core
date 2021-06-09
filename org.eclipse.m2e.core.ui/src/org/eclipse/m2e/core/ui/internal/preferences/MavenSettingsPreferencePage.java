@@ -181,8 +181,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
   @Override
   protected void performDefaults() {
-    globalSettingsText.setText("");
-    userSettingsText.setText("");
+    globalSettingsText.setText(""); //$NON-NLS-1$
+    userSettingsText.setText(""); //$NON-NLS-1$
     checkSettings();
     updateLocalRepository();
     super.performDefaults();

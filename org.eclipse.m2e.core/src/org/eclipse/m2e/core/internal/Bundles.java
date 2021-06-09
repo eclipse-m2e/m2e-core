@@ -84,7 +84,7 @@ public class Bundles {
   }
 
   public static List<String> getClasspathEntries(Bundle bundle) {
-    log.debug("getClasspathEntries(Bundle={})", bundle.toString());
+    log.debug("getClasspathEntries(Bundle={})", bundle.toString()); //$NON-NLS-1$
     Set<String> cp = new LinkedHashSet<>();
     if(DevClassPathHelper.inDevelopmentMode()) {
       cp.addAll(Arrays.asList(DevClassPathHelper.getDevClassPath(bundle.getSymbolicName())));
@@ -93,15 +93,15 @@ public class Bundles {
     List<String> entries = new ArrayList<>();
     for(String cpe : cp) {
       String entry;
-      if(".".equals(cpe)) {
-        entry = getNestedJarOrDir(bundle, "/");
+      if(".".equals(cpe)) { //$NON-NLS-1$
+        entry = getNestedJarOrDir(bundle, "/"); //$NON-NLS-1$
       } else {
         entry = getNestedJarOrDir(bundle, cpe);
       }
 
       if(entry != null) {
         entry = new Path(entry).toOSString();
-        log.debug("\tEntry:{}", entry);
+        log.debug("\tEntry:{}", entry); //$NON-NLS-1$
         entries.add(entry);
       }
     }
@@ -109,13 +109,13 @@ public class Bundles {
   }
 
   private static String[] parseBundleClasspath(Bundle bundle) {
-    String[] result = new String[] {"."};
+    String[] result = new String[] {"."}; //$NON-NLS-1$
     String header = bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
     ManifestElement[] classpathEntries = null;
     try {
       classpathEntries = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, header);
     } catch(BundleException ex) {
-      log.warn("Could not parse bundle classpath of {}", bundle.toString(), ex);
+      log.warn("Could not parse bundle classpath of {}", bundle.toString(), ex); //$NON-NLS-1$
     }
     if(classpathEntries != null) {
       result = new String[classpathEntries.length];
@@ -133,7 +133,7 @@ public class Bundles {
       try {
         return FileLocator.toFileURL(url).getFile();
       } catch(IOException ex) {
-        log.warn("Could not get entry {} for bundle {}", cp, bundle.toString(), ex);
+        log.warn("Could not get entry {} for bundle {}", cp, bundle.toString(), ex); //$NON-NLS-1$
       }
     }
 
@@ -145,7 +145,7 @@ public class Bundles {
       }
     }
 
-    log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
+    log.debug("Bundle {} does not have entry {}", bundle.toString(), cp); //$NON-NLS-1$
     return null;
   }
 

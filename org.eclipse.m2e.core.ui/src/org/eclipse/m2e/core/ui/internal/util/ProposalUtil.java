@@ -129,7 +129,7 @@ public class ProposalUtil {
         return getSearchEngine(project).findClassifiers(
             escapeQuerySpecialCharacters(groupIdText.getText()), //
             escapeQuerySpecialCharacters(artifactIdText.getText()),
-            escapeQuerySpecialCharacters(versionText.getText()), "", packaging);
+            escapeQuerySpecialCharacters(versionText.getText()), "", packaging); //$NON-NLS-1$
       }
     });
   }
@@ -140,7 +140,7 @@ public class ProposalUtil {
       public Collection<String> search() throws CoreException {
         Collection<String> toRet = new ArrayList<>();
         toRet.addAll(getSearchEngine(project).findVersions(escapeQuerySpecialCharacters(groupIdText.getText()), //
-            escapeQuerySpecialCharacters(artifactIdText.getText()), "", packaging));
+            escapeQuerySpecialCharacters(artifactIdText.getText()), "", packaging)); //$NON-NLS-1$
         if(mp != null) {
           //add version props now..
           Properties props = mp.getProperties();
@@ -166,7 +166,7 @@ public class ProposalUtil {
     addCompletionProposal(artifactIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "",
+        return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "", //$NON-NLS-1$
             packaging, null);
       }
     });

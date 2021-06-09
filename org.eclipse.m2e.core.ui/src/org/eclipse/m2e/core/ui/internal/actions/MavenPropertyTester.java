@@ -88,13 +88,13 @@ public class MavenPropertyTester extends PropertyTester {
     if(IS_TRANSITIVE_DEPENDENCY_TREE_NODE.equals(property)) {
       if(receiver instanceof DependencyNode) {
         DependencyNode nd = (DependencyNode) receiver;
-        return nd.getData().get("LEVEL") == null;
+        return nd.getData().get("LEVEL") == null; //$NON-NLS-1$
       }
     }
     if(IS_DIRECT_DEPENDENCY_TREE_NODE.equals(property)) {
       if(receiver instanceof DependencyNode) {
         DependencyNode nd = (DependencyNode) receiver;
-        return "DIRECT".equals(nd.getData().get("LEVEL"));
+        return "DIRECT".equals(nd.getData().get("LEVEL")); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
 

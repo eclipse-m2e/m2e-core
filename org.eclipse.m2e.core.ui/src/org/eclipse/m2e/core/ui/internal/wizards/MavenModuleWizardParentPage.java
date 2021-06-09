@@ -88,7 +88,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   /** Creates a new page. */
   public MavenModuleWizardParentPage(ProjectImportConfiguration projectImportConfiguration,
       List<IWorkingSet> workingSets) {
-    super("MavenModuleWizardParentPage", projectImportConfiguration);
+    super("MavenModuleWizardParentPage", projectImportConfiguration); //$NON-NLS-1$
     this.workingSets = workingSets;
     setTitle(Messages.wizardModulePageParentTitle);
     setDescription(Messages.wizardModulePageParentDescription);
@@ -249,7 +249,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   /** Skips the archetype selection page if the user chooses a simple project. */
   public IWizardPage getNextPage() {
     return getWizard()
-        .getPage(isSimpleProject() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage");
+        .getPage(isSimpleProject() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /** Returns the module name. */

@@ -124,7 +124,7 @@ public class ArtifactKey implements Serializable {
   private static int nextColonIndex(String str, int pos) {
     int idx = str.indexOf(':', pos);
     if(idx < 0)
-      throw new IllegalArgumentException(NLS.bind("Invalid portable string: {0}", str));
+      throw new IllegalArgumentException(NLS.bind("Invalid portable string: {0}", str)); //$NON-NLS-1$
     return idx;
   }
 

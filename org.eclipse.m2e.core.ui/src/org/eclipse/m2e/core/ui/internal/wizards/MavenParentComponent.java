@@ -120,7 +120,7 @@ public class MavenParentComponent extends Composite {
       parentClearButton = new Button(buttonPanel, SWT.NONE);
       parentClearButton.setText(Messages.wizardProjectPageArtifactParentClear);
       parentClearButton.setData("name", "parentClearButton"); //$NON-NLS-1$ //$NON-NLS-2$
-      parentClearButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setValues("", "", "")));
+      parentClearButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setValues("", "", ""))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
   }
 

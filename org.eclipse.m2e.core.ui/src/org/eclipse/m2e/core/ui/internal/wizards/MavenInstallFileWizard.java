@@ -120,7 +120,7 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
 
           // TODO update index for local maven repository
         } catch(CoreException ex) {
-          log.error("Failed to install artifact:" + ex.getMessage(), ex);
+          log.error("Failed to install artifact:" + ex.getMessage(), ex); //$NON-NLS-1$
         }
         return Status.OK_STATUS;
       }

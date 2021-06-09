@@ -79,7 +79,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
   /*package*/final Map<String, ProjectNode> projects = new ConcurrentHashMap<>();
 
-  /*package*/final Job refreshJob = new Job("") {
+  /*package*/final Job refreshJob = new Job("") { //$NON-NLS-1$
     protected IStatus run(IProgressMonitor monitor) {
       getSite().getShell().getDisplay().asyncExec(() -> viewer.refresh());
       return Status.OK_STATUS;

@@ -48,11 +48,11 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
 
   public String getMavenText() {
     MojoExecutionKey execution = element.getExecution();
-    if("default".equals(execution.getExecutionId())) {
-      return NLS.bind("{0}", prjconf.getRelpath());
+    if("default".equals(execution.getExecutionId())) { //$NON-NLS-1$
+      return NLS.bind("{0}", prjconf.getRelpath()); //$NON-NLS-1$
     }
     //TODO is execution id actually important or just takes up space
-    return NLS.bind("Execution {0}, in {1}", execution.getExecutionId(), prjconf.getRelpath());
+    return NLS.bind("Execution {0}, in {1}", execution.getExecutionId(), prjconf.getRelpath()); //$NON-NLS-1$
   }
 
   /* (non-Javadoc)

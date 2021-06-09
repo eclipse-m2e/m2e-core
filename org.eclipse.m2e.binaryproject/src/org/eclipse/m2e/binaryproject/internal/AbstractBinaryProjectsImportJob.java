@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 public abstract class AbstractBinaryProjectsImportJob extends Job {
 
   public AbstractBinaryProjectsImportJob() {
-    super("Import binary projects");
+    super("Import binary projects"); //$NON-NLS-1$
   }
 
   @Override

@@ -259,7 +259,7 @@ public class MavenPluginActivator extends Plugin {
     ResourcesPlugin.getWorkspace().addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
     //register URL handler, we can't use DS here because this triggers loading of m2e too early
     Hashtable<String, Object>               properties = new Hashtable<>();
-    properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
+    properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"}); //$NON-NLS-1$
     this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
         new MvnProtocolHandlerService(), properties);
   }
@@ -378,7 +378,7 @@ public class MavenPluginActivator extends Plugin {
           ((RepositoryRegistry) getRepositoryRegistry())
               .addRepositoryDiscoverer(new IndexesExtensionReader(indexManager));
         } catch(PlexusContainerException ex1) {
-          log.error("Failed to initialize the NexusIndexManager", ex1);
+          log.error("Failed to initialize the NexusIndexManager", ex1); //$NON-NLS-1$
         }
       }
     }
@@ -399,11 +399,11 @@ public class MavenPluginActivator extends Plugin {
           try {
             this.archetypeManager.readCatalogs();
           } catch(Exception ex) {
-            String msg = "Can't read archetype catalog configuration";
+            String msg = "Can't read archetype catalog configuration"; //$NON-NLS-1$
             log.error(msg, ex);
           }
         } catch(PlexusContainerException ex1) {
-          log.error("Failed to initialize the ArchetypeManager", ex1);
+          log.error("Failed to initialize the ArchetypeManager", ex1); //$NON-NLS-1$
         }
       }
     }
@@ -444,8 +444,8 @@ public class MavenPluginActivator extends Plugin {
     String osgiVersion = Platform
         .getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
     String m2eVersion = plugin.qualifiedVersion;
-    String javaVersion = System.getProperty("java.version", "unknown"); //$NON-NLS-1$ $NON-NLS-1$
-    return "m2e/" + osgiVersion + "/" + m2eVersion + "/" + javaVersion; //$NON-NLS-1$ $NON-NLS-1$
+    String javaVersion = System.getProperty("java.version", "unknown"); //$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-1$
+    return "m2e/" + osgiVersion + "/" + m2eVersion + "/" + javaVersion; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ $NON-NLS-1$
   }
 
   public IRepositoryRegistry getRepositoryRegistry() {

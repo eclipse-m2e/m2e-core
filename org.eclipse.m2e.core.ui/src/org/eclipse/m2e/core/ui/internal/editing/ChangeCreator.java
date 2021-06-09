@@ -119,7 +119,7 @@ public class ChangeCreator {
       try {
         return getHash(thisIndex).equals(((LineComparator) other).getHash(otherIndex));
       } catch(BadLocationException e) {
-        log.error("Problem comparing", e);
+        log.error("Problem comparing", e); //$NON-NLS-1$
         return false;
       }
     }

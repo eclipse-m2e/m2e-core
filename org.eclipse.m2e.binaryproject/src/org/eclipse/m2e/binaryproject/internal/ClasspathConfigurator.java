@@ -62,7 +62,7 @@ public class ClasspathConfigurator extends AbstractJavaProjectConfigurator {
     String groupId = projectNode.get(BinaryProjectPlugin.P_GROUPID, (String) null);
     String artifactId = projectNode.get(BinaryProjectPlugin.P_ARTIFACTID, (String) null);
     String version = projectNode.get(BinaryProjectPlugin.P_VERSION, (String) null);
-    String type = projectNode.get(BinaryProjectPlugin.P_TYPE, "jar");
+    String type = projectNode.get(BinaryProjectPlugin.P_TYPE, "jar"); //$NON-NLS-1$
     String classifier = projectNode.get(BinaryProjectPlugin.P_CLASSIFIER, (String) null);
 
     List<ArtifactRepository> repositories = null; // TODO store in project preferences

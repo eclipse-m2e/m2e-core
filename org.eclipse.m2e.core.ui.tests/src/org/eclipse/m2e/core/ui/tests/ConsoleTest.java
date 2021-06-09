@@ -40,11 +40,11 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
   @Test
   public void testConsoleHasOutput() throws Exception {
 	  var launchManager = DebugPlugin.getDefault().getLaunchManager();
-	  var configName = launchManager.generateLaunchConfigurationName("testConsole");
+	  var configName = launchManager.generateLaunchConfigurationName("testConsole"); //$NON-NLS-1$
 	  var wc = launchManager.getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID).newInstance(null, configName);
-	  var pomFile = new File(FileLocator.toFileURL(getClass().getResource("/resources/projects/simplePomOK/pom.xml")).getPath());
+	  var pomFile = new File(FileLocator.toFileURL(getClass().getResource("/resources/projects/simplePomOK/pom.xml")).getPath()); //$NON-NLS-1$
 	  wc.setAttribute(DebugPlugin.ATTR_WORKING_DIRECTORY, pomFile.getParent());
-	  wc.setAttribute(MavenLaunchConstants.ATTR_GOALS, "verify");
+	  wc.setAttribute(MavenLaunchConstants.ATTR_GOALS, "verify"); //$NON-NLS-1$
 	  wc.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, pomFile.getParent());
 	  var consoleManager = ConsolePlugin.getDefault().getConsoleManager();
 	  var consolesBefore = Arrays.stream(consoleManager.getConsoles()).collect(Collectors.toSet());
@@ -55,9 +55,9 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	  Set<IConsole> consolesAfter = new HashSet<>();
 	  consolesAfter.addAll(List.of(consoleManager.getConsoles()));
 	  consolesAfter.removeAll(consolesBefore);
-	  assertEquals("console not found", 1, consolesAfter.size());
+	  assertEquals("console not found", 1, consolesAfter.size()); //$NON-NLS-1$
 	  var mavenConsole = consolesAfter.iterator().next();
-	  assertTrue("missing output in console", ((TextConsole)mavenConsole).getDocument().get().contains("BUILD SUCCESS"));
+	  assertTrue("missing output in console", ((TextConsole)mavenConsole).getDocument().get().contains("BUILD SUCCESS")); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
 }

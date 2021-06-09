@@ -285,7 +285,7 @@ public class PomEdits {
     Element toFormat = null;
     Element toRet = null;
     if(names.length == 0) {
-      throw new IllegalArgumentException("At least one child name has to be specified");
+      throw new IllegalArgumentException("At least one child name has to be specified"); //$NON-NLS-1$
     }
     for(String name : names) {
       toRet = findChild(parent, name);
@@ -502,7 +502,7 @@ public class PomEdits {
             doc.appendChild(project);
 
             Element modelVersion = doc.createElement(MODEL_VERSION);
-            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE)); //$NON-NLS-1$
+            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE));
             project.appendChild(modelVersion);
             format(project);
           }

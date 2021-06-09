@@ -117,7 +117,7 @@ public class InputHistory {
   public void add(String id, final Control combo) {
     if(combo != null) {
       if(id == null) {
-        id = String.valueOf(combo.getData("name"));
+        id = String.valueOf(combo.getData("name")); //$NON-NLS-1$
       }
       List<ControlWrapper> combos = comboMap.get(id);
       if(combos == null) {

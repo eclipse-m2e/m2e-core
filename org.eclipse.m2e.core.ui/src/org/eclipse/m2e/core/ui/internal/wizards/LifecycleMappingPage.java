@@ -314,10 +314,10 @@ public class LifecycleMappingPage extends WizardPage {
                     }
 
                     if(executionId != null) {
-                      if("default".equals(executionId)) {
-                        return NLS.bind("{0}", relPath);
+                      if("default".equals(executionId)) { //$NON-NLS-1$
+                        return NLS.bind("{0}", relPath); //$NON-NLS-1$
                       }
-                      return NLS.bind("Execution {0}, in {1}", executionId, relPath);
+                      return NLS.bind("Execution {0}, in {1}", executionId, relPath); //$NON-NLS-1$
                     }
 
                     return null;

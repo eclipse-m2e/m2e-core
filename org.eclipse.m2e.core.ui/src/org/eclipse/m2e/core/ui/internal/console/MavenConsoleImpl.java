@@ -256,7 +256,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     if(showConsoleOnOutput()) {
       bringConsoleToFront();
     }
-    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message);
+    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message); //$NON-NLS-1$
 
     for(IMavenConsoleListener listener : listeners) {
       try {
@@ -271,7 +271,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     if(showConsoleOnOutput()) {
       bringConsoleToFront();
     }
-    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message);
+    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message); //$NON-NLS-1$
 
     for(IMavenConsoleListener listener : listeners) {
       try {

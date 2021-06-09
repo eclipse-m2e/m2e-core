@@ -67,7 +67,7 @@ public class MavenBuilderImpl {
 
   public static final QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
 
-  private static final String BUILD_PARTICIPANT_ID_ATTR_NAME = "buildParticipantId";
+  private static final String BUILD_PARTICIPANT_ID_ATTR_NAME = "buildParticipantId"; //$NON-NLS-1$
 
   private final DeltaProvider deltaProvider;
 
@@ -119,9 +119,9 @@ public class MavenBuilderImpl {
           Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<>(participantResults.getFiles())
               : null;
 
-          log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
+          log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(), //$NON-NLS-1$
               mojoExecutionKey.toString());
-          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
+          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName()); //$NON-NLS-1$
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
@@ -138,10 +138,10 @@ public class MavenBuilderImpl {
               }
             }
           } catch(Exception e) {
-            log.debug("Exception in build participant {}", participant.getClass().getName(), e);
+            log.debug("Exception in build participant {}", participant.getClass().getName(), e); //$NON-NLS-1$
             buildErrors.put(e, mojoExecutionKey);
           } finally {
-            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", participant.getClass().getName(), mojoExecutionKey.toString(), System.currentTimeMillis() - executionStartTime);
+            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", participant.getClass().getName(), mojoExecutionKey.toString(), System.currentTimeMillis() - executionStartTime); //$NON-NLS-1$
             participant.setMavenProjectFacade(null);
             participant.setGetDeltaCallback(null);
             participant.setSession(null);
@@ -158,7 +158,7 @@ public class MavenBuilderImpl {
         }
       }
     } catch(Exception e) {
-      log.debug("Unexpected build exception", e);
+      log.debug("Unexpected build exception", e); //$NON-NLS-1$
       buildErrors.put(e, null);
     } finally {
       snapshot.restore(mavenProject);
@@ -219,7 +219,7 @@ public class MavenBuilderImpl {
     MavenExecutionResult result = session.getResult();
     if(result.hasExceptions()) {
       for(Throwable e : result.getExceptions()) {
-        log.debug("Exception during execution {}", mojoExecutionKey, e);
+        log.debug("Exception during execution {}", mojoExecutionKey, e); //$NON-NLS-1$
         buildErrors.put(e, mojoExecutionKey);
       }
       result.getExceptions().clear();
@@ -231,7 +231,7 @@ public class MavenBuilderImpl {
     for(File file : resources) {
       IPath path = getProjectRelativePath(project, file);
       if(path == null) {
-        log.debug("Could not get relative path for file: ", file.getAbsoluteFile());
+        log.debug("Could not get relative path for file: ", file.getAbsoluteFile()); //$NON-NLS-1$
         continue; // odd
       }
 
@@ -380,7 +380,7 @@ public class MavenBuilderImpl {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
         MojoExecutionKey mojoExecutionKey = entry.getKey();
         for(InternalBuildParticipant participant : entry.getValue()) {
-          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
+          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName()); //$NON-NLS-1$
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
@@ -388,7 +388,7 @@ public class MavenBuilderImpl {
           try {
             participant.clean(monitor);
           } catch(Exception e) {
-            log.debug("Exception in build participant", e);
+            log.debug("Exception in build participant", e); //$NON-NLS-1$
             buildErrors.put(e, mojoExecutionKey);
           } finally {
             participant.setMavenProjectFacade(null);

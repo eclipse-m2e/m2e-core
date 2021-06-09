@@ -152,7 +152,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
       });
 
     } catch(Exception ex) {
-      log.error("Unable to create POM " + pom + "; " + ex.getMessage(), ex);
+      log.error("Unable to create POM " + pom + "; " + ex.getMessage(), ex); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
   }

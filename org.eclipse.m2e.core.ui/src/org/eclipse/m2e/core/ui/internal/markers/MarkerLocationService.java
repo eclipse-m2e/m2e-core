@@ -109,7 +109,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IFile resource = (IFile) marker.getResource();
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
       if(domModel == null) {
-        throw new IllegalArgumentException("Document is not structured: " + resource);
+        throw new IllegalArgumentException("Document is not structured: " + resource); //$NON-NLS-1$
       }
       IStructuredDocument document = domModel.getStructuredDocument();
       int charStart = document.getLineOffset(lineNumber - 1) + columnStart - 1;
@@ -138,10 +138,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       try {
         final boolean lookInPM = false;
-        final String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
-        final String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
-        final String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
-        final String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
+        final String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
+        final String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
+        final String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, ""); //$NON-NLS-1$
+        final String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
         XmlUtils.performOnRootElement((IFile) marker.getResource(), new NodeOperation<Element>() {
           public void process(Element root, IStructuredDocument structuredDocument) {
             Element build = findChild(root, PomEdits.BUILD);
@@ -174,7 +174,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             }
             Element ourMarkerPlacement = null;
             for(Element candid : candidates) {
-              Matcher match = "default".equals(exec) ? childMissingOrEqual(PomEdits.ID, "default")
+              Matcher match = "default".equals(exec) ? childMissingOrEqual(PomEdits.ID, "default") //$NON-NLS-1$ //$NON-NLS-2$
                   : childEquals(PomEdits.ID, exec);
               Element execution = findChild(findChild(candid, PomEdits.EXECUTIONS), PomEdits.EXECUTION, match);
               if(execution != null) {
@@ -209,7 +209,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
 
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            Matcher grIdmatch = "org.apache.maven.plugins".equals(groupId)
+            Matcher grIdmatch = "org.apache.maven.plugins".equals(groupId) //$NON-NLS-1$
                 ? childMissingOrEqual(PomEdits.GROUP_ID, groupId)
                 : childEquals(PomEdits.GROUP_ID, groupId);
             return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch,
@@ -217,9 +217,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
         });
       } catch(IOException e) {
-        log.error("Error locating marker", e);
+        log.error("Error locating marker", e); //$NON-NLS-1$
       } catch(CoreException e) {
-        log.error("Error locating marker", e);
+        log.error("Error locating marker", e); //$NON-NLS-1$
       }
     }
   }
@@ -411,18 +411,18 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private static void setManagedVersionAttributes(IMarker mark, MavenProject mavenproject,
       InputLocationTracker dependencyOrPlugin) throws CoreException {
-    InputLocation loc = dependencyOrPlugin == null ? null : dependencyOrPlugin.getLocation("version");
+    InputLocation loc = dependencyOrPlugin == null ? null : dependencyOrPlugin.getLocation("version"); //$NON-NLS-1$
     File file = loc == null ? null : XmlUtils.fileForInputLocation(loc, mavenproject);
 
     if(file != null) {
       mark.setAttribute(ATTR_MANAGED_VERSION_LOCATION, file.toURI().toString());
       int lineNumber = loc != null ? loc.getLineNumber() : -1;
       if(lineNumber > 0) {
-        mark.setAttribute("managedVersionLine", lineNumber);
+        mark.setAttribute("managedVersionLine", lineNumber); //$NON-NLS-1$
       }
       int columnNumber = loc != null ? loc.getColumnNumber() : -1;
       if(columnNumber > 0) {
-        mark.setAttribute("managedVersionColumn", columnNumber);
+        mark.setAttribute("managedVersionColumn", columnNumber); //$NON-NLS-1$
       }
     }
   }
@@ -493,11 +493,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       List<Plugin> plgs = pm.getPlugins();
       if(plgs != null) {
         for(Plugin plg : plgs) {
-          InputLocation loc = plg.getLocation("version");
+          InputLocation loc = plg.getLocation("version"); //$NON-NLS-1$
           //#350203 skip plugins defined in the superpom
           String modelID = loc == null ? null : (loc.getSource() == null ? null : loc.getSource().getModelId());
           if(loc != null && (modelID == null
-              || !(modelID.startsWith("org.apache.maven:maven-model-builder:") && modelID.endsWith(":super-pom")))) {
+              || !(modelID.startsWith("org.apache.maven:maven-model-builder:") && modelID.endsWith(":super-pom")))) { //$NON-NLS-1$ //$NON-NLS-2$
             managed.put(plg.getKey(), plg);
           }
         }
@@ -506,12 +506,12 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
     //now we have all the candidates, match them against the effective managed set
     for(Element dep : candidates) {
-      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID)); //$NON-NLS-1$
+      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID));
       if(grpString == null) {
         grpString = "org.apache.maven.plugins"; //$NON-NLS-1$
       }
-      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID)); //$NON-NLS-1$
-      Element version = findChild(dep, PomEdits.VERSION); //$NON-NLS-1$
+      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID));
+      Element version = findChild(dep, PomEdits.VERSION);
       String versionString = getTextValue(version);
       if(artString != null && versionString != null) {
         String id = Plugin.constructKey(grpString, artString);
@@ -571,11 +571,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     }
-    Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
+    Element version = findChild(root, PomEdits.VERSION);
     ProblemSeverity matchingParentVersionSeverity = getMatchingParentVersionSeverity();
     if(parent != null && version != null && !ProblemSeverity.ignore.equals(matchingParentVersionSeverity)) {
       //now compare the values of parent and project version..
-      String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
+      String parentString = getTextValue(findChild(parent, PomEdits.VERSION));
       String childString = getTextValue(version);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset

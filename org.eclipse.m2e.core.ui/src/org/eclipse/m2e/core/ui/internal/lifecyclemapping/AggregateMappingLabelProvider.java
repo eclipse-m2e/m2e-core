@@ -51,16 +51,16 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
 
   public String getMavenText() {
     if(element instanceof LifecycleStrategyMappingRequirement) {
-      return NLS.bind("Connector {0}", ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId());
+      return NLS.bind("Connector {0}", ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId()); //$NON-NLS-1$
     } else if(element instanceof MojoExecutionMappingRequirement) {
       MojoExecutionKey exec = ((MojoExecutionMappingRequirement) element).getExecution();
-      return NLS.bind("{0}:{1}:{2}",
+      return NLS.bind("{0}:{1}:{2}", //$NON-NLS-1$
           new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
     } else if(element instanceof PackagingTypeMappingRequirement) {
-      return NLS.bind("Packaging {0}", ((PackagingTypeMappingRequirement) element).getPackaging());
+      return NLS.bind("Packaging {0}", ((PackagingTypeMappingRequirement) element).getPackaging()); //$NON-NLS-1$
     } else if(element instanceof ProjectConfiguratorMappingRequirement) {
       MojoExecutionKey exec = ((ProjectConfiguratorMappingRequirement) element).getExecution();
-      return NLS.bind("{0}:{1}:{2}",
+      return NLS.bind("{0}:{1}:{2}", //$NON-NLS-1$
           new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
     }
     throw new IllegalStateException();
