@@ -64,10 +64,12 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
     return Collections.emptySet();
   }
 
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     this.targetPart = targetPart;
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;

@@ -95,9 +95,11 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
    */
+  @Override
   public void init(IWorkbenchWindow window) {
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
@@ -106,6 +108,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     }
   }
 
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     mavenProject = targetPart.getAdapter(MavenProject.class);
   }
@@ -114,6 +117,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     return mavenProject;
   }
 
+  @Override
   public void run(IAction action) {
     //TODO mkleint: this asks for rewrite.. having one action that does 2 quite different things based
     // on something as vague as selection passed in is unreadable..
@@ -123,7 +127,8 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
         final ArtifactKey ak = SelectionUtil.getArtifactKey(element);
         if(ak != null) {
           new Job(Messages.OpenPomAction_job_opening) {
-            protected IStatus run(IProgressMonitor monitor) {
+              @Override
+              protected IStatus run(IProgressMonitor monitor) {
               openEditor(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), getMavenProject(), monitor);
               return Status.OK_STATUS;
             }
@@ -140,7 +145,8 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     if(dialog.open() == Window.OK) {
       final IndexedArtifactFile iaf = (IndexedArtifactFile) dialog.getFirstResult();
       new Job(Messages.OpenPomAction_job_opening) {
-        protected IStatus run(IProgressMonitor monitor) {
+          @Override
+          protected IStatus run(IProgressMonitor monitor) {
           if(iaf != null) {
             openEditor(iaf.group, iaf.artifact, iaf.version, monitor);
           }
@@ -333,30 +339,37 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
     // IStorageEditorInput
 
+    @Override
     public boolean exists() {
       return true;
     }
 
+    @Override
     public String getName() {
       return this.name;
     }
 
+    @Override
     public String getToolTipText() {
       return this.tooltip;
     }
 
+    @Override
     public IStorage getStorage() {
       return new MavenStorage(name, path, content);
     }
 
+    @Override
     public ImageDescriptor getImageDescriptor() {
       return null;
     }
 
+    @Override
     public IPersistableElement getPersistable() {
       return null;
     }
 
+    @Override
     public <T> T getAdapter(Class<T> adapter) {
       return null;
     }
@@ -376,6 +389,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
      * @see java.lang.Object#equals(java.lang.Object)
      */
     //implemented as hinted by IPathEditorInput javadoc.
+    @Override
     public boolean equals(Object obj) {
       IPath path = getPath();
       if(path != null && obj instanceof MavenPathStorageEditorInput) {
@@ -398,22 +412,27 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       this.content = content;
     }
 
+    @Override
     public String getName() {
       return name;
     }
 
+    @Override
     public IPath getFullPath() {
       return path == null ? null : new Path(path);
     }
 
+    @Override
     public InputStream getContents() {
       return new ByteArrayInputStream(content);
     }
 
+    @Override
     public boolean isReadOnly() {
       return true;
     }
 
+    @Override
     public <T> T getAdapter(Class<T> adapter) {
       return null;
     }

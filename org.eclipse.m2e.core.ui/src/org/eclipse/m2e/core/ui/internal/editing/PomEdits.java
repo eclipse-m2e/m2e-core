@@ -667,6 +667,7 @@ public class PomEdits {
       this.operations = operations;
     }
 
+    @Override
     public void process(Document document) {
       for(Operation oper : operations) {
         oper.process(document);
@@ -726,7 +727,8 @@ public class PomEdits {
     return new Matcher() {
       int count = 0;
 
-      public boolean matches(Element child) {
+        @Override
+        public boolean matches(Element child) {
         if(count == index) {
           return true;
         }

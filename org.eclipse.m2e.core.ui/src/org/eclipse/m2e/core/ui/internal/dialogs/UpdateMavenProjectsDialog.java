@@ -149,6 +149,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
     createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
   }
 
+  @Override
   protected void okPressed() {
     selectedProjects = nestedProjectsComposite.getSelectedProjects();
 

@@ -77,6 +77,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     this.setConsoleDocument(new ConsoleDocument());
   }
 
+  @Override
   protected void init() {
     super.init();
 
@@ -203,6 +204,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     ConsolePlugin.getDefault().getConsoleManager().addConsoleListener(this.newLifecycle());
   }
 
+  @Override
   public void propertyChange(PropertyChangeEvent event) {
     // font changed
     setFont(JFaceResources.getFontRegistry().get("pref_console_font")); //$NON-NLS-1$
@@ -219,6 +221,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   }
 
   // Called when console is removed from the console view
+  @Override
   protected void dispose() {
     // Here we can't call super.dispose() because we actually want the partitioner to remain
     // connected, but we won't show lines until the console is added to the console manager
@@ -244,6 +247,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
 
   // MavenConsole
 
+  @Override
   public void debug(String message) {
     if(!M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT)) {
       return;
@@ -262,6 +266,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
   }
 
+  @Override
   public void info(String message) {
     if(showConsoleOnOutput()) {
       bringConsoleToFront();
@@ -277,6 +282,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
   }
 
+  @Override
   public void error(String message) {
     if(showConsoleOnError()) {
       bringConsoleToFront();
@@ -381,7 +387,8 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
    */
   public class MavenConsoleLifecycle implements org.eclipse.ui.console.IConsoleListener {
 
-    public void consolesAdded(IConsole[] consoles) {
+      @Override
+      public void consolesAdded(IConsole[] consoles) {
       for(IConsole console : consoles) {
         if(console == MavenConsoleImpl.this) {
           init();
@@ -390,6 +397,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
 
     }
 
+    @Override
     public void consolesRemoved(IConsole[] consoles) {
       for(IConsole console : consoles) {
         if(console == MavenConsoleImpl.this) {

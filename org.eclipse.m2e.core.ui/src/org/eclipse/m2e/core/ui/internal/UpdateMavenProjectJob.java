@@ -69,6 +69,7 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
 
+  @Override
   public IStatus runInWorkspace(IProgressMonitor monitor) {
     ProjectConfigurationManager configurationManager = (ProjectConfigurationManager) MavenPlugin
         .getProjectConfigurationManager();

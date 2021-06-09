@@ -49,6 +49,7 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     this.element = element;
   }
 
+  @Override
   public String getMavenText() {
     if(element instanceof LifecycleStrategyMappingRequirement) {
       return NLS.bind("Connector {0}", ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId());
@@ -66,6 +67,7 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     throw new IllegalStateException();
   }
 
+  @Override
   public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration) {
     for(ILifecycleMappingLabelProvider pr : content) {
       if(pr.isError(mappingConfiguration)) {
@@ -79,10 +81,12 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     return content.toArray(new ILifecycleMappingLabelProvider[content.size()]);
   }
 
+  @Override
   public ILifecycleMappingRequirement getKey() {
     return element;
   }
 
+  @Override
   public Collection<MavenProject> getProjects() {
     Set<MavenProject> projects = new HashSet<>();
     for(ILifecycleMappingLabelProvider provider : content) {
@@ -91,10 +95,12 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     return projects;
   }
 
+  @Override
   public int hashCode() {
     return getMavenText().hashCode();
   }
 
+  @Override
   public boolean equals(Object other) {
     if(other instanceof AggregateMappingLabelProvider) {
       return other.hashCode() == hashCode();

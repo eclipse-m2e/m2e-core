@@ -25,7 +25,8 @@ import org.eclipse.m2e.core.ui.internal.dialogs.AssignWorkingSetDialog;
  */
 public class AssignWorkingSetAction extends MavenProjectActionSupport {
 
-  public void run(IAction action) {
+    @Override
+    public void run(IAction action) {
     IProject[] initialSelection = getProjects();
 
     AssignWorkingSetDialog dialog = new AssignWorkingSetDialog(getShell(), initialSelection);

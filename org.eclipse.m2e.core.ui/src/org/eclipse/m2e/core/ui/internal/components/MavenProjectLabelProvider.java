@@ -30,7 +30,8 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
  * @since 1.5
  */
 public class MavenProjectLabelProvider extends LabelProvider {
-  public Image getImage(Object element) {
+    @Override
+    public Image getImage(Object element) {
     if(Beans.isDesignTime()) {
       // windowbuilder compat
       return null;
@@ -46,6 +47,7 @@ public class MavenProjectLabelProvider extends LabelProvider {
     return img;
   }
 
+  @Override
   public String getText(Object element) {
     return element instanceof IProject ? ((IProject) element).getName() : ""; //$NON-NLS-1$
   }

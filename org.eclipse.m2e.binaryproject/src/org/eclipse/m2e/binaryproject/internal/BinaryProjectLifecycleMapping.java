@@ -59,9 +59,11 @@ public class BinaryProjectLifecycleMapping extends AbstractLifecycleMapping {
     return false;
   }
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     configurator.configure(request, monitor);
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {}
 }

@@ -105,20 +105,24 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     codebaseViewer = new CheckboxTreeViewer(this, SWT.BORDER);
     codebaseViewer.setContentProvider(new ITreeContentProvider() {
 
-      public void dispose() {
+        @Override
+        public void dispose() {
       }
 
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
 
-      public Object[] getElements(Object element) {
+        @Override
+        public Object[] getElements(Object element) {
         if(element instanceof Collection) {
           return ((Collection<?>) element).toArray();
         }
         return null;
       }
 
-      public Object[] getChildren(Object parentElement) {
+        @Override
+        public Object[] getChildren(Object parentElement) {
         if(parentElement instanceof IProject) {
           String elePath = getElePath(parentElement);
           String prevPath = null;
@@ -138,7 +142,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         return null;
       }
 
-      public Object getParent(Object element) {
+        @Override
+        public Object getParent(Object element) {
         String elePath = getElePath(element);
         String prevPath = null;
         for(String path : projectPaths.keySet()) {
@@ -150,7 +155,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         return prevPath == null ? projects : getProject(prevPath);
       }
 
-      public boolean hasChildren(Object element) {
+        @Override
+        public boolean hasChildren(Object element) {
         if(element instanceof IProject) {
           String elePath = getElePath(element);
           for(String path : projectPaths.keySet()) {
@@ -165,7 +171,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       }
     });
     codebaseViewer.setLabelProvider(new MavenProjectLabelProvider() {
-      public Image getImage(Object element) {
+        @Override
+        public Image getImage(Object element) {
         Image img = super.getImage(element);
         if(showOutOfDateUI && requiresUpdate((IProject) element)) {
           img = MavenImages.createOverlayImage(MavenImages.OOD_MVN_PROJECT, img, MavenImages.OUT_OF_DATE_OVERLAY,
@@ -425,6 +432,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     menuMgr.setRemoveAllWhenShown(true);
   }
 
+  @Override
   public void menuAboutToShow(IMenuManager manager) {
     if(codebaseViewer.getSelection().isEmpty()) {
       return;
@@ -437,14 +445,16 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   private final Action selectTree = new Action(Messages.UpdateDepenciesDialog_selectTree) {
-    public void run() {
+      @Override
+      public void run() {
       setSubtreeChecked(getSelection(), true);
       updateSelectedProjects();
     }
   };
 
   private final Action deselectTree = new Action(Messages.UpdateDepenciesDialog_deselectTree) {
-    public void run() {
+      @Override
+      public void run() {
       setSubtreeChecked(getSelection(), false);
       updateSelectedProjects();
     }

@@ -42,6 +42,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
     this.prjconf = prjconf;
   }
 
+  @Override
   public String getMavenText() {
     return prjconf.getRelpath();
   }
@@ -49,6 +50,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
+  @Override
   public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration) {
     return !mappingConfiguration.isRequirementSatisfied(getKey());
   }
@@ -56,6 +58,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
    */
+  @Override
   public ILifecycleMappingRequirement getKey() {
     return element.getLifecycleMappingRequirement();
   }
@@ -63,6 +66,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getProjects()
    */
+  @Override
   public Collection<MavenProject> getProjects() {
     return Collections.singleton(prjconf.getMavenProject());
   }

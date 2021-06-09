@@ -108,6 +108,7 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     }
   }
 
+  @Override
   protected Control createDialogArea(Composite parent) {
     readSettings();
     Composite superComposite = (Composite) super.createDialogArea(parent);
@@ -209,6 +210,7 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     return resultOperation;
   }
 
+  @Override
   protected void computeResult() {
     final String oldArtifactId = dependency.getArtifactId();
     final String oldGroupId = dependency.getGroupId();

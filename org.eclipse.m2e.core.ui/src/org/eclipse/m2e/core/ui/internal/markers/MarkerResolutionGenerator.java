@@ -35,10 +35,12 @@ import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 @SuppressWarnings("restriction")
 public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
-  public boolean hasResolutions(IMarker marker) {
+    @Override
+    public boolean hasResolutions(IMarker marker) {
     return true;
   }
 
+  @Override
   public IMarkerResolution[] getResolutions(IMarker marker) {
     return new IMarkerResolution[] {new RefreshResolution(marker)};
   }
@@ -49,27 +51,33 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       super(marker);
     }
 
+    @Override
     public String getDescription() {
       return Messages.MarkerResolutionGenerator_desc;
     }
 
+    @Override
     public Image getImage() {
       return null;
     }
 
+    @Override
     public String getLabel() {
       return Messages.MarkerResolutionGenerator_label;
     }
 
+    @Override
     public boolean isSingleton() {
       return true;
     }
 
+    @Override
     public void fix(IMarker[] markers, IDocument doc, IProgressMonitor monitor) {
       final Set<IProject> projects = getProjects(Stream.of(markers));
       new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
     }
 
+    @Override
     public boolean canFix(IMarker marker) throws CoreException {
       return IMavenConstants.MARKER_CONFIGURATION_ID.equals(marker.getType());
     }
