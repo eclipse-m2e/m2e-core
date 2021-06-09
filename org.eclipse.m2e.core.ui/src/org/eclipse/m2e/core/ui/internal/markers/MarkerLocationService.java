@@ -506,12 +506,12 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
     //now we have all the candidates, match them against the effective managed set
     for(Element dep : candidates) {
-      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID)); //$NON-NLS-1$
+      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID));
       if(grpString == null) {
         grpString = "org.apache.maven.plugins"; //$NON-NLS-1$
       }
-      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID)); //$NON-NLS-1$
-      Element version = findChild(dep, PomEdits.VERSION); //$NON-NLS-1$
+      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID));
+      Element version = findChild(dep, PomEdits.VERSION);
       String versionString = getTextValue(version);
       if(artString != null && versionString != null) {
         String id = Plugin.constructKey(grpString, artString);
@@ -571,11 +571,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     }
-    Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
+    Element version = findChild(root, PomEdits.VERSION);
     ProblemSeverity matchingParentVersionSeverity = getMatchingParentVersionSeverity();
     if(parent != null && version != null && !ProblemSeverity.ignore.equals(matchingParentVersionSeverity)) {
       //now compare the values of parent and project version..
-      String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
+      String parentString = getTextValue(findChild(parent, PomEdits.VERSION));
       String childString = getTextValue(version);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset

@@ -142,7 +142,7 @@ public class ProjectImportConfiguration {
     // check if project already exists
     if(workspace.getRoot().getProject(projectName).exists()) {
       return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
-          NLS.bind(Messages.importProjectExists, projectName), null); //$NON-NLS-1$
+          NLS.bind(Messages.importProjectExists, projectName), null);
     }
 
     return Status.OK_STATUS;

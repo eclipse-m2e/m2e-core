@@ -118,7 +118,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       StringBuilder buffer = new StringBuilder();
       Model model = project.getProject().getModel();
       buffer.append(model.getGroupId()).append(" : ") //$NON-NLS-1$
-          .append(model.getArtifactId()).append(" : ") //$NON-NLS-2$
+          .append(model.getArtifactId()).append(" : ")
           .append(model.getVersion());
       return buffer.toString();
     }

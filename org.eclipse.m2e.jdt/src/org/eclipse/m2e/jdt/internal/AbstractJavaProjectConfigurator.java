@@ -626,7 +626,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       try {
         List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
         if(args != null) {
-          generateParameters = args.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);//$NON-NLS-1$
+          generateParameters = args.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
         }
       } catch(Exception ex) {
         //ignore
@@ -639,7 +639,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
             monitor);
         if(compilerArgument != null) {
-          generateParameters = compilerArgument.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);//$NON-NLS-1$
+          generateParameters = compilerArgument.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
         }
       } catch(CoreException ex) {
         //ignore
@@ -654,7 +654,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //1st, check the --enable-preview flag in the compilerArgs list
     try {
       List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
-      if(args != null && args.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {//$NON-NLS-1$
+      if(args != null && args.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
       }
     } catch(Exception ex) {
@@ -665,7 +665,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     try {
       String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
           monitor);
-      if(compilerArgument != null && compilerArgument.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {//$NON-NLS-1$
+      if(compilerArgument != null && compilerArgument.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
       }
     } catch(CoreException ex) {
@@ -793,7 +793,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     } else {
       relative = absolutePath;
     }
-    return new Path(relative.replace('\\', '/')); //$NON-NLS-1$ //$NON-NLS-2$
+    return new Path(relative.replace('\\', '/'));
   }
 
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {

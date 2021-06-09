@@ -176,7 +176,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
     if(embedder != null) {
       StringBuilder sb = new StringBuilder();
-      sb.append(getVersion(embedder)); //$NON-NLS-1$
+      sb.append(getVersion(embedder));
       String version = embedder.getHeaders().get(Constants.BUNDLE_VERSION);
       sb.append('/').append(version);
       return sb.toString();

@@ -110,8 +110,8 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       String loc = null;
       Model mdl = mavprj.getModel();
       if(mdl.getProperties() != null && mdl.getProperties().containsKey(region.property)) {
-        if(mdl.getLocation(PomEdits.PROPERTIES) != null) { //$NON-NLS-1$
-          InputLocation location = mdl.getLocation(PomEdits.PROPERTIES).getLocation(region.property); //$NON-NLS-1$
+        if(mdl.getLocation(PomEdits.PROPERTIES) != null) {
+          InputLocation location = mdl.getLocation(PomEdits.PROPERTIES).getLocation(region.property);
           if(location != null) {
             //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
             // check!
