@@ -502,7 +502,7 @@ public class PomEdits {
             doc.appendChild(project);
 
             Element modelVersion = doc.createElement(MODEL_VERSION);
-            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE)); //$NON-NLS-1$
+            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE));
             project.appendChild(modelVersion);
             format(project);
           }

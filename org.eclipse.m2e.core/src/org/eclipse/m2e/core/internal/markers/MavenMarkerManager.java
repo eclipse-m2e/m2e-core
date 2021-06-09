@@ -292,16 +292,16 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       CoreException cex = (CoreException) cause;
       IStatus status = cex.getStatus();
       if(status != null) {
-        addMarker(resource, type, status.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/); //$NON-NLS-1$
+        addMarker(resource, type, status.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/);
         IStatus[] children = status.getChildren();
         if(children != null) {
           for(IStatus childStatus : children) {
-            addMarker(resource, type, childStatus.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/); //$NON-NLS-1$
+            addMarker(resource, type, childStatus.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/);
           }
         }
       }
     } else {
-      addMarker(resource, type, cause.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/); //$NON-NLS-1$
+      addMarker(resource, type, cause.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/);
     }
   }
 

@@ -365,7 +365,7 @@ public enum PomTemplateContext {
           //if groupid is the same, suggest ${project.version}
           if(groupId != null && groupId.equals(mvn.getGroupId())) {
             proposals.add(new Template("${project.version}", Messages.PomTemplateContext_project_version_hint, //$NON-NLS-1$
-                contextTypeId, "$${project.version}", false)); //$NON-NLS-3$
+                contextTypeId, "$${project.version}", false));
           }
           Properties props = mvn.getProperties();
           if(props != null) {
@@ -381,7 +381,7 @@ public enum PomTemplateContext {
               for(String key : keys) {
                 String expr = "${" + key + "}"; //$NON-NLS-1$ //$NON-NLS-2$
                 proposals.add(new Template(expr, Messages.PomTemplateContext_expression_description, contextTypeId,
-                    "$" + expr, false)); //$NON-NLS-2$ //$NON-NLS-1$
+                    "$" + expr, false)); //$NON-NLS-1$
               }
             }
           }
@@ -400,7 +400,7 @@ public enum PomTemplateContext {
             }
             if(groupId != null && groupId.equals(currentgroupid)) {
               proposals.add(new Template("${project.version}", Messages.PomTemplateContext_project_version_hint, //$NON-NLS-1$
-                  contextTypeId, "$${project.version}", false)); //$NON-NLS-3$
+                  contextTypeId, "$${project.version}", false));
             }
           }
         }

@@ -289,10 +289,10 @@ public abstract class MavenPomEditorPage extends FormPage {
             if(toAdd != null) {
               //errors get prepended while warnings get appended.
               if(toAdd.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR) {
-                text = NLS.bind(Messages.MavenPomEditorPage_error_add, toAdd.getAttribute(IMarker.MESSAGE, "")) + text; //$NON-NLS-2$
+                text = NLS.bind(Messages.MavenPomEditorPage_error_add, toAdd.getAttribute(IMarker.MESSAGE, "")) + text;
               } else {
                 text = text
-                    + NLS.bind(Messages.MavenPomEditorPage_warning_add, toAdd.getAttribute(IMarker.MESSAGE, "")); //$NON-NLS-2$
+                    + NLS.bind(Messages.MavenPomEditorPage_warning_add, toAdd.getAttribute(IMarker.MESSAGE, ""));
               }
             }
           }

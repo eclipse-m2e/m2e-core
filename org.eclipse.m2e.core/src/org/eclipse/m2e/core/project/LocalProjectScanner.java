@@ -106,7 +106,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       return;
     }
 
-    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null); //$NON-NLS-1$
+    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null);
     if(projectInfo != null) {
       addProject(projectInfo);
       return; // don't scan subfolders of the Maven project

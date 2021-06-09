@@ -146,10 +146,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if(current != null) {
       Node artNode = null;
       Node groupNode = null;
-      if(ARTIFACT_ID.equals(current.getNodeName())) { //$NON-NLS-1$
+      if(ARTIFACT_ID.equals(current.getNodeName())) {
         artNode = current;
       }
-      if(GROUP_ID.equals(current.getNodeName())) { //$NON-NLS-1$
+      if(GROUP_ID.equals(current.getNodeName())) {
         groupNode = current;
       }
       //only on artifactid and groupid elements..
@@ -161,10 +161,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       boolean isPlugin = false;
       if(root != null) {
         String name = root.getNodeName();
-        if(DEPENDENCY.equals(name)) { //$NON-NLS-1$
+        if(DEPENDENCY.equals(name)) {
           isDependency = true;
         }
-        if(PLUGIN.equals(name)) { //$NON-NLS-1$
+        if(PLUGIN.equals(name)) {
           isPlugin = true;
         }
       } else {
@@ -180,13 +180,13 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         Node child = childs.item(i);
         if(child instanceof Element) {
           Element el = (Element) child;
-          if(VERSION.equals(el.getNodeName())) { //$NON-NLS-1$
+          if(VERSION.equals(el.getNodeName())) {
             return null;
           }
-          if(artNode == null && ARTIFACT_ID.equals(el.getNodeName())) { //$NON-NLS-1$
+          if(artNode == null && ARTIFACT_ID.equals(el.getNodeName())) {
             artNode = el;
           }
-          if(groupNode == null && GROUP_ID.equals(el.getNodeName())) { //$NON-NLS-1$
+          if(groupNode == null && GROUP_ID.equals(el.getNodeName())) {
             groupNode = el;
           }
         }
@@ -264,7 +264,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if(list != null) {
           for(Dependency dep : list) {
             if(dep.getManagementKey().startsWith(id)) {
-              InputLocation location = dep.getLocation(ARTIFACT_ID); //$NON-NLS-1$
+              InputLocation location = dep.getLocation(ARTIFACT_ID);
               //when would this be null?
               if(location != null) {
                 openLocation = location;
@@ -285,7 +285,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           if(list != null) {
             for(Plugin plg : list) {
               if(id.equals(plg.getKey())) {
-                InputLocation location = plg.getLocation(ARTIFACT_ID); //$NON-NLS-1$
+                InputLocation location = plg.getLocation(ARTIFACT_ID);
                 //when would this be null?
                 if(location != null) {
                   openLocation = location;

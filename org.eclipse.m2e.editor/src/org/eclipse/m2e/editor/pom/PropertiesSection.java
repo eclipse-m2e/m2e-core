@@ -184,7 +184,7 @@ public class PropertiesSection {
 
   void createNewProperty() {
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
-        Messages.PropertiesSection_title_addProperty, "", "", listener); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        Messages.PropertiesSection_title_addProperty, "", "", listener); //$NON-NLS-1$//$NON-NLS-2$
     if(dialog.open() == IDialogConstants.OK_ID) {
       final String key = dialog.getName();
       final String value = dialog.getValue();

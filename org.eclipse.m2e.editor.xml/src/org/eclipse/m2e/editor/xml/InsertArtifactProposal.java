@@ -172,7 +172,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 }
                 plugin = createElement(getChild(build, PLUGINS), PLUGIN);
               }
-              if(BUILD.equals(currentName) || PLUGIN_MANAGEMENT.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
+              if(BUILD.equals(currentName) || PLUGIN_MANAGEMENT.equals(currentName)) {
                 Element plugins = findChild(currentNode, PLUGINS);
                 if(plugins == null) {
                   plugins = insertAt(doc.createElement(PLUGINS), fOffset);
@@ -214,7 +214,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
               String currentName = currentNode.getNodeName();
               Element dependency = null;
               Element toFormat = null;
-              if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+              if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$
                 Element deps = findChild(currentNode, DEPENDENCIES);
                 if(deps == null) {
                   deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
