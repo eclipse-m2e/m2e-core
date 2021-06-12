@@ -8,7 +8,7 @@ pipeline {
 	}
 	tools {
 		maven 'apache-maven-latest'
-		// Need adoptOpenJDK because we want JDK >= 11.0.3 to avaid TLS issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=577256
+		// Need adoptOpenJDK because we want JDK >= 11.0.3 to avoid TLS issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=577256
 		jdk 'adoptopenjdk-hotspot-jdk11-latest'
 	}
 	stages {
@@ -46,7 +46,7 @@ pipeline {
 								mkdir -p ${1}"
 							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
-						M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)<\\/m2e.version>.*/\\1/')
+						M2E_VERSION=$(<"org.eclipse.m2e.sdk.feature/target/m2.version")
 						SNAPSHOT_VERSIONED_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest
 						SNAPSHOT_LATEST_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 
