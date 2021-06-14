@@ -23,11 +23,6 @@
 
 	<name>M2E - Maven runtime bundles</name>
 
-	<scm>
-		<connection>scm:git:git://git.eclipse.org/gitroot/m2e/m2e-core.git</connection>
-		<developerConnection>scm:git:git://git.eclipse.org/gitroot/m2e/m2e-core.git</developerConnection>
-	</scm>
-
 	<properties>
 		<archetype-common.version>2.4</archetype-common.version>
 	</properties>

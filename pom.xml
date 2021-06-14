@@ -27,7 +27,7 @@
 	<name>Maven Integration for Eclipse (parent)</name>
 	<description>Maven Integration for Eclipse provides tight integration
 		for Maven into the IDE</description>
-	<url>https://eclipse.org/m2e</url>
+	<url>https://www.eclipse.org/m2e</url>
 	<inceptionYear>2005</inceptionYear>
 
 	<properties>
@@ -49,7 +49,6 @@
 		<name>Eclipse Foundation</name>
 		<url>https://eclipse.org/m2e</url>
 	</organization>
-
 	<licenses>
 		<license>
 			<name>Eclipse Public License - v 2.0</name>
@@ -57,9 +56,13 @@
 		</license>
 	</licenses>
 
+	<scm>
+		<connection>scm:git:https://github.com/eclipse-m2e/m2e-core.git</connection>
+		<developerConnection>scm:git:git@github.com:eclipse-m2e/m2e-core.git</developerConnection>
+	</scm>
 	<issueManagement>
-		<url>https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e</url>
-		<system>Bugzilla</system>
+		<url>https://github.com/eclipse-m2e/m2e-core/issues</url>
+		<system>GitHub issues</system>
 	</issueManagement>
 
 	<modules>
@@ -508,16 +511,16 @@
 		<mailingList>
 			<name>Users List</name>
 			<subscribe>m2e-users@eclipse.org</subscribe>
-			<unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-users</unsubscribe>
+			<unsubscribe>https://accounts.eclipse.org/mailing-list/m2e-users</unsubscribe>
 			<post>m2e-users@eclipse.org</post>
-			<archive>https://dev.eclipse.org/mhonarc/lists/m2e-users</archive>
+			<archive>https://www.eclipse.org/lists/m2e-users</archive>
 		</mailingList>
 		<mailingList>
-			<name>Developer List</name>
+			<name>Developers List</name>
 			<subscribe>m2e-dev@eclipse.org</subscribe>
-			<unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-dev</unsubscribe>
+			<unsubscribe>https://accounts.eclipse.org/mailing-list/m2e-dev</unsubscribe>
 			<post>m2e-dev@eclipse.org</post>
-			<archive>https://dev.eclipse.org/mhonarc/lists/m2e-dev</archive>
+			<archive>https://www.eclipse.org/lists/m2e-dev</archive>
 		</mailingList>
 	</mailingLists>
 </project>
