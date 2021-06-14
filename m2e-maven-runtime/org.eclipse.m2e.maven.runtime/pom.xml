@@ -140,7 +140,6 @@
 						<Embed-Dependency>
 							*;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api|javax.inject
 						</Embed-Dependency>
-						<Embed-Directory>jars</Embed-Directory>
 						<_exportcontents>
 							META-INF.plexus;-noimport:=true,
 							META-INF.sisu;-noimport:=true,
@@ -163,10 +162,6 @@
 						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

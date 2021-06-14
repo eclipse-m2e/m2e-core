@@ -138,6 +138,8 @@
 					<configuration>
 						<instructions>
 							<Embed-Transitive>true</Embed-Transitive>
+							<Embed-Directory>jars</Embed-Directory>
+
 							<_failok>true</_failok>
 							<_nouses>true</_nouses>
 							<_nodefaultversion>true</_nodefaultversion>
@@ -240,6 +242,10 @@
 							<excludeInnerJars>true</excludeInnerJars>
 							<resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
 						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-p2-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>
