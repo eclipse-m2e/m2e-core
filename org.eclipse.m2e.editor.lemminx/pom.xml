@@ -1,102 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!--
+  Copyright (c) 2019, 2021 Red Hat Inc. and others
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License 2.0
+  which accompanies this distribution, and is available at
+  https://www.eclipse.org/legal/epl-2.0/
 
-	<modelVersion>4.0.0</modelVersion>
+  SPDX-License-Identifier: EPL-2.0
 
-	<parent>
-		<groupId>org.eclipse.m2e</groupId>
-		<artifactId>m2e-core</artifactId>
-		<version>1.16.0-SNAPSHOT</version>
-	</parent>
+  Contributors:
+  Andrew Obuchowicz (Red Hat Inc.) - Initial implementation
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
-	<packaging>eclipse-plugin</packaging>
-	<version>1.17.3-SNAPSHOT</version>
+  <modelVersion>4.0.0</modelVersion>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven.indexer</groupId>
-			<artifactId>indexer-core</artifactId>
-			<version>6.0.0</version>
-		</dependency>
-	</dependencies>
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-core</artifactId>
+    <version>1.16.0-SNAPSHOT</version>
+  </parent>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${basedir}</directory>
-							<includes>
-								<include>lemminx-maven*.jar</include>
-								<include>indexer-jars/*.jar</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>get-lemminx-maven</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.eclipse.lemminx</groupId>
-									<artifactId>lemminx-maven</artifactId>
-									<version>0.3.0</version>
-									<outputDirectory>${basedir}</outputDirectory>
-									<destFileName>lemminx-maven.jar</destFileName>
-									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
-									Git timestamp qualifier + Baseline replacement will ignore the change -->
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<?m2e execute onConfiguration?>
-						<goals><goal>single</goal></goals>
-						<phase>generate-sources</phase>
-						<configuration>
-							<outputDirectory>${basedir}</outputDirectory>
-							<attach>false</attach>
-							<formats><format>dir</format></formats>
-							<descriptors><descriptor>build-indexer-jars.xml</descriptor></descriptors>
-							<finalName>indexer-jars</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<classifier></classifier>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-packaging-plugin</artifactId>
-				<configuration>
-					<jgit.ignore>nothing</jgit.ignore> <!-- empty (whitespace needed), don't ignore pom.xml as changes in here affect payload -->
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
+  <version>1.17.3-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
 
-	<repositories>
-		<repository>
-			<id>lemminx-maven</id>
-			<url>https://repo.eclipse.org/content/repositories/lemminx/</url>
-			<snapshots><enabled>true</enabled></snapshots>
-			<releases><enabled>true</enabled></releases>
-		</repository>
-	</repositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-core</artifactId>
+      <version>6.0.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>lemminx-maven*.jar</include>
+                <include>indexer-jars/*.jar</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>get-lemminx-maven</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.lemminx</groupId>
+                  <artifactId>lemminx-maven</artifactId>
+                  <version>0.3.0</version>
+                  <outputDirectory>${basedir}</outputDirectory>
+                  <destFileName>lemminx-maven.jar</destFileName>
+                  <!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
+                    Git timestamp qualifier + Baseline replacement will ignore the change -->
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <?m2e execute onConfiguration?>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <outputDirectory>${basedir}</outputDirectory>
+              <attach>false</attach>
+              <formats>
+                <format>dir</format>
+              </formats>
+              <descriptors>
+                <descriptor>build-indexer-jars.xml</descriptor>
+              </descriptors>
+              <finalName>indexer-jars</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <classifier></classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <configuration>
+          <jgit.ignore>nothing</jgit.ignore> <!-- empty (whitespace needed), don't ignore pom.xml as changes in here affect payload -->
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>lemminx-maven</id>
+      <url>https://repo.eclipse.org/content/repositories/lemminx/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
 </project>

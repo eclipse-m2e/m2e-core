@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2008 Sonatype, Inc.
+  Copyright (c) 2008, 2021 Sonatype, Inc.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License 2.0
   which accompanies this distribution, and is available at
@@ -19,33 +19,35 @@
   </parent>
 
   <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-  <packaging>bundle</packaging>
   <version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+  <packaging>bundle</packaging>
 
   <name>Embedded Maven Runtime Bundle</name>
 
   <properties>
     <!-- maven core version -->
     <!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
-         jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
-         bundle. So the developer must go to the <_exportcontents> section of this file and modify
-         version of the org.eclipse.aether packages accordingly
-         https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
+      jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
+      bundle. So the developer must go to the <_exportcontents> section of this file and modify
+      version of the org.eclipse.aether packages accordingly
+      https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
     <maven-core.version>3.8.1</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.17.8</okhttp-connector.version>
     <guava.version>30.1-jre</guava.version>
   </properties>
+
   <dependencies>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <optional>true</optional>
       <exclusions>
         <exclusion>
-          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project  -->
-          <!--  http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
+          <!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>jsr305</artifactId>
         </exclusion>
@@ -55,11 +57,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-embedder</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
@@ -78,6 +82,7 @@
       <version>${plexus-build-api.version}</version>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>io.takari.aether</groupId>
       <artifactId>aether-connector-okhttp</artifactId>
@@ -89,38 +94,46 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-impl</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-connector-basic</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-transport-wagon</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
+
   </dependencies>
 
   <dependencyManagement>
     <dependencies>
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven</artifactId>
@@ -128,11 +141,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
     </dependencies>
   </dependencyManagement>
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -168,10 +183,12 @@
           </instructions>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
       </plugin>
+
     </plugins>
   </build>
 </project>

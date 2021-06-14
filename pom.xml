@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2010, 2019 Sonatype, Inc, and others.
+  Copyright (c) 2010, 2021 Sonatype, Inc, and others.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License 2.0
   which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
@@ -33,8 +34,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Current target version of m2e, used to deduce some URL at verify and publish.
-    This should usually be sync'd with the main feature version.
-    Also change it in m2e-maven-runtime/pom.xml -->
+      This should usually be sync'd with the main feature version.
+      Also change it in m2e-maven-runtime/pom.xml -->
     <m2e.version>1.18.0</m2e.version>
 
     <tycho-version>2.3.0</tycho-version>
@@ -115,6 +116,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
@@ -152,6 +154,7 @@
           </filters>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-source-plugin</artifactId>
@@ -165,13 +168,16 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.5</version>
         <executions>
           <execution>
-            <goals><goal>prepare-agent</goal></goals>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -183,28 +189,33 @@
           </includes>
         </configuration>
       </plugin>
+
       <plugin>
-      	<groupId>org.eclipse.tycho.extras</groupId>
-      	<artifactId>tycho-p2-extras-plugin</artifactId>
-      	<version>${tycho-version}</version>
-      	<executions>
-      		<execution>
-      			<id>check-no-version-regression</id>
-      			<goals><goal>compare-version-with-baselines</goal></goals>
-      			<phase>verify</phase>
-      			<configuration>
-      				<baselines>
-      					<baseline>https://download.eclipse.org/technology/m2e/releases/latest/</baseline>
-      				</baselines>
-      				<comparator>zip</comparator>
-      			</configuration>
-      		</execution>
-      	</executions>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>tycho-p2-extras-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <executions>
+          <execution>
+            <id>check-no-version-regression</id>
+            <goals>
+              <goal>compare-version-with-baselines</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <baselines>
+                <baseline>https://download.eclipse.org/technology/m2e/releases/latest/</baseline>
+              </baselines>
+              <comparator>zip</comparator>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
+
     </plugins>
 
     <pluginManagement>
       <plugins>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-packaging-plugin</artifactId>
@@ -212,7 +223,7 @@
           <configuration>
             <format>yyyyMMdd-HHmm</format>
             <sourceReferences>
-            	<generate>true</generate>
+              <generate>true</generate>
             </sourceReferences>
             <!-- resources whose changes usually don't affect the binary output -->
             <jgit.ignore>
@@ -238,6 +249,7 @@
             </dependency>
           </dependencies>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -250,46 +262,57 @@
             <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-plugin</artifactId>
           <version>${tycho-version}</version>
           <configuration>
-	        <baselineRepositories>
-	          <repository><url>https://download.eclipse.org/technology/m2e/releases/latest/</url></repository>
-	          <repository><url>https://download.eclipse.org/technology/m2e/snapshots/${m2e.version}/latest/</url></repository>
-	        </baselineRepositories>
-           </configuration>
+            <baselineRepositories>
+              <repository>
+                <url>https://download.eclipse.org/technology/m2e/releases/latest/</url>
+              </repository>
+              <repository>
+                <url>https://download.eclipse.org/technology/m2e/snapshots/${m2e.version}/latest/</url>
+              </repository>
+            </baselineRepositories>
+          </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>target-platform-configuration</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-compiler-plugin</artifactId>
           <version>${tycho-version}</version>
           <configuration>
-          	<!-- workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=571363 -->
-          	<deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
+            <!-- workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=571363 -->
+            <deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
           </configuration>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-publisher-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-repository-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
           <version>${sonar-maven-plugin.version}</version>
         </plugin>
+
         <plugin>
           <groupId>org.eclipse.cbi.maven.plugins</groupId>
           <artifactId>eclipse-jarsigner-plugin</artifactId>
@@ -299,16 +322,17 @@
             <resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
   </build>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>tycho-snapshots</id>
-			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
-		</pluginRepository>
-	</pluginRepositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>tycho-snapshots</id>
+      <url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <profiles>
 
@@ -324,6 +348,7 @@
 
       <build>
         <plugins>
+
           <plugin>
             <groupId>org.eclipse.cbi.maven.plugins</groupId>
             <artifactId>eclipse-jarsigner-plugin</artifactId>
@@ -336,6 +361,7 @@
               </execution>
             </executions>
           </plugin>
+
           <plugin>
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-p2-plugin</artifactId>
@@ -353,6 +379,7 @@
               <defaultP2Metadata>false</defaultP2Metadata>
             </configuration>
           </plugin>
+
         </plugins>
       </build>
     </profile>
@@ -360,8 +387,8 @@
     <profile>
       <id>selfhosted-workspace</id>
       <!--
-      This profile is a convenience meant to help setting up m2e development workspace.
-      On command line, embedded maven runtime must be built separately, before m2e-core sources tree.
+        This profile is a convenience meant to help setting up m2e development workspace.
+        On command line, embedded maven runtime must be built separately, before m2e-core sources tree.
       -->
       <activation>
         <property>
@@ -386,6 +413,7 @@
       <build>
         <pluginManagement>
           <plugins>
+
             <plugin>
               <groupId>org.eclipse.tycho</groupId>
               <artifactId>tycho-surefire-plugin</artifactId>
@@ -405,22 +433,26 @@
                 </dependencies>
               </configuration>
             </plugin>
+
           </plugins>
         </pluginManagement>
       </build>
     </profile>
+
     <profile>
       <id>uts</id>
       <modules>
         <module>m2e-core-tests</module>
       </modules>
     </profile>
+
     <profile>
       <id>its</id>
       <modules>
         <module>m2e-core-tests</module>
       </modules>
     </profile>
+
   </profiles>
 
   <developers>
