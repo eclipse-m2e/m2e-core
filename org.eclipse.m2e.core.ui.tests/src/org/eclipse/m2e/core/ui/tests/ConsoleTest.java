@@ -57,6 +57,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	  consolesAfter.removeAll(consolesBefore);
 	  assertEquals("console not found", 1, consolesAfter.size());
 	  var mavenConsole = consolesAfter.iterator().next();
+	  System.out.println("Console Text: " + ((TextConsole)mavenConsole).getDocument().get());
 	  assertTrue("missing output in console", ((TextConsole)mavenConsole).getDocument().get().contains("BUILD SUCCESS"));
   }
 
