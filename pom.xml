@@ -34,8 +34,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Current target version of m2e, used to deduce some URL at verify and publish.
-			This should usually be sync'd with the main feature version.
-			Also change it in m2e-maven-runtime/pom.xml -->
+			This should usually be sync'd with the main feature version. -->
 		<m2e.version>1.18.2</m2e.version>
 
 		<tycho-version>2.3.0</tycho-version>
@@ -316,17 +315,15 @@
 			<id>tycho-snapshots</id>
 			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
 		</pluginRepository>
+		<pluginRepository>
+			<id>cbi-releases</id>
+			<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
+		</pluginRepository>
 	</pluginRepositories>
 
 	<profiles>
 		<profile>
 			<id>eclipse-sign</id>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>cbi-releases</id>
-					<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
-				</pluginRepository>
-			</pluginRepositories>
 			<build>
 				<plugins>
 					<plugin>
