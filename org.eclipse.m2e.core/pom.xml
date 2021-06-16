@@ -30,7 +30,6 @@
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
@@ -55,7 +54,6 @@
           <useJava5>true</useJava5>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 </project>

@@ -25,7 +25,6 @@
   <name>Maven Archetype Common Bundle</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
       <artifactId>archetype-common</artifactId>
@@ -51,24 +50,21 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <version>0.3.4</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
       <version>2.1.3</version>
     </dependency>
-
   </dependencies>
+
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -90,13 +86,11 @@
               plexus-velocity,
               velocity
             </Embed-Dependency>
-
             <_exportcontents>
               META-INF.plexus;-noimport:=true;x-internal:=true,
               org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
               org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
             </_exportcontents>
-
             <Import-Package>
               !*
             </Import-Package>
@@ -104,24 +98,20 @@
           </instructions>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
       </plugin>
-
     </plugins>
   </build>
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>3.2.2</version>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 </project>

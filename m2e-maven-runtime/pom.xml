@@ -52,14 +52,12 @@
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho.version}</version>
         <extensions>true</extensions>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -79,7 +77,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
@@ -99,7 +96,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
         <artifactId>tycho-p2-extras-plugin</artifactId>
@@ -120,12 +116,10 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
 
     <pluginManagement>
       <plugins>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -136,7 +130,6 @@
             <target>11</target>
           </configuration>
         </plugin>
-
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -163,7 +156,6 @@
             </archive>
           </configuration>
         </plugin>
-
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-plugin</artifactId>
@@ -188,7 +180,6 @@
             </execution>
           </executions>
         </plugin>
-
       </plugins>
     </pluginManagement>
   </build>
@@ -207,7 +198,6 @@
       <build>
         <pluginManagement>
           <plugins>
-
             <plugin>
               <groupId>org.apache.felix</groupId>
               <artifactId>maven-bundle-plugin</artifactId>
@@ -216,25 +206,20 @@
                 <manifestLocation>META-INF</manifestLocation>
               </configuration>
             </plugin>
-
           </plugins>
         </pluginManagement>
       </build>
     </profile>
-
     <profile>
       <id>eclipse-sign</id>
-
       <pluginRepositories>
         <pluginRepository>
           <id>cbi-releases</id>
           <url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
         </pluginRepository>
       </pluginRepositories>
-
       <build>
         <plugins>
-
           <plugin>
             <groupId>org.eclipse.cbi.maven.plugins</groupId>
             <artifactId>eclipse-jarsigner-plugin</artifactId>
@@ -256,10 +241,8 @@
               <resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
             </configuration>
           </plugin>
-
         </plugins>
       </build>
     </profile>
   </profiles>
-
 </project>

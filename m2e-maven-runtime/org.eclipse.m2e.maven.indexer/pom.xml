@@ -29,7 +29,6 @@
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-core</artifactId>
@@ -60,21 +59,18 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <version>0.3.4</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
       <artifactId>archetype-common</artifactId>
       <version>${archetype-common.version}</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -88,12 +84,10 @@
         </exclusion>
       </exclusions>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-
       <!-- Need to regenerate the "javax.inject.Named" index to include additional
         injectable classes that do not override those provided by maven-indexer,
         this is included in the classpath in front of maven-indexer so it takes precedence
@@ -112,7 +106,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -121,13 +114,11 @@
             <Embed-Dependency>
               *;scope=compile|runtime
             </Embed-Dependency>
-
             <_exportcontents>
               META-INF.sisu;-noimport:=true,
               org.apache.lucene.*;provider=m2e;mandatory:=provider,
               org.apache.maven.*;provider=m2e;mandatory:=provider,
             </_exportcontents>
-
             <Import-Package>
               !*
             </Import-Package>
@@ -135,20 +126,15 @@
               org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
               org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
             </Require-Bundle>
-
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
-
             <Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
           </instructions>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-plugin</artifactId>
       </plugin>
-
     </plugins>
   </build>
-
 </project>

@@ -13,7 +13,6 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -36,7 +35,6 @@
 
   <build>
     <plugins>
-
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <configuration>
@@ -51,7 +49,6 @@
           </filesets>
         </configuration>
       </plugin>
-
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -77,7 +74,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
@@ -103,7 +99,6 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-packaging-plugin</artifactId>
@@ -111,7 +106,6 @@
           <jgit.ignore>nothing</jgit.ignore> <!-- empty (whitespace needed), don't ignore pom.xml as changes in here affect payload -->
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 

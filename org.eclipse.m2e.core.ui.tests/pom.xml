@@ -33,7 +33,6 @@
   <build>
     <pluginManagement>
       <plugins>
-
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -43,7 +42,6 @@
             <useUIThread>false</useUIThread>
           </configuration>
         </plugin>
-
       </plugins>
     </pluginManagement>
   </build>
