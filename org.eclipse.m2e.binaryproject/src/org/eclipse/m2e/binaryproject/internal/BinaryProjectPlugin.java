@@ -45,25 +45,25 @@ import org.osgi.service.prefs.BackingStoreException;
 
 public class BinaryProjectPlugin implements BundleActivator {
 
-  public static final String PLUGIN_ID = "org.eclipse.m2e.binaryproject";
+  public static final String PLUGIN_ID = "org.eclipse.m2e.binaryproject"; //$NON-NLS-1$
 
-  public static final String LIFECYCLE_MAPPING_ID = "org.eclipse.m2e.binaryproject";
+  public static final String LIFECYCLE_MAPPING_ID = "org.eclipse.m2e.binaryproject"; //$NON-NLS-1$
 
-  public static final String P_GROUPID = "groupId";
+  public static final String P_GROUPID = "groupId"; //$NON-NLS-1$
 
-  public static final String P_ARTIFACTID = "artifactId";
+  public static final String P_ARTIFACTID = "artifactId"; //$NON-NLS-1$
 
-  public static final String P_VERSION = "version";
+  public static final String P_VERSION = "version"; //$NON-NLS-1$
 
-  public static final String P_TYPE = "type";
+  public static final String P_TYPE = "type"; //$NON-NLS-1$
 
-  public static final String P_CLASSIFIER = "classifier";
+  public static final String P_CLASSIFIER = "classifier"; //$NON-NLS-1$
 
   /**
    * Name of IProject persistent property that identifies absolute filesystem path of the target jar artifact of the
    * workspace binary project.
    */
-  public static final QualifiedName QNAME_JAR = new QualifiedName(PLUGIN_ID, "jar");
+  public static final QualifiedName QNAME_JAR = new QualifiedName(PLUGIN_ID, "jar"); //$NON-NLS-1$
 
   private static BinaryProjectPlugin SELF;
 
@@ -78,24 +78,24 @@ public class BinaryProjectPlugin implements BundleActivator {
     IMaven maven = MavenPlugin.getMaven();
 
     Artifact pomArtifact =
-        maven.resolve(groupId, artifactId, version, "pom" /* type */, null /* classifier */, repositories, monitor);
+        maven.resolve(groupId, artifactId, version, "pom" /* type */, null /* classifier */, repositories, monitor); //$NON-NLS-1$
 
     ResolverConfiguration resolverConfig = new ResolverConfiguration();
     resolverConfig.setLifecycleMappingId(LIFECYCLE_MAPPING_ID);
 
-    String projectName = groupId + "_" + artifactId + "_" + version;
+    String projectName = groupId + "_" + artifactId + "_" + version; //$NON-NLS-1$ //$NON-NLS-2$
 
     IPath stateLocation = Platform.getStateLocation(bundle);
 
     IPath projectLocation = stateLocation.append(projectName);
     projectLocation.toFile().mkdirs();
 
-    File pomFile = new File(projectLocation.toFile(), "pom.xml");
+    File pomFile = new File(projectLocation.toFile(), "pom.xml"); //$NON-NLS-1$
 
     try {
       FileUtils.copyFile(pomArtifact.getFile(), pomFile);
     } catch (IOException e) {
-      throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, "Could not create binary project", e));
+      throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, "Could not create binary project", e)); //$NON-NLS-1$
     }
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -120,7 +120,7 @@ public class BinaryProjectPlugin implements BundleActivator {
     try {
       projectNode.flush();
     } catch (BackingStoreException e) {
-      throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, "Could not create binary project", e));
+      throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, "Could not create binary project", e)); //$NON-NLS-1$
     }
 
     IProjectConfigurationManager configManager = MavenPlugin.getProjectConfigurationManager();

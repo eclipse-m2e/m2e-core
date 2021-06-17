@@ -869,7 +869,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           final String msg = NLS.bind(
               org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2, archetypeName);
           log.error(msg, ex2);
-          getShell().getDisplay().asyncExec(() -> setErrorMessage(msg + "\n" + ex2.toString()));
+          getShell().getDisplay().asyncExec(() -> setErrorMessage(msg + "\n" + ex2.toString())); //$NON-NLS-1$
 
         } finally {
           monitor.done();

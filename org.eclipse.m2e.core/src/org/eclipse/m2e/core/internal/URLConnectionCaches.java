@@ -58,7 +58,7 @@ public final class URLConnectionCaches {
 
   public static void assertDisabled() {
     if(conn.getDefaultUseCaches()) {
-      log.error("Unexpected URLConnection defaultUseCaches enabled");
+      log.error("Unexpected URLConnection defaultUseCaches enabled"); //$NON-NLS-1$
     }
   }
 }

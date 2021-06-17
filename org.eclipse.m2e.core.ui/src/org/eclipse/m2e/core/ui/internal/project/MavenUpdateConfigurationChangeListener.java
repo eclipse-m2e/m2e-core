@@ -50,7 +50,7 @@ public class MavenUpdateConfigurationChangeListener implements IResourceChangeLi
       event.getDelta().accept(visitor);
       outOfDateProjects = visitor.outOfDateProjects;
     } catch(CoreException e) {
-      LOG.error("An error occurred while checking for out-of-date configuration markers", e);
+      LOG.error("An error occurred while checking for out-of-date configuration markers", e); //$NON-NLS-1$
       return;
     }
     updateProjectConfiguration(outOfDateProjects);
@@ -62,7 +62,7 @@ public class MavenUpdateConfigurationChangeListener implements IResourceChangeLi
 
   protected void updateProjectConfiguration(List<IProject> outOfDateProjects) {
     if(outOfDateProjects != null && !outOfDateProjects.isEmpty()) {
-      LOG.debug("Automatic update of {}", outOfDateProjects);
+      LOG.debug("Automatic update of {}", outOfDateProjects); //$NON-NLS-1$
       Job updateJob = new UpdateMavenProjectJob(outOfDateProjects.toArray(new IProject[outOfDateProjects.size()]));
       updateJob.schedule();
     }

@@ -45,7 +45,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testDeletedFacadeIsRemoved() throws IOException, CoreException, InterruptedException {
-    IProject project = createExisting(getClass().getSimpleName(), "resources/projects/simplePomOK", true);
+    IProject project = createExisting(getClass().getSimpleName(), "resources/projects/simplePomOK", true); //$NON-NLS-1$
     waitForJobsToComplete(monitor);
     IMavenProjectFacade facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project,
         monitor);
@@ -53,7 +53,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     project.delete(true, monitor);
     waitForJobsToComplete(new NullProgressMonitor());
     Assert.assertTrue(facade.isStale());
-    project = createExisting(getClass().getSimpleName(), "resources/projects/emptyPom", true);
+    project = createExisting(getClass().getSimpleName(), "resources/projects/emptyPom", true); //$NON-NLS-1$
     waitForJobsToComplete(monitor);
     facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project, monitor);
     Assert.assertNull(facade);
@@ -61,24 +61,24 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testMissingParentCapabilityStored() throws IOException, CoreException, InterruptedException {
-    IProject project = createExisting(getClass().getSimpleName(), "resources/projects/missingParent", true);
+    IProject project = createExisting(getClass().getSimpleName(), "resources/projects/missingParent", true); //$NON-NLS-1$
     waitForJobsToComplete(monitor);
     MutableProjectRegistry registry = MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
         .newMutableProjectRegistry();
     MavenCapability parentCapability = MavenCapability
-        .createMavenParent(new ArtifactKey("missingGroup", "missingArtifactId", "1", null));
-    assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
+        .createMavenParent(new ArtifactKey("missingGroup", "missingArtifactId", "1", null)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false)); //$NON-NLS-1$
   }
 
   @Test
   public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
-    IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
-    IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
+    IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true); //$NON-NLS-1$ //$NON-NLS-2$
+    IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true); //$NON-NLS-1$ //$NON-NLS-2$
     waitForJobsToComplete(monitor);
     ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
     Collection<IFile> pomFiles = new ArrayList<>(2);
-    pomFiles.add(dependentProject.getFile("pom.xml"));
-    pomFiles.add(dependencyProject.getFile("pom.xml"));
+    pomFiles.add(dependentProject.getFile("pom.xml")); //$NON-NLS-1$
+    pomFiles.add(dependencyProject.getFile("pom.xml")); //$NON-NLS-1$
     MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().newMutableProjectRegistry();
     state.clear();
     registryManager.getMaven().execute(false, false, (context, aMonitor) -> {
@@ -91,7 +91,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
   @Ignore(value = "This test doesn't manage to reproduce Bug 547172 while similar manual steps do lead to an error")
   @Test
   public void testInvalidParent() throws IOException, CoreException, InterruptedException {
-    IProject childProject = importProject("invalidParent", "resources/projects/invalidParent/child/", new ProjectImportConfiguration());
+    IProject childProject = importProject("invalidParent", "resources/projects/invalidParent/child/", new ProjectImportConfiguration()); //$NON-NLS-1$ //$NON-NLS-2$
     waitForJobsToComplete(monitor);
     Optional<IMarker> maybeErrorMarker = Arrays.stream(childProject.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE))
       .filter(marker -> marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR)
@@ -107,14 +107,14 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     boolean autoBuilding = isAutoBuilding();
     setAutoBuilding(false);
     try {
-        IProject parent = createExisting("parent", "resources/projects/bug548652/", false);
-        IProjectDescription childProjectDescription = parent.getWorkspace().loadProjectDescription(parent.getFolder("child").getFile(IProjectDescription.DESCRIPTION_FILE_NAME).getLocation());
+        IProject parent = createExisting("parent", "resources/projects/bug548652/", false); //$NON-NLS-1$ //$NON-NLS-2$
+        IProjectDescription childProjectDescription = parent.getWorkspace().loadProjectDescription(parent.getFolder("child").getFile(IProjectDescription.DESCRIPTION_FILE_NAME).getLocation()); //$NON-NLS-1$
         IProject child = parent.getWorkspace().getRoot().getProject(childProjectDescription.getName());
         child.create(childProjectDescription, new NullProgressMonitor());
         child.open(new NullProgressMonitor());
         MavenUpdateRequest request = new MavenUpdateRequest(false, false);
-        request.addPomFile(parent.getFile("pom.xml"));
-        IFile childPom = child.getFile("pom.xml");
+        request.addPomFile(parent.getFile("pom.xml")); //$NON-NLS-1$
+        IFile childPom = child.getFile("pom.xml"); //$NON-NLS-1$
         request.addPomFile(childPom);
         MavenPluginActivator.getDefault().getProjectManagerRefreshJob().refresh(request);
         waitForJobsToComplete();

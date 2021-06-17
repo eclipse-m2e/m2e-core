@@ -202,7 +202,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         }
       };
 
-      Job job = new WorkspaceJob("Apply Lifecycle Mapping Changes") {
+      Job job = new WorkspaceJob("Apply Lifecycle Mapping Changes") { //$NON-NLS-1$
         @Override
         public IStatus runInWorkspace(IProgressMonitor monitor) {
           try {

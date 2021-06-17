@@ -37,10 +37,10 @@ public class RepositoryNode extends AbstractIndexedRepositoryNode {
     sb.append(repository.getId());
     sb.append(" (").append(repository.getUrl()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
     if(repository.getMirrorOf() != null) {
-      sb.append(" [mirrorOf=").append(repository.getMirrorOf()).append("]"); //$NON-NLS-2$
+      sb.append(" [mirrorOf=").append(repository.getMirrorOf()).append("]");  //$NON-NLS-1$//$NON-NLS-2$
     }
     if(repository.getMirrorId() != null) {
-      sb.append(" [mirrored by ").append(repository.getMirrorId()).append("]"); //$NON-NLS-2$
+      sb.append(" [mirrored by ").append(repository.getMirrorId()).append("]");  //$NON-NLS-1$//$NON-NLS-2$
     }
     if(isUpdating()) {
       sb.append(Messages.RepositoryNode_updating);

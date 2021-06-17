@@ -132,7 +132,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
 
     // This is strictly to get SWT Designer working locally without blowing up.
     if(MavenPluginActivator.getDefault() == null) {
-      pluginSettings = new DialogSettings("Workbench");
+      pluginSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
     } else {
       pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
     }

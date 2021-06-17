@@ -74,21 +74,21 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       }
       String path = url.getPath();
       if(path == null) {
-        throw new IOException("maven coordinates are missing");
+        throw new IOException("maven coordinates are missing"); //$NON-NLS-1$
       }
       int subPathIndex = path.indexOf('/');
 
       String[] coordinates;
       if(subPathIndex > -1) {
         subPath = path.substring(subPathIndex);
-        coordinates = path.substring(0, subPathIndex).split(":");
+        coordinates = path.substring(0, subPathIndex).split(":"); //$NON-NLS-1$
       } else {
-        coordinates = path.split(":");
+        coordinates = path.split(":"); //$NON-NLS-1$
       }
       if(coordinates.length < 3) {
-        throw new IOException("required format is groupId:artifactId:version[:packaging[:classifier]]");
+        throw new IOException("required format is groupId:artifactId:version[:packaging[:classifier]]"); //$NON-NLS-1$
       }
-      String type = coordinates.length > 3 ? coordinates[3] : "jar";
+      String type = coordinates.length > 3 ? coordinates[3] : "jar"; //$NON-NLS-1$
       String classifier = coordinates.length > 4 ? coordinates[4] : null;
       Artifact artifact = new DefaultArtifact(coordinates[0], coordinates[1], classifier, type, coordinates[2]);
       try {
@@ -108,12 +108,12 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
               return repoSystem.resolveArtifact(session, artifactRequest);
             } catch(ArtifactResolutionException e) {
               throw new CoreException(new Status(IStatus.ERROR, MvnProtocolHandlerService.class.getPackage().getName(),
-                  "Resolving artifact failed", e));
+                  "Resolving artifact failed", e)); //$NON-NLS-1$
             }
           }
         }, new NullProgressMonitor());
       } catch(CoreException e) {
-        throw new IOException("resolving artifact " + artifact + " failed", e);
+        throw new IOException("resolving artifact " + artifact + " failed", e); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
 
@@ -127,7 +127,7 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       if(subPath == null) {
         return new FileInputStream(location);
       }
-      String urlSpec = "jar:" + location.toURI() + "!" + subPath;
+      String urlSpec = "jar:" + location.toURI() + "!" + subPath; //$NON-NLS-1$ //$NON-NLS-2$
       return new URL(urlSpec).openStream();
     }
   }

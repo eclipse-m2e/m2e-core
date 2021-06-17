@@ -75,7 +75,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
   private final IFile file;
 
   public MavenInstallFileArtifactWizardPage(IFile file) {
-    super("mavenInstallFileWizardPage");
+    super("mavenInstallFileWizardPage"); //$NON-NLS-1$
     this.file = file;
     this.setTitle(Messages.MavenInstallFileArtifactWizardPage_title);
     this.setDescription(Messages.MavenInstallFileArtifactWizardPage_desc);

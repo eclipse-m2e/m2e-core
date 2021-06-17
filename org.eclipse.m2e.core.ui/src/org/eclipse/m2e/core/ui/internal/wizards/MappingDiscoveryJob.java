@@ -41,7 +41,7 @@ public class MappingDiscoveryJob extends WorkspaceJob {
   private final Collection<IProject> projects;
 
   public MappingDiscoveryJob(Collection<IProject> projects) {
-    super("Discover lifecycle mappings");
+    super("Discover lifecycle mappings"); //$NON-NLS-1$
     this.projects = projects;
 
   }

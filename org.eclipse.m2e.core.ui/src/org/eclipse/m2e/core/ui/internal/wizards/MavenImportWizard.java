@@ -97,7 +97,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
       // https://bugs.eclipse.org/bugs/show_bug.cgi?id=427205
       // ideally, this should be contributed by m2e jdt.ui, but this looks like overkill
-      String JDT_OTHER_PROJECTS = "org.eclipse.jdt.internal.ui.OthersWorkingSet";
+      String JDT_OTHER_PROJECTS = "org.eclipse.jdt.internal.ui.OthersWorkingSet"; //$NON-NLS-1$
       if(workingSet != null && !JDT_OTHER_PROJECTS.equals(workingSet.getId())) {
         page.setWorkingSetName(workingSet.getName());
       }

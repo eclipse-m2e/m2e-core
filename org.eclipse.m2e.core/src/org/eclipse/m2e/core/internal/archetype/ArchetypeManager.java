@@ -153,7 +153,7 @@ public class ArchetypeManager {
    */
   public List<?> getRequiredProperties(Archetype archetype, ArtifactRepository remoteArchetypeRepository,
       IProgressMonitor monitor) throws UnknownArchetype, CoreException {
-    Assert.isNotNull(archetype, "Archetype can not be null");
+    Assert.isNotNull(archetype, "Archetype can not be null"); //$NON-NLS-1$
 
     if(monitor == null) {
       monitor = new NullProgressMonitor();

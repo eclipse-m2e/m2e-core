@@ -57,7 +57,7 @@ public class BinaryProjectImportWizard extends Wizard implements IImportWizard {
       }
     }
     artifactsPage =
-        new MavenDependenciesWizardPage(new ProjectImportConfiguration(), "Artifacts", "Select artifacts to import") {
+        new MavenDependenciesWizardPage(new ProjectImportConfiguration(), "Artifacts", "Select artifacts to import") { //$NON-NLS-1$ //$NON-NLS-2$
           @Override
           protected void createAdvancedSettings(Composite composite, GridData gridData) {
             // TODO profile can theoretically be usedful

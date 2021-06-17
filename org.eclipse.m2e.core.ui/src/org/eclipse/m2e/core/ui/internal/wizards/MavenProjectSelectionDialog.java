@@ -137,7 +137,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
               children.add(project);
             }
           } catch(CoreException e) {
-            log.error("Error checking project: " + e.getMessage(), e);
+            log.error("Error checking project: " + e.getMessage(), e); //$NON-NLS-1$
           }
         }
         return children.toArray();
@@ -155,7 +155,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
             }
             return children.toArray();
           } catch(CoreException e) {
-            log.error("Error checking container: " + e.getMessage(), e);
+            log.error("Error checking container: " + e.getMessage(), e); //$NON-NLS-1$
           }
         }
       }

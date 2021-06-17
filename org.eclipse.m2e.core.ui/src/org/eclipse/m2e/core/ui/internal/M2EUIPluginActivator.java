@@ -73,7 +73,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private MavenUpdateConfigurationChangeListener mavenUpdateConfigurationChangeListener;
 
-  public static final String PROP_SHOW_EXPERIMENTAL_FEATURES = "m2e.showExperimentalFeatures";
+  public static final String PROP_SHOW_EXPERIMENTAL_FEATURES = "m2e.showExperimentalFeatures"; //$NON-NLS-1$
 
   @Override
   public void start(BundleContext context) throws Exception {

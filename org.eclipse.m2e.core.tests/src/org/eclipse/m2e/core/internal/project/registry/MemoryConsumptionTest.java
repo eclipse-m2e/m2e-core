@@ -62,17 +62,17 @@ public class MemoryConsumptionTest extends AbstractMavenProjectTestCase {
     int nbProjects = 50;
     Set<File> poms = buildLinearHierarchy(nbProjects, tempDirectory);
     try {
-      List<MavenProjectInfo> toImport = poms.stream().map(pom -> new MavenProjectInfo("", pom, null, null))
+      List<MavenProjectInfo> toImport = poms.stream().map(pom -> new MavenProjectInfo("", pom, null, null)) //$NON-NLS-1$
           .collect(Collectors.toList());
       MavenPlugin.getProjectConfigurationManager().importProjects(toImport, new ProjectImportConfiguration(), null,
           new NullProgressMonitor());
       waitForJobsToComplete(monitor);
       for(IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
         if(p.hasNature(IMavenConstants.NATURE_ID)) {
-          poms.remove(p.getFile("pom.xml").getLocation().toFile());
+          poms.remove(p.getFile("pom.xml").getLocation().toFile()); //$NON-NLS-1$
         }
       }
-      Assert.assertEquals("Some poms were not imported as project", Collections.emptySet(), poms);
+      Assert.assertEquals("Some poms were not imported as project", Collections.emptySet(), poms); //$NON-NLS-1$
       Assert.assertEquals(nbProjects, maxMavenProjectInstancesInContext[0]);
     } finally {
       MavenPluginActivator.getDefault().getMavenProjectManagerImpl().addContextProjectListener = null;
@@ -83,26 +83,26 @@ public class MemoryConsumptionTest extends AbstractMavenProjectTestCase {
   private Set<File> buildLinearHierarchy(int depth, File tempDirectory) throws FileNotFoundException {
     Set<File> poms = new HashSet<>(depth, 1.f);
     for(int i = 0; i < depth; i++ ) {
-      File projectDir = new File(tempDirectory, "p" + i);
+      File projectDir = new File(tempDirectory, "p" + i); //$NON-NLS-1$
       projectDir.mkdirs();
-      File pom = new File(projectDir, "pom.xml");
+      File pom = new File(projectDir, "pom.xml"); //$NON-NLS-1$
       poms.add(pom);
       try (PrintStream content = new PrintStream(pom);) {
-        content.println("<project>");
-        content.println("  <modelVersion>4.0.0</modelVersion>");
-        content.println("  <groupId>org.eclipse.m2e.core.tests.hierarchy</groupId>");
-        content.println("  <artifactId>pNUMBER</artifactId>".replace("NUMBER", Integer.toString(i)));
-        content.println("  <version>1</version>");
-        content.println("  <packaging>pom</packaging>");
+        content.println("<project>"); //$NON-NLS-1$
+        content.println("  <modelVersion>4.0.0</modelVersion>"); //$NON-NLS-1$
+        content.println("  <groupId>org.eclipse.m2e.core.tests.hierarchy</groupId>"); //$NON-NLS-1$
+        content.println("  <artifactId>pNUMBER</artifactId>".replace("NUMBER", Integer.toString(i))); //$NON-NLS-1$ //$NON-NLS-2$
+        content.println("  <version>1</version>"); //$NON-NLS-1$
+        content.println("  <packaging>pom</packaging>"); //$NON-NLS-1$
         if(i > 1) {
-          content.println("  <parent>");
-          content.println("    <groupId>org.eclipse.m2e.core.tests.hierarchy</groupId>");
-          content.println("    <artifactId>pNUMBER</artifactId>".replace("NUMBER", Integer.toString(i - 1)));
-          content.println("    <version>1</version>");
-          content.println("    <relativePath>../pNUMBER</relativePath>".replace("NUMBER", Integer.toString(i - 1)));
-          content.println("  </parent>");
+          content.println("  <parent>"); //$NON-NLS-1$
+          content.println("    <groupId>org.eclipse.m2e.core.tests.hierarchy</groupId>"); //$NON-NLS-1$
+          content.println("    <artifactId>pNUMBER</artifactId>".replace("NUMBER", Integer.toString(i - 1))); //$NON-NLS-1$ //$NON-NLS-2$
+          content.println("    <version>1</version>"); //$NON-NLS-1$
+          content.println("    <relativePath>../pNUMBER</relativePath>".replace("NUMBER", Integer.toString(i - 1))); //$NON-NLS-1$ //$NON-NLS-2$
+          content.println("  </parent>"); //$NON-NLS-1$
         }
-        content.println("</project>");
+        content.println("</project>"); //$NON-NLS-1$
       }
     }
     return poms;

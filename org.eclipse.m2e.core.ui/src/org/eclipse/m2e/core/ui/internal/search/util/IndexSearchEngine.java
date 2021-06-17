@@ -64,8 +64,8 @@ public class IndexSearchEngine implements SearchEngine {
       // we are wiring in the defaults only, but user changes are lost!
       // org.apache.maven.plugins
       // org.codehaus.mojo
-      groupIdSearchExpressions.add(new MatchTypedStringSearchExpression("org.apache.maven.plugins", MatchType.EXACT));
-      groupIdSearchExpressions.add(new MatchTypedStringSearchExpression("org.codehaus.mojo", MatchType.EXACT));
+      groupIdSearchExpressions.add(new MatchTypedStringSearchExpression("org.apache.maven.plugins", MatchType.EXACT)); //$NON-NLS-1$
+      groupIdSearchExpressions.add(new MatchTypedStringSearchExpression("org.codehaus.mojo", MatchType.EXACT)); //$NON-NLS-1$
     } else {
       groupIdSearchExpressions.add(new MatchTypedStringSearchExpression(groupId, MatchType.EXACT));
     }

@@ -164,7 +164,7 @@ public class XmlUtils {
         if(origin.getModel().getId().equals(modelId) && origin.getFile() != null) {
           return origin.getFile();
         }
-        String[] splitStrings = modelId.split(":");
+        String[] splitStrings = modelId.split(":"); //$NON-NLS-1$
         assert splitStrings.length == 3;
         IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(splitStrings[0],
             splitStrings[1], splitStrings[2]);
@@ -175,12 +175,12 @@ public class XmlUtils {
           IMaven maven = MavenPlugin.getMaven();
           try {
             String path = maven.getArtifactPath(maven.getLocalRepository(), splitStrings[0], splitStrings[1],
-                splitStrings[2], "pom", null);
+                splitStrings[2], "pom", null); //$NON-NLS-1$
             if(path != null) {
               file = new File(maven.getLocalRepositoryPath(), path);
             }
           } catch(CoreException e) {
-            log.error("Failed to calculate local repository path of artifact", e);
+            log.error("Failed to calculate local repository path of artifact", e); //$NON-NLS-1$
           }
         }
       }
@@ -234,7 +234,7 @@ public class XmlUtils {
     try {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
       if(domModel == null) {
-        throw new IllegalArgumentException("Document is not structured: " + doc);
+        throw new IllegalArgumentException("Document is not structured: " + doc); //$NON-NLS-1$
       }
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
@@ -259,7 +259,7 @@ public class XmlUtils {
     try {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
       if(domModel == null) {
-        throw new IllegalArgumentException("Document is not structured: " + resource);
+        throw new IllegalArgumentException("Document is not structured: " + resource); //$NON-NLS-1$
       }
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
@@ -287,7 +287,7 @@ public class XmlUtils {
     while(node != null && current > 0) {
       if(node instanceof Element) {
         if(buf.length() > 0) {
-          buf.insert(0, "/");
+          buf.insert(0, "/"); //$NON-NLS-1$
         }
         buf.insert(0, node.getNodeName());
         current = current - 1;

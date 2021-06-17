@@ -97,7 +97,7 @@ public class ExtensionReader {
             return new ArchetypeCatalogFactory.LocalCatalogFactory(url, description, false);
           }
         }
-        log.error("Unable to find Archetype catalog " + name + " in " + contributor.getName());
+        log.error("Unable to find Archetype catalog " + name + " in " + contributor.getName()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     } else if(ELEMENT_REMOTE_ARCHETYPE.equals(element.getName())) {
       String url = element.getAttribute(ATTR_URL);
@@ -143,7 +143,7 @@ public class ExtensionReader {
       for(IExtension extension : mappingsExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if("framework".equals(element.getName())) {
+          if("framework".equals(element.getName())) { //$NON-NLS-1$
             try {
               frameworks.add((IIncrementalBuildFramework) element.createExecutableExtension("class")); //$NON-NLS-1$
             } catch(CoreException ex) {

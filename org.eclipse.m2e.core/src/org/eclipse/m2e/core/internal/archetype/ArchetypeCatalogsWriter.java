@@ -73,9 +73,9 @@ public class ArchetypeCatalogsWriter {
 
   private static final String TYPE_SYSTEM = "system"; //$NON-NLS-1$
 
-  public static final String ATT_CATALOG_ID = "id";
+  public static final String ATT_CATALOG_ID = "id"; //$NON-NLS-1$
 
-  public static final String ATT_CATALOG_ENABLED = "enabled";
+  public static final String ATT_CATALOG_ENABLED = "enabled"; //$NON-NLS-1$
 
   public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is,
       Map<String, ArchetypeCatalogFactory> existingCatalogs) throws IOException {

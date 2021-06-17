@@ -63,7 +63,7 @@ public class WorkingSets {
     if(workingSet == null) {
       workingSet = wsm.createWorkingSet(workingSetName, new IAdaptable[0]);
       // TODO is there a constant we should be setting here?
-      workingSet.setId("org.eclipse.ui.resourceWorkingSetPage");
+      workingSet.setId("org.eclipse.ui.resourceWorkingSetPage"); //$NON-NLS-1$
       wsm.addWorkingSet(workingSet);
     }
     return workingSet;
