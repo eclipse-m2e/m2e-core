@@ -1,145 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2008 Sonatype, Inc.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the Eclipse Public License 2.0
-  which accompanies this distribution, and is available at
-  https://www.eclipse.org/legal/epl-2.0/
+	Copyright (c) 2008, 2021 Sonatype, Inc. and others
+	All rights reserved. This program and the accompanying materials
+	are made available under the terms of the Eclipse Public License 2.0
+	which accompanies this distribution, and is available at
+	https://www.eclipse.org/legal/epl-2.0/
 
-  SPDX-License-Identifier: EPL-2.0
+	SPDX-License-Identifier: EPL-2.0
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.m2e</groupId>
-    <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>org.eclipse.m2e</groupId>
+		<artifactId>m2e-maven-runtime</artifactId>
+		<version>1.16.0-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-  <version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
-  <packaging>bundle</packaging>
+	<artifactId>org.eclipse.m2e.maven.indexer</artifactId>
+	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<packaging>bundle</packaging>
 
-  <name>Nexus Indexer Bundle</name>
+	<name>Nexus Indexer Bundle</name>
 
-  <properties>
-    <guava.version>30.1-jre</guava.version>
-  </properties>
+	<properties>
+		<guava.version>30.1-jre</guava.version>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-core</artifactId>
-      <version>6.0.0</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-model</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.resolver</groupId>
-          <artifactId>maven-resolver-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.resolver</groupId>
-          <artifactId>maven-resolver-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-        </exclusion>
-        <exclusion>
-          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project  -->
-          <!--  http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>0.3.4</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.archetype</groupId>
-      <artifactId>archetype-common</artifactId>
-      <version>${archetype-common.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
-      <exclusions>
-        <exclusion>
-          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project  -->
-          <!--  http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven.indexer</groupId>
+			<artifactId>indexer-core</artifactId>
+			<version>6.0.0</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-model</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.resolver</groupId>
+					<artifactId>maven-resolver-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.resolver</groupId>
+					<artifactId>maven-resolver-util</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
+					<!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.sisu</groupId>
+			<artifactId>org.eclipse.sisu.plexus</artifactId>
+			<version>0.3.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.archetype</groupId>
+			<artifactId>archetype-common</artifactId>
+			<version>${archetype-common.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
+					<!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
 
-  <build>
-    <plugins>
-    <!-- Need to regenerate the "javax.inject.Named" index to include additional 
-        injectable classes that do not override those provided by maven-indexer, 
-        this is included in the classpath in front of maven-indexer so it takes precedence 
-        over the one in the maven-indexer jar -->
-      <plugin>
-        <groupId>org.eclipse.sisu</groupId>
-        <artifactId>sisu-maven-plugin</artifactId>
-        <version>0.3.4</version>
-        <executions>
-          <execution>
-            <id>index-project</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>index</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>
-              *;scope=compile|runtime
-            </Embed-Dependency>
-
-            <_exportcontents>
-              META-INF.sisu;-noimport:=true,
-              org.apache.lucene.*;provider=m2e;mandatory:=provider,
-              org.apache.maven.*;provider=m2e;mandatory:=provider,
-            </_exportcontents>
-
-            <Import-Package>
-              !*
-            </Import-Package>
-            <Require-Bundle>
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
-              org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
-            </Require-Bundle>
-
-            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
-
-            <Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
+	<build>
+		<plugins>
+			<!-- Need to regenerate the "javax.inject.Named" index to include additional
+				injectable classes that do not override those provided by maven-indexer,
+				this is included in the classpath in front of maven-indexer so it takes precedence
+				over the one in the maven-indexer jar -->
+			<plugin>
+				<groupId>org.eclipse.sisu</groupId>
+				<artifactId>sisu-maven-plugin</artifactId>
+				<version>0.3.4</version>
+				<executions>
+					<execution>
+						<id>index-project</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>index</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>
+							*;scope=compile|runtime
+						</Embed-Dependency>
+						<_exportcontents>
+							META-INF.sisu;-noimport:=true,
+							org.apache.lucene.*;provider=m2e;mandatory:=provider,
+							org.apache.maven.*;provider=m2e;mandatory:=provider,
+						</_exportcontents>
+						<Import-Package>
+							!*
+						</Import-Package>
+						<Require-Bundle>
+							org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
+							org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
+						</Require-Bundle>
+						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+						<Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>

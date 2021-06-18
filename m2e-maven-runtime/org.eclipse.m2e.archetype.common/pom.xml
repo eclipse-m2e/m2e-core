@@ -1,118 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2008 Sonatype, Inc.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the Eclipse Public License 2.0
-  which accompanies this distribution, and is available at
-  https://www.eclipse.org/legal/epl-2.0/
+	Copyright (c) 2008, 2021 Sonatype, Inc. and others
+	All rights reserved. This program and the accompanying materials
+	are made available under the terms of the Eclipse Public License 2.0
+	which accompanies this distribution, and is available at
+	https://www.eclipse.org/legal/epl-2.0/
 
-  SPDX-License-Identifier: EPL-2.0
+	SPDX-License-Identifier: EPL-2.0
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.m2e</groupId>
-    <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>org.eclipse.m2e</groupId>
+		<artifactId>m2e-maven-runtime</artifactId>
+		<version>1.16.0-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-  <packaging>bundle</packaging>
-  <version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<artifactId>org.eclipse.m2e.archetype.common</artifactId>
+	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<packaging>bundle</packaging>
 
-  <name>Maven Archetype Common Bundle</name>
+	<name>Maven Archetype Common Bundle</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.archetype</groupId>
-      <artifactId>archetype-common</artifactId>
-      <version>${archetype-common.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <!-- there is newer velocity with different groupId that we want -->
-          <artifactId>velocity</artifactId>
-          <groupId>velocity</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-inject-plexus</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>dom4j</groupId>
-          <artifactId>dom4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.sisu</groupId>
-      <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>0.3.4</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>2.1.3</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>
-              archetype-common,
-              archetype-catalog,
-              archetype-descriptor,
-              archetype-registry,
-              maven-invoker,
-              commons-collections,
-              commons-io,
-              commons-lang,
-              dom4j;version=2.1.3,
-              jchardet,
-              jdom,
-              oro,
-              plexus-velocity,
-              velocity
-            </Embed-Dependency>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven.archetype</groupId>
+			<artifactId>archetype-common</artifactId>
+			<version>${archetype-common.version}</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<!-- there is newer velocity with different groupId that we want -->
+					<artifactId>velocity</artifactId>
+					<groupId>velocity</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>plexus-container-default</artifactId>
+					<groupId>org.codehaus.plexus</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-inject-plexus</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>dom4j</groupId>
+					<artifactId>dom4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.sisu</groupId>
+			<artifactId>org.eclipse.sisu.plexus</artifactId>
+			<version>0.3.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>2.1.3</version>
+		</dependency>
+	</dependencies>
 
-            <_exportcontents>
-              META-INF.plexus;-noimport:=true;x-internal:=true,
-              org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
-              org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
-            </_exportcontents>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>
+							archetype-common,
+							archetype-catalog,
+							archetype-descriptor,
+							archetype-registry,
+							maven-invoker,
+							commons-collections,
+							commons-io,
+							commons-lang,
+							dom4j;version=2.1.3,
+							jchardet,
+							jdom,
+							oro,
+							plexus-velocity,
+							velocity
+						</Embed-Dependency>
+						<_exportcontents>
+							META-INF.plexus;-noimport:=true;x-internal:=true,
+							org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
+							org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
+						</_exportcontents>
+						<Import-Package>
+							!*
+						</Import-Package>
+						<Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
-            <Import-Package>
-              !*
-            </Import-Package>
-            <Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-  <dependencyManagement>
-  	<dependencies>
-  		<dependency>
-  			<groupId>commons-collections</groupId>
-  			<artifactId>commons-collections</artifactId>
-  			<version>3.2.2</version>
-  		</dependency>
-  	</dependencies>
-  </dependencyManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>3.2.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

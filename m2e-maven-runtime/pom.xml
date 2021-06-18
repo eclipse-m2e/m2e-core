@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright (c) 2011 Sonatype, Inc.
+	Copyright (c) 2011, 2021 Sonatype, Inc. and others
 	All rights reserved. This program and the accompanying materials
 	are made available under the terms of the Eclipse Public License 2.0
 	which accompanies this distribution, and is available at
@@ -23,7 +23,9 @@
 	<artifactId>m2e-maven-runtime</artifactId>
 	<version>1.16.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
 	<name>M2E - Maven runtime bundles</name>
+
 	<organization>
 		<name>Eclipse.org - m2e</name>
 		<url>www.eclipse.org</url>
@@ -62,7 +64,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<?m2e ignore?>
+					<?m2e ignore?>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -87,7 +89,9 @@
 						</goals>
 						<phase>initialize</phase>
 						<configuration>
-							<files><file>${project.build.directory}/timestamp.properties</file></files>
+							<files>
+								<file>${project.build.directory}/timestamp.properties</file>
+							</files>
 						</configuration>
 					</execution>
 				</executions>
@@ -99,7 +103,9 @@
 				<executions>
 					<execution>
 						<id>check-no-version-regression</id>
-						<goals><goal>compare-version-with-baselines</goal></goals>
+						<goals>
+							<goal>compare-version-with-baselines</goal>
+						</goals>
 						<phase>verify</phase>
 						<configuration>
 							<baselines>
@@ -119,7 +125,7 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
 					<configuration>
-					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+						<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
 						<source>11</source>
 						<target>11</target>
 					</configuration>
@@ -163,8 +169,12 @@
 							<phase>package</phase>
 							<configuration>
 								<baselineRepositories>
-									<repository><url>https://download.eclipse.org/technology/m2e/releases/latest/</url></repository>
-									<repository><url>https://download.eclipse.org/technology/m2e/snapshots/${m2e.version}/latest/</url></repository>
+									<repository>
+										<url>https://download.eclipse.org/technology/m2e/releases/latest/</url>
+									</repository>
+									<repository>
+										<url>https://download.eclipse.org/technology/m2e/snapshots/${m2e.version}/latest/</url>
+									</repository>
 								</baselineRepositories>
 							</configuration>
 						</execution>
@@ -192,7 +202,7 @@
 							<groupId>org.apache.felix</groupId>
 							<artifactId>maven-bundle-plugin</artifactId>
 							<configuration>
-									<!-- PDE does not honour custom manifest location -->
+								<!-- PDE does not honour custom manifest location -->
 								<manifestLocation>META-INF</manifestLocation>
 							</configuration>
 						</plugin>
@@ -200,17 +210,14 @@
 				</pluginManagement>
 			</build>
 		</profile>
-
 		<profile>
 			<id>eclipse-sign</id>
-
 			<pluginRepositories>
 				<pluginRepository>
 					<id>cbi-releases</id>
 					<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
 				</pluginRepository>
 			</pluginRepositories>
-
 			<build>
 				<plugins>
 					<plugin>
@@ -238,5 +245,4 @@
 			</build>
 		</profile>
 	</profiles>
-
 </project>

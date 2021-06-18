@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2013 Igor Fedorenko
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the Eclipse Public License 2.0
-  which accompanies this distribution, and is available at
-  https://www.eclipse.org/legal/epl-2.0/
+	Copyright (c) 2013, 2021 Igor Fedorenko and others
+	All rights reserved. This program and the accompanying materials
+	are made available under the terms of the Eclipse Public License 2.0
+	which accompanies this distribution, and is available at
+	https://www.eclipse.org/legal/epl-2.0/
 
-  SPDX-License-Identifier: EPL-2.0
+	SPDX-License-Identifier: EPL-2.0
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.m2e</groupId>
-    <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>org.eclipse.m2e</groupId>
+		<artifactId>m2e-maven-runtime</artifactId>
+		<version>1.16.0-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-  <name>SLF4J-simple bundle</name>
-  <packaging>bundle</packaging>
-  <version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
+	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<packaging>bundle</packaging>
 
-  <description>
+	<name>SLF4J-simple bundle</name>
+	<description>
   This bundle provides SLF4j implementation and configuration required to run m2e embedded Maven runtime
   in external JVM. This bundle is NOT a general purpose slf4j-simple OSGi bundle, it does NOT export
   any packages and it CANNOT be used as an OSGI SLF4J implementation.
@@ -38,41 +38,40 @@
   I don't know if these are supported bu P2. 
   </description>
 
-  <properties>
-    <!-- maven core version -->
-    <slf4j-simple.version>1.7.5</slf4j-simple.version>
-  </properties>
+	<properties>
+		<!-- maven core version -->
+		<slf4j-simple.version>1.7.5</slf4j-simple.version>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j-simple.version}</version>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j-simple.version}</version>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Directory>jars</Embed-Directory>
-            <Embed-Dependency>
-              slf4j-simple
-            </Embed-Dependency>
-            <Import-Package>!*</Import-Package>
-            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Embed-Directory>jars</Embed-Directory>
+						<Embed-Dependency>
+							slf4j-simple
+						</Embed-Dependency>
+						<Import-Package>!*</Import-Package>
+						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
