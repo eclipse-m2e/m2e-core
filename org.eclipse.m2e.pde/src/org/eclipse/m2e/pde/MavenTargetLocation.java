@@ -74,6 +74,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
 	public static final String DEFAULT_PACKAGE_TYPE = "jar";
+	public static final String POM_PACKAGE_TYPE = "pom";
 	public static final String DEPENDENCYNODE_IS_ROOT = "dependencynode.root";
 	public static final String DEPENDENCYNODE_PARENT = "dependencynode.parent";
 
@@ -122,7 +123,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
 					getArtifactType(), getClassifier(), repositories, monitor));
 			if (artifact != null) {
-				if (dependencyScope != null && !dependencyScope.isBlank()) {
+				boolean isPomType = POM_PACKAGE_TYPE.equals(artifact.getExtension());
+				if (isPomType || (dependencyScope != null && !dependencyScope.isBlank())) {
 					IMavenExecutionContext context = maven.createExecutionContext();
 					PreorderNodeListGenerator dependecies = context.execute(new ICallable<PreorderNodeListGenerator>() {
 
@@ -171,6 +173,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven) {
+		if (POM_PACKAGE_TYPE.equals(artifact.getExtension())) {
+			// pom typed artifacts are not for bundeling --> TODO we should generate a
+			// feature from them!
+			return;
+		}
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
 		if (bndInstructions == null) {
 			// no specific instructions for this artifact, try using the location default
