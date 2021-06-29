@@ -40,7 +40,7 @@
 		<maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
 		<tycho.version>2.3.0</tycho.version>
 		<!-- Also change in ../pom.xml -->
-		<m2e.version>1.18.0</m2e.version>
+		<m2e.version>1.18.2</m2e.version>
 	</properties>
 
 	<modules>
