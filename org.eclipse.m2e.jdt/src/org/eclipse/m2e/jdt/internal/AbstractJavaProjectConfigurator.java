@@ -153,7 +153,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     IClasspathDescriptor classpath = new ClasspathDescriptor(javaProject);
 
-    addProjectSourceFolders(classpath, request, monitor);
+    addProjectSourceFolders(classpath, options, request, monitor);
 
     String environmentId = getExecutionEnvironmentId(options);
 
@@ -267,6 +267,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
+    addProjectSourceFolders(classpath, new HashMap<String, String>(), request, monitor);
+  }
+
+  protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
+      ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     SubMonitor mon = SubMonitor.convert(monitor, 6);
     try {
       IProject project = request.getProject();
@@ -293,7 +298,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
       for(MojoExecution compile : executions) {
-        if(isCompileExecution(compile)) {
+        if(isCompileExecution(compile, mavenProject, options, monitor)) {
           mainSourceEncoding = maven.getMojoParameterValue(mavenProject, compile, "encoding", String.class, monitor); //$NON-NLS-1$
           try {
             inclusion = toPaths(
@@ -311,7 +316,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
 
       for(MojoExecution compile : executions) {
-        if(isTestCompileExecution(compile)) {
+        if(isTestCompileExecution(compile, mavenProject, options, monitor)) {
           testSourceEncoding = maven.getMojoParameterValue(mavenProject, compile, "encoding", String.class, monitor); //$NON-NLS-1$
           try {
             inclusionTest = toPaths(
@@ -353,12 +358,34 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  protected boolean isTestCompileExecution(MojoExecution execution) {
-    return GOAL_TESTCOMPILE.equals(execution.getGoal());
+  protected boolean isTestCompileExecution(MojoExecution execution, MavenProject mavenProject,
+      Map<String, String> options, IProgressMonitor monitor) throws CoreException {
+    return GOAL_TESTCOMPILE.equals(execution.getGoal()) && isCompliant(execution, mavenProject, options, monitor);
   }
 
-  protected boolean isCompileExecution(MojoExecution execution) {
-    return GOAL_COMPILE.equals(execution.getGoal());
+  protected boolean isCompileExecution(MojoExecution execution, MavenProject mavenProject, Map<String, String> options,
+      IProgressMonitor monitor) throws CoreException {
+    return GOAL_COMPILE.equals(execution.getGoal()) && isCompliant(execution, mavenProject, options, monitor);
+  }
+
+  private boolean isCompliant(MojoExecution execution, MavenProject mavenProject, Map<String, String> options,
+      IProgressMonitor monitor) throws CoreException {
+    String release = maven.getMojoParameterValue(mavenProject, execution, "release", String.class, monitor); //$NON-NLS-1$
+    if(release != null && !sanitizeJavaVersion(release).equals(options.get(JavaCore.COMPILER_COMPLIANCE))) {
+      return false;
+    }
+    if(release == null) {
+      String source = maven.getMojoParameterValue(mavenProject, execution, "source", String.class, monitor); //$NON-NLS-1$
+      if(source != null && !sanitizeJavaVersion(source).equals(options.get(JavaCore.COMPILER_SOURCE))) {
+        return false;
+      }
+      String target = maven.getMojoParameterValue(mavenProject, execution, "target", String.class, monitor); //$NON-NLS-1$
+      if(target != null
+          && !sanitizeJavaVersion(target).equals(options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private IPath[] toPaths(String[] values) {

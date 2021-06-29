@@ -13,6 +13,7 @@
 package org.eclipse.m2e.binaryproject.internal;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -40,6 +41,10 @@ public class ClasspathConfigurator extends AbstractJavaProjectConfigurator {
 
   @Override
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
+      IProgressMonitor monitor) throws CoreException {}
+
+  @Override
+  protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {}
 
   @Override
