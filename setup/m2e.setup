@@ -224,11 +224,12 @@
     </setupTask>
   </setupTask>
   <setupTask
+      xsi:type="launching:LaunchTask"
+      launcher="m2e-maven-runtime--install"
+      runEveryStartup="true"/>
+  <setupTask
       xsi:type="pde:TargetPlatformTask"
       name="m2e-target-platform"/>
-  <setupTask
-      xsi:type="launching:LaunchTask"
-      launcher="m2e-maven-runtime--install"/>
   <setupTask
       xsi:type="projects:ProjectsBuildTask"
       refresh="true"
