@@ -138,12 +138,6 @@
 					<pomDependencies>consider</pomDependencies>
 					<filters>
 						<filter>
-							<!-- Remove as it is only included to be able to launch Eclipse-application for debugging -->
-							<type>p2-installable-unit</type>
-							<id>org.eclipse.sdk.feature.group</id>
-							<removeAll />
-						</filter>
-						<filter>
 							<!-- Remove as it may come as an undesired transitive dep from p2 under Java 11 -->
 							<type>p2-installable-unit</type>
 							<id>javax.xml</id>
