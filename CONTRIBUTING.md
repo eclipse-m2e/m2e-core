@@ -11,16 +11,11 @@ The project license is available at [LICENSE](LICENSE).
 This Eclipse Foundation open project is governed by the Eclipse Foundation
 Development Process and operates under the terms of the Eclipse IP Policy.
 
-Before your contribution can be accepted by the project team contributors must
-electronically sign the Eclipse Contributor Agreement (ECA).
+Before your contribution can be accepted by the project team, 
+contributors must have an Eclipse Foundation account and 
+must electronically sign the Eclipse Contributor Agreement (ECA).
 
 * [http://www.eclipse.org/legal/ECA.php](http://www.eclipse.org/legal/ECA.php)
-
-Commits that are provided by non-committers must have a `Signed-off-by` field in
-the footer indicating that the author is aware of the terms by which the
-contribution has been provided to the project. The non-committer must
-additionally have an Eclipse Foundation account and must have a signed Eclipse
-Contributor Agreement (ECA) on file.
 
 For more information, please see the Eclipse Committer Handbook:
 [https://www.eclipse.org/projects/handbook/#resources-commit](https://www.eclipse.org/projects/handbook/#resources-commit).
@@ -30,12 +25,11 @@ For more information, please see the Eclipse Committer Handbook:
 Eclipse m2e use mainly 2 channels for strategical and technical discussions
 
 * 🐞 View and report issues through uses GitHub Issues at https://github.com/eclipse-m2e/m2e-core/issues. _📜 Migration to GitHub tracker took place in March 2021, for older tickets, see https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e 📜_
-* 📧 Join the m2e-dev@eclipse.org mailing-list to get in touch with other contributors aboantiqueut project organizationa and planning, and browse archive at 📜 [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
-
+* 📧 Join the m2e-dev@eclipse.org mailing-list to get in touch with other contributors about project organization and planning, and browse archive at 📜 [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
 
 ## 🆕 Trying latest builds
 
-Latest builds, for testing, can usually be found at https://download.eclipse.org/technology/m2e/snapshots/`${targetRelease}`/latest/ where `${targetRelease}` is the name of the **next** release.
+Latest builds, for testing, can usually be found at `https://download.eclipse.org/technology/m2e/snapshots/latest/` .
 
 ## 🧑‍💻 Developer resources
 
@@ -48,8 +42,7 @@ Furthermore a local git installation is required and the git executable must be 
 
 Quick-Link:
 
- <a href="https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true"
-style="margin-left:2em;margin-top:1ex;margin-bottom:1ex;font-weight:bold;border:1px solid chocolate;background-color:darkorange;color:white;padding:0.25ex 0.25em;text-align:center;text-decoration:none" rel="nofollow">Create m2e Development Environment with Eclipse-Oomph...</a>
+[![Create Eclipse Development Environment for m2e](https://img.shields.io/static/v1?logo=eclipseide&label=Create%20Development%20Environment&message=M2E&style=for-the-badge&logoColor=white&labelColor=darkorange&color=gray)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true)
 
 Step by Step guide:
 
