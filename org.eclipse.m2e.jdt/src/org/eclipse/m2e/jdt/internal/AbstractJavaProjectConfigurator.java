@@ -867,15 +867,20 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * @return the arguments
    * @throws CoreException
    */
-  private List<String> getCompilerArguments(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+  private List<String> getCompilerArguments(IMavenProjectFacade facade, Map<String, String> options,
+      IProgressMonitor monitor) throws CoreException {
     List<String> compilerArgs = new ArrayList<>();
 
     List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
 
+    MavenProject mavenProject = facade.getMavenProject();
+
+    //facade.getProject().get
     for(MojoExecution compile : executions) {
-      if(isCompileExecution(compile) || isTestCompileExecution(compile)) {
-        List<String> args = getCompilerArguments(facade.getMavenProject(), compile, monitor);
+      if(isCompileExecution(compile, mavenProject, options, monitor)
+          || isTestCompileExecution(compile, mavenProject, options, monitor)) {
+        List<String> args = getCompilerArguments(mavenProject, compile, monitor);
         if(args != null) {
           compilerArgs.addAll(args);
         }
@@ -892,7 +897,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
 
-    List<String> compilerArgs = getCompilerArguments(request.getMavenProjectFacade(), monitor);
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IJavaProject javaProject = JavaCore.create(facade.getProject());
+    if(javaProject == null || !javaProject.exists() || classpath == null) {
+      return;
+    }
+
+    List<String> compilerArgs = getCompilerArguments(facade, javaProject.getOptions(true), monitor);
 
     ModuleSupport.configureRawClasspath(request, classpath, monitor, compilerArgs);
   }
