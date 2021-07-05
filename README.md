@@ -1,6 +1,9 @@
 # Eclipse IDE integration for Maven (Eclipse m2e project)
 
- <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a>
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/eclipse-m2e/m2e-core?label=Version&sort=semver)
+[![GitHub license](https://img.shields.io/github/license/eclipse-m2e/m2e-core?label=License)](https://github.com/eclipse-m2e/m2e-core/blob/master/LICENSE)
+[![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmaster%2F&label=Build)](https://ci.eclipse.org/m2e/job/m2e/)
+![Jenkins tests](https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmaster%2F&label=Tests)
 
 M2Eclipse provides tight integration for Apache Maven into the Eclipse IDE with the following features:
 * Rich editor for pom.xml files
@@ -14,18 +17,25 @@ M2Eclipse provides tight integration for Apache Maven into the Eclipse IDE with 
 See also https://projects.eclipse.org/projects/technology.m2e
 
 ## 📥 Installation
+The recommended way to install Eclipse-m2e is using the Eclipse marketplace. Either click on
 
-The recommended way is to install using the [Eclipse marketplace entry for m2e](https://marketplace.eclipse.org/content/eclipse-m2e-maven-support-eclipse-ide). Either simply by [Clicking this link](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirectToMarketplace.html?entryId=3394048), or using the installation tricks possible from the website, or using the Eclipse Marketplace Client directly from within the IDE.  
+[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Marketplace&message=Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=darkorange&color=grey)](https://marketplace.eclipse.org/content/eclipse-m2e-maven-support-eclipse-ide "Open Eclipse Marketplace entry")
+&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;
+[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Drag%20to%20install&message=Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=4B0082&color=grey)](https://marketplace.eclipse.org/marketplace-client-intro?mpc_install=5321178 "Drag to your running Eclipse workspace. Requires Eclipse Marketplace Client")
+
+into your Eclipse-IDE, or use the Eclipse Marketplace Client directly from within the IDE.
+
 ⚠️ _Some other entries exist that look like m2e. They're usually outdated or incorrect. Please use the official one, linked above._
 
 Alternatively, you can install the lastest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository: https://download.eclipse.org/technology/m2e/releases/latest/
 
-For information about testing development builds, see [CONTRIBUTING.md](CONTRIBUTING.md).
+## 📢 Release notes
+
+See [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
 ## ⌨️ Contributing
+[![Create Eclipse Development Environment for m2e](https://img.shields.io/static/v1?logo=eclipseide&label=Create%20Development%20Environment&message=M2E&style=for-the-badge&logoColor=white&labelColor=darkorange&color=gray)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
+&nbsp;&nbsp;&nbsp;or just&nbsp;&nbsp;&nbsp;
+[![Clone to Eclipse IDE](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png)](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## ⚖️ License
-
-See [LICENSE](LICENSE)
+For detailed information about development, testing and builds, see [CONTRIBUTING.md](CONTRIBUTING.md).

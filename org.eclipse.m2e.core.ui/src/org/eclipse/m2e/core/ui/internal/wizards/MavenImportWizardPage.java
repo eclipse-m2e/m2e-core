@@ -602,7 +602,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
 
     // empty scanner
-    return new AbstractProjectScanner<MavenProjectInfo>() {
+    return new AbstractProjectScanner<>() {
       @Override
       public String getDescription() {
         return ""; //$NON-NLS-1$

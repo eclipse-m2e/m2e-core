@@ -90,7 +90,6 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
    * Default constructor. Sets the title and image of the wizard.
    */
   public MavenProjectWizard() {
-    super();
     setWindowTitle(Messages.wizardProjectTitle);
     setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
     setNeedsProgressMonitor(true);

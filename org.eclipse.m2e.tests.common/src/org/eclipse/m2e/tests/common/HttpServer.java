@@ -428,9 +428,7 @@ public class HttpServer {
    * @return This server, never {@code null}.
    */
   public HttpServer enableRecording(String... patterns) {
-    for(String pattern : patterns) {
-      recordedPatterns.add(pattern);
-    }
+    Collections.addAll(recordedPatterns, patterns);
 
     return this;
   }

@@ -173,14 +173,17 @@ public class InputHistory {
       this.combo = combo;
     }
 
+    @Override
     protected String getText() {
       return combo.getText();
     }
 
+    @Override
     protected String[] getItems() {
       return combo.getItems();
     }
 
+    @Override
     protected void setItems(String[] items) {
       String value = combo.getText();
       combo.setItems(items);
@@ -201,10 +204,12 @@ public class InputHistory {
       this.combo = combo;
     }
 
+    @Override
     protected String getText() {
       return combo.getText();
     }
 
+    @Override
     protected String[] getItems() {
       try {
         return combo.getItems();
@@ -214,6 +219,7 @@ public class InputHistory {
       }
     }
 
+    @Override
     protected void setItems(String[] items) {
       String value = combo.getText();
       combo.setItems(items);

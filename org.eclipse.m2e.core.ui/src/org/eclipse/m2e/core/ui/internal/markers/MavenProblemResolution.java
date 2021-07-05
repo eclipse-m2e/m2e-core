@@ -82,39 +82,48 @@ public abstract class MavenProblemResolution extends WorkbenchMarkerResolution
 
   public abstract boolean canFix(IMarker marker) throws CoreException;
 
+  @Override
   public Point getSelection(IDocument document) {
     return null;
   }
 
+  @Override
   public final String getDisplayString() {
     return getLabel();
   }
 
+  @Override
   public String getDescription() {
     return getLabel();
   }
 
+  @Override
   public String getAdditionalProposalInfo() {
     Object o = getAdditionalProposalInfo(new NullProgressMonitor());
     return o == null ? null : o.toString();
   }
 
+  @Override
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     return getDescription();
   }
 
+  @Override
   public IContextInformation getContextInformation() {
     return null;
   }
 
+  @Override
   public final void run(IMarker marker) {
     run(marker, null);
   }
 
+  @Override
   public final void apply(IDocument document) {
     run(marker, document);
   }
 
+  @Override
   public final void run(IMarker[] markers, IProgressMonitor monitor) {
     fix(markers, null, monitor);
   }
@@ -155,6 +164,7 @@ public abstract class MavenProblemResolution extends WorkbenchMarkerResolution
     return result.toArray(new IMarker[result.size()]);
   }
 
+  @Override
   public final IMarker[] findOtherMarkers(IMarker[] markers) {
     return findOtherMarkers(markers, false);
   }

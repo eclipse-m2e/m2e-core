@@ -280,7 +280,7 @@ public class MavenRuntimeLaunchSupport {
 
   public static void applyWorkspaceArtifacts(VMArguments properties) {
     File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
-    properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath())); //$NON-NLS-1$
+    properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath()));
   }
 
   public IVMRunner decorateVMRunner(final IVMRunner runner) {

@@ -46,6 +46,7 @@ public class UpdateMavenProjectCommandHandler extends AbstractHandler {
 
   private static final Logger log = LoggerFactory.getLogger(UpdateMavenProjectCommandHandler.class);
 
+  @Override
   public Object execute(final ExecutionEvent event) {
 
     ISelection selection = HandlerUtil.getCurrentSelection(event);

@@ -70,6 +70,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     pomsViewer.setContentProvider(new PomHeirarchyContentProvider());
   }
 
+  @Override
   public void setEnabled(boolean bool) {
     pomsViewer.getTree().setEnabled(bool);
     super.setEnabled(bool);
@@ -118,11 +119,12 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       StringBuilder buffer = new StringBuilder();
       Model model = project.getProject().getModel();
       buffer.append(model.getGroupId()).append(" : ") //$NON-NLS-1$
-          .append(model.getArtifactId()).append(" : ") //$NON-NLS-2$
+          .append(model.getArtifactId()).append(" : ") //$NON-NLS-1$
           .append(model.getVersion());
       return buffer.toString();
     }
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof ParentHierarchyEntry) {
         ParentHierarchyEntry project = (ParentHierarchyEntry) element;
@@ -134,10 +136,12 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
 
+    @Override
     public Image getImage(Object element) {
       if(element instanceof ParentHierarchyEntry) {
         ParentHierarchyEntry project = (ParentHierarchyEntry) element;
@@ -157,6 +161,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public PomHeirarchyContentProvider() {
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       if(newInput instanceof List) {
@@ -164,15 +169,18 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       }
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       Object[] children = getChildren(element);
 
       return children.length != 0;
     }
 
+    @Override
     public Object getParent(Object element) {
       if(element instanceof ParentHierarchyEntry) {
         for(int i = 1; i < projects.size(); i++ ) {
@@ -184,6 +192,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object[] getElements(Object inputElement) {
       if(inputElement instanceof List) {
@@ -196,6 +205,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       return new Object[0];
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       if(parentElement instanceof ParentHierarchyEntry) {
         /*
@@ -228,22 +238,27 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     }
   }
 
+  @Override
   public void addSelectionChangedListener(ISelectionChangedListener listener) {
     pomsViewer.addSelectionChangedListener(listener);
   }
 
+  @Override
   public Object getInput() {
     return pomsViewer.getInput();
   }
 
+  @Override
   public ISelection getSelection() {
     return pomsViewer.getSelection();
   }
 
+  @Override
   public void removeSelectionChangedListener(ISelectionChangedListener listener) {
     pomsViewer.removeSelectionChangedListener(listener);
   }
 
+  @Override
   public void setSelection(ISelection selection) {
     pomsViewer.setSelection(selection);
   }

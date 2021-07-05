@@ -16,6 +16,22 @@
     xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/launching/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Launching.ecore http://www.eclipse.org/oomph/setup/maven/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Maven.ecore http://www.eclipse.org/oomph/setup/pde/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/PDE.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="m2e"
     label="m2e">
+  <annotation
+      source="http://www.eclipse.org/oomph/setup/BrandingInfo">
+    <detail
+        key="imageURI">
+      <value>https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.core/m2eclipse.gif</value>
+    </detail>
+    <detail
+        key="siteURI">
+      <value>https://www.eclipse.org/m2e/</value>
+    </detail>
+  </annotation>
+  <annotation
+      source="ConfigurationReference">
+    <reference
+        href="m2eDevelopmentEnvironmentConfiguration.setup#/"/>
+  </annotation>
   <setupTask
       xsi:type="setup:CompoundTask"
       name="User Preferences">
@@ -63,6 +79,10 @@
     </content>
   </setupTask>
   <setupTask
+      xsi:type="setup:VariableTask"
+      name="eclipse.target.platform"
+      value="None"/>
+  <setupTask
       xsi:type="setup.p2:P2Task"
       label="m2e">
     <requirement
@@ -72,7 +92,7 @@
     <requirement
         name="org.eclipse.m2e.pde.feature.feature.group"/>
     <repository
-        url="https://download.eclipse.org/technology/m2e/snapshots/1.18.0/latest/"/>
+        url="https://download.eclipse.org/technology/m2e/snapshots/latest/"/>
     <description>Install the tools needed in the IDE to work with the source code for ${scope.project.label}</description>
   </setupTask>
   <setupTask
@@ -204,16 +224,16 @@
     </setupTask>
   </setupTask>
   <setupTask
+      xsi:type="launching:LaunchTask"
+      launcher="m2e-maven-runtime--install"
+      runEveryStartup="true"/>
+  <setupTask
       xsi:type="pde:TargetPlatformTask"
-      name="m2e-dev-workspace"/>
+      name="m2e-target-platform"/>
   <setupTask
       xsi:type="projects:ProjectsBuildTask"
       refresh="true"
       clean="true"/>
-  <setupTask
-      xsi:type="launching:LaunchTask"
-      predecessor="//@setupTasks.11"
-      launcher="m2e-maven-runtime--install"/>
   <stream name="master"
       label="master"/>
   <logicalProjectContainer

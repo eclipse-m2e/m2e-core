@@ -545,7 +545,7 @@ public class DependenciesComposite extends Composite {
   public void loadData() {
     resetDependencies();
     resetManagedDependencies();
-    ValueProvider<List<org.apache.maven.model.Dependency>> dmValueProvider = new ValueProvider<List<org.apache.maven.model.Dependency>>() {
+    ValueProvider<List<org.apache.maven.model.Dependency>> dmValueProvider = new ValueProvider<>() {
       @Override
       public List<org.apache.maven.model.Dependency> getValue() {
         List<org.apache.maven.model.Dependency> toRet = new ArrayList<>();

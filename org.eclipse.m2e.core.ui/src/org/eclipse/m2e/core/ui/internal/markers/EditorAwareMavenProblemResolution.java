@@ -44,6 +44,7 @@ public abstract class EditorAwareMavenProblemResolution extends MavenProblemReso
     this.context = context;
   }
 
+  @Override
   protected final void fix(IMarker[] markers, IDocument document, IProgressMonitor monitor) {
 
     Map<IResource, List<IMarker>> resourceMap = Stream.of(markers).collect(Collectors.groupingBy(IMarker::getResource));

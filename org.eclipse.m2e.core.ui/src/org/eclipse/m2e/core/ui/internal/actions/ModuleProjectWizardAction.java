@@ -40,6 +40,7 @@ public class ModuleProjectWizardAction implements IObjectActionDelegate {
   private Shell parent;
 
   /** Runs the action. */
+  @Override
   public void run(IAction action) {
     MavenModuleWizard wizard = new MavenModuleWizard();
     wizard.init(PlatformUI.getWorkbench(), selection);
@@ -48,11 +49,13 @@ public class ModuleProjectWizardAction implements IObjectActionDelegate {
   }
 
   /** Sets the active workbench part. */
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart part) {
     parent = part.getSite().getShell();
   }
 
   /** Handles the selection change */
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;

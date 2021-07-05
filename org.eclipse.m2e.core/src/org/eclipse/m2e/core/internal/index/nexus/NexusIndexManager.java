@@ -374,8 +374,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       // query = new PrefixQuery(new Term(ArtifactInfo.GROUP_ID, term));
     } else if(IIndex.SEARCH_ARTIFACT.equals(type)) {
       BooleanQuery.Builder bq = new BooleanQuery.Builder();
-      bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD); //$NON-NLS-1$
-      bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD); //$NON-NLS-1$
+      bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD);
+      bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD);
       bq.add(
           constructQuery(MAVEN.SHA1, term.getStringValue(), term.getStringValue().length() == 40 ? SearchType.EXACT
               : SearchType.SCORED), Occur.SHOULD);
@@ -387,8 +387,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         query = constructQuery(MAVEN.PACKAGING, "pom", SearchType.EXACT); //$NON-NLS-1$
       } else {
         BooleanQuery.Builder bq = new BooleanQuery.Builder();
-        bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD); //$NON-NLS-1$
-        bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD); //$NON-NLS-1$
+        bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD);
+        bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD);
         bq.add(
             constructQuery(MAVEN.SHA1, term.getStringValue(), term.getStringValue().length() == 40 ? SearchType.EXACT
                 : SearchType.SCORED), Occur.SHOULD);
@@ -404,8 +404,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         query = constructQuery(MAVEN.PACKAGING, "maven-plugin", SearchType.EXACT); //$NON-NLS-1$
       } else {
         BooleanQuery.Builder bq = new BooleanQuery.Builder();
-        bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD); //$NON-NLS-1$
-        bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD); //$NON-NLS-1$
+        bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD);
+        bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD);
         Query tq = constructQuery(MAVEN.PACKAGING, "maven-plugin", SearchType.EXACT); //$NON-NLS-1$
         BooleanQuery.Builder builder = new BooleanQuery.Builder();
         builder.add(bq.build(), Occur.MUST);
@@ -415,8 +415,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
     } else if(IIndex.SEARCH_ARCHETYPE.equals(type)) {
       BooleanQuery.Builder bq = new BooleanQuery.Builder();
-      bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD); //$NON-NLS-1$
-      bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD); //$NON-NLS-1$
+      bq.add(constructQuery(MAVEN.GROUP_ID, term), Occur.SHOULD);
+      bq.add(constructQuery(MAVEN.ARTIFACT_ID, term), Occur.SHOULD);
       Query tq = constructQuery(MAVEN.PACKAGING, "maven-archetype", SearchType.EXACT); //$NON-NLS-1$
       BooleanQuery.Builder builder = new BooleanQuery.Builder();
       builder.add(bq.build(), Occur.MUST);
@@ -615,7 +615,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         IndexingContext context = getIndexingContext(repository);
         if(context == null) {
           String msg = "Unable to find document to remove" + getDocumentKey(key);
-          log.error(msg); //$NON-NLS-1$
+          log.error(msg);
           return;
         }
         ArtifactContext artifactContext;

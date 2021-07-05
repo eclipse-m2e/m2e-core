@@ -25,7 +25,8 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
  */
 public class OpenMavenConsoleAction extends Action {
 
-  public void run() {
+    @Override
+    public void run() {
     M2EUIPluginActivator.getDefault().getMavenConsole().showConsole();
   }
 

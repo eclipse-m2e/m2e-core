@@ -58,6 +58,7 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
     this.initialSelection = initialSelection;
   }
 
+  @Override
   protected Control createDialogArea(Composite parent) {
     setTitle(Messages.AssignWorkingSetDialog_title);
 

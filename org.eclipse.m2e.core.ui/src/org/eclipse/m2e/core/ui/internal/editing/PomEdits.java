@@ -502,7 +502,7 @@ public class PomEdits {
             doc.appendChild(project);
 
             Element modelVersion = doc.createElement(MODEL_VERSION);
-            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE)); //$NON-NLS-1$
+            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE));
             project.appendChild(modelVersion);
             format(project);
           }
@@ -667,6 +667,7 @@ public class PomEdits {
       this.operations = operations;
     }
 
+    @Override
     public void process(Document document) {
       for(Operation oper : operations) {
         oper.process(document);
@@ -726,7 +727,8 @@ public class PomEdits {
     return new Matcher() {
       int count = 0;
 
-      public boolean matches(Element child) {
+        @Override
+        public boolean matches(Element child) {
         if(count == index) {
           return true;
         }

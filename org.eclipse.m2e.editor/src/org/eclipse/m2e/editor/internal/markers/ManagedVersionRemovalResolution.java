@@ -93,7 +93,7 @@ public class ManagedVersionRemovalResolution extends AbstractPomProblemResolutio
           LOG.error("Unable to find the marked element"); //$NON-NLS-1$
           continue;
         }
-        Element value = XmlUtils.findChild(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+        Element value = XmlUtils.findChild(artifact, VERSION_NODE);
         if(value instanceof IndexedRegion) {
           IndexedRegion off = (IndexedRegion) value;
 

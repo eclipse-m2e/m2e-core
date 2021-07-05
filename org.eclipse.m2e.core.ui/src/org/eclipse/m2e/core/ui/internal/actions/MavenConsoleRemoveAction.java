@@ -28,6 +28,7 @@ public class MavenConsoleRemoveAction extends Action {
     setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE));
   }
 
+  @Override
   public void run() {
     M2EUIPluginActivator.getDefault().getMavenConsole().closeConsole();
   }

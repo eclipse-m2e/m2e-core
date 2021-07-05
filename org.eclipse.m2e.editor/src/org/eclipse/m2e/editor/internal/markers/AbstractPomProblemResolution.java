@@ -96,7 +96,7 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
         nextString = nextString.replace("\t", "  "); //$NON-NLS-1$ //$NON-NLS-2$
         prevString = StringUtils.convertToHTMLContent(prevString);
         nextString = StringUtils.convertToHTMLContent(nextString);
-        return "<html>...<br>" + prevString + /** "<del>" + currentLine + "</del>" + */ //$NON-NLS-0$
+        return "<html>...<br>" + prevString + /** "<del>" + currentLine + "</del>" + */
             nextString + "...<html>"; //$NON-NLS-1$
       } catch(BadLocationException e) {
         // TODO Auto-generated catch block

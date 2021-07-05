@@ -47,6 +47,7 @@ public class AddExclusionOperation implements Operation {
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation#process(org.w3c.dom.Document)
    */
+  @Override
   public void process(Document document) {
     Element depElement = PomHelper.findDependency(document, dependency);
 

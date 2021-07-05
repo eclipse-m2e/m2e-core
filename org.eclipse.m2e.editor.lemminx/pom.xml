@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!--
+	Copyright (c) 2019, 2021 Red Hat Inc. and others
+	All rights reserved. This program and the accompanying materials
+	are made available under the terms of the Eclipse Public License 2.0
+	which accompanies this distribution, and is available at
+	https://www.eclipse.org/legal/epl-2.0/
 
+	SPDX-License-Identifier: EPL-2.0
+
+	Contributors:
+	Andrew Obuchowicz (Red Hat Inc.) - Initial implementation
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -11,7 +23,7 @@
 
 	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.17.3-SNAPSHOT</version>
+	<version>1.18.1-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -51,11 +63,11 @@
 								<artifactItem>
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
-									<version>0.3.0</version>
+									<version>0.3.1</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
-									Git timestamp qualifier + Baseline replacement will ignore the change -->
+										Git timestamp qualifier + Baseline replacement will ignore the change -->
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -67,13 +79,19 @@
 				<executions>
 					<execution>
 						<?m2e execute onConfiguration?>
-						<goals><goal>single</goal></goals>
+						<goals>
+							<goal>single</goal>
+						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
 							<outputDirectory>${basedir}</outputDirectory>
 							<attach>false</attach>
-							<formats><format>dir</format></formats>
-							<descriptors><descriptor>build-indexer-jars.xml</descriptor></descriptors>
+							<formats>
+								<format>dir</format>
+							</formats>
+							<descriptors>
+								<descriptor>build-indexer-jars.xml</descriptor>
+							</descriptors>
 							<finalName>indexer-jars</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<classifier></classifier>
@@ -95,8 +113,12 @@
 		<repository>
 			<id>lemminx-maven</id>
 			<url>https://repo.eclipse.org/content/repositories/lemminx/</url>
-			<snapshots><enabled>true</enabled></snapshots>
-			<releases><enabled>true</enabled></releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 	</repositories>
 </project>

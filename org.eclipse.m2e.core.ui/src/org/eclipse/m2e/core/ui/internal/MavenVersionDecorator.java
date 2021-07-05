@@ -41,10 +41,12 @@ public class MavenVersionDecorator implements ILabelDecorator {
 
   private final Map<ILabelProviderListener, IMavenProjectChangedListener> listeners = new HashMap<>();
 
+  @Override
   public Image decorateImage(Image image, Object element) {
     return null;
   }
 
+  @Override
   public String decorateText(String text, Object element) {
     if(element instanceof IResource) {
       IResource resource = (IResource) element;
@@ -71,10 +73,12 @@ public class MavenVersionDecorator implements ILabelDecorator {
     return null;
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void addListener(final ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = (events, monitor) -> {
       ArrayList<IResource> pomList = new ArrayList<>();
@@ -97,6 +101,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
     projectManager.addMavenProjectChangedListener(projectChangeListener);
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = listeners.get(listener);
     if(projectChangeListener != null) {
@@ -105,6 +110,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
     }
   }
 
+  @Override
   public void dispose() {
     // TODO remove all listeners
   }

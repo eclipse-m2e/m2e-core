@@ -94,6 +94,7 @@ public class LifecycleMappingOperation implements Operation {
     this.createAtTopLevel = createAtTopLevel;
   }
 
+  @Override
   public void process(Document document) {
     Element root = document.getDocumentElement();
     Element pluginExecutions; // add the new plugins here
