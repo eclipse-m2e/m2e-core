@@ -175,8 +175,11 @@ public class LifecycleMappingFactory {
   private LifecycleMappingFactory() {
   }
 
+  // TODO CRO: dies ist der problematische Einstieg in diese Factory. Hier müsste der Kontext bereits bereitstehen
+  //           eine Möglichkeit wäre es, den LifecycleMappingResult anzureichenr...
+
   public static LifecycleMappingResult calculateLifecycleMapping(MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor) {
+      List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor, LifecycleMappingContext mappingContext) {
     long start = System.currentTimeMillis();
     log.debug("Loading lifecycle mapping for {}.", mavenProject); //$NON-NLS-1$
 
@@ -187,7 +190,7 @@ public class LifecycleMappingFactory {
         instantiateLifecycleMapping(result, mavenProject, lifecycleMappingId);
       }
 
-      calculateEffectiveLifecycleMappingMetadata(result, mavenProject, mojoExecutions, monitor);
+      calculateEffectiveLifecycleMappingMetadata(result, mavenProject, mojoExecutions, monitor, mappingContext);
 
       if(result.getLifecycleMapping() == null) {
         lifecycleMappingId = result.getLifecycleMappingId();
@@ -209,7 +212,7 @@ public class LifecycleMappingFactory {
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenProject mavenProject, List<MojoExecution> mojoExecutions, IProgressMonitor monitor) throws CoreException {
+      MavenProject mavenProject, List<MojoExecution> mojoExecutions, IProgressMonitor monitor, LifecycleMappingContext mappingContext) throws CoreException {
 
     String packagingType = mavenProject.getPackaging();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
@@ -247,7 +250,7 @@ public class LifecycleMappingFactory {
     List<MappingMetadataSource> metadataSources;
     try {
       metadataSources = getProjectMetadataSources(mavenProject, getBundleMetadataSources(), mojoExecutions, true,
-          monitor);
+          monitor, mappingContext);
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
@@ -260,16 +263,16 @@ public class LifecycleMappingFactory {
 
   public static List<MappingMetadataSource> getProjectMetadataSources(MavenProject mavenProject,
       List<LifecycleMappingMetadataSource> bundleMetadataSources, List<MojoExecution> mojoExecutions,
-      boolean includeDefault, IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
+      boolean includeDefault, IProgressMonitor monitor, LifecycleMappingContext mappingContext) throws CoreException, LifecycleMappingConfigurationException {
 
     Map<String, List<MappingMetadataSource>> metadataSourcesMap = getProjectMetadataSourcesMap(mavenProject,
-        bundleMetadataSources, mojoExecutions, includeDefault, monitor);
+        bundleMetadataSources, mojoExecutions, includeDefault, monitor, mappingContext);
     return asList(metadataSourcesMap);
   }
 
   public static Map<String, List<MappingMetadataSource>> getProjectMetadataSourcesMap(MavenProject mavenProject,
       List<LifecycleMappingMetadataSource> bundleMetadataSources, List<MojoExecution> mojoExecutions,
-      boolean includeDefault, IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
+      boolean includeDefault, IProgressMonitor monitor, LifecycleMappingContext mappingContext) throws CoreException, LifecycleMappingConfigurationException {
 
     Map<String, List<MappingMetadataSource>> metadataSourcesMap = new HashMap<>();
     // List order
@@ -283,7 +286,7 @@ public class LifecycleMappingFactory {
 
     // TODO validate metadata and replace invalid entries with error mapping
 
-    metadataSourcesMap.put("pomMappingMetadataSources", getPomMappingMetadataSources(mavenProject, monitor));
+    metadataSourcesMap.put("pomMappingMetadataSources", getPomMappingMetadataSources(mavenProject, monitor, mappingContext));
 
     metadataSourcesMap.put("workspaceMetadataSources", //
         Collections
@@ -832,11 +835,12 @@ public class LifecycleMappingFactory {
    * <li>and so on</li>
    * </ol>
    * Returns empty list if no metadata sources are embedded/referenced by pom.xml
+   * @param mappingContext TODO
    *
    * @throws CoreException if metadata sources cannot be resolved or read
    */
   public static List<MappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor, LifecycleMappingContext mappingContext) throws CoreException {
     IMaven maven = MavenPlugin.getMaven();
 
     List<MappingMetadataSource> sources = new ArrayList<>();
@@ -873,7 +877,17 @@ public class LifecycleMappingFactory {
 
       // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
       //      each instance takes ~1M, so we can easily save 100M+ of heap for larger workspaces
-      project = maven.resolveParentProject(project, monitor);
+      // TODO: wir brauchen einen parent-cache nicht einen cache der child->parent relation
+
+      MavenProject parent = mappingContext.determineResolvedParentFor(project);
+
+      if(parent == null) {
+        parent = maven.resolveParentProject(project, monitor);
+      }
+      if(parent != null) {
+        mappingContext.registerResolvedParent(parent);
+      }
+      project = parent;
     } while(project != null);
 
     return sources;

@@ -55,6 +55,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
@@ -183,8 +184,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
     List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
 
-    Map<String, List<MappingMetadataSource>> metadataSourcesMap = LifecycleMappingFactory
-        .getProjectMetadataSourcesMap(mavenProject, null, mojoExecutions, false, monitor);
+    Map<String, List<MappingMetadataSource>> metadataSourcesMap = LifecycleMappingFactory.getProjectMetadataSourcesMap(
+        mavenProject, null, mojoExecutions, false, monitor, new LifecycleMappingContext());
 
     for(CatalogItemCacheEntry itemEntry : items) {
       CatalogItem item = itemEntry.getItem();
