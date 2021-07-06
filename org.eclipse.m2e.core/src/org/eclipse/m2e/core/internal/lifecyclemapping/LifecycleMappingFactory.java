@@ -175,8 +175,6 @@ public class LifecycleMappingFactory {
   private LifecycleMappingFactory() {
   }
 
-  // TODO CRO: dies ist der problematische Einstieg in diese Factory. Hier müsste der Kontext bereits bereitstehen
-  //           eine Möglichkeit wäre es, den LifecycleMappingResult anzureichenr...
 
   public static LifecycleMappingResult calculateLifecycleMapping(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor, LifecycleMappingContext mappingContext) {
