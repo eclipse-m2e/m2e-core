@@ -58,7 +58,7 @@ public class CacheManager {
 	private CacheManager(File folder) {
 		this.folder = folder;
 		try {
-			FileUtils.touch(new File(LASTACCESS_MARKER));
+			FileUtils.touch(new File(folder, LASTACCESS_MARKER));
 		} catch (IOException e) {
 			// can't mark last access then...
 		}

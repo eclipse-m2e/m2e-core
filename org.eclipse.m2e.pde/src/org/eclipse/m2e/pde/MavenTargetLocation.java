@@ -252,7 +252,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 		String key = artifact.getGroupId() + ":" + artifact.getArtifactId();
 		String classifier = artifact.getClassifier();
-		if (classifier != null) {
+		if (classifier != null && !classifier.isBlank()) {
 			key += ":" + classifier;
 		}
 		key += ":" + artifact.getBaseVersion();
