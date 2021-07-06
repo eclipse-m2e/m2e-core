@@ -43,9 +43,8 @@ public class BNDInstructions {
 	}
 
 	public static BNDInstructions getDefaultInstructions() {
-		InputStream input = MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH);
-		try {
-			return new BNDInstructions("", IOUtils.toString(input, StandardCharsets.ISO_8859_1));
+		try (Reader reader = getDefaultInstructionsReader()) {
+			return new BNDInstructions("", IOUtils.toString(reader));
 		} catch (IOException e) {
 			throw new RuntimeException("load default properties failed", e);
 		}
@@ -54,18 +53,22 @@ public class BNDInstructions {
 	public Properties asProperties() {
 		Reader reader;
 		if (instructions == null || instructions.isBlank()) {
-			reader = new InputStreamReader(MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH),
-					StandardCharsets.ISO_8859_1);
+			reader = getDefaultInstructionsReader();
 		} else {
 			reader = new StringReader(instructions);
 		}
 		Properties properties = new Properties();
-		try {
+		try (reader) {
 			properties.load(reader);
 		} catch (IOException e) {
 			throw new RuntimeException("conversion to properties failed", e);
 		}
 		return properties;
+	}
+
+	private static InputStreamReader getDefaultInstructionsReader() {
+		return new InputStreamReader(MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH),
+				StandardCharsets.ISO_8859_1);
 	}
 
 	public boolean isEmpty() {
