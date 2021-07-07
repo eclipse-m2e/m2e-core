@@ -115,13 +115,10 @@
 							*;scope=compile|runtime
 						</Embed-Dependency>
 						<_exportcontents>
-							META-INF.sisu;-noimport:=true,
 							org.apache.lucene.*;provider=m2e;mandatory:=provider,
 							org.apache.maven.*;provider=m2e;mandatory:=provider,
 						</_exportcontents>
-						<Import-Package>
-							!*
-						</Import-Package>
+						<Import-Package>!*</Import-Package>
 						<Require-Bundle>
 							org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
 							org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
