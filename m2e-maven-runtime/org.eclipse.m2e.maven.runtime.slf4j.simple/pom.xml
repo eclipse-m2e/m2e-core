@@ -63,6 +63,7 @@
 							slf4j-simple
 						</Embed-Dependency>
 						<Import-Package>!*</Import-Package>
+						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 					</instructions>
 				</configuration>
 			</plugin>
