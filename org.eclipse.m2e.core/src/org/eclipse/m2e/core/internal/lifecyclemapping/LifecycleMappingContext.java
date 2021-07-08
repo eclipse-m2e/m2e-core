@@ -35,7 +35,28 @@ public class LifecycleMappingContext {
    * @param project
    * @return
    */
-  public MavenProject determineResolvedParentFor(MavenProject project) {
+  public MavenProject getResolvedParent(MavenProject project, IProgressMonitor monitor) {
+    if(project == null) {
+      return null;
+    }
+    String parentId;
+    if(project.getParent() != null) {
+      parentId = project.getParent().getId();
+    } else if(project.getParentArtifact() != null) {
+      parentId = project.getParentArtifact().getId();
+    } else {
+      return null;
+    }
+    return mavenParentCache.computeIfAbsent(parentId, id -> {
+      IMaven maven = MavenPlugin.getMaven();
+      try {
+        return maven.resolveParentProject(project, monitor);
+      } catch(CoreException ex) {
+        LOG.error("Failed to resolve parent project of " + project.getId(), ex);
+        return null;
+      }
+    });
+  }
     if(project == null) {
       return null;
     }
