@@ -93,6 +93,7 @@
 						</_exportcontents>
 						<Import-Package>!*</Import-Package>
 						<Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
+						<Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
 					</instructions>
 				</configuration>
 			</plugin>

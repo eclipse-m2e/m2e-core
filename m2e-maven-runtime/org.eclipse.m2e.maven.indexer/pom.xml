@@ -124,7 +124,6 @@
 							org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
 							org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
 						</Require-Bundle>
-						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 						<Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
 					</instructions>
 				</configuration>
