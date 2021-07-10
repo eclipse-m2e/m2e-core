@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2022 Christoph Läubrich and others
+ * Copyright (c) 2018, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -143,7 +143,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		this.dependencyScopes = dependencyScopes;
 		this.includeSource = includeSource;
 		for (BNDInstructions instr : instructions) {
-			instructionsMap.put(instr.getKey(), instr);
+			instructionsMap.put(instr.key(), instr);
 		}
 		excludedArtifacts.addAll(excludes);
 		for (MavenTargetDependency root : roots) {
@@ -241,7 +241,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 		if (artifact != null) {
 			DependencyDepth depth = dependencyDepth;
-			if (POM_PACKAGE_TYPE.equals(artifact.getExtension()) && depth == DependencyDepth.NONE) {
+			if (isPomType(artifact) && depth == DependencyDepth.NONE) {
 				// fetching only the pom but no dependencies does not makes much sense...
 				depth = DependencyDepth.DIRECT;
 			}
@@ -315,7 +315,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 						FileUtils.touch(markerFile);
 						return null;
 					}
-
 					Files.copy(jar.getInputStream(entry), featureFile.toPath());
 
 					return featureFile;
@@ -530,7 +529,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (featureTemplate != null) {
 			try (PrintWriter writer = new PrintWriter(new StringBuilderWriter(xml))) {
 				featureTemplate.write("", writer);
-				writer.flush();
 			}
 		}
 		if (!roots.isEmpty()) {
@@ -558,12 +556,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			xml.append("</" + ELEMENT_REPOSITORIES + ">");
 		}
 		instructionsMap.values().stream().filter(Predicate.not(BNDInstructions::isEmpty))
-				.sorted(Comparator.comparing(BNDInstructions::getKey)).forEachOrdered(bnd -> {
-					String instructions = bnd.getInstructions();
+				.sorted(Comparator.comparing(BNDInstructions::key)).forEachOrdered(bnd -> {
 					xml.append("<" + ELEMENT_INSTRUCTIONS);
-					attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.getKey());
+					attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.key());
 					xml.append("><![CDATA[\r\n");
-					xml.append(instructions);
+					xml.append(bnd.instructions());
 					xml.append("\r\n]]></" + ELEMENT_INSTRUCTIONS + ">");
 				});
 		excludedArtifacts.stream().sorted().forEachOrdered(ignored -> element(xml, ELEMENT_EXCLUDED, ignored));

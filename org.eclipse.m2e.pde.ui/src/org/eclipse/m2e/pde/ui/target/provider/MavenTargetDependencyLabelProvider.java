@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich
+ * Copyright (c) 2021, 2023 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -56,8 +56,8 @@ public class MavenTargetDependencyLabelProvider implements ILabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof MavenTargetDependency) {
-			return ((MavenTargetDependency) element).getKey();
+		if (element instanceof MavenTargetDependency targetDependency) {
+			return targetDependency.getKey();
 		}
 		return String.valueOf(element);
 	}

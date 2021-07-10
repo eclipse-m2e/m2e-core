@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 Christoph Läubrich and others
+ * Copyright (c) 2020, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -13,61 +13,44 @@
 package org.eclipse.m2e.pde.target;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
+public record BNDInstructions(String key, String instructions) {
 
-public class BNDInstructions {
+	public static final String DEFAULT_INSTRUCTIONS = """
+			Bundle-Name:           Bundle derived from maven artifact ${mvnGroupId}:${mvnArtifactId}:${mvnVersion}
+			version:               ${version_cleanup;${mvnVersion}}
+			Bundle-SymbolicName:   wrapped.${mvnGroupId}.${mvnArtifactId}
+			Bundle-Version:        ${version}
+			Import-Package:        *;resolution:=optional
+			Export-Package:        *;version="${version}";-noimport:=true
+			DynamicImport-Package: *
+			""";
 
-	private static final String BND_DEFAULT_PROPERTIES_PATH = "bnd-default.properties";
 	public static final BNDInstructions EMPTY = new BNDInstructions("", null);
-	private final String key;
-	private final String instructions;
 
 	public BNDInstructions(String key, String instructions) {
 		this.key = key;
 		this.instructions = instructions == null ? null : instructions.strip();
 	}
 
-	public String getKey() {
-		return key;
-	}
-
-	public String getInstructions() {
-		return instructions;
-	}
-
-	public static BNDInstructions getDefaultInstructions() {
-		try (Reader reader = getDefaultInstructionsReader()) {
-			return new BNDInstructions("", IOUtils.toString(reader));
-		} catch (IOException e) {
-			throw new RuntimeException("load default properties failed", e);
-		}
+	public static Properties getDefaultInstructionProperties() {
+		return asProperties(DEFAULT_INSTRUCTIONS);
 	}
 
 	public Properties asProperties() {
-		Reader reader;
-		if (instructions == null || instructions.isBlank()) {
-			reader = getDefaultInstructionsReader();
-		} else {
-			reader = new StringReader(instructions);
-		}
-		Properties properties = new Properties();
-		try (reader) {
-			properties.load(reader);
-		} catch (IOException e) {
-			throw new RuntimeException("conversion to properties failed", e);
-		}
-		return properties;
+		return asProperties(instructions == null || instructions.isBlank() ? DEFAULT_INSTRUCTIONS : instructions);
 	}
 
-	private static InputStreamReader getDefaultInstructionsReader() {
-		return new InputStreamReader(MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH),
-				StandardCharsets.ISO_8859_1);
+	private static Properties asProperties(String instructions) {
+		Properties properties = new Properties();
+		try {
+			properties.load(new StringReader(instructions));
+		} catch (IOException e) { // Cannot happen
+			throw new AssertionError("conversion to properties failed", e);
+		}
+		return properties;
 	}
 
 	public boolean isEmpty() {

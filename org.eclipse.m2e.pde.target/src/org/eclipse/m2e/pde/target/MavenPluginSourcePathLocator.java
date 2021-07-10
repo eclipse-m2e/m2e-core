@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Christoph Läubrich and others
+ * Copyright (c) 2022, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -27,7 +27,6 @@ import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetPlatformService;
-import org.eclipse.pde.internal.core.target.TargetPlatformService;
 
 /**
  * Look up sources of plugins in maven
@@ -64,13 +63,14 @@ public class MavenPluginSourcePathLocator implements IPluginSourcePathLocator {
 	}
 
 	private ArtifactKey aquireFromTargetState(File file) {
-		ITargetPlatformService platformService = TargetPlatformService.getDefault();
+		@SuppressWarnings("restriction")
+		ITargetPlatformService platformService = org.eclipse.pde.internal.core.target.TargetPlatformService
+				.getDefault();
 		try {
 			ITargetDefinition targetDefinition = platformService.getWorkspaceTargetDefinition();
 			if (targetDefinition != null) {
 				for (ITargetLocation location : targetDefinition.getTargetLocations()) {
-					if (location instanceof MavenTargetLocation) {
-						MavenTargetLocation targetLocation = (MavenTargetLocation) location;
+					if (location instanceof MavenTargetLocation targetLocation) {
 						Artifact lookupArtifact = targetLocation.lookupArtifact(file);
 						if (lookupArtifact != null) {
 							return new ArtifactKey(lookupArtifact);

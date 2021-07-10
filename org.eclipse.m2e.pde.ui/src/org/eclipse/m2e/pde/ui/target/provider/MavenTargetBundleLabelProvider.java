@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2023 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -29,15 +29,12 @@ public class MavenTargetBundleLabelProvider extends LabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof MavenTargetBundle) {
-			if (((MavenTargetBundle) element).isWrapped()) {
-				Display current = Display.getCurrent();
-				if (image == null && current != null) {
-					image = new Image(current,
-							MavenTargetAdapterFactory.class.getResourceAsStream("/icons/jar_obj.gif"));
-				}
-				return image;
+		if (element instanceof MavenTargetBundle targetBundle && targetBundle.isWrapped()) {
+			Display current = Display.getCurrent();
+			if (image == null && current != null) {
+				image = new Image(current, MavenTargetAdapterFactory.class.getResourceAsStream("/icons/jar_obj.gif"));
 			}
+			return image;
 		}
 		return null;
 	}

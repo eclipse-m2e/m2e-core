@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2022 Christoph Läubrich and others
+ * Copyright (c) 2018, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -32,7 +32,6 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
-@SuppressWarnings("restriction")
 final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerator> {
 		private final Artifact artifact;
 		private final List<ArtifactRepository> repositories;

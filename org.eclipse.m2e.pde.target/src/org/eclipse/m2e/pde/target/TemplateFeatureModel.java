@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich and others
+ * Copyright (c) 2021, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -38,7 +38,6 @@ public final class TemplateFeatureModel extends AbstractFeatureModel {
 			StringWriter stringWriter = new StringWriter();
 			try (PrintWriter writer = new PrintWriter(stringWriter)) {
 				template.write("", writer);
-				writer.flush();
 			}
 			this.xml = stringWriter.toString();
 		}

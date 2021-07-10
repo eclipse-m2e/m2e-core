@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich and others
+ * Copyright (c) 2018, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -51,10 +51,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	@Override
 	public boolean isSourceBundle() {
-		if (bundle == null) {
-			return false;
-		}
-		return bundle.isSourceBundle();
+		return bundle != null && bundle.isSourceBundle();
 	}
 
 	@Override
@@ -67,10 +64,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	@Override
 	public boolean isFragment() {
-		if (bundle == null) {
-			return false;
-		}
-		return bundle.isFragment();
+		return bundle != null && bundle.isFragment();
 	}
 
 	@Override
@@ -81,7 +75,7 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, Properties bndInstructions, CacheManager cacheManager,
+	public MavenTargetBundle(Artifact artifact, BNDInstructions instructions, CacheManager cacheManager,
 			MissingMetadataMode metadataMode) {
 		this.artifact = artifact;
 		File file = artifact.getFile();
@@ -95,6 +89,9 @@ public class MavenTargetBundle extends TargetBundle {
 				LOGGER.log(status);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
+					Properties bndInstructions = instructions == null
+							? BNDInstructions.getDefaultInstructionProperties()
+							: instructions.asProperties();
 					bundle = cacheManager.accessArtifactFile(artifact,
 							artifactFile -> getWrappedArtifact(artifact, bndInstructions, artifactFile));
 					isWrapped = true;
@@ -136,8 +133,7 @@ public class MavenTargetBundle extends TargetBundle {
 					analyzer.setProperty("mvnArtifactId", artifact.getArtifactId());
 					analyzer.setProperty("mvnVersion", artifact.getBaseVersion());
 					analyzer.setProperty("mvnClassifier", artifact.getClassifier());
-					analyzer.setProperty("generatedOSGiVersion",
-							TargetBundles.createOSGiVersion(artifact).toString());
+					analyzer.setProperty("generatedOSGiVersion", TargetBundles.createOSGiVersion(artifact).toString());
 					analyzer.setProperties(bndInstructions);
 					jar.setManifest(analyzer.calcManifest());
 					jar.write(wrappedFile);
