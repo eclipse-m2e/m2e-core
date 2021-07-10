@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Christoph Läubrich and others
+ * Copyright (c) 2020, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -14,20 +14,30 @@ package org.eclipse.m2e.pde.target;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.DeletingPathVisitor;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.core.target.ITargetHandle;
 import org.eclipse.pde.core.target.TargetBundle;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  *
@@ -43,26 +53,27 @@ import org.eclipse.pde.core.target.TargetBundle;
  * time</li>
  * </ul>
  */
-public class CacheManager {
+class CacheManager {
 
 	private static final String LASTACCESS_MARKER = ".lastaccess";
 
-	private static File baseDir;
+	private static Path baseDir;
 
 	private static final Map<String, CacheManager> MANAGERS = new HashMap<>();
 
-	private volatile boolean invalidated;
+	private final Path folder;
 
-	private final File folder;
-
-	private CacheManager(File folder) {
-		this.folder = folder;
+	private CacheManager(String cacheKey) {
+		this.folder = getCacheBaseDir().resolve(cacheKey);
 		try {
-			FileUtils.touch(new File(folder, LASTACCESS_MARKER));
+			Files.writeString(folder.resolve(LASTACCESS_MARKER), ""); // touch last access
 		} catch (IOException e) {
 			// can't mark last access then...
 		}
 	}
+
+	private static final Set<OpenOption> LOCK_FILE_OPEN_OPTIONS = Set.of(StandardOpenOption.CREATE,
+			StandardOpenOption.WRITE, StandardOpenOption.DELETE_ON_CLOSE);
 
 	/**
 	 * Allows synchronized and locked access to the given artifact, the consumer is
@@ -81,16 +92,12 @@ public class CacheManager {
 	 *                   consumer itself
 	 */
 	public synchronized <R> R accessArtifactFile(Artifact artifact, CacheConsumer<R> consumer) throws Exception {
-		File gavFolder = new File(folder,
-				artifact.getGroupId() + "/" + artifact.getArtifactId() + "/" + artifact.getBaseVersion());
-		FileUtils.forceMkdir(gavFolder);
-		File file = new File(gavFolder, artifact.getFile().getName());
-		File lockFile = new File(gavFolder, artifact.getFile().getName() + ".lock");
-		lockFile.deleteOnExit();
-		try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rw");
-				FileChannel channel = raf.getChannel();
-				FileLock lock = channel.lock()) {
-			return consumer.consume(file);
+		Path gav = Path.of(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion());
+		Path gavFolder = Files.createDirectories(folder.resolve(gav));
+		Path file = gavFolder.resolve(artifact.getFile().getName());
+		Path lockFile = gavFolder.resolve(artifact.getFile().getName() + ".lock");
+		try (FileChannel channel = FileChannel.open(lockFile, LOCK_FILE_OPEN_OPTIONS); FileLock lock = channel.lock()) {
+			return consumer.consume(file.toFile());
 		}
 	}
 
@@ -105,16 +112,7 @@ public class CacheManager {
 	 */
 	public MavenTargetBundle getTargetBundle(Artifact artifact, BNDInstructions bndInstructions,
 			MissingMetadataMode metadataMode) {
-		if (invalidated) {
-			throw new IllegalStateException("invalidated location");
-		}
-		Properties prop;
-		if (bndInstructions == null) {
-			prop = BNDInstructions.getDefaultInstructions().asProperties();
-		} else {
-			prop = bndInstructions.asProperties();
-		}
-		return new MavenTargetBundle(artifact, prop, this, metadataMode);
+		return new MavenTargetBundle(artifact, bndInstructions, this, metadataMode);
 	}
 
 	/**
@@ -129,55 +127,50 @@ public class CacheManager {
 	 *                       {@link ITargetHandle}
 	 */
 	public static synchronized CacheManager forTargetHandle(ITargetHandle handle) throws CoreException {
-		if (baseDir == null) {
-			throw new IllegalStateException("bundle not active");
-		}
 		String targetId = DigestUtils.sha1Hex(handle.getMemento());
-		return MANAGERS.computeIfAbsent(targetId, key -> {
-
-			File folder = new File(baseDir, key);
-			return new CacheManager(folder);
-		});
+		return MANAGERS.computeIfAbsent(targetId, CacheManager::new);
 	}
 
 	/**
 	 * Clears all inactive cache locations that are older than the given time
 	 *
-	 * @param amount the amount of time to use
-	 * @param unit   the unit of time to use
+	 * @param timeout the duration since the last use after which a CacheManager is
+	 *                deleted
 	 */
-	public static synchronized void clearFilesOlderThan(long amount, TimeUnit unit) {
-		if (baseDir == null) {
-			throw new IllegalStateException("bundle not active");
-		}
-		File[] listFiles = baseDir.listFiles();
-		long deleteStamp = System.currentTimeMillis() - unit.toMillis(amount);
-		if (listFiles != null) {
-			for (File folder : listFiles) {
-				if (folder.isDirectory() && !MANAGERS.containsKey(folder.getName())) {
-					File marker = new File(folder, LASTACCESS_MARKER);
-					if (marker.isFile() && FileUtils.isFileOlder(marker, deleteStamp)) {
-						try {
-							FileUtils.deleteDirectory(folder);
-						} catch (IOException e) {
-						}
+	private static synchronized void clearFilesOlderThan(Path cacheBaseDir, Duration timeout) {
+		FileTime deleteBefore = FileTime.from(Instant.now().minus(timeout));
+		try (DirectoryStream<Path> folders = Files.newDirectoryStream(cacheBaseDir)) {
+			for (Path folder : folders) {
+				// Delete cache-folders last used before the specified timeout
+				// and not used in any manager
+				if (!MANAGERS.containsKey(folder.getFileName().toString())) {
+					Path marker = folder.resolve(LASTACCESS_MARKER);
+					if (Files.isRegularFile(marker) && Files.getLastModifiedTime(marker).compareTo(deleteBefore) < 0) {
+						Files.walkFileTree(folder, DeletingPathVisitor.withLongCounters());
 					}
 				}
 			}
+		} catch (IOException e) { // ignore exceptions
+			Platform.getLog(CacheManager.class).log(Status.error("Failed to clear Maven bundle cache", e));
 		}
 	}
 
-	/**
-	 * Set the basedir to use, purge all existing managers and invalidate them
-	 *
-	 * @param baseDir
-	 */
-	static synchronized void setBasedir(File baseDir) {
-		CacheManager.baseDir = baseDir;
-		for (CacheManager m : MANAGERS.values()) {
-			m.invalidated = true;
+	private static synchronized Path getCacheBaseDir() {
+		if (baseDir == null) {
+			Bundle bundle = FrameworkUtil.getBundle(CacheManager.class);
+			if (bundle == null) {
+				throw new IllegalStateException(CacheManager.class.getSimpleName() + " not loaded from a bundle");
+			}
+			baseDir = bundle.getDataFile("").toPath();
+			// clear all locations older than 14 days, this can be improved by
+			// 1) watch for changes in the workspace -> if target is deleted/removed from
+			// workspace we can clear the cache
+			// 2) we can add a preference page where the user can force clearing the cache
+			// or set the cache days
+			Runnable cleaner = () -> clearFilesOlderThan(baseDir, Duration.ofDays(14));
+			new Thread(cleaner, "Wrapped bundles cache cleaner").start();
 		}
-		MANAGERS.clear();
+		return baseDir;
 	}
 
 	/**
@@ -186,7 +179,7 @@ public class CacheManager {
 	 *
 	 * @param <T> the return type
 	 */
-	public interface CacheConsumer<T> {
+	interface CacheConsumer<T> {
 		T consume(File file) throws Exception;
 	}
 

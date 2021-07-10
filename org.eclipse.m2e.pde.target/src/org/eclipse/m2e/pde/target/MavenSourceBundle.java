@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Christoph Läubrich and others
+ * Copyright (c) 2020, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -13,21 +13,21 @@
 package org.eclipse.m2e.pde.target;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.Enumeration;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
-import org.eclipse.m2e.pde.target.CacheManager.CacheConsumer;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.osgi.framework.Constants;
 
@@ -48,51 +48,45 @@ public class MavenSourceBundle extends TargetBundle {
 		if (isValidSourceManifest(manifest)) {
 			fInfo.setLocation(sourceFile.toURI());
 		} else {
-			File generatedSourceBundle = cacheManager.accessArtifactFile(artifact, new CacheConsumer<File>() {
-
-				@Override
-				public File consume(File file) throws Exception {
-					if (CacheManager.isOutdated(file, sourceFile)) {
-						Attributes attr = manifest.getMainAttributes();
-						if (attr.isEmpty()) {
-							attr.put(Name.MANIFEST_VERSION, "1.0");
-						}
-						attr.putValue(ECLIPSE_SOURCE_BUNDLE_HEADER, sourceTarget.getSymbolicName() + ";version=\""
-								+ sourceTarget.getVersion() + "\";roots:=\".\"");
-						attr.putValue(Constants.BUNDLE_MANIFESTVERSION, "2");
-						attr.putValue(Constants.BUNDLE_NAME, "Source Bundle for " + sourceTarget.getSymbolicName()
-								+ ":" + sourceTarget.getVersion());
-						attr.putValue(Constants.BUNDLE_SYMBOLICNAME, fInfo.getSymbolicName());
-						attr.putValue(Constants.BUNDLE_VERSION, fInfo.getVersion());
-						try (JarOutputStream stream = new JarOutputStream(new FileOutputStream(file), manifest)) {
-							try (JarFile jar = new JarFile(sourceFile)) {
-								Enumeration<JarEntry> entries = jar.entries();
-								while (entries.hasMoreElements()) {
-									JarEntry jarEntry = entries.nextElement();
-									if (JarFile.MANIFEST_NAME.equals(jarEntry.getName())) {
-										continue;
-									}
-									try (InputStream is = jar.getInputStream(jarEntry)) {
-										stream.putNextEntry(new ZipEntry(jarEntry.getName()));
-										is.transferTo(stream);
-										stream.closeEntry();
-									}
-								}
-							}
-						}
-					}
-					return file;
+			File generatedSourceBundle = cacheManager.accessArtifactFile(artifact, file -> {
+				if (CacheManager.isOutdated(file, sourceFile)) {
+					addSourceBundleMetadata(manifest, sourceTarget);
+					transferJarEntries(sourceFile, manifest, file);
 				}
+				return file;
 			});
 			fInfo.setLocation(generatedSourceBundle.toURI());
 		}
 	}
 
-	private static boolean isValidSourceManifest(Manifest manifest) {
-		if (manifest != null) {
-			return manifest.getMainAttributes().getValue(ECLIPSE_SOURCE_BUNDLE_HEADER) != null;
+	private void addSourceBundleMetadata(Manifest manifest, BundleInfo bundle) {
+		Attributes attr = manifest.getMainAttributes();
+		if (attr.isEmpty()) {
+			attr.put(Name.MANIFEST_VERSION, "1.0");
 		}
-		return false;
+		attr.putValue(ECLIPSE_SOURCE_BUNDLE_HEADER,
+				bundle.getSymbolicName() + ";version=\"" + bundle.getVersion() + "\";roots:=\".\"");
+		attr.putValue(Constants.BUNDLE_MANIFESTVERSION, "2");
+		attr.putValue(Constants.BUNDLE_NAME,
+				"Source Bundle for " + bundle.getSymbolicName() + ":" + bundle.getVersion());
+		attr.putValue(Constants.BUNDLE_SYMBOLICNAME, fInfo.getSymbolicName());
+		attr.putValue(Constants.BUNDLE_VERSION, fInfo.getVersion());
+	}
+
+	private void transferJarEntries(File source, Manifest manifest, File target) throws IOException {
+		try (var output = new JarOutputStream(new FileOutputStream(target), manifest);
+				var input = new JarInputStream(new FileInputStream(source));) {
+			for (JarEntry entry; (entry = input.getNextJarEntry()) != null;) {
+				if (!JarFile.MANIFEST_NAME.equals(entry.getName())) {
+					output.putNextEntry(new ZipEntry(entry.getName()));
+					input.transferTo(output);
+				}
+			}
+		}
+	}
+
+	private static boolean isValidSourceManifest(Manifest manifest) {
+		return manifest != null && manifest.getMainAttributes().getValue(ECLIPSE_SOURCE_BUNDLE_HEADER) != null;
 	}
 
 }

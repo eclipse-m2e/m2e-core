@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich and others
+ * Copyright (c) 2021, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -43,7 +43,7 @@ class TargetBundles {
 	final Map<MavenTargetDependency, List<DependencyNode>> dependencyNodes = new HashMap<>();
 
 	Optional<DependencyNode> getDependencyNode(Artifact artifact) {
-		return dependencyNodes.values().stream().flatMap(l -> l.stream())
+		return dependencyNodes.values().stream().flatMap(List::stream)
 				.filter(node -> artifact.equals(node.getArtifact())).findAny();
 	}
 
@@ -53,11 +53,8 @@ class TargetBundles {
 	}
 
 	Optional<TargetBundle> getTargetBundle(Artifact artifact, boolean source) {
-		if (source) {
-			return Optional.ofNullable(sourceBundles.get(artifact));
-		} else {
-			return Optional.ofNullable(bundles.get(artifact));
-		}
+		Map<Artifact, ? extends TargetBundle> bundlesMap = source ? sourceBundles : bundles;
+		return Optional.ofNullable(bundlesMap.get(artifact));
 	}
 
 	Optional<MavenTargetBundle> getTargetBundle(MavenTargetDependency dependency) {
@@ -96,7 +93,6 @@ class TargetBundles {
 			return new Version(0, 0, 1, version);
 		}
 	}
-
 
 	public void addBundle(Artifact artifact, TargetBundle bundle) {
 		bundles.put(artifact, bundle);

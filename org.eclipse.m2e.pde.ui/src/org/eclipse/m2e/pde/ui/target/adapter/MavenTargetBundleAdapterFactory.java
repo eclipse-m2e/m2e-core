@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich and others
+ * Copyright (c) 2018, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -24,13 +24,12 @@ import org.osgi.service.component.annotations.Deactivate;
 		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ILabelProvider" })
 public class MavenTargetBundleAdapterFactory implements IAdapterFactory {
 
-	private final ILabelProvider LABEL_PROVIDER = new MavenTargetBundleLabelProvider();
+	private final ILabelProvider labelProvider = new MavenTargetBundleLabelProvider();
+
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-		if (adaptableObject instanceof MavenTargetBundle) {
-			if (adapterType == ILabelProvider.class) {
-				return adapterType.cast(LABEL_PROVIDER);
-			}
+		if (adaptableObject instanceof MavenTargetBundle && adapterType == ILabelProvider.class) {
+			return adapterType.cast(labelProvider);
 		}
 		return null;
 	}
@@ -42,7 +41,7 @@ public class MavenTargetBundleAdapterFactory implements IAdapterFactory {
 
 	@Deactivate
 	void dispose() {
-		LABEL_PROVIDER.dispose();
+		labelProvider.dispose();
 	}
 
 }

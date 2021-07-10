@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Christoph Läubrich and others
+ * Copyright (c) 2022, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -41,11 +41,9 @@ public class MavenTargetDependencyFilter implements DependencyFilter {
 		String extension = node.getArtifact().getExtension();
 		for (String valid : VALID_EXTENSIONS) {
 			// only for a valid extension...
-			if (valid.equalsIgnoreCase(extension)) {
-				if (dependencyDepth == DependencyDepth.INFINITE
-						|| (dependencyDepth == DependencyDepth.DIRECT && parents.size() <= 1)) {
-					return isValidScope(node.getDependency());
-				}
+			if (valid.equalsIgnoreCase(extension) && (dependencyDepth == DependencyDepth.INFINITE
+					|| (dependencyDepth == DependencyDepth.DIRECT && parents.size() <= 1))) {
+				return isValidScope(node.getDependency());
 			}
 		}
 		return false;
@@ -59,12 +57,7 @@ public class MavenTargetDependencyFilter implements DependencyFilter {
 		if (locationScopes.isEmpty()) {
 			return SCOPE_COMPILE.equalsIgnoreCase(dependecyScope);
 		}
-		for (String locationScope : locationScopes) {
-			if (dependecyScope.equalsIgnoreCase(locationScope)) {
-				return true;
-			}
-		}
-		return false;
+		return locationScopes.stream().anyMatch(dependecyScope::equalsIgnoreCase);
 	}
 
 	static final Collection<String> expandScope(String scope) {

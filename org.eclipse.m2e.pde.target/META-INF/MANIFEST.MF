@@ -12,11 +12,11 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.19.0",
  org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.core.resources
 Export-Package: org.eclipse.m2e.pde.target;x-friends:="org.eclipse.m2e.pde.ui"
-Bundle-Activator: org.eclipse.m2e.pde.target.Activator
 Bundle-ActivationPolicy: lazy
 Import-Package: aQute.bnd.osgi;version="[5.5.0,6.0.0)",
  aQute.bnd.version;version="[2.2.0,3.0.0)",
  org.apache.commons.codec.digest;version="1.14.0",
  org.apache.commons.io;version="2.6.0",
+ org.apache.commons.io.file;version="2.8.0",
  org.apache.commons.io.output;version="2.8.0"
 Bundle-Vendor: Eclipse.org - m2e
