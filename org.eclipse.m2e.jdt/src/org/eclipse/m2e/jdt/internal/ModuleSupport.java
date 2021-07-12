@@ -16,15 +16,25 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +52,14 @@ import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IModuleDescription;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.AutomaticModuleNaming;
 import org.eclipse.jdt.internal.compiler.env.IModule;
+import org.eclipse.jdt.internal.core.JrtPackageFragmentRoot;
 import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -54,8 +67,10 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
+import org.eclipse.m2e.jdt.IClasspathManager;
 
 
 /**
@@ -318,5 +333,378 @@ public class ModuleSupport {
       log.error(ex.getMessage(), ex);
     }
     return false;
+  }
+
+  /**
+   * Updates M2E container and JRE container with the jpms arguments provided to the maven-compiler-plugin. The dispatch
+   * between M2E and JRE containers is done using the targeted module. If the JRE container contains the targeted module
+   * then the jpms argument will be attached to it else it will be attached to the M2E container
+   * 
+   * @param request
+   * @param classpath
+   * @param monitor
+   * @param compilerArgs
+   */
+  public static void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
+      IProgressMonitor monitor, List<String> compilerArgs) {
+
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
+
+    IJavaProject javaProject = JavaCore.create(facade.getProject());
+    if(javaProject == null || !javaProject.exists() || classpath == null) {
+      return;
+    }
+
+    Optional<JpmsArgs> jpmsArgs = JpmsArgs.computeFromArgs(compilerArgs);
+
+    if(jpmsArgs.isEmpty()) {
+      return;
+    }
+
+    IClasspathEntry m2eEntry = findMavenContainerEntry(classpath);
+    IClasspathEntry jreEntry = findJreContainerEntry(classpath);
+
+    IClasspathEntryDescriptor m2eEntryDescriptor = new ClasspathEntryDescriptor(m2eEntry);
+    IClasspathEntryDescriptor jreEntryDescriptor = new ClasspathEntryDescriptor(jreEntry);
+
+    // list all the modules managed in the jre container
+    final List<String> availableModules = getRootModules(javaProject, jreEntry);
+    log.debug("Found {} modules managed by the JRE Container", availableModules.size());
+
+    // iterate and add attributes to the matching container jre/m2e
+    for(JpmsArgType argType : JpmsArgType.values()) {
+      List<JpmsArgValue> values = argType.getFromArgs(jpmsArgs.get());
+
+      if(values != null && !values.isEmpty()) {
+
+        // dispatch jpms args between jre and m2e container
+        Map<Boolean, List<JpmsArgValue>> partitioned = values.stream()
+            .collect(Collectors.partitioningBy(v -> availableModules.contains(v.getModule())));
+
+        List<JpmsArgValue> jreValues = partitioned.get(true);
+        List<JpmsArgValue> m2eValues = partitioned.get(false);
+
+        jreEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), null);
+        if(jreValues != null && !jreValues.isEmpty()) {
+
+          String valuesAsString = jreValues.stream().map(JpmsArgValue::getValue).distinct()
+              .collect(Collectors.joining(JpmsArgs.VALUE_SEPARATOR));
+
+          jreEntryDescriptor.setClasspathAttribute(IClasspathAttribute.MODULE, "true");
+          jreEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), valuesAsString);
+        }
+
+        m2eEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), null);
+        if(m2eValues != null && !m2eValues.isEmpty()) {
+
+          String valuesAsString = m2eValues.stream().map(JpmsArgValue::getValue).distinct()
+              .collect(Collectors.joining(JpmsArgs.VALUE_SEPARATOR));
+
+          //m2eEntryDescriptor.setClasspathAttribute(IClasspathAttribute.MODULE, "true");
+          m2eEntryDescriptor.setClasspathAttribute(argType.getEclipseArgumentName(), valuesAsString);
+        }
+      }
+    }
+
+    classpath.replaceEntry(descriptor -> IClasspathManager.CONTAINER_ID.equals(descriptor.getPath().segment(0)),
+        m2eEntryDescriptor.toClasspathEntry());
+    classpath.replaceEntry(descriptor -> JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0)),
+        jreEntryDescriptor.toClasspathEntry());
+
+  }
+
+  private static IClasspathEntry findContainerEntry(IClasspathDescriptor classpath,
+      Predicate<IClasspathEntry> predicate) {
+    // when .classpath file is deleted we need to search those entries directly in non commited classpath
+    for(IClasspathEntry entry : classpath.getEntries()) {
+      if(predicate.test(entry)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  private static IClasspathEntry findMavenContainerEntry(IClasspathDescriptor classpath) {
+    return findContainerEntry(classpath, (e) -> MavenClasspathHelpers.isMaven2ClasspathContainer(e.getPath()));
+  }
+
+  private static IClasspathEntry findJreContainerEntry(IClasspathDescriptor classpath) {
+    return findContainerEntry(classpath, (e) -> MavenClasspathHelpers.isJREClasspathContainer(e.getPath()));
+  }
+
+  private static List<String> getRootModules(IJavaProject javaProject, IClasspathEntry entry) {
+
+    Set<String> result = new HashSet<String>();
+
+    try {
+      for(IClasspathEntry entry2 : javaProject.getResolvedClasspath(false)) {
+        IPackageFragmentRoot[] fAllSystemRoots = javaProject.findUnfilteredPackageFragmentRoots(entry2);
+        for(IPackageFragmentRoot pfr : fAllSystemRoots) {
+
+          if(pfr instanceof JrtPackageFragmentRoot) {
+            String moduleName = pfr.getElementName();
+            IModuleDescription module = pfr.getModuleDescription();// javaProject.findModule(moduleName, null);
+
+            if(module == null) {
+              continue;
+            }
+
+            result.add(moduleName);
+          }
+        }
+      }
+
+      return new ArrayList<String>(result);
+    } catch(JavaModelException ex) {
+      log.error(ex.getMessage(), ex);
+      return Collections.emptyList();
+    }
+  }
+
+  private static class JpmsArgValue {
+
+    private final String module;
+
+    private final String value;
+
+    /**
+     * @param module
+     * @param value
+     */
+    public JpmsArgValue(String module, String value) {
+      super();
+      this.module = module;
+      this.value = value;
+    }
+
+    /**
+     * @return Returns the module.
+     */
+    public String getModule() {
+      return this.module;
+    }
+
+    /**
+     * @return Returns the value.
+     */
+    public String getValue() {
+      return this.value;
+    }
+
+  }
+
+  private static class JpmsArgs {
+
+    public static final String VALUE_SEPARATOR = ":";
+
+    private final List<JpmsArgValue> addExports = new ArrayList<>();
+
+    private final List<JpmsArgValue> addOpens = new ArrayList<>();
+
+    // does not seem supported by jdt
+    //private final List<JpmsArgValue> addModules = new ArrayList<>();
+
+    private final List<JpmsArgValue> addReads = new ArrayList<>();
+
+    private final List<JpmsArgValue> patchModule = new ArrayList<>();
+
+    protected static Optional<JpmsArgs> computeFromArgs(List<String> args) {
+      JpmsArgs jpmsArgs = null;
+
+      if(args != null) {
+        ListIterator<String> it = args.listIterator();
+
+        while(it.hasNext()) {
+          String argumentName = it.next();
+          JpmsArgType argType = JpmsArgType.valueFromArgumentName(argumentName);
+
+          if(argType == null) {
+            continue;
+          }
+
+          String value = it.next();
+          JpmsArgValue argValue = argType.parse(value);
+
+          if(argValue == null) {
+            it.previous();
+            continue;
+          }
+
+          if(jpmsArgs == null) {
+            jpmsArgs = new JpmsArgs();
+          }
+          argType.addToArgs(jpmsArgs, argValue);
+        }
+      }
+
+      return Optional.ofNullable(jpmsArgs);
+    }
+
+    /**
+     * @return Returns the exports.
+     */
+    public List<JpmsArgValue> getAddExports() {
+      return this.addExports;
+    }
+
+    public boolean toAddExports(JpmsArgValue addExport) {
+      return this.addExports.add(addExport);
+    }
+
+    /**
+     * @return Returns the opens.
+     */
+    public List<JpmsArgValue> getAddOpens() {
+      return this.addOpens;
+    }
+
+    public boolean toAddOpens(JpmsArgValue addOpen) {
+      return this.addOpens.add(addOpen);
+    }
+
+//    /**
+//     * @return Returns the modules.
+//     */
+//    public List<JpmsArgValue> getAddModules() {
+//      return this.addModules;
+//    }
+//
+//    public boolean toAddModules(JpmsArgValue addModule) {
+//      return this.addModules.add(addModule);
+//    }
+
+    /**
+     * @return Returns the reads.
+     */
+    public List<JpmsArgValue> getAddReads() {
+      return this.addReads;
+    }
+
+    public boolean toAddReads(JpmsArgValue addRead) {
+      return this.addReads.add(addRead);
+    }
+
+    /**
+     * @return Returns the patched modules.
+     */
+    public List<JpmsArgValue> getPatchModule() {
+      return this.patchModule;
+    }
+
+    public boolean toPatchModule(JpmsArgValue patchModule) {
+      return this.patchModule.add(patchModule);
+    }
+  }
+
+  protected enum JpmsArgType {
+    // @formatter:off
+    AddExports("--add-exports", IClasspathAttribute.ADD_EXPORTS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddExports(v),
+        (a) -> a.getAddExports()),
+
+    AddOpens("--add-opens", IClasspathAttribute.ADD_OPENS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddOpens(v),
+        (a) -> a.getAddOpens()),
+
+//    AddModules("--add-modules", IClasspathAttribute."add-modules", //Not supported 
+//        Pattern.compile("^(()[A-Za-z0-9\\.$_\\-,]*)$"),
+//        (a, v) -> a.toAddModules(v),
+//        (a) -> a.getAddModules()), 
+
+    AddReads("--add-reads", IClasspathAttribute.ADD_READS,
+        Pattern.compile("^(([A-Za-z0-9\\.$_]*)=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddReads(v),
+        (a) -> a.getAddReads()),
+
+    PatchModule("--patch-module", IClasspathAttribute.PATCH_MODULE, Pattern.compile("^(([A-Za-z0-9\\.$_]*)=.*)$"), // maybe .* for jar name is too permissive
+        (a, v) -> a.toPatchModule(v), (a) -> a.getPatchModule());
+    // @formatter:on
+
+    private String argumentName;
+
+    private String eclipseArgumentName;
+
+    private Pattern extractPattern;
+
+    private BiFunction<JpmsArgs, JpmsArgValue, Boolean> addFunction;
+
+    private Function<JpmsArgs, List<JpmsArgValue>> getFunction;
+
+    /**
+     * Jpms argument type enum constructor
+     * 
+     * @param argumentName the argument name to search in the compiler arguments
+     * @param eclipseArgumentName the attribute name to use in the eclipse container
+     * @param extractPattern this pattern must validate the value and extract 2 groups, first the value and second the
+     *          targeted module name
+     * @param addFunction function used to populate the {@link JpmsArgs}
+     * @param getFunction function used to get {@link JpmsArgValue} list from the {@link JpmsArgs}
+     */
+    JpmsArgType(String argumentName, String eclipseArgumentName, Pattern extractPattern,
+        BiFunction<JpmsArgs, JpmsArgValue, Boolean> addFunction, Function<JpmsArgs, List<JpmsArgValue>> getFunction) {
+      this.argumentName = argumentName;
+      this.eclipseArgumentName = eclipseArgumentName;
+      this.extractPattern = extractPattern;
+      this.addFunction = addFunction;
+      this.getFunction = getFunction;
+    }
+
+    /**
+     * Parse a Jpms argument value provided to the maven compiler into a {@link JpmsArgValue}
+     * 
+     * @param value
+     * @return the parsed value
+     */
+    public JpmsArgValue parse(String value) {
+      String trimed = value.trim();
+      Matcher matcher = extractPattern.matcher(trimed);
+
+      if(matcher.matches()) {
+        String argValue = matcher.group(1);
+        String module = matcher.group(2);
+        return new JpmsArgValue(module, argValue);
+      }
+
+      return null;
+    }
+
+    public boolean addToArgs(JpmsArgs args, JpmsArgValue value) {
+      return this.addFunction.apply(args, value);
+    }
+
+    public List<JpmsArgValue> getFromArgs(JpmsArgs args) {
+      return this.getFunction.apply(args);
+    }
+
+    /**
+     * Provided an jpms compiler argument return an {@link JpmsArgType}
+     * 
+     * @param the argument name
+     * @return
+     */
+    static JpmsArgType valueFromArgumentName(String argumentName) {
+      Optional<JpmsArgType> result = Arrays.stream(JpmsArgType.values())
+          .filter(at -> at.getArgumentName().equalsIgnoreCase(argumentName)).findFirst();
+
+      if(result.isEmpty()) {
+        return null;
+      }
+
+      return result.get();
+    }
+
+    /**
+     * @return Returns the argumentName.
+     */
+    public String getArgumentName() {
+      return this.argumentName;
+    }
+
+    /**
+     * @return Returns the eclipseArgumentName.
+     */
+    public String getEclipseArgumentName() {
+      return this.eclipseArgumentName;
+    }
+
   }
 }

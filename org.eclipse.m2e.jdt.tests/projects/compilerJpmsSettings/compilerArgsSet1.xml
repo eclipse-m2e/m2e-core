@@ -1,0 +1,29 @@
+<compilerArgs>
+	<!-- M2E Container exports -->
+	<arg>--add-exports</arg>
+	<arg>javafx.graphics/com.sun.javafx.geometry=somemodule</arg>
+	<!-- JRE Container exports -->
+	<arg>--add-exports</arg>
+	<arg>jdk.jartool/sun.tools.jar=somemodule</arg>
+
+	<!-- M2E Container opens -->
+	<arg>--add-opens</arg>
+	<arg>javafx.graphics/com.sun.javafx.geometry=somemodule</arg>
+	<!-- JRE Container opens -->
+	<arg>--add-opens</arg>
+	<arg>jdk.jartool/sun.tools.jar=somemodule</arg>
+
+	<!-- M2E Container reads -->
+	<arg>--add-reads</arg>
+	<arg>javafx.graphics=somemodule</arg>
+	<!-- JRE Container reads -->
+	<arg>--add-reads</arg>
+	<arg>jdk.jartool=jdk.javadoc</arg>
+
+	<!-- M2E Container patch -->
+	<arg>--patch-module</arg>
+	<arg>javafx.graphics=somepath/some.jar</arg>
+	<!-- JRE Container patch -->
+	<arg>--patch-module</arg>
+	<arg>jdk.jartool=somepath/some.jar</arg>
+</compilerArgs>
