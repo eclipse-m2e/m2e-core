@@ -79,12 +79,13 @@
         <artifactId>maven-remote-resources-plugin</artifactId>
         <versionRange>[1.0,)</versionRange>
         <goals>
+          <goal>bundle</goal>
           <goal>process</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
         <ignore>
-          <message>maven-remote-resources-plugin (goal "process") is ignored by m2e.</message>
+          <message>maven-remote-resources-plugin is ignored by m2e.</message>
         </ignore>
       </action>
     </pluginExecution>
