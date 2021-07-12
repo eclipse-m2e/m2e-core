@@ -12,6 +12,7 @@ package org.eclipse.m2e.editor.lemminx;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -33,16 +34,23 @@ public class BundleResolver {
 
 	public static File getBundleResource(String bundleID, String resourceName) {
 		Bundle bundle = getBundle(bundleID);
-		File f = null;
+		if (bundle == null) {
+			LOG.debug("Bundle {} was not found!", bundleID);
+			return null;
+		}
 		try {
-			f = new java.io.File(FileLocator
-					.toFileURL(FileLocator.find(bundle, new Path(bundle.getResource(resourceName).getPath())))
+			URL resource = bundle.getResource(resourceName);
+			if (resource == null) {
+				LOG.debug("resource {} was not found in bundle {}!", resourceName, bundle.getSymbolicName());
+				return null;
+			}
+			return new java.io.File(
+					FileLocator
+					.toFileURL(FileLocator.find(bundle, new Path(resource.getPath())))
 					.getPath());
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 			return null;
 		}
-
-		return f;
 	}
 }
