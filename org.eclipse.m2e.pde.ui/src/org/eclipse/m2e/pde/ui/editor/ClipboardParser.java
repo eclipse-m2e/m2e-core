@@ -31,6 +31,7 @@ public class ClipboardParser {
 	private String classifier;
 	private Exception error;
 	private String scope;
+	private String type;
 
 	public ClipboardParser(String text) {
 		if (text != null && text.trim().startsWith("<")) {
@@ -44,6 +45,7 @@ public class ClipboardParser {
 				version = getTextFor("version", doc);
 				classifier = getTextFor("classifier", doc);
 				scope = getTextFor("scope", doc);
+				type = getTextFor("type", doc);
 			} catch (Exception e) {
 				// we can't use the clipboard content then...
 				this.error = e;
@@ -82,5 +84,9 @@ public class ClipboardParser {
 
 	public String getClassifier() {
 		return Objects.requireNonNullElse(classifier, "");
+	}
+
+	public String getType() {
+		return Objects.requireNonNullElse(type, MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 	}
 }
