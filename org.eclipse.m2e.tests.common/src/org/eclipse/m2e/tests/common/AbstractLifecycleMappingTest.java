@@ -38,6 +38,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
@@ -128,13 +129,16 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   }
 
   /**
+   * @param mappingContext
    * @since 1.4
    */
-  protected LifecycleMappingResult calculateLifecycleMapping(MavenProjectFacade facade) throws CoreException {
+  protected LifecycleMappingResult calculateLifecycleMapping(MavenProjectFacade facade,
+      LifecycleMappingContext mappingContext) throws CoreException {
     MavenProject mavenProject = facade.getMavenProject(monitor);
     List<MojoExecution> mojoExecutions = facade.getMojoExecutions(monitor);
     String lifecycleMappingId = facade.getResolverConfiguration().getLifecycleMappingId();
-    return LifecycleMappingFactory.calculateLifecycleMapping(mavenProject, mojoExecutions, lifecycleMappingId, monitor);
+    return LifecycleMappingFactory.calculateLifecycleMapping(mavenProject, mojoExecutions, lifecycleMappingId, monitor,
+        mappingContext);
   }
 
 }

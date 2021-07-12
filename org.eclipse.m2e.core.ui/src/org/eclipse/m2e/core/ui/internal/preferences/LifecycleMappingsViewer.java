@@ -64,6 +64,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -527,7 +528,8 @@ class LifecycleMappingsViewer {
               MavenProject mavenProject = facade.getMavenProject(monitor1);
               List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor1);
               LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
-                  mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1);
+                  mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1,
+                  new LifecycleMappingContext());
               mappings = mappingResult.getMojoExecutionMapping();
               return null;
             }, monitor);

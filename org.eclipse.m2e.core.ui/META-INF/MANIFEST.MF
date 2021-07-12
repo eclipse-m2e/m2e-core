@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.core.ui;singleton:=true
-Bundle-Version: 1.18.1.qualifier
+Bundle-Version: 1.18.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor

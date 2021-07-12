@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.eclipse.core.resources.IProject;
@@ -46,6 +47,7 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 public class MemoryConsumptionTest extends AbstractMavenProjectTestCase {
 
   @Test
+  @Ignore
   public void testImportLongBuildChain() throws Exception {
     int[] maxMavenProjectInstancesInContext = new int[] {0};
     MavenPluginActivator.getDefault().getMavenProjectManagerImpl().addContextProjectListener = context -> {

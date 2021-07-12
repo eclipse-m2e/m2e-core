@@ -99,6 +99,7 @@ import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -377,6 +378,8 @@ public class ProjectRegistryManager {
     final Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
     final Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<>();
 
+    LifecycleMappingContext mappingContext = new LifecycleMappingContext();
+
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
       List<IFile> toReadPomFiles = new ArrayList<>();
@@ -475,7 +478,7 @@ public class ProjectRegistryManager {
 
     context.forcePomFiles(allProcessedPoms);
 
-    // phase 2: resolve project dependencies
+    // phase 2: resolve project dependencies   
     while(!context.isEmpty()) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
@@ -511,11 +514,13 @@ public class ProjectRegistryManager {
         final ResolverConfiguration resolverConfiguration = _newFacade.getResolverConfiguration();
         createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
             (executionContext, pm) -> {
-              refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, _newFacade, pm);
+              refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, _newFacade, pm,
+                  mappingContext);
               return null;
             }, monitor);
       } else {
-        refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
+        refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor,
+            mappingContext);
       }
 
       monitor.worked(1);
@@ -524,13 +529,14 @@ public class ProjectRegistryManager {
 
   void refreshPhase2(MutableProjectRegistry newState, DependencyResolutionContext context,
       Map<IFile, Set<Capability>> originalCapabilities, Map<IFile, Set<RequiredCapability>> originalRequirements,
-      IFile pom, MavenProjectFacade newFacade, IProgressMonitor monitor) throws CoreException {
+      IFile pom, MavenProjectFacade newFacade, IProgressMonitor monitor, LifecycleMappingContext lifecycleMapping)
+      throws CoreException {
     Set<Capability> capabilities = null;
     Set<RequiredCapability> requirements = null;
     if(newFacade != null) {
       monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, newFacade.getProject().getName()));
 
-      setupLifecycleMapping(newState, monitor, newFacade);
+      setupLifecycleMapping(newState, monitor, newFacade, lifecycleMapping);
 
       capabilities = new LinkedHashSet<>();
       requirements = new LinkedHashSet<>();
@@ -610,9 +616,10 @@ public class ProjectRegistryManager {
   }
 
   private void setupLifecycleMapping(MutableProjectRegistry newState, IProgressMonitor monitor,
-      MavenProjectFacade newFacade) throws CoreException {
+      MavenProjectFacade newFacade, LifecycleMappingContext lifecycleMapping) throws CoreException {
     LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(getMavenProject(newFacade),
-        newFacade.getMojoExecutions(), newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor);
+        newFacade.getMojoExecutions(), newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor,
+        lifecycleMapping);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = mappingResult
