@@ -26,12 +26,12 @@
 
 	<properties>
 		<!-- maven core version -->
+		<maven-core.version>3.8.1</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
-			bundle. So the developer must go to the <_exportcontents> section of this file and modify
-			version of the org.eclipse.aether packages accordingly
+			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-		<maven-core.version>3.8.1</maven-core.version>
+		<maven-resolver.version>1.6.2</maven-resolver.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
@@ -146,7 +146,7 @@
 							org.apache.maven.*;provider=m2e;mandatory:=provider,
 							org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
 							org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
-							org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=1.1.1,
+							org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},
 							com.google.inject.*;provider=m2e;mandatory:=provider,
 							io.takari.*;provider=m2e;mandatory:=provider
 						</_exportcontents>
@@ -159,7 +159,6 @@
 							org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",
 							javax.inject;bundle-version="1.0.0";visibility:=reexport
 						</Require-Bundle>
-						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 					</instructions>
 				</configuration>
 			</plugin>
