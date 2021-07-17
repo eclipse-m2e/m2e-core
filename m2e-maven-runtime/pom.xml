@@ -61,6 +61,7 @@
 						<manifestLocation>META-INF</manifestLocation>
 						<supportedProjectTypes>eclipse-plugin</supportedProjectTypes>
 						<instructions>
+							<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive>
 							<Embed-Directory>${dependency.jars.folder}</Embed-Directory>
 
@@ -76,6 +77,7 @@
 							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 							<Automatic-Module-Name>${project.name}</Automatic-Module-Name>
 
+							<Import-Package>!*</Import-Package>
 							<Eclipse-BundleShape>dir</Eclipse-BundleShape>
 						</instructions>
 						<archive>
@@ -160,7 +162,7 @@
 										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
 										<!-- and http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
 										<if>
-											<equals arg1="${project.packaging}" arg2="pom" /> <!-- only soncider children of m2e-maven-runtime project -->
+											<equals arg1="${project.packaging}" arg2="pom" /> <!-- only consider children of m2e-maven-runtime project -->
 											<then>
 												<echo message="Skip pom project" />
 											</then>
