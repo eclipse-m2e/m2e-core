@@ -47,6 +47,10 @@
 					<groupId>org.checkerframework</groupId>
 					<artifactId>checker-compat-qual</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>aopalliance</groupId>
+					<artifactId>aopalliance</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -102,8 +106,18 @@
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
 		</dependency>
+		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -123,9 +137,6 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>
-							*;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api|javax.inject
-						</Embed-Dependency>
 						<_exportcontents>
 							META-INF.plexus;-noimport:=true,
 							META-INF.sisu;-noimport:=true,

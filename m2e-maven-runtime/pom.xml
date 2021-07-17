@@ -107,6 +107,7 @@
 					<extensions>true</extensions>
 					<configuration>
 						<instructions>
+							<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive>
 							<Embed-Directory>jars</Embed-Directory>
 
@@ -121,6 +122,7 @@
 							<Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
 							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 
+							<Import-Package>!*</Import-Package>
 							<Eclipse-BundleShape>dir</Eclipse-BundleShape>
 						</instructions>
 						<archive>
