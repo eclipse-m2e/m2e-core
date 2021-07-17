@@ -29,7 +29,6 @@
 			<groupId>org.apache.maven.archetype</groupId>
 			<artifactId>archetype-common</artifactId>
 			<version>${archetype-common.version}</version>
-			<optional>true</optional>
 			<exclusions>
 				<exclusion>
 					<!-- there is newer velocity with different groupId that we want -->
@@ -49,12 +48,6 @@
 					<artifactId>dom4j</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.sisu</groupId>
-			<artifactId>org.eclipse.sisu.plexus</artifactId>
-			<version>0.3.4</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.dom4j</groupId>

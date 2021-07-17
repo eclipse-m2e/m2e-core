@@ -48,7 +48,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j-simple.version}</version>
-			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
