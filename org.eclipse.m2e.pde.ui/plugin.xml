@@ -57,4 +57,20 @@
           </adapter>
        </factory>
     </extension>
+    <extension
+          point="org.eclipse.core.runtime.adapters">
+       <factory
+             adaptableType="org.eclipse.m2e.pde.MavenTargetDependency"
+             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetDependencyAdapterFactory">
+          <adapter
+                type="org.eclipse.jface.viewers.ILabelProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.jface.viewers.ITreeContentProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.pde.ui.target.ITargetLocationHandler">
+          </adapter>
+       </factory>
+    </extension>
 </plugin>
