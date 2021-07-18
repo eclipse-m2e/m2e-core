@@ -93,6 +93,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				type = combo(new CCombo(composite, SWT.BORDER));
 				type.add("jar"); //$NON-NLS-1$
 				type.add("bundle"); //$NON-NLS-1$
+				type.add("pom"); //$NON-NLS-1$
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_9);
 				createMetadataCombo(composite);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
@@ -118,7 +119,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					artifactId.setText(clipboardParser.getArtifactId());
 					version.setText(clipboardParser.getVersion());
 					classifier.setText(clipboardParser.getClassifier());
-					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
+					type.setText(clipboardParser.getType());
 					scope.setText(clipboardParser.getScope());
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
