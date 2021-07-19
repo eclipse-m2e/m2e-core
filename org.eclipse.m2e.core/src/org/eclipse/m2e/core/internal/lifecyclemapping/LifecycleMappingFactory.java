@@ -175,7 +175,6 @@ public class LifecycleMappingFactory {
   private LifecycleMappingFactory() {
   }
 
-
   public static LifecycleMappingResult calculateLifecycleMapping(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor, LifecycleMappingContext mappingContext) {
     long start = System.currentTimeMillis();

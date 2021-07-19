@@ -478,7 +478,7 @@ public class ProjectRegistryManager {
 
     context.forcePomFiles(allProcessedPoms);
 
-    // phase 2: resolve project dependencies   
+    // phase 2: resolve project dependencies
     while(!context.isEmpty()) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
