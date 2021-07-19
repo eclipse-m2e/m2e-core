@@ -19,9 +19,9 @@ See also https://projects.eclipse.org/projects/technology.m2e
 ## 📥 Installation
 The recommended way to install Eclipse-m2e is using the Eclipse marketplace. Either click on
 
-[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Marketplace&message=Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=darkorange&color=grey)](https://marketplace.eclipse.org/content/eclipse-m2e-maven-support-eclipse-ide "Open Eclipse Marketplace entry")
+[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Marketplace&message=Install%20Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=darkorange&color=grey)](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirectToMarketplace.html?entryId=5321178 "Install with Marketplace client")
 &nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;
-[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Drag%20to%20install&message=Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=4B0082&color=grey)](https://marketplace.eclipse.org/marketplace-client-intro?mpc_install=5321178 "Drag to your running Eclipse workspace. Requires Eclipse Marketplace Client")
+[![Eclipse Maven integration Marketplace entry](https://img.shields.io/static/v1?logo=eclipseide&label=Marketplace&message=View%20Eclipse%20m2e&style=for-the-badge&logoColor=white&labelColor=darkorange&color=grey)](https://marketplace.eclipse.org/content/eclipse-m2e-maven-support-eclipse-ide "Open Eclipse Marketplace entry")
 
 into your Eclipse-IDE, or use the Eclipse Marketplace Client directly from within the IDE.
 
