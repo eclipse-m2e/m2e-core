@@ -833,7 +833,6 @@ public class LifecycleMappingFactory {
    * <li>and so on</li>
    * </ol>
    * Returns empty list if no metadata sources are embedded/referenced by pom.xml
-   * @param mappingContext TODO
    *
    * @throws CoreException if metadata sources cannot be resolved or read
    */
@@ -873,19 +872,8 @@ public class LifecycleMappingFactory {
         maven.detachFromSession(project); // don't cache maven session
       }
 
-      // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
-      //      each instance takes ~1M, so we can easily save 100M+ of heap for larger workspaces
-      // TODO: wir brauchen einen parent-cache nicht einen cache der child->parent relation
+      project = mappingContext.determineParentFor(project, monitor);
 
-      MavenProject parent = mappingContext.determineResolvedParentFor(project);
-
-      if(parent == null) {
-        parent = maven.resolveParentProject(project, monitor);
-      }
-      if(parent != null) {
-        mappingContext.registerResolvedParent(parent);
-      }
-      project = parent;
     } while(project != null);
 
     return sources;

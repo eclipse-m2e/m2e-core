@@ -17,11 +17,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 
 
 /**
- * LifecycleMappingContext
+ * This class holds the context of a lifecycle mapping execution (typically on a set of {@link MavenProject}s
  *
  * @author caroso-de
  */
@@ -32,10 +38,12 @@ public class LifecycleMappingContext {
   private Map<String, MavenProject> mavenParentCache = new ConcurrentHashMap<>();
 
   /**
-   * @param project
-   * @return
+   * determines the maven parent for the given project either by leveraging a built-in cache or by using {@link IMaven}
+   * 
+   * @param project a {@link MavenProject} to determine the parent for
+   * @return the maven parent or <b>null</b> if none can be determined
    */
-  public MavenProject getResolvedParent(MavenProject project, IProgressMonitor monitor) {
+  public MavenProject determineParentFor(MavenProject project, IProgressMonitor monitor) {
     if(project == null) {
       return null;
     }
@@ -47,9 +55,10 @@ public class LifecycleMappingContext {
     } else {
       return null;
     }
+
     return mavenParentCache.computeIfAbsent(parentId, id -> {
-      IMaven maven = MavenPlugin.getMaven();
       try {
+        IMaven maven = MavenPlugin.getMaven();
         return maven.resolveParentProject(project, monitor);
       } catch(CoreException ex) {
         LOG.error("Failed to resolve parent project of " + project.getId(), ex);
@@ -57,31 +66,4 @@ public class LifecycleMappingContext {
       }
     });
   }
-    if(project == null) {
-      return null;
-    }
-    MavenProject parentProject = null;
-
-    if(project.getParent() != null) {
-      parentProject = mavenParentCache.get(project.getParent().getId());
-    } else if(project.getParentArtifact() != null) {
-      parentProject = mavenParentCache.get(project.getParentArtifact().getId());
-    } else {
-      return null;
-    }
-
-    LOG.info("parent cache {} for child {}", parentProject != null ? "HIT" : "MISS", project.getId());
-    return parentProject;
-  }
-
-  /**
-   * @param parent
-   */
-  public void registerResolvedParent(MavenProject parent) {
-    if(parent != null) {
-      mavenParentCache.put(parent.getId(), parent);
-    }
-
-  }
-
 }
