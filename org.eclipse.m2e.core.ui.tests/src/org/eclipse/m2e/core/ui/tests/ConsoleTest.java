@@ -33,13 +33,11 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.TextConsole;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ConsoleTest extends AbstractMavenProjectTestCase {
 
   @Test
-  @Ignore("test shwos no console output")
   public void testConsoleHasOutput() throws Exception {
 	  var launchManager = DebugPlugin.getDefault().getLaunchManager();
 	  var configName = launchManager.generateLaunchConfigurationName("testConsole");
