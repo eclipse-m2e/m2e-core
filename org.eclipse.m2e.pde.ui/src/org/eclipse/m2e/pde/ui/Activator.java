@@ -15,6 +15,7 @@ package org.eclipse.m2e.pde.ui;
 import org.eclipse.m2e.pde.ui.adapter.DependencyNodeAdapterFactory;
 import org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory;
 import org.eclipse.m2e.pde.ui.adapter.MavenTargetBundleAdapterFactory;
+import org.eclipse.m2e.pde.ui.adapter.MavenTargetDependencyAdapterFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -34,6 +35,7 @@ public class Activator implements BundleActivator {
 		MavenTargetAdapterFactory.LABEL_PROVIDER.dispose();
 		MavenTargetAdapterFactory.TREE_CONTENT_PROVIDER.dispose();
 		MavenTargetBundleAdapterFactory.LABEL_PROVIDER.dispose();
+		MavenTargetDependencyAdapterFactory.LABEL_PROVIDER.dispose();
 	}
 
 }

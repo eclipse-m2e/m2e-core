@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetBundle;
+import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.MissingMetadataMode;
 import org.eclipse.m2e.pde.ui.Activator;
@@ -51,6 +52,12 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 					MavenTargetBundle bundle = location.getMavenTargetBundle(node.getArtifact());
 					return bundle != null && bundle.isWrapped();
 				}
+				// or a target dependency
+				if (lastSegment instanceof MavenTargetDependency) {
+					MavenTargetDependency dependency = (MavenTargetDependency) lastSegment;
+					MavenTargetBundle bundle = location.getMavenTargetBundle(dependency);
+					return bundle != null && bundle.isWrapped();
+				}
 			}
 		}
 		return false;
@@ -69,40 +76,50 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			Object lastSegment = treePath.getLastSegment();
 			if (lastSegment instanceof DependencyNode) {
 				DependencyNode node = (DependencyNode) lastSegment;
-				Artifact artifact = node.getArtifact();
-				BNDInstructions instructions = location.getInstructions(artifact);
-				MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions) {
-					@Override
-					public boolean performFinish() {
-						boolean finish = super.performFinish();
-						if (finish) {
-							BNDInstructions instructions = getInstructions();
-							List<BNDInstructions> updatedInstructions = new ArrayList<>();
-							updatedInstructions.add(instructions);
-							for (BNDInstructions existing : location.getInstructions()) {
-								if (existing.getKey().equals(instructions.getKey())) {
-									continue;
-								}
-								updatedInstructions.add(instructions);
-							}
-							MavenTargetLocation update = location.withInstructions(updatedInstructions);
-							ITargetLocation[] locations = target.getTargetLocations();
-							for (int i = 0; i < locations.length; i++) {
-								if (locations[i] == location) {
-									locations[i] = update;
-									break;
-								}
-							}
-							target.setTargetLocations(locations);
-						}
-						return finish;
-					}
-				};
-				wizard.setWindowTitle(wizard.getWindowTitle() + " [" + artifact + "]");
-				return wizard;
+				return edit(target, location, node.getArtifact());
+			}
+			if (lastSegment instanceof MavenTargetDependency) {
+				MavenTargetBundle bundle = location.getMavenTargetBundle((MavenTargetDependency) lastSegment);
+				if (bundle != null) {
+					return edit(target, location, bundle.getArtifact());
+				}
+
 			}
 		}
 		return null;
+	}
+
+	private IWizard edit(ITargetDefinition target, MavenTargetLocation location, Artifact artifact) {
+		BNDInstructions instructions = location.getInstructions(artifact);
+		MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions) {
+			@Override
+			public boolean performFinish() {
+				boolean finish = super.performFinish();
+				if (finish) {
+					BNDInstructions instructions = getInstructions();
+					List<BNDInstructions> updatedInstructions = new ArrayList<>();
+					updatedInstructions.add(instructions);
+					for (BNDInstructions existing : location.getInstructions()) {
+						if (existing.getKey().equals(instructions.getKey())) {
+							continue;
+						}
+						updatedInstructions.add(instructions);
+					}
+					MavenTargetLocation update = location.withInstructions(updatedInstructions);
+					ITargetLocation[] locations = target.getTargetLocations();
+					for (int i = 0; i < locations.length; i++) {
+						if (locations[i] == location) {
+							locations[i] = update;
+							break;
+						}
+					}
+					target.setTargetLocations(locations);
+				}
+				return finish;
+			}
+		};
+		wizard.setWindowTitle(wizard.getWindowTitle() + " [" + artifact + "]");
+		return wizard;
 	}
 
 	@Override
