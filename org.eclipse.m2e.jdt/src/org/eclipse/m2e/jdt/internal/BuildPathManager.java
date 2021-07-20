@@ -75,7 +75,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -331,14 +330,17 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
         ArtifactKey aKey = desc.getArtifactKey();
         if(aKey != null) { // maybe we should try to find artifactKey little harder here?
+          boolean isSnapshot = aKey.getVersion().endsWith("-SNAPSHOT");
           // We should update a sources/javadoc jar for a snapshot in case they're already downloaded.
           File plainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
           File srcFile = srcPath != null ? srcPath.toFile() : null;
           boolean downloadSources = (srcPath == null && mavenConfiguration.isDownloadSources())
-              || (plainFile != null && plainFile.canRead() && srcFile != null && srcFile.canRead());
+              || (plainFile != null && plainFile.canRead() && srcFile != null && srcFile.canRead() && isSnapshot
+                  && srcFile.lastModified() < plainFile.lastModified());
           File javaDocFile = javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
           boolean downloadJavaDoc = (javaDocUrl == null && mavenConfiguration.isDownloadJavaDoc())
-              || (plainFile != null && plainFile.canRead() && javaDocFile != null && javaDocFile.canRead());
+              || (plainFile != null && plainFile.canRead() && javaDocFile != null && javaDocFile.canRead() && isSnapshot
+                  && javaDocFile.lastModified() < plainFile.lastModified());
 
           scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
               downloadJavaDoc);
@@ -352,29 +354,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
     return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR /*type*/,
         a.getClassifier(), repositories);
-  }
-
-  /*
-   * Returns 'true' if a snapshot sources/javadoc jar doesn't exist locally or it exists and is outdated (its lastModificationTime 
-   * is less than lastModificationTime of according plain jar). 
-   * Returns 'false' only if a snapshot sources/javadoc jar exists locally and is not outdated (no need to be re-downloaded)
-   */
-  private boolean isOutdatedSnapshot(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    Artifact artifact = maven.lookup(RepositorySystem.class).createArtifactWithClassifier(a.getGroupId(),
-        a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR, a.getClassifier());
-    ArtifactRepository localRepository = maven.getLocalRepository();
-
-    File artifactFile = new File(localRepository.getBasedir(), localRepository.pathOf(artifact));
-
-    if(artifactFile.canRead()) {
-      // artifact is available locally
-      Artifact artifactBin = maven.lookup(RepositorySystem.class).createArtifactWithClassifier(a.getGroupId(),
-          a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR, null);
-      File artifacBintFile = new File(localRepository.getBasedir(), localRepository.pathOf(artifactBin));
-      return artifactFile.lastModified() < artifacBintFile.lastModified();
-    }
-
-    return true;
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -940,12 +919,11 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           if(getAttachedArtifactFile(a, CLASSIFIER_JAVADOC) == null) {
             downloadJavaDoc = true;
           }
-        } else if(isOutdatedSnapshot(sourcesArtifact, repositories)) {
+        } else {
           result[0] = sourcesArtifact;
         }
       }
-      if(downloadJavaDoc
-          && (!isUnavailable(javadocArtifact, repositories) && isOutdatedSnapshot(javadocArtifact, repositories))) {
+      if(downloadJavaDoc && !isUnavailable(javadocArtifact, repositories)) {
         result[1] = javadocArtifact;
       }
     }
