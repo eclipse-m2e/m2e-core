@@ -48,10 +48,11 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				mode = MissingMetadataMode.ERROR;
 			}
 			String dependencyScope = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPE);
+			List<MavenTargetDependency> dependencies = new ArrayList<>();
+			List<MavenTargetRepository> repositories = new ArrayList<>();
 
 			NodeList dependencyNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_DEPENDENCY);
 			int dependencyLength = dependencyNodeList.getLength();
-			List<MavenTargetDependency> dependencies = new ArrayList<>();
 			if (dependencyLength == 0) {
 				// backward compatibility for older formats
 				dependencies.add(parseDependency(location));
@@ -63,6 +64,18 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 					}
 				}
 			}
+			NodeList repositoryNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_REPOSITORY);
+			int repositoryLength = repositoryNodeList.getLength();
+			for (int i = 0; i < repositoryLength; i++) {
+				Node item = repositoryNodeList.item(i);
+				if (item instanceof Element) {
+					Element element = (Element) item;
+					repositories
+							.add(new MavenTargetRepository(getText(MavenTargetLocation.ELEMENT_REPOSITORY_ID, element),
+									getText(MavenTargetLocation.ELEMENT_REPOSITORY_URL, element)));
+				}
+			}
+
 			NodeList instructionsNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
 			NodeList excludesNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_EXCLUDED);
 			List<BNDInstructions> instructions = new ArrayList<>();
@@ -84,7 +97,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 					excludes.add(((Element) item).getTextContent());
 				}
 			}
-			return new MavenTargetLocation(dependencies, mode, dependencyScope,
+			return new MavenTargetLocation(dependencies, repositories, mode, dependencyScope,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
 					instructions, excludes);
 		} catch (Exception e) {

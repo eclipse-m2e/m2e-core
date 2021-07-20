@@ -67,15 +67,18 @@ public class MavenTargetDependencyEditor {
 
 			}
 		});
-		for (MavenTargetDependency dependency : initialItems) {
-			add(dependency.copy());
+		if (initialItems.isEmpty()) {
+			add(new MavenTargetDependency("", "", "", "", ""));
+		} else {
+			for (MavenTargetDependency dependency : initialItems) {
+				add(dependency.copy());
+			}
 		}
 		tabFolder.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.item == addItem) {
-
 					Clipboard clipboard = new Clipboard(e.display);
 					String text = (String) clipboard.getContents(TextTransfer.getInstance());
 					clipboard.dispose();
@@ -90,8 +93,8 @@ public class MavenTargetDependencyEditor {
 					}
 					Exception clipboardError = clipboardParser.getError();
 					if (clipboardError != null) {
-						Platform.getLog(MavenTargetLocationWizard.class).warn(MessageFormat
-								.format(Messages.ClipboardParser_1, clipboardError.getMessage()));
+						Platform.getLog(MavenTargetLocationWizard.class)
+								.warn(MessageFormat.format(Messages.ClipboardParser_1, clipboardError.getMessage()));
 					}
 
 				}
@@ -103,7 +106,6 @@ public class MavenTargetDependencyEditor {
 			}
 		});
 
-
 	}
 
 	private void add(MavenTargetDependency dependency) {
@@ -111,7 +113,6 @@ public class MavenTargetDependencyEditor {
 		newItem.setData(EDITOR_KEY, new DependencyEditor(tabFolder, dependency, newItem));
 		newItem.setData(DEPENDENCY_KEY, dependency);
 		tabFolder.setSelection(newItem);
-
 	}
 
 	public Control getControl() {
@@ -161,6 +162,9 @@ public class MavenTargetDependencyEditor {
 				}
 			});
 			item.setControl(composite);
+			parent.getDisplay().asyncExec(() -> {
+				((Control) groupId.getWidget()).forceFocus();
+			});
 		}
 
 	}
