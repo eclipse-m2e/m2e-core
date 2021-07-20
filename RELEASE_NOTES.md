@@ -2,6 +2,60 @@
 
 ### Next release
 
+#### the m2e-pde editor now supports adding more than one dependency per target location:
+
+![grafik](https://user-images.githubusercontent.com/1331477/126075863-ee075afb-c4e1-423d-acc0-8174905378dd.png)
+![grafik](https://user-images.githubusercontent.com/1331477/126106751-892626dc-46d5-45a5-841b-beff82085de0.png)
+
+```
+<target name="multipleElements">
+<locations>
+	<location includeDependencyScope="compile" includeSource="true" missingManifest="generate" type="Maven">
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>11.0.3</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>11.0.3</version>
+			<type>jar</type>
+		</dependency>
+	</location>
+</locations>
+</target>
+```
+
+Old target formats are automatically converted.
+
+#### the m2e-pde editor now supports adding additional maven repoistories for a target location:
+
+![grafik](https://user-images.githubusercontent.com/1331477/126276711-8e42165c-01bd-4d79-a28b-441bbc7c9fc7.png)
+
+```
+<target name="extraRepository">
+	<locations>
+		<location includeDependencyScope="compile" includeSource="true" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+				  <groupId>edu.ucar</groupId>
+				  <artifactId>cdm</artifactId>
+				  <version>5.0.0</version>
+				</dependency>
+			</dependencies>
+			<repositories>
+				<repository>
+					<id>unidata-all</id>
+					<url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
+				</repository>
+			</repositories>
+		</location>
+	</locations>
+</target>
+```
+
 ## 1.18.1
 
 * 📅 Release Date: June 23rd, 2021

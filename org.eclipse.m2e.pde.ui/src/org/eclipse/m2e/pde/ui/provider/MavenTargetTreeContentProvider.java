@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 
 public class MavenTargetTreeContentProvider implements ITreeContentProvider {
@@ -29,15 +30,12 @@ public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) parentElement;
-			List<DependencyNode> nodes = location.getDependencyNodes();
-			if (nodes != null) {
-				for (DependencyNode dependencyNode : nodes) {
-					if (dependencyNode.getData().containsKey(MavenTargetLocation.DEPENDENCYNODE_IS_ROOT)) {
-						dependencyNode.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parentElement);
-						return getChildren(dependencyNode);
-					}
-				}
+			List<MavenTargetDependency> roots = location.getRoots();
+			if (roots.size() == 1) {
+				return getDependecyChilds(roots.get(0), parentElement);
 			}
+			Object[] array = roots.toArray();
+			return array;
 		} else if (parentElement instanceof DependencyNode) {
 			DependencyNode[] dependencyNodes = ((DependencyNode) parentElement).getChildren()
 					.toArray(new DependencyNode[0]);
@@ -45,8 +43,24 @@ public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 				dependencyNode.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parentElement);
 			}
 			return dependencyNodes;
+		} else if (parentElement instanceof MavenTargetDependency) {
+			return getDependecyChilds((MavenTargetDependency) parentElement, parentElement);
 		}
-		return null;
+		return new Object[0];
+	}
+
+	private Object[] getDependecyChilds(MavenTargetDependency targetDependency, Object parentElement) {
+
+		List<DependencyNode> nodes = targetDependency.getDependencyNodes();
+		if (nodes != null) {
+			for (DependencyNode dependencyNode : nodes) {
+				if (dependencyNode.getData().containsKey(MavenTargetLocation.DEPENDENCYNODE_ROOT)) {
+					dependencyNode.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parentElement);
+					return getChildren(dependencyNode);
+				}
+			}
+		}
+		return new Object[0];
 	}
 
 	@Override
@@ -56,7 +70,7 @@ public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 			Object parent = dependencyNode.getData().get(MavenTargetLocation.DEPENDENCYNODE_PARENT);
 			if (parent instanceof DependencyNode) {
 				DependencyNode dp = (DependencyNode) parent;
-				if (dp.getData().containsKey(MavenTargetLocation.DEPENDENCYNODE_IS_ROOT)) {
+				if (dp.getData().containsKey(MavenTargetLocation.DEPENDENCYNODE_ROOT)) {
 					return getParent(dp);
 				}
 			}
@@ -69,11 +83,14 @@ public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 	public boolean hasChildren(Object element) {
 		if (element instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) element;
-			List<DependencyNode> dependencyNodes = location.getDependencyNodes();
-			return dependencyNodes != null && !dependencyNodes.isEmpty();
+			return location.getRoots().size() > 0;
 		} else if (element instanceof DependencyNode) {
 			DependencyNode node = (DependencyNode) element;
 			return !node.getChildren().isEmpty();
+		} else if (element instanceof MavenTargetDependency) {
+			MavenTargetDependency targetDependency = (MavenTargetDependency) element;
+			List<DependencyNode> dependencyNodes = targetDependency.getDependencyNodes();
+			return dependencyNodes != null && !dependencyNodes.isEmpty();
 		}
 		return false;
 	}
