@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -27,6 +28,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetLocation;
+import org.eclipse.m2e.pde.MavenTargetRepository;
 import org.eclipse.m2e.pde.MissingMetadataMode;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
@@ -43,6 +45,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class MavenTargetLocationWizard extends Wizard implements ITargetLocationWizard {
 
@@ -53,6 +56,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private BNDInstructions bndInstructions;
 	private Button includeSource;
 	private MavenTargetDependencyEditor dependencyEditor;
+	private List<MavenTargetRepository> repositoryList = new ArrayList<>();
 
 	public MavenTargetLocationWizard() {
 		this(null);
@@ -61,6 +65,11 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
+		if (targetLocation != null) {
+			for (MavenTargetRepository mavenTargetRepository : targetLocation.getExtraRepositories()) {
+				repositoryList.add(mavenTargetRepository.copy());
+			}
+		}
 		WizardPage page = new WizardPage(
 				targetLocation == null ? Messages.MavenTargetLocationWizard_1 : Messages.MavenTargetLocationWizard_2) {
 
@@ -72,6 +81,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				Composite composite = new Composite(parent, SWT.NONE);
 				setControl(composite);
 				composite.setLayout(new GridLayout(2, false));
+				createRepositoryLink(composite);
 				dependencyEditor = new MavenTargetDependencyEditor(composite,
 						targetLocation == null ? Collections.emptyList() : targetLocation.getRoots());
 				GridData gd_dep = new GridData(GridData.FILL_BOTH);
@@ -220,7 +230,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				list.add(bndInstructions);
 			}
 		}
-		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(),
+		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(), repositoryList,
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
 				includeSource.getSelection(), list, excludes);
 		if (targetLocation == null) {
@@ -235,6 +245,42 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			targetDefinition.setTargetLocations(locations);
 		}
 		return true;
+	}
+
+	private void createRepositoryLink(Composite composite) {
+		GridData gd_link = new GridData();
+		gd_link.horizontalSpan = 2;
+		Link link = new Link(composite, SWT.NONE);
+		link.setText(Messages.MavenTargetLocationWizard_12);
+		link.setLayoutData(gd_link);
+		link.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if ("#maven".equals(e.text)) {
+					PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(composite.getShell(),
+							"org.eclipse.m2e.core.preferences.MavenSettingsPreferencePage",
+							new String[] { "org.eclipse.m2e.core.preferences.MavenSettingsPreferencePage",
+									"org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage",
+									"org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage",
+									"org.eclipse.m2e.core.ui.preferences.UserInterfacePreferencePage",
+									"org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage",
+									"org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag" },
+							null);
+					dialog.open();
+				} else if ("#configure".equals(e.text)) {
+					MavenTargetRepositoryEditor editor = new MavenTargetRepositoryEditor(composite.getShell(),
+							repositoryList);
+					editor.open();
+				}
+
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+		});
 	}
 
 }

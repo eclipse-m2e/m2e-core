@@ -72,6 +72,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_EXCLUDED = "exclude";
 	public static final String ELEMENT_DEPENDENCY = "dependency";
 	public static final String ELEMENT_DEPENDENCIES = "dependencies";
+	public static final String ELEMENT_REPOSITORY = "repository";
+	public static final String ELEMENT_REPOSITORY_ID = "id";
+	public static final String ELEMENT_REPOSITORY_URL = "url";
+	public static final String ELEMENT_REPOSITORIES = "repositories";
+
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
@@ -93,11 +98,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
 	private final boolean includeSource;
 	private final List<MavenTargetDependency> roots;
+	private final List<MavenTargetRepository> extraRepositories;
 
-	public MavenTargetLocation(Collection<MavenTargetDependency> rootDependecies, MissingMetadataMode metadataMode,
+	public MavenTargetLocation(Collection<MavenTargetDependency> rootDependecies,
+			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
 			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
 			Collection<String> excludes) {
 		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
+		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
 		this.includeSource = includeSource;
@@ -118,7 +126,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			ignoredArtifacts.clear();
 			targetBundles = new HashMap<>();
 			IMaven maven = MavenPlugin.getMaven();
-			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
+			List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
+			for (MavenTargetRepository extraRepository : extraRepositories) {
+				ArtifactRepository repository = maven.createArtifactRepository(extraRepository.getId(),
+						extraRepository.getUrl());
+				repositories.add(repository);
+			}
 			SubMonitor subMonitor = SubMonitor.convert(monitor, roots.size() * 100);
 			for (MavenTargetDependency root : roots) {
 				resolveDependency(root, maven, repositories, cacheManager, subMonitor.split(100));
@@ -127,6 +140,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		TargetBundle[] bundles = targetBundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
 				.map(Entry::getValue).toArray(TargetBundle[]::new);
 		return bundles;
+	}
+
+	public List<MavenTargetRepository> getExtraRepositories() {
+		return extraRepositories;
 	}
 
 	private void resolveDependency(MavenTargetDependency root, IMaven maven, List<ArtifactRepository> repositories,
@@ -224,8 +241,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			IMaven maven = MavenPlugin.getMaven();
 			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
 			IMavenExecutionContext context = maven.createExecutionContext();
-			List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-			List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
+			List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
+			for (MavenTargetRepository extraRepository : extraRepositories) {
+				ArtifactRepository repository = maven.createArtifactRepository(extraRepository.getId(),
+						extraRepository.getUrl());
+				repositories.add(repository);
+			}
+			List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(repositories);
 			VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
 			VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
 
@@ -255,8 +277,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 
-		return new MavenTargetLocation(latest, metadataMode, dependencyScope, includeSource, instructionsMap.values(),
-				excludedArtifacts);
+		return new MavenTargetLocation(latest, extraRepositories, metadataMode, dependencyScope, includeSource,
+				instructionsMap.values(), excludedArtifacts);
 
 	}
 
@@ -265,8 +287,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
-		return new MavenTargetLocation(roots, metadataMode, dependencyScope, includeSource, instructions,
-				excludedArtifacts);
+		return new MavenTargetLocation(roots, extraRepositories, metadataMode, dependencyScope, includeSource,
+				instructions, excludedArtifacts);
 	}
 
 	public BNDInstructions getInstructions(Artifact artifact) {
@@ -371,7 +393,17 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			});
 			xml.append("</" + ELEMENT_DEPENDENCIES + ">");
 		}
-
+		if (!extraRepositories.isEmpty()) {
+			xml.append("<" + ELEMENT_REPOSITORIES + ">");
+			extraRepositories.stream().sorted(Comparator.comparing(MavenTargetRepository::getUrl))
+					.forEach(repository -> {
+						xml.append("<" + ELEMENT_REPOSITORY + ">");
+						element(xml, ELEMENT_REPOSITORY_ID, repository.getId());
+						element(xml, ELEMENT_REPOSITORY_URL, repository.getUrl());
+						xml.append("</" + ELEMENT_REPOSITORY + ">");
+					});
+			xml.append("</" + ELEMENT_REPOSITORIES + ">");
+		}
 		instructionsMap.values().stream().filter(Predicate.not(BNDInstructions::isEmpty))
 				.sorted(Comparator.comparing(BNDInstructions::getKey)).forEach(bnd -> {
 					String instructions = bnd.getInstructions();

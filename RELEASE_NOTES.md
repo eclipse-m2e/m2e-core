@@ -30,6 +30,32 @@
 
 Old target formats are automatically converted.
 
+#### the m2e-pde editor now supports adding additional maven repoistories for a target location:
+
+![grafik](https://user-images.githubusercontent.com/1331477/126276711-8e42165c-01bd-4d79-a28b-441bbc7c9fc7.png)
+
+```
+<target name="extraRepository">
+	<locations>
+		<location includeDependencyScope="compile" includeSource="true" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+				  <groupId>edu.ucar</groupId>
+				  <artifactId>cdm</artifactId>
+				  <version>5.0.0</version>
+				</dependency>
+			</dependencies>
+			<repositories>
+				<repository>
+					<id>unidata-all</id>
+					<url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
+				</repository>
+			</repositories>
+		</location>
+	</locations>
+</target>
+```
+
 ## 1.18.1
 
 * 📅 Release Date: June 23rd, 2021
