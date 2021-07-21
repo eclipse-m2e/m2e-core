@@ -1,6 +1,6 @@
 .classpath
 .settings/
 *.log
-META-INF/
+**/META-INF/MANIFEST.MF
 jars/
 !**/metadataTemplates/*

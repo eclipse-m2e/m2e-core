@@ -26,6 +26,7 @@
 	<properties>
 		<archetype-common.version>2.4</archetype-common.version>
 		<dependency.jars.folder>jars</dependency.jars.folder>
+		<dependency.sources.folder>jars/sources</dependency.sources.folder>
 		<metadata.templates.folder>metadataTemplates</metadata.templates.folder>
 	</properties>
 
@@ -132,6 +133,51 @@
 				</pluginManagement>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-clean-plugin</artifactId>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${dependency.jars.folder}</directory>
+								</fileset>
+							</filesets>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.2.0</version>
+						<configuration>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<excludeScope>provided</excludeScope>
+							<includeScope>runtime</includeScope><!-- only include runtime and compile time dependencies, not test or provided! -->
+						</configuration>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<phase>generate-sources</phase>
+								<configuration>
+									<outputDirectory>${project.basedir}/${dependency.jars.folder}</outputDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-dependency-sources</id>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<phase>generate-sources</phase>
+								<configuration>
+									<outputDirectory>${project.basedir}/${dependency.sources.folder}</outputDirectory>
+									<classifier>sources</classifier>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 						<groupId>org.apache.felix</groupId>
 						<artifactId>maven-bundle-plugin</artifactId>
 						<configuration>
@@ -139,7 +185,7 @@
 						<executions>
 							<execution>
 								<goals>
-									<goal>bundle</goal>
+									<goal>manifest</goal>
 								</goals>
 								<phase>generate-sources</phase>
 							</execution>
@@ -167,21 +213,6 @@
 												<echo message="Skip pom project" />
 											</then>
 											<else>
-												<echo message="Delete generated files in '${project.basedir}'" level="info" />
-												<delete includeemptydirs="true" failonerror="false">
-													<fileset dir="${project.basedir}">
-														<include name="${dependency.jars.folder}/**/" />
-														<include name="META-INF/*" />
-														<include name=".classpath" />
-													</fileset>
-												</delete>
-												<unzip dest="${project.basedir}">
-													<fileset file="${project.build.directory}/${project.build.finalName}.jar" />
-													<patternset>
-														<include name="META-INF/*" />
-														<include name="${dependency.jars.folder}/*" />
-													</patternset>
-												</unzip>
 												<!-- create the property 'dependency.jars.lib.entries' that contains the classpath entries for all dependency
 													libs and that is exported from ant to maven and used when the .classpath template files are filtered. -->
 												<var name="dependency.jars.lib.entries" value="" />
@@ -189,9 +220,9 @@
 													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
 													<sequential>
 														<local name="jarFilename" />
-														<basename property="jarFilename" file="@{jarFile}" />
+														<basename property="jarFilename" file="@{jarFile}" suffix=".jar"/>
 														<local name="lib.entry" />
-														<property name="lib.entry"><![CDATA[<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}"/>]]></property>
+														<property name="lib.entry"><![CDATA[<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}.jar"  sourcepath="${dependency.sources.folder}/${jarFilename}-sources.jar"/>]]></property>
 														<var name="dependency.jars.lib.entries" value="${dependency.jars.lib.entries}&#xA;&#x9;${lib.entry}" />
 													</sequential>
 												</for>
