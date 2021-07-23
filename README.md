@@ -29,6 +29,8 @@ into your Eclipse-IDE, or use the Eclipse Marketplace Client directly from withi
 
 Alternatively, you can install the lastest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository: https://download.eclipse.org/technology/m2e/releases/latest/
 
+To use the latest snapshot build, you can use this p2 repository: https://download.eclipse.org/technology/m2e/snapshots/latest/
+
 ## 📢 Release notes
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md)
