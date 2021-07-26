@@ -9,8 +9,4 @@
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="output" path="target/classes"/>
 	${dependency.jars.lib.entries}
-	<!--
-	TODO: simply use the Maven-Classpath-Container entry. Then this does not need to be copied?! This should also include the sources?!  
-	And for the long term create a directory jars classpath container?! use JDTCore.newLibraryEntry to create an entry for each jar in a directory (think about the sources?!).
-	-->
 </classpath>

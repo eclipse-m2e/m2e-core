@@ -1,1 +1,0 @@
-#just here to silence PDE warnings. This file is not intended to be contained in the finally build jars.

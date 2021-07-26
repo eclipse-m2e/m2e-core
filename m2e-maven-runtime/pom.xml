@@ -98,14 +98,6 @@
 	<profiles>
 		<profile>
 			<id>generate-osgi-metadata</id>
-			<!-- TODO:
-				<activation>
-
-				<property>
-				<name>m2e.version</name>
-				</property>
-				</activation>
-			-->
 			<build>
 				<pluginManagement>
 					<plugins>
@@ -196,7 +188,7 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>unpack-jars-and-manifest-and-generate-classpathentires</id>
+								<id>generate-classpath-entires</id>
 								<goals>
 									<goal>run</goal>
 								</goals>
