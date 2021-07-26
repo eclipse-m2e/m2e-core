@@ -37,7 +37,7 @@
 			This should usually be sync'd with the main feature version. -->
 		<m2e.version>1.18.2</m2e.version>
 
-		<tycho-version>2.3.0</tycho-version>
+		<tycho-version>2.4.0</tycho-version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -153,6 +153,16 @@
 						</filter>
 					</filters>
 				</configuration>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>default-target-platform</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>target-platform</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
