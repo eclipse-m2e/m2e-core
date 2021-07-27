@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -68,7 +69,7 @@ public class MavenTargetDependencyEditor {
 			}
 		});
 		if (initialItems.isEmpty()) {
-			add(new MavenTargetDependency("", "", "", "", ""));
+			addNewItems(parent.getDisplay());
 		} else {
 			for (MavenTargetDependency dependency : initialItems) {
 				add(dependency.copy());
@@ -79,24 +80,7 @@ public class MavenTargetDependencyEditor {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.item == addItem) {
-					Clipboard clipboard = new Clipboard(e.display);
-					String text = (String) clipboard.getContents(TextTransfer.getInstance());
-					clipboard.dispose();
-					ClipboardParser clipboardParser = new ClipboardParser(text);
-					List<MavenTargetDependency> dependencies = clipboardParser.getDependencies();
-					if (dependencies.isEmpty()) {
-						add(new MavenTargetDependency("", "", "", "", ""));
-					} else {
-						for (MavenTargetDependency mavenTargetDependency : dependencies) {
-							add(mavenTargetDependency);
-						}
-					}
-					Exception clipboardError = clipboardParser.getError();
-					if (clipboardError != null) {
-						Platform.getLog(MavenTargetLocationWizard.class)
-								.warn(MessageFormat.format(Messages.ClipboardParser_1, clipboardError.getMessage()));
-					}
-
+					addNewItems(e.display);
 				}
 			}
 
@@ -106,6 +90,26 @@ public class MavenTargetDependencyEditor {
 			}
 		});
 
+	}
+
+	private void addNewItems(Display display) {
+		Clipboard clipboard = new Clipboard(display);
+		String text = (String) clipboard.getContents(TextTransfer.getInstance());
+		clipboard.dispose();
+		ClipboardParser clipboardParser = new ClipboardParser(text);
+		List<MavenTargetDependency> dependencies = clipboardParser.getDependencies();
+		if (dependencies.isEmpty()) {
+			add(new MavenTargetDependency("", "", "", "", ""));
+		} else {
+			for (MavenTargetDependency mavenTargetDependency : dependencies) {
+				add(mavenTargetDependency);
+			}
+		}
+		Exception clipboardError = clipboardParser.getError();
+		if (clipboardError != null) {
+			Platform.getLog(MavenTargetLocationWizard.class)
+					.warn(MessageFormat.format(Messages.ClipboardParser_1, clipboardError.getMessage()));
+		}
 	}
 
 	private void add(MavenTargetDependency dependency) {
