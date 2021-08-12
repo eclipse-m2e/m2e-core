@@ -153,16 +153,6 @@
 						</filter>
 					</filters>
 				</configuration>
-				<executions>
-					<execution>
-						<?m2e ignore?>
-						<id>default-target-platform</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>target-platform</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
