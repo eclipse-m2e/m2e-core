@@ -189,8 +189,6 @@ public class MavenPluginActivator extends Plugin {
       System.err.println("### executing start() " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
       new Throwable().printStackTrace();
     }
-    // Workaround MNG-6530
-    System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
 
     URLConnectionCaches.disable();
 
