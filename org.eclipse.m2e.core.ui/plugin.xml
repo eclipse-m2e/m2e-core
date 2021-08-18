@@ -380,6 +380,18 @@
             properties="workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey,isBuildDirectory"
             type="org.eclipse.core.runtime.IAdaptable"/>
       <propertyTester
+            id="org.eclipse.m2e.core.MavenPropertyTester"
+            class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
+            namespace="org.eclipse.m2e"
+            properties="hasMavenNature"
+            type="org.eclipse.core.resources.IResource"/>
+      <propertyTester
+            id="org.eclipse.m2e.core.MavenPropertyTester"
+            class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
+            namespace="org.eclipse.m2e"
+            properties="hasMavenNature"
+            type="org.eclipse.ui.IFileEditorInput"/>
+      <propertyTester
             id="org.eclipse.m2e.core.MavenPropertyTester2"
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
@@ -673,5 +685,22 @@
    </extension>
    <extension point="org.eclipse.m2e.core.archetypeCatalogs">
       <remote  url="https://repo1.maven.org/maven2/archetype-catalog.xml" description="Maven Central"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:project">
+            <command
+                  commandId="org.eclipse.m2e.core.ui.command.updateProject"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                   <with variable="activeEditorInput">
+                       <test property="org.eclipse.m2e.hasMavenNature" value="true"/>
+                   </with>
+                </visibleWhen>
+            </command>
+      </menuContribution>
    </extension>
 </plugin>
