@@ -15,10 +15,9 @@ package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -70,7 +69,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -156,54 +154,6 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     }
   }
 
-  public static void openEditor(IndexedArtifact ia, IndexedArtifactFile f, IProgressMonitor monitor) {
-    new OpenPomAction().openPomEditor(ia, f, monitor);
-  }
-
-  public void openPomEditor(IndexedArtifact ia, IndexedArtifactFile f, IProgressMonitor monitor) {
-    if(f == null || ia.getClassname() == null || ia.getPackageName() == null) {
-      return;
-    }
-
-    String groupId = f.getDependency().getGroupId();
-    String artifactId = f.getDependency().getArtifactId();
-    String version = f.getDependency().getVersion();
-
-    String name = ia.getClassname();
-    String fileName = ia.getPackageName().replace('.', '/') + "/" + ia.getClassname() + ".java"; //$NON-NLS-1$ //$NON-NLS-2$
-    String tooltip = groupId + ":" + artifactId + ":" + version + "/" + fileName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-    try {
-      IMaven maven = MavenPlugin.getMaven();
-
-      List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-
-      Artifact artifact = maven.resolve(groupId, artifactId, version, "java-source", "sources", artifactRepositories, //$NON-NLS-1$ //$NON-NLS-2$
-          monitor);
-
-      final File file = artifact.getFile();
-      if(file == null) {
-        openDialog(NLS.bind(Messages.OpenPomAction_error_download_source, tooltip));
-        return;
-      }
-
-      // that won't work if source archive have subfolders before actual source tree
-      String url = "jar:" + file.toURL().toString() + "!/" + fileName; //$NON-NLS-1$ //$NON-NLS-2$
-      InputStream is = new URL(url).openStream();
-      byte[] buff = readStream(is);
-
-      openEditor(new MavenPathStorageEditorInput(name + ".java", tooltip, url, buff), name + ".java"); //$NON-NLS-1$ //$NON-NLS-2$
-
-    } catch(IOException ex) {
-      String msg = NLS.bind(Messages.OpenPomAction_error_open_editor, name);
-      log.error(msg, ex);
-      openDialog(msg + "\n" + ex.toString()); //$NON-NLS-1$
-    } catch(CoreException ex) {
-      log.error(ex.getMessage(), ex);
-      openDialog(ex.getMessage() + "\n" + ex.toString()); //$NON-NLS-1$
-    }
-  }
-
   public static IEditorPart openEditor(String groupId, String artifactId, String version, IProgressMonitor monitor) {
     return openEditor(groupId, artifactId, version, null, monitor);
   }
@@ -239,8 +189,9 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
         File file = artifact.getFile();
         if(file != null) {
-          return openPomEditor(new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
-              readStream(new FileInputStream(file))), name);
+          return openPomEditor(
+              new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(), Files.readAllBytes(file.toPath())),
+              name);
         }
 
         openDialog(NLS.bind(Messages.OpenPomAction_error_download, name));
@@ -292,28 +243,6 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       r.run();
     } else {
       display.asyncExec(r);
-    }
-  }
-
-  private static byte[] readStream(InputStream is) throws IOException {
-    byte[] b = new byte[is.available()];
-    int len = 0;
-    while(true) {
-      int n = is.read(b, len, b.length - len);
-      if(n == -1) {
-        if(len < b.length) {
-          byte[] c = new byte[len];
-          System.arraycopy(b, 0, c, 0, len);
-          b = c;
-        }
-        return b;
-      }
-      len += n;
-      if(len == b.length) {
-        byte[] c = new byte[b.length + 1000];
-        System.arraycopy(b, 0, c, 0, len);
-        b = c;
-      }
     }
   }
 
