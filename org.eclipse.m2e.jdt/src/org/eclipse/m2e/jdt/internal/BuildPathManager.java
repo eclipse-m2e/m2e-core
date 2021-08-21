@@ -332,21 +332,22 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         if(aKey != null) { // maybe we should try to find artifactKey little harder here?
           boolean isSnapshot = aKey.getVersion().endsWith("-SNAPSHOT");
           // We should update a sources/javadoc jar for a snapshot in case they're already downloaded.
-          File plainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
+          File jarFile = desc.getPath() != null ? desc.getPath().toFile() : null;
           File srcFile = srcPath != null ? srcPath.toFile() : null;
           boolean downloadSources = (srcPath == null && mavenConfiguration.isDownloadSources())
-              || (plainFile != null && plainFile.canRead() && srcFile != null && srcFile.canRead() && isSnapshot
-                  && srcFile.lastModified() < plainFile.lastModified());
+              || (isSnapshot && isLastModifiedBefore(srcFile, jarFile));
           File javaDocFile = javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
           boolean downloadJavaDoc = (javaDocUrl == null && mavenConfiguration.isDownloadJavaDoc())
-              || (plainFile != null && plainFile.canRead() && javaDocFile != null && javaDocFile.canRead() && isSnapshot
-                  && javaDocFile.lastModified() < plainFile.lastModified());
-
+              || (isSnapshot && isLastModifiedBefore(javaDocFile, jarFile));
           scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
               downloadJavaDoc);
         }
       }
     }
+  }
+
+  private static boolean isLastModifiedBefore(File file, File ref) {
+    return ref != null && ref.canRead() && file != null && file.canRead() && file.lastModified() < ref.lastModified();
   }
 
   private static final String ARTIFACT_TYPE_JAR = "jar";
