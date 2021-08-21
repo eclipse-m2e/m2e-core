@@ -313,13 +313,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         if(aKey != null) { // maybe we should try to find artifactKey little harder here?
           boolean isSnapshot = aKey.getVersion().endsWith("-SNAPSHOT");
           // We should update a sources/javadoc jar for a snapshot in case they're already downloaded.
-          File mainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
+          File jarFile = desc.getPath() != null ? desc.getPath().toFile() : null;
           File srcFile = srcPath != null ? srcPath.toFile() : null;
           boolean downloadSources = (srcPath == null && mavenConfiguration.isDownloadSources())
-              || (isSnapshot && isLastModifiedBefore(srcFile, mainFile));
+              || (isSnapshot && isLastModifiedBefore(srcFile, jarFile));
           File javaDocFile = javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
           boolean downloadJavaDoc = (javaDocUrl == null && mavenConfiguration.isDownloadJavaDoc())
-              || (isSnapshot && isLastModifiedBefore(javaDocFile, mainFile));
+              || (isSnapshot && isLastModifiedBefore(javaDocFile, jarFile));
           scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
               downloadJavaDoc);
         }

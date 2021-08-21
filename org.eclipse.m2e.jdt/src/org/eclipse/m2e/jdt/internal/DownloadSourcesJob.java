@@ -130,6 +130,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private final BlockingQueue<DownloadRequest> queue = new LinkedBlockingQueue<>();
 
+  private Set<DownloadRequest> requests = new HashSet<>();
+
   private final Set<IProject> toUpdateMavenProjects = new HashSet<>();
 
   private final Map<IPackageFragmentRoot, Attachments> toUpdateAttachments = new HashMap<>();
@@ -156,6 +158,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         if(!status.isOK()) {
           // or maybe just log and ignore?
           queue.clear();
+          requests.clear();
           toUpdateAttachments.clear();
           toUpdateMavenProjects.clear();
           return status;
@@ -166,6 +169,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     }
     if(monitor.isCanceled()) {
       queue.clear();
+      requests.clear();
       toUpdateAttachments.clear();
       toUpdateMavenProjects.clear();
       return Status.CANCEL_STATUS;
@@ -179,6 +183,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       toUpdateAttachments.clear();
       toUpdateMavenProjects.clear();
     }
+    requests.clear(); // retain all elements in queue (in an efficient manner)
+    requests.addAll(queue); // queue might not be empty anymore (filled by updateClasspath)
     subMonitor.done();
     return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
   }
@@ -326,8 +332,10 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       return;
     }
     DownloadRequest request = new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc);
-    queue.add(request);
-    schedule(SCHEDULE_INTERVAL);
+    if(requests.add(request)) { // guard against new requests that are/will be already downloaded in this run to prevent endless loops
+      queue.add(request);
+      schedule(SCHEDULE_INTERVAL);
+    }
   }
 
   /**
