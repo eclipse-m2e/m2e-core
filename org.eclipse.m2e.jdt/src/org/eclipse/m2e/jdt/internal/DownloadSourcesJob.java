@@ -113,13 +113,9 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       this.sources = sources;
     }
 
-    /**
-     * @return
-     */
     public boolean isNotEmpty() {
       return sources != null || javadoc != null;
     }
-
   }
 
   private final IMaven maven;
@@ -183,8 +179,9 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       toUpdateAttachments.clear();
       toUpdateMavenProjects.clear();
     }
-    requests.clear(); // retain all elements in queue (in an efficient manner)
-    requests.addAll(queue); // queue might not be empty anymore (filled by updateClasspath)
+    // updateClasspath might has added new requests to the queue. 
+    requests.clear(); // Retain in requests all elements in queue (in an efficient manner)
+    requests.retainAll(queue);
     subMonitor.done();
     return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
   }
@@ -269,11 +266,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   }
 
   /**
-   * @param artifact
-   * @param repositories
-   * @param downloadSources
-   * @param downloadJavadoc
-   * @param monitor
    * @return null if no attachment was found, the found attachments otherwise
    * @throws CoreException
    */
