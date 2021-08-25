@@ -223,6 +223,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
+                 icon="icons/update_dependencies.png"
                  menubarPath="org.eclipse.m2e.core.fileMenu/update"
                  enablesFor="1"/>
          <visibility>
@@ -415,12 +416,12 @@
             id="org.eclipse.m2e.core.ui.command.addPlugin"
             name="%m2.shortcut.addPlugin">
       </command>
-       <command
+      <command
              categoryId="org.eclipse.ui.category.window"
              description="%command.updateproject.description"
              id="org.eclipse.m2e.core.ui.command.updateProject"
-             name="%m2.shortcut.updateProject">
-       </command>      
+             name="%m2.shortcut.updateMavenProject">
+      </command>
    </extension>
 
     <extension
@@ -693,6 +694,7 @@
             locationURI="menu:project">
             <command
                   commandId="org.eclipse.m2e.core.ui.command.updateProject"
+                  icon="icons/update_dependencies.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
