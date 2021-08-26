@@ -17,13 +17,17 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ui.IFileEditorInput;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -51,6 +55,8 @@ public class MavenPropertyTester extends PropertyTester {
   private static final String IS_BUILD_DIRECTORY = "isBuildDirectory"; //$NON-NLS-1$
 
   private static final String DEFAULT_BUILD_DIR = "target"; //$NON-NLS-1$
+
+  private static final String HAS_MAVEN_NATURE = "hasMavenNature"; //$NON-NLS-1$
 
   @Override
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
@@ -123,8 +129,28 @@ public class MavenPropertyTester extends PropertyTester {
       }
     }
 
+    if(HAS_MAVEN_NATURE.equals(property)) {
+      if(receiver instanceof IFileEditorInput) {
+        var editor = (IFileEditorInput) receiver;
+        return checkProjectNature(editor.getFile().getProject(), expectedValue);
+      }
+      if(receiver instanceof IResource) {
+        IProject project = ((IResource) receiver).getProject();
+        return checkProjectNature(project, expectedValue);
+      }
+    }
+
     return false;
 
+  }
+
+  private boolean checkProjectNature(IProject project, Object expectedValue) {
+    boolean expectedBoolean = expectedValue instanceof Boolean ? (Boolean) expectedValue : true;
+    try {
+      return project.hasNature(IMavenConstants.NATURE_ID) == expectedBoolean;
+    } catch(CoreException ex) {
+      throw new RuntimeException("Unable to get project natures for " + project + ", error= " + ex.getMessage(), ex);
+    }
   }
 
 }
