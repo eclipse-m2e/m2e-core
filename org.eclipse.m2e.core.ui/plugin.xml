@@ -703,12 +703,12 @@
                           <iterate>
                               <adapt
                                     type="org.eclipse.core.resources.IResource">
-                                   <test property="org.eclipse.m2e.hasMavenNature" value="true"/>
+                                   <test forcePluginActivation="true" property="org.eclipse.m2e.hasMavenNature" value="true"/>
                               </adapt>
                           </iterate>
                        </with>
                        <with variable="activeEditorInput">
-                           <test property="org.eclipse.m2e.hasMavenNature" value="true"/>
+                           <test forcePluginActivation="true" property="org.eclipse.m2e.hasMavenNature" value="true"/>
                        </with>
                    </or>
                 </visibleWhen>
