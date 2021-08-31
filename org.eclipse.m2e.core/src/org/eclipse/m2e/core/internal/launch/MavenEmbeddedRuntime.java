@@ -34,8 +34,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
-import org.codehaus.plexus.util.IOUtil;
-
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -73,18 +71,22 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     super(MavenRuntimeManagerImpl.EMBEDDED);
   }
 
+  @Override
   public boolean isEditable() {
     return false;
   }
 
+  @Override
   public String getLocation() {
     return MavenRuntimeManagerImpl.EMBEDDED;
   }
 
+  @Override
   public boolean isAvailable() {
     return true;
   }
 
+  @Override
   public void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException {
     collector.setMainType(MAVEN_EXECUTOR_CLASS, PLEXUS_CLASSWORLD_NAME);
@@ -171,6 +173,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     return Bundles.findDependencyBundle(m2eCore, MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME);
   }
 
+  @Override
   public String toString() {
     Bundle embedder = findMavenEmbedderBundle();
 
@@ -207,21 +210,16 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
       File mavenCoreJar = new File(mavenCoreJarPath);
       if(mavenCoreJar.isFile()) {
-        ZipFile zip = new ZipFile(mavenCoreJarPath);
-        try {
+        try (ZipFile zip = new ZipFile(mavenCoreJarPath)) {
           ZipEntry zipEntry = zip.getEntry(MAVEN_CORE_POM_PROPERTIES);
           if(zipEntry != null) {
             pomProperties.load(zip.getInputStream(zipEntry));
           }
-        } finally {
-          zip.close();
         }
       } else if(mavenCoreJar.isDirectory()) {
-        InputStream is = new BufferedInputStream(new FileInputStream(new File(mavenCoreJar, MAVEN_CORE_POM_PROPERTIES)));
-        try {
+        try (InputStream is = new BufferedInputStream(
+            new FileInputStream(new File(mavenCoreJar, MAVEN_CORE_POM_PROPERTIES)))) {
           pomProperties.load(is);
-        } finally {
-          IOUtil.close(is);
         }
       }
 
@@ -238,6 +236,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     return Messages.MavenEmbeddedRuntime_unknown;
   }
 
+  @Override
   public String getVersion() {
     Bundle bundle = findMavenEmbedderBundle();
     return getVersion(bundle);

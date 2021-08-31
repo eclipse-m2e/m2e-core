@@ -22,6 +22,7 @@ public class DefaultWorkspaceRuntime extends MavenWorkspaceRuntime {
     super(MavenRuntimeManagerImpl.WORKSPACE);
   }
 
+  @Override
   public boolean isEditable() {
     return false;
   }

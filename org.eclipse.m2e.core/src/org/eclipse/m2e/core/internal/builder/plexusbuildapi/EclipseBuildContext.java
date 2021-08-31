@@ -46,23 +46,28 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
     this.project = project;
   }
 
+  @Override
   public boolean hasDelta(String relpath) {
     return true;
   }
 
+  @Override
   @SuppressWarnings("rawtypes")
   public boolean hasDelta(List relpath) {
     return true;
   }
 
+  @Override
   public boolean hasDelta(File file) {
     return true;
   }
 
+  @Override
   public Scanner newDeleteScanner(File basedir) {
     return new EmptyScanner(basedir);
   }
 
+  @Override
   public Scanner newScanner(File basedir) {
     IPath relpath = getRelativePath(basedir);
     if(relpath != null) {
@@ -77,14 +82,17 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
     return ds;
   }
 
+  @Override
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
     return newScanner(basedir);
   }
 
+  @Override
   protected IProject getBaseResource() {
     return project;
   }
 
+  @Override
   public boolean isIncremental() {
     return false;
   }

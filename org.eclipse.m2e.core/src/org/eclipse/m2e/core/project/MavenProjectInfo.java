@@ -182,6 +182,7 @@ public class MavenProjectInfo {
     return this.profiles;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(obj instanceof MavenProjectInfo) {
       MavenProjectInfo info = (MavenProjectInfo) obj;
@@ -193,10 +194,12 @@ public class MavenProjectInfo {
     return false;
   }
 
+  @Override
   public int hashCode() {
     return pomFile == null ? 0 : pomFile.hashCode();
   }
 
+  @Override
   public String toString() {
     return "'" + label + "'" + (pomFile == null ? "" : " " + pomFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }

@@ -135,6 +135,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
 
   // IProjectRegistry
 
+  @Override
   public MavenProjectFacade getProjectFacade(IFile pom) {
     if(isClosed()) {
       return parent.getProjectFacade(pom);
@@ -142,6 +143,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return super.getProjectFacade(pom);
   }
 
+  @Override
   public MavenProjectFacade getProjectFacade(File pom) {
     if(isClosed()) {
       return parent.getProjectFacade(pom);
@@ -149,6 +151,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return super.getProjectFacade(pom);
   }
 
+  @Override
   public MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version) {
     if(isClosed()) {
       return parent.getProjectFacade(groupId, artifactId, version);
@@ -156,6 +159,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return super.getProjectFacade(groupId, artifactId, version);
   }
 
+  @Override
   public MavenProjectFacade[] getProjects() {
     if(isClosed()) {
       return parent.getProjects();
@@ -163,6 +167,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return super.getProjects();
   }
 
+  @Override
   public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
     if(isClosed()) {
       return parent.getWorkspaceArtifacts(groupId, artifactId);

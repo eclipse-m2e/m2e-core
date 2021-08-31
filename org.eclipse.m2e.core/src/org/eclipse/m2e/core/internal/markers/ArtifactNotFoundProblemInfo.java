@@ -46,6 +46,7 @@ public class ArtifactNotFoundProblemInfo extends MavenProblemInfo {
    *
    * @since 1.4.0
    */
+  @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
     if(artifact != null) {

@@ -52,6 +52,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
       this.packaging = packaging;
     }
 
+    @Override
     public int hashCode() {
       int hash = execution.hashCode();
       if(executionId != null) {
@@ -60,6 +61,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
       return hash;
     }
 
+    @Override
     public boolean equals(Object obj) {
       if(this == obj) {
         return true;
@@ -105,10 +107,12 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
       this.configuratorId = configuratorId;
     }
 
+    @Override
     public int hashCode() {
       return configuratorId.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
       if(this == obj) {
         return true;
@@ -184,10 +188,12 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
    * Mapping requirement key. Null if this mojo execution configuration is complete, i.e. mapped to ignore, execute or
    * error actions.
    */
+  @Override
   public ILifecycleMappingRequirement getLifecycleMappingRequirement() {
     return requirement;
   }
 
+  @Override
   public int hashCode() {
     int hash = execution.hashCode();
 
@@ -201,6 +207,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;

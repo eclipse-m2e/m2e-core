@@ -34,29 +34,36 @@ public class NoopLifecycleMapping extends AbstractLifecycleMapping {
    */
   public static final String LIFECYCLE_MAPPING_ID = "NULL";
 
+  @Override
   public String getId() {
     return LIFECYCLE_MAPPING_ID;
   }
 
+  @Override
   public String getName() {
     return "noop";
   }
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
+  @Override
   public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project, IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
+  @Override
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade project,
       IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 
+  @Override
   public boolean hasLifecycleMappingChanged(IMavenProjectFacade newFacade,
       ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor) {
     return false;

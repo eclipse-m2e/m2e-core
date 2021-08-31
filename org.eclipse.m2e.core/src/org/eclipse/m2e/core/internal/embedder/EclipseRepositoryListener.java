@@ -19,7 +19,6 @@ import javax.inject.Singleton;
 
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
-import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.artifact.Artifact;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -31,14 +30,16 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
  * Dispatches local repository events to registered ILocalRepositoryListener's
  */
 @Singleton
-public class EclipseRepositoryListener extends AbstractRepositoryListener implements RepositoryListener {
+public class EclipseRepositoryListener extends AbstractRepositoryListener {
 
   public static final String ROLE_HINT = "EclipseRepositoryListener";
 
+  @Override
   public void artifactInstalled(RepositoryEvent event) {
     notifyListeners(event);
   }
 
+  @Override
   public void artifactDownloaded(RepositoryEvent event) {
     notifyListeners(event);
   }

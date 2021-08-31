@@ -32,14 +32,17 @@ public class EclipseLoggerManager extends AbstractLoggerManager {
     this.logger = new EclipseLogger(mavenConfiguration);
   }
 
+  @Override
   public int getActiveLoggerCount() {
     return 1;
   }
 
+  @Override
   public Logger getLoggerForComponent(String arg0, String arg1) {
     return logger;
   }
 
+  @Override
   public int getThreshold() {
     return Logger.LEVEL_DEBUG;
   }
@@ -48,15 +51,18 @@ public class EclipseLoggerManager extends AbstractLoggerManager {
     return Logger.LEVEL_DEBUG;
   }
 
+  @Override
   public void returnComponentLogger(String arg0, String arg1) {
   }
 
+  @Override
   public void setThreshold(int arg0) {
   }
 
   public void setThreshold(String arg0, String arg1, int arg2) {
   }
 
+  @Override
   public void setThresholds(int arg0) {
   }
 

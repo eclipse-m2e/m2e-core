@@ -54,6 +54,7 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
     this.indexManager = indexManager;
   }
 
+  @Override
   public void addRepositories(RepositoryRegistry registry, IProgressMonitor monitor) throws CoreException {
     IExtensionPoint indexesExtensionPoint = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_INDEXES);
     if(indexesExtensionPoint != null) {

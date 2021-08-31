@@ -30,23 +30,17 @@ public abstract class AbstractProjectConversionEnabler implements IProjectConver
   private static final String[] PACKAGING_OPTIONS = {JAR};
 
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler#accept(org.eclipse.core.resources.IProject)
-   */
+  @Override
   public boolean accept(IProject project) {
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler#shouldProjectBeConverted(org.eclipse.core.resources.IProject)
-   */
+  @Override
   public IStatus canBeConverted(IProject project) {
     return Status.OK_STATUS;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler#getPackagingTypes(org.eclipse.core.resources.IProject)
-   */
+  @Override
   public String[] getPackagingTypes(IProject project) {
     return PACKAGING_OPTIONS;
   }

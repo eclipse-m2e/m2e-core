@@ -35,6 +35,7 @@ public class EquinoxLocker implements org.apache.maven.index.fs.Locker {
       this.locker = locker;
     }
 
+    @Override
     public void release() {
       locker.release();
     }

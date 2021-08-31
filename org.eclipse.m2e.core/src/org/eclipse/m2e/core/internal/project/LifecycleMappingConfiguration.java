@@ -64,14 +64,17 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
     this.mojoExecutionConfiguration = mojoExecutionConfiguration;
   }
 
+  @Override
   public String getLifecycleMappingId() {
     return lifecycleMappingId;
   }
 
+  @Override
   public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
+  @Override
   public Xpp3Dom getMojoExecutionConfiguration(MojoExecutionKey key) {
     return mojoExecutionConfiguration.get(key);
   }
@@ -95,12 +98,9 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
   private static void persist(IProject project, LifecycleMappingConfiguration configuration) {
     try {
       File configFile = getConfigurationFile(project);
-      ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(configFile));
-      try {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(configFile))) {
         oos.writeObject(configuration);
         oos.flush();
-      } finally {
-        IOUtil.close(oos);
       }
     } catch(IOException ex) {
       log.warn("Could not persist build lifecycle mapping configuration for {}.", project.toString(), ex);

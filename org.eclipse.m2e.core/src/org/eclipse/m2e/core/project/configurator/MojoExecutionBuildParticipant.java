@@ -47,6 +47,7 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
     this.runOnConfiguration = runOnConfiguration;
   }
 
+  @Override
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
     if(appliesToBuildKind(kind)) {
       IMaven maven = MavenPlugin.getMaven();

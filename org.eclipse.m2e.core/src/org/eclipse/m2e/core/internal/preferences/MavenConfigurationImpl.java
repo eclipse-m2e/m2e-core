@@ -89,14 +89,17 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     ((IEclipsePreferences) preferencesLookup[1].parent()).addNodeChangeListener(this);
   }
 
+  @Override
   public String getGlobalSettingsFile() {
     return preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null, preferencesLookup);
   }
 
+  @Override
   public String getUserSettingsFile() {
     return preferenceStore.get(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null, preferencesLookup);
   }
 
+  @Override
   public boolean isDebugOutput() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DEBUG_OUTPUT, null, preferencesLookup));
   }
@@ -105,11 +108,13 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT, debug);
   }
 
+  @Override
   public boolean isDownloadJavaDoc() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, null,
         preferencesLookup));
   }
 
+  @Override
   public boolean isDownloadSources() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, null,
         preferencesLookup));
@@ -123,15 +128,18 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, downloadJavadoc);
   }
 
+  @Override
   public boolean isHideFoldersOfNestedProjects() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, null,
         preferencesLookup));
   }
 
+  @Override
   public boolean isOffline() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_OFFLINE, null, preferencesLookup));
   }
 
+  @Override
   public void setUserSettingsFile(String settingsFile) throws CoreException {
     settingsFile = trim(settingsFile);
     if(!eq(settingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null))) {
@@ -144,6 +152,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
   }
 
+  @Override
   public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
     globalSettingsFile = trim(globalSettingsFile);
     if(!eq(globalSettingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null))) {
@@ -168,20 +177,24 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     return !str.isEmpty() ? str : null;
   }
 
+  @Override
   public boolean isUpdateProjectsOnStartup() {
     return Boolean.parseBoolean(preferenceStore
         .get(MavenPreferenceConstants.P_UPDATE_PROJECTS, null, preferencesLookup));
   }
 
+  @Override
   public boolean isUpdateIndexesOnStartup() {
     return Boolean
         .parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_UPDATE_INDEXES, null, preferencesLookup));
   }
 
+  @Override
   public synchronized void addConfigurationChangeListener(IMavenConfigurationChangeListener listener) {
     this.listeners.add(listener);
   }
 
+  @Override
   public void preferenceChange(PreferenceChangeEvent event) {
     MavenConfigurationChangeEvent mavenEvent = new MavenConfigurationChangeEvent(event.getKey(), event.getNewValue(),
         event.getOldValue());
@@ -194,9 +207,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
   }
 
+  @Override
   public void added(NodeChangeEvent event) {
   }
 
+  @Override
   public void removed(NodeChangeEvent event) {
     if(event.getChild() == preferencesLookup[0] || event.getChild() == preferencesLookup[1]) {
       init();
@@ -205,16 +220,19 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   private IPreferenceFilter getPreferenceFilter() {
     return new IPreferenceFilter() {
+      @Override
       public String[] getScopes() {
         return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
       }
 
+      @Override
       public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
         return null;
       }
     };
   }
 
+  @Override
   public String getGlobalUpdatePolicy() {
     boolean never = Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, null,
         preferencesLookup));
@@ -231,6 +249,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
   }
 
+  @Override
   public String getWorkspaceLifecycleMappingMetadataFile() {
     IPath stateLocation = MavenPluginActivator.getDefault().getStateLocation();
     String defaultValue = stateLocation.append(LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME)
@@ -238,6 +257,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     return preferenceStore.get(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, defaultValue, preferencesLookup);
   }
 
+  @Override
   public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException {
     if(location != null) {
       preferencesLookup[0].put(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, location);
@@ -247,6 +267,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 
+  @Override
   public String getOutOfDateProjectSeverity() {
     return preferenceStore.get(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB,
         ProblemSeverity.error.toString(), preferencesLookup);

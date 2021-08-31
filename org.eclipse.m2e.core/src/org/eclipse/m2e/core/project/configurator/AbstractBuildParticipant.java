@@ -79,8 +79,10 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
    *          {@link #INCREMENTAL_BUILD}
    * @noreference this method is not intended to be called by the clients.
    */
+  @Override
   public abstract Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception;
 
+  @Override
   public boolean callOnEmptyDelta() {
     return false;
   }
@@ -88,23 +90,28 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
   /**
    * This method is called during workspace clean build.
    */
+  @Override
   @SuppressWarnings("unused")
   public void clean(IProgressMonitor monitor) throws CoreException {
     // default implementation does nothing
   }
 
+  @Override
   protected IMavenProjectFacade getMavenProjectFacade() {
     return super.getMavenProjectFacade();
   }
 
+  @Override
   protected IResourceDelta getDelta(IProject project) {
     return super.getDelta(project);
   }
 
+  @Override
   protected MavenSession getSession() {
     return super.getSession();
   }
 
+  @Override
   protected BuildContext getBuildContext() {
     return super.getBuildContext();
   }

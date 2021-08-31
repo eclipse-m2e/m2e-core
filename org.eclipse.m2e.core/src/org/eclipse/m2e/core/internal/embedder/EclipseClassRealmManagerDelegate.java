@@ -63,6 +63,7 @@ public class EclipseClassRealmManagerDelegate implements ClassRealmManagerDelega
     this.plexus = plexus;
   }
 
+  @Override
   public void setupRealm(ClassRealm realm, ClassRealmRequest request) {
     if(supportsBuildApi(request.getConstituents())) {
       ClassRealm coreRealm = plexus.getContainerRealm();

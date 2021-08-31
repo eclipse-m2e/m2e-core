@@ -207,6 +207,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     mavenConfiguration.addConfigurationChangeListener(this);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException {
@@ -260,6 +261,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return request;
   }
 
+  @Override
   public String getLocalRepositoryPath() {
     String path = null;
     try {
@@ -274,6 +276,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return path;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor) {
@@ -293,6 +296,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return result;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public MavenSession createSession(MavenExecutionRequest request, MavenProject project) {
     RepositorySystemSession repoSession = createRepositorySession(request);
@@ -316,6 +320,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
@@ -345,6 +350,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
       throws CoreException {
     try {
@@ -370,10 +376,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
       boolean setup, IProgressMonitor monitor) throws CoreException {
@@ -386,12 +394,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public MavenExecutionPlan calculateExecutionPlan(final MavenProject project, final List<String> goals,
       final boolean setup, final IProgressMonitor monitor) throws CoreException {
     return context().execute(project,
         (context, pm) -> calculateExecutionPlan(context.getSession(), project, goals, setup, pm), monitor);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
       throws CoreException {
@@ -411,12 +421,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return clone;
   }
 
+  @Override
   public MojoExecution setupMojoExecution(final MavenProject project, final MojoExecution execution,
       IProgressMonitor monitor) throws CoreException {
     return context().execute(project, (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
         monitor);
   }
 
+  @Override
   public ArtifactRepository getLocalRepository() throws CoreException {
     try {
       String localRepositoryPath = getLocalRepositoryPath();
@@ -430,6 +442,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public Settings getSettings() throws CoreException {
     return getSettings(false);
   }
@@ -481,6 +494,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return settings;
   }
 
+  @Override
   public Settings buildSettings(String globalSettings, String userSettings) throws CoreException {
     SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
     request.setGlobalSettingsFile(globalSettings != null ? new File(globalSettings) : null);
@@ -494,6 +508,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public void writeSettings(Settings settings, OutputStream out) throws CoreException {
     try {
       lookup(SettingsWriter.class).write(out, null, settings);
@@ -503,6 +518,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public List<SettingsProblem> validateSettings(String settings) {
     List<SettingsProblem> problems = new ArrayList<>();
     if(settings != null) {
@@ -526,6 +542,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return problems;
   }
 
+  @Override
   public void reloadSettings() throws CoreException {
     Settings settings = getSettings(true);
     for(ISettingsChangeListener listener : settingsListeners) {
@@ -537,6 +554,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public Server decryptPassword(Server server) throws CoreException {
     SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest(server);
     SettingsDecryptionResult result = lookup(SettingsDecrypter.class).decrypt(request);
@@ -546,6 +564,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return result.getServer();
   }
 
+  @Override
   public void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException {
     if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())
         || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.getKey())) {
@@ -553,6 +572,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public Model readModel(InputStream in) throws CoreException {
     try {
       return lookup(ModelReader.class).read(in, null);
@@ -562,6 +582,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public Model readModel(File pomFile) throws CoreException {
     try {
@@ -577,6 +598,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public void writeModel(Model model, OutputStream out) throws CoreException {
     try {
       lookup(ModelWriter.class).write(out, null, model);
@@ -586,6 +608,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public MavenProject readProject(final File pomFile, IProgressMonitor monitor) throws CoreException {
     return context().execute((context, pm) -> {
         MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
@@ -605,6 +628,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }, monitor);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException {
     final RepositorySystemSession repositorySession = createRepositorySession(request);
@@ -620,6 +644,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return readMavenProject(pomFile, configuration);
   }
 
+  @Override
   public MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException {
     long start = System.currentTimeMillis();
 
@@ -645,6 +670,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return result;
   }
 
+  @Override
   public Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
       ProjectBuildingRequest configuration)
       throws CoreException {
@@ -687,10 +713,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    * Do note that MavenProject.getParentProject() cannot be used for detached MavenProject instances. Use
    * #resolveParentProject to resolve parent project instance.
    */
+  @Override
   public void detachFromSession(MavenProject project) throws CoreException {
     project.getProjectBuildingRequest().setRepositorySession(lookup(ContextRepositorySystemSession.class));
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject child, IProgressMonitor monitor)
@@ -736,11 +764,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return null;
   }
 
+  @Override
   public MavenProject resolveParentProject(final MavenProject child, IProgressMonitor monitor) throws CoreException {
     return context().execute(child, (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
         context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
 
+  @Override
   public Artifact resolve(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> remoteRepositories, IProgressMonitor monitor) throws CoreException {
     Artifact artifact = lookup(RepositorySystem.class).createArtifactWithClassifier(groupId, artifactId, version, type,
@@ -815,6 +845,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return resolve(artifact, remoteRepositories, monitor);
   }
 
+  @Override
   public String getArtifactPath(ArtifactRepository repository, String groupId, String artifactId, String version,
       String type, String classifier) throws CoreException {
     Artifact artifact = lookup(RepositorySystem.class).createArtifactWithClassifier(groupId, artifactId, version, type,
@@ -851,6 +882,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   /**
    * This is a temporary implementation that only works for artifacts resolved using #resolve.
    */
+  @Override
   public boolean isUnavailable(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> remoteRepositories) throws CoreException {
     Artifact artifact = lookup(RepositorySystem.class).createArtifactWithClassifier(groupId, artifactId, version, type,
@@ -943,6 +975,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return directory.replace(GROUP_SEPARATOR, PATH_SEPARATOR);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException {
@@ -979,12 +1012,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public <T> T getMojoParameterValue(final MavenProject project, final MojoExecution mojoExecution,
       final String parameter, final Class<T> asType, final IProgressMonitor monitor) throws CoreException {
     return context().execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
       ConfigurationContainer configuration, String goal) throws CoreException {
@@ -1047,6 +1082,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public <T> T getMojoParameterValue(final MavenProject project, final String parameter, final Class<T> type,
       final Plugin plugin, final ConfigurationContainer configuration, final String goal, IProgressMonitor monitor)
       throws CoreException {
@@ -1055,6 +1091,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         monitor);
   }
 
+  @Override
   public ArtifactRepository createArtifactRepository(String id, String url) throws CoreException {
     Repository repository = new Repository();
     repository.setId(id);
@@ -1073,10 +1110,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return repo;
   }
 
+  @Override
   public List<ArtifactRepository> getArtifactRepositories() throws CoreException {
     return getArtifactRepositories(true);
   }
 
+  @Override
   public List<ArtifactRepository> getArtifactRepositories(boolean injectSettings) throws CoreException {
     ArrayList<ArtifactRepository> repositories = new ArrayList<>();
     for(Profile profile : getActiveProfiles()) {
@@ -1160,10 +1199,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return activeProfiles;
   }
 
+  @Override
   public List<ArtifactRepository> getPluginArtifactRepositories() throws CoreException {
     return getPluginArtifactRepositories(true);
   }
 
+  @Override
   public List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException {
     ArrayList<ArtifactRepository> repositories = new ArrayList<>();
     for(Profile profile : getActiveProfiles()) {
@@ -1178,12 +1219,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return removeDuplicateRepositories(repositories);
   }
 
+  @Override
   public Mirror getMirror(ArtifactRepository repo) throws CoreException {
     MavenExecutionRequest request = createExecutionRequest(new NullProgressMonitor());
     populateDefaults(request);
     return lookup(RepositorySystem.class).getMirror(repo, request.getMirrors());
   }
 
+  @Override
   public void populateDefaults(MavenExecutionRequest request) throws CoreException {
     try {
       lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -1193,24 +1236,29 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public List<Mirror> getMirrors() throws CoreException {
     MavenExecutionRequest request = createExecutionRequest(null);
     populateDefaults(request);
     return request.getMirrors();
   }
 
+  @Override
   public void addSettingsChangeListener(ISettingsChangeListener listener) {
     settingsListeners.add(listener);
   }
 
+  @Override
   public void removeSettingsChangeListener(ISettingsChangeListener listener) {
     settingsListeners.remove(listener);
   }
 
+  @Override
   public void addLocalRepositoryListener(ILocalRepositoryListener listener) {
     localRepositoryListeners.add(listener);
   }
 
+  @Override
   public void removeLocalRepositoryListener(ILocalRepositoryListener listener) {
     localRepositoryListeners.remove(listener);
   }
@@ -1219,6 +1267,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return localRepositoryListeners;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public WagonTransferListenerAdapter createTransferListener(IProgressMonitor monitor) {
     return new WagonTransferListenerAdapter(this, monitor);
@@ -1245,6 +1294,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return plexus;
   }
 
+  @Override
   public ProxyInfo getProxyInfo(String protocol) throws CoreException {
     Settings settings = getSettings();
 
@@ -1264,6 +1314,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return null;
   }
 
+  @Override
   public List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException {
     try {
       ProjectSorter rm = new ProjectSorter(projects);
@@ -1275,6 +1326,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException {
     Plugin plugin = new Plugin();
     plugin.setGroupId(groupId);
@@ -1287,6 +1339,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public <T> T lookup(Class<T> clazz) throws CoreException {
     try {
       return getPlexusContainer().lookup(clazz);
@@ -1325,11 +1378,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         .setName("mavenCore"); //$NON-NLS-1$
 
     final Module logginModule = new AbstractModule() {
+      @Override
       protected void configure() {
         bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
       }
     };
     final Module coreExportsModule = new AbstractModule() {
+      @Override
       protected void configure() {
         ClassRealm realm = mavenCoreCC.getRealm();
         CoreExtensionEntry entry = CoreExtensionEntry.discoverFrom(realm);
@@ -1346,6 +1401,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @Override
   public ClassLoader getProjectRealm(MavenProject project) {
     ClassLoader classLoader = project.getClassRealm();
     if(classLoader == null) {
@@ -1362,6 +1418,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, problems);
   }
 
+  @Override
   public <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException {
     IMavenExecutionContext context = createExecutionContext();
@@ -1370,10 +1427,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return context.execute(callable, monitor);
   }
 
+  @Override
   public <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     return context().execute(callable, monitor);
   }
 
+  @Override
   public void execute(final MavenProject project, final MojoExecution execution, final IProgressMonitor monitor)
       throws CoreException {
     context().execute(project, (context, pm) -> {
@@ -1382,10 +1441,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }, monitor);
   }
 
+  @Override
   public MavenExecutionContext createExecutionContext() {
     return new MavenExecutionContext(this);
   }
 
+  @Override
   public MavenExecutionContext getExecutionContext() {
     return MavenExecutionContext.getThreadContext();
   }

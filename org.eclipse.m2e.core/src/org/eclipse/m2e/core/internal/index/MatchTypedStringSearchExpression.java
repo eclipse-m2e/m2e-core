@@ -24,6 +24,7 @@ public class MatchTypedStringSearchExpression extends StringSearchExpression imp
     this.matchType = matchType;
   }
 
+  @Override
   public MatchType getMatchType() {
     return matchType;
   }

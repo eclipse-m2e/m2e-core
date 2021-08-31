@@ -131,6 +131,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   // IMavenProjectChangedListener
 
+  @Override
   public final void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
@@ -153,6 +154,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   }
 
   // IExecutableExtension
+  @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);

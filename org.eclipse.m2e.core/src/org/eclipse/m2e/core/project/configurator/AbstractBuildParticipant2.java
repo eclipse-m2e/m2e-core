@@ -55,6 +55,7 @@ public abstract class AbstractBuildParticipant2 extends InternalBuildParticipant
    * Returns a table of builder-specific arguments as described in IncrementalProjectBuilder#build. Always empty map
    * when kind == {@link #PRECONFIGURE_BUILD}.
    */
+  @Override
   protected Map<String, String> getArgs() {
     return super.getArgs();
   }

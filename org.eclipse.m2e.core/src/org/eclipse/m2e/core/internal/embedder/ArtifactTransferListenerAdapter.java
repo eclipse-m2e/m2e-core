@@ -31,6 +31,7 @@ public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAda
     super(maven, monitor);
   }
 
+  @Override
   public void transferInitiated(TransferEvent event) throws TransferCancelledException {
     try {
       transferInitiated(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
@@ -39,6 +40,7 @@ public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAda
     }
   }
 
+  @Override
   public void transferProgressed(TransferEvent event) throws TransferCancelledException {
     long total = event.getResource().getContentLength();
     String artifactUrl = event.getResource().getRepositoryUrl() + event.getResource().getResourceName();
@@ -50,17 +52,21 @@ public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAda
     }
   }
 
+  @Override
   public void transferStarted(TransferEvent event) {
     transferStarted(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
   }
 
+  @Override
   public void transferCorrupted(TransferEvent event) {
   }
 
+  @Override
   public void transferSucceeded(TransferEvent event) {
     transferCompleted(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
   }
 
+  @Override
   public void transferFailed(TransferEvent event) {
     transferCompleted(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
   }

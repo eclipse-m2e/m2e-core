@@ -27,6 +27,7 @@ public class IndexingTransferListener implements ILocalRepositoryListener {
     this.indexManager = indexManager;
   }
 
+  @Override
   public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
       File artifactFile) {
     NexusIndex localIndex = indexManager.getLocalIndex();
