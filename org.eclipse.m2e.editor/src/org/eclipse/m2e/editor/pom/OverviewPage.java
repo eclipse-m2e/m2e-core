@@ -586,7 +586,7 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(modulesEditor);
     toolkit.adapt(modulesEditor);
 
-    modulesEditor.setContentProvider(new ListEditorContentProvider<String>());
+    modulesEditor.setContentProvider(new ListEditorContentProvider<>());
     modulesEditor.setLabelProvider(new ModulesLabelProvider(this));
 
     modulesEditor.setOpenListener(openevent -> {
