@@ -1211,7 +1211,7 @@ public class OverviewPage extends MavenPomEditorPage {
             }
             loadModules(modules, pack);
             //#335337 no editing of packaging when there are modules, results in error anyway
-            if(modules.size() > 0) {
+            if(!modules.isEmpty()) {
               artifactPackagingCombo.setEnabled(false);
             } else {
               artifactPackagingCombo.setEnabled(true);

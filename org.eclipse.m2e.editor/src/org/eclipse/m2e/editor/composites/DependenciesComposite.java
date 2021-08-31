@@ -273,7 +273,7 @@ public class DependenciesComposite extends Composite {
         } finally {
           setDependenciesInput();
           List<Dependency> deps = getDependencies();
-          if(deps.size() > 0) {
+          if(!deps.isEmpty()) {
             dependenciesEditor.setSelection(Collections.<Object> singletonList(deps.get(deps.size() - 1)));
           }
         }
@@ -461,7 +461,7 @@ public class DependenciesComposite extends Composite {
         } finally {
           setDependencyManagementInput();
           List<Dependency> dlist = getManagedDependencies();
-          if(dlist.size() > 0) {
+          if(!dlist.isEmpty()) {
             dependencyManagementEditor
                 .setSelection(Collections.<Dependency> singletonList(dlist.get(dlist.size() - 1)));
           }

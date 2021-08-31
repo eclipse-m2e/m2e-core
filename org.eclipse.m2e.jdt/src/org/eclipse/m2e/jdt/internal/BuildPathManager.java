@@ -424,7 +424,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     if(path != null) {
       Set<ArtifactKey> artifacts = findArtifacts(project, path);
       // it is not possible to have more than one classpath entry with the same path
-      if(artifacts.size() > 0) {
+      if(!artifacts.isEmpty()) {
         return artifacts.iterator().next();
       }
     }

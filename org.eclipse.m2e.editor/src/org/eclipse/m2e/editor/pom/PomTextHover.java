@@ -179,7 +179,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       }
     }
 
-    return toRet.getRegions().size() > 0 ? toRet : null;
+    return !toRet.getRegions().isEmpty() ? toRet : null;
   }
 
   @Override

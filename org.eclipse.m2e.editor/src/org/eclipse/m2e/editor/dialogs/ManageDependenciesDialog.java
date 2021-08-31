@@ -227,11 +227,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer.addSelectionChangedListener(new DependenciesViewerSelectionListener());
 
     pomHierarchy.addSelectionChangedListener(new PomViewerSelectionChangedListener());
-    if(getProjectHierarchy().size() > 0) {
+    if(!getProjectHierarchy().isEmpty()) {
       pomHierarchy.setSelection(new StructuredSelection(pomHierarchy.getProject()));
     }
 
-    if(originalSelection != null && originalSelection.size() > 0) {
+    if(originalSelection != null && !originalSelection.isEmpty()) {
       dependenciesViewer.setSelection(new StructuredSelection(originalSelection));
     }
 
