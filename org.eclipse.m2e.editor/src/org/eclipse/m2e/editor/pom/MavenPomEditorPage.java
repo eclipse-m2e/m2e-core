@@ -422,11 +422,7 @@ public abstract class MavenPomEditorPage extends FormPage {
       } catch(Exception e) {
         ret[0] = false;
       }
-      if(ret[0]) {
-        selectParentAction.setEnabled(true);
-      } else {
-        selectParentAction.setEnabled(false);
-      }
+      selectParentAction.setEnabled(ret[0]);
     }
   }
 
@@ -443,9 +439,6 @@ public abstract class MavenPomEditorPage extends FormPage {
         .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
     final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP) {
 
-      /* (non-Javadoc)
-       * @see org.eclipse.jface.fieldassist.ControlDecoration#getDescriptionText()
-       */
       @Override
       public String getDescriptionText() {
         MavenProject mp = getPomEditor().getMavenProject();

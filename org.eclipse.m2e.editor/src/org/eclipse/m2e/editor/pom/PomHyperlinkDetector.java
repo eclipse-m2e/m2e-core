@@ -728,10 +728,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     public boolean isDefinedInParent() {
       IMarker mark = ann.getMarker();
       String isElsewhere = mark.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, null);
-      if(isElsewhere != null) {
-        return true;
-      }
-      return false;
+      return isElsewhere != null;
     }
 
   }
