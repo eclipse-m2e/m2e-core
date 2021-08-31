@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,7 +140,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final File stateLocationDir;
 
-  final Map<String, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<>();
+  final Map<URI, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<>();
 
   private final DownloadSourcesJob downloadSourcesJob;
 
@@ -616,7 +617,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         log.error("Can't delete " + containerState.getAbsolutePath()); //$NON-NLS-1$
       }
 
-      moduleInfosMap.remove(project.getLocation().toString());
+      moduleInfosMap.remove(project.getLocationURI());
 
     } else if(IResourceChangeEvent.POST_CHANGE == type) {
 
@@ -666,7 +667,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
             if(moduleDescription == null) {
               return false;
             }
-            String location = p.getLocation().toString();
+            URI location = p.getLocationURI();
             InternalModuleInfo newModuleInfo = ModuleSupport.getModuleInfo(jp, monitor);
             if(monitor.isCanceled()) {
               return false;
