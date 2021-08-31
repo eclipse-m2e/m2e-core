@@ -226,7 +226,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
       return false;
     }
     List<Archetype> archetypes = archetypeCatalog.getArchetypes();
-    if(archetypes == null || archetypes.size() == 0) {
+    if(archetypes == null || archetypes.isEmpty()) {
       setMessage(Messages.LocalArchetypeCatalogDialog_error_empty, IStatus.WARNING);
     }
 

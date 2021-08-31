@@ -363,7 +363,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       return false;
     }
     List<SettingsProblem> result = maven.validateSettings(location);
-    if(result.size() > 0) {
+    if(!result.isEmpty()) {
       setMessage(NLS.bind(errorParse, result.get(0).getMessage()), IMessageProvider.WARNING);
       return false;
     }

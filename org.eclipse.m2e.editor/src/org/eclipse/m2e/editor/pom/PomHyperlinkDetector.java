@@ -134,7 +134,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
     });
 
-    if(hyperlinks.size() > 0) {
+    if(!hyperlinks.isEmpty()) {
       return hyperlinks.toArray(new IHyperlink[0]);
     }
     return null;

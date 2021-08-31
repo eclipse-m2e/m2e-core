@@ -379,7 +379,7 @@ public enum PomTemplateContext {
             }
             //sort just properties
             Collections.sort(keys);
-            if(keys.size() > 0) {
+            if(!keys.isEmpty()) {
               for(String key : keys) {
                 String expr = "${" + key + "}"; //$NON-NLS-1$ //$NON-NLS-2$
                 proposals.add(new Template(expr, Messages.PomTemplateContext_expression_description, contextTypeId,

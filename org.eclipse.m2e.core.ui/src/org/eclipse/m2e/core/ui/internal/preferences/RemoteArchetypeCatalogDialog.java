@@ -194,7 +194,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
               if(!s.isOK()) {
                 setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
                 getButton(IDialogConstants.OK_ID).setEnabled(false);
-              } else if(archetypes.size() == 0) {
+              } else if(archetypes.isEmpty()) {
                 setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
               } else {
                 setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),

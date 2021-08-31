@@ -230,7 +230,7 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   protected List<IArtifactNode> getArtifactNodes(List<?> elements) {
-    if(elements == null || elements.size() == 0) {
+    if(elements == null || elements.isEmpty()) {
       return null;
     }
     ArrayList<IArtifactNode> list = new ArrayList<>();
@@ -366,9 +366,8 @@ public class MavenRepositoryView extends ViewPart {
             indexManager.removeIndexListener(indexListener);
             try {
               List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
-              if(nodes.size() > 0) {
-                final String title = nodes.size() == 1 ? Messages.MavenRepositoryView_rebuild_title
-                    : Messages.MavenRepositoryView_rebuild_title;
+              if(!nodes.isEmpty()) {
+                final String title = Messages.MavenRepositoryView_rebuild_title;
                 final String msg = nodes.size() == 1
                     ? NLS.bind(Messages.MavenRepositoryView_rebuild_msg, nodes.get(0).getIndex().getRepositoryUrl())
                     : Messages.MavenRepositoryView_rebuild_msg2;

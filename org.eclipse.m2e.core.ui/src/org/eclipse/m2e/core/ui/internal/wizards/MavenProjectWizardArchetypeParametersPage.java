@@ -333,7 +333,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       return NLS.bind(Messages.wizardProjectPageMaven2ValidatorProjectNameInvalid, nameStatus.getMessage());
     }
 
-    if(requiredProperties.size() > 0) {
+    if(!requiredProperties.isEmpty()) {
       Properties properties = getProperties();
       for(String key : requiredProperties) {
         String value = properties.getProperty(key);

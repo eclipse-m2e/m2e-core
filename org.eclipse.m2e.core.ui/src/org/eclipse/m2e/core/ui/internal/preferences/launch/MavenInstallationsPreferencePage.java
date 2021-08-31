@@ -175,7 +175,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       public Object[] getElements(Object input) {
         if(input instanceof List<?>) {
           List<?> list = (List<?>) input;
-          if(list.size() > 0) {
+          if(!list.isEmpty()) {
             return list.toArray(new AbstractMavenRuntime[list.size()]);
           }
         }
