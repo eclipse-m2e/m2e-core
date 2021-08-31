@@ -97,7 +97,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     return projects;
   }
 
-  public IStatus execute(Shell shell, IProject... projects) throws ExecutionException {
+  public IStatus execute(Shell shell, IProject... projects) {
     Set<IMavenProjectFacade> facades = getMavenProjects(projects);
     if(facades.isEmpty()) {
       display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
@@ -269,8 +269,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
     private Map<IMavenProjectFacade, List<ProfileData>> getAllProfiles(final Set<IMavenProjectFacade> facades,
         final IProfileManager profileManager) throws CoreException {
-      Map<IMavenProjectFacade, List<ProfileData>> allProfiles = new HashMap<>(
-          facades.size());
+      Map<IMavenProjectFacade, List<ProfileData>> allProfiles = new HashMap<>(facades.size());
       IProgressMonitor monitor = new NullProgressMonitor();
       for(IMavenProjectFacade facade : facades) {
         allProfiles.put(facade, profileManager.getProfileDatas(facade, monitor));

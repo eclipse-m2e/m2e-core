@@ -133,7 +133,6 @@ import org.eclipse.m2e.editor.internal.Messages;
 /**
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("synthetic-access")
 public class OverviewPage extends MavenPomEditorPage {
 
   static final Logger LOG = LoggerFactory.getLogger(OverviewPage.class);

@@ -42,7 +42,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenPomWizard;
 
@@ -102,7 +101,6 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
   }
 
   private void enableNature(final IProject project, boolean isSingle) {
-    final M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
     IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
     if(!pom.exists()) {
       if(isSingle) {
