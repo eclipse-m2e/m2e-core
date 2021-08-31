@@ -40,16 +40,15 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * @see {@link AbstractBuildParticipant#getBuildContext()}
  * @since 1.4
  */
-public abstract class AbstractSourcesGenerationProjectConfigurator extends AbstractProjectConfigurator implements
-    IJavaProjectConfigurator {
+public abstract class AbstractSourcesGenerationProjectConfigurator extends AbstractProjectConfigurator
+    implements IJavaProjectConfigurator {
   @Override
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
     // TODO Auto-generated method stub
 
   }
 
-  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
-      throws CoreException {
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     // TODO Auto-generated method stub
 
   }

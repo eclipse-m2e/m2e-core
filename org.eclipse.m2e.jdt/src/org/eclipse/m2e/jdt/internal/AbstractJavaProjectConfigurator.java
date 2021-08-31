@@ -193,8 +193,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     addNature(project, JavaCore.NATURE_ID, monitor);
   }
 
-  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath)
-      throws JavaModelException {
+  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath) {
   }
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,

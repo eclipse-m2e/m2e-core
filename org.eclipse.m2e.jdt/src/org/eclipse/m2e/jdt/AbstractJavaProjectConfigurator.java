@@ -30,16 +30,15 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * @deprecated use {@link AbstractSourcesGenerationProjectConfigurator} instead.
  */
 @Deprecated
-public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator implements
-    IJavaProjectConfigurator {
+public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator
+    implements IJavaProjectConfigurator {
   @Override
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
     // TODO Auto-generated method stub
 
   }
 
-  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
-      throws CoreException {
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     // TODO Auto-generated method stub
 
   }
@@ -71,8 +70,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution)
       throws CoreException {
-    return new File[] {getParameterValue(getOutputFolderParameterName(), File.class, request.getMavenSession(),
-        mojoExecution)};
+    return new File[] {
+        getParameterValue(getOutputFolderParameterName(), File.class, request.getMavenSession(), mojoExecution)};
   }
 
   protected String getOutputFolderParameterName() {

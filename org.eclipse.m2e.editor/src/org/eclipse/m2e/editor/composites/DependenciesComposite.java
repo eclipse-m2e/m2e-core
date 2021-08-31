@@ -103,7 +103,6 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
 /**
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("synthetic-access")
 public class DependenciesComposite extends Composite {
   private static final Logger log = LoggerFactory.getLogger(DependenciesComposite.class);
 

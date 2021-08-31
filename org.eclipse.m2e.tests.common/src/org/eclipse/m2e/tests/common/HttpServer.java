@@ -65,7 +65,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  *
  * @author Benjamin Bentmann
  */
-@SuppressWarnings("synthetic-access")
 public class HttpServer {
 
   private Server server;

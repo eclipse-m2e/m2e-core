@@ -215,7 +215,6 @@ public class LifecycleMappingPage extends WizardPage {
         }
       }
 
-      @SuppressWarnings("synthetic-access")
       @Override
       protected Object getValue(Object element) {
         if(element instanceof ILifecycleMappingLabelProvider) {
@@ -236,7 +235,6 @@ public class LifecycleMappingPage extends WizardPage {
         return Integer.valueOf(0);
       }
 
-      @SuppressWarnings("synthetic-access")
       @Override
       protected CellEditor getCellEditor(Object element) {
         if(element instanceof ILifecycleMappingLabelProvider) {
@@ -265,7 +263,6 @@ public class LifecycleMappingPage extends WizardPage {
         throw new IllegalStateException();
       }
 
-      @SuppressWarnings("synthetic-access")
       @Override
       protected boolean canEdit(Object element) {
         if(element instanceof AggregateMappingLabelProvider) {
@@ -331,7 +328,6 @@ public class LifecycleMappingPage extends WizardPage {
                     return requirement;
                   }
 
-                  @SuppressWarnings("synthetic-access")
                   public Collection<MavenProject> getProjects() {
                     MavenProject mavenProject;
                     try {
@@ -392,7 +388,6 @@ public class LifecycleMappingPage extends WizardPage {
       public void addListener(ILabelProviderListener listener) {
       }
 
-      @SuppressWarnings("synthetic-access")
       public String getColumnText(Object element, int columnIndex) {
         if(element instanceof ILifecycleMappingLabelProvider) {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
@@ -423,7 +418,6 @@ public class LifecycleMappingPage extends WizardPage {
         return null;
       }
 
-      @SuppressWarnings("synthetic-access")
       public Image getColumnImage(Object element, int columnIndex) {
         if(columnIndex != 0) {
           return null;
