@@ -65,6 +65,7 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 
@@ -73,6 +74,7 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
    * blocks needed to manipulate various types of preferences. Each field editor
    * knows how to save and restore itself.
    */
+  @Override
   public void createFieldEditors() {
     parent = getFieldEditorParent();
 

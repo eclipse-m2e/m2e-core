@@ -79,6 +79,7 @@ import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
  * @author Milos Kleint
  */
 public class PomHyperlinkDetector implements IHyperlinkDetector {
+  @Override
   public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region,
       boolean canShowMultipleHyperlinks) {
     if(region == null || textViewer == null) {
@@ -213,19 +214,23 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
   public static IHyperlink createHyperlink(final ManagedArtifactRegion region) {
     return new IHyperlink() {
+      @Override
       public IRegion getHyperlinkRegion() {
         return region;
       }
 
+      @Override
       public String getHyperlinkText() {
         return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_link_managed,
             "" + region.groupId + ":" + region.artifactId);
       }
 
+      @Override
       public String getTypeLabel() {
         return "pom-dependency-plugin-management"; //$NON-NLS-1$
       }
 
+      @Override
       public void open() {
         //see if we can find the plugin in plugin management of resolved project.
         MavenProject mavprj = region.project;
@@ -341,18 +346,22 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
   public static IHyperlink createHyperlink(final ExpressionRegion region) {
     return new IHyperlink() {
+      @Override
       public IRegion getHyperlinkRegion() {
         return region;
       }
 
+      @Override
       public String getHyperlinkText() {
         return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_open_property, region.property);
       }
 
+      @Override
       public String getTypeLabel() {
         return "pom-property-expression"; //$NON-NLS-1$
       }
 
+      @Override
       public void open() {
         //see if we can find the plugin in plugin management of resolved project.
         MavenProject mavprj = region.project;
@@ -428,18 +437,22 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   public static IHyperlink createHyperlink(final MarkerRegion mark) {
     return new IHyperlink() {
 
+      @Override
       public IRegion getHyperlinkRegion() {
         return new Region(mark.getOffset(), mark.getLength());
       }
 
+      @Override
       public String getTypeLabel() {
         return "marker-error-defined-in-parent"; //$NON-NLS-1$;
       }
 
+      @Override
       public String getHyperlinkText() {
         return NLS.bind("Open definition in parent for {0}", mark.getAnnotation().getText()); //TODO if there are multiple markers in one spot, how to differentiate better..
       }
 
+      @Override
       public void open() {
         IMarker marker = mark.getAnnotation().getMarker();
         String loc = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, null);
@@ -507,18 +520,22 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final IndexedRegion region = (IndexedRegion) current;
 
     return new IHyperlink() {
+      @Override
       public IRegion getHyperlinkRegion() {
         return new Region(region.getStartOffset(), region.getEndOffset() - region.getStartOffset());
       }
 
+      @Override
       public String getHyperlinkText() {
         return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_open_module, fPath);
       }
 
+      @Override
       public String getTypeLabel() {
         return "pom-module"; //$NON-NLS-1$
       }
 
+      @Override
       public void open() {
         XMLEditorUtility.openXmlEditor(fileStore);
       }
@@ -545,7 +562,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       final Node version = XmlUtils.findChild(parent, VERSION);
       final MavenProject prj = XmlUtils.extractMavenProject(viewer);
 
-      IHyperlink pomHyperlink = new IHyperlink() {
+      return new IHyperlink() {
+        @Override
         public IRegion getHyperlinkRegion() {
           //the goal here is to have the groupid/artifactid/version combo underscored by the link.
           //that will prevent underscoring big portions (like plugin config) underscored and
@@ -559,17 +577,21 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           return new Region(min, max - min);
         }
 
+        @Override
         public String getHyperlinkText() {
           return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_hyperlink_pattern,
               XmlUtils.getTextValue(groupId), XmlUtils.getTextValue(artifactId));
         }
 
+        @Override
         public String getTypeLabel() {
           return "pom"; //$NON-NLS-1$
         }
 
+        @Override
         public void open() {
           new Job(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_job_name) {
+            @Override
             protected IStatus run(IProgressMonitor monitor) {
               // TODO resolve groupId if groupId==null
               String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getTextValue(groupId); //$NON-NLS-1$
@@ -603,7 +625,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         }
 
       };
-      return pomHyperlink;
     }
     return null;
   }
@@ -626,10 +647,12 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       assert project != null;
     }
 
+    @Override
     public int getLength() {
       return length;
     }
 
+    @Override
     public int getOffset() {
       return offset;
     }
@@ -663,10 +686,12 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       this.isPlugin = isPlugin;
     }
 
+    @Override
     public int getLength() {
       return length;
     }
 
+    @Override
     public int getOffset() {
       return offset;
     }
@@ -686,10 +711,12 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       this.ann = applicable;
     }
 
+    @Override
     public int getLength() {
       return length;
     }
 
+    @Override
     public int getOffset() {
       return offset;
     }

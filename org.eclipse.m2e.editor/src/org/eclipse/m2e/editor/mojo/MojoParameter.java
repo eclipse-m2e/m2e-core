@@ -116,6 +116,7 @@ public class MojoParameter {
     this.defaultValue = defaultValue;
   }
 
+  @Override
   public String toString() {
     return name + "{" + type + "}"; //$NON-NLS-1$ //$NON-NLS-2$
   }

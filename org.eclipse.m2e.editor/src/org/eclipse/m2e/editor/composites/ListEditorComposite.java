@@ -229,6 +229,7 @@ public class ListEditorComposite<T> extends Composite {
     ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
       Object prevSelection;
 
+      @Override
       protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
 
         IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();

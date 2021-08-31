@@ -144,6 +144,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     this.pomEditor = pomEditor;
   }
 
+  @Override
   protected void createFormContent(IManagedForm managedForm) {
     MavenPluginActivator.getDefault().getMavenProjectManager().addMavenProjectChangedListener(this);
 
@@ -212,6 +213,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         IMessageProvider.WARNING);
 
     dataLoadingJob = new Job(Messages.DependencyTreePage_job_loading) {
+      @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
           mavenProject = pomEditor.readMavenProject(force, monitor);
@@ -225,6 +227,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
             return Status.CANCEL_STATUS;
           }
           dependencyNode.accept(new DependencyVisitor() {
+            @Override
             public boolean visitEnter(DependencyNode node) {
               if(node.getDependency() != null) {
                 dependencyNodes.add(node);
@@ -232,6 +235,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
               return true;
             }
 
+            @Override
             public boolean visitLeave(DependencyNode dependencynode) {
               return true;
             }
@@ -318,6 +322,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     hiearchyToolBarManager
         .add(new Action(Messages.DependencyTreePage_action_collapseAll, MavenEditorImages.COLLAPSE_ALL) {
+          @Override
           public void run() {
             treeViewer.getTree().setRedraw(false);
             try {
@@ -329,6 +334,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         });
 
     hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_expandAll, MavenEditorImages.EXPAND_ALL) {
+      @Override
       public void run() {
         treeViewer.getTree().setRedraw(false);
         try {
@@ -342,10 +348,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     hiearchyToolBarManager.add(new Separator());
 
     hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_sort, MavenEditorImages.SORT) {
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         if(treeViewer.getComparator() == null) {
           treeViewer.setComparator(new ViewerComparator());
@@ -357,10 +365,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     hiearchyToolBarManager
         .add(new Action(Messages.DependencyTreePage_action_showGroupId, MavenEditorImages.SHOW_GROUP) {
+          @Override
           public int getStyle() {
             return AS_CHECK_BOX;
           }
 
+          @Override
           public void run() {
             treeLabelProvider.setShowGroupId(isChecked());
             treeViewer.refresh();
@@ -368,10 +378,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         });
 
     hierarchyFilterAction = new Action(Messages.DependencyTreePage_action_filterSearch, MavenEditorImages.FILTER) {
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         if(isChecked()) {
           setTreeFilter(currentFilter, true);
@@ -457,10 +469,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         setChecked(true);
       }
 
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         if(listViewer.getComparator() == null) {
           listViewer.setComparator(new ViewerComparator());
@@ -471,10 +485,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     });
 
     listToolBarManager.add(new Action(Messages.DependencyTreePage_action_showGroupId, MavenEditorImages.SHOW_GROUP) {
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         listLabelProvider.setShowGroupId(isChecked());
         listViewer.refresh();
@@ -482,10 +498,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     });
 
     listToolBarManager.add(new Action(Messages.DependencyTreePage_action_filter, MavenEditorImages.FILTER) {
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         if(listViewer.getFilters() == null || listViewer.getFilters().length == 0) {
           listViewer.addFilter(searchFilter);
@@ -529,10 +547,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         setMenuCreator(this);
       }
 
+      @Override
       public Menu getMenu(Menu parent) {
         return null;
       }
 
+      @Override
       public Menu getMenu(Control parent) {
         if(menu != null) {
           menu.dispose();
@@ -553,6 +573,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         new ActionContributionItem(action).fill(parent, -1);
       }
 
+      @Override
       public void dispose() {
         if(menu != null) {
           menu.dispose();
@@ -564,6 +585,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     toolBarManager.add(new Separator());
     toolBarManager.add(new Action(Messages.DependencyTreePage_action_refresh, MavenEditorImages.REFRESH) {
+      @Override
       public void run() {
         loadData(true);
       }
@@ -575,6 +597,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     // filter text is modified. Using a job is in this way lets us
     // defer updating the field while the user is typing.
     final Job updateJob = new WorkbenchJob("Update Maven Dependency Viewers") {
+      @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         if(!listViewer.getTable().isDisposed()) {
           isSettingSelection = true;
@@ -588,6 +611,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     };
 
     searchControl.getSearchText().addFocusListener(new FocusAdapter() {
+      @Override
       public void focusGained(FocusEvent e) {
         // The net effect here is that the field will update 200 ms after
         // the user stops typing.
@@ -654,6 +678,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       this.matcher = matcher;
     }
 
+    @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
       if(matcher != null && !matcher.isEmpty()) {
         // matcher = new TextMatcher(searchControl.getSearchText().getText());
@@ -671,6 +696,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
           class ChildMatcher implements DependencyVisitor {
             protected boolean foundMatch = false;
 
+            @Override
             public boolean visitEnter(DependencyNode node) {
               org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
               if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
@@ -680,6 +706,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
               return true;
             }
 
+            @Override
             public boolean visitLeave(DependencyNode node) {
               return true;
             }
@@ -703,6 +730,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     // ISelectionChangedListener
 
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       if(!isSettingSelection) {
         isSettingSelection = true;
@@ -716,6 +744,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     // FocusListener
 
+    @Override
     public void focusGained(FocusEvent e) {
       if(hierarchyFilterAction.isChecked()) {
         setTreeFilter(this, false);
@@ -723,6 +752,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       }
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
 //      treeViewer.removeFilter(this);
       matcher = null;
@@ -731,10 +761,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   final class DependencyTreeContentProvider implements ITreeContentProvider {
 
+    @Override
     public Object[] getElements(Object input) {
       return getChildren(input);
     }
 
+    @Override
     public Object[] getChildren(Object element) {
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
@@ -744,10 +776,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return new Object[0];
     }
 
+    @Override
     public Object getParent(Object element) {
       return null;
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
@@ -756,9 +790,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return false;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
@@ -780,6 +816,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     // IColorProvider
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
@@ -791,6 +828,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       if(isMatching(element)) {
         return highlighter.getBackgroundColor();
@@ -895,6 +933,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     // IColorProvider
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof Artifact) {
         Artifact a = (Artifact) element;
@@ -906,6 +945,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       if(element instanceof Artifact && isMatching((Artifact) element)) {
         return highlighter.getBackgroundColor();
@@ -963,6 +1003,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   public class DependencyListContentProvider implements IStructuredContentProvider {
 
+    @Override
     public Object[] getElements(Object input) {
       if(input instanceof MavenProject) {
         MavenProject project = (MavenProject) input;
@@ -978,9 +1019,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return null;
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void dispose() {
     }
 
@@ -996,10 +1039,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       }
     }
 
+    @Override
     public boolean isEmpty() {
       return artifactKeys.isEmpty();
     }
 
+    @Override
     public boolean isMatchingArtifact(String groupId, String artifactId) {
       return artifactKeys.contains(getKey(groupId, artifactId));
     }
@@ -1079,6 +1124,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       this.classpath = classpath;
     }
 
+    @Override
     public void run() {
       if(isChecked()) {
         currentClasspath = classpath;
@@ -1093,6 +1139,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     loadData(true);
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
@@ -1101,6 +1148,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(event.getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
         // file has been changed. need to update graph
         new UIJob(Messages.DependencyTreePage_job_reloading) {
+          @Override
           public IStatus runInUIThread(IProgressMonitor monitor) {
             loadData();
             FormUtils.setMessage(getManagedForm().getForm(), null, IMessageProvider.WARNING);
@@ -1111,11 +1159,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
   }
 
+  @Override
   public void fileChanged() {
     if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
 
     new UIJob(Messages.DependencyTreePage_job_reloading) {
+      @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_updating,
             IMessageProvider.WARNING);
@@ -1148,10 +1198,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       backgroundColor = JFaceResources.getColorRegistry().get(HIGHLIGHT_BG_COLOR_NAME);
     }
 
+    @Override
     public void dispose() {
       JFaceResources.getColorRegistry().removeListener(this);
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
       String property = event.getProperty();
       if(HIGHLIGHT_BG_COLOR_NAME.equals(property)) {

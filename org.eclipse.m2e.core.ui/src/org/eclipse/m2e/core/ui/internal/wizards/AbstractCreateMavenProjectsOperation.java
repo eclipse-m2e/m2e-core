@@ -67,6 +67,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     return projects;
   }
 
+  @Override
   public void run(IProgressMonitor monitor) throws InvocationTargetException {
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
     Job.getJobManager().beginRule(rule, monitor);

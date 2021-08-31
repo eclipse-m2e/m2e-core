@@ -29,6 +29,7 @@ public class LocalRepositoryNode extends AbstractIndexedRepositoryNode {
     super(index);
   }
 
+  @Override
   public String getName() {
     IRepository repository = index.getRepository();
     StringBuilder sb = new StringBuilder();

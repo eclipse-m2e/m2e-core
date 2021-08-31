@@ -41,9 +41,7 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
     this.indexedArtifactGroup = group;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getChildren()
-   */
+  @Override
   public Object[] getChildren() {
     NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
 
@@ -65,18 +63,14 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
     return kids;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getName()
-   */
+  @Override
   public String getName() {
     String prefix = indexedArtifactGroup.getPrefix();
     int n = prefix.lastIndexOf('.');
     return n < 0 ? prefix : prefix.substring(n + 1);
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#hasChildren()
-   */
+  @Override
   public boolean hasChildren() {
 //    if(kids == null){
 //      kids = getChildren();
@@ -85,23 +79,17 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#getImage()
-   */
+  @Override
   public Image getImage() {
     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IArtifactNode#getDocumentKey()
-   */
+  @Override
   public String getDocumentKey() {
     return indexedArtifactGroup.getPrefix();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#isUpdating()
-   */
+  @Override
   public boolean isUpdating() {
     // TODO Auto-generated method isUpdating
     return false;

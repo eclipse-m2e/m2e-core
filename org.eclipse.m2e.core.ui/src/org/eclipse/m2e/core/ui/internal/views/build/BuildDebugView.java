@@ -80,6 +80,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
   /*package*/final Map<String, ProjectNode> projects = new ConcurrentHashMap<>();
 
   /*package*/final Job refreshJob = new Job("") {
+    @Override
     protected IStatus run(IProgressMonitor monitor) {
       getSite().getShell().getDisplay().asyncExec(() -> viewer.refresh());
       return Status.OK_STATUS;
@@ -88,6 +89,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
   /*package*/volatile boolean suspended = true;
 
+  @Override
   public void createPartControl(Composite parent) {
     viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     Tree tree = viewer.getTree();
@@ -105,19 +107,24 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     trclmnBuildCount.setText(Messages.BuildDebugView_columnBuildNumber);
     viewer.setLabelProvider(new ITableLabelProvider() {
 
+      @Override
       public void removeListener(ILabelProviderListener listener) {
       }
 
+      @Override
       public boolean isLabelProperty(Object element, String property) {
         return false;
       }
 
+      @Override
       public void dispose() {
       }
 
+      @Override
       public void addListener(ILabelProviderListener listener) {
       }
 
+      @Override
       public String getColumnText(Object element, int columnIndex) {
         if(element instanceof Node) {
           return getColumnText((Node) element, columnIndex);
@@ -142,6 +149,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
         return null;
       }
 
+      @Override
       public Image getColumnImage(Object element, int columnIndex) {
         return null;
       }
@@ -149,12 +157,15 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
     viewer.setContentProvider(new ITreeContentProvider() {
 
+      @Override
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
 
+      @Override
       public void dispose() {
       }
 
+      @Override
       public boolean hasChildren(Object element) {
         if(element instanceof ContainerNode) {
           return !((ContainerNode) element).getResources().isEmpty();
@@ -165,10 +176,12 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
         return false;
       }
 
+      @Override
       public Object getParent(Object element) {
         return null;
       }
 
+      @Override
       public Object[] getElements(Object inputElement) {
         if(inputElement == projects) {
           List<ProjectNode> sorted;
@@ -181,6 +194,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
         return new Object[0];
       }
 
+      @Override
       public Object[] getChildren(Object parentElement) {
         if(parentElement instanceof ProjectNode) {
           ArrayList<Object> result = new ArrayList<>();
@@ -214,6 +228,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     IActionBars actionBars = getViewSite().getActionBars();
     IToolBarManager toolBar = actionBars.getToolBarManager();
     Action suspendAction = new Action(Messages.BuildDebugView_actionSuspend, IAction.AS_CHECK_BOX) {
+      @Override
       public void run() {
         suspended = isChecked();
       }
@@ -221,6 +236,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     suspendAction.setImageDescriptor(MavenImages.SUSPEND);
     suspendAction.setChecked(suspended);
     Action clearAction = new Action(Messages.BuildDebugView_actionClear, MavenImages.CLEAR) {
+      @Override
       public void run() {
         synchronized(projectsLock) {
           projects.clear();
@@ -229,6 +245,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
       }
     };
     Action collapseAll = new Action(Messages.BuildDebugView_actionCollapseAll, MavenImages.COLLAPSEALL) {
+      @Override
       public void run() {
         viewer.collapseAll();
       }
@@ -239,19 +256,23 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     actionBars.updateActionBars();
   }
 
+  @Override
   public void setFocus() {
   }
 
+  @Override
   public void init(IViewSite site) throws PartInitException {
     super.init(site);
     MavenBuilder.addDebugHook(this);
   }
 
+  @Override
   public void dispose() {
     MavenBuilder.removeDebugHook(this);
     super.dispose();
   }
 
+  @Override
   public void buildStart(IMavenProjectFacade projectFacade, int kind, Map<String, String> args,
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants, IResourceDelta delta, IProgressMonitor monitor) {
 
@@ -294,6 +315,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     }
   }
 
+  @Override
   public void buildParticipant(IMavenProjectFacade projectFacade, MojoExecutionKey mojoExecutionKey,
       AbstractBuildParticipant participant, Set<File> files, IProgressMonitor monitor) {
 

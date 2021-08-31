@@ -30,6 +30,7 @@ abstract class ContainerNode implements Node {
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }

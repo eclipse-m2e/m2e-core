@@ -82,6 +82,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     this.maven = MavenPlugin.getMaven();
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 
@@ -104,6 +105,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     return true;
   }
 
+  @Override
   protected Control createContents(Composite parent) {
 
     Composite composite = new Composite(parent, SWT.NONE);
@@ -169,6 +171,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     runtimesViewer.setContentProvider(new IStructuredContentProvider() {
 
+      @Override
       public Object[] getElements(Object input) {
         if(input instanceof List<?>) {
           List<?> list = (List<?>) input;
@@ -179,9 +182,11 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         return new Object[0];
       }
 
+      @Override
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
 
+      @Override
       public void dispose() {
       }
 
@@ -285,6 +290,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
   static class RuntimesLabelProvider implements ITableLabelProvider, IColorProvider {
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
       switch(columnIndex) {
@@ -301,6 +307,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       return null;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if(columnIndex == 1 && !((AbstractMavenRuntime) element).isAvailable()) {
         return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
@@ -308,10 +315,12 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
 
+    @Override
     public Color getForeground(Object element) {
       AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
       if(!runtime.isEditable()) {
@@ -320,16 +329,20 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       return null;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   }

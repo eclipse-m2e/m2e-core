@@ -96,6 +96,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   }
 
   /** Creates the page controls. */
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
     container.setLayout(new GridLayout(3, false));
@@ -247,6 +248,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   }
 
   /** Skips the archetype selection page if the user chooses a simple project. */
+  @Override
   public IWizardPage getNextPage() {
     return getWizard()
         .getPage(isSimpleProject() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage");
@@ -303,6 +305,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   }
 
   /** Cleans up. */
+  @Override
   public void dispose() {
     super.dispose();
     workingSetGroup.dispose();

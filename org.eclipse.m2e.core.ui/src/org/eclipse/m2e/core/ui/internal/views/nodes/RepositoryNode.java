@@ -32,6 +32,7 @@ public class RepositoryNode extends AbstractIndexedRepositoryNode {
     this.repository = index.getRepository();
   }
 
+  @Override
   public String getName() {
     StringBuilder sb = new StringBuilder();
     sb.append(repository.getId());
@@ -48,6 +49,7 @@ public class RepositoryNode extends AbstractIndexedRepositoryNode {
     return sb.toString();
   }
 
+  @Override
   public String getRepositoryUrl() {
     return repository.getUrl();
   }

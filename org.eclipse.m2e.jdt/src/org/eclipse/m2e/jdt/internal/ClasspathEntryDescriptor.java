@@ -78,6 +78,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     setClasspathEntry(entry);
   }
 
+  @Override
   public IClasspathEntry toClasspathEntry() {
     Map<String, String> attributes = new LinkedHashMap<>(this.attributes);
 
@@ -147,6 +148,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     return entry;
   }
 
+  @Override
   public String getScope() {
     return scope;
   }
@@ -154,10 +156,12 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   /**
    * @return true if this entry corresponds to an optional maven dependency, false otherwise
    */
+  @Override
   public boolean isOptionalDependency() {
     return optionalDependency;
   }
 
+  @Override
   public void setClasspathAttribute(String name, String value) {
     if(name == null) {
       throw new NullPointerException(); // fail fast
@@ -169,10 +173,12 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
   }
 
+  @Override
   public Map<String, String> getClasspathAttributes() {
     return attributes;
   }
 
+  @Override
   public String getGroupId() {
     return artifactKey != null ? artifactKey.getGroupId() : null;
   }
@@ -206,14 +212,17 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
   }
 
+  @Override
   public String getArtifactId() {
     return artifactKey != null ? artifactKey.getArtifactId() : null;
   }
 
+  @Override
   public IPath getPath() {
     return path;
   }
 
+  @Override
   public void setPath(IPath path) {
     if(path == null) {
       throw new NullPointerException();
@@ -221,67 +230,83 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     this.path = path;
   }
 
+  @Override
   public int getEntryKind() {
     return entryKind;
   }
 
+  @Override
   public void setEntryKind(int entryKind) {
     this.entryKind = entryKind;
   }
 
+  @Override
   public ArtifactKey getArtifactKey() {
     return artifactKey;
   }
 
+  @Override
   public void setArtifactKey(ArtifactKey artifactKey) {
     this.artifactKey = artifactKey;
   }
 
+  @Override
   public void setSourceAttachment(IPath srcPath, IPath srcRoot) {
     this.sourceAttachmentPath = srcPath;
     this.sourceAttachmentRootPath = srcRoot;
   }
 
+  @Override
   public void setJavadocUrl(String javaDocUrl) {
     setClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, javaDocUrl);
   }
 
+  @Override
   public IPath getSourceAttachmentPath() {
     return sourceAttachmentPath;
   }
 
+  @Override
   public IPath getSourceAttachmentRootPath() {
     return sourceAttachmentRootPath;
   }
 
+  @Override
   public String getJavadocUrl() {
     return attributes.get(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME);
   }
 
+  @Override
   public void setScope(String scope) {
     this.scope = scope;
   }
 
+  @Override
   public void setOptionalDependency(boolean optional) {
     this.optionalDependency = optional;
   }
 
+  @Override
   public void addAccessRule(IAccessRule rule) {
     this.accessRules.add(rule);
   }
 
+  @Override
   public List<IAccessRule> getAccessRules() {
     return accessRules;
   }
 
+  @Override
   public void setOutputLocation(IPath outputLocation) {
     this.outputLocation = outputLocation;
   }
 
+  @Override
   public IPath getOutputLocation() {
     return outputLocation;
   }
 
+  @Override
   public void setInclusionPatterns(IPath[] inclusionPatterns) {
     if(inclusionPatterns != null) {
       this.inclusionPatterns = new LinkedHashSet<>(Arrays.asList(inclusionPatterns));
@@ -290,6 +315,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
   }
 
+  @Override
   public void addInclusionPattern(IPath pattern) {
     if(inclusionPatterns == null) {
       inclusionPatterns = new LinkedHashSet<>();
@@ -297,16 +323,19 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     inclusionPatterns.add(pattern);
   }
 
+  @Override
   public void removeInclusionPattern(IPath pattern) {
     if(inclusionPatterns != null) {
       inclusionPatterns.remove(pattern);
     }
   }
 
+  @Override
   public IPath[] getInclusionPatterns() {
     return inclusionPatterns != null ? inclusionPatterns.toArray(new IPath[inclusionPatterns.size()]) : null;
   }
 
+  @Override
   public void setExclusionPatterns(IPath[] exclusionPatterns) {
     if(exclusionPatterns != null) {
       this.exclusionPatterns = new LinkedHashSet<>(Arrays.asList(exclusionPatterns));
@@ -315,6 +344,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
   }
 
+  @Override
   public void addExclusionPattern(IPath pattern) {
     if(exclusionPatterns == null) {
       exclusionPatterns = new LinkedHashSet<>();
@@ -322,36 +352,44 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     exclusionPatterns.add(pattern);
   }
 
+  @Override
   public void removeExclusionPattern(IPath pattern) {
     if(exclusionPatterns != null) {
       exclusionPatterns.remove(pattern);
     }
   }
 
+  @Override
   public IPath[] getExclusionPatterns() {
     return exclusionPatterns != null ? exclusionPatterns.toArray(new IPath[exclusionPatterns.size()]) : null;
   }
 
+  @Override
   public void setExported(boolean exported) {
     this.exported = exported;
   }
 
+  @Override
   public boolean isExported() {
     return exported;
   }
 
+  @Override
   public void setCombineAccessRules(boolean combineAccessRules) {
     this.combineAccessRules = combineAccessRules;
   }
 
+  @Override
   public boolean combineAccessRules() {
     return combineAccessRules;
   }
 
+  @Override
   public boolean isPomDerived() {
     return Boolean.parseBoolean(attributes.get(IClasspathManager.POMDERIVED_ATTRIBUTE));
   }
 
+  @Override
   public void setPomDerived(boolean derived) {
     if(derived) {
       attributes.put(IClasspathManager.POMDERIVED_ATTRIBUTE, Boolean.toString(true));

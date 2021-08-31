@@ -89,6 +89,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     }
   }
 
+  @Override
   protected Control createContents(Composite parent) {
     Control control = super.createContents(parent);
     setTitle(title);
@@ -96,6 +97,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     return control;
   }
 
+  @Override
   protected Control createDialogArea(Composite parent) {
     Composite composite1 = (Composite) super.createDialogArea(parent);
 
@@ -152,16 +154,19 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     return array == null ? new String[0] : array;
   }
 
+  @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     shell.setText(title);
   }
 
+  @Override
   public void create() {
     super.create();
     getButton(IDialogConstants.OK_ID).setEnabled(false);
   }
 
+  @Override
   protected void okPressed() {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogLocationCombo.getText().trim();

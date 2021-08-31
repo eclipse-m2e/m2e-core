@@ -67,6 +67,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     this.basedirRemameRequired = basedirRemameRequired;
   }
 
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 
@@ -83,6 +84,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
   }
 
+  @Override
   public void addPages() {
     if(!initialized) {
       init(null, null);
@@ -106,6 +108,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
   }
 
+  @Override
   public boolean performFinish() {
     //mkleint: this sounds wrong.
     if(!page.isPageComplete()) {

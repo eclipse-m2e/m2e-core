@@ -28,6 +28,7 @@ public class MavenClasspathVariableInitializer extends ClasspathVariableInitiali
   public MavenClasspathVariableInitializer() {
   }
 
+  @Override
   public void initialize(String variable) {
     ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).setupVariables();
   }

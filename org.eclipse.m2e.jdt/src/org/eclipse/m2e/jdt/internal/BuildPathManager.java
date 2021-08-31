@@ -185,6 +185,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return null;
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
@@ -197,6 +198,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     }
   }
 
+  @Override
   public void updateClasspath(IProject project, IProgressMonitor monitor) {
     IJavaProject javaProject = JavaCore.create(project);
     if(javaProject != null) {
@@ -373,6 +375,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return getClasspath(project, scope, true, monitor);
   }
 
+  @Override
   public IClasspathEntry[] getClasspath(IProject project, int scope, boolean uniquePaths, IProgressMonitor monitor)
       throws CoreException {
     IMavenProjectFacade facade = projectManager.create(project, monitor);
@@ -601,6 +604,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return new File(stateLocationDir, project.getName() + ".container"); //$NON-NLS-1$
   }
 
+  @Override
   public void resourceChanged(IResourceChangeEvent event) {
     int type = event.getType();
     if(IResourceChangeEvent.PRE_DELETE == type) {
@@ -818,6 +822,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return downloadSourcesJob;
   }
 
+  @Override
   public void scheduleDownload(IPackageFragmentRoot fragment, boolean downloadSources, boolean downloadJavadoc) {
     if(fragment == null) {
       return;
@@ -869,6 +874,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   }
 
+  @Override
   public void scheduleDownload(final IProject project, final boolean downloadSources, final boolean downloadJavadoc) {
     try {
       if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -974,6 +980,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       this.affectedProjects = affectedProjects;
     }
 
+    @Override
     public boolean visit(IResourceDelta delta) {
       if(delta.getResource() instanceof IFile) {
         IFile file = (IFile) delta.getResource();

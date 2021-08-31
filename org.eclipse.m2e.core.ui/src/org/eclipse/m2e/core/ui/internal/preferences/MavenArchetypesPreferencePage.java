@@ -84,6 +84,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     this.archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
   }
 
+  @Override
   protected void performDefaults() {
     for(Iterator<ArchetypeCatalogFactory> it = archetypeCatalogs.iterator(); it.hasNext();) {
       ArchetypeCatalogFactory factory = it.next();
@@ -98,6 +99,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     super.performDefaults();
   }
 
+  @Override
   public boolean performOk() {
     Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getArchetypeCatalogs();
     for(ArchetypeCatalogFactory factory : catalogs) {
@@ -123,9 +125,11 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     return super.performOk();
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 
+  @Override
   protected void createFieldEditors() {
     Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
     GridLayout gridLayout = new GridLayout(2, false);
@@ -291,6 +295,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
 
     private final Color disabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       ArchetypeCatalogFactory factory = (ArchetypeCatalogFactory) element;
       String description = factory.getDescription();
@@ -310,28 +315,35 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       return factory.isEditable() ? text : NLS.bind(Messages.MavenArchetypesPreferencePage_SystemLabel, text);
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
 
+    @Override
     public Color getForeground(Object element) {
       return archetypesViewer.getChecked(element) ? null : disabledColor;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 

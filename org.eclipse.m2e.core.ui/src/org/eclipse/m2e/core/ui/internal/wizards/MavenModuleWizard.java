@@ -94,6 +94,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   }
 
   /** Creates the pages. */
+  @Override
   public void addPages() {
     parentPage = new MavenModuleWizardParentPage(importConfiguration, workingSets);
     archetypePage = new MavenProjectWizardArchetypePage(importConfiguration);
@@ -107,6 +108,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   }
 
   /** Adds the listeners after the page controls are created. */
+  @Override
   public void createPageControls(Composite pageContainer) {
     artifactPage.setParentReadonly(true);
     artifactPage.setTitle(Messages.wizardModulePageArtifactTitle);
@@ -168,6 +170,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   }
 
   /** Performs the "finish" action. */
+  @Override
   public boolean performFinish() {
     // First of all, we extract all the information from the wizard pages.
     // Note that this should not be done inside the operation we will run
@@ -253,6 +256,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       };
     }
     job.addJobChangeListener(new JobChangeAdapter() {
+      @Override
       public void done(IJobChangeEvent event) {
         final IStatus result = event.getResult();
         if(result.isOK()) {

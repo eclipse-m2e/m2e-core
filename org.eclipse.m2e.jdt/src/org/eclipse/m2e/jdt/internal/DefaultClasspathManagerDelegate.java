@@ -58,6 +58,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     this.projectManager = MavenPlugin.getMavenProjectRegistry();
   }
 
+  @Override
   public void populateClasspath(final IClasspathDescriptor classpath, IMavenProjectFacade projectFacade, final int kind,
       final IProgressMonitor monitor) throws CoreException {
 

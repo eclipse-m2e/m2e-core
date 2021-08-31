@@ -138,6 +138,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     IProject project = request.getProject();
 
@@ -783,6 +784,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return Double.parseDouble(sanitizeJavaVersion(level));
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     super.unconfigure(request, monitor);
     removeMavenClasspathContainer(request.getProject());
@@ -822,10 +824,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return new Path(relative.replace('\\', '/'));
   }
 
+  @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     ModuleSupport.configureClasspath(facade, classpath, monitor);
   }
 
+  @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) {
   }

@@ -98,6 +98,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     }
   }
 
+  @Override
   protected Control createContents(Composite parent) {
     Control control = super.createContents(parent);
     setTitle(title);
@@ -106,6 +107,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     return control;
   }
 
+  @Override
   protected Control createDialogArea(Composite parent) {
     Composite composite1 = (Composite) super.createDialogArea(parent);
 
@@ -147,6 +149,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
    */
+  @Override
   protected Control createButtonBar(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout();
@@ -170,6 +173,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
       final RemoteCatalogFactory factory = new RemoteCatalogFactory(url, null, true);
 
       new Job(Messages.RemoteArchetypeCatalogDialog_job_download) {
+        @Override
         protected IStatus run(IProgressMonitor monitor) {
           IStatus status = Status.OK_STATUS;
           ArchetypeCatalog catalog = null;
@@ -212,6 +216,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     return composite;
   }
 
+  @Override
   protected Button getButton(int id) {
     return super.getButton(id);
   }
@@ -221,16 +226,19 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     return array == null ? new String[0] : array;
   }
 
+  @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     shell.setText(title);
   }
 
+  @Override
   public void create() {
     super.create();
     getButton(IDialogConstants.OK_ID).setEnabled(false);
   }
 
+  @Override
   protected void okPressed() {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogUrlCombo.getText().trim();

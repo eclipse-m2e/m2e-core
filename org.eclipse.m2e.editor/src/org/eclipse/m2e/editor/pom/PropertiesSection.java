@@ -116,6 +116,7 @@ public class PropertiesSection {
     propertiesSection.setText(Messages.PropertiesSection_section_properties);
     propertiesSection.setData("name", "propertiesSection"); //$NON-NLS-1$ //$NON-NLS-2$
     propertiesSection.addExpansionListener(new ExpansionAdapter() {
+      @Override
       public void expansionStateChanged(ExpansionEvent e) {
         setExpanded(e.getState());
       }
@@ -223,6 +224,7 @@ public class PropertiesSection {
 
   static class PropertyPairLabelProvider extends LabelProvider {
 
+    @Override
     public String getText(Object element) {
       if(element instanceof PropertyElement) {
         PropertyElement pair = (PropertyElement) element;
@@ -231,6 +233,7 @@ public class PropertiesSection {
       return super.getText(element);
     }
 
+    @Override
     public Image getImage(Object element) {
       return MavenEditorImages.IMG_PROPERTY;
     }

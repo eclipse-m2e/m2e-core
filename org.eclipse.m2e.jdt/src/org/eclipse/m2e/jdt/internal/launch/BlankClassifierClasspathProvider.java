@@ -35,6 +35,7 @@ public class BlankClassifierClasspathProvider extends AbstractClassifierClasspat
   /**
    * This provider applies to the mavenProjectFacade if the classifier is blank.
    */
+  @Override
   public boolean applies(IMavenProjectFacade mavenProjectFacade, String classifier) {
     return getClassifier().equals(classifier);
   }
@@ -42,6 +43,7 @@ public class BlankClassifierClasspathProvider extends AbstractClassifierClasspat
   /**
    * @return an empty String
    */
+  @Override
   public String getClassifier() {
     return "";
   }

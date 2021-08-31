@@ -90,6 +90,7 @@ public class MavenJdtPlugin extends Plugin {
   /**
    * @noreference see class javadoc
    */
+  @Override
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
 
@@ -115,6 +116,7 @@ public class MavenJdtPlugin extends Plugin {
     workspaceSourceDownloadJob = new WorkspaceSourceDownloadJob();
 
     mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
+      @Override
       @SuppressWarnings("static-access")
       public void mavenConfigurationChange(MavenConfigurationChangeEvent event) {
         String key = event.getKey();
@@ -139,6 +141,7 @@ public class MavenJdtPlugin extends Plugin {
         if(buildpathManager.setupVariables() && buildpathManager.variablesAreInUse()) {
           WorkspaceJob job = new WorkspaceJob(Messages.MavenJdtPlugin_job_name) {
 
+            @Override
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
               ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
               return Status.OK_STATUS;
@@ -161,6 +164,7 @@ public class MavenJdtPlugin extends Plugin {
   /**
    * @noreference see class javadoc
    */
+  @Override
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
 
@@ -208,13 +212,12 @@ public class MavenJdtPlugin extends Plugin {
       setPriority(BuildPathManager.SOURCE_DOWNLOAD_PRIORITY);//low priority job
     }
 
+    @Override
     public boolean isEmpty() {
       return done;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-     */
+    @Override
     public IStatus run(IProgressMonitor monitor) {
       done = false;
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();

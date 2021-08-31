@@ -32,12 +32,14 @@ abstract class AbstractLifecycleMappingResolution extends EditorAwareMavenProble
     this.action = action;
   }
 
+  @Override
   public Image getImage() {
     return PluginExecutionAction.ignore.equals(action)
         ? PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_TOOL_DELETE)
         : PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_TOOL_FORWARD);
   }
 
+  @Override
   public boolean canFix(IMarker marker) throws CoreException {
     return marker.getType().equals(getMarker().getType()) && marker.getResource().equals(getMarker().getResource());
   }

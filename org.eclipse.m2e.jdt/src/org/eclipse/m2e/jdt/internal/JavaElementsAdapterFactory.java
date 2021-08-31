@@ -46,10 +46,12 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
   private static final Class<?>[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class,
       IMavenProjectFacade.class};
 
+  @Override
   public Class<?>[] getAdapterList() {
     return ADAPTER_LIST;
   }
 
+  @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if(adapterType == ArtifactKey.class) {
       if(adaptableObject instanceof IPackageFragmentRoot) {
