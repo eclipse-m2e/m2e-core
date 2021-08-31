@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParserBase;
 
 import org.apache.maven.project.MavenProject;
 
@@ -195,7 +195,7 @@ public class ProposalUtil {
   //for proposal queries, any special chars shall be escaped
   //    + - && || ! ( ) { } [ ] ^ " ~ * ? : \
   private static String escapeQuerySpecialCharacters(String raw) {
-    return QueryParser.escape(raw);
+    return QueryParserBase.escape(raw);
   }
 
   public static SearchEngine getSearchEngine(final IProject project) throws CoreException {

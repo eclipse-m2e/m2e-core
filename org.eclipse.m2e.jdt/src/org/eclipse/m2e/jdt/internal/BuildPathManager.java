@@ -218,20 +218,10 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private void saveContainerState(IProject project, IClasspathContainer container) {
     File containerStateFile = getContainerStateFile(project);
-    FileOutputStream is = null;
-    try {
-      is = new FileOutputStream(containerStateFile);
+    try (FileOutputStream is = new FileOutputStream(containerStateFile)) {
       new MavenClasspathContainerSaveHelper().writeContainer(container, is);
     } catch(IOException ex) {
       log.error("Can't save classpath container state for " + project.getName(), ex); //$NON-NLS-1$
-    } finally {
-      if(is != null) {
-        try {
-          is.close();
-        } catch(IOException ex) {
-          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
-        }
-      }
     }
   }
 
@@ -241,24 +231,12 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       return null;
     }
 
-    FileInputStream is = null;
-    try {
-      is = new FileInputStream(containerStateFile);
+    try (FileInputStream is = new FileInputStream(containerStateFile)) {
+      ;
       return new MavenClasspathContainerSaveHelper().readContainer(is);
-    } catch(IOException ex) {
+    } catch(IOException | ClassNotFoundException ex) {
       throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
           "Can't read classpath container state for " + project.getName(), ex));
-    } catch(ClassNotFoundException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
-          "Can't read classpath container state for " + project.getName(), ex));
-    } finally {
-      if(is != null) {
-        try {
-          is.close();
-        } catch(IOException ex) {
-          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
-        }
-      }
     }
   }
 
@@ -386,11 +364,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       Properties props = new Properties();
       File file = getSourceAttachmentPropertiesFile(project);
       if(file.canRead()) {
-        InputStream is = new BufferedInputStream(new FileInputStream(file));
-        try {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
           props.load(is);
-        } finally {
-          is.close();
         }
       }
       return getClasspath(facade, scope, props, uniquePaths, monitor);
@@ -569,13 +544,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     // persist custom source/javadoc attachement info
     File file = getSourceAttachmentPropertiesFile(project.getProject());
-    try {
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-      try {
-        props.store(os, null);
-      } finally {
-        os.close();
-      }
+    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+      props.store(os, null);
     } catch(IOException e) {
       throw new CoreException(
           new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, "Can't save classpath container changes", e));
@@ -790,9 +760,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   private static String getJavaDocPathInArchive(File file) {
-    ZipFile jarFile = null;
-    try {
-      jarFile = new ZipFile(file);
+    try (ZipFile jarFile = new ZipFile(file);) {
       String marker = "package-list"; //$NON-NLS-1$
       for(Enumeration<? extends ZipEntry> en = jarFile.entries(); en.hasMoreElements();) {
         ZipEntry entry = en.nextElement();
@@ -803,13 +771,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       }
     } catch(IOException ex) {
       // ignore
-    } finally {
-      try {
-        if(jarFile != null)
-          jarFile.close();
-      } catch(IOException ex) {
-        //
-      }
     }
 
     return ""; //$NON-NLS-1$
