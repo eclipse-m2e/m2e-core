@@ -30,7 +30,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
@@ -72,7 +71,7 @@ public class MavenArtifactIdentifier {
     }
   };
 
-  public Collection<ArtifactKey> identify(File classesLocation, IProgressMonitor monitor) {
+  public Collection<ArtifactKey> identify(File classesLocation) {
     // checksum-based lookup in nexus index
     // checksum-based lookup in central
     // GAV extracted from pom.properties

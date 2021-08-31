@@ -49,7 +49,6 @@ import org.eclipse.osgi.util.NLS;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -551,7 +550,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     }
   }
 
-  private void reindexWorkspace(boolean force, IProgressMonitor monitor) throws CoreException {
+  private void reindexWorkspace(boolean force) throws CoreException {
     IRepository workspaceRepository = repositoryRegistry.getWorkspaceRepository();
     if(!force)
       return;
@@ -585,7 +584,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         ArtifactContext artifactContext;
         if(repository.isScope(IRepositoryRegistry.SCOPE_WORKSPACE)) {
           IMavenProjectFacade facade = getProjectByArtifactKey(key);
-          artifactContext = getWorkspaceArtifactContext(facade, context);
+          artifactContext = getWorkspaceArtifactContext(facade);
         } else {
           artifactContext = getArtifactContext(file, context);
         }
@@ -624,7 +623,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
             // try to get one, but you MUST have facade in case of project deletion, see mavenProjectChanged()
             facade = getProjectByArtifactKey(key);
           }
-          artifactContext = getWorkspaceArtifactContext(facade, context);
+          artifactContext = getWorkspaceArtifactContext(facade);
         } else {
           artifactContext = getArtifactContext(file, context);
         }
@@ -642,7 +641,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     return getArtifactContextProducer().getArtifactContext(context, file);
   }
 
-  private ArtifactContext getWorkspaceArtifactContext(IMavenProjectFacade facade, IndexingContext context) {
+  private ArtifactContext getWorkspaceArtifactContext(IMavenProjectFacade facade) {
     IRepository workspaceRepository = repositoryRegistry.getWorkspaceRepository();
     ArtifactKey key = facade.getArtifactKey();
     ArtifactInfo ai = new ArtifactInfo(workspaceRepository.getUid(), key.getGroupId(), key.getArtifactId(),
@@ -930,7 +929,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
             getIndexer().removeIndexingContext(indexingContext, false);
           }
 
-          createIndexingContext(repository, details);
+          createIndexingContext(repository);
 
           fireIndexAdded(repository);
 
@@ -954,7 +953,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     }
   }
 
-  protected IndexingContext createIndexingContext(IRepository repository, String details) throws IOException {
+  protected IndexingContext createIndexingContext(IRepository repository) throws IOException {
     IndexingContext indexingContext;
     Directory directory = getIndexDirectory(repository);
 
@@ -1071,7 +1070,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   public void updateIndex(IRepository repository, boolean force, IProgressMonitor monitor) throws CoreException {
     synchronized(getIndexLock(repository)) {
       if(repository.isScope(IRepositoryRegistry.SCOPE_WORKSPACE)) {
-        reindexWorkspace(force, monitor);
+        reindexWorkspace(force);
       } else {
         IndexingContext context = getIndexingContext(repository);
         if(context != null) {
@@ -1145,7 +1144,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
             getIndexer().removeIndexingContext(cacheCtx, false); // keep the cache!
             FileUtils.cleanDirectory(context.getIndexDirectoryFile());
             FileUtils.copyDirectory(luceneCache, context.getIndexDirectoryFile()); // copy cached lucene index
-            context = createIndexingContext(repository, details); // re-create indexing context
+            context = createIndexingContext(repository); // re-create indexing context
 
             updated = true;
           } else {
@@ -1194,13 +1193,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   public void initialize(IProgressMonitor monitor) throws CoreException {
-    try {
-      BufferedInputStream is = new BufferedInputStream(new FileInputStream(getIndexDetailsFile()));
-      try {
+    try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(getIndexDetailsFile()))) {
         indexDetails.load(is);
-      } finally {
-        is.close();
-      }
     } catch(FileNotFoundException e) {
       // that's quite alright
     } catch(IOException e) {
@@ -1213,11 +1207,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     try {
       File indexDetailsFile = getIndexDetailsFile();
       indexDetailsFile.getParentFile().mkdirs();
-      BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(indexDetailsFile));
-      try {
+      try (BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(indexDetailsFile))) {
         indexDetails.store(os, null);
-      } finally {
-        os.close();
       }
     } catch(IOException e) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
@@ -1258,12 +1249,10 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   protected ArtifactInfo identify(File artifact, Collection<IndexingContext> contexts) throws IOException {
 
-    FileInputStream is = null;
-
-    try {
+    try (FileInputStream is = new FileInputStream(artifact)) {
       MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 
-      is = new FileInputStream(artifact);
+
 
       byte[] buff = new byte[4096];
 
@@ -1282,8 +1271,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
     } catch(NoSuchAlgorithmException ex) {
       throw new IOException("Unable to calculate digest");
-    } finally {
-      IOUtil.close(is);
     }
 
   }

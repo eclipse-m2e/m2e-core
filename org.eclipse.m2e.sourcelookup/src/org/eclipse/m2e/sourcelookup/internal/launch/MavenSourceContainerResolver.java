@@ -39,7 +39,7 @@ public class MavenSourceContainerResolver implements ISourceContainerResolver {
 
   @Override
   public Collection<ISourceContainer> resolveSourceContainers(File classesLocation, IProgressMonitor monitor) {
-    Collection<ArtifactKey> classesArtifacts = INDENTIFIER.identify(classesLocation, monitor);
+    Collection<ArtifactKey> classesArtifacts = INDENTIFIER.identify(classesLocation);
 
     if (classesArtifacts == null) {
       return null;
