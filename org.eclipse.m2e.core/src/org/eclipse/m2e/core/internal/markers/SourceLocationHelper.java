@@ -215,7 +215,7 @@ public class SourceLocationHelper {
     return null;
   }
 
-  private static <T> boolean eq(String s1, String s2) {
+  private static boolean eq(String s1, String s2) {
     if(s1 != null && s1.trim().length() == 0) {
       s1 = null;
     }

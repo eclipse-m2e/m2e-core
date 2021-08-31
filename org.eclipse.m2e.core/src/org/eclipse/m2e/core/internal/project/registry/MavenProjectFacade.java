@@ -191,6 +191,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   /**
    * Returns project relative paths of resource directories
    */
+  @Override
   public IPath[] getResourceLocations() {
     return resourceLocations;
   }
@@ -198,14 +199,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   /**
    * Returns project relative paths of test resource directories
    */
+  @Override
   public IPath[] getTestResourceLocations() {
     return testResourceLocations;
   }
 
+  @Override
   public IPath[] getCompileSourceLocations() {
     return compileSourceLocations;
   }
 
+  @Override
   public IPath[] getTestCompileSourceLocations() {
     return testCompileSourceLocations;
   }
@@ -216,6 +220,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * @param resourceLocation absolute file system location
    * @return IPath the full, absolute workspace path resourceLocation
    */
+  @Override
   public IPath getProjectRelativePath(String resourceLocation) {
     return MavenProjectUtils.getProjectRelativePath(getProject(), resourceLocation);
   }
@@ -224,6 +229,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * Returns the full, absolute path of this project maven build output directory relative to the workspace or null if
    * maven build output directory cannot be determined or outside of the workspace.
    */
+  @Override
   public IPath getOutputLocation() {
     return outputLocation;
   }
@@ -232,14 +238,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * Returns the full, absolute path of this project maven build test output directory relative to the workspace or null
    * if maven build output directory cannot be determined or outside of the workspace.
    */
+  @Override
   public IPath getTestOutputLocation() {
     return testOutputLocation;
   }
 
+  @Override
   public String getFinalName() {
     return finalName;
   }
 
+  @Override
   public IPath getFullPath() {
     return getProject().getFullPath();
   }
@@ -247,26 +256,32 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   /**
    * Lazy load and cache MavenProject instance
    */
+  @Override
   public MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException {
     return manager.getMavenProject(this, monitor);
   }
 
+  @Override
   public MavenProject getMavenProject() {
     return manager.getMavenProject(this);
   }
 
+  @Override
   public String getPackaging() {
     return packaging;
   }
 
+  @Override
   public IProject getProject() {
     return pom.getProject();
   }
 
+  @Override
   public IFile getPom() {
     return pom;
   }
 
+  @Override
   public File getPomFile() {
     return pomFile;
   }
@@ -275,14 +290,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * Returns the full, absolute path of the given file relative to the workspace. Returns null if the file does not
    * exist or is not a member of this project.
    */
+  @Override
   public IPath getFullPath(File file) {
     return MavenProjectUtils.getFullPath(getProject(), file);
   }
 
+  @Override
   public List<String> getMavenProjectModules() {
     return modules;
   }
 
+  @Override
   public Set<ArtifactRef> getMavenProjectArtifacts() {
     return artifacts;
   }
@@ -291,6 +309,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.artifacts = Collections.unmodifiableSet(ArtifactRef.fromArtifact(mavenProject.getArtifacts()));
   }
 
+  @Override
   public ResolverConfiguration getResolverConfiguration() {
     return resolverConfiguration;
   }
@@ -298,6 +317,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   /**
    * @return true if maven project needs to be re-read from disk
    */
+  @Override
   public boolean isStale() {
     IProject project = getProject();
     int i = 0;
@@ -322,10 +342,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return file.getLocalTimeStamp() + file.getModificationStamp();
   }
 
+  @Override
   public ArtifactKey getArtifactKey() {
     return artifactKey;
   }
 
+  @Override
   public synchronized void setSessionProperty(String key, Object value) {
     if(sessionProperties == null) {
       sessionProperties = new HashMap<>();
@@ -337,24 +359,29 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
   }
 
+  @Override
   public synchronized Object getSessionProperty(String key) {
     return sessionProperties != null ? sessionProperties.get(key) : null;
   }
 
+  @Override
   public Set<ArtifactRepositoryRef> getArtifactRepositoryRefs() {
     return artifactRepositories;
   }
 
+  @Override
   public Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs() {
     return pluginArtifactRepositories;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getProject().toString()).append(": ").append(getArtifactKey().toString());
     return sb.toString();
   }
 
+  @Override
   public String getLifecycleMappingId() {
     return lifecycleMappingId;
   }
@@ -363,6 +390,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.lifecycleMappingId = lifecycleMappingId;
   }
 
+  @Override
   public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
@@ -407,6 +435,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return executionPlans;
   }
 
+  @Override
   public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException {
     Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
@@ -430,6 +459,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
   }
 
+  @Override
   public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException {
     List<MojoExecution> result = new ArrayList<>();

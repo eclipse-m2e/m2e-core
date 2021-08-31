@@ -42,14 +42,17 @@ public class ResourceScanner extends AbstractScanner {
     this.resource = resource;
   }
 
+  @Override
   public String[] getIncludedDirectories() {
     return includedDirectories.toArray(new String[includedDirectories.size()]);
   }
 
+  @Override
   public String[] getIncludedFiles() {
     return includedFiles.toArray(new String[includedFiles.size()]);
   }
 
+  @Override
   public void scan() {
     try {
       setupDefaultFilters();
@@ -83,6 +86,7 @@ public class ResourceScanner extends AbstractScanner {
     return resource.getFullPath().removeFirstSegments(this.resource.getFullPath().segmentCount()).toOSString();
   }
 
+  @Override
   public File getBasedir() {
     return resource.getLocation().toFile();
   }

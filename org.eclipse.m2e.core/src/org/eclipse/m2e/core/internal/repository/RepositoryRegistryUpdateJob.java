@@ -41,6 +41,7 @@ public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProce
     this.registry = registry;
   }
 
+  @Override
   public IStatus run(IProgressMonitor monitor) {
     synchronized(queue) {
       queue.clear();
@@ -53,6 +54,7 @@ public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProce
     return Status.OK_STATUS;
   }
 
+  @Override
   public boolean isEmpty() {
     synchronized(queue) {
       return queue.isEmpty();

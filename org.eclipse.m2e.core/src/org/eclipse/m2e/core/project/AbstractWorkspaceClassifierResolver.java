@@ -39,10 +39,12 @@ public abstract class AbstractWorkspaceClassifierResolver
     this.name = config.getAttribute(ATTR_NAME);
   }
 
+  @Override
   public int getPriority() {
     return 0;
   }
 
+  @Override
   public String toString() {
     return getName();
   }

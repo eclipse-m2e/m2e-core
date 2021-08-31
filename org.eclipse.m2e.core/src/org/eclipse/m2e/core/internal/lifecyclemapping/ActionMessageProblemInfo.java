@@ -31,6 +31,7 @@ public class ActionMessageProblemInfo extends MojoExecutionProblemInfo {
     this.pomMapping = pomMapping;
   }
 
+  @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
 

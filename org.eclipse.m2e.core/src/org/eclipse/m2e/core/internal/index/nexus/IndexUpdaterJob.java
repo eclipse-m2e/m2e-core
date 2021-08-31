@@ -34,10 +34,12 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
 
   public static class IndexUpdaterRule implements ISchedulingRule {
 
+    @Override
     public boolean contains(ISchedulingRule rule) {
       return rule == this;
     }
 
+    @Override
     public boolean isConflicting(ISchedulingRule rule) {
       return rule == this;
     }
@@ -59,6 +61,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
     updateQueue.add(indexCommand);
   }
 
+  @Override
   public IStatus run(IProgressMonitor monitor) {
     monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
 
@@ -83,6 +86,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
         problems.toArray(new IStatus[problems.size()]), null, null);
   }
 
+  @Override
   public boolean isEmpty() {
     return updateQueue.isEmpty();
   }

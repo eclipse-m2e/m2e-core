@@ -45,12 +45,15 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
     this.monitor = monitor;
   }
 
+  @Override
   public void scanningStarted(IndexingContext ctx) {
   }
 
+  @Override
   public void scanningFinished(IndexingContext ctx, ScanningResult result) {
   }
 
+  @Override
   public void artifactDiscovered(ArtifactContext ac) {
     long current = System.currentTimeMillis();
     if((current - timestamp) > THRESHOLD) {
@@ -61,6 +64,7 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
     }
   }
 
+  @Override
   public void artifactError(ArtifactContext ac, Exception e) {
     String id = ac.getPom().getAbsolutePath().substring(repositoryDir.getAbsolutePath().length());
     log.error(id + " " + e.getMessage()); //$NON-NLS-1$

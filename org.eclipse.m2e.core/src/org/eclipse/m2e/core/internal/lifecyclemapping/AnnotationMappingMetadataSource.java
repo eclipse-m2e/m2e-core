@@ -81,6 +81,7 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     projectId = project.getModel().getLocation(SELF).getSource().getModelId();
   }
 
+  @Override
   public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution) {
     Xpp3Dom action = getAction(execution);
     if(action != null) {
@@ -135,6 +136,7 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     return plugins == null ? null : plugins.getPluginsAsMap().get(key);
   }
 
+  @Override
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
     return null;
   }

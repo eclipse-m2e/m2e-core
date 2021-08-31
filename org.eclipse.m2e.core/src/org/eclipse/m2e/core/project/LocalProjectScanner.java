@@ -66,6 +66,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     this.modelManager = modelManager;
   }
 
+  @Override
   public void run(IProgressMonitor monitor) throws InterruptedException {
     SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, 1);
 
@@ -209,6 +210,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     return new MavenProjectInfo(label, pomFile, model, parent);
   }
 
+  @Override
   public String getDescription() {
     return folders.toString();
   }

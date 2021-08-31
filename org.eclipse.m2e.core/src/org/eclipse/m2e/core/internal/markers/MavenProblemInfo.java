@@ -104,6 +104,7 @@ public class MavenProblemInfo {
     }
   }
 
+  @Override
   public String toString() {
     return message;
   }

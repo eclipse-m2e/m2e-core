@@ -444,30 +444,18 @@ public class LifecycleMappingFactory {
     LifecycleMappingMetadataSource metadata = null;
     try {
       if(file.isFile()) {
-        JarFile jar = new JarFile(file);
-        try {
+        try (JarFile jar = new JarFile(file)) {
           ZipEntry entry = jar.getEntry(LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH);
           if(entry == null) {
             return null;
           }
           InputStream is = jar.getInputStream(entry);
           metadata = createLifecycleMappingMetadataSource(is);
-        } finally {
-          try {
-            jar.close();
-          } catch(IOException e) {
-            // too bad
-          }
         }
       } else if(file.isDirectory()) {
-        try {
-          InputStream is = new BufferedInputStream(
-              new FileInputStream(new File(file, LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH)));
-          try {
+        try (InputStream is = new BufferedInputStream(
+            new FileInputStream(new File(file, LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH)))) {
             metadata = createLifecycleMappingMetadataSource(is);
-          } finally {
-            IOUtil.close(is);
-          }
         } catch(FileNotFoundException e) {
           // expected and tolerated
         }
@@ -491,13 +479,8 @@ public class LifecycleMappingFactory {
   public static synchronized LifecycleMappingMetadataSource getWorkspaceMetadata(boolean reload) {
     if(workspaceMetadataSource == null || reload) {
       File mappingFile = getWorkspaceMetadataFile();
-      try {
-        InputStream is = new BufferedInputStream(new FileInputStream(mappingFile));
-        try {
+      try (InputStream is = new BufferedInputStream(new FileInputStream(mappingFile))) {
           workspaceMetadataSource = createLifecycleMappingMetadataSource(is);
-        } finally {
-          IOUtil.close(is);
-        }
       } catch(FileNotFoundException e) {
         // this is expected, ignore
       } catch(IOException | XmlPullParserException ex) {

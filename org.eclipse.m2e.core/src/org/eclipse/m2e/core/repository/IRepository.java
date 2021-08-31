@@ -88,5 +88,6 @@ public interface IRepository {
   /**
    * Human readable repository identifier
    */
+  @Override
   String toString();
 }

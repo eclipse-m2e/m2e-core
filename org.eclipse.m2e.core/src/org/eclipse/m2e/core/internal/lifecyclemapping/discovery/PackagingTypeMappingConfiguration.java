@@ -25,10 +25,12 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
       this.packaging = packaging;
     }
 
+    @Override
     public int hashCode() {
       return packaging.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
       if(this == obj) {
         return true;
@@ -58,10 +60,12 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
       this.lifecycleMappingId = lifecycleMappingId;
     }
 
+    @Override
     public int hashCode() {
       return lifecycleMappingId.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
       if(this == obj) {
         return true;
@@ -110,12 +114,14 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
     return lifecycleMappingId;
   }
 
+  @Override
   public int hashCode() {
     int hash = packaging.hashCode();
     hash = 17 * hash + (lifecycleMappingId != null ? lifecycleMappingId.hashCode() : 0);
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;
@@ -134,6 +140,7 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
     return a != null ? a.equals(b) : b == null;
   }
 
+  @Override
   public ILifecycleMappingRequirement getLifecycleMappingRequirement() {
     return requirement;
   }

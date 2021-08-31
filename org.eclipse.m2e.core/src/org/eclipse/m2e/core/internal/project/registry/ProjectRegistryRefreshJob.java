@@ -70,6 +70,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   // Job
 
+  @Override
   public IStatus run(final IProgressMonitor monitor) {
     monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
     final ArrayList<MavenUpdateRequest> requests;
@@ -180,6 +181,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   // IResourceChangeListener
 
+  @Override
   public void resourceChanged(IResourceChangeEvent event) {
     boolean offline = mavenConfiguration.isOffline();
     boolean forceDependencyUpdate = false;
@@ -225,6 +227,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     }
   }
 
+  @Override
   public void preferenceChange(PreferenceChangeEvent event) {
     boolean offline = mavenConfiguration.isOffline();
     boolean updateSnapshots = false;
@@ -234,6 +237,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     }
   }
 
+  @Override
   public boolean isEmpty() {
     synchronized(queue) {
       return queue.isEmpty();
