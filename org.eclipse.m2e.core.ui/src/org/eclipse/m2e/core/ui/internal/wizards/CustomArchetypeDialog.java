@@ -119,7 +119,7 @@ public class CustomArchetypeDialog extends TitleAreaDialog {
     archetypeGroupIdComboData.widthHint = 350;
     archetypeGroupIdCombo.setLayoutData(archetypeGroupIdComboData);
     archetypeGroupIdCombo.setItems(getSavedValues(KEY_ARCHETYPE_GROUP_ID));
-    archetypeGroupIdCombo.setData("name", "archetypeGroupId"); //$NON-NLS-1$ //$NON-NLS-2$
+    archetypeGroupIdCombo.setData("name", KEY_ARCHETYPE_GROUP_ID); //$NON-NLS-1$ //$NON-NLS-2$
 
     Label archetypeArtifactIdLabel = new Label(composite, SWT.NONE);
     archetypeArtifactIdLabel.setText(Messages.CustomArchetypeDialog_lblArchetypeartifactid);
@@ -127,7 +127,7 @@ public class CustomArchetypeDialog extends TitleAreaDialog {
     archetypeArtifactIdCombo = new Combo(composite, SWT.NONE);
     archetypeArtifactIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     archetypeArtifactIdCombo.setItems(getSavedValues(KEY_ARCHETYPE_ARTIFACT_ID));
-    archetypeArtifactIdCombo.setData("name", "archetypeArtifactId"); //$NON-NLS-1$ //$NON-NLS-2$
+    archetypeArtifactIdCombo.setData("name", KEY_ARCHETYPE_ARTIFACT_ID); //$NON-NLS-1$ //$NON-NLS-2$
 
     Label archetypeVersionLabel = new Label(composite, SWT.NONE);
     archetypeVersionLabel.setText(Messages.CustomArchetypeDialog_lblArchetypeversion);
@@ -135,7 +135,7 @@ public class CustomArchetypeDialog extends TitleAreaDialog {
     archetypeVersionCombo = new Combo(composite, SWT.NONE);
     archetypeVersionCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     archetypeVersionCombo.setItems(getSavedValues(KEY_ARCHETYPE_VERSION));
-    archetypeVersionCombo.setData("name", "archetypeVersion"); //$NON-NLS-1$ //$NON-NLS-2$
+    archetypeVersionCombo.setData("name", KEY_ARCHETYPE_VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 
     Label repositoryLabel = new Label(composite, SWT.NONE);
     repositoryLabel.setText(Messages.CustomArchetypeDialog_lblRepo);
