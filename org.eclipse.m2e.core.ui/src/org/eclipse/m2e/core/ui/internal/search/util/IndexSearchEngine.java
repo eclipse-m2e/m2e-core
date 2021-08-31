@@ -52,6 +52,7 @@ public class IndexSearchEngine implements SearchEngine {
     return str == null || str.trim().length() == 0;
   }
 
+  @Override
   public Collection<String> findArtifactIds(String groupId, String searchExpression, Packaging packaging,
       ArtifactInfo containingArtifact) {
     // TODO add support for implicit groupIds in plugin dependencies "org.apache.maven.plugins", ...
@@ -82,6 +83,7 @@ public class IndexSearchEngine implements SearchEngine {
     }
   }
 
+  @Override
   public Collection<String> findClassifiers(String groupId, String artifactId, String version, String prefix,
       Packaging packaging) {
     try {
@@ -104,6 +106,7 @@ public class IndexSearchEngine implements SearchEngine {
     }
   }
 
+  @Override
   public Collection<String> findGroupIds(String searchExpression, Packaging packaging, ArtifactInfo containingArtifact) {
     try {
       TreeSet<String> ids = new TreeSet<>();
@@ -120,6 +123,7 @@ public class IndexSearchEngine implements SearchEngine {
     }
   }
 
+  @Override
   public Collection<String> findTypes(String groupId, String artifactId, String version, String prefix,
       Packaging packaging) {
     try {
@@ -142,6 +146,7 @@ public class IndexSearchEngine implements SearchEngine {
     }
   }
 
+  @Override
   public Collection<String> findVersions(String groupId, String artifactId, String searchExpression, Packaging packaging) {
     try {
       Collection<IndexedArtifact> values = index.find(new MatchTypedStringSearchExpression(groupId, MatchType.EXACT),

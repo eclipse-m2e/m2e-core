@@ -27,10 +27,12 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class GlobalRepositoriesNode extends AbstractRepositoriesNode {
 
+  @Override
   public String getName() {
     return Messages.GlobalRepositoriesNode_name;
   }
 
+  @Override
   protected List<IRepository> getRepositories() {
     return repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_SETTINGS);
   }

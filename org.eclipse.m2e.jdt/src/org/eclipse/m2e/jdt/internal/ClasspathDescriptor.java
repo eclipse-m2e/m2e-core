@@ -69,6 +69,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
   /**
    * @return true if classpath contains entry with specified path, false otherwise.
    */
+  @Override
   public boolean containsPath(IPath path) {
     for(IClasspathEntryDescriptor descriptor : entries) {
       if(path.equals(descriptor.getPath())) {
@@ -78,6 +79,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return false;
   }
 
+  @Override
   public ClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, boolean generated) {
     return addSourceEntry(sourcePath, //
         outputLocation, //
@@ -86,10 +88,12 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
         generated);
   }
 
+  @Override
   public List<IClasspathEntryDescriptor> removeEntry(final IPath path) {
     return removeEntry(descriptor -> path.equals(descriptor.getPath()));
   }
 
+  @Override
   public List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter) {
     ArrayList<IClasspathEntryDescriptor> result = new ArrayList<>();
 
@@ -106,6 +110,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return result;
   }
 
+  @Override
   public ClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion,
       IPath[] exclusion, boolean generated) {
 //    IWorkspaceRoot workspaceRoot = project.getProject().getWorkspace().getRoot();
@@ -133,10 +138,12 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return descriptor;
   }
 
+  @Override
   public void touchEntry(IPath sourcePath) {
     staleEntries.remove(sourcePath);
   }
 
+  @Override
   public IClasspathEntry[] getEntries() {
     List<IClasspathEntry> result = new ArrayList<>();
 
@@ -149,16 +156,19 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return result.toArray(new IClasspathEntry[result.size()]);
   }
 
+  @Override
   public List<IClasspathEntryDescriptor> getEntryDescriptors() {
     return entries;
   }
 
+  @Override
   public ClasspathEntryDescriptor addEntry(IClasspathEntry cpe) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(cpe);
     addEntryDescriptor(entry);
     return entry;
   }
 
+  @Override
   public IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry cpe) {
 
     ListIterator<IClasspathEntryDescriptor> iter = entries.listIterator();
@@ -175,6 +185,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return null;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public ClasspathEntryDescriptor addProjectEntry(Artifact a, IMavenProjectFacade projectFacade) {
     ClasspathEntryDescriptor entry = addProjectEntry(projectFacade.getFullPath());
@@ -184,12 +195,14 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return entry;
   }
 
+  @Override
   public ClasspathEntryDescriptor addProjectEntry(IPath entryPath) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(IClasspathEntry.CPE_PROJECT, entryPath);
     addEntryDescriptor(entry);
     return entry;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public ClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl) {
     ArtifactKey artifactKey = new ArtifactKey(artifact);
@@ -205,6 +218,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return entry;
   }
 
+  @Override
   public ClasspathEntryDescriptor addLibraryEntry(IPath entryPath) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(IClasspathEntry.CPE_LIBRARY, entryPath);
     addEntryDescriptor(entry);

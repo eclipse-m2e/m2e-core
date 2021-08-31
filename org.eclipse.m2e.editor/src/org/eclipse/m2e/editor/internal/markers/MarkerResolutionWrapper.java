@@ -40,10 +40,12 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
     this.marker = marker;
   }
 
+  @Override
   public void apply(IDocument document) {
     resolution.run(marker);
   }
 
+  @Override
   public String getAdditionalProposalInfo() {
     if(resolution instanceof IMarkerResolution2) {
       return ((IMarkerResolution2) resolution).getDescription();
@@ -52,14 +54,17 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
     return problemDesc;
   }
 
+  @Override
   public IContextInformation getContextInformation() {
     return null;
   }
 
+  @Override
   public String getDisplayString() {
     return resolution.getLabel();
   }
 
+  @Override
   public Image getImage() {
     if(resolution instanceof IMarkerResolution2) {
       return ((IMarkerResolution2) resolution).getImage();
@@ -67,6 +72,7 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
     return null; //what is the default image here??
   }
 
+  @Override
   public Point getSelection(IDocument document) {
     return null;
   }

@@ -85,29 +85,34 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     maven = (MavenImpl) MavenPlugin.getMaven();
   }
 
+  @Override
   @Deprecated
   public MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className, IProgressMonitor monitor)
       throws CoreException {
     return getClassConfiguration(pluginKey, className);
   }
 
+  @Override
   @Deprecated
   public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos, IProgressMonitor monitor)
       throws CoreException {
     return getMojoConfiguration(pluginKey, mojos);
   }
 
+  @Override
   @Deprecated
   public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException {
     return getMojoConfiguration(pluginKey);
   }
 
+  @Override
   @Deprecated
   public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo, IProgressMonitor monitor)
       throws CoreException {
     return getMojoConfiguration(pluginKey, mojo);
   }
 
+  @Override
   public MojoParameter getClassConfiguration(final ArtifactKey pluginKey, final String className) throws CoreException {
 
     try {
@@ -141,6 +146,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     }
   }
 
+  @Override
   public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, final Collection<String> mojos)
       throws CoreException {
     List<MojoParameter> params = new ArrayList<>();
@@ -156,10 +162,12 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     return new MojoParameter("", "", params); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
+  @Override
   public MojoParameter getMojoConfiguration(ArtifactKey pluginKey) throws CoreException {
     return getMojoConfiguration(pluginKey, "*"); //$NON-NLS-1$
   }
 
+  @Override
   public MojoParameter getMojoConfiguration(final ArtifactKey pluginKey, final String mojo) throws CoreException {
 
     MojoParameter predefParameters = getPredefined(pluginKey);

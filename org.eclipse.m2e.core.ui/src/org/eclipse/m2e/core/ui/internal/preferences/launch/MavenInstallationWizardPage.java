@@ -85,24 +85,30 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   class TreeContentProvider implements ITreeContentProvider {
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return ((Collection<?>) inputElement).toArray();
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       return null;
     }
 
+    @Override
     public Object getParent(Object element) {
       return null;
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       return false;
     }
@@ -111,23 +117,29 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   class TreeLabelProvider implements ILabelProvider {
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public Image getImage(Object element) {
       return null;
     }
 
+    @Override
     public String getText(Object element) {
       if(element instanceof ProjectClasspathEntry) {
         return ((ProjectClasspathEntry) element).getProject();
@@ -146,6 +158,7 @@ public class MavenInstallationWizardPage extends WizardPage {
         : new ArrayList<>();
   }
 
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
 

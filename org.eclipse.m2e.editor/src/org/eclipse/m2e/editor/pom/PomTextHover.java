@@ -49,6 +49,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   public PomTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
   }
 
+  @Override
   public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
 
     if(hoverRegion instanceof ExpressionRegion) {
@@ -134,6 +135,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     return new StyledString(""); //$NON-NLS-1$
   }
 
+  @Override
   public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
     IDocument document = textViewer.getDocument();
     if(document == null) {
@@ -180,10 +182,12 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     return toRet.getRegions().size() > 0 ? toRet : null;
   }
 
+  @Override
   public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
     return hoverRegion;
   }
 
+  @Override
   public IInformationControlCreator getHoverControlCreator() {
     return parent -> new MarkerHoverControl(parent);
   }
@@ -205,10 +209,12 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       this.textOffset = textOffset;
     }
 
+    @Override
     public int getLength() {
       return length;
     }
 
+    @Override
     public int getOffset() {
       return offset;
     }

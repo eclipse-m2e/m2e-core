@@ -25,12 +25,14 @@ public class SearchMatcher extends Matcher {
     this.searchControl = searchControl;
   }
 
+  @Override
   public boolean isMatchingArtifact(String groupId, String artifactId) {
     String text = searchControl.getSearchText().getText().toLowerCase();
     return (artifactId != null && artifactId.toLowerCase().contains(text)) //
         || (groupId != null && groupId.toLowerCase().contains(text));
   }
 
+  @Override
   public boolean isEmpty() {
     return searchControl.getSearchText().getText() == null //
         || searchControl.getSearchText().getText().trim().isEmpty();

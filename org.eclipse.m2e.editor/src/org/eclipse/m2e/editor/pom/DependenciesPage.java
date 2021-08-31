@@ -43,6 +43,7 @@ public class DependenciesPage extends MavenPomEditorPage {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.dependencies", Messages.DependenciesPage_title); //$NON-NLS-1$
   }
 
+  @Override
   public void dispose() {
     if(dependenciesComposite != null) {
       dependenciesComposite.dispose();
@@ -50,6 +51,7 @@ public class DependenciesPage extends MavenPomEditorPage {
     super.dispose();
   }
 
+  @Override
   public void setActive(boolean active) {
     super.setActive(active);
     if(active) {
@@ -58,6 +60,7 @@ public class DependenciesPage extends MavenPomEditorPage {
     }
   }
 
+  @Override
   protected void createFormContent(IManagedForm managedForm) {
     FormToolkit toolkit = managedForm.getToolkit();
 
@@ -88,6 +91,7 @@ public class DependenciesPage extends MavenPomEditorPage {
     super.createFormContent(managedForm);
   }
 
+  @Override
   public void loadData() {
     dependenciesComposite.loadData();
   }

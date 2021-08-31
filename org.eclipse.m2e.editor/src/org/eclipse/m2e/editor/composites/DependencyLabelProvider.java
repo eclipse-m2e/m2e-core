@@ -48,8 +48,8 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
  *
  * @author Eugene Kuleshov
  */
-public class DependencyLabelProvider extends LabelProvider implements IColorProvider,
-    DelegatingStyledCellLabelProvider.IStyledLabelProvider {
+public class DependencyLabelProvider extends LabelProvider
+    implements IColorProvider, DelegatingStyledCellLabelProvider.IStyledLabelProvider {
 
   private MavenPomEditor pomEditor;
 
@@ -80,6 +80,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
 
   // IColorProvider
 
+  @Override
   public Color getForeground(Object element) {
     //a workaround to handle display in ManagedDependenciesDialog
     //TODO shall have a switch of it's own.. the curse of blind code reuse
@@ -90,6 +91,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     return null;
   }
 
+  @Override
   public Color getBackground(Object element) {
     return null;
   }
@@ -138,6 +140,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     return null;
   }
 
+  @Override
   public StyledString getStyledText(Object element) {
     if(element instanceof DependenciesComposite.Dependency) {
       StyledString ss = new StyledString(getText(element));
@@ -231,16 +234,17 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
       IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
       if(projectFacade != null) {
-        return isManaged ? MavenImages.getOverlayImage(MavenImages.PATH_PROJECT, MavenImages.PATH_LOCK,
-            IDecoration.BOTTOM_LEFT) : MavenEditorImages.IMG_PROJECT;
+        return isManaged
+            ? MavenImages.getOverlayImage(MavenImages.PATH_PROJECT, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT)
+            : MavenEditorImages.IMG_PROJECT;
       }
     }
-    return isManaged ? MavenImages
-        .getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT)
+    return isManaged ? MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT)
         : MavenEditorImages.IMG_JAR;
   }
 
-  private String getText(String groupId, String artifactId, String version, String classifier, String type, String scope) {
+  private String getText(String groupId, String artifactId, String version, String classifier, String type,
+      String scope) {
     StringBuilder sb = new StringBuilder();
 
     if(showGroupId) {

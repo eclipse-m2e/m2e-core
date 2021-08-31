@@ -38,11 +38,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   }
 
+  @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     // TODO Auto-generated method stub
 
   }
 
+  @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade facade = request.getMavenProjectFacade();

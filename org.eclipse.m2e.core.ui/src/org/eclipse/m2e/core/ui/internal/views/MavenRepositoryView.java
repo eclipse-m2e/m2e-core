@@ -139,10 +139,12 @@ public class MavenRepositoryView extends ViewPart {
 
   private IndexListener indexListener;
 
+  @Override
   public void setFocus() {
     viewer.getControl().setFocus();
   }
 
+  @Override
   public void createPartControl(Composite parent) {
     viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     contentProvider = new RepositoryViewContentProvider();
@@ -166,18 +168,22 @@ public class MavenRepositoryView extends ViewPart {
     contributeToActionBars();
     this.indexListener = new IndexListener() {
 
+      @Override
       public void indexAdded(IRepository repository) {
         refreshView();
       }
 
+      @Override
       public void indexChanged(IRepository repository) {
         refreshView();
       }
 
+      @Override
       public void indexRemoved(IRepository repository) {
         refreshView();
       }
 
+      @Override
       public void indexUpdating(IRepository repository) {
         Display.getDefault().asyncExec(() -> viewer.refresh(true));
       }
@@ -267,6 +273,7 @@ public class MavenRepositoryView extends ViewPart {
 
   private void makeActions() {
     collapseAllAction = new Action(Messages.MavenRepositoryView_btnCollapse) {
+      @Override
       public void run() {
         viewer.collapseAll();
       }
@@ -275,12 +282,14 @@ public class MavenRepositoryView extends ViewPart {
     collapseAllAction.setImageDescriptor(
         PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
     reloadSettings = new Action(Messages.MavenRepositoryView_action_reload) {
+      @Override
       public void run() {
         String msg = Messages.MavenRepositoryView_reload_msg;
         boolean res = MessageDialog.openConfirm(getViewSite().getShell(), //
             Messages.MavenRepositoryView_reload_title, msg);
         if(res) {
           Job job = new WorkspaceJob(Messages.MavenRepositoryView_job_reloading) {
+            @Override
             public IStatus runInWorkspace(IProgressMonitor monitor) {
               try {
                 MavenPlugin.getMaven().reloadSettings();
@@ -317,6 +326,7 @@ public class MavenRepositoryView extends ViewPart {
     //updateAction.setImageDescriptor(MavenImages.UPD_INDEX);
 
     updateAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_update) {
+      @Override
       public void run() {
         List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
         for(AbstractIndexedRepositoryNode node : nodes) {
@@ -326,6 +336,7 @@ public class MavenRepositoryView extends ViewPart {
         }
       }
 
+      @Override
       protected boolean updateSelection(IStructuredSelection selection) {
         int indexCount = 0;
         for(AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
@@ -345,9 +356,11 @@ public class MavenRepositoryView extends ViewPart {
     updateAction.setImageDescriptor(MavenImages.UPD_INDEX);
 
     rebuildAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_rebuild) {
+      @Override
       public void run() {
         new Job(Messages.MavenRepositoryView_rebuild_indexes) {
 
+          @Override
           protected IStatus run(IProgressMonitor monitor) {
             // Remove the index listener to avoid locking the user interface
             indexManager.removeIndexListener(indexListener);
@@ -392,6 +405,7 @@ public class MavenRepositoryView extends ViewPart {
         }.schedule();
       }
 
+      @Override
       protected boolean updateSelection(IStructuredSelection selection) {
         int indexCount = 0;
         for(AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
@@ -425,6 +439,7 @@ public class MavenRepositoryView extends ViewPart {
     enableFullAction.setImageDescriptor(MavenImages.REBUILD_INDEX);
 
     openPomAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_open) {
+      @Override
       public void run() {
         ISelection selection = viewer.getSelection();
         Object element = ((IStructuredSelection) selection).getFirstElement();
@@ -434,6 +449,7 @@ public class MavenRepositoryView extends ViewPart {
         }
       }
 
+      @Override
       protected boolean updateSelection(IStructuredSelection selection) {
         return selection.getFirstElement() instanceof IndexedArtifactFileNode;
       }
@@ -442,6 +458,7 @@ public class MavenRepositoryView extends ViewPart {
     openPomAction.setImageDescriptor(MavenImages.POM);
 
     copyUrlAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_copy) {
+      @Override
       public void run() {
         Object element = getStructuredSelection().getFirstElement();
         String url = null;
@@ -466,6 +483,7 @@ public class MavenRepositoryView extends ViewPart {
         }
       }
 
+      @Override
       protected boolean updateSelection(IStructuredSelection selection) {
         Object element = selection.getFirstElement();
         return element instanceof RepositoryNode || element instanceof IndexedArtifactGroup;
@@ -522,6 +540,7 @@ public class MavenRepositoryView extends ViewPart {
     return element instanceof AbstractIndexedRepositoryNode ? (AbstractIndexedRepositoryNode) element : null;
   }
 
+  @Override
   public void dispose() {
 //    viewer.removeSelectionChangedListener(materializeProjectAction);
     viewer.removeSelectionChangedListener(copyUrlAction);
@@ -563,6 +582,7 @@ public class MavenRepositoryView extends ViewPart {
       super(text, style);
     }
 
+    @Override
     public void run() {
       IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
       setIndexDetails(getSelectedRepositoryNode(sel), getDetailsValue());
@@ -570,6 +590,7 @@ public class MavenRepositoryView extends ViewPart {
 
     /*
      */
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       IStructuredSelection sel = (IStructuredSelection) event.getSelection();
       updateSelection(sel);
@@ -598,10 +619,12 @@ public class MavenRepositoryView extends ViewPart {
       super(DISABLE_DETAILS, IAction.AS_CHECK_BOX);
     }
 
+    @Override
     protected String getDetailsValue() {
       return NexusIndex.DETAILS_DISABLED;
     }
 
+    @Override
     protected String getActionText() {
       return isChecked() ? DISABLED_DETAILS : DISABLE_DETAILS;
     }
@@ -612,10 +635,12 @@ public class MavenRepositoryView extends ViewPart {
       super(ENABLE_MIN, IAction.AS_CHECK_BOX);
     }
 
+    @Override
     protected String getDetailsValue() {
       return NexusIndex.DETAILS_MIN;
     }
 
+    @Override
     protected String getActionText() {
       return isChecked() ? ENABLED_MIN : ENABLE_MIN;
     }
@@ -626,10 +651,12 @@ public class MavenRepositoryView extends ViewPart {
       super(ENABLE_FULL, IAction.AS_CHECK_BOX);
     }
 
+    @Override
     protected String getDetailsValue() {
       return NexusIndex.DETAILS_FULL;
     }
 
+    @Override
     protected String getActionText() {
       return isChecked() ? ENABLED_FULL : ENABLE_FULL;
     }

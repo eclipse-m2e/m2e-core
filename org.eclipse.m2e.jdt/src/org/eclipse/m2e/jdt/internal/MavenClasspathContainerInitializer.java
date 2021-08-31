@@ -42,6 +42,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 public class MavenClasspathContainerInitializer extends ClasspathContainerInitializer {
   private static final Logger log = LoggerFactory.getLogger(MavenClasspathContainerInitializer.class);
 
+  @Override
   public void initialize(IPath containerPath, IJavaProject project) {
     if(MavenClasspathHelpers.isMaven2ClasspathContainer(containerPath)) {
       try {
@@ -57,14 +58,17 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
     }
   }
 
+  @Override
   public boolean canUpdateClasspathContainer(IPath containerPath, IJavaProject project) {
     return true;
   }
 
+  @Override
   public void requestClasspathContainerUpdate(IPath containerPath, final IJavaProject project,
       final IClasspathContainer containerSuggestion) {
     // one job per request. assumption that users are not going to change hundreds of containers simultaneously.
     new Job(Messages.MavenClasspathContainerInitializer_job_name) {
+      @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
           getBuildPathManager().persistAttachedSourcesAndJavadoc(project, containerSuggestion, monitor);

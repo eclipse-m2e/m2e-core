@@ -76,6 +76,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
    * <code>MavenLocationComponent</code> which allows to specify whether the project should be created in the workspace
    * or at some given external location.
    */
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
     container.setLayout(new GridLayout(3, false));
@@ -168,6 +169,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
   protected void createAdditionalControls(Composite container) {
   }
 
+  @Override
   public void dispose() {
     super.dispose();
     workingSetGroup.dispose();
@@ -201,6 +203,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
   }
 
   /** {@inheritDoc} */
+  @Override
   public void setVisible(boolean visible) {
     super.setVisible(visible);
 
