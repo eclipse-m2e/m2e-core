@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableMap;
 
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.core.runtime.CoreException;
@@ -353,8 +352,8 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
   static {
     // @formatter:off
-    PREDEF = ImmutableMap
-        .<String, MojoParameter> of("org.eclipse.m2e:lifecycle-mapping:1.0.0",
+    PREDEF = Map
+        .of("org.eclipse.m2e:lifecycle-mapping:1.0.0",
             new MojoParameter("", "",
                 Collections
                     .singletonList(
