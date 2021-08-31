@@ -14,7 +14,6 @@
 package org.eclipse.m2e.editor.pom;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -67,9 +66,7 @@ class PomTemplateContextUtil {
         log.error(msg);
       } else {
         InputStream is = null;
-        ZipFile zf = null;
-        try {
-          zf = new ZipFile(file);
+        try (ZipFile zf = new ZipFile(file)) {
           ZipEntry entry = zf.getEntry("META-INF/maven/plugin.xml"); //$NON-NLS-1$
           if(entry != null) {
             is = zf.getInputStream(entry);
@@ -83,11 +80,6 @@ class PomTemplateContextUtil {
           log.error(msg, ex);
         } finally {
           IOUtil.close(is);
-          try {
-            zf.close();
-          } catch(IOException ex) {
-            // ignore
-          }
         }
       }
 
