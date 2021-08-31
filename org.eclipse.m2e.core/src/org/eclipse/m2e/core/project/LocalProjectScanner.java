@@ -167,7 +167,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         if(module.endsWith("/pom.xml")) { //$NON-NLS-1$
           module = module.substring(0, module.length() - "/pom.xml".length()); //$NON-NLS-1$
         }
-        modules.put(module, new HashSet<String>());
+        modules.put(module, new HashSet<>());
       }
 
       for(Profile profile : model.getProfiles()) {

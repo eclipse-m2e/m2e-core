@@ -267,7 +267,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    addProjectSourceFolders(classpath, new HashMap<String, String>(), request, monitor);
+    addProjectSourceFolders(classpath, new HashMap<>(), request, monitor);
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
