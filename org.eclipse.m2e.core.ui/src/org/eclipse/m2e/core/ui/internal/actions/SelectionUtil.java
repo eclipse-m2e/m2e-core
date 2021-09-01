@@ -265,7 +265,7 @@ public class SelectionUtil {
         File tempPomFile = null;
         try (InputStream is = storage.getContents()) {
           tempPomFile = File.createTempFile("maven-pom", ".pom"); //$NON-NLS-1$ //$NON-NLS-2$
-          Files.copy(storage.getContents(), tempPomFile.toPath());
+          Files.copy(is, tempPomFile.toPath());
           return readMavenProject(tempPomFile, monitor);
         } catch(IOException ex) {
           log.error("Can't close stream", ex); //$NON-NLS-1$

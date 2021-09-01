@@ -149,7 +149,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
 
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
-        parser.parse(is);
+      parser.parse(is);
     } catch(Exception e) {
       if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException) {
         throw (CoreException) e.getCause();
@@ -264,7 +264,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
               return version + suffix;
             }
           }
-        } 
+        }
       }
     } catch(Exception e) {
       // most likely a bad location, but who knows

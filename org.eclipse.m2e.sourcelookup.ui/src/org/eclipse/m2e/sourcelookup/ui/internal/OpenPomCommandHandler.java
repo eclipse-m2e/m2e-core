@@ -83,6 +83,6 @@ public class OpenPomCommandHandler extends AbstractHandler {
   static MavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
     try(is) {
       return new MavenStorageEditorInput(name, name, null, is.readAllBytes());
-    }  
+    }
   }
 }
