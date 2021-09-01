@@ -77,7 +77,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -585,13 +584,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   @SuppressWarnings("deprecation")
   public Model readModel(File pomFile) throws CoreException {
-    try {
-      BufferedInputStream is = new BufferedInputStream(new FileInputStream(pomFile));
-      try {
+    try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(pomFile))) {
         return readModel(is);
-      } finally {
-        IOUtil.close(is);
-      }
     } catch(IOException e) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
           Messages.MavenImpl_error_read_pom, e));
@@ -865,14 +859,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
 
     File lastUpdatedFile = getLastUpdatedFile(localRepository, artifact);
-    try {
-      lastUpdatedFile.getParentFile().mkdirs();
-      BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(lastUpdatedFile));
-      try {
-        lastUpdated.store(os, null);
-      } finally {
-        IOUtil.close(os);
-      }
+    lastUpdatedFile.getParentFile().mkdirs();
+    try (BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(lastUpdatedFile))) {
+      lastUpdated.store(os, null);
     } catch(IOException ex) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
           Messages.MavenImpl_error_write_lastUpdated, ex));
@@ -936,13 +925,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private Properties loadLastUpdated(ArtifactRepository localRepository, Artifact artifact) throws CoreException {
     Properties lastUpdated = new Properties();
     File lastUpdatedFile = getLastUpdatedFile(localRepository, artifact);
-    try {
-      BufferedInputStream is = new BufferedInputStream(new FileInputStream(lastUpdatedFile));
-      try {
+    try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(lastUpdatedFile))) {
         lastUpdated.load(is);
-      } finally {
-        IOUtil.close(is);
-      }
     } catch(FileNotFoundException ex) {
       // that's okay
     } catch(IOException ex) {

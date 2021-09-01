@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -82,10 +81,8 @@ public class OpenPomCommandHandler extends AbstractHandler {
   }
 
   static MavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
-    try {
-      return new MavenStorageEditorInput(name, name, null, IOUtil.toByteArray(is));
-    } finally {
-      IOUtil.close(is);
+    try(is) {
+      return new MavenStorageEditorInput(name, name, null, is.readAllBytes());
     }
   }
 }

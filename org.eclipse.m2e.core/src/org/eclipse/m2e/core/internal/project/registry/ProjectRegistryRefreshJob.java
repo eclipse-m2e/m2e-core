@@ -79,83 +79,78 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       this.queue.clear();
     }
 
-    try {
-      final MutableProjectRegistry newState = manager.newMutableProjectRegistry();
-      try {
-        manager.getMaven().execute((context, theMonitor) -> {
-          // group requests
-          Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
-          Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
-          Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
-          Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
-          for(MavenUpdateRequest request : requests) {
-            if(theMonitor.isCanceled()) {
-              throw new OperationCanceledException();
-            }
-            if(request.isOffline() && request.isForceDependencyUpdate()) {
-              offlineForceDependencyUpdate.addAll(request.getPomFiles());
-            } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
-              offlineNotForceDependencyUpdate.addAll(request.getPomFiles());
-            } else if(!request.isOffline() && request.isForceDependencyUpdate()) {
-              notOfflineForceDependencyUpdate.addAll(request.getPomFiles());
-            } else if(!request.isOffline() && !request.isForceDependencyUpdate()) {
-              notOfflineNotForceDependencyUpdate.addAll(request.getPomFiles());
-            }
-          }
-          // process requests
-          // true * true
+    try (MutableProjectRegistry newState = manager.newMutableProjectRegistry()) {
+      manager.getMaven().execute((context, theMonitor) -> {
+        // group requests
+        Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
+        Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
+        Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
+        Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
+        for(MavenUpdateRequest request : requests) {
           if(theMonitor.isCanceled()) {
             throw new OperationCanceledException();
           }
-          if(!offlineForceDependencyUpdate.isEmpty()) {
-            manager.getMaven().execute(true, true, (aContext, aMonitor) -> {
-              manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
-              return null;
-            }, theMonitor);
+          if(request.isOffline() && request.isForceDependencyUpdate()) {
+            offlineForceDependencyUpdate.addAll(request.getPomFiles());
+          } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
+            offlineNotForceDependencyUpdate.addAll(request.getPomFiles());
+          } else if(!request.isOffline() && request.isForceDependencyUpdate()) {
+            notOfflineForceDependencyUpdate.addAll(request.getPomFiles());
+          } else if(!request.isOffline() && !request.isForceDependencyUpdate()) {
+            notOfflineNotForceDependencyUpdate.addAll(request.getPomFiles());
           }
-          // true*false
-          if(theMonitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
-          if(!offlineNotForceDependencyUpdate.isEmpty()) {
-            manager.getMaven().execute(true, false, (aContext, aMonitor) -> {
-              manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
-              return null;
-            }, theMonitor);
-          }
-          // false*true
-          if(theMonitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
-          if(!notOfflineForceDependencyUpdate.isEmpty()) {
-            manager.getMaven().execute(false, true, (aContext, aMonitor) -> {
-              manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
-              return null;
-            }, theMonitor);
-          }
-          // false*false
-          if(theMonitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
-          if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
-            manager.getMaven().execute(false, false, (aContext, aMonitor) -> {
-              manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
-              return null;
-            }, theMonitor);
-          }
+        }
+        // process requests
+        // true * true
+        if(theMonitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+        if(!offlineForceDependencyUpdate.isEmpty()) {
+          manager.getMaven().execute(true, true, (aContext, aMonitor) -> {
+            manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
+            return null;
+          }, theMonitor);
+        }
+        // true*false
+        if(theMonitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+        if(!offlineNotForceDependencyUpdate.isEmpty()) {
+          manager.getMaven().execute(true, false, (aContext, aMonitor) -> {
+            manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
+            return null;
+          }, theMonitor);
+        }
+        // false*true
+        if(theMonitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+        if(!notOfflineForceDependencyUpdate.isEmpty()) {
+          manager.getMaven().execute(false, true, (aContext, aMonitor) -> {
+            manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
+            return null;
+          }, theMonitor);
+        }
+        // false*false
+        if(theMonitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+        if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
+          manager.getMaven().execute(false, false, (aContext, aMonitor) -> {
+            manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
+            return null;
+          }, theMonitor);
+        }
 
-          ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-          getJobManager().beginRule(rule, monitor);
-          try {
-            manager.applyMutableProjectRegistry(newState, monitor);
-          } finally {
-            getJobManager().endRule(rule);
-          }
-          return null;
-        }, monitor);
-      } finally {
-        newState.close();
-      }
+        ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+        getJobManager().beginRule(rule, monitor);
+        try {
+          manager.applyMutableProjectRegistry(newState, monitor);
+        } finally {
+          getJobManager().endRule(rule);
+        }
+        return null;
+      }, monitor);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     } catch(OperationCanceledException ex) {

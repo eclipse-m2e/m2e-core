@@ -307,17 +307,11 @@ public class ProjectRegistryManager {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectRegistryManager_task_refreshing, 100);
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
     Job.getJobManager().beginRule(rule, progress);
-    try {
-      syncRefreshThread = Thread.currentThread();
+    syncRefreshThread = Thread.currentThread();
+    try (MutableProjectRegistry newState = newMutableProjectRegistry()) {
+      refresh(newState, pomFiles, progress.newChild(95));
 
-      MutableProjectRegistry newState = newMutableProjectRegistry();
-      try {
-        refresh(newState, pomFiles, progress.newChild(95));
-
-        applyMutableProjectRegistry(newState, progress.newChild(5));
-      } finally {
-        newState.close();
-      }
+      applyMutableProjectRegistry(newState, progress.newChild(5));
     } finally {
       syncRefreshThread = null;
       Job.getJobManager().endRule(rule);

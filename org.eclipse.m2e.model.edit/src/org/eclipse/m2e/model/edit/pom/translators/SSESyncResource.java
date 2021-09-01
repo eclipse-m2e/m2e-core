@@ -127,11 +127,8 @@ public class SSESyncResource extends ResourceImpl {
           domModel = (IDOMModel) modelManager.getModelForEdit(ifile);
         } else if(uri.isFile()) {
           File f = new File(uri.toFileString());
-          FileInputStream is = new FileInputStream(f);
-          try {
+          try (FileInputStream is = new FileInputStream(f)) {
             domModel = (IDOMModel) modelManager.getModelForEdit(f.getAbsolutePath(), is, null);
-          } finally {
-            is.close();
           }
         }
         // Had to comment this out, ExtensibleURIConverterImpl isn't available in Eclipse 3.3

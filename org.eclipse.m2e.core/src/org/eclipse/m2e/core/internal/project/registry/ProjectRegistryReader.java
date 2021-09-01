@@ -39,8 +39,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.service.resolver.VersionRange;
 
-import org.codehaus.plexus.util.IOUtil;
-
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 
@@ -65,51 +63,52 @@ public class ProjectRegistryReader {
   public ProjectRegistry readWorkspaceState(final ProjectRegistryManager managerImpl) {
     if(stateFile.exists()) {
       final PackageAdmin packageAdmin = getPackageAdmin();
-      ObjectInputStream is = null;
-      try {
-        is = new ObjectInputStream(new BufferedInputStream(new FileInputStream(stateFile))) {
-          {
-            enableResolveObject(true);
-          }
-
-          @Override
-          protected Object resolveObject(Object o) throws IOException {
-            if(o instanceof IPathReplace) {
-              return ((IPathReplace) o).getPath();
-            } else if(o instanceof IFileReplace) {
-              return ((IFileReplace) o).getFile();
-            } else if(o instanceof MavenProjectManagerImplReplace) {
-              return managerImpl;
-            }
-            return super.resolveObject(o);
-          }
-
-          @Override
-          protected java.lang.Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException,
-              ClassNotFoundException {
-            String symbolicName = (String) readObject();
-            if(symbolicName == null) {
-              return super.resolveClass(desc);
-            }
-            String versionStr = (String) readObject();
-            Version version = Version.parseVersion(versionStr);
-            VersionRange versionRange = new VersionRange(version, true, version, true);
-            Bundle[] bundles = packageAdmin.getBundles(symbolicName, versionRange.toString());
-            if(bundles == null || bundles.length != 1) {
-              throw new ClassNotFoundException("Could not find bundle " + symbolicName + "/" + version //$NON-NLS-1$ //$NON-NLS-2$
-                  + " required to load class " + desc.getName()); //$NON-NLS-1$
-            }
-            return bundles[0].loadClass(desc.getName());
-          }
-        };
+      try (ObjectInputStream is = createObjectInputStream(managerImpl, packageAdmin)) {
         return (ProjectRegistry) is.readObject();
       } catch(Exception ex) {
         log.error("Can't read workspace state", ex);
-      } finally {
-        IOUtil.close(is);
       }
     }
     return null;
+  }
+
+  private ObjectInputStream createObjectInputStream(final ProjectRegistryManager managerImpl,
+      final PackageAdmin packageAdmin) throws IOException {
+    return new ObjectInputStream(new BufferedInputStream(new FileInputStream(stateFile))) {
+      {
+        enableResolveObject(true);
+      }
+
+      @Override
+      protected Object resolveObject(Object o) throws IOException {
+        if(o instanceof IPathReplace) {
+          return ((IPathReplace) o).getPath();
+        } else if(o instanceof IFileReplace) {
+          return ((IFileReplace) o).getFile();
+        } else if(o instanceof MavenProjectManagerImplReplace) {
+          return managerImpl;
+        }
+        return super.resolveObject(o);
+      }
+
+      @Override
+      protected java.lang.Class<?> resolveClass(java.io.ObjectStreamClass desc)
+          throws IOException, ClassNotFoundException {
+        String symbolicName = (String) readObject();
+        if(symbolicName == null) {
+          return super.resolveClass(desc);
+        }
+        String versionStr = (String) readObject();
+        Version version = Version.parseVersion(versionStr);
+        VersionRange versionRange = new VersionRange(version, true, version, true);
+        Bundle[] bundles = packageAdmin.getBundles(symbolicName, versionRange.toString());
+        if(bundles == null || bundles.length != 1) {
+          throw new ClassNotFoundException("Could not find bundle " + symbolicName + "/" + version //$NON-NLS-1$ //$NON-NLS-2$
+              + " required to load class " + desc.getName()); //$NON-NLS-1$
+        }
+        return bundles[0].loadClass(desc.getName());
+      }
+    };
   }
 
   private static synchronized PackageAdmin getPackageAdmin() {
@@ -125,60 +124,60 @@ public class ProjectRegistryReader {
   public void writeWorkspaceState(ProjectRegistry state) {
     final ClassLoader thisClassloader = getClass().getClassLoader();
 
-    ObjectOutputStream os = null;
-    try {
-      os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(stateFile))) {
-        {
-          enableReplaceObject(true);
-        }
-
-        @Override
-        protected Object replaceObject(Object o) throws IOException {
-          if(o instanceof IPath) {
-            return new IPathReplace((IPath) o);
-          } else if(o instanceof IFile) {
-            return new IFileReplace((IFile) o);
-          } else if(o instanceof ProjectRegistryManager) {
-            return new MavenProjectManagerImplReplace();
-          }
-          return super.replaceObject(o);
-        }
-
-        @Override
-        protected void annotateClass(java.lang.Class<?> cl) throws IOException {
-          // if the class is visible through this classloader, assume it will be during reading stream back
-          try {
-            Class<?> target = cl;
-            while(target.isArray()) {
-              target = target.getComponentType();
-            }
-
-            if(target.isPrimitive() || target.equals(thisClassloader.loadClass(target.getName()))) {
-              writeObject(null); // TODO is there a better way?
-              return;
-            }
-          } catch(ClassNotFoundException ex) {
-            // fall through
-          }
-
-          // foreign class
-          Bundle bundle = FrameworkUtil.getBundle(cl);
-          if(bundle != null) {
-            writeObject(bundle.getSymbolicName());
-            writeObject(bundle.getVersion().toString());
-          }
-
-          // TODO this will likely fail during desirialization
-        }
-      };
+    try (ObjectOutputStream os = createObjectOutputStream(thisClassloader)) {
       synchronized(state) { // see MNGECLIPSE-860
         os.writeObject(state);
       }
     } catch(Exception ex) {
       log.error("Can't write workspace state", ex);
-    } finally {
-      IOUtil.close(os);
     }
+  }
+
+  private ObjectOutputStream createObjectOutputStream(final ClassLoader thisClassloader) throws IOException {
+    return new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(stateFile))) {
+      {
+        enableReplaceObject(true);
+      }
+
+      @Override
+      protected Object replaceObject(Object o) throws IOException {
+        if(o instanceof IPath) {
+          return new IPathReplace((IPath) o);
+        } else if(o instanceof IFile) {
+          return new IFileReplace((IFile) o);
+        } else if(o instanceof ProjectRegistryManager) {
+          return new MavenProjectManagerImplReplace();
+        }
+        return super.replaceObject(o);
+      }
+
+      @Override
+      protected void annotateClass(java.lang.Class<?> cl) throws IOException {
+        // if the class is visible through this classloader, assume it will be during reading stream back
+        try {
+          Class<?> target = cl;
+          while(target.isArray()) {
+            target = target.getComponentType();
+          }
+
+          if(target.isPrimitive() || target.equals(thisClassloader.loadClass(target.getName()))) {
+            writeObject(null); // TODO is there a better way?
+            return;
+          }
+        } catch(ClassNotFoundException ex) {
+          // fall through
+        }
+
+        // foreign class
+        Bundle bundle = FrameworkUtil.getBundle(cl);
+        if(bundle != null) {
+          writeObject(bundle.getSymbolicName());
+          writeObject(bundle.getVersion().toString());
+        }
+
+        // TODO this will likely fail during desirialization
+      }
+    };
   }
 
   /**

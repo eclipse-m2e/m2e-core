@@ -149,7 +149,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
 
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
-        parser.parse(is);
+      parser.parse(is);
     } catch(Exception e) {
       if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException) {
         throw (CoreException) e.getCause();
@@ -245,14 +245,14 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         parser.parse(is);
       }
 
-      ZipFile zip = null;
+      File zipFile = null;
       if(handler.mavenCore != null) {
-        zip = new ZipFile(handler.mavenCore);
+        zipFile = handler.mavenCore;
       } else if(handler.uber != null) {
-        zip = new ZipFile(handler.uber);
+        zipFile = handler.uber;
       }
-      if(zip != null) {
-        try {
+      if(zipFile != null) {
+        try (ZipFile zip = new ZipFile(zipFile)) {
           String suffix = "";
           ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
           if(zipEntry != null) {
@@ -264,8 +264,6 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
               return version + suffix;
             }
           }
-        } finally {
-          zip.close();
         }
       }
     } catch(Exception e) {

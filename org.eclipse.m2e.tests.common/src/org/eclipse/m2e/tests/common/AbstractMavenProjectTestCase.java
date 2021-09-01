@@ -21,7 +21,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -64,7 +63,6 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
@@ -268,14 +266,10 @@ public abstract class AbstractMavenProjectTestCase {
 
       IFile pomFile = project.getFile("pom.xml");
       if(!pomFile.exists()) {
-        InputStream is = null;
-        try {
-          is = new FileInputStream(pomResource);
+        try (InputStream is = new FileInputStream(pomResource)) {
           pomFile.create(is, true, monitor);
-        } catch(FileNotFoundException ex) {
+        } catch(IOException ex) {
           throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
-        } finally {
-          IOUtil.close(is);
         }
       }
     }, null);

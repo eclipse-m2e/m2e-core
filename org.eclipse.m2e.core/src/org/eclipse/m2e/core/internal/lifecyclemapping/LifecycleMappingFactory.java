@@ -56,7 +56,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.osgi.util.NLS;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -455,7 +454,7 @@ public class LifecycleMappingFactory {
       } else if(file.isDirectory()) {
         try (InputStream is = new BufferedInputStream(
             new FileInputStream(new File(file, LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH)))) {
-            metadata = createLifecycleMappingMetadataSource(is);
+          metadata = createLifecycleMappingMetadataSource(is);
         } catch(FileNotFoundException e) {
           // expected and tolerated
         }
@@ -480,7 +479,7 @@ public class LifecycleMappingFactory {
     if(workspaceMetadataSource == null || reload) {
       File mappingFile = getWorkspaceMetadataFile();
       try (InputStream is = new BufferedInputStream(new FileInputStream(mappingFile))) {
-          workspaceMetadataSource = createLifecycleMappingMetadataSource(is);
+        workspaceMetadataSource = createLifecycleMappingMetadataSource(is);
       } catch(FileNotFoundException e) {
         // this is expected, ignore
       } catch(IOException | XmlPullParserException ex) {
@@ -501,10 +500,8 @@ public class LifecycleMappingFactory {
     LifecycleMappingMetadataSourceXpp3Writer writer = new LifecycleMappingMetadataSourceXpp3Writer();
     File mappingFile = getWorkspaceMetadataFile();
     mappingFile.getParentFile().mkdirs();
-    try (
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(mappingFile));
-    ) {
-        writer.write(os, metadata);
+    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(mappingFile))) {
+      writer.write(os, metadata);
     } catch(IOException ex) {
       log.error(ex.getMessage(), ex);
     }
@@ -1251,15 +1248,12 @@ public class LifecycleMappingFactory {
 
   private static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(String groupId, String artifactId,
       String version, File configuration) throws IOException, XmlPullParserException {
-    InputStream in = new FileInputStream(configuration);
-    try {
+    try (InputStream in = new FileInputStream(configuration)) {
       LifecycleMappingMetadataSource lifecycleMappingMetadataSource = createLifecycleMappingMetadataSource(in);
       lifecycleMappingMetadataSource.setGroupId(groupId);
       lifecycleMappingMetadataSource.setArtifactId(artifactId);
       lifecycleMappingMetadataSource.setVersion(version);
       return lifecycleMappingMetadataSource;
-    } finally {
-      IOUtil.close(in);
     }
   }
 
@@ -1294,15 +1288,10 @@ public class LifecycleMappingFactory {
     }
     URL url = bundle.getEntry(LIFECYCLE_MAPPING_METADATA_SOURCE_PATH);
     if(url != null) {
-      try {
-        InputStream in = url.openStream();
-        try {
-          LifecycleMappingMetadataSource metadata = createLifecycleMappingMetadataSource(in);
-          metadata.setSource(bundle);
-          return metadata;
-        } finally {
-          IOUtil.close(in);
-        }
+      try (InputStream in = url.openStream()) {
+        LifecycleMappingMetadataSource metadata = createLifecycleMappingMetadataSource(in);
+        metadata.setSource(bundle);
+        return metadata;
       } catch(IOException | XmlPullParserException e) {
         log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
       }

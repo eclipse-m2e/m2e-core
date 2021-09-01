@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
-import org.codehaus.plexus.util.IOUtil;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -65,11 +63,10 @@ class PomTemplateContextUtil {
         String msg = "Can't resolve plugin " + name; //$NON-NLS-1$
         log.error(msg);
       } else {
-        InputStream is = null;
         try (ZipFile zf = new ZipFile(file)) {
           ZipEntry entry = zf.getEntry("META-INF/maven/plugin.xml"); //$NON-NLS-1$
           if(entry != null) {
-            is = zf.getInputStream(entry);
+            InputStream is = zf.getInputStream(entry); // closed when zipFile is closed
             PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
             descriptor = builder.build(new InputStreamReader(is));
             descriptors.put(name, descriptor);
@@ -78,8 +75,6 @@ class PomTemplateContextUtil {
         } catch(Exception ex) {
           String msg = "Can't read configuration for " + name; //$NON-NLS-1$
           log.error(msg, ex);
-        } finally {
-          IOUtil.close(is);
         }
       }
 
