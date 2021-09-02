@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.m2e.editor.lemminx.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
+import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -42,8 +45,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EditorTest {
+public class EditorTest extends AbstractMavenProjectTestCase {
 
+	private static final String GENERIC_EDITOR = "org.eclipse.ui.genericeditor.GenericEditor";
 	private IWorkbenchPage page;
 	private IProject project;
 
@@ -61,7 +65,7 @@ public class EditorTest {
 		project.open(null);
 		IFile pomFile = project.getFile("pom.xml");
 		pomFile.create(getClass().getResourceAsStream("pom.xml"), true, null);
-		ITextEditor editorPart = (ITextEditor)IDE.openEditor(page, pomFile, "org.eclipse.ui.genericeditor.GenericEditor");
+		ITextEditor editorPart = (ITextEditor)IDE.openEditor(page, pomFile, GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
 		assertTrue("Missing diagnostic report", DisplayHelper.waitForCondition(display, 10000, () ->
 			{
@@ -105,5 +109,29 @@ public class EditorTest {
 		MavenPomEditor editor = (MavenPomEditor)page.openEditor(new FileEditorInput(pomFile), MavenPomEditor.EDITOR_ID);
 		Assert.assertNotNull(editor.getSourcePage());
 		Assert.assertEquals(editor.getSourcePage(), editor.getActiveEditor());
+	}
+
+	@Test
+	public void testOpenChildThenParentResolvesParent() throws Exception {
+		try (InputStream content = getClass().getResourceAsStream("pom-parent.xml")) {
+			createProject("parent", content);
+		}
+		IProject child = null;
+		try (InputStream content = getClass().getResourceAsStream("pom-child.xml")) {
+			child = createProject("child", content);
+		}
+		IFile pomFile = child.getFile("pom.xml");
+		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page.openEditor(new FileEditorInput(pomFile), GENERIC_EDITOR);
+		assertTrue("No marker published at all", DisplayHelper.waitForCondition(page.getWorkbenchWindow().getShell().getDisplay(), 10000, () -> {
+			try {
+				return pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO).length > 0;
+			} catch (CoreException e) {
+				return false;
+			}
+		}));
+		IMarker[] markers = pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO);
+		assertEquals(1, markers.length);
+		assertTrue(((String)markers[0].getAttribute(IMarker.MESSAGE)).contains("packaging"));
 	}
 }
