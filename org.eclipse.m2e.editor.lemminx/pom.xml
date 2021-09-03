@@ -63,7 +63,8 @@
 								<artifactItem>
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
-									<version>0.3.2</version>
+									<!-- Don't release as long as this points to SNAPSHOT -->
+									<version>0.4.0-SNAPSHOT</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
