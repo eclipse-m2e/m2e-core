@@ -112,28 +112,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private static final String ALL_CATALOGS = org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_all;
 
-  public static final Comparator<Archetype> ARCHETYPE_COMPARATOR = (a1, a2) -> {
-    String g1 = a1.getGroupId();
-    String g2 = a2.getGroupId();
-    int res = g1.compareTo(g2);
-    if(res != 0) {
-      return res;
-    }
-
-    String i1 = a1.getArtifactId();
-    String i2 = a2.getArtifactId();
-    res = i1.compareTo(i2);
-    if(res != 0) {
-      return res;
-    }
-
-    String v1 = a1.getVersion();
-    String v2 = a2.getVersion();
-    if(v1 == null) {
-      return v2 == null ? 0 : -1;
-    }
-    return v1.compareTo(v2);
-  };
+  public static final Comparator<Archetype> ARCHETYPE_COMPARATOR =
+      Comparator.comparing(Archetype::getGroupId).thenComparing(Archetype::getArtifactId)
+          .thenComparing(Archetype::getVersion, Comparator.nullsFirst(Comparator.naturalOrder()));
 
   private static final boolean DEFAULT_SHOW_LAST_VERSION = true;
 
@@ -765,10 +746,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       versions.add(v);
     }
 
-    final Comparator<ArtifactVersion> comparator = (v1, v2) -> v2.compareTo(v1);
-
     for(List<ArtifactVersion> versions : archetypeVersions.values()) {
-      Collections.sort(versions, comparator);
+      versions.sort(Comparator.reverseOrder());
     }
     return archetypeVersions;
   }

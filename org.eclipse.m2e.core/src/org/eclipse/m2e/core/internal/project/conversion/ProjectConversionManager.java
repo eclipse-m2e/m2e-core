@@ -184,23 +184,14 @@ public class ProjectConversionManager implements IProjectConversionManager {
     IConfigurationElement[] cf = registry.getConfigurationElementsFor(CONVERSION_ENABLER_EXTENSION_POINT);
     List<IConfigurationElement> list = Arrays.asList(cf);
 
-    Comparator<IConfigurationElement> c = (o1, o2) -> {
-      String o1String, o2String;
-      int o1int, o2int;
-      o1String = o1.getAttribute("weight");
-      o2String = o2.getAttribute("weight");
+    Comparator<IConfigurationElement> c = Comparator.comparingInt((IConfigurationElement o) -> {
+      String weight = o.getAttribute("weight");
       try {
-        o1int = Integer.parseInt(o1String);
+        return Integer.parseInt(weight);
       } catch(NumberFormatException nfe1) {
-        o1int = DEFAULT_WEIGHT;
+        return DEFAULT_WEIGHT;
       }
-      try {
-        o2int = Integer.parseInt(o2String);
-      } catch(NumberFormatException nfe2) {
-        o2int = DEFAULT_WEIGHT;
-      }
-      return o2int - o1int;
-    };
+    }).reversed();
     Collections.sort(list, c);
     ArrayList<IProjectConversionEnabler> retList = new ArrayList<>();
     Iterator<IConfigurationElement> i = list.iterator();
