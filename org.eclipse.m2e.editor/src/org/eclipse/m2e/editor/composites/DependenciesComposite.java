@@ -103,7 +103,6 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
 /**
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("synthetic-access")
 public class DependenciesComposite extends Composite {
   private static final Logger log = LoggerFactory.getLogger(DependenciesComposite.class);
 
@@ -274,7 +273,7 @@ public class DependenciesComposite extends Composite {
         } finally {
           setDependenciesInput();
           List<Dependency> deps = getDependencies();
-          if(deps.size() > 0) {
+          if(!deps.isEmpty()) {
             dependenciesEditor.setSelection(Collections.<Object> singletonList(deps.get(deps.size() - 1)));
           }
         }
@@ -335,10 +334,12 @@ public class DependenciesComposite extends Composite {
             dependenciesComparator.setSortByGroups(false);
           }
 
+          @Override
           public int getStyle() {
             return AS_CHECK_BOX;
           }
 
+          @Override
           public void run() {
             dependencyLabelProvider.setShowGroupId(isChecked());
             dependenciesComparator.setSortByGroups(isChecked());
@@ -351,10 +352,12 @@ public class DependenciesComposite extends Composite {
         setChecked(true);
       }
 
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         TableViewer viewer = dependenciesEditor.getViewer();
         if(isChecked()) {
@@ -458,7 +461,7 @@ public class DependenciesComposite extends Composite {
         } finally {
           setDependencyManagementInput();
           List<Dependency> dlist = getManagedDependencies();
-          if(dlist.size() > 0) {
+          if(!dlist.isEmpty()) {
             dependencyManagementEditor
                 .setSelection(Collections.<Dependency> singletonList(dlist.get(dlist.size() - 1)));
           }
@@ -497,10 +500,12 @@ public class DependenciesComposite extends Composite {
             dependencyManagementComparator.setSortByGroups(false);
           }
 
+          @Override
           public int getStyle() {
             return AS_CHECK_BOX;
           }
 
+          @Override
           public void run() {
             dependencyManagementLabelProvider.setShowGroupId(isChecked());
             dependencyManagementComparator.setSortByGroups(isChecked());
@@ -513,10 +518,12 @@ public class DependenciesComposite extends Composite {
         setChecked(true);
       }
 
+      @Override
       public int getStyle() {
         return AS_CHECK_BOX;
       }
 
+      @Override
       public void run() {
         TableViewer viewer = dependencyManagementEditor.getViewer();
         if(isChecked()) {
@@ -589,6 +596,7 @@ public class DependenciesComposite extends Composite {
     // filter text is modified. Using a job is in this way lets us
     // defer updating the field while the user is typing.
     final Job updateJob = new WorkbenchJob("Update Maven Dependency Viewers") {
+      @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         dependenciesViewer.refresh();
         dependencyManagementViewer.refresh();
@@ -613,6 +621,7 @@ public class DependenciesComposite extends Composite {
       this.searchMatcher = searchMatcher;
     }
 
+    @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
       if(element instanceof Dependency) {
         Dependency d = (Dependency) element;
@@ -975,6 +984,7 @@ public class DependenciesComposite extends Composite {
     public Dependency() {
     }
 
+    @Override
     public <T> T getAdapter(Class<T> adapter) {
       if(ArtifactKey.class.equals(adapter)) {
         return adapter.cast(new ArtifactKey(groupId, artifactId, version, classifier));

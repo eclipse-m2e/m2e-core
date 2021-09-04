@@ -34,6 +34,7 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
 
   private static final Class<?>[] ADAPTER_LIST = new Class[] {ArtifactKey.class,};
 
+  @Override
   public <T> T getAdapter(Object adaptable, Class<T> adapterType) {
     if(!ArtifactKey.class.equals(adapterType)) {
       return null;
@@ -59,6 +60,7 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
     return null;
   }
 
+  @Override
   public Class<?>[] getAdapterList() {
     // target type
     return ADAPTER_LIST;

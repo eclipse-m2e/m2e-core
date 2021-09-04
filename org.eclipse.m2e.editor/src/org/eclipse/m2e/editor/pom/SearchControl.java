@@ -52,6 +52,7 @@ public class SearchControl extends ControlContribution {
     return os != null && os.startsWith("Mac"); //$NON-NLS-1$
   }
 
+  @Override
   protected Control createControl(Composite parent) {
     if(parent instanceof ToolBar) {
       // the FormHeading class sets the toolbar cursor to hand for some reason,

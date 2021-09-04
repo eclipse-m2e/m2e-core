@@ -58,6 +58,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
     this.selection = selection;
   }
 
+  @Override
   public void createControl(Composite parent) {
     GridLayout layout = new GridLayout();
     layout.numColumns = 2;

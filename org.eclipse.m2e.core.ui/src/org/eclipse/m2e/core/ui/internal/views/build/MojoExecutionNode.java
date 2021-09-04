@@ -31,6 +31,7 @@ class MojoExecutionNode extends ContainerNode {
     return mojoExecutionKey;
   }
 
+  @Override
   public synchronized int getBuildCount() {
     return buildCount;
   }

@@ -103,6 +103,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     }
   }
 
+  @Override
   public void selectionChanged(SelectionChangedEvent event) {
     ParentHierarchyEntry project = pomComposite.fromSelection();
     if(getButton(OK) != null) {

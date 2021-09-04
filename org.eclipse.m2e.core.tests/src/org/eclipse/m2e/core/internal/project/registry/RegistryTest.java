@@ -104,7 +104,6 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testResolvedParentConfiguration() throws Exception {
-    boolean autoBuilding = isAutoBuilding();
     setAutoBuilding(false);
     try {
         IProject parent = createExisting("parent", "resources/projects/bug548652/", false);

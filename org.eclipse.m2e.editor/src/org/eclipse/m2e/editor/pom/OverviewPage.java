@@ -133,7 +133,6 @@ import org.eclipse.m2e.editor.internal.Messages;
 /**
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("synthetic-access")
 public class OverviewPage extends MavenPomEditorPage {
 
   static final Logger LOG = LoggerFactory.getLogger(OverviewPage.class);
@@ -241,6 +240,7 @@ public class OverviewPage extends MavenPomEditorPage {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
   }
 
+  @Override
   protected void createFormContent(IManagedForm managedForm) {
     FormToolkit toolkit = managedForm.getToolkit();
     ScrolledForm form = managedForm.getForm();
@@ -382,6 +382,7 @@ public class OverviewPage extends MavenPomEditorPage {
     parentSection.setData("name", "parentSection"); //$NON-NLS-1$ //$NON-NLS-2$
 
     parentSelectAction = new Action(Messages.OverviewPage_action_selectParent, MavenEditorImages.SELECT_ARTIFACT) {
+      @Override
       public void run() {
         // calculate current list of artifacts for the project - that's the current parent..
         Set<ArtifactKey> current = new HashSet<>();
@@ -427,11 +428,13 @@ public class OverviewPage extends MavenPomEditorPage {
     parentSelectAction.setEnabled(false);
 
     parentOpenAction = new Action(Messages.OverviewPage_job_open, MavenEditorImages.PARENT_POM) {
+      @Override
       public void run() {
         final String groupId = parentGroupIdText.getText();
         final String artifactId = parentArtifactIdText.getText();
         final String version = parentVersionText.getText();
         new Job(NLS.bind(Messages.OverviewPage_job, new Object[] {groupId, artifactId, version})) {
+          @Override
           protected IStatus run(IProgressMonitor monitor) {
             OpenPomAction.openEditor(groupId, artifactId, version, getPomEditor().getMavenProject(), monitor);
             return Status.OK_STATUS;
@@ -557,6 +560,7 @@ public class OverviewPage extends MavenPomEditorPage {
     modulesSection.setText(Messages.OverviewPage_section_modules);
     modulesSection.setData("name", "modulesSection"); //$NON-NLS-1$ //$NON-NLS-2$
     modulesSection.addExpansionListener(new ExpansionAdapter() {
+      @Override
       public void expansionStateChanged(ExpansionEvent e) {
         moduleSectionData.grabExcessVerticalSpace = e.getState();
         modulesSection.getParent().layout();
@@ -582,12 +586,13 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(modulesEditor);
     toolkit.adapt(modulesEditor);
 
-    modulesEditor.setContentProvider(new ListEditorContentProvider<String>());
+    modulesEditor.setContentProvider(new ListEditorContentProvider<>());
     modulesEditor.setLabelProvider(new ModulesLabelProvider(this));
 
     modulesEditor.setOpenListener(openevent -> {
       final List<String> selection = modulesEditor.getSelection();
       new Job(Messages.OverviewPage_opening_editors) {
+        @Override
         protected IStatus run(IProgressMonitor monitor) {
           for(String module : selection) {
             IMavenProjectFacade projectFacade = findModuleProject(module);
@@ -678,14 +683,17 @@ public class OverviewPage extends MavenPomEditorPage {
     }));
 
     modulesEditor.setCellModifier(new ICellModifier() {
+      @Override
       public boolean canModify(Object element, String property) {
         return true;
       }
 
+      @Override
       public Object getValue(Object element, String property) {
         return element;
       }
 
+      @Override
       public void modify(Object element, String property, final Object value) {
         final int n = modulesEditor.getViewer().getTable().getSelectionIndex();
         try {
@@ -723,6 +731,7 @@ public class OverviewPage extends MavenPomEditorPage {
         });
 
     newModuleElementAction = new Action(Messages.OverviewPage_action_newModuleElement, MavenImages.NEW_POM) {
+      @Override
       public void run() {
         createNewModule("?"); //$NON-NLS-1$
       }
@@ -772,6 +781,7 @@ public class OverviewPage extends MavenPomEditorPage {
     projectSection.setText(Messages.OverviewPage_section_project);
     projectSection.setData("name", "projectSection"); //$NON-NLS-1$ //$NON-NLS-2$
     projectSection.addExpansionListener(new ExpansionAdapter() {
+      @Override
       public void expansionStateChanged(ExpansionEvent e) {
         projectSectionData.grabExcessVerticalSpace = e.getState();
         projectSection.getParent().layout();
@@ -795,6 +805,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
     Hyperlink urlLabel = toolkit.createHyperlink(projectComposite, Messages.OverviewPage_lblUrl, SWT.NONE);
     urlLabel.addHyperlinkListener(new HyperlinkAdapter() {
+      @Override
       public void linkActivated(HyperlinkEvent e) {
         FormUtils.openHyperlink(projectUrlText.getText());
       }
@@ -869,6 +880,7 @@ public class OverviewPage extends MavenPomEditorPage {
     Hyperlink organizationUrlLabel = toolkit.createHyperlink(organizationComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
     organizationUrlLabel.addHyperlinkListener(new HyperlinkAdapter() {
+      @Override
       public void linkActivated(HyperlinkEvent e) {
         FormUtils.openHyperlink(organizationUrlText.getText());
       }
@@ -904,6 +916,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
     Hyperlink scmUrlLabel = toolkit.createHyperlink(scmComposite, Messages.OverviewPage_lblUrl, SWT.NONE);
     scmUrlLabel.addHyperlinkListener(new HyperlinkAdapter() {
+      @Override
       public void linkActivated(HyperlinkEvent e) {
         FormUtils.openHyperlink(scmUrlText.getText());
       }
@@ -990,6 +1003,7 @@ public class OverviewPage extends MavenPomEditorPage {
     Hyperlink issueManagementUrlLabel = toolkit.createHyperlink(issueManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
     issueManagementUrlLabel.addHyperlinkListener(new HyperlinkAdapter() {
+      @Override
       public void linkActivated(HyperlinkEvent e) {
         FormUtils.openHyperlink(issueManagementUrlCombo.getText());
       }
@@ -1045,6 +1059,7 @@ public class OverviewPage extends MavenPomEditorPage {
     Hyperlink ciManagementUrlLabel = toolkit.createHyperlink(ciManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
     ciManagementUrlLabel.addHyperlinkListener(new HyperlinkAdapter() {
+      @Override
       public void linkActivated(HyperlinkEvent e) {
         FormUtils.openHyperlink(ciManagementUrlCombo.getText());
       }
@@ -1074,6 +1089,7 @@ public class OverviewPage extends MavenPomEditorPage {
     //noop now
   }
 
+  @Override
   public void loadData() {
     loadThis(RELOAD_ALL);
 
@@ -1195,11 +1211,7 @@ public class OverviewPage extends MavenPomEditorPage {
             }
             loadModules(modules, pack);
             //#335337 no editing of packaging when there are modules, results in error anyway
-            if(modules.size() > 0) {
-              artifactPackagingCombo.setEnabled(false);
-            } else {
-              artifactPackagingCombo.setEnabled(true);
-            }
+            artifactPackagingCombo.setEnabled(modules.isEmpty());
           }
 
           if((mask & RELOAD_PROPERTIES) != 0) {

@@ -138,6 +138,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     IProject project = request.getProject();
 
@@ -196,8 +197,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     addNature(project, JavaCore.NATURE_ID, monitor);
   }
 
-  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath)
-      throws JavaModelException {
+  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath) {
   }
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
@@ -270,7 +270,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    addProjectSourceFolders(classpath, new HashMap<String, String>(), request, monitor);
+    addProjectSourceFolders(classpath, new HashMap<>(), request, monitor);
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
@@ -787,6 +787,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return Double.parseDouble(sanitizeJavaVersion(level));
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     super.unconfigure(request, monitor);
     removeMavenClasspathContainer(request.getProject());
@@ -890,10 +891,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return compilerArgs;
   }
 
+  @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     ModuleSupport.configureClasspath(facade, classpath, monitor);
   }
 
+  @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
 

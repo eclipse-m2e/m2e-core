@@ -43,6 +43,7 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
     return mappingsViewer.createContents(parent);
   }
 
+  @Override
   public void setElement(IAdaptable element) {
     super.setElement(element);
 

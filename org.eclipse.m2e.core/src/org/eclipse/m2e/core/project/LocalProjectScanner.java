@@ -66,6 +66,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     this.modelManager = modelManager;
   }
 
+  @Override
   public void run(IProgressMonitor monitor) throws InterruptedException {
     SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, 1);
 
@@ -167,7 +168,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         if(module.endsWith("/pom.xml")) { //$NON-NLS-1$
           module = module.substring(0, module.length() - "/pom.xml".length()); //$NON-NLS-1$
         }
-        modules.put(module, new HashSet<String>());
+        modules.put(module, new HashSet<>());
       }
 
       for(Profile profile : model.getProfiles()) {
@@ -209,6 +210,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     return new MavenProjectInfo(label, pomFile, model, parent);
   }
 
+  @Override
   public String getDescription() {
     return folders.toString();
   }

@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParserBase;
 
 import org.apache.maven.project.MavenProject;
 
@@ -65,18 +65,22 @@ public class ProposalUtil {
       this.text = text;
     }
 
+    @Override
     public int getCursorPosition() {
       return text.length();
     }
 
+    @Override
     public String getContent() {
       return text;
     }
 
+    @Override
     public String getLabel() {
       return text;
     }
 
+    @Override
     public String getDescription() {
       return null;
     }
@@ -125,6 +129,7 @@ public class ProposalUtil {
   public static void addClassifierProposal(final IProject project, final Text groupIdText, final Text artifactIdText,
       final Text versionText, final Text classifierText, final Packaging packaging) {
     addCompletionProposal(classifierText, new Searcher() {
+      @Override
       public Collection<String> search() throws CoreException {
         return getSearchEngine(project).findClassifiers(
             escapeQuerySpecialCharacters(groupIdText.getText()), //
@@ -137,6 +142,7 @@ public class ProposalUtil {
   public static void addVersionProposal(final IProject project, final MavenProject mp, final Text groupIdText,
       final Text artifactIdText, final Text versionText, final Packaging packaging) {
     addCompletionProposal(versionText, new Searcher() {
+      @Override
       public Collection<String> search() throws CoreException {
         Collection<String> toRet = new ArrayList<>();
         toRet.addAll(getSearchEngine(project).findVersions(escapeQuerySpecialCharacters(groupIdText.getText()), //
@@ -164,6 +170,7 @@ public class ProposalUtil {
   public static void addArtifactIdProposal(final IProject project, final Text groupIdText, final Text artifactIdText,
       final Packaging packaging) {
     addCompletionProposal(artifactIdText, new Searcher() {
+      @Override
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
         return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "",
@@ -174,6 +181,7 @@ public class ProposalUtil {
 
   public static void addGroupIdProposal(final IProject project, final Text groupIdText, final Packaging packaging) {
     addCompletionProposal(groupIdText, new Searcher() {
+      @Override
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
         return getSearchEngine(project).findGroupIds(escapeQuerySpecialCharacters(groupIdText.getText()), packaging,
@@ -187,7 +195,7 @@ public class ProposalUtil {
   //for proposal queries, any special chars shall be escaped
   //    + - && || ! ( ) { } [ ] ^ " ~ * ? : \
   private static String escapeQuerySpecialCharacters(String raw) {
-    return QueryParser.escape(raw);
+    return QueryParserBase.escape(raw);
   }
 
   public static SearchEngine getSearchEngine(final IProject project) throws CoreException {

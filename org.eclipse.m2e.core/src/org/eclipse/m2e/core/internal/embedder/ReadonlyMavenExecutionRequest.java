@@ -552,38 +552,47 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
     throw new IllegalStateException();
   }
 
+  @Override
   public Map<String, Object> getData() {
     return Collections.unmodifiableMap(request.getData());
   }
 
+  @Override
   public EventSpyDispatcher getEventSpyDispatcher() {
     return request.getEventSpyDispatcher();
   }
 
+  @Override
   public File getGlobalToolchainsFile() {
     return request.getGlobalToolchainsFile();
   }
 
+  @Override
   public File getMultiModuleProjectDirectory() {
     return request.getMultiModuleProjectDirectory();
   }
 
+  @Override
   public Map<String, List<ToolchainModel>> getToolchains() {
     return Collections.unmodifiableMap(request.getToolchains());
   }
 
+  @Override
   public MavenExecutionRequest setEventSpyDispatcher(EventSpyDispatcher eventSpyDispatcher) {
     throw new IllegalStateException();
   }
 
+  @Override
   public MavenExecutionRequest setGlobalToolchainsFile(File globalToolchainsFile) {
     throw new IllegalStateException();
   }
 
+  @Override
   public void setMultiModuleProjectDirectory(File file) {
     throw new IllegalStateException();
   }
 
+  @Override
   public MavenExecutionRequest setToolchains(Map<String, List<ToolchainModel>> toolchains) {
     throw new IllegalStateException();
   }

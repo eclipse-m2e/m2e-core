@@ -66,14 +66,17 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
     return MAVEN_EXECUTOR_CLASS;
   }
 
+  @Override
   public String getLocation() {
     return MavenRuntimeManagerImpl.WORKSPACE;
   }
 
+  @Override
   public boolean isEditable() {
     return true;
   }
 
+  @Override
   public boolean isAvailable() {
     return getMavenDistribution() != null && isSupportedVersion();
   }
@@ -95,6 +98,7 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
     return null;
   }
 
+  @Override
   public void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException {
     IMavenProjectFacade maven = getMavenDistribution();
@@ -153,6 +157,7 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
     }
   }
 
+  @Override
   public String toString() {
     IMavenProjectFacade maven = getMavenDistribution();
     if(maven != null) {
@@ -175,6 +180,7 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
     }
   }
 
+  @Override
   public String getVersion() {
     IMavenProjectFacade maven = getMavenDistribution();
     if(maven != null) {

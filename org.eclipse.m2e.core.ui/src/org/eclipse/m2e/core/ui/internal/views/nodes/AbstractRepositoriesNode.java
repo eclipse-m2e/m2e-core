@@ -37,6 +37,7 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
   protected final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
+  @Override
   public Object[] getChildren() {
 
     ArrayList<Object> mirrorNodes = new ArrayList<>();
@@ -61,19 +62,23 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
   protected abstract List<IRepository> getRepositories();
 
+  @Override
   public String toString() {
     return getName();
   }
 
+  @Override
   public boolean hasChildren() {
     Object[] kids = getChildren();
     return kids != null && kids.length > 0;
   }
 
+  @Override
   public Image getImage() {
     return MavenImages.IMG_INDEXES;
   }
 
+  @Override
   public boolean isUpdating() {
     return false;
   }

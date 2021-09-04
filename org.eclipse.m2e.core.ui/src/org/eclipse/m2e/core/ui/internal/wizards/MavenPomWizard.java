@@ -73,6 +73,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
    * Adding the page to the wizard.
    */
 
+  @Override
   public void addPages() {
     artifactPage = new MavenPomWizardPage(selection);
 
@@ -83,6 +84,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
    * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using
    * wizard as execution context.
    */
+  @Override
   public boolean performFinish() {
     final String projectName = artifactPage.getProject();
     final Model model = artifactPage.getModel();
@@ -162,6 +164,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
    *
    * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
    */
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     this.selection = selection;
   }

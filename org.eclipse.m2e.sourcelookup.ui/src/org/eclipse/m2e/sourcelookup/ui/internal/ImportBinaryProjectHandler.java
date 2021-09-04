@@ -76,7 +76,7 @@ public class ImportBinaryProjectHandler extends AbstractHandler {
 
       @Override
       protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) throws CoreException {
-        return new MavenArtifactIdentifier().identify(location, monitor);
+        return new MavenArtifactIdentifier().identify(location);
       }
 
     };

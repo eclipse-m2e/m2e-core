@@ -13,19 +13,25 @@ public class Messages extends NLS {
 	public static String MavenTargetLocationWizard_0;
 	public static String MavenTargetLocationWizard_1;
 	public static String MavenTargetLocationWizard_2;
-	public static String MavenTargetLocationWizard_3;
-	public static String MavenTargetLocationWizard_4;
-	public static String MavenTargetLocationWizard_5;
-	public static String MavenTargetLocationWizard_6;
-	public static String MavenTargetLocationWizard_7;
+	public static String MavenTargetDependencyEditor_1;
+	public static String MavenTargetDependencyEditor_2;
+	public static String MavenTargetDependencyEditor_3;
+	public static String MavenTargetDependencyEditor_4;
+	public static String MavenTargetDependencyEditor_5;
+	public static String MavenTargetDependencyEditor_6;
 	public static String MavenTargetLocationWizard_8;
 	public static String MavenTargetLocationWizard_9;
 	public static String MavenTargetLocationWizard_10;
 	public static String MavenTargetLocationWizard_11;
+	public static String MavenTargetLocationWizard_12;
+	public static String MavenTargetRepositoryEditor_1;
+	public static String ClipboardParser_1;
 	public static String MavenTargetLocationWizard_15;
 	public static String MavenTargetLocationWizard_20;
 	public static String MavenTargetLocationWizard_21;
 	public static String MavenTargetLocationWizard_23;
+	public static String MavenTargetLocationLabelProvider_1;
+	public static String MavenTargetLocationLabelProvider_2;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

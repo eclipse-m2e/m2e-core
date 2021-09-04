@@ -223,6 +223,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
+                 icon="icons/update_dependencies.png"
                  menubarPath="org.eclipse.m2e.core.fileMenu/update"
                  enablesFor="1"/>
          <visibility>
@@ -380,6 +381,18 @@
             properties="workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey,isBuildDirectory"
             type="org.eclipse.core.runtime.IAdaptable"/>
       <propertyTester
+            id="org.eclipse.m2e.core.MavenPropertyTester"
+            class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
+            namespace="org.eclipse.m2e"
+            properties="hasMavenNature"
+            type="org.eclipse.core.resources.IResource"/>
+      <propertyTester
+            id="org.eclipse.m2e.core.MavenPropertyTester"
+            class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
+            namespace="org.eclipse.m2e"
+            properties="hasMavenNature"
+            type="org.eclipse.ui.IFileEditorInput"/>
+      <propertyTester
             id="org.eclipse.m2e.core.MavenPropertyTester2"
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
@@ -403,12 +416,12 @@
             id="org.eclipse.m2e.core.ui.command.addPlugin"
             name="%m2.shortcut.addPlugin">
       </command>
-       <command
+      <command
              categoryId="org.eclipse.ui.category.window"
              description="%command.updateproject.description"
              id="org.eclipse.m2e.core.ui.command.updateProject"
-             name="%m2.shortcut.updateProject">
-       </command>      
+             name="%m2.shortcut.updateMavenProject">
+      </command>
    </extension>
 
     <extension
@@ -673,5 +686,33 @@
    </extension>
    <extension point="org.eclipse.m2e.core.archetypeCatalogs">
       <remote  url="https://repo1.maven.org/maven2/archetype-catalog.xml" description="Maven Central"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:project">
+            <command
+                  commandId="org.eclipse.m2e.core.ui.command.updateProject"
+                  icon="icons/update_dependencies.png"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                   <or>
+                       <with variable="selection">
+                          <iterate>
+                              <adapt
+                                    type="org.eclipse.core.resources.IResource">
+                                   <test forcePluginActivation="true" property="org.eclipse.m2e.hasMavenNature" value="true"/>
+                              </adapt>
+                          </iterate>
+                       </with>
+                       <with variable="activeEditorInput">
+                           <test forcePluginActivation="true" property="org.eclipse.m2e.hasMavenNature" value="true"/>
+                       </with>
+                   </or>
+                </visibleWhen>
+            </command>
+      </menuContribution>
    </extension>
 </plugin>

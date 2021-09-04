@@ -81,6 +81,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     this.setDescription(Messages.MavenInstallFileArtifactWizardPage_desc);
   }
 
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(3, false));

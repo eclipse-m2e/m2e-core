@@ -58,6 +58,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     return this.sources;
   }
 
+  @Override
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
     if(packagingType == null) {
       return null;
@@ -74,6 +75,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     return mapping;
   }
 
+  @Override
   public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution) {
     ArrayList<PluginExecutionMetadata> mappings = new ArrayList<>();
     if(execution != null) {

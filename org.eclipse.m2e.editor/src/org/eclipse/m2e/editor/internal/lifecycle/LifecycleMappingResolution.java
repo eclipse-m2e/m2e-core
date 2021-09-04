@@ -112,6 +112,7 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
     return new CompoundOperation(lst.toArray(new Operation[lst.size()]));
   }
 
+  @Override
   public String getLabel() {
     String goal = getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
     return PluginExecutionAction.ignore.equals(action) ? NLS.bind(Messages.LifecycleMappingProposal_ignore_label, goal)

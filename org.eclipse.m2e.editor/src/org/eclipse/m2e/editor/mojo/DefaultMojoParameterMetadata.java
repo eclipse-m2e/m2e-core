@@ -38,6 +38,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 public class DefaultMojoParameterMetadata implements IMojoParameterMetadata {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
+  @Override
   public List<MojoParameter> loadMojoParameters(PluginDescriptor desc, MojoDescriptor mojo, PlexusConfigHelper helper,
       IProgressMonitor monitor) throws CoreException {
 

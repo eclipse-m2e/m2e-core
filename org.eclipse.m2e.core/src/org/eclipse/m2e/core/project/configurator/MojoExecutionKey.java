@@ -53,6 +53,7 @@ public class MojoExecutionKey implements Serializable {
     this.executionId = executionId;
   }
 
+  @Override
   public int hashCode() {
     int hash = groupId.hashCode();
     hash = 17 * hash + artifactId.hashCode();
@@ -63,6 +64,7 @@ public class MojoExecutionKey implements Serializable {
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;
@@ -105,6 +107,7 @@ public class MojoExecutionKey implements Serializable {
     return groupId + ":" + artifactId + ":" + version + ":" + goal + ":" + executionId + ":" + lifecyclePhase;
   }
 
+  @Override
   public String toString() {
     return groupId + ":" + artifactId + ":" + version + ":" + goal + " (execution: " + executionId + ", phase: "
         + lifecyclePhase + ")";

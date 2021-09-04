@@ -15,9 +15,8 @@
 package org.eclipse.m2e.editor.pom;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +65,7 @@ public class XMLEditorUtility {
             File file = new File(fileStore.toURI());
             try {
               IEditorInput input = new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
-                  readStream(new FileInputStream(file)));
+                  Files.readAllBytes(file.toPath()));
               IEditorPart part = OpenPomAction.openEditor(input, name);
               reveal(selectEditorPage(part), line, column);
             } catch(IOException e) {
@@ -110,35 +109,6 @@ public class XMLEditorUtility {
         editor.selectAndReveal(offset + column - 1, 0);
       } catch(BadLocationException e) {
         log.error("failed selecting part of editor", e);
-      }
-    }
-  }
-
-  /**
-   * duplicate of OpenPomAction method
-   *
-   * @param is
-   * @return
-   * @throws IOException
-   */
-  private static byte[] readStream(InputStream is) throws IOException {
-    byte[] b = new byte[is.available()];
-    int len = 0;
-    while(true) {
-      int n = is.read(b, len, b.length - len);
-      if(n == -1) {
-        if(len < b.length) {
-          byte[] c = new byte[len];
-          System.arraycopy(b, 0, c, 0, len);
-          b = c;
-        }
-        return b;
-      }
-      len += n;
-      if(len == b.length) {
-        byte[] c = new byte[b.length + 1000];
-        System.arraycopy(b, 0, c, 0, len);
-        b = c;
       }
     }
   }

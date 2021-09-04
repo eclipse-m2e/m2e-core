@@ -48,7 +48,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j-simple.version}</version>
-			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
@@ -63,7 +62,6 @@
 							slf4j-simple
 						</Embed-Dependency>
 						<Import-Package>!*</Import-Package>
-						<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 					</instructions>
 				</configuration>
 			</plugin>

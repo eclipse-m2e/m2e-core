@@ -70,6 +70,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     this.maven = maven;
   }
 
+  @Override
   public MavenExecutionRequest getExecutionRequest() throws CoreException {
     if(request != null && context != null) {
       return new ReadonlyMavenExecutionRequest(request);
@@ -97,10 +98,12 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     return request;
   }
 
+  @Override
   public <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     return execute(null, callable, monitor);
   }
 
+  @Override
   public <V> V execute(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     Deque<MavenExecutionContext> stack = threadLocal.get();
     if(stack == null) {
@@ -187,6 +190,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
   }
 
+  @Override
   public MavenSession getSession() {
     if(context == null) {
       throw new IllegalStateException();
@@ -194,6 +198,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     return getValue(CTX_MAVENSESSION);
   }
 
+  @Override
   public ArtifactRepository getLocalRepository() {
     if(context == null) {
       throw new IllegalStateException();
@@ -201,6 +206,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     return getValue(CTX_LOCALREPOSITORY);
   }
 
+  @Override
   public FilterRepositorySystemSession getRepositorySession() {
     if(context == null) {
       throw new IllegalStateException();
@@ -238,6 +244,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    * no easy way to create new populated ProjectBuildingRequest instances. Otherwise this method would not be
    * needed.</rant>
    */
+  @Override
   public ProjectBuildingRequest newProjectBuildingRequest() {
     DefaultProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest();
     projectBuildingRequest.setLocalRepository(getLocalRepository());

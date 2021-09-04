@@ -131,11 +131,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     this.mavenConfiguration = mavenConfiguration;
   }
 
+  @Override
   public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
     return importProjects(projectInfos, configuration, null, monitor);
   }
 
+  @Override
   public List<IMavenProjectImportResult> importProjects(final Collection<MavenProjectInfo> projectInfos,
       final ProjectImportConfiguration configuration, final IProjectCreationListener listener,
       final IProgressMonitor monitor) throws CoreException {
@@ -310,11 +312,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
+  @Override
   public void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException {
     updateProjectConfiguration(new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false), monitor);
   }
 
   // TODO deprecate this method
+  @Override
   public void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
     // for now, only allow one project per request.
 
@@ -521,10 +525,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         "Updated project configuration for {} in {} ms.", mavenProjectFacade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 
+  @Override
   public void enableMavenNature(final IProject project, final ResolverConfiguration configuration,
       final IProgressMonitor monitor) throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
     maven.execute(new AbstractRunnable() {
+      @Override
       protected void run(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         enableBasicMavenNature(project, configuration, monitor);
         configureNewMavenProjects(Collections.singletonList(project), monitor);
@@ -552,6 +558,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
+  @Override
   public void disableMavenNature(IProject project, IProgressMonitor monitor) throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_disable_nature);
 
@@ -587,6 +594,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false));
   }
 
+  @Override
   public boolean addMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
       throws CoreException {
     boolean setProjectDescription = false;
@@ -624,6 +632,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     return true;
   }
 
+  @Override
   public boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
       throws CoreException {
     boolean setProjectDescription = false;
@@ -659,6 +668,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   // project creation
 
+  @Override
   public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
     createSimpleProject(project, location, model, directories, configuration, null, monitor);
@@ -678,6 +688,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * </p>
    */
   // XXX should use Maven plugin configurations instead of manually specifying folders
+  @Override
   public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
       ProjectImportConfiguration configuration, IProjectCreationListener listener, IProgressMonitor monitor)
           throws CoreException {
@@ -758,6 +769,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * @deprecated use
    *             {@link #createArchetypeProjects(IPath, Archetype, String, String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
    */
+  @Override
   @Deprecated
   public void createArchetypeProject(IProject project, IPath location, Archetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Properties properties,
@@ -772,6 +784,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
+  @Override
   public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, final String groupId,
       String artifactId, String version, String javaPackage, Properties properties,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
@@ -785,6 +798,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * @return an unmodifiable list of created projects.
    * @since 1.8
    */
+  @Override
   public List<IProject> createArchetypeProjects(final IPath location, final Archetype archetype, final String groupId,
       final String artifactId, final String version, final String javaPackage, final Properties properties,
       final ProjectImportConfiguration configuration, final IProjectCreationListener listener,
@@ -913,6 +927,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
+  @Override
   public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {
     // TODO what does this do?
     return new LinkedHashSet<MavenProjectInfo>() {
@@ -929,6 +944,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }.collectProjects(projects);
   }
 
+  @Override
   public ISchedulingRule getRule() {
     return ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
   }
@@ -1065,6 +1081,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
+  @Override
   public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) {
     if(projectFacade == null) {
       return null;
@@ -1073,16 +1090,19 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     return LifecycleMappingFactory.getLifecycleMapping(projectFacade);
   }
 
+  @Override
   public void resourceChanged(IResourceChangeEvent event) {
     if(event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource() instanceof IProject) {
       LifecycleMappingConfiguration.remove((IProject) event.getResource());
     }
   }
 
+  @Override
   public ResolverConfiguration getResolverConfiguration(IProject project) {
     return ResolverConfigurationIO.readResolverConfiguration(project);
   }
 
+  @Override
   public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
     return ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
   }

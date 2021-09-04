@@ -35,29 +35,36 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  */
 public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
 
+  @Override
   public String getId() {
     return "invalid";
   }
 
+  @Override
   public String getName() {
     return "invalid";
   }
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
+  @Override
   public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project, IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
+  @Override
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade project,
       IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 
+  @Override
   public boolean hasLifecycleMappingChanged(IMavenProjectFacade newFacade,
       ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor) {
     return false;

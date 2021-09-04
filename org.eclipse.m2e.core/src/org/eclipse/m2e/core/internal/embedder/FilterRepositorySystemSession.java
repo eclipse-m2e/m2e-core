@@ -34,6 +34,7 @@ class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardin
     this.updatePolicy = updatePolicy;
   }
 
+  @Override
   public String getUpdatePolicy() {
     return updatePolicy != null ? updatePolicy : super.getUpdatePolicy();
   }
@@ -52,6 +53,7 @@ class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardin
     return origSessionData;
   }
 
+  @Override
   protected DefaultRepositorySystemSession getSession() {
     return this.session;
   }

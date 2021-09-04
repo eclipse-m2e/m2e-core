@@ -39,6 +39,7 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
     sourceViewerActionContributor = new TextEditorActionContributor();
   }
 
+  @Override
   public void init(IActionBars bars) {
     super.init(bars);
     if(bars != null) {
@@ -46,11 +47,13 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
     }
   }
 
+  @Override
   public void dispose() {
     super.dispose();
     sourceViewerActionContributor.dispose();
   }
 
+  @Override
   public void setActiveEditor(IEditorPart targetEditor) {
     if(targetEditor instanceof MavenPomEditor) {
       editorPart = (MavenPomEditor) targetEditor;
@@ -58,6 +61,7 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
     }
   }
 
+  @Override
   public void setActivePage(IEditorPart part) {
     //set the text editor
     IActionBars actionBars = getActionBars();

@@ -95,10 +95,12 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     setNeedsProgressMonitor(true);
   }
 
+  @Override
   public void addPages() {
     locationPage = new MavenProjectWizardLocationPage(importConfiguration, //
         Messages.wizardProjectPageProjectTitle, Messages.wizardProjectPageProjectDescription, workingSets) { //
 
+      @Override
       protected void createAdditionalControls(Composite container) {
         simpleProject = new Button(container, SWT.CHECK);
         simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
@@ -112,6 +114,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       }
 
       /** Skips the archetype selection page if the user chooses a simple project. */
+      @Override
       public IWizardPage getNextPage() {
         return getPage(simpleProject.getSelection() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage"); //$NON-NLS-1$ //$NON-NLS-2$
       }
@@ -129,6 +132,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
   }
 
   /** Adds the listeners after the page controls are created. */
+  @Override
   public void createPageControls(Composite pageContainer) {
     super.createPageControls(pageContainer);
 
@@ -165,6 +169,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
    * To perform the actual project creation, an operation is created and run using this wizard as execution context.
    * That way, messages about the progress of the project creation are displayed inside the wizard.
    */
+  @Override
   public boolean performFinish() {
     // First of all, we extract all the information from the wizard pages.
     // Note that this should not be done inside the operation we will run
@@ -238,6 +243,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     }
 
     job.addJobChangeListener(new JobChangeAdapter() {
+      @Override
       public void done(IJobChangeEvent event) {
         final IStatus result = event.getResult();
         if(!result.isOK()) {

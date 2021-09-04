@@ -53,6 +53,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
     this.projectManager = projectManager;
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     try {
       MutableWorkspaceState state = new MutableWorkspaceState();

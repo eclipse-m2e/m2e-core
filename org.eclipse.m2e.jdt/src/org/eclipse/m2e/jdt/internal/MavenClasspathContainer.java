@@ -35,18 +35,22 @@ public class MavenClasspathContainer implements IClasspathContainer, Serializabl
     this.entries = entries;
   }
 
+  @Override
   public String getDescription() {
     return Messages.MavenClasspathContainer_description;
   }
 
+  @Override
   public int getKind() {
     return IClasspathContainer.K_APPLICATION;
   }
 
+  @Override
   public synchronized IClasspathEntry[] getClasspathEntries() {
     return entries;
   }
 
+  @Override
   public IPath getPath() {
     return path;
   }

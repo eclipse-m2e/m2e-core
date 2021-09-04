@@ -30,97 +30,116 @@ class EclipseLogger implements Logger {
     this.mavenConfiguration = mavenConfiguration;
   }
 
+  @Override
   public void debug(String msg) {
     if(isDebugEnabled()) {
       log.debug(msg);
     }
   }
 
+  @Override
   public void debug(String msg, Throwable t) {
     if(isDebugEnabled()) {
       log.debug(msg + " " + t.getMessage(), t);
     }
   }
 
+  @Override
   public void info(String msg) {
     if(isInfoEnabled()) {
       log.info(msg);
     }
   }
 
+  @Override
   public void info(String msg, Throwable t) {
     if(isInfoEnabled()) {
       log.info(msg + " " + t.getMessage(), t);
     }
   }
 
+  @Override
   public void warn(String msg) {
     if(isWarnEnabled()) {
       log.warn(msg);
     }
   }
 
+  @Override
   public void warn(String msg, Throwable t) {
     if(isWarnEnabled()) {
       log.warn(msg + " " + t.getMessage(), t);
     }
   }
 
+  @Override
   public void fatalError(String msg) {
     if(isFatalErrorEnabled()) {
       log.error(msg);
     }
   }
 
+  @Override
   public void fatalError(String msg, Throwable t) {
     if(isFatalErrorEnabled()) {
       log.error(msg + " " + t.getMessage(), t);
     }
   }
 
+  @Override
   public void error(String msg) {
     if(isErrorEnabled()) {
       log.error(msg);
     }
   }
 
+  @Override
   public void error(String msg, Throwable t) {
     if(isErrorEnabled()) {
       log.error(msg + " " + t.getMessage(), t);
     }
   }
 
+  @Override
   public boolean isDebugEnabled() {
     return mavenConfiguration.isDebugOutput();
   }
 
+  @Override
   public boolean isInfoEnabled() {
     return true;
   }
 
+  @Override
   public boolean isWarnEnabled() {
     return true;
   }
 
+  @Override
   public boolean isErrorEnabled() {
     return true;
   }
 
+  @Override
   public boolean isFatalErrorEnabled() {
     return true;
   }
 
+  @Override
   public void setThreshold(int treshold) {
   }
 
+  @Override
   public int getThreshold() {
     return LEVEL_DEBUG;
   }
 
+  @Override
   public Logger getChildLogger(String name) {
     return this;
   }
 
+  @Override
   public String getName() {
     return Messages.EclipseLogger_name;
   }

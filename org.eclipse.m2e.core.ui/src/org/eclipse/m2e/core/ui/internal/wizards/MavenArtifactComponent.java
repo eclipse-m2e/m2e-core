@@ -156,6 +156,7 @@ public class MavenArtifactComponent extends Composite {
     packagingCombo.addModifyListener(modifyingListener);
   }
 
+  @Override
   public void dispose() {
     super.dispose();
 
@@ -167,9 +168,7 @@ public class MavenArtifactComponent extends Composite {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.swt.widgets.Composite#setFocus()
-   */
+  @Override
   public boolean setFocus() {
     if(groupIdCombo != null) {
       return groupIdCombo.setFocus();

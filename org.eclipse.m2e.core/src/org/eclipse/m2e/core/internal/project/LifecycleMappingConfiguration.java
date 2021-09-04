@@ -31,7 +31,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -64,14 +63,17 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
     this.mojoExecutionConfiguration = mojoExecutionConfiguration;
   }
 
+  @Override
   public String getLifecycleMappingId() {
     return lifecycleMappingId;
   }
 
+  @Override
   public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
+  @Override
   public Xpp3Dom getMojoExecutionConfiguration(MojoExecutionKey key) {
     return mojoExecutionConfiguration.get(key);
   }
@@ -93,15 +95,10 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
   }
 
   private static void persist(IProject project, LifecycleMappingConfiguration configuration) {
-    try {
-      File configFile = getConfigurationFile(project);
-      ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(configFile));
-      try {
-        oos.writeObject(configuration);
-        oos.flush();
-      } finally {
-        IOUtil.close(oos);
-      }
+    File configFile = getConfigurationFile(project);
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(configFile))) {
+      oos.writeObject(configuration);
+      oos.flush();
     } catch(IOException ex) {
       log.warn("Could not persist build lifecycle mapping configuration for {}.", project.toString(), ex);
     }
@@ -144,15 +141,10 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
 
   public static LifecycleMappingConfiguration restore(IMavenProjectFacade facade, IProgressMonitor monitor) {
     File configFile = getConfigurationFile(facade.getProject());
-    try {
-      ObjectInputStream ois = new ObjectInputStream(new FileInputStream(configFile));
-      try {
-        Object obj = ois.readObject();
-        if(obj instanceof LifecycleMappingConfiguration) {
-          return (LifecycleMappingConfiguration) obj;
-        }
-      } finally {
-        IOUtil.close(ois);
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(configFile))) {
+      Object obj = ois.readObject();
+      if(obj instanceof LifecycleMappingConfiguration) {
+        return (LifecycleMappingConfiguration) obj;
       }
     } catch(ClassNotFoundException ex) {
       log.warn("Could not read persistent build lifecycle mapping configuration for {}.", facade.toString(), ex);

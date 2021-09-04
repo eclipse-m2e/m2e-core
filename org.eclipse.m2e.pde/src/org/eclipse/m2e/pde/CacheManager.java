@@ -58,7 +58,7 @@ public class CacheManager {
 	private CacheManager(File folder) {
 		this.folder = folder;
 		try {
-			FileUtils.touch(new File(LASTACCESS_MARKER));
+			FileUtils.touch(new File(folder, LASTACCESS_MARKER));
 		} catch (IOException e) {
 			// can't mark last access then...
 		}
@@ -87,13 +87,10 @@ public class CacheManager {
 		File file = new File(gavFolder, artifact.getFile().getName());
 		File lockFile = new File(gavFolder, artifact.getFile().getName() + ".lock");
 		lockFile.deleteOnExit();
-		try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rw"); FileChannel channel = raf.getChannel()) {
-			FileLock lock = channel.lock();
-			try {
-				return consumer.consume(file);
-			} finally {
-				lock.release();
-			}
+		try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rw");
+				FileChannel channel = raf.getChannel();
+				FileLock lock = channel.lock()) {
+			return consumer.consume(file);
 		}
 	}
 

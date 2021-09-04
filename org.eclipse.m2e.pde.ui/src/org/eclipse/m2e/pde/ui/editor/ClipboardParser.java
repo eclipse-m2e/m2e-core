@@ -13,37 +13,50 @@
 package org.eclipse.m2e.pde.ui.editor;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class ClipboardParser {
 
-	private String groupId;
-	private String artifactId;
-	private String version;
-	private String classifier;
 	private Exception error;
-	private String scope;
+
+	private List<MavenTargetDependency> dependencies = new ArrayList<>();
 
 	public ClipboardParser(String text) {
 		if (text != null && text.trim().startsWith("<")) {
+			text = "<dummy>" + text + "</dummy>";
 			try {
 				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes("UTF-8"));
 				Document doc = builder.parse(input);
-				groupId = getTextFor("groupId", doc);
-				artifactId = getTextFor("artifactId", doc);
-				version = getTextFor("version", doc);
-				classifier = getTextFor("classifier", doc);
-				scope = getTextFor("scope", doc);
+				NodeList dependencies = doc.getElementsByTagName("dependency");
+
+				for (int i = 0; i < dependencies.getLength(); i++) {
+					Node item = dependencies.item(i);
+					if (item instanceof Element) {
+						Element element = (Element) item;
+						String groupId = getTextFor("groupId", element, "");
+						String artifactId = getTextFor("artifactId", element, "");
+						String version = getTextFor("version", element, "");
+						String classifier = getTextFor("classifier", element, "");
+						String type = getTextFor("type", element, MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
+						this.dependencies
+								.add(new MavenTargetDependency(groupId, artifactId, version, type, classifier));
+					}
+
+				}
 			} catch (Exception e) {
 				// we can't use the clipboard content then...
 				this.error = e;
@@ -51,36 +64,24 @@ public class ClipboardParser {
 		}
 	}
 
-	private String getTextFor(String element, Document doc) {
+	private String getTextFor(String element, Element doc, String defaultValue) {
 		NodeList nl = doc.getElementsByTagName(element);
 		Node item = nl.item(0);
 		if (item != null) {
-			return item.getTextContent();
+			String v = Objects.requireNonNullElse(item.getTextContent(), defaultValue);
+			if (!v.isBlank()) {
+				return v;
+			}
 		}
-		return null;
+		return defaultValue;
 	}
 
 	public Exception getError() {
 		return error;
 	}
 
-	public String getScope() {
-		return Objects.requireNonNullElse(scope, MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
+	public List<MavenTargetDependency> getDependencies() {
+		return dependencies;
 	}
 
-	public String getGroupId() {
-		return Objects.requireNonNullElse(groupId, "");
-	}
-
-	public String getArtifactId() {
-		return Objects.requireNonNullElse(artifactId, "");
-	}
-
-	public String getVersion() {
-		return Objects.requireNonNullElse(version, "");
-	}
-
-	public String getClassifier() {
-		return Objects.requireNonNullElse(classifier, "");
-	}
 }

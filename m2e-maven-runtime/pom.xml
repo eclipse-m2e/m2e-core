@@ -34,6 +34,18 @@
 		<module>org.eclipse.m2e.maven.runtime.slf4j.simple</module>
 	</modules>
 
+	<dependencies>
+		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
+		<dependency>
+			<!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
+			<!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>[1.0.0,)</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -107,7 +119,7 @@
 							<Bundle-RequiredExecutionEnvironment>JavaSE-11</Bundle-RequiredExecutionEnvironment>
 							<Bundle-Name>%Bundle-Name</Bundle-Name>
 							<Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
-							<Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
+							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
 
 							<Eclipse-BundleShape>dir</Eclipse-BundleShape>
 						</instructions>

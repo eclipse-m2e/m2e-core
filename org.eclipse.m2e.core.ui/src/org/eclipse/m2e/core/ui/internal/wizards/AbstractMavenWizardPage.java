@@ -101,6 +101,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   }
 
   /** Loads the advanced settings data when the page is displayed. */
+  @Override
   public void setVisible(boolean visible) {
     if(visible) {
       if(!isHistoryLoaded) {
@@ -121,6 +122,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   }
 
   /** Saves the history when the page is disposed. */
+  @Override
   public void dispose() {
     saveInputHistory();
     super.dispose();

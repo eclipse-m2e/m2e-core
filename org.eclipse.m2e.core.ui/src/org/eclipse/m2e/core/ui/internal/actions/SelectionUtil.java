@@ -14,10 +14,9 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,8 +47,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
-
-import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -266,19 +263,13 @@ public class SelectionUtil {
       IPath path = storage.getFullPath();
       if(path == null || !new File(path.toOSString()).exists()) {
         File tempPomFile = null;
-        InputStream is = null;
-        OutputStream os = null;
-        try {
+        try (InputStream is = storage.getContents()) {
           tempPomFile = File.createTempFile("maven-pom", ".pom"); //$NON-NLS-1$ //$NON-NLS-2$
-          os = new FileOutputStream(tempPomFile);
-          is = storage.getContents();
-          IOUtil.copy(is, os);
+          Files.copy(is, tempPomFile.toPath());
           return readMavenProject(tempPomFile, monitor);
         } catch(IOException ex) {
           log.error("Can't close stream", ex); //$NON-NLS-1$
         } finally {
-          IOUtil.close(is);
-          IOUtil.close(os);
           if(tempPomFile != null) {
             tempPomFile.delete();
           }

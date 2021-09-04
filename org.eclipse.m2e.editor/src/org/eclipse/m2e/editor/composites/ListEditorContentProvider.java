@@ -32,6 +32,7 @@ public class ListEditorContentProvider<T> implements IStructuredContentProvider 
 
   private Comparator<T> comparator;
 
+  @Override
   @SuppressWarnings("unchecked")
   public Object[] getElements(Object input) {
     if(input instanceof List) {
@@ -46,9 +47,11 @@ public class ListEditorContentProvider<T> implements IStructuredContentProvider 
     return EMPTY;
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void dispose() {
   }
 

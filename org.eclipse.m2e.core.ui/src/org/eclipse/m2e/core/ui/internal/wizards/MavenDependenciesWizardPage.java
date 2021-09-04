@@ -88,6 +88,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
    * {@inheritDoc} This wizard page contains a <code>TableViewer</code> to display the currently included Maven2
    * directories and a button area with buttons to add further dependencies or remove existing ones.
    */
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     GridLayout layout = new GridLayout(3, false);
@@ -162,6 +163,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     });
   }
 
+  @Override
   public IWizardContainer getContainer() {
     return super.getContainer();
   }
@@ -230,6 +232,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
      * {groupId} - {artifactId} - {version} - {type}
      * </p>
      */
+    @Override
     public String getText(Object element) {
       if(element instanceof Dependency) {
         Dependency d = (Dependency) element;
@@ -239,6 +242,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
       return super.getText(element);
     }
 
+    @Override
     public Image getImage(Object element) {
       if(element instanceof Dependency) {
         return DEPENDENCY_IMAGE;
@@ -256,6 +260,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     /**
      * Two objects of type <code>Dependency</code> are sorted by (1) their groupId and (2) their artifactId.
      */
+    @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
       if(!(e1 instanceof Dependency) || !(e2 instanceof Dependency)) {
         return super.compare(viewer, e1, e2);

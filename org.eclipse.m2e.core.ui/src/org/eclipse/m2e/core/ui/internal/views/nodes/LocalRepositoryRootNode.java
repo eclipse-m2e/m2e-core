@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class LocalRepositoryRootNode implements IMavenRepositoryNode {
 
+  @Override
   public Object[] getChildren() {
     NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
     NexusIndex localIndex = indexManager.getLocalIndex();
@@ -36,18 +37,22 @@ public class LocalRepositoryRootNode implements IMavenRepositoryNode {
     return new Object[] {new LocalRepositoryNode(localIndex), new WorkspaceRepositoryNode(workspaceIndex)};
   }
 
+  @Override
   public String getName() {
     return Messages.LocalRepositoryRootNode_name;
   }
 
+  @Override
   public boolean hasChildren() {
     return true;
   }
 
+  @Override
   public Image getImage() {
     return MavenImages.IMG_INDEXES;
   }
 
+  @Override
   public boolean isUpdating() {
     return false;
   }

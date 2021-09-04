@@ -30,11 +30,13 @@ final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter
     super(maven, monitor);
   }
 
+  @Override
   public void transferInitiated(TransferEvent e) {
     // System.err.println( "init "+e.getWagon().getRepository()+"/"+e.getResource().getName());
     transferInitiated((String) null);
   }
 
+  @Override
   public void transferStarted(TransferEvent e) {
     StringBuilder sb = new StringBuilder();
     if(e.getWagon() != null && e.getWagon().getRepository() != null) {
@@ -47,6 +49,7 @@ final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter
     transferStarted(sb.toString());
   }
 
+  @Override
   public void transferProgress(TransferEvent e, byte[] buffer, int length) {
     long total = e.getResource().getContentLength();
     String artifactUrl = e.getWagon().getRepository() + "/" + e.getResource().getName(); //$NON-NLS-1$
@@ -54,15 +57,18 @@ final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter
     transferProgress(artifactUrl, total, length);
   }
 
+  @Override
   public void transferCompleted(TransferEvent e) {
     String artifactUrl = e.getWagon().getRepository() + "/" + e.getResource().getName(); //$NON-NLS-1$
     transferCompleted(artifactUrl);
   }
 
+  @Override
   public void transferError(TransferEvent e) {
     transferError(e.getWagon().getRepository() + "/" + e.getResource().getName(), e.getException()); //$NON-NLS-1$
   }
 
+  @Override
   public void debug(String message) {
     // System.err.println( "debug "+message);
   }

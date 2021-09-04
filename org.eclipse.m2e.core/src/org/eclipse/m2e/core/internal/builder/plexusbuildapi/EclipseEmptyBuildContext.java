@@ -40,36 +40,44 @@ public class EclipseEmptyBuildContext extends AbstractEclipseBuildContext {
     this.emptyScanner = new EmptyScanner(project.getLocation().toFile());
   }
 
+  @Override
   public boolean hasDelta(String relpath) {
     return false;
   }
 
+  @Override
   public boolean hasDelta(File file) {
     return false;
   }
 
+  @Override
   @SuppressWarnings("rawtypes")
   public boolean hasDelta(List relpaths) {
     return false;
   }
 
+  @Override
   public Scanner newScanner(File basedir) {
     return emptyScanner;
   }
 
+  @Override
   public Scanner newDeleteScanner(File basedir) {
     return emptyScanner;
   }
 
+  @Override
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
     // @TODO should ignoreDelta be considered?
     return emptyScanner;
   }
 
+  @Override
   public boolean isIncremental() {
     return true;
   }
 
+  @Override
   protected IResource getBaseResource() {
     return project;
   }

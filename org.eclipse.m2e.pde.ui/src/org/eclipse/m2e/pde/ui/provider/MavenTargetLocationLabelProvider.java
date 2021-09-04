@@ -12,10 +12,15 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.provider;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory;
+import org.eclipse.m2e.pde.ui.editor.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
@@ -26,7 +31,14 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 	public String getText(Object element) {
 		if (element instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) element;
-			return location.getGroupId() + ":" + location.getArtifactId() + " (" + location.getVersion() + ")";
+			List<MavenTargetDependency> roots = location.getRoots();
+			if (roots.size() == 1) {
+				MavenTargetDependency dependency = roots.get(0);
+				return MessageFormat.format(Messages.MavenTargetLocationLabelProvider_1, dependency.getGroupId(),
+						dependency.getArtifactId(), dependency.getVersion());
+			} else {
+				return MessageFormat.format(Messages.MavenTargetLocationLabelProvider_2, roots.size());
+			}
 		}
 		return String.valueOf(element);
 	}

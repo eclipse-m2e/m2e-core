@@ -64,6 +64,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
     return id;
   }
 
+  @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);
@@ -102,6 +103,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
    */
   public abstract void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException;
 
+  @Override
   public String toString() {
     return (name == null) ? getId() : name;
   }

@@ -12,14 +12,13 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -29,14 +28,13 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetLocation;
+import org.eclipse.m2e.pde.MavenTargetRepository;
 import org.eclipse.m2e.pde.MissingMetadataMode;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,21 +45,18 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class MavenTargetLocationWizard extends Wizard implements ITargetLocationWizard {
 
-	private Text artifactId;
-	private Text groupId;
-	private Text version;
-	private Text classifier;
-	private CCombo type;
 	private MavenTargetLocation targetLocation;
 	private CCombo scope;
 	private ComboViewer metadata;
 	private ITargetDefinition targetDefinition;
 	private BNDInstructions bndInstructions;
 	private Button includeSource;
+	private MavenTargetDependencyEditor dependencyEditor;
+	private List<MavenTargetRepository> repositoryList = new ArrayList<>();
 
 	public MavenTargetLocationWizard() {
 		this(null);
@@ -70,6 +65,11 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
+		if (targetLocation != null) {
+			for (MavenTargetRepository mavenTargetRepository : targetLocation.getExtraRepositories()) {
+				repositoryList.add(mavenTargetRepository.copy());
+			}
+		}
 		WizardPage page = new WizardPage(
 				targetLocation == null ? Messages.MavenTargetLocationWizard_1 : Messages.MavenTargetLocationWizard_2) {
 
@@ -81,18 +81,14 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				Composite composite = new Composite(parent, SWT.NONE);
 				setControl(composite);
 				composite.setLayout(new GridLayout(2, false));
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_3);
-				groupId = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_4);
-				artifactId = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_5);
-				version = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_7);
-				classifier = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_6);
-				type = combo(new CCombo(composite, SWT.BORDER));
-				type.add("jar"); //$NON-NLS-1$
-				type.add("bundle"); //$NON-NLS-1$
+				createRepositoryLink(composite);
+				dependencyEditor = new MavenTargetDependencyEditor(composite,
+						targetLocation == null ? Collections.emptyList() : targetLocation.getRoots());
+				GridData gd_dep = new GridData(GridData.FILL_BOTH);
+				gd_dep.horizontalSpan = 2;
+				gd_dep.heightHint = 200;
+				dependencyEditor.getControl().setLayoutData(gd_dep);
+
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_9);
 				createMetadataCombo(composite);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
@@ -100,34 +96,14 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_8);
 				includeSource = new Button(composite, SWT.CHECK);
 				if (targetLocation != null) {
-					artifactId.setText(targetLocation.getArtifactId());
-					groupId.setText(targetLocation.getGroupId());
-					version.setText(targetLocation.getVersion());
-					classifier.setText(targetLocation.getClassifier());
-					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 					bndInstructions = targetLocation.getInstructions(null);
 					includeSource.setSelection(targetLocation.isIncludeSource());
 				} else {
-					Clipboard clipboard = new Clipboard(composite.getDisplay());
-					String text = (String) clipboard.getContents(TextTransfer.getInstance());
-					clipboard.dispose();
-					ClipboardParser clipboardParser = new ClipboardParser(text);
-					groupId.setText(clipboardParser.getGroupId());
-					artifactId.setText(clipboardParser.getArtifactId());
-					version.setText(clipboardParser.getVersion());
-					classifier.setText(clipboardParser.getClassifier());
-					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
-					scope.setText(clipboardParser.getScope());
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
 					includeSource.setSelection(true);
-					Exception clipboardError = clipboardParser.getError();
-					if (clipboardError != null) {
-						Platform.getLog(MavenTargetLocationWizard.class).warn(MessageFormat
-								.format(Messages.MavenTargetLocationWizard_11, clipboardError.getMessage()));
-					}
 				}
 				updateUI();
 			}
@@ -205,13 +181,6 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				scopeLabel.setVisible(scope.getText().isBlank());
 			}
 
-			private Text fill(Text text) {
-				GridData data = new GridData(GridData.FILL_HORIZONTAL);
-				data.grabExcessHorizontalSpace = true;
-				text.setLayoutData(data);
-				return text;
-			}
-
 			private CCombo combo(CCombo combo) {
 				GridData data = new GridData();
 				data.widthHint = 100;
@@ -261,10 +230,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				list.add(bndInstructions);
 			}
 		}
-		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
-				version.getText(), type.getText(), classifier.getText(),
-				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), includeSource.getSelection(),
-				list, excludes);
+		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(), repositoryList,
+				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
+				includeSource.getSelection(), list, excludes);
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {
@@ -277,6 +245,42 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			targetDefinition.setTargetLocations(locations);
 		}
 		return true;
+	}
+
+	private void createRepositoryLink(Composite composite) {
+		GridData gd_link = new GridData();
+		gd_link.horizontalSpan = 2;
+		Link link = new Link(composite, SWT.NONE);
+		link.setText(Messages.MavenTargetLocationWizard_12);
+		link.setLayoutData(gd_link);
+		link.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if ("#maven".equals(e.text)) {
+					PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(composite.getShell(),
+							"org.eclipse.m2e.core.preferences.MavenSettingsPreferencePage",
+							new String[] { "org.eclipse.m2e.core.preferences.MavenSettingsPreferencePage",
+									"org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage",
+									"org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage",
+									"org.eclipse.m2e.core.ui.preferences.UserInterfacePreferencePage",
+									"org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage",
+									"org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag" },
+							null);
+					dialog.open();
+				} else if ("#configure".equals(e.text)) {
+					MavenTargetRepositoryEditor editor = new MavenTargetRepositoryEditor(composite.getShell(),
+							repositoryList);
+					editor.open();
+				}
+
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+		});
 	}
 
 }

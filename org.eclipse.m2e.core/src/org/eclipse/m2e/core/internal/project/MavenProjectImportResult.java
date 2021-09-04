@@ -30,10 +30,12 @@ public class MavenProjectImportResult implements IMavenProjectImportResult {
     this.project = project;
   }
 
+  @Override
   public IProject getProject() {
     return project;
   }
 
+  @Override
   public MavenProjectInfo getMavenProjectInfo() {
     return projectInfo;
   }

@@ -42,6 +42,7 @@ public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryN
     this.index = index;
   }
 
+  @Override
   public Object[] getChildren() {
 
     if(index == null) {
@@ -65,14 +66,17 @@ public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryN
     }
   }
 
+  @Override
   public Image getImage() {
     return MavenImages.IMG_INDEX;
   }
 
+  @Override
   public boolean hasChildren() {
     return index != null;
   }
 
+  @Override
   public boolean isUpdating() {
     return index != null && index.isUpdating();
   }

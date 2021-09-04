@@ -46,29 +46,35 @@ public class FilteredIndex implements IIndex {
     this.index = index;
   }
 
+  @Override
   public IndexedArtifactFile getIndexedArtifactFile(ArtifactKey artifact) throws CoreException {
     return index.getIndexedArtifactFile(artifact);
   }
 
+  @Override
   public IndexedArtifactFile identify(File file) throws CoreException {
     return index.identify(file);
   }
 
+  @Override
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
       SearchExpression version, SearchExpression packaging) throws CoreException {
     return filter(index.find(groupId, artifactId, version, packaging));
   }
 
+  @Override
   public Collection<IndexedArtifact> find(Collection<SearchExpression> groupId,
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
     return filter(index.find(groupId, artifactId, version, packaging));
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression expression, String searchType) throws CoreException {
     return filter(index.search(expression, searchType));
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression expression, String searchType, int classifier)
       throws CoreException {
     return filter(index.search(expression, searchType, classifier));

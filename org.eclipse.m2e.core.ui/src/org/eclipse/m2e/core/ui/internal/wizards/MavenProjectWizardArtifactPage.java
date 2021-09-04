@@ -118,6 +118,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
    * artifact and a <code>Maven2DirectoriesComponent</code> which allows to choose which directories of the default
    * Maven directory structure to create.
    */
+  @Override
   public void createControl(Composite parent) {
     GridLayout layout = new GridLayout();
     layout.marginWidth = 0;
@@ -174,6 +175,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     setControl(container);
   }
 
+  @Override
   public void setVisible(boolean visible) {
     super.setVisible(visible);
     artifactComponent.getGroupIdCombo().setFocus();
@@ -306,6 +308,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     this.isUsed = isUsed;
   }
 
+  @Override
   public boolean isPageComplete() {
     return !isUsed || super.isPageComplete();
   }

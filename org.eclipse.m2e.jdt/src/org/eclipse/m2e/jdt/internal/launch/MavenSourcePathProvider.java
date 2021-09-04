@@ -31,6 +31,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 
 public class MavenSourcePathProvider extends MavenRuntimeClasspathProvider {
 
+  @Override
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(ILaunchConfiguration configuration) throws CoreException {
     boolean useDefault = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_DEFAULT_SOURCE_PATH, true);
     if(useDefault) {

@@ -14,9 +14,9 @@
 package org.eclipse.m2e.logback.configuration;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,16 +26,16 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.SubstituteLoggerFactory;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 
 
 public class LogPlugin extends Plugin {
@@ -120,23 +120,10 @@ public class LogPlugin extends Plugin {
 
       if(!configFile.isFile()) {
         // Copy the default config file to the actual config file
-        InputStream is = bundleContext.getBundle().getEntry("defaultLogbackConfiguration/logback.xml").openStream(); //$NON-NLS-1$
-        try {
+        try (InputStream is = bundleContext.getBundle().getEntry("defaultLogbackConfiguration/logback.xml") //$NON-NLS-1$
+            .openStream()) {
           configFile.getParentFile().mkdirs();
-          FileOutputStream fos = new FileOutputStream(configFile);
-          try {
-            for(byte[] buffer = new byte[1024 * 4];;) {
-              int n = is.read(buffer);
-              if(n < 0) {
-                break;
-              }
-              fos.write(buffer, 0, n);
-            }
-          } finally {
-            fos.close();
-          }
-        } finally {
-          is.close();
+          Files.copy(is, configFile.toPath());
         }
       }
 

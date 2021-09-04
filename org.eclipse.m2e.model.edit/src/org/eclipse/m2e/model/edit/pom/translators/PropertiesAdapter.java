@@ -212,13 +212,6 @@ public class PropertiesAdapter extends ListAdapter {
     }
 
     /**
-     * @return the property
-     */
-    public PropertyElement getProperty() {
-      return property;
-    }
-
-    /**
      * @return the element
      */
     public Element getElement() {

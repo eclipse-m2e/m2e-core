@@ -54,6 +54,7 @@ public abstract class AbstractClassifierClasspathProvider
    * @deprecated replaced by
    *             {@link IClassifierClasspathProvider#setTestClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
    */
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public void setTestClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
@@ -65,6 +66,7 @@ public abstract class AbstractClassifierClasspathProvider
    * @deprecated replaced by
    *             {@link IClassifierClasspathProvider#setRuntimeClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
    */
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
@@ -127,11 +129,13 @@ public abstract class AbstractClassifierClasspathProvider
     }
   }
 
+  @Override
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);
   }
 
+  @Override
   public String toString() {
     return getName();
   }
