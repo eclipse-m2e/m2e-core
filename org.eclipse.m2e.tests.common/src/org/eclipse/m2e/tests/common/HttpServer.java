@@ -16,9 +16,10 @@ package org.eclipse.m2e.tests.common;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -53,7 +54,6 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -669,29 +669,24 @@ public class HttpServer {
             return;
           } else if(HttpMethod.PUT.equals(request.getMethod()) || HttpMethod.POST.equals(request.getMethod())) {
             file.getParentFile().mkdirs();
-            FileOutputStream os = new FileOutputStream(file);
-            try {
-              IO.copy(request.getInputStream(), os);
-            } finally {
-              os.close();
+
+            try (var input = request.getInputStream()) {
+              Files.copy(input, file.toPath());
             }
 
             response.setStatus(HttpServletResponse.SC_CREATED);
             ((Request) request).setHandled(true);
           } else if(file.isFile()) {
-            FileInputStream is = new FileInputStream(file);
 
-            try {
+            try (var outputStream = response.getOutputStream()) {
               String filterEncoding = getFilterEncoding(path, resourceFilters.get(contextRoot));
               if(filterEncoding == null) {
-                IO.copy(is, response.getOutputStream());
+                Files.copy(file.toPath(), outputStream);
               } else {
-                String text = IO.toString(is, filterEncoding);
+                String text = Files.readString(file.toPath(), Charset.forName(filterEncoding));
                 text = filter(text, filterTokens);
-                response.getOutputStream().write(text.getBytes(filterEncoding));
+                outputStream.write(text.getBytes(filterEncoding));
               }
-            } finally {
-              is.close();
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
