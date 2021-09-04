@@ -64,13 +64,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 @SuppressWarnings("restriction")
 public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
-  /*package*/static final Comparator<Node> NODE_COMPARATOR = (p1, p2) -> {
-    int d = p2.getBuildCount() - p1.getBuildCount();
-    if(d != 0) {
-      return d;
-    }
-    return p1.getName().compareTo(p2.getName());
-  };
+  /*package*/static final Comparator<Node> NODE_COMPARATOR = // 
+      Comparator.comparingInt(Node::getBuildCount).reversed() // 
+          .thenComparing(Node::getName);
 
   /*package*/TreeViewer viewer;
 
