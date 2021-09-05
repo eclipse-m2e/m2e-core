@@ -65,6 +65,12 @@ Old target formats are automatically converted.
 
 With upgrade to newer LemMinX-Maven, the edition of pom.xml with the Generic Editor receives several comfortable fixes and improvements.
 
+#### One way synchronization for jpms directives from maven compiler arguments to .classpath file
+
+Extract jpms arguments (--add-exports,--add-opens,--add-reads,--patch-module) from the maven-compiler-plugin compiler arguments if any.
+Dispatch the arguments in the right container (if the target module is part of JRE then in JreContainer else in M2eContainer) and
+transform them into eclipse classpath attributes (add-exports, add-opens, add-reads, patch-module)
+
 ### Older releases
 
 ## 1.18.1
