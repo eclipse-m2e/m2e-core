@@ -835,7 +835,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * @param monitor the progress monitor
    * @return the arguments
    */
-  @Override
   private List<String> getCompilerArguments(MavenProject mavenProject, MojoExecution execution,
       IProgressMonitor monitor) {
 
