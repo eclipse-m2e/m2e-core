@@ -94,6 +94,7 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
     return IMavenConstants.EDITOR_HINT_MISSING_SCHEMA.equals(hint);
   }
 
+  @Override
   public boolean hasResolutions(IMarker marker) {
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
     return hint != null;

@@ -72,6 +72,7 @@ public class M2EErrorDialog extends MessageDialog {
     setShellStyle(getShellStyle() | SWT.RESIZE);
   }
 
+  @Override
   protected Control createCustomArea(Composite parent) {
     Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, true);
@@ -150,9 +151,7 @@ public class M2EErrorDialog extends MessageDialog {
    */
   class ErrorTableContentProvider implements IStructuredContentProvider {
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-     */
+    @Override
     public Object[] getElements(Object inputElement) {
       if(inputElement instanceof Map) {
         return ((Map) inputElement).keySet().toArray();
@@ -160,31 +159,23 @@ public class M2EErrorDialog extends MessageDialog {
       return new Object[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-     */
+    @Override
     public void dispose() {
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-     */
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
   }
 
   class ErrorTableLabelProvider implements ITableLabelProvider {
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
-     */
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
-     */
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       if(columnIndex == PROJECT_COL) {
         return element.toString();
@@ -193,30 +184,22 @@ public class M2EErrorDialog extends MessageDialog {
       return msg == null ? "" : msg; //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
+    @Override
     public void addListener(ILabelProviderListener listener) {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-     */
+    @Override
     public void dispose() {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
-     */
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   }

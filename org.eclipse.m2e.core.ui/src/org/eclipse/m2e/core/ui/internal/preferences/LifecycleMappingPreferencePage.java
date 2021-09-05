@@ -65,6 +65,7 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
   }
 
   // reset to default lifecycle mappings file
+  @Override
   protected void performDefaults() {
     // set to default
     mappingFilePath = getDefaultLocation();
@@ -72,6 +73,7 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
     super.performDefaults();
   }
 
+  @Override
   public boolean performOk() {
     try {
       MavenPlugin.getMavenConfiguration().setWorkspaceLifecycleMappingMetadataFile(mappingFilePath);
@@ -83,10 +85,12 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
     }
   }
 
+  @Override
   public void init(IWorkbench workbench) {
     mappingFilePath = getCurrentLocation();
   }
 
+  @Override
   protected Control createContents(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayout gridLayout = new GridLayout(1, false);

@@ -2,6 +2,11 @@
 
 ### Next release
 
+## 1.18.2
+
+* 📅 Release Date: ~September 2021
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.1...1.18.2
+
 #### the m2e-pde editor now supports adding more than one dependency per target location:
 
 ![grafik](https://user-images.githubusercontent.com/1331477/126075863-ee075afb-c4e1-423d-acc0-8174905378dd.png)
@@ -56,6 +61,12 @@ Old target formats are automatically converted.
 </target>
 ```
 
+#### Multiple fixes and improvement in LemMinX based editor
+
+With upgrade to newer LemMinX-Maven, the edition of pom.xml with the Generic Editor receives several comfortable fixes and improvements.
+
+### Older releases
+
 ## 1.18.1
 
 * 📅 Release Date: June 23rd, 2021
@@ -65,8 +76,6 @@ Main changes:
 * Use newer guava 30.1
 * Code cleanups
 * Improve project structure, documentation and other files to ease contributions
-
-### Older releases
 
 ## 1.18.0
 

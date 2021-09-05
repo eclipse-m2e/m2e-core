@@ -110,6 +110,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
+  @Override
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(final ILaunchConfiguration configuration)
       throws CoreException {
     boolean isModular = JavaRuntime.isModularConfiguration(configuration);
@@ -153,6 +154,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     return recoverRuntimePath(configuration, IJavaLaunchConfigurationConstants.ATTR_CLASSPATH);
   }
 
+  @Override
   public IRuntimeClasspathEntry[] resolveClasspath(final IRuntimeClasspathEntry[] entries,
       final ILaunchConfiguration configuration) throws CoreException {
     IProgressMonitor monitor = new NullProgressMonitor(); // XXX
@@ -219,9 +221,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       }
     }
 
-    if(scope == IClasspathManager.CLASSPATH_TEST
-        && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5
-            .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
+    if(scope == IClasspathManager.CLASSPATH_TEST && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5
+        .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
       addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
     }
   }

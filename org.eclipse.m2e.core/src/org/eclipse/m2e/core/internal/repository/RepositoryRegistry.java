@@ -110,6 +110,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     return localRepository;
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     /*
      * This method is called while holding workspace lock. Avoid long-running operations if possible.
@@ -281,6 +282,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     }
   }
 
+  @Override
   public List<IRepository> getRepositories(int scope) {
     ArrayList<IRepository> result = new ArrayList<>();
     for(RepositoryInfo repository : repositories.values()) {
@@ -303,15 +305,18 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     this.discoverers.add(discoverer);
   }
 
+  @Override
   public RepositoryInfo getRepository(ArtifactRepositoryRef ref) {
     String uid = RepositoryInfo.getUid(ref.getId(), ref.getUrl(), ref.getUsername());
     return repositories.get(uid);
   }
 
+  @Override
   public IRepository getWorkspaceRepository() {
     return workspaceRepository;
   }
 
+  @Override
   public IRepository getLocalRepository() {
     synchronized(localRepositoryLock) {
       if(localRepository == null) {
@@ -322,6 +327,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     return localRepository;
   }
 
+  @Override
   public void settingsChanged(Settings settings) {
     updateRegistry();
   }

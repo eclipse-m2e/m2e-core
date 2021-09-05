@@ -70,10 +70,10 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.m2e.core.ui.internal.markers.MavenProblemResolution;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.pom.PomTextHover;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.MarkerRegion;
+import org.eclipse.m2e.editor.pom.PomTextHover;
 import org.eclipse.m2e.editor.pom.PomTextHover.CompoundRegion;
 import org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator;
 
@@ -101,9 +101,7 @@ public class MarkerHoverControl extends AbstractInformationControl
     create();
   }
 
-  /*
-   * @see org.eclipse.jface.text.IInformationControlExtension2#setInput(java.lang.Object)
-   */
+  @Override
   public void setInput(Object input) {
     assert input instanceof CompoundRegion;
     if(input instanceof CompoundRegion) {
@@ -123,16 +121,12 @@ public class MarkerHoverControl extends AbstractInformationControl
     return parent;
   }
 
-  /*
-   * @see org.eclipse.jface.text.IInformationControlExtension#hasContents()
-   */
+  @Override
   public boolean hasContents() {
     return region != null;
   }
 
-  /*
-   * @see org.eclipse.jdt.internal.ui.text.java.hover.AbstractAnnotationHover.AbstractInformationControl#setFocus()
-   */
+  @Override
   public void setFocus() {
     super.setFocus();
     if(focusControl != null) {
@@ -140,9 +134,7 @@ public class MarkerHoverControl extends AbstractInformationControl
     }
   }
 
-  /*
-   * @see org.eclipse.jface.text.AbstractInformationControl#setVisible(boolean)
-   */
+  @Override
   public final void setVisible(boolean visible) {
     if(!visible)
       disposeDeferredCreatedContent();
@@ -159,9 +151,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       toolBarManager.removeAll();
   }
 
-  /*
-   * @see org.eclipse.jface.text.AbstractInformationControl#createContent(org.eclipse.swt.widgets.Composite)
-   */
+  @Override
   protected void createContent(Composite parent) {
     this.parent = parent;
     GridLayout layout = new GridLayout(1, false);
@@ -207,6 +197,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       composite.addListener(SWT.Resize, new Listener() {
         int width = -1;
 
+        @Override
         public void handleEvent(Event e) {
           int newWidth = composite.getSize().x;
           if(newWidth != width) {
@@ -444,6 +435,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       final int index = i;
       final Link link = links[index];
       link.addKeyListener(new KeyListener() {
+        @Override
         public void keyPressed(KeyEvent e) {
           switch(e.keyCode) {
             case SWT.ARROW_DOWN:
@@ -461,6 +453,7 @@ public class MarkerHoverControl extends AbstractInformationControl
           }
         }
 
+        @Override
         public void keyReleased(KeyEvent e) {
         }
       });
@@ -516,6 +509,7 @@ public class MarkerHoverControl extends AbstractInformationControl
   /**
    * {@inheritDoc} This default implementation returns <code>null</code>. Subclasses may override.
    */
+  @Override
   public IInformationControlCreator getInformationPresenterControlCreator() {
     return parent -> new MarkerHoverControl(parent, new ToolBarManager(SWT.FLAT));
   }

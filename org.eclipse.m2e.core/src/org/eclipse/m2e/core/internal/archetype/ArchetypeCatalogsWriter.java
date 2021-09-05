@@ -120,6 +120,7 @@ public class ArchetypeCatalogsWriter {
       this.catalogs = catalogs;
     }
 
+    @Override
     public void parse(InputSource input) throws SAXException {
       ContentHandler handler = getContentHandler();
       handler.startDocument();
@@ -163,6 +164,7 @@ public class ArchetypeCatalogsWriter {
       this.existingCatalogs = existingCatalogs == null ? Collections.emptyMap() : existingCatalogs;
     }
 
+    @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
       if(ELEMENT_CATALOG.equals(qName) && attributes != null) {
         String type = attributes.getValue(ATT_CATALOG_TYPE);

@@ -52,19 +52,20 @@ public class ChangedFileOutputStream extends OutputStream {
     this.os = new BufferedOutputStream(new FileOutputStream(file));
   }
 
+  @Override
   public void write(int b) {
     buffer.write(b);
   }
 
+  @Override
   public void write(byte[] b, int off, int len) {
     buffer.write(b, off, len);
   }
 
+  @Override
   public void close() throws IOException {
-    try {
+    try (os) {
       writeIfNewOrChanged();
-    } finally {
-      os.close();
     }
   }
 
@@ -75,19 +76,12 @@ public class ChangedFileOutputStream extends OutputStream {
 
     // XXX harden
     if(file.exists()) {
-      BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
-      try {
+      try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(file))) {
         for(byte element : bytes) {
           if(element != is.read()) {
             needToWrite = true;
             break;
           }
-        }
-      } finally {
-        try {
-          is.close();
-        } catch(IOException e) {
-
         }
       }
     } else {

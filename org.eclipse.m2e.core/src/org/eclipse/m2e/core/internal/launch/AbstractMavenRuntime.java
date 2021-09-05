@@ -122,6 +122,7 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     }
   }
 
+  @Override
   public boolean equals(Object o) {
     if(o != null && getClass().equals(o.getClass())) {
       return getName().equals(((AbstractMavenRuntime) o).getName());
@@ -129,6 +130,7 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return false;
   }
 
+  @Override
   public int hashCode() {
     return getName().hashCode();
   }
@@ -137,15 +139,7 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return SUPPORTED_VERSION != null && SUPPORTED_VERSION.containsVersion(new DefaultArtifactVersion(getVersion()));
   }
 
-  public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
-      throws CoreException;
-
-  public abstract String getLocation();
-
-  public abstract boolean isAvailable();
-
-  public abstract boolean isEditable();
-
+  @Override
   public String getSettings() {
     String settings = MavenPlugin.getMavenConfiguration().getGlobalSettingsFile();
     if(!StringUtils.isEmpty(settings)) {
@@ -157,5 +151,4 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return settings;
   }
 
-  public abstract String getVersion();
 }

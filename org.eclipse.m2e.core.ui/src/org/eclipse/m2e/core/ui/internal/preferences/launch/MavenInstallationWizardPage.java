@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -85,24 +86,30 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   class TreeContentProvider implements ITreeContentProvider {
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return ((Collection<?>) inputElement).toArray();
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       return null;
     }
 
+    @Override
     public Object getParent(Object element) {
       return null;
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       return false;
     }
@@ -111,23 +118,29 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   class TreeLabelProvider implements ILabelProvider {
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public Image getImage(Object element) {
       return null;
     }
 
+    @Override
     public String getText(Object element) {
       if(element instanceof ProjectClasspathEntry) {
         return ((ProjectClasspathEntry) element).getProject();
@@ -146,6 +159,7 @@ public class MavenInstallationWizardPage extends WizardPage {
         : new ArrayList<>();
   }
 
+  @Override
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
 
@@ -291,7 +305,7 @@ public class MavenInstallationWizardPage extends WizardPage {
         projects.add(project);
       }
     }
-    Collections.sort(projects, (p1, p2) -> p1.getName().compareTo(p2.getName()));
+    projects.sort(Comparator.comparing(IProject::getName));
     ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new MavenProjectLabelProvider());
     dialog.setElements(projects.toArray());
     dialog.setMessage(Messages.MavenInstallationWizardPage_selectProjectMessage);

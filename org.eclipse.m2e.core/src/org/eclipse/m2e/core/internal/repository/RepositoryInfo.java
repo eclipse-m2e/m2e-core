@@ -60,22 +60,27 @@ public class RepositoryInfo implements IRepository {
     this.basedir = basedir;
   }
 
+  @Override
   public AuthenticationInfo getAuthenticationInfo() {
     return authInfo;
   }
 
+  @Override
   public String getUrl() {
     return repositoryUrl;
   }
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public String getMirrorId() {
     return mirrorId;
   }
 
+  @Override
   public String getMirrorOf() {
     return mirrorOf;
   }
@@ -102,6 +107,7 @@ public class RepositoryInfo implements IRepository {
     projects.remove(project);
   }
 
+  @Override
   public String getUid() {
     if(uid == null) {
       uid = getUid(id, repositoryUrl, authInfo != null ? authInfo.getUserName() : null);
@@ -141,6 +147,7 @@ public class RepositoryInfo implements IRepository {
     return uid;
   }
 
+  @Override
   public String getProtocol() {
     return getProtocol(repositoryUrl);
   }
@@ -165,14 +172,17 @@ public class RepositoryInfo implements IRepository {
     return null;
   }
 
+  @Override
   public File getBasedir() {
     return basedir;
   }
 
+  @Override
   public boolean isScope(int scope) {
     return (this.scope & scope) != 0;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if(id != null) {

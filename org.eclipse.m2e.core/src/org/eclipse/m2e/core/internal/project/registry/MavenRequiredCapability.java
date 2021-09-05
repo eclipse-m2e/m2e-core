@@ -71,6 +71,7 @@ public class MavenRequiredCapability extends RequiredCapability {
         null, false, true);
   }
 
+  @Override
   public boolean isPotentialMatch(Capability capability, boolean narrowMatch) {
     if(capability instanceof MavenCapability && getVersionlessKey().equals(capability.getVersionlessKey())) {
       String version = ((MavenCapability) capability).getVersion();
@@ -91,6 +92,7 @@ public class MavenRequiredCapability extends RequiredCapability {
     return false;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getVersionlessKey().toString());
@@ -104,6 +106,7 @@ public class MavenRequiredCapability extends RequiredCapability {
     return sb.toString();
   }
 
+  @Override
   public int hashCode() {
     int hash = getVersionlessKey().hashCode();
     hash = hash * 17 + versionRange.hashCode();
@@ -112,6 +115,7 @@ public class MavenRequiredCapability extends RequiredCapability {
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;

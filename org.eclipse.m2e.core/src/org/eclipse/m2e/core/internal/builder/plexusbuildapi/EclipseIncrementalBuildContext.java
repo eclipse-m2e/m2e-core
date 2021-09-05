@@ -41,6 +41,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     this.delta = delta;
   }
 
+  @Override
   public boolean hasDelta(String relPath) {
     IPath path = new Path(relPath);
     return hasDelta(path);
@@ -50,6 +51,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     return delta == null || path == null || delta.findMember(path) != null;
   }
 
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public boolean hasDelta(List relPaths) {
     for(String relPath : (List<String>) relPaths) {
@@ -60,10 +62,12 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     return false;
   }
 
+  @Override
   public boolean hasDelta(File file) {
     return hasDelta(getRelativePath(file));
   }
 
+  @Override
   public Scanner newDeleteScanner(File basedir) {
     IResourceDelta reldelta = getDelta(basedir);
 
@@ -74,10 +78,12 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     return new ResourceDeltaScanner(reldelta, true);
   }
 
+  @Override
   public Scanner newScanner(File basedir) {
     return newScanner(basedir, false);
   }
 
+  @Override
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
     if(!ignoreDelta) {
       IResourceDelta reldelta = getDelta(basedir);
@@ -140,6 +146,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     return delta.getResource();
   }
 
+  @Override
   public boolean isIncremental() {
     return true;
   }

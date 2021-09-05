@@ -28,7 +28,6 @@ import org.apache.maven.index.Field;
 import org.apache.maven.index.MAVEN;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IMutableIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
@@ -41,7 +40,7 @@ import org.eclipse.m2e.core.repository.IRepository;
  *
  * @author igor
  */
-public class NexusIndex implements IIndex, IMutableIndex {
+public class NexusIndex implements IMutableIndex {
 
   /**
    * Repository index is disabled.
@@ -78,14 +77,17 @@ public class NexusIndex implements IIndex, IMutableIndex {
     return this.indexDetails;
   }
 
+  @Override
   public void addArtifact(File pomFile, ArtifactKey artifactKey) {
     indexManager.addDocument(repository, pomFile, artifactKey);
   }
 
+  @Override
   public void removeArtifact(File pomFile, ArtifactKey artifactKey) {
     indexManager.removeDocument(repository, pomFile, artifactKey, null);
   }
 
+  @Override
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
       SearchExpression version, SearchExpression packaging) throws CoreException {
     return find(wrapIfNotNull(groupId), wrapIfNotNull(artifactId), wrapIfNotNull(version), wrapIfNotNull(packaging));
@@ -104,6 +106,7 @@ public class NexusIndex implements IIndex, IMutableIndex {
     return Collections.singleton(se);
   }
 
+  @Override
   public Collection<IndexedArtifact> find(Collection<SearchExpression> groupId,
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
@@ -135,14 +138,17 @@ public class NexusIndex implements IIndex, IMutableIndex {
     }
   }
 
+  @Override
   public IndexedArtifactFile getIndexedArtifactFile(ArtifactKey artifact) throws CoreException {
     return indexManager.getIndexedArtifactFile(repository, artifact);
   }
 
+  @Override
   public IndexedArtifactFile identify(File file) throws CoreException {
     return indexManager.identify(repository, file);
   }
 
+  @Override
   public void updateIndex(boolean force, IProgressMonitor monitor) throws CoreException {
     indexManager.updateIndex(repository, force, monitor);
   }
@@ -171,10 +177,12 @@ public class NexusIndex implements IIndex, IMutableIndex {
     indexManager.setIndexDetails(repository, details, null/*async*/);
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType) throws CoreException {
     return indexManager.search(getRepository(), term, searchType);
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType, int classifier)
       throws CoreException {
     return indexManager.search(getRepository(), term, searchType, classifier);

@@ -24,41 +24,25 @@ import org.eclipse.m2e.core.MavenPlugin;
 public class MavenNature implements IProjectNature {
   private IProject project;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.resources.IProjectNature#configure()
-   */
+  @Override
   public void configure() throws CoreException {
     IProjectDescription description = project.getDescription();
     MavenPlugin.getProjectConfigurationManager().addMavenBuilder(project, description, null /*monitor*/);
     project.setDescription(description, null);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.resources.IProjectNature#deconfigure()
-   */
+  @Override
   public void deconfigure() throws CoreException {
     IProjectDescription description = project.getDescription();
     MavenPlugin.getProjectConfigurationManager().removeMavenBuilder(project, description, null /*monitor*/);
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.resources.IProjectNature#getProject()
-   */
+  @Override
   public IProject getProject() {
     return project;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
-   */
+  @Override
   public void setProject(IProject project) {
     this.project = project;
   }

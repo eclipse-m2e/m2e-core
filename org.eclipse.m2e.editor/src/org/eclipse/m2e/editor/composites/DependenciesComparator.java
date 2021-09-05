@@ -22,6 +22,7 @@ public class DependenciesComparator<T> implements Comparator<T> {
 
   private boolean sortByGroups = true;
 
+  @Override
   public int compare(T o1, T o2) {
     String[] gav1;
     String[] gav2;

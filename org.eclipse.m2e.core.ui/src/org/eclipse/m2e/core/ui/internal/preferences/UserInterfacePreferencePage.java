@@ -33,6 +33,7 @@ public class UserInterfacePreferencePage extends FieldEditorPreferencePage imple
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 
@@ -41,6 +42,7 @@ public class UserInterfacePreferencePage extends FieldEditorPreferencePage imple
    * blocks needed to manipulate various types of preferences. Each field editor
    * knows how to save and restore itself.
    */
+  @Override
   public void createFieldEditors() {
     parent = getFieldEditorParent();
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, Messages.pomEditorDefaultPage,

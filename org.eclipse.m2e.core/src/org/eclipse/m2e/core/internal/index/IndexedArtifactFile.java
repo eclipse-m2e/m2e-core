@@ -95,6 +95,7 @@ public class IndexedArtifactFile implements IAdaptable {
     return new ArtifactKey(group, artifact, version, classifier);
   }
 
+  @Override
   public <T> T getAdapter(Class<T> adapter) {
     if(adapter == ArtifactKey.class) {
       return adapter.cast(getArtifactKey());

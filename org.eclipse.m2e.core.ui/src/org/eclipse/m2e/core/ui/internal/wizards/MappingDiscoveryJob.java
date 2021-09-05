@@ -46,6 +46,7 @@ public class MappingDiscoveryJob extends WorkspaceJob {
 
   }
 
+  @Override
   public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     //Detect and resolve Lifecycle Mapping issues
     LifecycleMappingDiscoveryRequest discoveryRequest = LifecycleMappingDiscoveryHelper

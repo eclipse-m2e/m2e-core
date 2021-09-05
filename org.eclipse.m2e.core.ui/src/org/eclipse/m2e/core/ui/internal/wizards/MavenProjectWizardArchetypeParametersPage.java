@@ -128,6 +128,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   /** Creates page controls. */
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     composite.setLayout(new GridLayout(3, false));
@@ -227,10 +228,12 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     propertiesViewer.setCellEditors(new CellEditor[] {new TextCellEditor(propertiesTable, SWT.NONE),
         new TextCellEditor(propertiesTable, SWT.NONE)});
     propertiesViewer.setCellModifier(new ICellModifier() {
+      @Override
       public boolean canModify(Object element, String property) {
         return true;
       }
 
+      @Override
       public void modify(Object element, String property, Object value) {
         if(element instanceof TableItem) {
           ((TableItem) element).setText(getTextIndex(property), String.valueOf(value));
@@ -238,6 +241,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
         }
       }
 
+      @Override
       public Object getValue(Object element, String property) {
         if(element instanceof TableItem) {
           return ((TableItem) element).getText(getTextIndex(property));
@@ -329,7 +333,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       return NLS.bind(Messages.wizardProjectPageMaven2ValidatorProjectNameInvalid, nameStatus.getMessage());
     }
 
-    if(requiredProperties.size() > 0) {
+    if(!requiredProperties.isEmpty()) {
       Properties properties = getProperties();
       for(String key : requiredProperties) {
         String value = properties.getProperty(key);
@@ -343,6 +347,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   /** Ends the wizard flow chain. */
+  @Override
   public IWizardPage getNextPage() {
     return null;
   }
@@ -419,6 +424,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       return properties;
     }
 
+    @Override
     public void run(IProgressMonitor monitor) {
       String archetypeName = getName(archetype);
       monitor.beginTask(NLS.bind(
@@ -521,11 +527,13 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     this.isUsed = isUsed;
   }
 
+  @Override
   public boolean isPageComplete() {
     return !isUsed || super.isPageComplete();
   }
 
   /** Loads the group value when the page is displayed. */
+  @Override
   public void setVisible(boolean visible) {
     super.setVisible(visible);
 

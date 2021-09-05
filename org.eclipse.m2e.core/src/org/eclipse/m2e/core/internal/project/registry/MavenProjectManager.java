@@ -55,46 +55,56 @@ public class MavenProjectManager implements IMavenProjectRegistry {
 
   // Maven projects
 
+  @Override
   public void refresh(MavenUpdateRequest request) {
     mavenBackgroundJob.refresh(request);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
     manager.refresh(request, monitor);
   }
 
+  @Override
   public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException {
     manager.refresh(pomFiles, monitor);
   }
 
+  @Override
   public void addMavenProjectChangedListener(IMavenProjectChangedListener listener) {
     manager.addMavenProjectChangedListener(listener);
   }
 
+  @Override
   public void removeMavenProjectChangedListener(IMavenProjectChangedListener listener) {
     manager.removeMavenProjectChangedListener(listener);
   }
 
+  @Override
   public IMavenProjectFacade create(IFile pom, boolean load, IProgressMonitor monitor) {
     return manager.create(pom, load, monitor);
   }
 
+  @Override
   public IMavenProjectFacade create(IProject project, IProgressMonitor monitor) {
     return manager.create(project, monitor);
   }
 
+  @Override
   public IMavenProjectFacade[] getProjects() {
     return manager.getProjects();
   }
 
   //XXX mkleint: this only returns a correct facade for the project's own pom.xml, if the POM file is nested, the result is wrong.
+  @Override
   public IMavenProjectFacade getProject(IProject project) {
     return manager.getProject(project);
   }
 
   //XXX mkleint: what happens when multiple workspace projects have the same coordinates?!?
+  @Override
   public IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version) {
     return manager.getMavenProject(groupId, artifactId, version);
   }
@@ -103,6 +113,7 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     return workspaceStateFile;
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
@@ -110,6 +121,7 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     return manager.createExecutionRequest(pom, resolverConfiguration, monitor);
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   @Deprecated
   public MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
@@ -117,6 +129,7 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     return createExecutionRequest(project.getPom(), project.getResolverConfiguration(), monitor);
   }
 
+  @Override
   public <V> V execute(final IMavenProjectFacade facade, final ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException {
     MavenExecutionContext context = manager.createExecutionContext(facade.getPom(), facade.getResolverConfiguration());

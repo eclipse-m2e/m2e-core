@@ -98,11 +98,13 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final float VERSION_9 = 9.0f;
 
+  @Override
   public boolean accept(IProject project) throws CoreException {
     boolean accepts = project != null && project.isAccessible() && project.hasNature(JavaCore.NATURE_ID);
     return accepts;
   }
 
+  @Override
   public void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException {
     if(!accept(project)) {
       return;
@@ -397,6 +399,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     public NonJavaResourceVisitor() {
     }
 
+    @Override
     @SuppressWarnings("unused")
     public boolean visit(IResource resource) throws CoreException {
       String resourceName = resource.getProjectRelativePath().lastSegment();

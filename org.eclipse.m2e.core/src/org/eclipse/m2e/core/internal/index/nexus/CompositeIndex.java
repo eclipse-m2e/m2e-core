@@ -44,6 +44,7 @@ public class CompositeIndex implements IIndex {
     this.indexes = indexes;
   }
 
+  @Override
   public IndexedArtifactFile getIndexedArtifactFile(ArtifactKey artifact) throws CoreException {
     for(IIndex index : indexes) {
       IndexedArtifactFile aif = index.getIndexedArtifactFile(artifact);
@@ -57,6 +58,7 @@ public class CompositeIndex implements IIndex {
     return null;
   }
 
+  @Override
   public IndexedArtifactFile identify(File file) throws CoreException {
     List<IndexedArtifactFile> aifs = identifyAll(file);
     return !aifs.isEmpty() ? aifs.get(0) : null;
@@ -77,6 +79,7 @@ public class CompositeIndex implements IIndex {
     return result;
   }
 
+  @Override
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
       SearchExpression version, SearchExpression packaging) throws CoreException {
     Set<IndexedArtifact> result = new TreeSet<>();
@@ -89,6 +92,7 @@ public class CompositeIndex implements IIndex {
     return result;
   }
 
+  @Override
   public Collection<IndexedArtifact> find(Collection<SearchExpression> groupId,
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
@@ -103,6 +107,7 @@ public class CompositeIndex implements IIndex {
     return result;
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType) throws CoreException {
     Map<String, IndexedArtifact> result = new TreeMap<>();
     for(IIndex index : indexes) {
@@ -114,6 +119,7 @@ public class CompositeIndex implements IIndex {
     return result;
   }
 
+  @Override
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType, int classifier)
       throws CoreException {
     Map<String, IndexedArtifact> result = new TreeMap<>();

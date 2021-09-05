@@ -124,6 +124,7 @@ public enum PomTemplateContext {
 
   PROPERTIES("properties") { // //$NON-NLS-1$
 
+    @Override
     protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates,
         Node currentNode, String prefix) {
 
@@ -161,6 +162,7 @@ public enum PomTemplateContext {
 
   CONFIGURATION("configuration") { //$NON-NLS-1$
 
+    @Override
     public boolean handlesSubtree() {
       return true;
     }
@@ -377,7 +379,7 @@ public enum PomTemplateContext {
             }
             //sort just properties
             Collections.sort(keys);
-            if(keys.size() > 0) {
+            if(!keys.isEmpty()) {
               for(String key : keys) {
                 String expr = "${" + key + "}"; //$NON-NLS-1$ //$NON-NLS-2$
                 proposals.add(new Template(expr, Messages.PomTemplateContext_expression_description, contextTypeId,
@@ -685,8 +687,8 @@ public enum PomTemplateContext {
     }
 
     List<File> files = Arrays.asList(pctx.parentDir.listFiles());
-    Collections.sort(files, Comparator.<File, Integer> comparing(r -> r.isDirectory() ? 0 : 1)
-        .thenComparing(Comparator.comparing(r -> r.getName())));
+    Collections.sort(files, Comparator.comparingInt((File r) -> r.isDirectory() ? 0 : 1)
+        .thenComparing(Comparator.comparing(File::getName)));
 
     int rel = 4000;
     for(File f : files) {
@@ -721,6 +723,7 @@ public enum PomTemplateContext {
     Path thisPath = f.toPath();
     try {
       Files.walkFileTree(thisPath, new SimpleFileVisitor<Path>() {
+        @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
           if(thisPath.equals(dir)) {
             return FileVisitResult.CONTINUE;
@@ -729,6 +732,7 @@ public enum PomTemplateContext {
           return FileVisitResult.TERMINATE;
         }
 
+        @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
           if(dirsOnly) {
             return FileVisitResult.CONTINUE;
@@ -1110,8 +1114,7 @@ public enum PomTemplateContext {
       if(props != null) {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-      inter.addValueSource(
-          new PrefixedObjectValueSource(Arrays.asList("pom.", "project."), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList("pom.", "project."), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {

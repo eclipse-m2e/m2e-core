@@ -38,14 +38,17 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 public class MavenLaunchConfigurationListener implements ILaunchConfigurationListener, IMavenProjectChangedListener {
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchConfigurationListener.class);
 
+  @Override
   public void launchConfigurationAdded(ILaunchConfiguration configuration) {
     updateLaunchConfiguration(configuration);
   }
 
+  @Override
   public void launchConfigurationChanged(ILaunchConfiguration configuration) {
     updateLaunchConfiguration(configuration);
   }
 
+  @Override
   public void launchConfigurationRemoved(ILaunchConfiguration configuration) {
     // do nothing
   }
@@ -119,6 +122,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
     return true;
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {

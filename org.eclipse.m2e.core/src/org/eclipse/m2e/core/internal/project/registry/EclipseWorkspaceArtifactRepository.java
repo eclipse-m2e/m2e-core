@@ -135,11 +135,13 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return workspaceArtifacts.get(matchingArtifact).iterator().next();
   }
 
+  @Override
   public File findArtifact(Artifact artifact) {
     return resolveAsEclipseProject(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(),
         artifact.getClassifier(), artifact.getExtension());
   }
 
+  @Override
   public org.apache.maven.artifact.Artifact find(org.apache.maven.artifact.Artifact artifact) {
     File file = resolveAsEclipseProject(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(),
         artifact.getClassifier(), artifact.getType());
@@ -152,6 +154,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return artifact;
   }
 
+  @Override
   public boolean hasLocalMetadata() {
     return false; // XXX
   }
@@ -164,14 +167,17 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return Boolean.TRUE.equals(disabled.get());
   }
 
+  @Override
   public int hashCode() {
     return 0; // no state
   }
 
+  @Override
   public boolean equals(Object obj) {
     return obj instanceof EclipseWorkspaceArtifactRepository;
   }
 
+  @Override
   public List<String> findVersions(Artifact artifact) {
     return findVersions(artifact.getGroupId(), artifact.getArtifactId());
   }
@@ -202,6 +208,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return versions;
   }
 
+  @Override
   public WorkspaceRepository getRepository() {
     return workspaceRepository;
   }

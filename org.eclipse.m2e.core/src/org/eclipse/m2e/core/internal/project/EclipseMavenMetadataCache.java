@@ -26,7 +26,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.artifact.DefaultMavenMetadataCache;
-import org.apache.maven.project.artifact.MavenMetadataCache;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
@@ -37,7 +36,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  * @author igor
  */
 @Singleton
-public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache implements MavenMetadataCache, IManagedCache {
+public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache implements IManagedCache {
 
   @Override
   public void put(Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,

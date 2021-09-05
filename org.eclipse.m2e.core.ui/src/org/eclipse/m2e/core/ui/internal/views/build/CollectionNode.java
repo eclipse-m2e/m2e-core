@@ -31,10 +31,12 @@ class CollectionNode<T extends Node> implements Node {
     return members;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public int getBuildCount() {
     int result = 0;
     for(Node member : members) {

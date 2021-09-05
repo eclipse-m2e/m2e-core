@@ -44,12 +44,14 @@ public class VersionlessKey implements Serializable {
     return id;
   }
 
+  @Override
   public int hashCode() {
     int hash = namespace.hashCode();
     hash = hash * 17 + id.hashCode();
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(obj == this) {
       return true;
@@ -61,6 +63,7 @@ public class VersionlessKey implements Serializable {
     return namespace.equals(other.namespace) && id.equals(other.id);
   }
 
+  @Override
   public String toString() {
     return namespace + "/" + id; //$NON-NLS-1$
   }

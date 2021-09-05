@@ -94,6 +94,7 @@ public class MavenPomSelectionComponent extends Composite {
   /* (non-Javadoc)
    * @see org.eclipse.swt.widgets.Widget#dispose()
    */
+  @Override
   public void dispose() {
     if(searchJob != null) {
       searchJob.cancel();
@@ -162,6 +163,7 @@ public class MavenPomSelectionComponent extends Composite {
     searchText = new Text(this, SWT.BORDER | SWT.SEARCH);
     searchText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1));
     searchText.addKeyListener(new KeyAdapter() {
+      @Override
       public void keyPressed(KeyEvent e) {
         if(e.keyCode == SWT.ARROW_DOWN) {
           searchResultViewer.getTree().setFocus();
@@ -185,10 +187,12 @@ public class MavenPomSelectionComponent extends Composite {
     tree.setData("name", "searchResultTree"); //$NON-NLS-1$ //$NON-NLS-2$
     tree.addFocusListener(new FocusListener() {
 
+      @Override
       public void focusGained(FocusEvent e) {
         selectFirstElementInTheArtifactTreeIfNoSelectionHasBeenMade();
       }
 
+      @Override
       public void focusLost(FocusEvent e) {
 
       }
@@ -217,6 +221,7 @@ public class MavenPomSelectionComponent extends Composite {
   /* (non-Javadoc)
    * @see org.eclipse.swt.widgets.Composite#setFocus()
    */
+  @Override
   public boolean setFocus() {
     return searchText.setFocus();
   }
@@ -436,6 +441,7 @@ public class MavenPomSelectionComponent extends Composite {
       this.query = query;
     }
 
+    @Override
     public boolean shouldRun() {
       stop = false;
       return super.shouldRun();
@@ -447,6 +453,7 @@ public class MavenPomSelectionComponent extends Composite {
       return IIndex.SEARCH_JARS + IIndex.SEARCH_TESTS;
     }
 
+    @Override
     protected IStatus run(IProgressMonitor monitor) {
       int classifier = showClassifiers() ? getClassifier() : IIndex.SEARCH_ALL;
       if(searchResultViewer == null || searchResultViewer.getControl() == null
@@ -489,6 +496,7 @@ public class MavenPomSelectionComponent extends Composite {
       return Status.OK_STATUS;
     }
 
+    @Override
     protected void canceling() {
       stop = true;
     }
@@ -524,6 +532,7 @@ public class MavenPomSelectionComponent extends Composite {
       this.managedKeys = managedKeys;
     }
 
+    @Override
     public String getText(Object element) {
       return super.getText(element);
     }
@@ -532,6 +541,7 @@ public class MavenPomSelectionComponent extends Composite {
       return repo;
     }
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
@@ -547,10 +557,12 @@ public class MavenPomSelectionComponent extends Composite {
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
 
+    @Override
     public Image getImage(Object element) {
       if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
@@ -576,6 +588,7 @@ public class MavenPomSelectionComponent extends Composite {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
      */
+    @Override
     public StyledString getStyledText(Object element) {
       if(element instanceof IndexedArtifact) {
         IndexedArtifact a = (IndexedArtifact) element;
@@ -605,9 +618,11 @@ public class MavenPomSelectionComponent extends Composite {
   public static class SearchResultContentProvider implements ITreeContentProvider {
     private static Object[] EMPTY = new Object[0];
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       if(inputElement instanceof Map) {
         return ((Map<?, ?>) inputElement).values().toArray();
@@ -615,6 +630,7 @@ public class MavenPomSelectionComponent extends Composite {
       return EMPTY;
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       if(parentElement instanceof IndexedArtifact) {
         IndexedArtifact a = (IndexedArtifact) parentElement;
@@ -623,14 +639,17 @@ public class MavenPomSelectionComponent extends Composite {
       return EMPTY;
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       return element instanceof IndexedArtifact;
     }
 
+    @Override
     public Object getParent(Object element) {
       return null;
     }
 
+    @Override
     public void dispose() {
 
     }

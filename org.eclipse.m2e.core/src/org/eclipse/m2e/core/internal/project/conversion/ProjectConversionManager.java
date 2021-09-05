@@ -135,6 +135,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
     }
   }
 
+  @Override
   public void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException {
     if(model == null) {
       return;
@@ -147,11 +148,13 @@ public class ProjectConversionManager implements IProjectConversionManager {
     }
   }
 
+  @Override
   @Deprecated
   public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project) throws CoreException {
     return getConversionParticipants(project, null);
   }
 
+  @Override
   public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
       throws CoreException {
     List<AbstractProjectConversionParticipant> allParticipants = lookupConversionParticipants(project);
@@ -181,23 +184,14 @@ public class ProjectConversionManager implements IProjectConversionManager {
     IConfigurationElement[] cf = registry.getConfigurationElementsFor(CONVERSION_ENABLER_EXTENSION_POINT);
     List<IConfigurationElement> list = Arrays.asList(cf);
 
-    Comparator<IConfigurationElement> c = (o1, o2) -> {
-      String o1String, o2String;
-      int o1int, o2int;
-      o1String = o1.getAttribute("weight");
-      o2String = o2.getAttribute("weight");
+    Comparator<IConfigurationElement> c = Comparator.comparingInt((IConfigurationElement o) -> {
+      String weight = o.getAttribute("weight");
       try {
-        o1int = Integer.parseInt(o1String);
+        return Integer.parseInt(weight);
       } catch(NumberFormatException nfe1) {
-        o1int = DEFAULT_WEIGHT;
+        return DEFAULT_WEIGHT;
       }
-      try {
-        o2int = Integer.parseInt(o2String);
-      } catch(NumberFormatException nfe2) {
-        o2int = DEFAULT_WEIGHT;
-      }
-      return o2int - o1int;
-    };
+    }).reversed();
     Collections.sort(list, c);
     ArrayList<IProjectConversionEnabler> retList = new ArrayList<>();
     Iterator<IConfigurationElement> i = list.iterator();
@@ -217,6 +211,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
     return retList.toArray(new IProjectConversionEnabler[retList.size()]);
   }
 
+  @Override
   public IProjectConversionEnabler getConversionEnablerForProject(IProject project) {
     if(enablers == null) {
       enablers = loadProjectConversionEnablers();

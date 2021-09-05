@@ -27,6 +27,7 @@ import org.eclipse.m2e.core.project.IWorkspaceClassifierResolver;
  */
 public class WorkspaceDefaultClassifierResolver extends AbstractWorkspaceClassifierResolver {
 
+  @Override
   public IPath resolveClassifier(IMavenProjectFacade project, String classifier) {
     if(classifier == null || "".equals(classifier)) { // //$NON-NLS-1$
       return project.getOutputLocation();
@@ -34,6 +35,7 @@ public class WorkspaceDefaultClassifierResolver extends AbstractWorkspaceClassif
     return null;
   }
 
+  @Override
   public int getPriority() {
     return Integer.MAX_VALUE;
   }

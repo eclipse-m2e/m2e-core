@@ -49,6 +49,7 @@ public class ArtifactKey implements Serializable {
     this.classifier = classifier;
   }
 
+  @Override
   public boolean equals(Object o) {
     if(this == o)
       return true;
@@ -60,6 +61,7 @@ public class ArtifactKey implements Serializable {
     return false;
   }
 
+  @Override
   public int hashCode() {
     int hash = 17;
     hash = hash * 31 + (groupId != null ? groupId.hashCode() : 0);
@@ -85,6 +87,7 @@ public class ArtifactKey implements Serializable {
         && equals(a1.getVersion(), a2.getVersion()) && equals(a1.getClassifier(), a2.getClassifier());
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(groupId).append(':').append(artifactId).append(':').append(version);

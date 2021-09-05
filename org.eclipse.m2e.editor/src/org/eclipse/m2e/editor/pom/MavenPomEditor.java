@@ -184,6 +184,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   /**
    * Closes all project files on project close.
    */
+  @Override
   public void resourceChanged(final IResourceChangeEvent event) {
     if(pomFile == null) {
       return;
@@ -200,6 +201,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     class RemovedResourceDeltaVisitor implements IResourceDeltaVisitor {
       boolean removed = false;
 
+      @Override
       public boolean visit(IResourceDelta delta) {
         if(delta.getResource() == pomFile //
             && (delta.getKind() & (IResourceDelta.REMOVED)) != 0) {
@@ -225,6 +227,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     class ChangedResourceDeltaVisitor implements IResourceDeltaVisitor {
 
+      @Override
       public boolean visit(IResourceDelta delta) {
         if(delta.getResource().equals(pomFile) && (delta.getKind() & IResourceDelta.CHANGED) != 0
             && delta.getResource().exists()) {
@@ -311,6 +314,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return EFFECTIVE_POM.equals(name);
   }
 
+  @Override
   protected void addPages() {
 
     overviewPage = new OverviewPage(this);
@@ -374,6 +378,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
 
+  @Override
   protected void pageChange(int newPageIndex) {
     String name = getPageText(newPageIndex);
     if(EFFECTIVE_POM.equals(name)) {
@@ -421,9 +426,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     sourceDocument = this.getDocument();
     documentListener = new IDocumentListener() {
 
+      @Override
       public void documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent event) {
       }
 
+      @Override
       public void documentChanged(org.eclipse.jface.text.DocumentEvent event) {
         try {
           if(pomFile != null) {
@@ -444,6 +451,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   }
 
+  @Override
   protected IEditorSite createSite(IEditorPart editor) {
     IEditorSite site = null;
     if(editor == sourcePage) {
@@ -451,6 +459,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         /**
          * @see org.eclipse.ui.part.MultiPageEditorSite#getActionBarContributor()
          */
+        @Override
         public IEditorActionBarContributor getActionBarContributor() {
           IEditorActionBarContributor contributor = super.getActionBarContributor();
           IEditorActionBarContributor multiContributor = MavenPomEditor.this.getEditorSite().getActionBarContributor();
@@ -460,6 +469,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           return contributor;
         }
 
+        @Override
         public String getId() {
           // sets this id so nested editor is considered xml source
           // page
@@ -637,6 +647,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return mavenProject;
   }
 
+  @Override
   public void dispose() {
     disposed = true;
 
@@ -665,6 +676,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   /**
    * Saves structured editor XXX form model need to be synchronized
    */
+  @Override
   public void doSave(IProgressMonitor monitor) {
     resourceChangeEventSkip = true;
     try {
@@ -674,6 +686,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
 
+  @Override
   public void doSaveAs() {
     // IEditorPart editor = getEditor(0);
     // editor.doSaveAs();
@@ -681,13 +694,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     // setInput(editor.getEditorInput());
   }
 
-  /*
-   * (non-Javadoc) Method declared on IEditorPart.
-   */
+  @Override
   public boolean isSaveAsAllowed() {
     return false;
   }
 
+  @Override
   public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
 
     setPartName(editorInput.getToolTipText());
@@ -728,12 +740,14 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   // IShowEditorInput
 
+  @Override
   public void showEditorInput(IEditorInput editorInput) {
     // could activate different tabs based on the editor input
   }
 
   // IGotoMarker
 
+  @Override
   public void gotoMarker(IMarker marker) {
     // TODO use selection to activate corresponding form page elements
     setActivePage(sourcePageIndex);
@@ -743,14 +757,17 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   // ISearchEditorAccess
 
+  @Override
   public IDocument getDocument(Match match) {
     return sourcePage.getDocumentProvider().getDocument(getEditorInput());
   }
 
+  @Override
   public IAnnotationModel getAnnotationModel(Match match) {
     return sourcePage.getDocumentProvider().getAnnotationModel(getEditorInput());
   }
 
+  @Override
   public boolean isDirty() {
     return sourcePage.isDirty();
   }
@@ -831,27 +848,33 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     // IPartListener
 
+    @Override
     public void partActivated(IWorkbenchPart part) {
       activePart = part;
       handleActivation();
       checkReadOnly();
     }
 
+    @Override
     public void partBroughtToTop(IWorkbenchPart part) {
     }
 
+    @Override
     public void partClosed(IWorkbenchPart part) {
     }
 
+    @Override
     public void partDeactivated(IWorkbenchPart part) {
       activePart = null;
     }
 
+    @Override
     public void partOpened(IWorkbenchPart part) {
     }
 
     // IWindowListener
 
+    @Override
     public void windowActivated(IWorkbenchWindow window) {
       if(window == getEditorSite().getWorkbenchWindow()) {
         /*
@@ -863,12 +886,15 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
     }
 
+    @Override
     public void windowDeactivated(IWorkbenchWindow window) {
     }
 
+    @Override
     public void windowClosed(IWorkbenchWindow window) {
     }
 
+    @Override
     public void windowOpened(IWorkbenchWindow window) {
     }
 
@@ -961,6 +987,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    * to tell those IMavenprojectfacade instances apart.. Your storyteller for tonite was mkleint
    */
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     IEditorInput input = getEditorInput();
     if(input instanceof IFileEditorInput) {
@@ -988,6 +1015,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   /*
    * @see org.eclipse.ui.part.MultiPageEditorPart#setPageText(int, java.lang.String)
    */
+  @Override
   public void setPageText(int pageIndex, String text) {
     super.setPageText(pageIndex, text);
   }

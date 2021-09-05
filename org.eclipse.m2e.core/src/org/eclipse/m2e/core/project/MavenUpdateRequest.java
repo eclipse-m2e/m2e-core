@@ -100,6 +100,7 @@ public class MavenUpdateRequest {
     return this.pomFiles.isEmpty();
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("["); //$NON-NLS-1$
     String sep = ""; //$NON-NLS-1$

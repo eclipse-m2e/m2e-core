@@ -35,6 +35,7 @@ public class ProjectRepositoriesNode implements IMavenRepositoryNode {
 
   private final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
+  @Override
   public Object[] getChildren() {
     ArrayList<Object> nodes = new ArrayList<>();
     for(IRepository repo : repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_PROJECT)) {
@@ -45,23 +46,28 @@ public class ProjectRepositoriesNode implements IMavenRepositoryNode {
     return nodes.toArray(new Object[nodes.size()]);
   }
 
+  @Override
   public Image getImage() {
     return MavenImages.IMG_INDEXES;
   }
 
+  @Override
   public String getName() {
     return Messages.ProjectRepositoriesNode_name;
   }
 
+  @Override
   public String toString() {
     return getName();
   }
 
+  @Override
   public boolean hasChildren() {
     Object[] kids = getChildren();
     return kids != null && kids.length > 0;
   }
 
+  @Override
   public boolean isUpdating() {
     return false;
   }

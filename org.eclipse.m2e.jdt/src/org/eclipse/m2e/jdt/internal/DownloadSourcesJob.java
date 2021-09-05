@@ -14,7 +14,6 @@
 package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +57,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  *
  * @author igor
  */
+@SuppressWarnings("restriction")
 class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   private static Logger log = LoggerFactory.getLogger(DownloadSourcesJob.class);
 
@@ -85,13 +85,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
     @Override
     public int hashCode() {
-      int hash = 17;
-      hash = hash * 31 + project.hashCode();
-      hash = hash * 31 + Objects.hashCode(fragment);
-      hash = hash * 31 + Objects.hashCode(artifact);
-      hash = hash * 31 + Boolean.hashCode(downloadSources);
-      hash = hash * 31 + Boolean.hashCode(downloadJavaDoc);
-      return hash;
+      return Objects.hash(project, fragment, artifact, downloadSources, downloadJavaDoc);
     }
 
     @Override
@@ -103,7 +97,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         return false;
       }
       DownloadRequest other = (DownloadRequest) o;
-
       return project.equals(other.project) && Objects.equals(fragment, other.fragment)
           && Objects.equals(artifact, other.artifact) && downloadSources == other.downloadSources
           && downloadJavaDoc == other.downloadJavaDoc;
@@ -137,6 +130,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private final BlockingQueue<DownloadRequest> queue = new LinkedBlockingQueue<>();
 
+  private Set<DownloadRequest> requests = new HashSet<>();
+
   private final Set<IProject> toUpdateMavenProjects = new HashSet<>();
 
   private final Map<IPackageFragmentRoot, Attachments> toUpdateAttachments = new HashMap<>();
@@ -163,6 +158,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         if(!status.isOK()) {
           // or maybe just log and ignore?
           queue.clear();
+          requests.clear();
           toUpdateAttachments.clear();
           toUpdateMavenProjects.clear();
           return status;
@@ -173,6 +169,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     }
     if(monitor.isCanceled()) {
       queue.clear();
+      requests.clear();
       toUpdateAttachments.clear();
       toUpdateMavenProjects.clear();
       return Status.CANCEL_STATUS;
@@ -186,18 +183,16 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       toUpdateAttachments.clear();
       toUpdateMavenProjects.clear();
     }
+    requests.clear(); // retain all elements in queue (in an efficient manner)
+    requests.addAll(queue); // queue might not be empty anymore (filled by updateClasspath)
     subMonitor.done();
-    if(monitor.isCanceled()) {
-      return Status.CANCEL_STATUS;
-    }
-    return Status.OK_STATUS;
+    return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
   }
 
   private static void updateClasspath(BuildPathManager manager, Set<IProject> toUpdateMavenProjects,
       Map<IPackageFragmentRoot, Attachments> toUpdateAttachments, IProgressMonitor monitor) {
-    SubMonitor updateMonitor = SubMonitor.convert(monitor,
-        1 + toUpdateMavenProjects.size() + toUpdateMavenProjects.size());
-    updateMonitor.setTaskName(Messages.DownloadSourcesJob_job_associateWithClasspath);
+    SubMonitor updateMonitor = SubMonitor.convert(monitor, Messages.DownloadSourcesJob_job_associateWithClasspath,
+        1 + toUpdateMavenProjects.size() + toUpdateAttachments.size());
     ISchedulingRule schedulingRule = ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
     getJobManager().beginRule(schedulingRule, updateMonitor.split(1));
     try {
@@ -219,8 +214,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   }
 
   IStatus downloadFilesAndPopulateToUpdate(DownloadRequest request, IProgressMonitor monitor) {
-    final List<IStatus> exceptions = new ArrayList<>();
-
     SubMonitor requestMonitor = SubMonitor.convert(monitor, 33);
     try {
       if(request.artifact != null) {
@@ -247,17 +240,13 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
           toUpdateAttachments.put(request.fragment, files);
         }
       }
+      return Status.OK_STATUS;
     } catch(CoreException ex) {
-      exceptions.add(ex.getStatus());
+      return new MultiStatus(MavenJdtPlugin.PLUGIN_ID, -1, new IStatus[] {ex.getStatus()},
+          "Could not download sources or javadoc", null);
+    } finally {
+      requestMonitor.done();
     }
-    requestMonitor.done();
-
-    if(!exceptions.isEmpty()) {
-      IStatus[] problems = exceptions.toArray(new IStatus[exceptions.size()]);
-      return new MultiStatus(MavenJdtPlugin.PLUGIN_ID, -1, problems, "Could not download sources or javadoc", null);
-    }
-
-    return Status.OK_STATUS;
   }
 
   private Attachments downloadMaven(IMavenProjectFacade projectFacade, ArtifactKey artifact, boolean downloadSources,
@@ -339,17 +328,14 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private void scheduleDownload(IProject project, IPackageFragmentRoot fragment, ArtifactKey artifact,
       boolean downloadSources, boolean downloadJavadoc) {
-    addDownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc);
-
-    schedule(SCHEDULE_INTERVAL);
-  }
-
-  public void addDownloadRequest(IProject project, IPackageFragmentRoot fragment, ArtifactKey artifact,
-      boolean downloadSources, boolean downloadJavadoc) {
     if(project == null || !project.isAccessible()) {
       return;
     }
-    queue.add(new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc));
+    DownloadRequest request = new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc);
+    if(requests.add(request)) { // guard against new requests that are/will be already downloaded in this run to prevent endless loops
+      queue.add(request);
+      schedule(SCHEDULE_INTERVAL);
+    }
   }
 
   /**

@@ -36,6 +36,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 class ExtensionModule extends AbstractModule implements IMavenComponentContributor.IMavenComponentBinder {
   private static final Logger log = LoggerFactory.getLogger(ExtensionModule.class);
 
+  @Override
   public <T> void bind(Class<T> role, Class<? extends T> impl, String hint) {
     ScopedBindingBuilder builder;
     if(hint == null || hint.length() <= 0 || "default".equals(hint)) { //$NON-NLS-1$
@@ -48,6 +49,7 @@ class ExtensionModule extends AbstractModule implements IMavenComponentContribut
     }
   }
 
+  @Override
   protected void configure() {
     IExtensionRegistry r = Platform.getExtensionRegistry();
     for(IConfigurationElement c : r.getConfigurationElementsFor(IMavenConstants.MAVEN_COMPONENT_CONTRIBUTORS_XPT)) {

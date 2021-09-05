@@ -29,6 +29,7 @@ public class StringLabelProvider extends LabelProvider {
     this.img = img;
   }
 
+  @Override
   public String getText(Object element) {
     if(element instanceof String) {
       return (String) element;
@@ -36,6 +37,7 @@ public class StringLabelProvider extends LabelProvider {
     return ""; //$NON-NLS-1$
   }
 
+  @Override
   public Image getImage(Object element) {
     return img;
   }

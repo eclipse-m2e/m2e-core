@@ -138,6 +138,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     IProject project = request.getProject();
 
@@ -163,6 +164,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     addCustomClasspathEntries(javaProject, classpath);
 
+    IContainer classesFolder = getOutputLocation(request, project);
+
+    // allow module resolution in invokeJavaProjectConfigurators step
+    javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
+
     invokeJavaProjectConfigurators(classpath, request, monitor);
 
     // now apply new configuration
@@ -172,8 +178,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     for(Map.Entry<String, String> option : options.entrySet()) {
       javaProject.setOption(option.getKey(), option.getValue());
     }
-
-    IContainer classesFolder = getOutputLocation(request, project);
 
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
 
@@ -193,8 +197,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     addNature(project, JavaCore.NATURE_ID, monitor);
   }
 
-  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath)
-      throws JavaModelException {
+  protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath) {
   }
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
@@ -267,7 +270,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    addProjectSourceFolders(classpath, new HashMap<String, String>(), request, monitor);
+    addProjectSourceFolders(classpath, new HashMap<>(), request, monitor);
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
@@ -784,6 +787,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return Double.parseDouble(sanitizeJavaVersion(level));
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     super.unconfigure(request, monitor);
     removeMavenClasspathContainer(request.getProject());
@@ -823,11 +827,87 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return new Path(relative.replace('\\', '/'));
   }
 
+  /**
+   * get all the arguments provided to the compiler for the provided {@link MojoExecution}
+   * 
+   * @param mavenProject the current maven project
+   * @param execution the plugin execution
+   * @param monitor the progress monitor
+   * @return the arguments
+   */
+  private List<String> getCompilerArguments(MavenProject mavenProject, MojoExecution execution,
+      IProgressMonitor monitor) {
+
+    List<String> arguments = new ArrayList<>();
+
+    //1st, get the arguments in the compilerArgs list
+    try {
+      List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      if(args != null) {//$NON-NLS-1$
+        args.stream().filter(a -> a != null).forEach(a -> arguments.add(a.toString()));
+      }
+    } catch(Exception ex) {
+      //ignore
+    }
+
+    // Let's ignore the <compilerArgument>, As the maven-compiler-plugin doc states all jpms arguments
+    // are in fact two arguments so no complete jpms argument can be provided using compilerArgument
+
+    // Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
+
+    // Let's ignore the <testCompilerArguments> Map because it don't suppport double dashed arguments
+
+    return arguments;
+  }
+
+  /**
+   * get all the arguments provided to the compiler
+   * 
+   * @param facade
+   * @param monitor
+   * @return the arguments
+   * @throws CoreException
+   */
+  private List<String> getCompilerArguments(IMavenProjectFacade facade, Map<String, String> options,
+      IProgressMonitor monitor) throws CoreException {
+    List<String> compilerArgs = new ArrayList<>();
+
+    List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
+
+    MavenProject mavenProject = facade.getMavenProject();
+
+    //facade.getProject().get
+    for(MojoExecution compile : executions) {
+      if(isCompileExecution(compile, mavenProject, options, monitor)
+          || isTestCompileExecution(compile, mavenProject, options, monitor)) {
+        List<String> args = getCompilerArguments(mavenProject, compile, monitor);
+        if(args != null) {
+          compilerArgs.addAll(args);
+        }
+      }
+    }
+
+    return compilerArgs;
+  }
+
+  @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     ModuleSupport.configureClasspath(facade, classpath, monitor);
   }
 
+  @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
-      IProgressMonitor monitor) {
+      IProgressMonitor monitor) throws CoreException {
+
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IJavaProject javaProject = JavaCore.create(facade.getProject());
+    if(javaProject == null || !javaProject.exists() || classpath == null) {
+      return;
+    }
+
+    List<String> compilerArgs = getCompilerArguments(facade, javaProject.getOptions(true), monitor);
+
+    ModuleSupport.configureRawClasspath(request, classpath, monitor, compilerArgs);
   }
 }

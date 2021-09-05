@@ -126,27 +126,34 @@ public abstract class MavenPomEditorPage extends FormPage {
     this.pomEditor = pomEditor;
     this.inputHistory = new InputHistory(id);
     listener = new IModelStateListener() {
+      @Override
       public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
       }
 
+      @Override
       public void modelResourceDeleted(IStructuredModel model) {
       }
 
+      @Override
       public void modelReinitialized(IStructuredModel structuredModel) {
       }
 
+      @Override
       public void modelDirtyStateChanged(IStructuredModel model, boolean isDirty) {
       }
 
+      @Override
       public void modelChanged(IStructuredModel model) {
         if(!updatingModel2) {
           loadData();
         }
       }
 
+      @Override
       public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
       }
 
+      @Override
       public void modelAboutToBeChanged(IStructuredModel model) {
       }
     };
@@ -183,6 +190,7 @@ public abstract class MavenPomEditorPage extends FormPage {
 //    toolBarManager.add(pomEditor.showAdvancedTabsAction);
 
     selectParentAction = new Action(Messages.MavenPomEditorPage_action_open, MavenEditorImages.PARENT_POM) {
+      @Override
       public void run() {
         final String[] ret = new String[3];
         try {
@@ -195,6 +203,7 @@ public abstract class MavenPomEditorPage extends FormPage {
           // XXX listen to parent modification and accordingly enable/disable action
           if(!isEmpty(ret[0]) && !isEmpty(ret[1]) && !isEmpty(ret[2])) {
             new Job(Messages.MavenPomEditorPage_job_opening) {
+              @Override
               protected IStatus run(IProgressMonitor monitor) {
                 OpenPomAction.openEditor(ret[0], ret[1], ret[2], getPomEditor().getMavenProject(), monitor);
                 return Status.OK_STATUS;
@@ -211,6 +220,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     updateParentAction();
 
     toolBarManager.add(new Action(Messages.MavenPomEditorPage_actio_refresh, MavenEditorImages.REFRESH) {
+      @Override
       public void run() {
         pomEditor.reload();
       }
@@ -224,6 +234,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     inputHistory.load();
   }
 
+  @Override
   public void setActive(boolean active) {
     super.setActive(active);
 
@@ -411,11 +422,7 @@ public abstract class MavenPomEditorPage extends FormPage {
       } catch(Exception e) {
         ret[0] = false;
       }
-      if(ret[0]) {
-        selectParentAction.setEnabled(true);
-      } else {
-        selectParentAction.setEnabled(false);
-      }
+      selectParentAction.setEnabled(ret[0]);
     }
   }
 
@@ -432,9 +439,6 @@ public abstract class MavenPomEditorPage extends FormPage {
         .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
     final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP) {
 
-      /* (non-Javadoc)
-       * @see org.eclipse.jface.fieldassist.ControlDecoration#getDescriptionText()
-       */
       @Override
       public String getDescriptionText() {
         MavenProject mp = getPomEditor().getMavenProject();
@@ -466,19 +470,23 @@ public abstract class MavenPomEditorPage extends FormPage {
       ((CCombo) control).addModifyListener(listener);
     }
     control.addMouseTrackListener(new MouseTrackListener() {
+      @Override
       public void mouseHover(MouseEvent e) {
         decoration.showHoverText(decoration.getDescriptionText());
       }
 
+      @Override
       public void mouseExit(MouseEvent e) {
         decoration.hideHover();
       }
 
+      @Override
       public void mouseEnter(MouseEvent e) {
       }
     });
   }
 
+  @Override
   public void dispose() {
     inputHistory.save();
     MavenPomEditor pe = getPomEditor();
@@ -512,6 +520,7 @@ public abstract class MavenPomEditorPage extends FormPage {
         throw new IllegalStateException();
       }
 
+      @Override
       public void modifyText(ModifyEvent e) {
         final ElementValueProvider provider = (ElementValueProvider) control.getData(VALUE_PROVIDER);
         if(provider == null) {

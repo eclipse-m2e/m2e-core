@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.editor;singleton:=true
-Bundle-Version: 1.18.1.qualifier
+Bundle-Version: 1.18.2.qualifier
 Bundle-Activator: org.eclipse.m2e.editor.MavenEditorPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -34,7 +34,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
-Bundle-ClassPath: .
 Export-Package: org.eclipse.m2e.editor;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.composites;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.dialogs;x-friends:="org.eclipse.m2e.editor.xml",

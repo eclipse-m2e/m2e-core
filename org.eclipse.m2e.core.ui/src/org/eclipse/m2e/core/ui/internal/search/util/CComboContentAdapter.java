@@ -38,15 +38,18 @@ public class CComboContentAdapter implements IControlContentAdapter /*, IControl
    */
   private static final boolean COMPUTE_TEXT_USING_CLIENTAREA = !"carbon".equals(SWT.getPlatform()); //$NON-NLS-1$
 
+  @Override
   public String getControlContents(Control control) {
     return ((CCombo) control).getText();
   }
 
+  @Override
   public void setControlContents(Control control, String text, int cursorPosition) {
     ((CCombo) control).setText(text);
     ((CCombo) control).setSelection(new Point(cursorPosition, cursorPosition));
   }
 
+  @Override
   public void insertControlContents(Control control, String text, int cursorPosition) {
     CCombo combo = (CCombo) control;
     String contents = combo.getText();
@@ -63,10 +66,12 @@ public class CComboContentAdapter implements IControlContentAdapter /*, IControl
     combo.setSelection(selection);
   }
 
+  @Override
   public int getCursorPosition(Control control) {
     return ((CCombo) control).getSelection().x;
   }
 
+  @Override
   public Rectangle getInsertionBounds(Control control) {
     // This doesn't take horizontal scrolling into affect.
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=204599
@@ -83,6 +88,7 @@ public class CComboContentAdapter implements IControlContentAdapter /*, IControl
     return new Rectangle(extent.x, 0, 1, combo.getSize().y);
   }
 
+  @Override
   public void setCursorPosition(Control control, int index) {
     ((CCombo) control).setSelection(new Point(index, index));
   }
