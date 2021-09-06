@@ -41,6 +41,7 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
 
   private IStructuredSelection selection;
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
@@ -49,6 +50,7 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
     }
   }
 
+  @Override
   public void run(IAction action) {
     if(selection != null) {
       Object element = this.selection.getFirstElement();
@@ -65,6 +67,7 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
   private void showDependencyHierarchy(final ArtifactKey projectKey, final ArtifactKey artifactKey) {
     if(artifactKey != null) {
       new Job(Messages.ShowDependencyHierarchyAction_job_openPomEditor) {
+        @Override
         protected IStatus run(IProgressMonitor monitor) {
           final IEditorPart editor = OpenPomAction.openEditor(projectKey.getGroupId(), //
               projectKey.getArtifactId(), projectKey.getVersion(), monitor);

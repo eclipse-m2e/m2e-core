@@ -36,6 +36,7 @@ class ProjectNode extends ContainerNode {
     return buildCount.incrementAndGet();
   }
 
+  @Override
   public int getBuildCount() {
     return buildCount.get();
   }

@@ -78,6 +78,7 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
       return labelProvider.getImage(element);
     }
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof IResource && knownModules.contains(((IResource) element).getLocation())) {
         return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
@@ -85,6 +86,7 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }

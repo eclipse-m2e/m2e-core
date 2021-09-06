@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +76,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -140,7 +140,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final File stateLocationDir;
 
-  final Map<String, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<>();
+  final Map<URI, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<>();
 
   private final DownloadSourcesJob downloadSourcesJob;
 
@@ -185,6 +185,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return null;
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
@@ -197,6 +198,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     }
   }
 
+  @Override
   public void updateClasspath(IProject project, IProgressMonitor monitor) {
     IJavaProject javaProject = JavaCore.create(project);
     if(javaProject != null) {
@@ -216,20 +218,10 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private void saveContainerState(IProject project, IClasspathContainer container) {
     File containerStateFile = getContainerStateFile(project);
-    FileOutputStream is = null;
-    try {
-      is = new FileOutputStream(containerStateFile);
+    try (FileOutputStream is = new FileOutputStream(containerStateFile)) {
       new MavenClasspathContainerSaveHelper().writeContainer(container, is);
     } catch(IOException ex) {
       log.error("Can't save classpath container state for " + project.getName(), ex); //$NON-NLS-1$
-    } finally {
-      if(is != null) {
-        try {
-          is.close();
-        } catch(IOException ex) {
-          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
-        }
-      }
     }
   }
 
@@ -239,24 +231,12 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       return null;
     }
 
-    FileInputStream is = null;
-    try {
-      is = new FileInputStream(containerStateFile);
+    try (FileInputStream is = new FileInputStream(containerStateFile)) {
+      ;
       return new MavenClasspathContainerSaveHelper().readContainer(is);
-    } catch(IOException ex) {
+    } catch(IOException | ClassNotFoundException ex) {
       throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
           "Can't read classpath container state for " + project.getName(), ex));
-    } catch(ClassNotFoundException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
-          "Can't read classpath container state for " + project.getName(), ex));
-    } finally {
-      if(is != null) {
-        try {
-          is.close();
-        } catch(IOException ex) {
-          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
-        }
-      }
     }
   }
 
@@ -331,15 +311,15 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
         ArtifactKey aKey = desc.getArtifactKey();
         if(aKey != null) { // maybe we should try to find artifactKey little harder here?
+          boolean isSnapshot = aKey.getVersion().endsWith("-SNAPSHOT");
           // We should update a sources/javadoc jar for a snapshot in case they're already downloaded.
-          File plainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
+          File mainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
           File srcFile = srcPath != null ? srcPath.toFile() : null;
           boolean downloadSources = (srcPath == null && mavenConfiguration.isDownloadSources())
-              || (plainFile != null && plainFile.canRead() && srcFile != null && srcFile.canRead());
+              || (isSnapshot && isLastModifiedBefore(srcFile, mainFile));
           File javaDocFile = javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
           boolean downloadJavaDoc = (javaDocUrl == null && mavenConfiguration.isDownloadJavaDoc())
-              || (plainFile != null && plainFile.canRead() && javaDocFile != null && javaDocFile.canRead());
-
+              || (isSnapshot && isLastModifiedBefore(javaDocFile, mainFile));
           scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
               downloadJavaDoc);
         }
@@ -347,34 +327,15 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     }
   }
 
+  private static boolean isLastModifiedBefore(File file, File ref) {
+    return ref != null && ref.canRead() && file != null && file.canRead() && file.lastModified() < ref.lastModified();
+  }
+
   private static final String ARTIFACT_TYPE_JAR = "jar";
 
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
     return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR /*type*/,
         a.getClassifier(), repositories);
-  }
-
-  /*
-   * Returns 'true' if a snapshot sources/javadoc jar doesn't exist locally or it exists and is outdated (its lastModificationTime 
-   * is less than lastModificationTime of according plain jar). 
-   * Returns 'false' only if a snapshot sources/javadoc jar exists locally and is not outdated (no need to be re-downloaded)
-   */
-  private boolean isOutdatedSnapshot(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    Artifact artifact = maven.lookup(RepositorySystem.class).createArtifactWithClassifier(a.getGroupId(),
-        a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR, a.getClassifier());
-    ArtifactRepository localRepository = maven.getLocalRepository();
-
-    File artifactFile = new File(localRepository.getBasedir(), localRepository.pathOf(artifact));
-
-    if(artifactFile.canRead()) {
-      // artifact is available locally
-      Artifact artifactBin = maven.lookup(RepositorySystem.class).createArtifactWithClassifier(a.getGroupId(),
-          a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR, null);
-      File artifacBintFile = new File(localRepository.getBasedir(), localRepository.pathOf(artifactBin));
-      return artifactFile.lastModified() < artifacBintFile.lastModified();
-    }
-
-    return true;
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -393,6 +354,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return getClasspath(project, scope, true, monitor);
   }
 
+  @Override
   public IClasspathEntry[] getClasspath(IProject project, int scope, boolean uniquePaths, IProgressMonitor monitor)
       throws CoreException {
     IMavenProjectFacade facade = projectManager.create(project, monitor);
@@ -403,11 +365,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       Properties props = new Properties();
       File file = getSourceAttachmentPropertiesFile(project);
       if(file.canRead()) {
-        InputStream is = new BufferedInputStream(new FileInputStream(file));
-        try {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
           props.load(is);
-        } finally {
-          is.close();
         }
       }
       return getClasspath(facade, scope, props, uniquePaths, monitor);
@@ -466,7 +425,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     if(path != null) {
       Set<ArtifactKey> artifacts = findArtifacts(project, path);
       // it is not possible to have more than one classpath entry with the same path
-      if(artifacts.size() > 0) {
+      if(!artifacts.isEmpty()) {
         return artifacts.iterator().next();
       }
     }
@@ -586,13 +545,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     // persist custom source/javadoc attachement info
     File file = getSourceAttachmentPropertiesFile(project.getProject());
-    try {
-      OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
-      try {
-        props.store(os, null);
-      } finally {
-        os.close();
-      }
+    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+      props.store(os, null);
     } catch(IOException e) {
       throw new CoreException(
           new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, "Can't save classpath container changes", e));
@@ -621,6 +575,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return new File(stateLocationDir, project.getName() + ".container"); //$NON-NLS-1$
   }
 
+  @Override
   public void resourceChanged(IResourceChangeEvent event) {
     int type = event.getType();
     if(IResourceChangeEvent.PRE_DELETE == type) {
@@ -637,7 +592,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         log.error("Can't delete " + containerState.getAbsolutePath()); //$NON-NLS-1$
       }
 
-      moduleInfosMap.remove(project.getLocation().toString());
+      moduleInfosMap.remove(project.getLocationURI());
 
     } else if(IResourceChangeEvent.POST_CHANGE == type) {
 
@@ -687,7 +642,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
             if(moduleDescription == null) {
               return false;
             }
-            String location = p.getLocation().toString();
+            URI location = p.getLocationURI();
             InternalModuleInfo newModuleInfo = ModuleSupport.getModuleInfo(jp, monitor);
             if(monitor.isCanceled()) {
               return false;
@@ -806,9 +761,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   private static String getJavaDocPathInArchive(File file) {
-    ZipFile jarFile = null;
-    try {
-      jarFile = new ZipFile(file);
+    try (ZipFile jarFile = new ZipFile(file);) {
       String marker = "package-list"; //$NON-NLS-1$
       for(Enumeration<? extends ZipEntry> en = jarFile.entries(); en.hasMoreElements();) {
         ZipEntry entry = en.nextElement();
@@ -819,13 +772,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       }
     } catch(IOException ex) {
       // ignore
-    } finally {
-      try {
-        if(jarFile != null)
-          jarFile.close();
-      } catch(IOException ex) {
-        //
-      }
     }
 
     return ""; //$NON-NLS-1$
@@ -838,6 +784,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return downloadSourcesJob;
   }
 
+  @Override
   public void scheduleDownload(IPackageFragmentRoot fragment, boolean downloadSources, boolean downloadJavadoc) {
     if(fragment == null) {
       return;
@@ -889,6 +836,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   }
 
+  @Override
   public void scheduleDownload(final IProject project, final boolean downloadSources, final boolean downloadJavadoc) {
     try {
       if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -940,12 +888,11 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           if(getAttachedArtifactFile(a, CLASSIFIER_JAVADOC) == null) {
             downloadJavaDoc = true;
           }
-        } else if(isOutdatedSnapshot(sourcesArtifact, repositories)) {
+        } else {
           result[0] = sourcesArtifact;
         }
       }
-      if(downloadJavaDoc
-          && (!isUnavailable(javadocArtifact, repositories) && isOutdatedSnapshot(javadocArtifact, repositories))) {
+      if(downloadJavaDoc && !isUnavailable(javadocArtifact, repositories)) {
         result[1] = javadocArtifact;
       }
     }
@@ -995,6 +942,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       this.affectedProjects = affectedProjects;
     }
 
+    @Override
     public boolean visit(IResourceDelta delta) {
       if(delta.getResource() instanceof IFile) {
         IFile file = (IFile) delta.getResource();

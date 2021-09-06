@@ -40,6 +40,7 @@ public class IndexedArtifactNode implements IMavenRepositoryNode, IArtifactNode 
     this.artifact = artifact;
   }
 
+  @Override
   public Object[] getChildren() {
     Set<IndexedArtifactFile> files = artifact.getFiles();
     if(files == null) {
@@ -53,6 +54,7 @@ public class IndexedArtifactNode implements IMavenRepositoryNode, IArtifactNode 
     return kids;
   }
 
+  @Override
   public String getName() {
     // return a.group + ":" + a.artifact;
     String pkg = artifact.getPackaging();
@@ -62,19 +64,23 @@ public class IndexedArtifactNode implements IMavenRepositoryNode, IArtifactNode 
     return artifact.getArtifactId() + " - " + pkg; //$NON-NLS-1$
   }
 
+  @Override
   public boolean hasChildren() {
     //return kids != null && kids.length > 0;
     return true;
   }
 
+  @Override
   public Image getImage() {
     return MavenImages.IMG_JAR;
   }
 
+  @Override
   public String getDocumentKey() {
     return artifact.getArtifactId();
   }
 
+  @Override
   public boolean isUpdating() {
     return false;
   }

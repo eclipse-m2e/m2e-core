@@ -189,6 +189,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   };
 
+  @Override
   protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor)
       throws CoreException {
     log.debug("Building project {}", getProject().getName()); //$NON-NLS-1$
@@ -200,6 +201,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   }
 
+  @Override
   protected void clean(final IProgressMonitor monitor) throws CoreException {
     log.debug("Cleaning project {}", getProject().getName()); //$NON-NLS-1$
     final long start = System.currentTimeMillis();
@@ -242,6 +244,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   }
 
+  @Override
   public ISchedulingRule getRule(int kind, Map<String, String> args) {
     if(MavenPlugin.getMavenConfiguration().buildWithNullSchedulingRule()) {
       return null;

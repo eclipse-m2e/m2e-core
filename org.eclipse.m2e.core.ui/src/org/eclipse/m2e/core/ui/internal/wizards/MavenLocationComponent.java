@@ -172,6 +172,7 @@ public class MavenLocationComponent extends Composite {
     return locationCombo;
   }
 
+  @Override
   public void dispose() {
     super.dispose();
     if(modifyingListener != null) {

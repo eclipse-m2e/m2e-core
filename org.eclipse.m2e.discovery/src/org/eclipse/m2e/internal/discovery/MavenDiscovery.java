@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.Workbench;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -157,11 +156,8 @@ public class MavenDiscovery {
       if(conn instanceof JarURLConnection) {
         ((JarURLConnection) conn).setDefaultUseCaches(false);
       }
-      InputStream is = conn.getInputStream();
-      try {
+      try (InputStream is = conn.getInputStream()) {
         return LifecycleMappingFactory.createLifecycleMappingMetadataSource(is);
-      } finally {
-        IOUtil.close(is);
       }
     } catch(FileNotFoundException e) {
       // CatalogItem does not contain lifecycle mapping

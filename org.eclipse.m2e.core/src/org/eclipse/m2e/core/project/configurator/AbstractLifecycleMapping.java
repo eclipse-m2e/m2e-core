@@ -58,6 +58,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   protected String id;
 
   private static final MavenBuilderImpl builder = new MavenBuilderImpl() {
+    @Override
     protected boolean isApplicable(org.eclipse.m2e.core.internal.builder.InternalBuildParticipant participant,
         int kind, org.eclipse.core.resources.IResourceDelta delta) {
       return true;
@@ -67,6 +68,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   /**
    * Calls #configure method of all registered project configurators
    */
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor mon) throws CoreException {
     final SubMonitor monitor = SubMonitor.convert(mon, 5);
     try {
@@ -136,6 +138,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     }
   }
 
+  @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
 
@@ -150,6 +153,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   /**
    * @return Returns the name.
    */
+  @Override
   public String getName() {
     return this.name;
   }
@@ -164,6 +168,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   /**
    * @return Returns the id.
    */
+  @Override
   public String getId() {
     return this.id;
   }

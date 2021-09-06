@@ -36,6 +36,7 @@ public abstract class MojoExecutionProblemInfo extends MavenProblemInfo {
     this.mojoExecutionKey = mojoExecutionKey;
   }
 
+  @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
 

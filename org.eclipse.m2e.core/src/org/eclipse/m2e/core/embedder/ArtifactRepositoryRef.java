@@ -46,6 +46,7 @@ public class ArtifactRepositoryRef implements Serializable {
     return username;
   }
 
+  @Override
   public int hashCode() {
     int hash = 17;
     hash = hash * 31 + (id != null ? id.hashCode() : 0);
@@ -54,6 +55,7 @@ public class ArtifactRepositoryRef implements Serializable {
     return hash;
   }
 
+  @Override
   public boolean equals(Object o) {
     if(o == this) {
       return true;

@@ -43,10 +43,12 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
     return this.artifactFile;
   }
 
+  @Override
   public Object[] getChildren() {
     return null;
   }
 
+  @Override
   public String getName() {
     String label = artifactFile.artifact;
     if(artifactFile.classifier != null) {
@@ -58,10 +60,12 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
     return label;
   }
 
+  @Override
   public boolean hasChildren() {
     return false;
   }
 
+  @Override
   public Image getImage() {
     if(artifactFile.sourcesExists == IIndex.PRESENT) {
       return MavenImages.IMG_VERSION_SRC;
@@ -70,10 +74,12 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
 
   }
 
+  @Override
   public String getDocumentKey() {
     return NexusIndexManager.getDocumentKey(artifactFile.getArtifactKey());
   }
 
+  @Override
   public boolean isUpdating() {
     return false;
   }
@@ -82,6 +88,7 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
 
     private static final Class<?>[] ADAPTERS = new Class[] {ArtifactKey.class, IndexedArtifactFile.class};
 
+    @Override
     public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
       if(adaptableObject instanceof IndexedArtifactFileNode) {
         IndexedArtifactFileNode node = (IndexedArtifactFileNode) adaptableObject;
@@ -96,6 +103,7 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
       return null;
     }
 
+    @Override
     public Class<?>[] getAdapterList() {
       return ADAPTERS;
     }

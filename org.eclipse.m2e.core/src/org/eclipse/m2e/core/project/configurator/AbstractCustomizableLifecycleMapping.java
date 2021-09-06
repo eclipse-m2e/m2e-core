@@ -42,6 +42,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifecycleMapping {
   private static Logger log = LoggerFactory.getLogger(AbstractCustomizableLifecycleMapping.class);
 
+  @Override
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade projectFacade,
       IProgressMonitor monitor) throws CoreException {
     log.debug("Build participants for {}", projectFacade.getMavenProject());
@@ -101,6 +102,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     return result;
   }
 
+  @Override
   public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade projectFacade,
       IProgressMonitor monitor) {
     return new ArrayList<>(getProjectConfigurators(projectFacade).values());

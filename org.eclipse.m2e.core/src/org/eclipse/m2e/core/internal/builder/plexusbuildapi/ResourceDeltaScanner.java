@@ -41,14 +41,17 @@ public class ResourceDeltaScanner extends AbstractScanner {
     this.deleted = deleted;
   }
 
+  @Override
   public String[] getIncludedDirectories() {
     return includedDirectories.toArray(new String[includedDirectories.size()]);
   }
 
+  @Override
   public String[] getIncludedFiles() {
     return includedFiles.toArray(new String[includedFiles.size()]);
   }
 
+  @Override
   public void scan() {
     try {
       setupDefaultFilters();
@@ -63,6 +66,7 @@ public class ResourceDeltaScanner extends AbstractScanner {
   private void scanDelta() throws CoreException {
     delta.accept(new IResourceDeltaVisitor() {
 
+      @Override
       @SuppressWarnings("synthetic-access")
       public boolean visit(IResourceDelta delta) {
         String relpath = getRelativePath(delta);
@@ -93,6 +97,7 @@ public class ResourceDeltaScanner extends AbstractScanner {
     return delta.getFullPath().removeFirstSegments(this.delta.getFullPath().segmentCount()).toOSString();
   }
 
+  @Override
   public File getBasedir() {
     return delta.getResource().getLocation().toFile();
   }

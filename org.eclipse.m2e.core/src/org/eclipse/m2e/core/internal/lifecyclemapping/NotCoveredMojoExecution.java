@@ -41,6 +41,7 @@ public class NotCoveredMojoExecution extends MojoExecutionProblemInfo {
         mojoExecutionKey, markerLocation);
   }
 
+  @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
 

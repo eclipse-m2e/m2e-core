@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
@@ -86,8 +87,8 @@ public class SourceLocationHelper {
     }
 
     int columnNumber = Math.max(1, modelProblem.getColumnNumber());
-    String pomFile = pomResource.getLocation().toOSString();
-    if(pomFile.equals(modelProblem.getSource())) {
+    IPath pomLocation = pomResource.getLocation();
+    if(pomLocation != null && pomLocation.toOSString().equals(modelProblem.getSource())) {
       return new SourceLocation(lineNumber, 1, columnNumber - COLUMN_END_OFFSET);
     }
     SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(), lineNumber,
@@ -214,7 +215,7 @@ public class SourceLocationHelper {
     return null;
   }
 
-  private static <T> boolean eq(String s1, String s2) {
+  private static boolean eq(String s1, String s2) {
     if(s1 != null && s1.trim().length() == 0) {
       s1 = null;
     }

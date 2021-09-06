@@ -35,6 +35,7 @@ import org.eclipse.m2e.core.internal.project.registry.EclipsePluginDependenciesR
 
 public class DefaultMavenComponentContributor implements IMavenComponentContributor {
 
+  @Override
   public void contribute(IMavenComponentBinder binder) {
     binder.bind(MavenMetadataCache.class, EclipseMavenMetadataCache.class, null);
     binder.bind(ExtensionRealmCache.class, EclipseExtensionRealmCache.class, null);

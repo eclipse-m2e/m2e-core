@@ -97,11 +97,13 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     setWindowTitle(Messages.MavenDiscoveryProposalWizard_title);
   }
 
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     this.pageFactory = M2EUIPluginActivator.getDefault().getImportWizardPageFactory();
     initialized = true;
   }
 
+  @Override
   public void addPages() {
     if(!initialized) {
       init(null, null);
@@ -110,6 +112,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     addPage(lifecycleMappingPage);
   }
 
+  @Override
   public boolean performFinish() {
     if(lifecycleMappingPage != null && !lifecycleMappingPage.isMappingComplete() && !warnIncompleteMapping()) {
       return false;
@@ -131,6 +134,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     if(doIgnore) {
       final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
 
+        @Override
         public void run(IProgressMonitor monitor) {
           List<IProject> changed = new LinkedList<>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {

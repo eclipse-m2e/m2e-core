@@ -279,6 +279,7 @@ public class ProjectConfigurationElementSorter {
     return isRoot;
   }
 
+  @Override
   public String toString() {
     return "ProjectConfigurationElementSorter [" + getSortedConfigurators() + "]";
   }

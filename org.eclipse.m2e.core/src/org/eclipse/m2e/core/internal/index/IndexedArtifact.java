@@ -17,29 +17,12 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-
 
 public class IndexedArtifact implements Comparable<IndexedArtifact> {
 
-  public static final Comparator<IndexedArtifactFile> FILE_INFO_COMPARATOR = (f1, f2) -> {
-    ArtifactVersion v1 = f1.getArtifactVersion();
-    ArtifactVersion v2 = f2.getArtifactVersion();
-    int r = -v1.compareTo(v2);
-    if(r != 0) {
-      return r;
-    }
-
-    String c1 = f1.classifier;
-    String c2 = f2.classifier;
-    if(c1 == null) {
-      return c2 == null ? 0 : -1;
-    }
-    if(c2 == null) {
-      return 1;
-    }
-    return c1.compareTo(c2);
-  };
+  public static final Comparator<IndexedArtifactFile> FILE_INFO_COMPARATOR = Comparator
+      .comparing(IndexedArtifactFile::getArtifactVersion).reversed()
+      .thenComparing(f -> f.classifier, Comparator.nullsFirst(Comparator.naturalOrder()));
 
   private final String group;
 
@@ -78,6 +61,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
     return packageName;
   }
 
+  @Override
   public String toString() {
 	  StringBuilder sb = new StringBuilder(
         "\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -104,9 +88,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
     return files;
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
+  @Override
   public int hashCode() {
     int result = SEED;
     result *= fieldHash(getGroupId());
@@ -127,6 +109,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
   /**
    * Assumes all the fields are important for equals.
    */
+  @Override
   public boolean equals(Object artifact) {
     if(this == artifact) {
       return true;
@@ -146,6 +129,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
     return field1 == null ? field2 == null : field1.equals(field2);
   }
 
+  @Override
   public int compareTo(IndexedArtifact o) {
     if(this.equals(o))
       return 0;

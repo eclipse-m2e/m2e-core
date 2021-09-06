@@ -51,16 +51,19 @@ public class MavenCapability extends Capability {
     return version;
   }
 
+  @Override
   public String toString() {
     return getVersionlessKey().toString() + "/" + version; //$NON-NLS-1$
   }
 
+  @Override
   public int hashCode() {
     int hash = getVersionlessKey().hashCode();
     hash = hash * 17 + version.hashCode();
     return hash;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;

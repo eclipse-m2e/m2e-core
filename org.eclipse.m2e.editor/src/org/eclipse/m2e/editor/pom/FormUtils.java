@@ -271,15 +271,18 @@ public abstract class FormUtils {
           cleanupMouseListeners(kid, SWT.MouseEnter);
           cleanupMouseListeners(kid, SWT.MouseExit);
           kid.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseUp(MouseEvent e) {
               runnable.accept(kid.toDisplay(new Point(e.x, e.y)));
             }
           });
           kid.addMouseTrackListener(new MouseTrackAdapter() {
+            @Override
             public void mouseEnter(MouseEvent e) {
               head.setCursor(Display.getDefault().getSystemCursor(SWT.CURSOR_HAND));
             }
 
+            @Override
             public void mouseExit(MouseEvent e) {
               head.setCursor(null);
             }
@@ -324,8 +327,7 @@ public abstract class FormUtils {
       if(props != null) {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-      inter.addValueSource(
-          new PrefixedObjectValueSource(Arrays.asList("pom.", "project."), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList("pom.", "project."), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {

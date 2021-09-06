@@ -59,6 +59,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     setTitle(Messages.MavenProjectPreferencePage_title);
   }
 
+  @Override
   protected Control createContents(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout(2, false));
@@ -101,6 +102,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     return composite;
   }
 
+  @Override
   protected void performDefaults() {
     init(new ResolverConfiguration());
   }
@@ -112,6 +114,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     selectedProfilesText.setText(configuration.getSelectedProfiles());
   }
 
+  @Override
   public boolean performOk() {
     final IProject project = getProject();
     try {
@@ -142,6 +145,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
           Messages.MavenProjectPreferencePage_dialog_message);
       if(res) {
         WorkspaceJob job = new WorkspaceJob(NLS.bind(Messages.MavenProjectPreferencePage_job, project.getName())) {
+          @Override
           public IStatus runInWorkspace(IProgressMonitor monitor) {
             try {
               MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);

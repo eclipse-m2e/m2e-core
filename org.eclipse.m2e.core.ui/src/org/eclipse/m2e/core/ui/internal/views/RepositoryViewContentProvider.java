@@ -43,20 +43,25 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
   public RepositoryViewContentProvider() {
   }
 
+  @Override
   public void inputChanged(Viewer v, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public Object[] getElements(Object parent) {
     return getChildren(parent);
   }
 
+  @Override
   public Object getParent(Object child) {
     return null;
   }
 
+  @Override
   public boolean hasChildren(Object parent) {
     if(parent instanceof IMavenRepositoryNode) {
       return ((IMavenRepositoryNode) parent).hasChildren();
@@ -81,6 +86,7 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
     return new Object[] {localNode, globalNode, projectNode, customNode};
   }
 
+  @Override
   public Object[] getChildren(Object parent) {
     if(parent instanceof IViewSite) {
       return getRootNodes();

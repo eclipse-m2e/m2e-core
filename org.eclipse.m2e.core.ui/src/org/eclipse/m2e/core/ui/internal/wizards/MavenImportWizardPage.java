@@ -137,6 +137,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     this.basedirRemameRequired = basedirRemameRequired;
   }
 
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout(3, false));
@@ -189,6 +190,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       });
 
       rootDirectoryCombo.addFocusListener(new FocusAdapter() {
+        @Override
         public void focusLost(FocusEvent e) {
           if(rootDirectoryChanged()) {
             scanProjects();
@@ -196,12 +198,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         }
       });
       rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
+        @Override
         public void widgetDefaultSelected(SelectionEvent e) {
           if(rootDirectoryChanged()) {
             scanProjects();
           }
         }
 
+        @Override
         public void widgetSelected(SelectionEvent e) {
           if(rootDirectoryChanged()) {
             //in runnable to have the combo popup collapse before disabling controls.
@@ -242,6 +246,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     projectTreeViewer.setContentProvider(new ITreeContentProvider() {
 
+      @Override
       public Object[] getElements(Object element) {
         if(element instanceof List) {
           @SuppressWarnings("unchecked")
@@ -251,6 +256,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         return EMPTY;
       }
 
+      @Override
       public Object[] getChildren(Object parentElement) {
         if(parentElement instanceof List) {
           @SuppressWarnings("unchecked")
@@ -264,10 +270,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         return EMPTY;
       }
 
+      @Override
       public Object getParent(Object element) {
         return null;
       }
 
+      @Override
       public boolean hasChildren(Object parentElement) {
         if(parentElement instanceof List) {
           List<?> projects = (List<?>) parentElement;
@@ -279,9 +287,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         return false;
       }
 
+      @Override
       public void dispose() {
       }
 
+      @Override
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
     });
@@ -380,6 +390,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return _rootDirectory == null || !_rootDirectory.equals(rootDirectory);
   }
 
+  @Override
   public void dispose() {
     super.dispose();
   }
@@ -688,6 +699,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   class ProjectLabelProvider extends LabelProvider implements IColorProvider,
       DelegatingStyledCellLabelProvider.IStyledLabelProvider {
 
+    @Override
     public String getText(Object element) {
       if(element instanceof MavenProjectInfo) {
         MavenProjectInfo info = (MavenProjectInfo) element;
@@ -728,9 +740,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       return groupId + ":" + artifactId + ":" + version + ":" + packaging; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-     */
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof MavenProjectInfo) {
         MavenProjectInfo info = (MavenProjectInfo) element;
@@ -743,16 +753,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-     */
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
-     */
+    @Override
     public StyledString getStyledText(Object element) {
       if(element instanceof MavenProjectInfo) {
         MavenProjectInfo info = (MavenProjectInfo) element;

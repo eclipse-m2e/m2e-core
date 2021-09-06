@@ -40,10 +40,10 @@ pipeline {
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}
-							ssh genie.m2e@build.eclipse.org "\
+							ssh genie.m2e@projects-storage.eclipse.org "\
 								rm -rf  ${1}/* && \
 								mkdir -p ${1}"
-							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@build.eclipse.org:${1}
+							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)<\\/m2e.version>.*/\\1/')
 						SNAPSHOT_VERSIONED_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest

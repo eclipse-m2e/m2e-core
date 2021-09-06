@@ -164,9 +164,6 @@ public class MavenModelManager {
 
       pomFile.create(new ByteArrayInputStream(buf.toByteArray()), true, new NullProgressMonitor());
 
-    } catch(RuntimeException ex) {
-      String msg = NLS.bind(Messages.MavenModelManager_error_create, pomFileName, ex.toString());
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
     } catch(Exception ex) {
       String msg = NLS.bind(Messages.MavenModelManager_error_create, pomFileName, ex.toString());
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
@@ -279,8 +276,7 @@ public class MavenModelManager {
 
   public MavenProject readMavenProject(IFile file, IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade projectFacade = projectManager.create(file, true, monitor);
-    MavenProject mavenProject = projectFacade.getMavenProject(monitor);
-    return mavenProject;
+    return projectFacade.getMavenProject(monitor);
   }
 
 }

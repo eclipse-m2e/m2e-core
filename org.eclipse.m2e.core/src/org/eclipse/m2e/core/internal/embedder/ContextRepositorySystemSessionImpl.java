@@ -156,6 +156,7 @@ public class ContextRepositorySystemSessionImpl implements ContextRepositorySyst
     return getSession().getWorkspaceReader();
   }
 
+  @Override
   public boolean isOffline() {
     return getSession().isOffline();
   }

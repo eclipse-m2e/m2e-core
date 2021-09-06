@@ -28,6 +28,7 @@ public class WorkspaceRepositoryNode extends AbstractIndexedRepositoryNode {
     super(index);
   }
 
+  @Override
   public String getName() {
     return Messages.WorkspaceRepositoryNode_name;
   }

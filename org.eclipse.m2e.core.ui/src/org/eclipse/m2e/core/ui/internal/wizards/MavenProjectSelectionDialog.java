@@ -74,6 +74,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
   }
 
   /** Produces the result of the selection. */
+  @Override
   protected void computeResult() {
     if(useCheckboxTree) {
       List<Object> result = new ArrayList<>();
@@ -97,6 +98,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
   }
 
   /** Creates the dialog controls. */
+  @Override
   protected Control createDialogArea(Composite parent) {
     readSettings();
 
@@ -114,6 +116,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     return composite;
   }
 
+  @Override
   protected void okPressed() {
     super.okPressed();
   }
@@ -126,6 +129,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
   protected static class MavenContainerContentProvider implements ITreeContentProvider {
 
     /** Returns the children of the parent node. */
+    @Override
     public Object[] getChildren(Object parent) {
       if(parent instanceof IWorkspace) {
         IProject[] projects = ((IWorkspace) parent).getRoot().getProjects();
@@ -163,6 +167,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     }
 
     /** Returns the parent of the given element. */
+    @Override
     public Object getParent(Object element) {
       if(element instanceof IResource) {
         return ((IResource) element).getParent();
@@ -171,19 +176,23 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     }
 
     /** Returns true if the element has any children. */
+    @Override
     public boolean hasChildren(Object element) {
       return getChildren(element).length > 0;
     }
 
     /** Disposes of any resources used. */
+    @Override
     public void dispose() {
     }
 
     /** Handles the input change. */
+    @Override
     public void inputChanged(Viewer viewer, Object arg1, Object arg2) {
     }
 
     /** Returns the elements of the given root. */
+    @Override
     public Object[] getElements(Object element) {
       return getChildren(element);
     }

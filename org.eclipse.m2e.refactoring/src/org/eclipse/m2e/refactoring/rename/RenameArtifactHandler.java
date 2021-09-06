@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
@@ -36,7 +35,7 @@ public class RenameArtifactHandler extends AbstractHandler {
   private static final Logger log = LoggerFactory.getLogger(RenameArtifactHandler.class);
 
   @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
+  public Object execute(ExecutionEvent event) {
     ISelection selection = computeSelection(event);
     if(!(selection instanceof IStructuredSelection)) {
       return null;

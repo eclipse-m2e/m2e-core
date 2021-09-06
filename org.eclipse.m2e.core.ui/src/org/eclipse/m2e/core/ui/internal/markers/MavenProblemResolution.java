@@ -202,9 +202,8 @@ public abstract class MavenProblemResolution extends WorkbenchMarkerResolution
   public static List<IMarkerResolution> getResolutions(IMarker marker) {
     IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(marker);
     List<IMarkerResolution> sortedResolutions = Arrays.asList(resolutions);
-    Collections.sort(sortedResolutions,
-        Comparator.<IMarkerResolution, Integer> comparing(MavenProblemResolution::getOrder)
-            .thenComparing(IMarkerResolution::getLabel));
+    Collections.sort(sortedResolutions, Comparator.<IMarkerResolution> comparingInt(MavenProblemResolution::getOrder)
+        .thenComparing(IMarkerResolution::getLabel));
     return sortedResolutions;
   }
 

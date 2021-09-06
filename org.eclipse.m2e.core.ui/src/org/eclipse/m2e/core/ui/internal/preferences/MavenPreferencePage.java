@@ -47,6 +47,7 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
   }
 
+  @Override
   public void init(IWorkbench workbench) {
   }
 
@@ -55,6 +56,7 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
    * blocks needed to manipulate various types of preferences. Each field editor
    * knows how to save and restore itself.
    */
+  @Override
   public void createFieldEditors() {
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_OFFLINE, Messages.preferencesOffline,

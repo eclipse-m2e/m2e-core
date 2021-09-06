@@ -80,11 +80,8 @@ public class FileHelpers {
   public static void filterXmlFile(File src, File dst, Map<String, String> tokens) throws IOException {
     String text;
 
-    Reader reader = ReaderFactory.newXmlReader(src);
-    try {
+    try (Reader reader = ReaderFactory.newXmlReader(src)) {
       text = IOUtil.toString(reader);
-    } finally {
-      reader.close();
     }
 
     for(String token : tokens.keySet()) {

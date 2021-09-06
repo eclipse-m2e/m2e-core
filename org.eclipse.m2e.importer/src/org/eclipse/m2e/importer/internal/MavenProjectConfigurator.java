@@ -38,7 +38,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -168,7 +167,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                             .getProjectConfigurationManager();
                     MavenUpdateRequest request = new MavenUpdateRequest(
                             toProcessNow.toArray(new IProject[toProcessNow.size()]), false, false);
-                    Map<String, IStatus> updateStatus = configurationManager.updateProjectConfiguration(request, true,
+                    configurationManager.updateProjectConfiguration(request, true,
                             false, false, monitor);
                 }
             }
@@ -246,7 +245,6 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
         final ResolverConfiguration configuration = new ResolverConfiguration();
         configuration.setResolveWorkspaceProjects(true);
-        final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
         try {
             if (!project.hasNature(IMavenConstants.NATURE_ID)) {
                 IProjectDescription description = project.getDescription();

@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,24 +32,28 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
  *
  * @author Igor Fedorenko
  */
-public class ProjectRegistry extends BasicProjectRegistry implements Serializable, IProjectRegistry {
+public class ProjectRegistry extends BasicProjectRegistry implements IProjectRegistry {
 
   private static final long serialVersionUID = 7296606601386638800L;
 
   private transient int version;
 
+  @Override
   public synchronized MavenProjectFacade getProjectFacade(IFile pom) {
     return super.getProjectFacade(pom);
   }
 
+  @Override
   public synchronized MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version) {
     return super.getProjectFacade(groupId, artifactId, version);
   }
 
+  @Override
   public synchronized MavenProjectFacade[] getProjects() {
     return super.getProjects();
   }
 
+  @Override
   public synchronized Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
     return super.getWorkspaceArtifacts(groupId, artifactId);
   }

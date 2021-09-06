@@ -129,6 +129,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   /* (non-Javadoc)
    * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
    */
+  @Override
   protected Control createDialogArea(Composite parent) {
     readSettings();
 
@@ -226,11 +227,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer.addSelectionChangedListener(new DependenciesViewerSelectionListener());
 
     pomHierarchy.addSelectionChangedListener(new PomViewerSelectionChangedListener());
-    if(getProjectHierarchy().size() > 0) {
+    if(!getProjectHierarchy().isEmpty()) {
       pomHierarchy.setSelection(new StructuredSelection(pomHierarchy.getProject()));
     }
 
-    if(originalSelection != null && originalSelection.size() > 0) {
+    if(originalSelection != null && !originalSelection.isEmpty()) {
       dependenciesViewer.setSelection(new StructuredSelection(originalSelection));
     }
 
@@ -262,11 +263,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       protected IStatus run(IProgressMonitor monitor) {
         try {
           if(same) {
-            performOnDOMDocument(new OperationTuple(current, new CompoundOperation(createManageOperation(modelDeps),
-                createRemoveVersionOperation(modelDeps))));
+            performOnDOMDocument(new OperationTuple(current,
+                new CompoundOperation(createManageOperation(modelDeps), createRemoveVersionOperation(modelDeps))));
           } else {
-            performOnDOMDocument(new OperationTuple(target, createManageOperation(modelDeps)), new OperationTuple(
-                current, createRemoveVersionOperation(modelDeps)));
+            performOnDOMDocument(new OperationTuple(target, createManageOperation(modelDeps)),
+                new OperationTuple(current, createRemoveVersionOperation(modelDeps)));
           }
         } catch(Exception e) {
           LOG.error("Error updating managed dependencies", e);
@@ -416,12 +417,14 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   protected class DependenciesViewerSelectionListener implements ISelectionChangedListener {
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       checkStatus(getTargetPOM(), getDependenciesList());
     }
   }
 
   protected class PomViewerSelectionChangedListener implements ISelectionChangedListener {
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       checkStatus(getTargetPOM(), getDependenciesList());
     }
@@ -454,6 +457,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     }
 
+    @Override
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
@@ -467,24 +471,29 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       return null;
     }
 
+    @Override
     public Color getBackground(Object element) {
       return null;
     }
   }
 
   public class ContentProvider implements ITreeContentProvider {
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public boolean hasChildren(Object element) {
       Object[] children = getChildren(element);
 
       return children.length != 0;
     }
 
+    @Override
     public Object getParent(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
@@ -498,6 +507,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
      * (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
      */
+    @Override
     public Object[] getElements(Object inputElement) {
 
       if(inputElement instanceof LinkedList) {
@@ -511,6 +521,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       return new Object[0];
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       if(parentElement instanceof MavenProject) {
         /*

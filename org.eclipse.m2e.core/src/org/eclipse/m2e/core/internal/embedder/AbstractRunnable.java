@@ -24,6 +24,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
  * @since 1.5
  */
 public abstract class AbstractRunnable implements ICallable<Void> {
+  @Override
   public final Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
     run(context, monitor);
     return null;

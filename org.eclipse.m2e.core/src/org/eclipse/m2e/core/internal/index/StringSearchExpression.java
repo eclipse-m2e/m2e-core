@@ -26,6 +26,7 @@ public class StringSearchExpression implements SearchExpression {
     this.expression = expression;
   }
 
+  @Override
   public String getStringValue() {
     return expression;
   }

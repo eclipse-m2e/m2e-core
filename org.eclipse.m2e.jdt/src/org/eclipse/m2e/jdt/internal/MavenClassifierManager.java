@@ -57,14 +57,17 @@ public class MavenClassifierManager implements IMavenClassifierManager {
 
   private static final IClassifierClasspathProvider NO_OP_CLASSIFIER_CLASSPATH_PROVIDER = new AbstractClassifierClasspathProvider() {
 
+    @Override
     public String getClassifier() {
       return "(__ignore_classifier__)";
     }
 
+    @Override
     public boolean applies(IMavenProjectFacade mavenProjectFacade, String classifier) {
       return false;
     }
 
+    @Override
     public String toString() {
       return "No-Op Classifier Classpath Provider";
     }
@@ -78,24 +81,29 @@ public class MavenClassifierManager implements IMavenClassifierManager {
       this.path = path;
     }
 
+    @Override
     public String getClassifier() {
       return "(__ignore_classifier__)";
     }
 
+    @Override
     public boolean applies(IMavenProjectFacade mavenProjectFacade, String classifier) {
       return false;
     }
 
+    @Override
     public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath,
         IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor, int classpathProperty) {
       addFolders(runtimeClasspath, mavenProjectFacade.getProject(), Collections.singleton(path), classpathProperty);
     }
 
+    @Override
     public void setTestClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
         IProgressMonitor monitor, int classpathProperty) {
       setRuntimeClasspath(runtimeClasspath, mavenProjectFacade, monitor, classpathProperty);
     }
 
+    @Override
     public String toString() {
       return "Delegates to IWorkspaceClassifierResolver";
     }
@@ -103,6 +111,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
 
   private Map<String, List<IClassifierClasspathProvider>> classifierClasspathProvidersMap;
 
+  @Override
   public IClassifierClasspathProvider getClassifierClasspathProvider(IMavenProjectFacade project, String classifier) {
     List<IClassifierClasspathProvider> allProviders = getClassifierClasspathProviders(classifier);
     List<IClassifierClasspathProvider> compatibleProviders = new ArrayList<>();

@@ -139,11 +139,8 @@ public class MavenRuntimeLaunchSupport {
         File dir = new File(state, "launches"); //$NON-NLS-1$
         dir.mkdirs();
         cwconfFile = File.createTempFile("m2conf", ".tmp", dir); //$NON-NLS-1$ //$NON-NLS-2$
-        OutputStream os = new FileOutputStream(cwconfFile);
-        try {
+        try (OutputStream os = new FileOutputStream(cwconfFile)) {
           cwconf.save(os);
-        } finally {
-          os.close();
         }
       } catch(IOException e) {
         throw new CoreException(

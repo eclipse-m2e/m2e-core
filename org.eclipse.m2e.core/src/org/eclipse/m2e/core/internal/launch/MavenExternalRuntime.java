@@ -64,14 +64,17 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     this.location = location;
   }
 
+  @Override
   public boolean isEditable() {
     return true;
   }
 
+  @Override
   public boolean isAvailable() {
     return new File(location, "bin").exists() && getLauncherClasspath() != null && isSupportedVersion(); //$NON-NLS-1$
   }
 
+  @Override
   public String getLocation() {
     return location;
   }
@@ -84,6 +87,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return new File(location, "bin/m2.conf"); //$NON-NLS-1$
   }
 
+  @Override
   public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, final IProgressMonitor monitor)
       throws CoreException {
 
@@ -93,10 +97,12 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     ConfigurationHandler handler = new ConfigurationHandler() {
       private String mainRealmName;
 
+      @Override
       public void addImportFrom(String relamName, String importSpec) {
         throw new UnsupportedOperationException(Messages.MavenExternalRuntime_exc_unsupported);
       }
 
+      @Override
       public void addLoadFile(File file) {
         try {
           collector.addArchiveEntry(file.getAbsolutePath());
@@ -105,6 +111,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         }
       }
 
+      @Override
       public void addLoadURL(URL url) {
         try {
           collector.addArchiveEntry(url.toExternalForm());
@@ -113,6 +120,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         }
       }
 
+      @Override
       public void addRealm(String realmName) {
         if(mainRealmName == null) {
           throw new IllegalStateException();
@@ -127,6 +135,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         }
       }
 
+      @Override
       public void setAppMain(String mainClassName, String mainRealmName) {
         this.mainRealmName = mainRealmName;
         collector.setMainType(mainClassName, mainRealmName);
@@ -139,13 +148,8 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
 
-    try {
-      FileInputStream is = new FileInputStream(getLauncherConfigurationFile());
-      try {
-        parser.parse(is);
-      } finally {
-        is.close();
-      }
+    try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
+      parser.parse(is);
     } catch(Exception e) {
       if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException) {
         throw (CoreException) e.getCause();
@@ -157,6 +161,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     // XXX show error dialog and fail launch
   }
 
+  @Override
   public String toString() {
     return location + ' ' + getVersion();
   }
@@ -187,6 +192,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return null;
   }
 
+  @Override
   public synchronized String getVersion() {
     if(version == null) {
       version = getVersion0();
@@ -200,9 +206,11 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
       File uber;
 
+      @Override
       public void addImportFrom(String relamName, String importSpec) {
       }
 
+      @Override
       public void addLoadFile(File file) {
         if(file.getName().contains("maven-core")) { //$NON-NLS-1$
           mavenCore = file;
@@ -211,12 +219,15 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         }
       }
 
+      @Override
       public void addLoadURL(URL url) {
       }
 
+      @Override
       public void addRealm(String realmName) {
       }
 
+      @Override
       public void setAppMain(String mainClassName, String mainRealmName) {
       }
     }
@@ -230,21 +241,18 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
 
     try {
-      FileInputStream is = new FileInputStream(getLauncherConfigurationFile());
-      try {
+      try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
         parser.parse(is);
-      } finally {
-        is.close();
       }
 
-      ZipFile zip = null;
+      File zipFile = null;
       if(handler.mavenCore != null) {
-        zip = new ZipFile(handler.mavenCore);
+        zipFile = handler.mavenCore;
       } else if(handler.uber != null) {
-        zip = new ZipFile(handler.uber);
+        zipFile = handler.uber;
       }
-      if(zip != null) {
-        try {
+      if(zipFile != null) {
+        try (ZipFile zip = new ZipFile(zipFile)) {
           String suffix = "";
           ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
           if(zipEntry != null) {
@@ -256,8 +264,6 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
               return version + suffix;
             }
           }
-        } finally {
-          zip.close();
         }
       }
     } catch(Exception e) {

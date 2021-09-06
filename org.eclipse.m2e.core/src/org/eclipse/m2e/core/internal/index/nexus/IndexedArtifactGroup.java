@@ -52,6 +52,7 @@ public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup> {
   /*
    * Compare the groups by prefix
    */
+  @Override
   public int compareTo(IndexedArtifactGroup o) {
     if(o == null) {
       return -1;

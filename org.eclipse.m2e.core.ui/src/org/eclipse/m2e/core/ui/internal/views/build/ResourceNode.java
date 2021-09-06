@@ -26,6 +26,7 @@ class ResourceNode implements Node {
     this.path = path;
   }
 
+  @Override
   public String getName() {
     return path.toPortableString();
   }
@@ -34,6 +35,7 @@ class ResourceNode implements Node {
     return path;
   }
 
+  @Override
   public synchronized int getBuildCount() {
     return buildCount;
   }

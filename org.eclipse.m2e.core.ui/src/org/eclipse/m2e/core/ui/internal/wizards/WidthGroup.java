@@ -30,6 +30,7 @@ public class WidthGroup extends ControlAdapter {
 
   private final HashSet<Control> controls = new HashSet<>();
 
+  @Override
   public void controlResized(ControlEvent e) {
     int maxWidth = 0;
     for(Control c : this.controls) {

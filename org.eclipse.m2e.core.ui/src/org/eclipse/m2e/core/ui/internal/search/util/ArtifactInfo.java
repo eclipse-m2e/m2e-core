@@ -62,6 +62,7 @@ public class ArtifactInfo {
    *
    * @return a <code>String</code> representation of this object.
    */
+  @Override
   public String toString() {
     final String TAB = "    "; //$NON-NLS-1$
 
