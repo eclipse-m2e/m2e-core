@@ -139,8 +139,8 @@
 					<configuration>
 						<instructions>
 							<_exportcontents>
-								META-INF.plexus;-noimport:=true,
-								META-INF.sisu;-noimport:=true,
+								META-INF.plexus;-noimport:=true;x-internal:=true,
+								META-INF.sisu;-noimport:=true;x-internal:=true,
 								org.apache.maven.*;provider=m2e;mandatory:=provider,
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,

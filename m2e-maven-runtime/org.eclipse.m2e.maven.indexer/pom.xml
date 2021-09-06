@@ -99,7 +99,7 @@
 					<configuration>
 						<instructions>
 							<_exportcontents>
-								META-INF.sisu;-noimport:=true,
+								META-INF.sisu;-noimport:=true;x-internal:=true,
 								org.apache.lucene.*;provider=m2e;mandatory:=provider,
 								org.apache.maven.*;provider=m2e;mandatory:=provider,
 							</_exportcontents>

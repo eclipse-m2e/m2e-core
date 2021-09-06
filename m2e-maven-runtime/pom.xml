@@ -58,9 +58,10 @@
 					<version>5.1.1</version>
 					<extensions>true</extensions>
 					<configuration>
+						<supportedProjectTypes>eclipse-plugin</supportedProjectTypes>
 						<!-- PDE does not honor custom manifest location -->
 						<manifestLocation>META-INF</manifestLocation>
-						<supportedProjectTypes>eclipse-plugin</supportedProjectTypes>
+						<niceManifest>true</niceManifest>
 						<instructions>
 							<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive>
@@ -212,7 +213,7 @@
 													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
 													<sequential>
 														<local name="jarFilename" />
-														<basename property="jarFilename" file="@{jarFile}" suffix=".jar"/>
+														<basename property="jarFilename" file="@{jarFile}" suffix=".jar" />
 														<local name="lib.entry" />
 														<property name="lib.entry"><![CDATA[<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}.jar"  sourcepath="${dependency.sources.folder}/${jarFilename}-sources.jar"/>]]></property>
 														<var name="dependency.jars.lib.entries" value="${dependency.jars.lib.entries}&#xA;&#x9;${lib.entry}" />
