@@ -53,13 +53,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<!-- TODO: this can be removed as soon as the sisu index file below is created in the main m2e maven build -->
-			<groupId>org.apache.maven.archetype</groupId>
-			<artifactId>archetype-common</artifactId>
-			<version>${archetype-common.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
