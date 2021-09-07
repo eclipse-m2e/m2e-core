@@ -95,10 +95,11 @@
 	<profiles>
 		<profile>
 			<id>generate-osgi-metadata</id>
+			<!-- Generate the OSGi metadata for the Maven-Runtime bundles as described in the co-located README.md -->
 			<build>
 				<pluginManagement>
 					<plugins>
-						<!-- Disable Tycho plug-ins that would fail in the first pure Maven build -->
+						<!-- Disable Tycho plug-ins that would fail in the first pure Maven build because the MANIFEST.MF does not yet exist -->
 						<plugin>
 							<groupId>org.eclipse.tycho</groupId>
 							<artifactId>tycho-packaging-plugin</artifactId>
@@ -144,7 +145,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<id>copy-dependencies</id>
+								<id>fetch-dependencies</id>
 								<goals>
 									<goal>copy-dependencies</goal>
 								</goals>
@@ -154,7 +155,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>copy-dependency-sources</id>
+								<id>fetch-dependency-sources</id>
 								<goals>
 									<goal>copy-dependencies</goal>
 								</goals>
@@ -173,6 +174,7 @@
 						</configuration>
 						<executions>
 							<execution>
+								<id>generate-manifest</id>
 								<goals>
 									<goal>manifest</goal>
 								</goals>
