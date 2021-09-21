@@ -181,7 +181,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     }
     // updateClasspath might has added new requests to the queue. 
     requests.clear(); // Retain in requests all elements in queue (in an efficient manner)
-    requests.retainAll(queue);
+    requests.addAll(queue);
     subMonitor.done();
     return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
   }
