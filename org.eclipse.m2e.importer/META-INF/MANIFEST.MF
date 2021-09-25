@@ -1,10 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
+Bundle-Name: M2E Import Framework
 Bundle-SymbolicName: org.eclipse.m2e.importer;singleton:=true
 Bundle-Version: 1.17.3.qualifier
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Localization: plugin
+Bundle-Vendor: Eclipse.org - m2e
 Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.ui,
  org.eclipse.core.runtime,
