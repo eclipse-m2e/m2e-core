@@ -36,7 +36,7 @@ To use the latest snapshot build, you can use this p2 repository: https://downlo
 See [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
 ## ⌨️ Contributing
-[![Create Eclipse Development Environment for m2e](https://img.shields.io/static/v1?logo=eclipseide&label=Create%20Development%20Environment&message=M2E&style=for-the-badge&logoColor=white&labelColor=darkorange&color=gray)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
+[![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
 &nbsp;&nbsp;&nbsp;or just&nbsp;&nbsp;&nbsp;
 [![Clone to Eclipse IDE](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png)](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html)
 
