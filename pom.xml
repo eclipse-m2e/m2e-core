@@ -111,6 +111,7 @@
 		<module>org.eclipse.m2e.core.ui.tests</module>
 		<module>org.eclipse.m2e.importer.tests</module>
 		<module>org.eclipse.m2e.binaryproject.tests</module>
+		<module>org.eclipse.m2e.editor.tests</module>
 		<module>org.eclipse.m2e.editor.lemminx.tests</module>
 		<module>org.eclipse.m2e.jdt.tests</module>
 		<module>org.eclipse.m2e.editor.xml.sse.tests</module>
