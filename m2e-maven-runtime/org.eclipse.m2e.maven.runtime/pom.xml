@@ -26,7 +26,7 @@
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.8.2</maven-core.version>
+		<maven-core.version>3.8.3</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
@@ -37,6 +37,19 @@
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
 		<guava.version>30.1-jre</guava.version>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>Maven-Staging</id>
+			<url>https://repository.apache.org/content/repositories/maven-1667/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
