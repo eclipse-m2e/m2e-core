@@ -255,6 +255,14 @@ public abstract class AbstractMavenProjectTestCase {
   }
 
   protected IProject createProject(String projectName, final String pomResource) throws CoreException {
+    try (InputStream is = new FileInputStream(pomResource)) {
+      return createProject(projectName, is);
+    } catch(IOException ex1) {
+      throw new CoreException(new Status(IStatus.ERROR, "", 0, ex1.toString(), ex1));
+    }
+  }
+
+  protected IProject createProject(String projectName, InputStream pomContent) throws CoreException {
     final IProject project = workspace.getRoot().getProject(projectName);
 
     workspace.run((IWorkspaceRunnable) monitor -> {
@@ -266,9 +274,9 @@ public abstract class AbstractMavenProjectTestCase {
 
       IFile pomFile = project.getFile("pom.xml");
       if(!pomFile.exists()) {
-        try (InputStream is = new FileInputStream(pomResource)) {
-          pomFile.create(is, true, monitor);
-        } catch(IOException ex) {
+        try {
+          pomFile.create(pomContent, true, monitor);
+        } catch(CoreException ex) {
           throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
         }
       }

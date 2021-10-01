@@ -518,7 +518,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           return Status.OK_STATUS;
         }
         IDocument doc = getEffectivePomSourcePage().getDocumentProvider().getDocument(getEffectivePomEditorInput());
-        doc.set(content);
+        getSite().getShell().getDisplay().syncExec(() -> doc.set(content)); // run in UI Thread as some listeners require it
         return Status.OK_STATUS;
       } catch(CoreException ce) {
         return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, -1,
@@ -532,8 +532,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   /**
    * Load the effective POM. Should only happen when tab is brought to front or tab is in front when a reload happens.
+   * This is NOT an API, it's only meant for usage in tests.
    */
-  private void loadEffectivePOM() {
+  public void loadEffectivePOM() {
     if(disposed) {
       return;
     }
