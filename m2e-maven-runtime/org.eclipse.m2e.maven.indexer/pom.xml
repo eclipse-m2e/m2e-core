@@ -22,7 +22,7 @@
 	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
 	<packaging>bundle</packaging>
 
-	<name>M2E Maven/Nexus Indexer Bundle</name>
+	<name>M2E Maven/Nexus Indexer</name>
 
 	<properties>
 		<guava.version>30.1-jre</guava.version>
@@ -92,7 +92,7 @@
 				<configuration>
 					<instructions>
 						<_exportcontents>
-							META-INF.sisu;-noimport:=true,
+							META-INF.sisu;-noimport:=true;x-internal:=true,
 							org.apache.lucene.*;provider=m2e;mandatory:=provider,
 							org.apache.maven.*;provider=m2e;mandatory:=provider,
 						</_exportcontents>

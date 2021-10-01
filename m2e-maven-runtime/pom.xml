@@ -25,6 +25,7 @@
 
 	<properties>
 		<archetype-common.version>2.4</archetype-common.version>
+		<dependency.jars.folder>jars</dependency.jars.folder>
 	</properties>
 
 	<modules>
@@ -103,13 +104,13 @@
 				<plugin>
 					<groupId>org.apache.felix</groupId>
 					<artifactId>maven-bundle-plugin</artifactId>
-					<version>5.1.1</version>
+					<version>5.1.2</version>
 					<extensions>true</extensions>
 					<configuration>
 						<instructions>
 							<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive>
-							<Embed-Directory>jars</Embed-Directory>
+							<Embed-Directory>${dependency.jars.folder}</Embed-Directory>
 
 							<_failok>true</_failok>
 							<_nouses>true</_nouses>
@@ -121,13 +122,11 @@
 							<Bundle-Name>${project.name}</Bundle-Name>
 							<Bundle-Vendor>Eclipse.org - m2e</Bundle-Vendor>
 							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+							<Automatic-Module-Name>${project.artifactId}</Automatic-Module-Name>
 
 							<Import-Package>!*</Import-Package>
 							<Eclipse-BundleShape>dir</Eclipse-BundleShape>
 						</instructions>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-						</archive>
 					</configuration>
 				</plugin>
 			</plugins>

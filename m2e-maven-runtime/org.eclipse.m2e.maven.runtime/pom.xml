@@ -22,7 +22,7 @@
 	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
 	<packaging>bundle</packaging>
 
-	<name>M2E Embedded Maven Runtime Bundle (includes Incubating components)</name>
+	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
@@ -138,8 +138,8 @@
 				<configuration>
 					<instructions>
 						<_exportcontents>
-							META-INF.plexus;-noimport:=true,
-							META-INF.sisu;-noimport:=true,
+							META-INF.plexus;-noimport:=true;x-internal:=true,
+							META-INF.sisu;-noimport:=true;x-internal:=true,
 							org.apache.maven.*;provider=m2e;mandatory:=provider,
 							org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
 							org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
