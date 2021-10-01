@@ -60,7 +60,6 @@
 						<supportedProjectTypes>eclipse-plugin</supportedProjectTypes>
 						<!-- PDE does not honor custom manifest location -->
 						<manifestLocation>META-INF</manifestLocation>
-						<niceManifest>true</niceManifest>
 						<instructions>
 							<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive>
