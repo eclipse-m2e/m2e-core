@@ -22,7 +22,7 @@
 	<version>1.18.1-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
-	<name>Embedded Maven Runtime Bundle</name>
+	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->

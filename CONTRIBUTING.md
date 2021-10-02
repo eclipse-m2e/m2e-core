@@ -39,7 +39,7 @@ Java 11 and Maven 3.6.3 (only if you want to build from the command-line), or ne
 
 ### ⌨️ Setting up the Development Environment automatically, using the Eclipse Installer (Oomph)
 
-[![Create Eclipse Development Environment for m2e](https://img.shields.io/static/v1?logo=eclipseide&label=Create%20Development%20Environment&message=M2E&style=for-the-badge&logoColor=white&labelColor=darkorange&color=gray)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
+[![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
 
 Step by Step guide:
 

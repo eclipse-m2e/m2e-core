@@ -37,7 +37,7 @@
 			This should usually be sync'd with the main feature version. -->
 		<m2e.version>1.18.2</m2e.version>
 
-		<tycho-version>2.4.0</tycho-version>
+		<tycho-version>2.5.0</tycho-version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -114,6 +114,7 @@
 		<module>org.eclipse.m2e.core.ui.tests</module>
 		<module>org.eclipse.m2e.importer.tests</module>
 		<module>org.eclipse.m2e.binaryproject.tests</module>
+		<module>org.eclipse.m2e.editor.tests</module>
 		<module>org.eclipse.m2e.editor.lemminx.tests</module>
 		<module>org.eclipse.m2e.jdt.tests</module>
 		<module>org.eclipse.m2e.editor.xml.sse.tests</module>

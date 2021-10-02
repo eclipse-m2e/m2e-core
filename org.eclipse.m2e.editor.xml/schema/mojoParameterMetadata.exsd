@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.m2e.editor.xml" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.m2e.editor.xml" id="mojoParameterMetadata" name="%extension-point.mojoParameterMetadata.name"/>
+         <meta.schema plugin="org.eclipse.m2e.editor.xml" id="mojoParameterMetadata" name="Mojo Parameter Metadata"/>
       </appInfo>
       <documentation>
          Mojo parameter metadata sources provide plugin configuration options that mirror the corresponding component configurator

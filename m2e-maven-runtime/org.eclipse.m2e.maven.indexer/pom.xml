@@ -22,7 +22,7 @@
 	<version>1.18.1-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
-	<name>Nexus Indexer Bundle</name>
+	<name>M2E Maven/Nexus Indexer</name>
 
 	<properties>
 		<guava.version>30.1-jre</guava.version>

@@ -22,7 +22,7 @@
 	<version>1.18.1-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
-	<name>Maven Archetype Common Bundle</name>
+	<name>M2E Maven Archetype Common</name>
 
 	<dependencies>
 		<dependency>
