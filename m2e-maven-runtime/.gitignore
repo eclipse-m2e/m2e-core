@@ -1,6 +1,4 @@
 .classpath
 .settings/
-*.log
 META-INF/
 jars/
-!**/metadataTemplates/*

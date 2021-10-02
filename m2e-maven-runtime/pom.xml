@@ -95,6 +95,9 @@
 		<profile>
 			<id>generate-osgi-metadata</id>
 			<!-- Generate the OSGi metadata for the Maven-Runtime bundles as described in the co-located README.md -->
+			<properties>
+				<extraClasspathEntries></extraClasspathEntries><!-- child-projects can overwrite, to add their own classpath-entries -->
+			</properties>
 			<build>
 				<pluginManagement>
 					<plugins>
@@ -186,13 +189,12 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>generate-classpath-entires</id>
+								<id>generate-classpath-file</id>
 								<goals>
 									<goal>run</goal>
 								</goals>
 								<phase>generate-sources</phase>
 								<configuration>
-									<exportAntProperties>true</exportAntProperties>
 									<target>
 										<taskdef resource="net/sf/antcontrib/antlib.xml" />
 										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
@@ -200,22 +202,36 @@
 										<if>
 											<equals arg1="${project.packaging}" arg2="pom" /> <!-- only consider children of m2e-maven-runtime project -->
 											<then>
-												<echo message="Skip pom project" />
+												<echo message="Skip creation of .classpath file for pom project" />
 											</then>
 											<else>
-												<!-- create the property 'dependency.jars.lib.entries' that contains the classpath entries for all dependency
-													libs and that is exported from ant to maven and used when the .classpath template files are filtered. -->
-												<var name="dependency.jars.lib.entries" value="" />
+												<echo file="${project.basedir}/.classpath"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="output" path="target/classes"/>
+												]]></echo>
+												<echo message="&#xA;&#x9;${extraClasspathEntries}" file="${project.basedir}/.classpath" append="true" />
 												<for param="jarFile"><!--Ant-contrib tasks already defined in calling script -->
 													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
 													<sequential>
 														<local name="jarFilename" />
 														<basename property="jarFilename" file="@{jarFile}" suffix=".jar" />
-														<local name="lib.entry" />
-														<property name="lib.entry"><![CDATA[<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}.jar"  sourcepath="${dependency.sources.folder}/${jarFilename}-sources.jar"/>]]></property>
-														<var name="dependency.jars.lib.entries" value="${dependency.jars.lib.entries}&#xA;&#x9;${lib.entry}" />
+														<echo message="&#xA;&#x9;" file="${project.basedir}/.classpath" append="true" />
+														<echo file="${project.basedir}/.classpath" append="true"><![CDATA[
+															<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}.jar" sourcepath="${dependency.sources.folder}/${jarFilename}-sources.jar"/>
+														]]></echo>
 													</sequential>
 												</for>
+												<echo message="&#xA;" file="${project.basedir}/.classpath" append="true" />
+												<echo file="${project.basedir}/.classpath" append="true"><![CDATA[</classpath>]]></echo>
+												<echo message="&#xA;" file="${project.basedir}/.classpath" append="true" />
 											</else>
 										</if>
 									</target>
@@ -235,30 +251,6 @@
 								</exclusions>
 							</dependency>
 						</dependencies>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.2.0</version>
-						<executions>
-							<execution>
-								<id>process-metadata-templates</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<resource>
-											<directory>${project.basedir}/${metadata.templates.folder}</directory>
-											<filtering>true</filtering>
-										</resource>
-									</resources>
-									<overwrite>true</overwrite>
-									<outputDirectory>${project.basedir}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
