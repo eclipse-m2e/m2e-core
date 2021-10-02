@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2021 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,25 +13,25 @@
 
 package org.eclipse.m2e.logback.appender;
 
-import org.osgi.framework.Bundle;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-
 
 public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private static final String BUNDLE_ID = "org.eclipse.m2e.logback.appender"; //$NON-NLS-1$
 
+  private static final ILog ECLIPSE_LOG = Platform.getLog(EclipseLogAppender.class);
+
   @Override
   protected void append(ILoggingEvent logEvent) {
-    int severity = 0;
+    int severity;
     switch(logEvent.getLevel().levelInt) {
       case Level.ERROR_INT:
         severity = IStatus.ERROR;
@@ -45,36 +45,18 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
       default:
         return;
     }
-
     IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
-    ILog eclipseLog = Platform.getLog(getSelfBundle());
-    eclipseLog.log(status);
+    ECLIPSE_LOG.log(status);
   }
 
-  private Bundle self;
-
-  private Bundle getSelfBundle() {
-    if(self == null) {
-      self = Platform.getBundle(BUNDLE_ID);
-    }
-    return self;
-  }
-
-  private Throwable getThrowable(ILoggingEvent logEvent) {
+  private static Throwable getThrowable(ILoggingEvent logEvent) {
     if(logEvent.getThrowableProxy() instanceof ThrowableProxy) {
       return ((ThrowableProxy) logEvent.getThrowableProxy()).getThrowable();
     }
-
     Object[] args = logEvent.getArgumentArray();
-    if(args == null || args.length == 0) {
-      return null;
+    if(args != null && args.length > 0 && args[args.length - 1] instanceof Throwable) {
+      return (Throwable) args[args.length - 1];
     }
-
-    Object lastObject = args[args.length - 1];
-    if(lastObject instanceof Throwable) {
-      return (Throwable) lastObject;
-    }
-
     return null;
   }
 }

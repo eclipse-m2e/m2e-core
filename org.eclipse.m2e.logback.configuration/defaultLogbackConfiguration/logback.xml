@@ -38,6 +38,4 @@
     <appender-ref ref="EclipseLog" />
     <appender-ref ref="MavenConsoleLog" />
   </root>
-
-  <logger name="com.ning.http.client" level="INFO" />
 </configuration>
