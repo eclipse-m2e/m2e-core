@@ -22,7 +22,7 @@
 	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
 	<packaging>bundle</packaging>
 
-	<name>Maven Archetype Common Bundle</name>
+	<name>M2E Maven Archetype Common Bundle</name>
 
 	<dependencies>
 		<dependency>

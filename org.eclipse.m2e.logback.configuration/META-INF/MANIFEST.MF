@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
-Bundle-Vendor: %Bundle-Vendor
+Bundle-Name: M2E Logback Configuration
+Bundle-Vendor: Eclipse.org - m2e
 Bundle-SymbolicName: org.eclipse.m2e.logback.configuration;singleton:=true
 Bundle-Version: 1.16.3.qualifier
 Bundle-Activator: org.eclipse.m2e.logback.configuration.LogPlugin
