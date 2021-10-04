@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
+	<version>1.18.1-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
 	<packaging>bundle</packaging>
 
 	<name>M2E SLF4J-Simple Binding for Embedded Maven Runtime</name>
@@ -40,7 +40,7 @@
 
 	<properties>
 		<!-- maven core version -->
-		<slf4j-simple.version>1.7.5</slf4j-simple.version>
+		<slf4j-simple.version>1.7.30</slf4j-simple.version>
 	</properties>
 
 	<dependencies>
