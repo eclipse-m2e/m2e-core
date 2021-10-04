@@ -40,7 +40,7 @@
 
 	<properties>
 		<!-- maven core version -->
-		<slf4j-simple.version>1.7.5</slf4j-simple.version>
+		<slf4j-simple.version>1.7.30</slf4j-simple.version>
 	</properties>
 
 	<dependencies>
