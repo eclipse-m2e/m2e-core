@@ -70,13 +70,13 @@
 		<location includeSource="true" missingManifest="generate" type="Maven">
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>1.18.0-SNAPSHOT</version>
+			<version>1.18.1-SNAPSHOT</version>
 			<type>jar</type>
 		</location>
 		<location includeSource="true" missingManifest="generate" type="Maven">
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-			<version>1.18.0-SNAPSHOT</version>
+			<version>1.18.1-SNAPSHOT</version>
 			<type>jar</type>
 		</location>
 	</locations>
