@@ -26,7 +26,6 @@
 
 	<properties>
 		<guava.version>30.1-jre</guava.version>
-		<extraClasspathEntries><![CDATA[<classpathentry kind="src" path="src/main/java"/>]]></extraClasspathEntries>
 	</properties>
 
 	<dependencies>

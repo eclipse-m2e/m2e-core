@@ -95,9 +95,6 @@
 		<profile>
 			<id>generate-osgi-metadata</id>
 			<!-- Generate the OSGi metadata for the Maven-Runtime bundles as described in the co-located README.md -->
-			<properties>
-				<extraClasspathEntries></extraClasspathEntries><!-- child-projects can overwrite, to add their own classpath-entries -->
-			</properties>
 			<build>
 				<pluginManagement>
 					<plugins>
@@ -214,10 +211,19 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="output" path="target/classes"/>
 												]]></echo>
-												<echo message="&#xA;&#x9;${extraClasspathEntries}" file="${project.basedir}/.classpath" append="true" />
+												<loadproperties srcFile="${project.basedir}/build.properties" prefix="buildProperties." />
+												<!-- Append source-folder entries (projects may contain multiple) -->
+												<for param="sourceFolder" list="${buildProperties.source..}" delimiter="," trim="true">
+													<sequential>
+														<echo message="&#xA;&#x9;" file="${project.basedir}/.classpath" append="true" />
+														<echo file="${project.basedir}/.classpath" append="true"><![CDATA[
+															<classpathentry kind="src" path="@{sourceFolder}"/>
+														]]></echo>
+													</sequential>
+												</for>
+												<!-- Append library-entries (one for each embedded jar) -->
 												<for param="jarFile"><!--Ant-contrib tasks already defined in calling script -->
 													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
 													<sequential>

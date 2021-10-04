@@ -1,6 +1,8 @@
 
 The Maven-Runtime bundles are ordinary Eclipse-Plugins that facilitate Maven to fetch Maven-dependency jars (and their sources) from a Maven-repository
-and to generate corresponding Manifest and .classpath files that include all fetched jars accordingly.
+and to generate corresponding MANIFEST.MF and .classpath files that include all fetched jars accordingly.
+Consequently the content of those files and folders is fully controlled by the project's pom.xml (and its parent) and should only be adjusted via the pom.
+Those files/folders are ignored by git and direct changes are therefore lost upon the next metadata-generation.
 
 Therefore two builds are necessary to build m2e from scratch:
 	1. A pure Maven build (tycho.mode=maven), to fetch all jars and to generate the MANIFEST.MF and .classpath file for each Maven-runtime project.
