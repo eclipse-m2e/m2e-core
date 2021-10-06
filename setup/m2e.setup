@@ -157,7 +157,7 @@
       </sourceLocator>
     </setupTask>
     <setupTask
-        xsi:type="maven:MavenImportTask">
+        xsi:type="projects:ProjectsImportTask">
       <sourceLocator
           rootFolder="${git.clone.m2e.core.location}/m2e-maven-runtime"
           locateNestedProjects="true">
@@ -225,7 +225,7 @@
   </setupTask>
   <setupTask
       xsi:type="launching:LaunchTask"
-      launcher="m2e-maven-runtime--install"
+      launcher="m2e-maven-runtime--generate-OSGi-metadata"
       runEveryStartup="true"/>
   <setupTask
       xsi:type="pde:TargetPlatformTask"
