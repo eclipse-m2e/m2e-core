@@ -23,6 +23,11 @@
 	<packaging>bundle</packaging>
 
 	<name>M2E SLF4J-Simple Binding for Embedded Maven Runtime</name>
+
+	<properties>
+		<slf4j-simple.version>1.7.30</slf4j-simple.version>
+	</properties>
+
 	<description>
   This bundle provides SLF4j implementation and configuration required to run m2e embedded Maven runtime
   in external JVM. This bundle is NOT a general purpose slf4j-simple OSGi bundle, it does NOT export
@@ -37,12 +42,6 @@
   this does not pollute OSGi classpath. Provide-Capability/Require-Capability would be cleaner, but
   I don't know if these are supported bu P2. 
   </description>
-
-	<properties>
-		<!-- maven core version -->
-		<slf4j-simple.version>1.7.30</slf4j-simple.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
