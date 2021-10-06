@@ -24,7 +24,6 @@
 	<name>M2E - Maven runtime bundles</name>
 
 	<properties>
-		<archetype-common.version>2.4</archetype-common.version>
 		<dependency.jars.folder>jars</dependency.jars.folder>
 		<dependency.sources.folder>jars/sources</dependency.sources.folder>
 		<metadata.templates.folder>metadataTemplates</metadata.templates.folder>
@@ -86,6 +85,19 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>3.0.0</version>
+					<dependencies>
+						<dependency>
+							<groupId>ant-contrib</groupId>
+							<artifactId>ant-contrib</artifactId>
+							<version>1.0b3</version>
+							<exclusions>
+								<exclusion>
+									<groupId>ant</groupId>
+									<artifactId>ant</artifactId>
+								</exclusion>
+							</exclusions>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
@@ -257,19 +269,6 @@
 								</configuration>
 							</execution>
 						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>ant-contrib</groupId>
-								<artifactId>ant-contrib</artifactId>
-								<version>1.0b3</version>
-								<exclusions>
-									<exclusion>
-										<groupId>ant</groupId>
-										<artifactId>ant</artifactId>
-									</exclusion>
-								</exclusions>
-							</dependency>
-						</dependencies>
 					</plugin>
 				</plugins>
 			</build>
