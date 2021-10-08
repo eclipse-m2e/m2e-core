@@ -1,8 +1,4 @@
-target/
-.project
 .classpath
 .settings/
-bin/
-*.log
-.DS_Store
 META-INF/
+jars/

@@ -19,8 +19,8 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.archetype.common</artifactId>
-	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
-	<packaging>bundle</packaging>
+	<version>1.18.1-SNAPSHOT</version>
+	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E Maven Archetype Common</name>
 
@@ -88,21 +88,23 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<_exportcontents>
-							META-INF.plexus;-noimport:=true;x-internal:=true,
-							org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
-							org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
-						</_exportcontents>
-						<Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<configuration>
+						<instructions>
+							<_exportcontents>
+								META-INF.plexus;-noimport:=true;x-internal:=true,
+								org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
+								org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
+							</_exportcontents>
+							<Require-Bundle>org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)"</Require-Bundle>
+						</instructions>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

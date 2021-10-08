@@ -18,9 +18,9 @@ pipeline {
 		}
 		stage('Build') {
 			steps {
-				sh 'mvn clean install -f m2e-maven-runtime/pom.xml -B -Peclipse-sign -Dmaven.repo.local=$WORKSPACE/.m2/repository'
+				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata '
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,uts,its -Dmaven.repo.local=$WORKSPACE/.m2/repository -Dtycho.surefire.timeout=7200'
+					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,uts,its -Dtycho.surefire.timeout=7200'
 				}
 			}
 			post {

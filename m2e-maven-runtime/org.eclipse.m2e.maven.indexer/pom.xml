@@ -19,15 +19,14 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-	<version>1.18.0-SNAPSHOT</version><!--Keep it in sync with version in target-platform.target -->
-	<packaging>bundle</packaging>
+	<version>1.18.1-SNAPSHOT</version>
+	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E Maven/Nexus Indexer</name>
 
 	<properties>
 		<maven-indexer.version>6.0.0</maven-indexer.version>
 		<guava.version>30.1-jre</guava.version>
-		<archetype-common.version>2.4</archetype-common.version>
 	</properties>
 
 	<dependencies>
@@ -55,15 +54,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<!-- TODO: this dependency is only required to compile the classes in this module and not at runtime because the org.eclipse.m2e.archetype.common
-				bundle is required by the bundle created from this module. Therefore it can be removed as soon as this bundle is build 
-				in the main m2e maven build -->
-			<groupId>org.apache.maven.archetype</groupId>
-			<artifactId>archetype-common</artifactId>
-			<version>${archetype-common.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
@@ -82,32 +72,39 @@
 				<version>0.3.4</version>
 				<executions>
 					<execution>
+						<?m2e execute onIncremental?>
 						<id>index-project</id>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>index</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}</outputDirectory>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<_exportcontents>
-							META-INF.sisu;-noimport:=true;x-internal:=true,
-							org.apache.lucene.*;provider=m2e;mandatory:=provider,
-							org.apache.maven.*;provider=m2e;mandatory:=provider,
-						</_exportcontents>
-						<Require-Bundle>
-							org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
-							org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
-						</Require-Bundle>
-						<Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
-					</instructions>
-				</configuration>
-			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<configuration>
+						<instructions>
+							<_exportcontents>
+								META-INF.sisu;-noimport:=true;x-internal:=true,
+								org.apache.lucene.*;provider=m2e;mandatory:=provider,
+								org.apache.maven.*;provider=m2e;mandatory:=provider,
+							</_exportcontents>
+							<Require-Bundle>
+								org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",
+								org.eclipse.m2e.archetype.common;bundle-version="[1.18.0,1.19.0)"
+							</Require-Bundle>
+						</instructions>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
