@@ -116,7 +116,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     if(CLASSPATH == null) {
       Set<String> allEntries = new LinkedHashSet<>();
 
-      addBundleClasspathEntries(allEntries, mavenRuntimeBundle);
+      addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
 
       Set<Bundle> bundles = new LinkedHashSet<>();
       // find and add required bundles and bundles providing imported packages
@@ -127,7 +127,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       requiredWires.stream().map(BundleWire::getProvider).map(BundleRevision::getBundle).forEach(bundles::add);
 
       for(Bundle bundle : bundles) {
-        addBundleClasspathEntries(allEntries, bundle);
+        addBundleClasspathEntries(allEntries, bundle, false);
       }
 
       List<String> cp = new ArrayList<>();
@@ -146,10 +146,10 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
+  private void addBundleClasspathEntries(Set<String> entries, Bundle bundle, boolean addFragments) {
     entries.addAll(Bundles.getClasspathEntries(bundle));
-    Bundle[] fragments = Platform.getFragments(bundle);
-    if(fragments != null) {
+    Bundle[] fragments;
+    if(addFragments && (fragments = Platform.getFragments(bundle)) != null) {
       for(Bundle fragment : fragments) {
         entries.addAll(Bundles.getClasspathEntries(fragment));
       }
