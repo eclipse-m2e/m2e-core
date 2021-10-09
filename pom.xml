@@ -38,6 +38,7 @@
 		<m2e.version>1.18.2</m2e.version>
 
 		<tycho-version>2.5.0</tycho-version>
+		<java.version>11</java.version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -156,6 +157,23 @@
 							</restrictTo>
 						</filter>
 					</filters>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -285,6 +303,7 @@
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho-version}</version>
 					<configuration>
+						<release>${java.version}</release>
 						<!-- workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=571363 -->
 						<deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
 					</configuration>

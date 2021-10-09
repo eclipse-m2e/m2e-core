@@ -70,7 +70,7 @@
 							<_snapshot>qualifier</_snapshot>
 
 							<Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
-							<Bundle-RequiredExecutionEnvironment>JavaSE-11</Bundle-RequiredExecutionEnvironment>
+							<Bundle-RequiredExecutionEnvironment>JavaSE-${java.version}</Bundle-RequiredExecutionEnvironment>
 							<Bundle-Name>${project.name}</Bundle-Name>
 							<Bundle-Vendor>Eclipse.org - m2e</Bundle-Vendor>
 							<Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
