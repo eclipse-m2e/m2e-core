@@ -3,10 +3,10 @@
    <description url="http://m2eclipse.sonatype.org/site">
       Maven Integration for Eclipse
    </description>
-   <feature url="features/org.eclipse.m2e.feature_0.0.0.jar" id="org.eclipse.m2e.feature" version="0.0.0">
+   <feature id="org.eclipse.m2e.feature">
       <category name="m2e"/>
    </feature>
-   <feature url="features/org.eclipse.m2e.logback.feature_0.0.0.jar" id="org.eclipse.m2e.logback.feature" version="0.0.0">
+   <feature id="org.eclipse.m2e.logback.feature">
       <category name="m2e"/>
    </feature>
    <feature id="org.eclipse.m2e.lemminx.feature">
@@ -16,6 +16,9 @@
       <category name="m2e"/>
    </feature>
    <feature id="org.eclipse.m2e.pde.feature">
+      <category name="m2e"/>
+   </feature>
+   <feature id="org.eclipse.m2e.sdk.feature">
       <category name="m2e"/>
    </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
