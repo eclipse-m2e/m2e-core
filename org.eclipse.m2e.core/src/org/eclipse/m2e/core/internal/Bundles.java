@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Igor Fedorenko
+ * Copyright (c) 2014, 2021 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
-import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
@@ -73,14 +72,6 @@ public class Bundles {
 
   public static Bundle findDependencyBundle(Bundle bundle, String dependencyId) {
     return findDependencyBundle(bundle, dependencyId, new HashSet<Bundle>());
-  }
-
-  public static ClassLoader getBundleClassloader(Bundle bundle) {
-    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-    if(bundleWiring == null) {
-      return null;
-    }
-    return bundleWiring.getClassLoader();
   }
 
   public static List<String> getClasspathEntries(Bundle bundle) {
@@ -147,37 +138,6 @@ public class Bundles {
 
     log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
     return null;
-  }
-
-  private static Bundle findDependencyBundleByPackage(Bundle bundle, String packageName, Set<Bundle> visited) {
-    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-    if(bundleWiring == null) {
-      return null;
-    }
-    ArrayList<BundleWire> dependencies = new ArrayList<>();
-    dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
-    dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
-    for(BundleWire wire : dependencies) {
-      BundleCapability cap = wire.getCapability();
-      String pkg = (String) cap.getAttributes().get(PackageNamespace.PACKAGE_NAMESPACE);
-      Bundle requiredBundle = wire.getProviderWiring().getBundle();
-      if(requiredBundle != null) {
-        if(packageName.equals(pkg)) {
-          return requiredBundle;
-        }
-        if(visited.add(requiredBundle)) {
-          Bundle required = findDependencyBundleByPackage(requiredBundle, packageName, visited);
-          if(required != null) {
-            return required;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  public static Bundle findDependencyBundleByPackage(Bundle bundle, String packageName) {
-    return findDependencyBundleByPackage(bundle, packageName, new HashSet<Bundle>());
   }
 
 }
