@@ -157,6 +157,8 @@
 								org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",
 								javax.inject;bundle-version="1.0.0";visibility:=reexport
 							</Require-Bundle>
+							<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched
+								Maven-Build-JVM. See MavenEmbeddedRuntime for details. -->
 						</instructions>
 					</configuration>
 				</plugin>
