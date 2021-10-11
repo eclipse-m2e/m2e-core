@@ -10,10 +10,6 @@
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://bndtools.jfrog.io/bndtools/update-latest"/>
-			<unit id="bndtools.main.feature.feature.group" version="0.0.0"/>
-		</location>
-		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="http://download.eclipse.org/egit/updates/"/>
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
@@ -47,10 +43,20 @@
 			<unit id="org.eclipse.license.feature.group" version="0.0.0"/>
 		</location>
 		<location includeSource="true" missingManifest="error" type="Maven">
-			<groupId>io.takari.m2e.workspace</groupId>
-			<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
-			<version>0.3.1</version>
-			<type>jar</type>
+			<dependencies>
+				<dependency>
+					<groupId>biz.aQute.bnd</groupId>
+					<artifactId>biz.aQute.bndlib</artifactId>
+					<version>5.1.2</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>io.takari.m2e.workspace</groupId>
+					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
+					<version>0.3.1</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
 		</location>
 	</locations>
 </target>
