@@ -36,6 +36,8 @@
 			<artifactId>archetype-common</artifactId>
 			<version>${archetype-common.version}</version>
 			<exclusions>
+				<!-- Excluded dependencies are fulfilled via the OSGi requirements specified below as Import-Package/Require-Bundle and
+					therefore don't have to be embedded. -->
 				<exclusion>
 					<!-- there is newer velocity with different groupId that we want -->
 					<artifactId>velocity</artifactId>
@@ -71,21 +73,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Transitive dependencies that are replaced with more recent version -->
 		<dependency>
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>${dom4j.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>${commons-collections.version}</version>
+		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>${commons-collections.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
