@@ -49,5 +49,6 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.repository
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
-Import-Package: org.slf4j;version="1.6.2"
+Import-Package: javax.inject;version="1.0.0",
+ org.slf4j;version="1.6.2"
 Automatic-Module-Name: org.eclipse.m2e.core
