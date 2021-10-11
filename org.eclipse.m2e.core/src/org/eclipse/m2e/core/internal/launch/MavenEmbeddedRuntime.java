@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2021 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,9 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,6 +26,11 @@ import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
+import org.osgi.framework.namespace.BundleNamespace;
+import org.osgi.framework.namespace.PackageNamespace;
+import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,43 +114,26 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private synchronized void initClasspath(Bundle mavenRuntimeBundle) {
     if(CLASSPATH == null) {
-      LinkedHashSet<String> allentries = new LinkedHashSet<>();
+      Set<String> allEntries = new LinkedHashSet<>();
 
-      addBundleClasspathEntries(allentries, mavenRuntimeBundle);
+      addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
 
       Set<Bundle> bundles = new LinkedHashSet<>();
-      // find and add more bundles
-      for(String sname : new String[] {"org.eclipse.m2e.maven.runtime.slf4j.simple", "javax.inject"}) {
-        Bundle dependency = Bundles.findDependencyBundle(mavenRuntimeBundle, sname);
-        if(dependency != null) {
-          bundles.add(dependency);
-        } else {
-          log.warn(
-              "Could not find OSGi bundle with symbolic name ''{}'' required to launch embedded maven runtime in external process",
-              sname);
-        }
-      }
-
-      // find bundles by exported packages
-      for(String pname : new String[] {"org.slf4j", "org.slf4j.helpers", "org.slf4j.spi"}) {
-        Bundle dependency = Bundles.findDependencyBundleByPackage(mavenRuntimeBundle, pname);
-        if(dependency != null) {
-          bundles.add(dependency);
-        } else {
-          log.warn(
-              "Could not find OSGi bundle exporting package ''{}'' required to launch embedded maven runtime in external process",
-              pname);
-        }
-      }
+      // find and add required bundles and bundles providing imported packages
+      List<BundleWire> requiredWires = new ArrayList<>();
+      BundleWiring wiring = mavenRuntimeBundle.adapt(BundleWiring.class);
+      requiredWires.addAll(wiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
+      requiredWires.addAll(wiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
+      requiredWires.stream().map(BundleWire::getProvider).map(BundleRevision::getBundle).forEach(bundles::add);
 
       for(Bundle bundle : bundles) {
-        addBundleClasspathEntries(allentries, bundle);
+        addBundleClasspathEntries(allEntries, bundle, false);
       }
 
       List<String> cp = new ArrayList<>();
       List<String> lcp = new ArrayList<>();
 
-      for(String entry : allentries) {
+      for(String entry : allEntries) {
         if(entry.contains("plexus-classworlds")) { //$NON-NLS-1$
           lcp.add(entry);
         } else {
@@ -159,10 +146,10 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
+  private void addBundleClasspathEntries(Set<String> entries, Bundle bundle, boolean addFragments) {
     entries.addAll(Bundles.getClasspathEntries(bundle));
-    Bundle[] fragments = Platform.getFragments(bundle);
-    if(fragments != null) {
+    Bundle[] fragments;
+    if(addFragments && (fragments = Platform.getFragments(bundle)) != null) {
       for(Bundle fragment : fragments) {
         entries.addAll(Bundles.getClasspathEntries(fragment));
       }
@@ -203,23 +190,22 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       }
 
       if(mavenCoreJarPath == null) {
-        throw new RuntimeException("Could not find maven core jar file");
+        throw new IllegalStateException("Could not find maven core jar file");
       }
 
       Properties pomProperties = new Properties();
 
-      File mavenCoreJar = new File(mavenCoreJarPath);
-      if(mavenCoreJar.isFile()) {
+      Path mavenCoreJar = Path.of(mavenCoreJarPath);
+      if(Files.isRegularFile(mavenCoreJar)) {
         try (ZipFile zip = new ZipFile(mavenCoreJarPath)) {
           ZipEntry zipEntry = zip.getEntry(MAVEN_CORE_POM_PROPERTIES);
           if(zipEntry != null) {
             pomProperties.load(zip.getInputStream(zipEntry));
           }
         }
-      } else if(mavenCoreJar.isDirectory()) {
-        try (InputStream is = new BufferedInputStream(
-            new FileInputStream(new File(mavenCoreJar, MAVEN_CORE_POM_PROPERTIES)))) {
-          pomProperties.load(is);
+      } else if(Files.isDirectory(mavenCoreJar)) {
+        try (Reader r = Files.newBufferedReader(mavenCoreJar.resolve(MAVEN_CORE_POM_PROPERTIES))) {
+          pomProperties.load(r);
         }
       }
 
