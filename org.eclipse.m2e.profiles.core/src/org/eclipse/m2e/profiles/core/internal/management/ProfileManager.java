@@ -14,6 +14,8 @@
 package org.eclipse.m2e.profiles.core.internal.management;
 
 import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,10 +37,12 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -210,19 +214,56 @@ public class ProfileManager implements IProfileManager {
     models.add(projectModel);
     Parent p = projectModel.getParent();
     if(p != null) {
-
-      IMaven maven = MavenPlugin.getMaven();
-
-      List<ArtifactRepository> repositories = new ArrayList<>();
-      repositories.addAll(getProjectRepositories(projectModel));
-      repositories.addAll(maven.getArtifactRepositories());
-
-      Model parentModel = resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), repositories, monitor);
+      Model parentModel = buildParentModel(projectModel, monitor);
       if(parentModel != null) {
         getModelHierarchy(models, parentModel, monitor);
       }
     }
     return models;
+  }
+
+  private Model buildParentModel(Model projectModel, IProgressMonitor monitor) throws CoreException {
+    Model parentModel = buildParentModelViaRelativePath(projectModel);
+
+    if(parentModel != null)
+      return parentModel;
+
+    IMaven maven = MavenPlugin.getMaven();
+    List<ArtifactRepository> repositories = new ArrayList<>();
+    repositories.addAll(getProjectRepositories(projectModel));
+    repositories.addAll(maven.getArtifactRepositories());
+
+    Parent p = projectModel.getParent();
+    return resolvePomModel(p.getGroupId(), p.getArtifactId(), p.getVersion(), repositories, monitor);
+  }
+
+  /**
+   * @param parent The parent to attempt to build a POM model for via it's relative path.
+   * @return the POM model for the parent, or <code>null</code> if this could not be built.
+   */
+  private Model buildParentModelViaRelativePath(Model model) {
+    if(StringUtils.isEmpty(model.getParent().getRelativePath()))
+      return null;
+
+    String pomFileSystemPath = model.getPomFile().getPath();
+    String relativeFileSystemPathToParentPom = ".." + File.separator + model.getParent().getRelativePath();
+
+    try {
+      File parentPomFile = Paths.get(pomFileSystemPath, relativeFileSystemPathToParentPom).toFile().getCanonicalFile();
+      if(parentPomFile.exists()) {
+        MavenXpp3Reader mavenreader = new MavenXpp3Reader();
+        FileReader reader = new FileReader(parentPomFile);
+        final Model parentModel = mavenreader.read(reader);
+        parentModel.setPomFile(parentPomFile);
+        return parentModel;
+      }
+    } catch(Exception e) {
+      MavenProfilesCoreActivator.getDefault().getLog()
+          .error("" + "Error building Maven model for parent POM file with relative path ["
+              + relativeFileSystemPathToParentPom + "] from child POM path [" + pomFileSystemPath + "]", e);
+    }
+
+    return null; // If we have got here then we failed to locate the parent POM file
   }
 
   private List<ArtifactRepository> getProjectRepositories(Model projectModel) {
