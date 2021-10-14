@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.artifact.Artifact;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -119,9 +120,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				scopeLabel = new Label(composite, SWT.NONE);
 				scopeLabel.setText(Messages.MavenTargetLocationWizard_15);
 				scope.add(""); //$NON-NLS-1$
-				scope.add("compile"); //$NON-NLS-1$
-				scope.add("test"); //$NON-NLS-1$
-				scope.add("provided"); //$NON-NLS-1$
+				scope.add(Artifact.SCOPE_COMPILE);
+				scope.add(Artifact.SCOPE_PROVIDED);
+				scope.add(Artifact.SCOPE_TEST);
 				scope.addModifyListener(new ModifyListener() {
 
 					@Override
