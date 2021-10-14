@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<lifecycleMappingMetadata>
-  <lifecycleMappings>
-    <lifecycleMapping>
-      <lifecycleMappingId>no such lifecycle mapping for test-packaging-for-eclipse-extension - referenced from pom</lifecycleMappingId>
-      <packagingType>test-packaging-for-eclipse-extension</packagingType>
-    </lifecycleMapping>
-  </lifecycleMappings>
-</lifecycleMappingMetadata>
