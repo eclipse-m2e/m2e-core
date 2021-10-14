@@ -44,7 +44,7 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
 
   @Test
   public void testUserSelectedProfiles() throws Exception {
-    String pomPath = "projects/embedded-profiles/pom.xml";
+    String pomPath = "resources/projects/embedded-profiles/pom.xml";
     IProject project = importProject(pomPath);
     waitForJobsToComplete();
     assertNotNull(pomPath + " could not be imported", project);
@@ -118,7 +118,7 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
 
   @Test
   public void testDisabledProfiles() throws Exception {
-    String pomPath = "projects/disabled-profiles/pom.xml";
+    String pomPath = "resources/projects/disabled-profiles/pom.xml";
     IProject project = importProject(pomPath);
     waitForJobsToComplete();
     assertNotNull(pomPath + " could not be imported", project);
@@ -155,7 +155,7 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
 
   @Test
   public void testParentFromRemote() throws Exception {
-    String pomPath = "projects/profiles-from-parent/pom.xml";
+    String pomPath = "resources/projects/profiles-from-parent/pom.xml";
     IProject project = importProject(pomPath);
     waitForJobsToComplete();
     assertNotNull(pomPath + " could not be imported", project);
@@ -205,7 +205,7 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
 
   @Test
   public void test441112_InheritParentActiveProfiles() throws Exception {
-    String projectsRoot = "projects/com.mygroup.test.bug.parent";
+    String projectsRoot = "resources/projects/com.mygroup.test.bug.parent";
 
     IProject[] projects = importProjects(projectsRoot, new String[] {"pom.xml", "com.mygroup.test.bug.itest/pom.xml"},
         new ResolverConfiguration());
@@ -243,9 +243,9 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
   public void testLoadingProfilesFromPomsResolvedViaTheirRelativePath() throws Exception {
     // -- Given...
     //
-    importProject("projects/relative-path-profiles/poms/parent-pom/pom.xml");
-    importProject("projects/relative-path-profiles/poms/classification-poms/api-classifier-pom/pom.xml");
-    String pomPath = "projects/relative-path-profiles/modules/module-a/pom.xml";
+    importProject("resources/projects/relative-path-profiles/poms/parent-pom/pom.xml");
+    importProject("resources/projects/relative-path-profiles/poms/classification-poms/api-classifier-pom/pom.xml");
+    String pomPath = "resources/projects/relative-path-profiles/modules/module-a/pom.xml";
     IProject project = importProject(pomPath);
     waitForJobsToComplete();
     assertNotNull(pomPath + " could not be imported", project);
