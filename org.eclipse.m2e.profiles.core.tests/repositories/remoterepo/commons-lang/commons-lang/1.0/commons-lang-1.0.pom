@@ -1,0 +1,90 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>commons-lang</groupId>
+  <artifactId>commons-lang</artifactId>
+  <name>Lang</name>
+  <version>1.0</version>
+  <description>Commons.Lang, a package of Java utility classes for the
+    classes that are in java.lang's hierarchy, or are considered to be so
+    standard as to justify existence in java.lang.</description>
+  <inceptionYear>2001</inceptionYear>
+  <developers>
+    <developer>
+      <id>dlr</id>
+      <name>Daniel Rall</name>
+      <email>dlr@finemaltcoding.com</email>
+      <organization>CollabNet, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>scolebourne</id>
+      <name>Stephen Colebourne</name>
+      <email>scolebourne@joda.org</email>
+      <organization>SITA ATS Ltd</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>bayard</id>
+      <name>Henri Yandell</name>
+      <email>bayard@generationjava.com</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id></id>
+      <name>Steven Caswell</name>
+      <email>steven@caswell.name</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Ringo De Smet</name>
+      <email>ringods@yahoo.co.uk</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Steve Downey</name>
+      <email>steve.downey@netfolio.com</email>
+      <organization></organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*TestCase.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/Abstract*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.7</version>
+    </dependency>
+  </dependencies>
+</project>

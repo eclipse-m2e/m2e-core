@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.mygroup</groupId>
+	<artifactId>com.mygroup.test.bug.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<profiles>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInsideEclipse</id>
+			<activation>
+				<file>
+					<exists>.itests</exists>
+				</file>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInParent</id>
+			<activation>
+				<file>
+					<exists>.itests</exists>
+				</file>
+				<property>
+					<name>!missing.framework</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInParentWithoutProperty</id>
+			<activation>
+				<property>
+					<name>missing.framework</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInParentWithPropertyNegation</id>
+			<activation>
+				<property>
+					<name>!missing.framework</name>
+				</property>
+			</activation>
+		</profile>
+	</profiles>
+	<modules>
+		<module>com.mygroup.test.bug.itest</module>
+	</modules>
+</project>

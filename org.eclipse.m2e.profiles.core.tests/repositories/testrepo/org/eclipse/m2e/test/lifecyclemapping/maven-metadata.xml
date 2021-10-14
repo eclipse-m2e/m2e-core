@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>test-lifecyclemapping-plugin</name>
+      <prefix>test-lifecyclemapping</prefix>
+      <artifactId>test-lifecyclemapping-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>test-buildhelper-plugin</name>
+      <prefix>test-buildhelper</prefix>
+      <artifactId>test-buildhelper-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>test-embeddedmapping-plugin</name>
+      <prefix>test-embeddedmapping</prefix>
+      <artifactId>test-embeddedmapping-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

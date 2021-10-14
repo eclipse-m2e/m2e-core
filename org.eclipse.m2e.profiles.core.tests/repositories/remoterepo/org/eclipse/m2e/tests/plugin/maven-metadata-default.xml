@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>test-buildcontext-plugin Maven Plugin</name>
+      <prefix>test-buildcontext</prefix>
+      <artifactId>test-buildcontext-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

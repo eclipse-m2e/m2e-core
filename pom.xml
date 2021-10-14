@@ -118,6 +118,7 @@
 		<module>org.eclipse.m2e.editor.lemminx.tests</module>
 		<module>org.eclipse.m2e.jdt.tests</module>
 		<module>org.eclipse.m2e.editor.xml.sse.tests</module>
+		<module>org.eclipse.m2e.profiles.core.tests</module>
 	</modules>
 
 	<build>

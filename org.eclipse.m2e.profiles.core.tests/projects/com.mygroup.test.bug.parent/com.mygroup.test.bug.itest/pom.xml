@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.mygroup</groupId>
+		<artifactId>com.mygroup.test.bug.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>com.mygroup.test.bug.itest</artifactId>
+
+	<profiles>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInChildPOM</id>
+			<activation>
+				<file>
+					<exists>.itests</exists>
+				</file>
+
+			</activation>
+		</profile>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInChildWithoutProperty</id>
+			<activation>
+				<property>
+					<name>missing.framework</name>
+				</property>
+			</activation>
+		</profile>
+		<profile>
+			<id>whenIsIntegrationTestsProjectInChildWithPropertyNegation</id>
+			<activation>
+				<property>
+					<name>!missing.framework</name>
+				</property>
+			</activation>
+		</profile>	</profiles>	
+</project>

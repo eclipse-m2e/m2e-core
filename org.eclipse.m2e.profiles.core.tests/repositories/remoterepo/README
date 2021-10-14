@@ -1,0 +1,5 @@
+org/apache/maven/archetypes/maven-archetype-quickstart requires maven-metadata.xml
+to be able to resolve RELEASE version.
+
+log4j/log4j/1.2.13 and junit/junit/3.8.1 need *.sha1, which are used in indexer-based
+source lookup tests. All other sha1/md5 should be removed.

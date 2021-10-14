@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>mngeclipse-2110</name>
+      <prefix>mngeclipse-2110</prefix>
+      <artifactId>mngeclipse-2110</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.eclipse.m2e.test.registrymanager.t005</groupId>
+  <artifactId>t005-p4</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20110212050207</lastUpdated>
+  </versioning>
+</metadata>

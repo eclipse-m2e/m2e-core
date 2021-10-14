@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e.test</groupId>
+    <artifactId>m2e-test-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../m2e-test-parent</relativePath>
+  </parent>
+
+  <groupId>testLifecycleMappingMetadata</groupId>
+  <artifactId>testLifecycleMappingMetadata-parent</artifactId>
+  <version>0.0.1</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>LifecycleMappingMetadataPrioritiesTest</module>
+    <module>PluginExecutionMetadataPrioritiesTest</module>
+    <module>testLifecycleMappingMetadata1</module>
+    <module>testLifecycleMappingMetadata2-0.0.1</module>
+    <module>testLifecycleMappingMetadata2-0.0.2</module>
+    <module>testLifecycleMappingSpecifiedInMetadata</module>
+    <module>testMojoExecutionConfigurator</module>
+    <module>testMojoExecutionExecute</module>
+    <module>testMojoExecutionIgnore</module>
+  </modules>
+</project>

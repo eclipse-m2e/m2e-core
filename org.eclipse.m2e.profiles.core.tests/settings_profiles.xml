@@ -1,0 +1,47 @@
+<settings>
+  <localRepository>target/localrepo</localRepository>
+
+  <profiles>
+    <profile>
+      <id>activebydefault-settings-profile</id>
+      <activation><activeByDefault>true</activeByDefault></activation>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>file:repositories/remoterepo</url>
+          <snapshots><enabled>true</enabled></snapshots>
+          <releases><enabled>true</enabled></releases>
+		  <updatePolicy>true</updatePolicy>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>file:repositories/remoterepo</url>
+          <snapshots><enabled>true</enabled></snapshots>
+          <releases><enabled>true</enabled></releases>
+        </pluginRepository>
+      </pluginRepositories>      
+    </profile>
+    <profile>
+      <id>inactive-settings-profile</id>
+    </profile>
+    <profile>
+      <id>active-settings-profile</id>
+      <repositories>
+      	<repository>
+        	<id>testrepo</id>
+       		<url>file:repositories/testrepo</url>
+       		<snapshots><enabled>true</enabled></snapshots>
+       		<releases><enabled>true</enabled></releases>
+			<updatePolicy>true</updatePolicy>
+     	</repository>
+      </repositories>      
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>active-settings-profile</activeProfile>
+  </activeProfiles>
+
+</settings>

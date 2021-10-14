@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.archetypes</groupId>
+  <artifactId>maven-archetype-quickstart</artifactId>
+  <versioning>
+    <latest>1.1</latest>
+    <release>1.1</release>
+    <versions>
+      <version>1.1</version>
+    </versions>
+    <lastUpdated>20100501173945</lastUpdated>
+  </versioning>
+</metadata>

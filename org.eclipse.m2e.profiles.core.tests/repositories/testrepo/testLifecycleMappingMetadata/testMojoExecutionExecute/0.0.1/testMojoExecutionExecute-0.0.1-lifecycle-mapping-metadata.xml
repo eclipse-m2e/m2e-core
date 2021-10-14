@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+  <pluginExecutions>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <goals>
+          <goal>java</goal>
+        </goals>
+        <versionRange>[1.0,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <execute />
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
+</lifecycleMappingMetadata>

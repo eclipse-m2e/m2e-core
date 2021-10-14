@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e.test.registrymanager</groupId>
+    <artifactId>registrymanager-parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>org.eclipse.m2e.test.registrymanager.t021_dependencyVersionRange</groupId>
+  <artifactId>t021-p2</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
+</project>

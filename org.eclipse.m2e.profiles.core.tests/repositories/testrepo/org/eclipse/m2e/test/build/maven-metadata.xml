@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>422106_legacyPlexusUtils-plugin</name>
+      <prefix>422106_legacyPlexusUtils</prefix>
+      <artifactId>422106_legacyPlexusUtils-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>438454_guicescopes-plugin</name>
+      <prefix>438454_guicescopes</prefix>
+      <artifactId>438454_guicescopes-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

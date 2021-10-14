@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e.test</groupId>
+    <artifactId>m2e-test-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../m2e-test-parent</relativePath>
+  </parent>
+
+  <groupId>org.eclipse.m2e.test.registrymanager</groupId>
+  <artifactId>registrymanager-parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>t005-p2</module>
+    <module>t005-p4</module>
+    <module>t006-p2</module>
+    <module>t021_dependencyVersionRange-p2</module>
+  </modules>
+</project>
