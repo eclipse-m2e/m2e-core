@@ -7,7 +7,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>com.mygroup.test.bug.itest</artifactId>
-
+    <packaging>pom</packaging>
+    
 	<profiles>
 		<profile>
 			<id>whenIsIntegrationTestsProjectInChildPOM</id>

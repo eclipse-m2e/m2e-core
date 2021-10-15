@@ -243,16 +243,19 @@ public class ProfileManager implements IProfileManager {
    * @return the POM model for the parent, or <code>null</code> if this could not be built.
    */
   private Model buildParentModelViaRelativePath(Model model) {
-    if(StringUtils.isEmpty(model.getParent().getRelativePath())) {
-      return null;
-    }
-
     if(model.getPomFile() == null) {
       return null;
     }
 
+    String relativePath;
+    if(StringUtils.isEmpty(model.getParent().getRelativePath())) {
+      relativePath = ".." + File.separator + "pom.xml";
+    } else {
+      relativePath = model.getParent().getRelativePath();
+    }
+    String relativeFileSystemPathToParentPom = ".." + File.separator + relativePath;
+
     String pomFileSystemPath = model.getPomFile().getPath();
-    String relativeFileSystemPathToParentPom = ".." + File.separator + model.getParent().getRelativePath();
 
     try {
       File parentPomFile = Paths.get(pomFileSystemPath, relativeFileSystemPathToParentPom).toFile().getCanonicalFile();

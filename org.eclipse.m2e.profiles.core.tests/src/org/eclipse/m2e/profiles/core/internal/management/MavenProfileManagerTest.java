@@ -205,15 +205,11 @@ public class MavenProfileManagerTest extends AbstractMavenProfileTest {
 
   @Test
   public void test441112_InheritParentActiveProfiles() throws Exception {
-    String projectsRoot = "resources/projects/com.mygroup.test.bug.parent";
-
-    IProject[] projects = importProjects(projectsRoot, new String[] {"pom.xml", "com.mygroup.test.bug.itest/pom.xml"},
-        new ResolverConfiguration());
+	importProject("resources/projects/com.mygroup.test.bug.parent/pom.xml");
+	IProject project = importProject("resources/projects/com.mygroup.test.bug.parent/com.mygroup.test.bug.itest/pom.xml");
     waitForJobsToComplete();
-    assertNotNull(projectsRoot + " could not be imported", projects);
-    assertEquals(2, projects.length);
 
-    IMavenProjectFacade facade = getFacade(projects[1]);
+    IMavenProjectFacade facade = getFacade(project);
     List<ProfileData> profiles = profileManager.getProfileDatas(facade, monitor);
     assertEquals(profiles.toString(), 7 /*from projects*/+ 3 /*from settings*/, profiles.size());
     for(ProfileData p : profiles) {
