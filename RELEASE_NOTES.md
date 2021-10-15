@@ -4,8 +4,8 @@
 
 ## 1.18.2
 
-* 📅 Release Date: ~September 2021
-* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.1...1.18.2
+* 📅 Release Date: October 15th 2021
+* All changes: 
 
 #### the m2e-pde editor now supports adding more than one dependency per target location:
 
@@ -70,6 +70,10 @@ With upgrade to newer LemMinX-Maven, the edition of pom.xml with the Generic Edi
 Extract jpms arguments (--add-exports,--add-opens,--add-reads,--patch-module) from the maven-compiler-plugin compiler arguments if any.
 Dispatch the arguments in the right container (if the target module is part of JRE then in JreContainer else in M2eContainer) and
 transform them into eclipse classpath attributes (add-exports, add-opens, add-reads, patch-module)
+
+#### Improved m2e development workflow
+
+Many improvements happened in m2e to facilitate the setup and maintenance of the development environment. See details in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Older releases
 
