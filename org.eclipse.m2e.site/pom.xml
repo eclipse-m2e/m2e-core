@@ -63,7 +63,6 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-p2-repository-plugin</artifactId>
-						<version>${tycho-version}</version>
 						<executions>
 							<execution>
 								<id>update</id>
