@@ -26,7 +26,6 @@
 	<properties>
 		<dependency.jars.folder>jars</dependency.jars.folder>
 		<dependency.sources.folder>jars/sources</dependency.sources.folder>
-		<metadata.templates.folder>metadataTemplates</metadata.templates.folder>
 	</properties>
 
 	<modules>
@@ -84,7 +83,6 @@
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-packaging-plugin</artifactId>
-					<version>${tycho-version}</version>
 					<configuration>
 						<jgit.ignore>
 							.project
@@ -109,7 +107,6 @@
 						<plugin>
 							<groupId>org.eclipse.tycho</groupId>
 							<artifactId>tycho-packaging-plugin</artifactId>
-							<version>${tycho-version}</version>
 							<executions>
 								<execution>
 									<id>default-build-qualifier</id>
@@ -176,8 +173,6 @@
 					<plugin>
 						<groupId>org.apache.felix</groupId>
 						<artifactId>maven-bundle-plugin</artifactId>
-						<configuration>
-						</configuration>
 						<executions>
 							<execution>
 								<id>generate-manifest</id>
