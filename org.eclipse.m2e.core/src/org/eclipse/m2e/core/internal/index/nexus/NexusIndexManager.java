@@ -535,20 +535,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       IndexingContext context = getIndexingContext(repository);
       if(context != null) {
         // context.purge();  // TODO: use this again as soon as maven-indexer 6.1.0 is available
-
         // --- Workaround for https://issues.apache.org/jira/browse/MINDEXER-127, which got visible in m2e through https://github.com/eclipse-m2e/m2e-core/issues/169 ---
-
-        // Perform all calls from DefaultIndexingContext.purge() except for openAndWarmup() :
-        // calls DefaultIndexingContext.closeReaders()  and  DefaultIndexingContext.deleteIndexFiles( true )
-        getIndexer().removeIndexingContext(context, true);
-        // create a copy of the current index which calls prepareIndex( true )
-        context = getIndexer().addIndexingContextForced(context.getId(), context.getRepositoryId(),
-            context.getRepository(), context.getIndexDirectoryFile(), context.getRepositoryUrl(),
-            context.getIndexUpdateUrl(), context.getIndexCreators());
-
-        context.rebuildGroups();
-        context.updateTimestamp(true, null);
-        // ---  workaround end ---
+        context = contextPurgeWorkaroundMINDEXER127(context);
 
         if(context.getRepository().isDirectory()) {
           getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor), false);
@@ -564,6 +552,25 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     }
   }
 
+  /**
+   * Purge context, subsitute for <code>context.purge()</code> Workaround for
+   * https://issues.apache.org/jira/browse/MINDEXER-127, which got visible in m2e through
+   * https://github.com/eclipse-m2e/m2e-core/issues/169 ---
+   */
+  private IndexingContext contextPurgeWorkaroundMINDEXER127(IndexingContext context) throws IOException {
+    // Perform all calls from DefaultIndexingContext.purge() except for openAndWarmup() :
+    // calls DefaultIndexingContext.closeReaders()  and  DefaultIndexingContext.deleteIndexFiles( true )
+    getIndexer().removeIndexingContext(context, true);
+    // create a copy of the current index which calls prepareIndex( true )
+    context = getIndexer().addIndexingContextForced(context.getId(), context.getRepositoryId(),
+        context.getRepository(), context.getIndexDirectoryFile(), context.getRepositoryUrl(),
+        context.getIndexUpdateUrl(), context.getIndexCreators());
+
+    context.rebuildGroups();
+    context.updateTimestamp(true, null);
+    return context;
+  }
+
   private void reindexWorkspace(boolean force) throws CoreException {
     IRepository workspaceRepository = repositoryRegistry.getWorkspaceRepository();
     if(!force)
@@ -571,7 +578,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     try {
       IndexingContext context = getIndexingContext(workspaceRepository);
       if(context != null) {
-        context.purge();
+        // context.purge();
+        contextPurgeWorkaroundMINDEXER127(context);
       }
 
       for(IMavenProjectFacade facade : projectManager.getProjects()) {
