@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.sdk.feature"
       label="%featureName"
-      version="1.18.3.qualifier"
+      version="1.19.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -18,6 +18,26 @@
    <license url="%licenseURL">
       %license
    </license>
+
+   <includes
+         id="org.eclipse.m2e.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.lemminx.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.logback.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.pde.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.sse.ui.feature"
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.tests.common"
@@ -168,6 +188,41 @@
 
    <plugin
          id="org.eclipse.m2e.importer.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="biz.aQute.bndlib.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2e.editor.lemminx.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2e.pde.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2e.pde.ui.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2e.workspace.cli.source"
          download-size="0"
          install-size="0"
          version="0.0.0"

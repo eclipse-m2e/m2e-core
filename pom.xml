@@ -274,6 +274,7 @@
 								<url>https://download.eclipse.org/technology/m2e/snapshots/latest/</url>
 							</repository>
 						</baselineRepositories>
+						<baselineReplace>common</baselineReplace>
 					</configuration>
 				</plugin>
 				<plugin>
