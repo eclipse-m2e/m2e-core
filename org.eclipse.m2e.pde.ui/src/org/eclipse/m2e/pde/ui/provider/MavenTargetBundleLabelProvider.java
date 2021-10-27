@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -12,23 +12,23 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.provider;
 
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.m2e.pde.MavenTargetBundle;
 import org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
-@SuppressWarnings("restriction")
-public class MavenTargetBundleLabelProvider
-		extends org.eclipse.pde.internal.ui.shared.target.StyledBundleLabelProvider {
+public class MavenTargetBundleLabelProvider extends LabelProvider {
 
 	private Image image;
 
-	public MavenTargetBundleLabelProvider() {
-		super(true, false);
+	@Override
+	public String getText(Object element) {
+		return null;
 	}
 
 	@Override
-	public org.eclipse.swt.graphics.Image getImage(Object element) {
+	public Image getImage(Object element) {
 		if (element instanceof MavenTargetBundle) {
 			if (((MavenTargetBundle) element).isWrapped()) {
 				Display current = Display.getCurrent();
@@ -39,7 +39,7 @@ public class MavenTargetBundleLabelProvider
 				return image;
 			}
 		}
-		return super.getImage(element);
+		return null;
 	}
 
 	@Override
