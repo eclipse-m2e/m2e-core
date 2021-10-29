@@ -19,6 +19,7 @@ package org.eclipse.m2e.pde.ui.editor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,6 +55,7 @@ import org.eclipse.ui.PlatformUI;
 //derived from org.eclipse.pde.internal.ui.wizards.feature.PluginListPage
 @SuppressWarnings("restriction")
 public class PluginListPage extends BasePluginListPage {
+
 	class PluginContentProvider implements ITreeContentProvider {
 		@Override
 		public Object[] getElements(Object parent) {
@@ -101,6 +103,7 @@ public class PluginListPage extends BasePluginListPage {
 	private CheckboxTreeViewer pluginViewer;
 	private static final String S_INIT_LAUNCH = "initLaunch"; //$NON-NLS-1$
 	private MavenTargetLocation targetLocation;
+	private Map<String, String> id2version = new HashMap<>();
 
 	public PluginListPage(MavenTargetLocation targetLocation) {
 		super("pluginListPage"); //$NON-NLS-1$
@@ -147,10 +150,15 @@ public class PluginListPage extends BasePluginListPage {
 				CachedCheckboxTreeViewer treeViewer = treePart.getTreeViewer();
 				for (TreeItem item : items) {
 					IPluginModelBase model = (IPluginModelBase) item.getData();
-					List<IFeaturePlugin> list = map.getOrDefault(model.getPluginBase().getId(),
-							Collections.emptyList());
+					String id = model.getPluginBase().getId();
+					List<IFeaturePlugin> list = map.getOrDefault(id, Collections.emptyList());
 					if (list.size() > 0) {
 						treeViewer.setChecked(model, true);
+						String definedVersions = list.stream().map(fp -> fp.getVersion())
+								.filter(v -> !ICoreConstants.DEFAULT_VERSION.equals(v)).findAny().orElse(null);
+						if (definedVersions != null) {
+							id2version.put(id, definedVersions);
+						}
 					}
 				}
 			}
@@ -167,7 +175,7 @@ public class PluginListPage extends BasePluginListPage {
 			IPluginBase plugin = ((IPluginModelBase) selected[i]).getPluginBase();
 			FeaturePlugin fplugin = (FeaturePlugin) featureModel.getFactory().createPlugin();
 			fplugin.loadFrom(plugin);
-			fplugin.setVersion(ICoreConstants.DEFAULT_VERSION);
+			fplugin.setVersion(id2version.getOrDefault(plugin.getId(), ICoreConstants.DEFAULT_VERSION));
 			fplugin.setUnpack(CoreUtility.guessUnpack(plugin.getPluginModel().getBundleDescription()));
 			added[i] = fplugin;
 		}
