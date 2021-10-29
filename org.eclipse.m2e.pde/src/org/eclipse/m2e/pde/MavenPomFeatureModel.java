@@ -145,7 +145,7 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 	@Override
 	public IFeature getFeature() {
 		if (feature == null) {
-			Feature f = new MavenFeature(this);
+			Feature f = new MavenPomFeature(this);
 			this.feature = f;
 		}
 		return feature;

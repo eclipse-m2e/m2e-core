@@ -4,6 +4,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.m2e.pde.ui.editor.messages"; //$NON-NLS-1$
+	public static String NewFeatureWizard_PlugPage_desc;
+	public static String NewFeatureWizard_PlugPage_title;
 	public static String MavenArtifactInstructionsWizard_0;
 	public static String MavenArtifactInstructionsWizard_1;
 	public static String MavenArtifactInstructionsWizard_2;
@@ -20,6 +22,7 @@ public class Messages extends NLS {
 	public static String MavenTargetDependencyEditor_5;
 	public static String MavenTargetDependencyEditor_6;
 	public static String MavenTargetLocationWizard_8;
+	public static String MavenTargetLocationWizard_13;
 	public static String MavenTargetLocationWizard_9;
 	public static String MavenTargetLocationWizard_10;
 	public static String MavenTargetLocationWizard_11;

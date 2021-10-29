@@ -12,6 +12,10 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
+import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.aether.RepositoryException;
@@ -59,6 +64,9 @@ import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
+import org.eclipse.pde.internal.core.feature.WorkspaceFeatureModel;
+import org.eclipse.pde.internal.core.ifeature.IFeature;
+import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 
 @SuppressWarnings("restriction")
@@ -77,6 +85,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_REPOSITORY_ID = "id";
 	public static final String ELEMENT_REPOSITORY_URL = "url";
 	public static final String ELEMENT_REPOSITORIES = "repositories";
+	public static final String ELEMENT_FEATURE = "feature";
 
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
@@ -99,11 +108,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final boolean includeSource;
 	private final List<MavenTargetDependency> roots;
 	private final List<MavenTargetRepository> extraRepositories;
+	private final IFeature featureTemplate;
 
 	public MavenTargetLocation(Collection<MavenTargetDependency> rootDependecies,
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
 			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
-			Collection<String> excludes) {
+			Collection<String> excludes, IFeature featureTemplate) {
+		this.featureTemplate = featureTemplate;
 		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
@@ -307,7 +318,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 
 		return new MavenTargetLocation(latest, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructionsMap.values(), excludedArtifacts);
+				instructionsMap.values(), excludedArtifacts, featureTemplate);
 
 	}
 
@@ -317,7 +328,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
 		return new MavenTargetLocation(roots, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructions, excludedArtifacts);
+				instructions, excludedArtifacts, featureTemplate);
+	}
+
+	public IFeature getFeatureTemplate() {
+		return featureTemplate;
 	}
 
 	public BNDInstructions getInstructions(Artifact artifact) {
@@ -408,6 +423,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
 		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
 		xml.append(">");
+		if (featureTemplate != null) {
+			try (PrintWriter writer = new PrintWriter(new StringBuilderWriter(xml))) {
+				featureTemplate.write("", writer);
+				writer.flush();
+			}
+		}
 		if (!roots.isEmpty()) {
 			xml.append("<" + ELEMENT_DEPENDENCIES + ">");
 			roots.stream().sorted(Comparator.comparing(MavenTargetDependency::getKey)).forEach(dependency -> {
@@ -445,7 +466,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			element(xml, ELEMENT_EXCLUDED, ignored);
 		});
 		xml.append("</location>");
-		return xml.toString();
+		String string = xml.toString();
+		return string;
 	}
 
 	private static void element(StringBuilder xml, String name, String value) {
@@ -536,6 +558,21 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public Collection<BNDInstructions> getInstructions() {
 		return Collections.unmodifiableCollection(instructionsMap.values());
+	}
+
+	public static IFeatureModel copyFeature(IFeature feature) throws CoreException {
+		if (feature == null) {
+			return null;
+		}
+		StringWriter stringWriter = new StringWriter();
+		try (PrintWriter writer = new PrintWriter(stringWriter)) {
+			feature.write("", writer);
+			writer.flush();
+		}
+		WorkspaceFeatureModel model = new WorkspaceFeatureModel();
+		model.load(new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8)), false);
+		model.setLoaded(true);
+		return model;
 	}
 
 }

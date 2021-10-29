@@ -10,23 +10,52 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.m2e.pde;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.pde.internal.core.NLResourceHelper;
+import org.eclipse.pde.internal.core.feature.AbstractFeatureModel;
 import org.eclipse.pde.internal.core.feature.Feature;
+import org.w3c.dom.Node;
 
 @SuppressWarnings("restriction")
-class MavenFeature extends Feature {
+public class DomXmlFeature extends Feature {
 
-	private static final long serialVersionUID = 1L;
-
-	MavenFeature(MavenPomFeatureModel model) {
+	public DomXmlFeature(Node node) {
+		DomXmlFeatureModel model = new DomXmlFeatureModel();
 		setModel(model);
+		parse(node);
+		model.setEditable(false);
 	}
 
 	@Override
 	public boolean isValid() {
 		return hasRequiredAttributes();
+	}
+
+	private static final class DomXmlFeatureModel extends AbstractFeatureModel {
+
+		private boolean editable = true;
+
+		@Override
+		public void load() throws CoreException {
+
+		}
+
+		public void setEditable(boolean editable) {
+			this.editable = editable;
+		}
+
+		@Override
+		protected NLResourceHelper createNLResourceHelper() {
+			return null;
+		}
+
+		@Override
+		public boolean isEditable() {
+			return editable;
+		}
+
 	}
 
 }
