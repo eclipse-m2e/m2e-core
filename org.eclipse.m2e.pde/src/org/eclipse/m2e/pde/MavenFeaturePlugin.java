@@ -14,14 +14,16 @@ package org.eclipse.m2e.pde;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
+import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.internal.core.feature.FeaturePlugin;
+import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 
 @SuppressWarnings("restriction")
 class MavenFeaturePlugin extends FeaturePlugin {
 
 	private static final long serialVersionUID = -4864755319910409580L;
 
-	MavenFeaturePlugin(MavenTargetBundle child, MavenPomFeatureModel featureModel) throws CoreException {
+	MavenFeaturePlugin(TargetBundle child, IFeatureModel featureModel) throws CoreException {
 		setModel(featureModel);
 		BundleInfo bundleInfo = child.getBundleInfo();
 		setId(bundleInfo.getSymbolicName());

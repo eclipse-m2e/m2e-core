@@ -12,10 +12,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
-import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,6 +52,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -64,14 +62,14 @@ import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
-import org.eclipse.pde.internal.core.feature.WorkspaceFeatureModel;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
-import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
+import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	private static final String SOURCE_SUFFIX = ".source";
 	public static final String ELEMENT_CLASSIFIER = "classifier";
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_VERSION = "version";
@@ -155,6 +153,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 				resolveDependency(root, maven, repositories, bundles, cacheManager, subMonitor.split(100));
 			}
+			if (featureTemplate != null) {
+				generateFeature(bundles, false);
+				if (includeSource) {
+					generateFeature(bundles, true);
+				}
+			}
 			Iterator<IModel> iterator = bundles.features.stream().map(tf -> tf.getFeatureModel()).iterator();
 			while (iterator.hasNext()) {
 				IModel model = iterator.next();
@@ -166,6 +170,40 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			targetBundles = bundles;
 		}
 		return Optional.ofNullable(targetBundles);
+	}
+
+	private void generateFeature(TargetBundles bundles, boolean source) throws CoreException {
+		Predicate<TargetBundle> bundleFilter = TargetBundle::isSourceBundle;
+		TemplateFeatureModel featureModel = new TemplateFeatureModel(featureTemplate);
+		featureModel.load();
+		IFeature feature = featureModel.getFeature();
+		if (source) {
+			feature.setId(feature.getId() + SOURCE_SUFFIX);
+			String label = feature.getLabel();
+			if (label != null && !label.isBlank()) {
+				feature.setLabel(label + " (source)");
+			}
+			for (IFeaturePlugin plugin : feature.getPlugins()) {
+				if (!plugin.getId().endsWith(SOURCE_SUFFIX)) {
+					feature.removePlugins(new IFeaturePlugin[] { plugin });
+				}
+			}
+		} else {
+			bundleFilter = Predicate.not(bundleFilter);
+		}
+		Iterator<TargetBundle> featurePlugins = bundles.bundles.entrySet().stream() //
+				.filter(e -> !isExcluded(e.getKey()) && !isIgnored(e.getKey()))//
+				.map(Entry::getValue)//
+				.filter(bundleFilter)//
+				.sorted(Comparator.comparing(TargetBundle::getBundleInfo,
+						Comparator.comparing(BundleInfo::getSymbolicName)))
+				.iterator();
+		while (featurePlugins.hasNext()) {
+			TargetBundle targetBundle = featurePlugins.next();
+			feature.addPlugins(new IFeaturePlugin[] { new MavenFeaturePlugin(targetBundle, featureModel) });
+		}
+		featureModel.makeReadOnly();
+		bundles.features.add(new MavenTargetFeature(featureModel));
 	}
 
 	public List<MavenTargetRepository> getExtraRepositories() {
@@ -236,8 +274,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven,
 			TargetBundles targetBundles) {
 		if (isPomType(artifact)) {
-			MavenArtifactTargetFeature feature = new MavenArtifactTargetFeature(
-					new MavenPomFeatureModel(artifact, targetBundles));
+			MavenTargetFeature feature = new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles));
 			targetBundles.features.add(feature);
 			return;
 		}
@@ -558,21 +595,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public Collection<BNDInstructions> getInstructions() {
 		return Collections.unmodifiableCollection(instructionsMap.values());
-	}
-
-	public static IFeatureModel copyFeature(IFeature feature) throws CoreException {
-		if (feature == null) {
-			return null;
-		}
-		StringWriter stringWriter = new StringWriter();
-		try (PrintWriter writer = new PrintWriter(stringWriter)) {
-			feature.write("", writer);
-			writer.flush();
-		}
-		WorkspaceFeatureModel model = new WorkspaceFeatureModel();
-		model.load(new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8)), false);
-		model.setLoaded(true);
-		return model;
 	}
 
 }

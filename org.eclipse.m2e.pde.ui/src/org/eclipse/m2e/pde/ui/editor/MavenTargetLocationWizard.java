@@ -34,12 +34,11 @@ import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.MavenTargetRepository;
 import org.eclipse.m2e.pde.MissingMetadataMode;
+import org.eclipse.m2e.pde.TemplateFeatureModel;
 import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
-import org.eclipse.pde.internal.core.feature.WorkspaceFeatureModel;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
-import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -273,7 +272,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		Collection<String> excludes;
 		boolean iscreate = targetLocation == null;
 		boolean createFeature = this.createFeature.getSelection();
-		IFeatureModel featureModel = null;
+		TemplateFeatureModel featureModel = null;
 		if (iscreate) {
 			excludes = Collections.emptyList();
 			if (bndInstructions == null) {
@@ -296,7 +295,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			IFeature featureTemplate = targetLocation.getFeatureTemplate();
 			if (featureTemplate != null) {
 				try {
-					featureModel = MavenTargetLocation.copyFeature(featureTemplate);
+					featureModel = new TemplateFeatureModel(featureTemplate);
+					featureModel.load();
 				} catch (CoreException e) {
 					Platform.getLog(MavenTargetLocationWizard.class).log(e.getStatus());
 				}
@@ -304,7 +304,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		}
 		if (createFeature) {
 			if (featureModel == null) {
-				featureModel = new WorkspaceFeatureModel();
+				featureModel = new TemplateFeatureModel(null);
 			}
 			try {
 				featureSpecPage.update(featureModel, iscreate);
@@ -313,10 +313,12 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				Platform.getLog(Activator.class).log(e.getStatus());
 				e.printStackTrace();
 			}
+			featureModel.makeReadOnly();
 		}
+		IFeature f = createFeature ? featureModel.getFeature() : null;
 		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(), repositoryList,
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
-				includeSource.getSelection(), list, excludes, createFeature ? featureModel.getFeature() : null);
+				includeSource.getSelection(), list, excludes, f);
 		if (iscreate) {
 			targetLocation = location;
 		} else {

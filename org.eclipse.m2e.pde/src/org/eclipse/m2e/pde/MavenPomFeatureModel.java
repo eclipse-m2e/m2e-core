@@ -151,4 +151,19 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 		return feature;
 	}
 
+	private static final class MavenPomFeature extends Feature {
+
+		private static final long serialVersionUID = 1L;
+
+		MavenPomFeature(MavenPomFeatureModel model) {
+			setModel(model);
+		}
+
+		@Override
+		public boolean isValid() {
+			return hasRequiredAttributes();
+		}
+
+	}
+
 }
