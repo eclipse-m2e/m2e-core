@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2e.editor.lemminx.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
@@ -135,7 +134,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 				if (markers.length == 0) {
 					return false;
 				}
-				return ((String)markers[0].getAttribute(IMarker.MESSAGE, "")).contains("packaging");
+				return markers[0].getAttribute(IMarker.MESSAGE, "").contains("packaging");
 			} catch (CoreException e) {
 				return false;
 			}
