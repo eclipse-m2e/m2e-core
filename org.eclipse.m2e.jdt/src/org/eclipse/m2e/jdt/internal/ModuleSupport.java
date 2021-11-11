@@ -600,11 +600,11 @@ public class ModuleSupport {
     // @formatter:off
     AddExports("--add-exports", IClasspathAttribute.ADD_EXPORTS,
         Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddExports(v),
-        (a) -> a.getAddExports()),
+        JpmsArgs::getAddExports),
 
     AddOpens("--add-opens", IClasspathAttribute.ADD_OPENS,
         Pattern.compile("^(([A-Za-z0-9\\.$_]*)/[A-Za-z0-9\\.$_]*=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddOpens(v),
-        (a) -> a.getAddOpens()),
+        JpmsArgs::getAddOpens),
 
 //    AddModules("--add-modules", IClasspathAttribute."add-modules", //Not supported 
 //        Pattern.compile("^(()[A-Za-z0-9\\.$_\\-,]*)$"),
@@ -613,10 +613,10 @@ public class ModuleSupport {
 
     AddReads("--add-reads", IClasspathAttribute.ADD_READS,
         Pattern.compile("^(([A-Za-z0-9\\.$_]*)=[A-Za-z0-9\\.$_-]*)$"), (a, v) -> a.toAddReads(v),
-        (a) -> a.getAddReads()),
+        JpmsArgs::getAddReads),
 
     PatchModule("--patch-module", IClasspathAttribute.PATCH_MODULE, Pattern.compile("^(([A-Za-z0-9\\.$_]*)=.*)$"), // maybe .* for jar name is too permissive
-        (a, v) -> a.toPatchModule(v), (a) -> a.getPatchModule());
+        (a, v) -> a.toPatchModule(v), JpmsArgs::getPatchModule);
     // @formatter:on
 
     private String argumentName;
