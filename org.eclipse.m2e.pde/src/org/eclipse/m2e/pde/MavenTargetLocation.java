@@ -103,7 +103,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
 			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
 			Collection<String> excludes) {
-		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
+		this.roots = new ArrayList<>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
@@ -142,9 +142,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 			targetBundles = bundles;
 		}
-		TargetBundle[] bundles = targetBundles.bundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
+		return targetBundles.bundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
 				.map(Entry::getValue).toArray(TargetBundle[]::new);
-		return bundles;
 	}
 
 	public List<MavenTargetRepository> getExtraRepositories() {
@@ -240,7 +239,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
 
-		List<MavenTargetDependency> latest = new ArrayList<MavenTargetDependency>();
+		List<MavenTargetDependency> latest = new ArrayList<>();
 		int updated = 0;
 		for (MavenTargetDependency dependency : roots) {
 			Artifact artifact = new DefaultArtifact(
@@ -417,9 +416,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					xml.append(instructions);
 					xml.append("\r\n]]></" + ELEMENT_INSTRUCTIONS + ">");
 				});
-		excludedArtifacts.stream().sorted().forEach(ignored -> {
-			element(xml, ELEMENT_EXCLUDED, ignored);
-		});
+		excludedArtifacts.stream().sorted().forEach(ignored -> element(xml, ELEMENT_EXCLUDED, ignored));
 		xml.append("</location>");
 		return xml.toString();
 	}

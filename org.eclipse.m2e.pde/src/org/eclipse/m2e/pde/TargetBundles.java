@@ -24,6 +24,6 @@ import org.eclipse.pde.core.target.TargetBundle;
  * represents a resolved set of {@link Artifact} -> {@link TargetBundle}
  */
 class TargetBundles {
-	final Map<Artifact, TargetBundle> bundles = new HashMap<Artifact, TargetBundle>();
+	final Map<Artifact, TargetBundle> bundles = new HashMap<>();
 	final Set<Artifact> ignoredArtifacts = new HashSet<>();
 }
