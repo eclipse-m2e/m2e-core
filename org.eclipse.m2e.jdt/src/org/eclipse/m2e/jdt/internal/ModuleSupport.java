@@ -434,7 +434,7 @@ public class ModuleSupport {
 
   private static List<String> getRootModules(IJavaProject javaProject, IClasspathEntry entry) {
 
-    Set<String> result = new HashSet<String>();
+    Set<String> result = new HashSet<>();
 
     try {
       for(IClasspathEntry entry2 : javaProject.getResolvedClasspath(false)) {
@@ -454,7 +454,7 @@ public class ModuleSupport {
         }
       }
 
-      return new ArrayList<String>(result);
+      return new ArrayList<>(result);
     } catch(JavaModelException ex) {
       log.error(ex.getMessage(), ex);
       return Collections.emptyList();
