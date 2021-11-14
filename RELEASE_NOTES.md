@@ -2,10 +2,21 @@
 
 ### Next release
 
+## 1.19.0
+
+* 📅 Release Date: Nov or Dec 2021
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.2...master
+
+#### Generic Editor with LemMinX-Maven used as default source editor
+
+The legacy WTP-based pom editor is not included by default anymore. The LemMinX-Maven based editor is now referenced by default from the main feature, but as optional, so it can still be uninstalled, and the legacy editor can be manually installed instead.
+
+The new editor brings more powerful pom.xml understanding and edition features; and evolves much faster than the WTP-based one.
+
 ## 1.18.2
 
 * 📅 Release Date: October 15th 2021
-* All changes: 
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.1...1.18.2
 
 #### the m2e-pde editor now supports adding more than one dependency per target location:
 
