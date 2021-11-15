@@ -5,16 +5,14 @@ Bundle-SymbolicName: org.eclipse.m2e.editor.lemminx;singleton:=true
 Bundle-Version: 1.18.3.qualifier
 Automatic-Module-Name: org.eclipse.m2e.xmlls.extension
 Import-Package: org.eclipse.core.runtime;version="3.5.0",
- org.eclipse.m2e.core,
- org.eclipse.m2e.core.internal,
+ org.osgi.framework;version="1.10.0",
  org.slf4j;version="1.7.2"
-Require-Bundle: org.eclipse.m2e.maven.runtime,
- org.eclipse.osgi,
+Require-Bundle: javax.inject,
  org.eclipse.wildwebdeveloper.xml;bundle-version="[0.13.1,0.14.0)",
- org.eclipse.ui.genericeditor;bundle-version="1.1",
  org.eclipse.lsp4e;bundle-version="0.13.7",
  org.eclipse.lsp4j;bundle-version="0.9.0",
  org.eclipse.m2e.core,
- org.eclipse.equinox.common
+ org.eclipse.m2e.maven.runtime,
+ org.eclipse.m2e.maven.indexer
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: Eclipse.org - m2e
