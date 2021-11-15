@@ -25,30 +25,8 @@
 	<packaging>eclipse-plugin</packaging>
 	<version>1.18.3-SNAPSHOT</version>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven.indexer</groupId>
-			<artifactId>indexer-core</artifactId>
-			<version>6.0.0</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${basedir}</directory>
-							<includes>
-								<include>lemminx-maven*.jar</include>
-								<include>indexer-jars/*.jar</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -71,31 +49,6 @@
 										Git timestamp qualifier + Baseline replacement will ignore the change -->
 								</artifactItem>
 							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<?m2e execute onConfiguration?>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<phase>generate-sources</phase>
-						<configuration>
-							<outputDirectory>${basedir}</outputDirectory>
-							<attach>false</attach>
-							<formats>
-								<format>dir</format>
-							</formats>
-							<descriptors>
-								<descriptor>build-indexer-jars.xml</descriptor>
-							</descriptors>
-							<finalName>indexer-jars</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<classifier></classifier>
 						</configuration>
 					</execution>
 				</executions>
