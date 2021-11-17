@@ -46,7 +46,7 @@ pipeline {
 								mkdir -p ${1}"
 							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
-						M2E_VERSION=$(<"org.eclipse.m2e.sdk.feature/target/m2.version")
+						M2E_VERSION=$(<"org.eclipse.m2e.sdk.feature/target/m2e.version")
 						SNAPSHOT_VERSIONED_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest
 						SNAPSHOT_LATEST_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 
