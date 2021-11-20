@@ -13,11 +13,11 @@
 
 package org.eclipse.m2e.internal.launch;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +30,7 @@ import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
+import org.eclipse.m2e.workspace.WorkspaceState;
 
 
 /**
@@ -39,6 +40,9 @@ import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
  */
 @SuppressWarnings("restriction")
 public class MavenLaunchUtils {
+
+  private MavenLaunchUtils() { // static use only
+  }
 
   public static AbstractMavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
     MavenRuntimeManagerImpl runtimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
@@ -52,36 +56,17 @@ public class MavenLaunchUtils {
   }
 
   public static List<String> getCliResolver(AbstractMavenRuntime runtime) {
-    String resolverBundleId;
-    String runtimeVersion = runtime.getVersion();
-    if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
-      resolverBundleId = "org.eclipse.m2e.workspace.cli"; //$NON-NLS-1$
-    } else {
-      return Collections.emptyList(); // unsupported version of maven
+    if(runtime.getVersion().startsWith("3.")) { //$NON-NLS-1$
+      Bundle m2eWorkspaceCLIBundle = FrameworkUtil.getBundle(WorkspaceState.class);
+      return Bundles.getClasspathEntries(m2eWorkspaceCLIBundle);
     }
-    Bundle resolver = Bundles.findDependencyBundle(MavenLaunchPlugin.getDefault().getBundle(), resolverBundleId);
-    return Bundles.getClasspathEntries(resolver);
+    return Collections.emptyList(); // unsupported version of maven
   }
 
   /**
    * @since 1.4
    */
   public static String quote(String string) {
-    return string.indexOf(' ') > -1 ? "\"" + string + "\"" : string; //$NON-NLS-1$ //$NON-NLS-2$
+    return string.contains(" ") ? "\"" + string + "\"" : string; //$NON-NLS-1$ //$NON-NLS-2$
   }
-
-  /**
-   * @since 1.4
-   */
-  public static String toPath(List<String> cp) {
-    StringBuilder sb = new StringBuilder();
-    for(String cpe : cp) {
-      if(sb.length() > 0) {
-        sb.append(File.pathSeparator);
-      }
-      sb.append(cpe);
-    }
-    return sb.toString();
-  }
-
 }
