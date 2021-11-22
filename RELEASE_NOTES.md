@@ -4,8 +4,8 @@
 
 ## 1.19.0
 
-* 📅 Release Date: Nov or Dec 2021
-* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.2...master
+* 📅 Release Date: November 22nd 2021
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.2...1.19.0
 
 #### Generic Editor with LemMinX-Maven used as default source editor
 
