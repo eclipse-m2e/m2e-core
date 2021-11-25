@@ -851,9 +851,7 @@ public class LifecycleMappingFactory {
         maven.detachFromSession(project); // don't cache maven session
       }
 
-      // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
-      //      each instance takes ~1M, so we can easily save 100M+ of heap for larger workspaces
-      project = maven.resolveParentProject(project, monitor);
+      project = project.getParent();
     } while(project != null);
 
     return sources;
