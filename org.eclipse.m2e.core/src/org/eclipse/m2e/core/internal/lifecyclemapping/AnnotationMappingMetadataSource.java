@@ -170,9 +170,14 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
   }
 
   private static List<PI> parsePIs(MavenProject project) {
-
-    File pom = project.getFile();
     InputSource source = project.getModel().getLocation(SELF).getSource();
+    File pom = project.getFile();
+    if((pom == null || !pom.isFile()) && source.getLocation() != null) {
+      pom = new File(source.getLocation());
+    }
+    if(pom == null || !pom.isFile()) {
+      return List.of();
+    }
 
     List<PI> pis = new ArrayList<>();
 

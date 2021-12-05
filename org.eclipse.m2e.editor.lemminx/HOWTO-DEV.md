@@ -2,13 +2,19 @@
 
 This document gathers answers to main questions about technical process to troubleshot or improve m2e and lemminx-maven integration
 
+## How to try a different build of lemminx-maven while developing m2e
+
+In your development IDE, make sure the org.eclipse.m2e.editor.lemminx plugin is part of the workspace and can be resolved and built normally (no error marker). Then simply add/replace the `lemminx-maven.jar` file in its root with the particular lemminx-maven jar you're willing to work with. Then running as Eclipse Application will use the new jar for lemminx-maven.
+
+Note that this process needs to be performed after any Maven build: running `mvn verify` will restore the maven-lemminx.jar to the version that's defined in the pom.xml, overriding your changes.
+
 ## How to build m2e master with the latest builds from lemminx-maven
 
 `mvn install` to install maven-lemminx then `mvn verify` on m2e-core does a nice part of the job for testing *from the IDE*.
 Unfortunately, it's currently a bit more complex for the Tycho build because of Git-based qualifiers and baseline replacement replacing the newly built bundle (which contains local lemminx-maven jar) by the baseline one because they have the exact same version. To avoid this replacement and get the latest lemminx-maven cascading to a newer org.eclipse.m2e.editor.lemminx bundle and so on, you need to make an extra commit somewhere under the `org.eclipse.m2e.editor.lemminx` bundle. In Eclipse Platform, there is usually a file named `forceQualifierUpdate.txt` that's committed and updated whenever we want to enforce usage of local build vs baseline.
 (From https://github.com/eclipse/lemminx-maven/issues/43#issuecomment-622462629)
 
-## How can I debug the LemMinX-Maven instance and m2e at the same time
+## How can I debug Eclipse IDE with m2e and the LemMinX-Maven instance it's using, at the same time
 
 0. You need Eclipse Plugin Development Environment installed in your IDE.
 1. Get the code of lemminx-maven in your workspace, in a version that matches the one in org.eclipse.m2e.editor.lemminx. You can see the version of lemminx-maven in the pom.xml of this module.

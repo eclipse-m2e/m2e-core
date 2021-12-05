@@ -2,9 +2,20 @@
 
 ### Next release
 
+## 1.19.0
+
+* 📅 Release Date: November 22nd 2021
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.2...1.19.0
+
+#### Generic Editor with LemMinX-Maven used as default source editor
+
+The legacy WTP-based pom editor is not included by default anymore. The LemMinX-Maven based editor is now referenced by default from the main feature, but as optional, so it can still be uninstalled, and the legacy editor can be manually installed instead.
+
+The new editor brings more powerful pom.xml understanding and edition features; and evolves much faster than the WTP-based one.
+
 ## 1.18.2
 
-* 📅 Release Date: ~September 2021
+* 📅 Release Date: October 15th 2021
 * All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.18.1...1.18.2
 
 #### the m2e-pde editor now supports adding more than one dependency per target location:
@@ -70,6 +81,10 @@ With upgrade to newer LemMinX-Maven, the edition of pom.xml with the Generic Edi
 Extract jpms arguments (--add-exports,--add-opens,--add-reads,--patch-module) from the maven-compiler-plugin compiler arguments if any.
 Dispatch the arguments in the right container (if the target module is part of JRE then in JreContainer else in M2eContainer) and
 transform them into eclipse classpath attributes (add-exports, add-opens, add-reads, patch-module)
+
+#### Improved m2e development workflow
+
+Many improvements happened in m2e to facilitate the setup and maintenance of the development environment. See details in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Older releases
 

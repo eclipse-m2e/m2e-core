@@ -82,24 +82,6 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.0.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>ant-contrib</groupId>
-							<artifactId>ant-contrib</artifactId>
-							<version>1.0b3</version>
-							<exclusions>
-								<exclusion>
-									<groupId>ant</groupId>
-									<artifactId>ant</artifactId>
-								</exclusion>
-							</exclusions>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-packaging-plugin</artifactId>
 					<version>${tycho-version}</version>

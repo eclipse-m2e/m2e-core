@@ -32,7 +32,7 @@ import aQute.bnd.version.Version;
  * represents a resolved set of {@link Artifact} -> {@link TargetBundle}
  */
 class TargetBundles {
-	final Map<Artifact, TargetBundle> bundles = new HashMap<Artifact, TargetBundle>();
+	final Map<Artifact, TargetBundle> bundles = new HashMap<>();
 	final Set<Artifact> ignoredArtifacts = new HashSet<>();
 	final List<TargetFeature> features = new ArrayList<>();
 	final Map<MavenTargetDependency, List<DependencyNode>> dependencyNodes = new HashMap<>();
