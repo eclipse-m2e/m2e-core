@@ -308,7 +308,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   @Override
   public String getNotCoveredMojoExecutionSeverity() {
     return preferenceStore.get(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB,
-        ProblemSeverity.error.toString(), preferencesLookup);
+        ProblemSeverity.warning.toString(), preferencesLookup);
   }
 
   /**
