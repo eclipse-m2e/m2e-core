@@ -156,7 +156,7 @@ public class WorkspaceHelpers {
     });
     for(IMarker marker : project.findMarkers(null /* all markers */, true /* subtypes */, IResource.DEPTH_INFINITE)) {
       int severity = marker.getAttribute(IMarker.SEVERITY, 0);
-      if(severity != targetSeverity) {
+      if(targetSeverity >= 0 && severity != targetSeverity) {
         continue;
       }
       if(withAttribute != null) {
