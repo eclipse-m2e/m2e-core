@@ -2,6 +2,24 @@
 
 ### Next release
 
+#### the m2e-pde editor now supports generation of a feature from a location:
+
+In the wizzard it is now possible to request generation of a feature
+
+![grafik](https://user-images.githubusercontent.com/1331477/139412713-e0218ff7-642c-4c19-afac-55fca49ef325.png)
+
+If the option is checked the wizzard contains a new page to enter basic infos
+
+![grafik](https://user-images.githubusercontent.com/1331477/139412847-5268aaae-de32-472c-b30e-44a8e88728cd.png)
+
+If one likes he can add additional plugins as well that should be mentioned in the feature (but this step is optional)
+
+![grafik](https://user-images.githubusercontent.com/1331477/139413014-ff0463e2-cd89-41c4-89dd-fe4402be05b2.png)
+
+Afterwards this will end up in the target source and one can add/edit/adjust additional data, effectivly everything the feature.xml supports is allowed here:
+
+![grafik](https://user-images.githubusercontent.com/1331477/139413236-f04d9b5f-54a5-4240-b83f-86167c7519b2.png)
+
 ## 1.19.0
 
 * 📅 Release Date: November 22nd 2021
