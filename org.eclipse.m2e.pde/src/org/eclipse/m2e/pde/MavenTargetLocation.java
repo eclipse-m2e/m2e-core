@@ -12,20 +12,23 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.aether.RepositoryException;
@@ -49,19 +52,24 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
+import org.eclipse.pde.internal.core.ifeature.IFeature;
+import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	private static final String SOURCE_SUFFIX = ".source";
 	public static final String ELEMENT_CLASSIFIER = "classifier";
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_VERSION = "version";
@@ -75,6 +83,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_REPOSITORY_ID = "id";
 	public static final String ELEMENT_REPOSITORY_URL = "url";
 	public static final String ELEMENT_REPOSITORIES = "repositories";
+	public static final String ELEMENT_FEATURE = "feature";
 
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
@@ -90,7 +99,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
 	private TargetBundles targetBundles;
-	private final Map<MavenTargetDependency, List<DependencyNode>> dependencyNodes = new ConcurrentHashMap<>();
 
 	private final Set<String> excludedArtifacts = new HashSet<>();
 	private final Set<Artifact> failedArtifacts = new HashSet<>();
@@ -98,12 +106,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final boolean includeSource;
 	private final List<MavenTargetDependency> roots;
 	private final List<MavenTargetRepository> extraRepositories;
+	private final IFeature featureTemplate;
 
 	public MavenTargetLocation(Collection<MavenTargetDependency> rootDependecies,
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
 			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
-			Collection<String> excludes) {
-		this.roots = new ArrayList<>(rootDependecies);
+			Collection<String> excludes, IFeature featureTemplate) {
+		this.featureTemplate = featureTemplate;
+		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
@@ -120,7 +130,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	@Override
 	protected TargetBundle[] resolveBundles(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
-		if (targetBundles == null) {
+		return resolveArtifacts(definition, monitor).stream().flatMap(tb -> tb.bundles.entrySet().stream())
+				.filter(e -> !isExcluded(e.getKey())).map(Entry::getValue).toArray(TargetBundle[]::new);
+	}
+
+	private synchronized Optional<TargetBundles> resolveArtifacts(ITargetDefinition definition,
+			IProgressMonitor monitor) throws CoreException {
+		if (targetBundles == null && definition != null) {
 			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			TargetBundles bundles = new TargetBundles();
 			IMaven maven = MavenPlugin.getMaven();
@@ -137,26 +153,71 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 				resolveDependency(root, maven, repositories, bundles, cacheManager, subMonitor.split(100));
 			}
+			if (featureTemplate != null) {
+				generateFeature(bundles, false);
+				if (includeSource) {
+					generateFeature(bundles, true);
+				}
+			}
+			Iterator<IModel> iterator = bundles.features.stream().map(tf -> tf.getFeatureModel()).iterator();
+			while (iterator.hasNext()) {
+				IModel model = iterator.next();
+				model.load();
+			}
 			if (subMonitor.isCanceled()) {
-				return new TargetBundle[0];
+				return Optional.empty();
 			}
 			targetBundles = bundles;
 		}
-		return targetBundles.bundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
-				.map(Entry::getValue).toArray(TargetBundle[]::new);
+		return Optional.ofNullable(targetBundles);
+	}
+
+	private void generateFeature(TargetBundles bundles, boolean source) throws CoreException {
+		Predicate<TargetBundle> bundleFilter = TargetBundle::isSourceBundle;
+		TemplateFeatureModel featureModel = new TemplateFeatureModel(featureTemplate);
+		featureModel.load();
+		IFeature feature = featureModel.getFeature();
+		if (source) {
+			feature.setId(feature.getId() + SOURCE_SUFFIX);
+			String label = feature.getLabel();
+			if (label != null && !label.isBlank()) {
+				feature.setLabel(label + " (source)");
+			}
+			for (IFeaturePlugin plugin : feature.getPlugins()) {
+				if (!plugin.getId().endsWith(SOURCE_SUFFIX)) {
+					feature.removePlugins(new IFeaturePlugin[] { plugin });
+				}
+			}
+		} else {
+			bundleFilter = Predicate.not(bundleFilter);
+		}
+		Iterator<TargetBundle> featurePlugins = bundles.bundles.entrySet().stream() //
+				.filter(e -> !isExcluded(e.getKey()) && !isIgnored(e.getKey()))//
+				.map(Entry::getValue)//
+				.filter(bundleFilter)//
+				.sorted(Comparator.comparing(TargetBundle::getBundleInfo,
+						Comparator.comparing(BundleInfo::getSymbolicName)))
+				.iterator();
+		while (featurePlugins.hasNext()) {
+			TargetBundle targetBundle = featurePlugins.next();
+			feature.addPlugins(new IFeaturePlugin[] { new MavenFeaturePlugin(targetBundle, featureModel) });
+		}
+		featureModel.makeReadOnly();
+		bundles.features.add(new MavenTargetFeature(featureModel));
 	}
 
 	public List<MavenTargetRepository> getExtraRepositories() {
 		return extraRepositories;
 	}
 
-	private void resolveDependency(MavenTargetDependency root, IMaven maven, List<ArtifactRepository> repositories,
+	private Artifact resolveDependency(MavenTargetDependency root, IMaven maven, List<ArtifactRepository> repositories,
 			TargetBundles targetBundles, CacheManager cacheManager, IProgressMonitor monitor) throws CoreException {
 		Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(root.getGroupId(), root.getArtifactId(),
 				root.getVersion(), root.getType(), root.getClassifier(), repositories, monitor));
 		if (artifact != null) {
-			boolean isPomType = POM_PACKAGE_TYPE.equals(artifact.getExtension());
-			if (isPomType || (dependencyScope != null && !dependencyScope.isBlank())) {
+			boolean isPomType = isPomType(artifact);
+			boolean fetchTransitive = dependencyScope != null && !dependencyScope.isBlank();
+			if (isPomType || fetchTransitive) {
 				IMavenExecutionContext context = maven.createExecutionContext();
 				PreorderNodeListGenerator dependecies = context.execute(new ICallable<PreorderNodeListGenerator>() {
 
@@ -175,6 +236,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 							node.setData(DEPENDENCYNODE_ROOT, root);
 							DependencyRequest dependencyRequest = new DependencyRequest();
 							dependencyRequest.setRoot(node);
+							dependencyRequest
+									.setFilter(new MavenTargetDependencyFilter(fetchTransitive, dependencyScope));
 							repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
 							PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 							node.accept(nlg);
@@ -189,22 +252,30 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 						}
 					}
 				}, monitor);
-
 				for (Artifact a : dependecies.getArtifacts(true)) {
+					if (a.getFile() == null) {
+						// this is a filtered dependency
+						continue;
+					}
 					addBundleForArtifact(a, cacheManager, maven, targetBundles);
 				}
-				dependencyNodes.put(root, dependecies.getNodes());
+				targetBundles.dependencyNodes.put(root, dependecies.getNodes());
 			} else {
 				addBundleForArtifact(artifact, cacheManager, maven, targetBundles);
 			}
 		}
+		return artifact;
+	}
+
+	private boolean isPomType(Artifact artifact) {
+		return POM_PACKAGE_TYPE.equals(artifact.getExtension());
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven,
 			TargetBundles targetBundles) {
-		if (POM_PACKAGE_TYPE.equals(artifact.getExtension())) {
-			// pom typed artifacts are not for bundeling --> TODO we should generate a
-			// feature from them!
+		if (isPomType(artifact)) {
+			MavenTargetFeature feature = new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles));
+			targetBundles.features.add(feature);
 			return;
 		}
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
@@ -239,7 +310,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
 
-		List<MavenTargetDependency> latest = new ArrayList<>();
+		List<MavenTargetDependency> latest = new ArrayList<MavenTargetDependency>();
 		int updated = 0;
 		for (MavenTargetDependency dependency : roots) {
 			Artifact artifact = new DefaultArtifact(
@@ -284,7 +355,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 
 		return new MavenTargetLocation(latest, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructionsMap.values(), excludedArtifacts);
+				instructionsMap.values(), excludedArtifacts, featureTemplate);
 
 	}
 
@@ -294,7 +365,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
 		return new MavenTargetLocation(roots, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructions, excludedArtifacts);
+				instructions, excludedArtifacts, featureTemplate);
+	}
+
+	public IFeature getFeatureTemplate() {
+		return featureTemplate;
 	}
 
 	public BNDInstructions getInstructions(Artifact artifact) {
@@ -327,15 +402,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	List<DependencyNode> getDependencyNodes(MavenTargetDependency dependency) {
-		return dependencyNodes.get(dependency);
+		TargetBundles bundles = targetBundles;
+		if (bundles == null) {
+			return Collections.emptyList();
+		}
+		return bundles.dependencyNodes.get(dependency);
 	}
 
 	@Override
 	protected TargetFeature[] resolveFeatures(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
-		// XXX it would be possible to deploy features as maven artifacts, are there any
-		// examples?
-		return new TargetFeature[] {};
+		return resolveArtifacts(definition, monitor).stream().flatMap(tb -> tb.features.stream())
+				.toArray(TargetFeature[]::new);
 	}
 
 	@Override
@@ -350,7 +428,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(roots, dependencyNodes, dependencyScope, failedArtifacts, metadataMode);
+		return Objects.hash(roots, dependencyScope, failedArtifacts, metadataMode);
 	}
 
 	@Override
@@ -365,8 +443,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return false;
 		}
 		MavenTargetLocation other = (MavenTargetLocation) obj;
-		return Objects.equals(roots, other.roots) && Objects.equals(dependencyNodes, other.dependencyNodes)
-				&& Objects.equals(dependencyScope, other.dependencyScope)
+		return Objects.equals(roots, other.roots) && Objects.equals(dependencyScope, other.dependencyScope)
 				&& Objects.equals(failedArtifacts, other.failedArtifacts);
 	}
 
@@ -383,6 +460,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
 		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
 		xml.append(">");
+		if (featureTemplate != null) {
+			try (PrintWriter writer = new PrintWriter(new StringBuilderWriter(xml))) {
+				featureTemplate.write("", writer);
+				writer.flush();
+			}
+		}
 		if (!roots.isEmpty()) {
 			xml.append("<" + ELEMENT_DEPENDENCIES + ">");
 			roots.stream().sorted(Comparator.comparing(MavenTargetDependency::getKey)).forEach(dependency -> {
@@ -416,9 +499,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					xml.append(instructions);
 					xml.append("\r\n]]></" + ELEMENT_INSTRUCTIONS + ">");
 				});
-		excludedArtifacts.stream().sorted().forEach(ignored -> element(xml, ELEMENT_EXCLUDED, ignored));
+		excludedArtifacts.stream().sorted().forEach(ignored -> {
+			element(xml, ELEMENT_EXCLUDED, ignored);
+		});
 		xml.append("</location>");
-		return xml.toString();
+		String string = xml.toString();
+		return string;
 	}
 
 	private static void element(StringBuilder xml, String name, String value) {
@@ -452,7 +538,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public void refresh() {
-		dependencyNodes.clear();
 		targetBundles = null;
 		clearResolutionStatus();
 	}
@@ -491,22 +576,15 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public MavenTargetBundle getMavenTargetBundle(Artifact artifact) {
 		TargetBundles bundles = targetBundles;
 		if (bundles != null) {
-			TargetBundle targetBundle = bundles.bundles.get(artifact);
-			if (targetBundle instanceof MavenTargetBundle) {
-				return (MavenTargetBundle) targetBundle;
-			}
+			return bundles.getTargetBundle(artifact).orElse(null);
 		}
 		return null;
 	}
 
 	public MavenTargetBundle getMavenTargetBundle(MavenTargetDependency dependency) {
-		List<DependencyNode> list = dependencyNodes.get(dependency);
-		if (list != null) {
-			for (DependencyNode node : list) {
-				if (node.getData().get(DEPENDENCYNODE_ROOT) == dependency) {
-					return getMavenTargetBundle(node.getArtifact());
-				}
-			}
+		TargetBundles bundles = targetBundles;
+		if (bundles != null) {
+			return bundles.getTargetBundle(dependency).orElse(null);
 		}
 		return null;
 	}

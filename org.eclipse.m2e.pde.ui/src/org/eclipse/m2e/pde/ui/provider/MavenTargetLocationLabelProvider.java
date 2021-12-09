@@ -40,7 +40,7 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 				return MessageFormat.format(Messages.MavenTargetLocationLabelProvider_2, roots.size());
 			}
 		}
-		return String.valueOf(element);
+		return null;
 	}
 
 	@Override

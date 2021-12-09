@@ -3,3 +3,4 @@ bin/
 src-gen/
 .DS_Store
 .polyglot*
+indexer-jars/

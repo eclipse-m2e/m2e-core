@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetLocationFactory;
+import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -97,9 +99,13 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 					excludes.add(((Element) item).getTextContent());
 				}
 			}
+			NodeList featuresNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_FEATURE);
+			IFeature templateFeature = IntStream.range(0, featuresNodeList.getLength())
+					.mapToObj(index -> featuresNodeList.item(index)).map(DomXmlFeature::new).findFirst().orElse(null);
+
 			return new MavenTargetLocation(dependencies, repositories, mode, dependencyScope,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
-					instructions, excludes);
+					instructions, excludes, templateFeature);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
