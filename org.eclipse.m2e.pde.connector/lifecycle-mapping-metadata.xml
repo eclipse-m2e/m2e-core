@@ -33,6 +33,22 @@
 				</configurator>
 			</action>
 		</pluginExecution>
+		<pluginExecution>
+			<pluginExecutionFilter>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
+				<versionRange>[5.0.0,)</versionRange>
+				<goals>
+					<goal>jar</goal>
+					<goal>bnd-process</goal>
+				</goals>
+			</pluginExecutionFilter>
+			<action>
+				<configurator>
+					<id>org.eclipse.m2e.pde.connector.configurator.bundle</id>
+				</configurator>
+			</action>
+		</pluginExecution>
 	</pluginExecutions>
 </lifecycleMappingMetadata>
   
