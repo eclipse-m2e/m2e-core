@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import org.eclipse.pde.core.target.TargetBundle;
 
 import aQute.bnd.osgi.Analyzer;
 import aQute.bnd.osgi.Jar;
-import aQute.bnd.version.Version;
 
 public class MavenTargetBundle extends TargetBundle {
 
@@ -132,7 +131,8 @@ public class MavenTargetBundle extends TargetBundle {
 					analyzer.setProperty("mvnArtifactId", artifact.getArtifactId());
 					analyzer.setProperty("mvnVersion", artifact.getBaseVersion());
 					analyzer.setProperty("mvnClassifier", artifact.getClassifier());
-					analyzer.setProperty("generatedOSGiVersion", createBundleVersion(artifact).toString());
+					analyzer.setProperty("generatedOSGiVersion",
+							TargetBundles.createOSGiVersion(artifact).toString());
 					analyzer.setProperties(bndInstructions);
 					jar.setManifest(analyzer.calcManifest());
 					jar.write(wrappedFile);
@@ -167,24 +167,6 @@ public class MavenTargetBundle extends TargetBundle {
 			}
 		}
 		return true;
-	}
-
-	public static Version createBundleVersion(Artifact artifact) {
-		String version = artifact.getVersion();
-		if (version == null || version.isEmpty()) {
-			return new Version(0, 0, 1);
-		}
-		try {
-			int index = version.indexOf('-');
-			if (index > -1) {
-				StringBuilder sb = new StringBuilder(version);
-				sb.setCharAt(index, '.');
-				return Version.parseVersion(sb.toString());
-			}
-			return Version.parseVersion(version);
-		} catch (IllegalArgumentException e) {
-			return new Version(0, 0, 1, version);
-		}
 	}
 
 	public boolean isWrapped() {

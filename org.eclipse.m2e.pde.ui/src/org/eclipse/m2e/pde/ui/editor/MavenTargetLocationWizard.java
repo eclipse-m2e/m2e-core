@@ -18,20 +18,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.artifact.Artifact;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.MavenTargetRepository;
 import org.eclipse.m2e.pde.MissingMetadataMode;
+import org.eclipse.m2e.pde.TemplateFeatureModel;
+import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
+import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -57,11 +64,16 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private Button includeSource;
 	private MavenTargetDependencyEditor dependencyEditor;
 	private List<MavenTargetRepository> repositoryList = new ArrayList<>();
+	private Button createFeature;
+	private WizardPage page;
+	private FeatureSpecPage featureSpecPage;
+	private PluginListPage pluginListPage;
 
 	public MavenTargetLocationWizard() {
 		this(null);
 	}
 
+	@SuppressWarnings("restriction")
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
@@ -70,7 +82,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				repositoryList.add(mavenTargetRepository.copy());
 			}
 		}
-		WizardPage page = new WizardPage(
+
+		page = new WizardPage(
 				targetLocation == null ? Messages.MavenTargetLocationWizard_1 : Messages.MavenTargetLocationWizard_2) {
 
 			private Link editInstructionsButton;
@@ -93,19 +106,41 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				createMetadataCombo(composite);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
 				createScopeCombo(composite);
-				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_8);
-				includeSource = new Button(composite, SWT.CHECK);
+				includeSource = createCheckBox(composite, Messages.MavenTargetLocationWizard_8);
+				createFeature = createCheckBox(composite, Messages.MavenTargetLocationWizard_13);
+				createFeature.addSelectionListener(new SelectionListener() {
+
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						updateUI();
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e) {
+
+					}
+				});
 				if (targetLocation != null) {
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 					bndInstructions = targetLocation.getInstructions(null);
 					includeSource.setSelection(targetLocation.isIncludeSource());
+					IFeature template = targetLocation.getFeatureTemplate();
+					createFeature.setSelection(template != null);
 				} else {
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
 					includeSource.setSelection(true);
 				}
+
 				updateUI();
+			}
+
+			private Button createCheckBox(Composite composite, String text) {
+				new Label(composite, SWT.NONE);
+				Button box = new Button(composite, SWT.CHECK);
+				box.setText(text);
+				return box;
 			}
 
 			private void createScopeCombo(Composite parent) {
@@ -119,9 +154,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				scopeLabel = new Label(composite, SWT.NONE);
 				scopeLabel.setText(Messages.MavenTargetLocationWizard_15);
 				scope.add(""); //$NON-NLS-1$
-				scope.add("compile"); //$NON-NLS-1$
-				scope.add("test"); //$NON-NLS-1$
-				scope.add("provided"); //$NON-NLS-1$
+				scope.add(Artifact.SCOPE_COMPILE);
+				scope.add(Artifact.SCOPE_PROVIDED);
+				scope.add(Artifact.SCOPE_TEST);
 				scope.addModifyListener(new ModifyListener() {
 
 					@Override
@@ -179,21 +214,46 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				editInstructionsButton.setVisible(
 						metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE);
 				scopeLabel.setVisible(scope.getText().isBlank());
+				getContainer().updateButtons();
 			}
 
 			private CCombo combo(CCombo combo) {
 				GridData data = new GridData();
-				data.widthHint = 100;
+				data.widthHint = 120;
 				combo.setLayoutData(data);
 				return combo;
 			}
+
 		};
 		page.setImageDescriptor(ImageDescriptor
 				.createFromURL(MavenTargetLocationWizard.class.getResource("/icons/new_m2_project_wizard.gif"))); //$NON-NLS-1$
 		page.setTitle(page.getName());
 		page.setDescription(Messages.MavenTargetLocationWizard_23);
 		addPage(page);
+		featureSpecPage = new FeatureSpecPage(targetLocation);
+		addPage(featureSpecPage);
+		pluginListPage = new PluginListPage(targetLocation);
+		addPage(pluginListPage);
+	}
 
+	@Override
+	public boolean canFinish() {
+		if (isCreateFeature()) {
+			return page.isPageComplete();
+		}
+		return super.canFinish();
+	}
+
+	private boolean isCreateFeature() {
+		return createFeature == null || !createFeature.getSelection();
+	}
+
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if (isCreateFeature()) {
+			return null;
+		}
+		return super.getNextPage(page);
 	}
 
 	@Override
@@ -210,7 +270,10 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	public boolean performFinish() {
 		List<BNDInstructions> list;
 		Collection<String> excludes;
-		if (targetLocation == null) {
+		boolean iscreate = targetLocation == null;
+		boolean createFeature = this.createFeature.getSelection();
+		TemplateFeatureModel featureModel = null;
+		if (iscreate) {
 			excludes = Collections.emptyList();
 			if (bndInstructions == null) {
 				list = Collections.emptyList();
@@ -229,17 +292,41 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			if (bndInstructions != null) {
 				list.add(bndInstructions);
 			}
+			IFeature featureTemplate = targetLocation.getFeatureTemplate();
+			if (featureTemplate != null) {
+				try {
+					featureModel = new TemplateFeatureModel(featureTemplate);
+					featureModel.load();
+				} catch (CoreException e) {
+					Platform.getLog(MavenTargetLocationWizard.class).log(e.getStatus());
+				}
+			}
 		}
+		if (createFeature) {
+			if (featureModel == null) {
+				featureModel = new TemplateFeatureModel(null);
+			}
+			try {
+				featureSpecPage.update(featureModel, iscreate);
+				pluginListPage.update(featureModel);
+			} catch (CoreException e) {
+				Platform.getLog(Activator.class).log(e.getStatus());
+				e.printStackTrace();
+			}
+			featureModel.makeReadOnly();
+		}
+		IFeature f = createFeature ? featureModel.getFeature() : null;
 		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(), repositoryList,
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
-				includeSource.getSelection(), list, excludes);
-		if (targetLocation == null) {
+				includeSource.getSelection(), list, excludes, f);
+		if (iscreate) {
 			targetLocation = location;
 		} else {
 			ITargetLocation[] locations = targetDefinition.getTargetLocations().clone();
 			for (int i = 0; i < locations.length; i++) {
 				if (locations[i] == targetLocation) {
 					locations[i] = location;
+					break;
 				}
 			}
 			targetDefinition.setTargetLocations(locations);

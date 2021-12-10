@@ -83,7 +83,7 @@ Some tests are in a separate repository which is referenced as a Git submodule i
 The full Maven build of Eclipse m2e is performed in two subsequent steps.
 In order to build m2e on the command line, run the following commands subsequently from the root of this repo's clone
 
-1. `mvn generate-sources -f m2e-maven-runtime -Pgenerate-osgi-metadata`
+1. `mvn generate-sources -f m2e-maven-runtime -Pgenerate-osgi-metadata -Dtycho.mode=maven`
 2. `mvn clean verify`
 
 Within the Eclipse-IDE both builds can be run using the Maven Launch-Configurations *m2e-maven-runtime--generate-OSGi-metadata* respectively *m2e-core--build*. The Launch-Configuration *m2e-core--build-all* runs both builds subsequently.

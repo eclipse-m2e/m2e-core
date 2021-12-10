@@ -147,6 +147,17 @@ public interface IMaven {
   @Deprecated MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
       throws CoreException;
 
+  /**
+   * Returns MavenProject parent project or null if no such project.
+   * 
+   * @param project
+   * @param monitor
+   * @return
+   * @throws CoreException
+   * @deprecated directly use <code>project.getParent()</code> whenever possible, and if parent needs to be re-resolved,
+   *             it's a responsibility of the consumer to do it in its code.
+   */
+  @Deprecated
   MavenProject resolveParentProject(MavenProject project, IProgressMonitor monitor) throws CoreException;
 
   // execution
