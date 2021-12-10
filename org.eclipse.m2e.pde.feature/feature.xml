@@ -26,6 +26,13 @@
    </requires>
 
    <plugin
+         id="biz.aQute.bnd.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="biz.aQute.bndlib"
          download-size="0"
          install-size="0"
