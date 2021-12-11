@@ -80,16 +80,15 @@ Some tests are in a separate repository which is referenced as a Git submodule i
 
 ### 🏗️ Build
 
-The full Maven build of Eclipse m2e is performed in two subsequent steps.
-In order to build m2e on the command line, run the following commands subsequently from the root of this repo's clone
+In order to build m2e on the command line, run the following command from the root of this repo's clone
 
-1. `mvn generate-sources -f m2e-maven-runtime -Pgenerate-osgi-metadata -Dtycho.mode=maven`
-2. `mvn clean verify`
+`mvn clean verify`
 
-Within the Eclipse-IDE both builds can be run using the Maven Launch-Configurations *m2e-maven-runtime--generate-OSGi-metadata* respectively *m2e-core--build*. The Launch-Configuration *m2e-core--build-all* runs both builds subsequently.
+Within the Eclipse-IDE the build can be run using the Maven Launch-Configuration *m2e-core--build*.
 The (long-running) integration tests are skipped by default, add `-Pits` to your command in order to run them; adding `-DskipTests` will skip all tests, within Eclipse one can run *m2e-core--build-with-integration-tests*.
 
-If you have unresolved errors or are going to modify the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to launch the `m2e-maven-runtime--generate-OSGi-metadata` Run-configuration or trigger the Oomph-setup manually. See `m2e-maven-runtime/README.md` for details.
+If you have unresolved errors refreshing the `m2e-maven-runtime` project and/or performing a `Clean` + `Full` build may solve them.
+If are going to modify the Maven runtime components in `m2e-maven-runtime` folder you may want to delete the `target` folder of the affected sub-project and refresh and `Clean` + `Full` build it in order to ensure consistency.
 
 ### ⬆️ Version bump
 

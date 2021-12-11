@@ -14,8 +14,9 @@
 
 	<parent>
 		<groupId>org.eclipse.m2e</groupId>
-		<artifactId>m2e-core</artifactId>
+		<artifactId>m2e-parent</artifactId>
 		<version>2.1.0-SNAPSHOT</version>
+		<relativePath>../m2e-parent</relativePath>
 	</parent>
 
 	<artifactId>m2e-maven-runtime</artifactId>
@@ -24,9 +25,11 @@
 	<name>M2E - Maven runtime bundles</name>
 
 	<properties>
-		<dependency.jars.folder>jars</dependency.jars.folder>
-		<dependency.sources.folder>jars/sources</dependency.sources.folder>
+		<jars.directory>target/jars</jars.directory>
+		<jars.sources.directory>target/jars-sources</jars.sources.directory>
+		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
+		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
 
 	<modules>
@@ -47,44 +50,41 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}_${qualifiedVersion}</finalName> <!-- Use Eclipse jar naming schema -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
 					<version>6.3.1</version>
+					<extensions>true</extensions>
 					<configuration>
-						<packagingTypes>eclipse-plugin</packagingTypes>
-						<!-- PDE does not honor custom manifest location -->
-						<manifestPath>META-INF/MANIFEST.MF</manifestPath>
 						<bnd>
-						<![CDATA[
-							-includeresource: jars/=jars/;recursive:=false;lib:=true
+							<![CDATA[
+								-includeresource: jars/=${jars.directory}/;recursive:=false;lib:=true
 
-							-failok: true
-							-nouses: true
-							-nodefaultversion: true
-							-noextraheaders: true
-							-snapshot: qualifier
+								-failok: true
+								-nouses: true
+								-nodefaultversion: true
+								-noextraheaders: true
+								-snapshot: ${buildQualifier}
+								-removeheaders: Private-Package
 
-							Import-Package: !*
-							Automatic-Module-Name: ${bsn}
-							Eclipse-BundleShape: dir
-						]]>
+								Import-Package: !*
+								Automatic-Module-Name: ${bsn}
+								Eclipse-BundleShape: dir
+								Eclipse-SourceReferences: ${scmConnectionRaw};path="${gitRelativePath}";commitId=${gitCommitId}
+							]]>
 						</bnd>
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-packaging-plugin</artifactId>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.10.1</version>
 					<configuration>
-						<jgit.ignore>
-							.project
-							.classpath
-							.settings/
-							.polyglot.*
-							build.properties
-						</jgit.ignore>
+						<release>1.8</release>
+						<proc>none</proc>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -92,26 +92,14 @@
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>3.3.0</version>
 					<configuration>
-						<overWriteReleases>true</overWriteReleases>
-						<overWriteSnapshots>true</overWriteSnapshots>
-						<excludeScope>provided</excludeScope>
+						<overWriteIfNewer>true</overWriteIfNewer>
 						<includeScope>runtime</includeScope> <!-- only include runtime and compile time dependencies, not test or provided! -->
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-source-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<additionalFileSets>
-							<fileSet>
-								<directory>${project.build.directory}/${dependency.sources.folder}</directory>
-								<includes>
-									<include>**/*</include>
-								</includes>
-							</fileSet>
-						</additionalFileSets>
-					</configuration>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -136,215 +124,225 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<?m2e execute onIncremental?>
+						<id>fetch-dependency-jars</id>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${project.basedir}/${jars.directory}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e ignore?>
+						<id>unpack-dependency-sources-java</id>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${outputDirectory.sources}</outputDirectory>
+							<classifier>sources</classifier>
+							<includes>**/*.java</includes>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e ignore?>
+						<id>unpack-dependency-sources-resources</id>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${outputDirectory.sources}</outputDirectory>
+							<classifier>sources</classifier>
+							<excludes>**/*.java</excludes>
+							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>unzip-sources-and-move-java-files-to-source-bundle-root</id>
+						<!-- TODO: Make the tycho-packaging-plugin:build-qualifier goal to work with non 'eclipse-plugin' typed projects -->
+						<?m2e execute onIncremental?>
+						<id>generate-build-qualifier</id>
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<phase>process-resources</phase>
+						<phase>initialize</phase>
+						<configuration>
+							<exportAntProperties>true</exportAntProperties>
+							<target>
+								<taskdef resource="net/sf/antcontrib/antlib.xml" />
+								<mkdir dir="${project.build.directory}/git" />
+
+								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/buildQualifier" failonerror="true">
+									<arg value="log" />
+									<arg value="-n 1" />
+									<arg value="--pretty=format:%cd" />
+									<arg value="--date=format:${buildqualifier.format}" />
+								</exec>
+								<loadfile property="buildQualifier" srcFile="${project.build.directory}/git/buildQualifier" />
+								<delete file="${project.build.directory}/git/buildQualifier" />
+								<propertyregex property="buildQualifier" input="${buildQualifier}" regexp="\s" replace="" override="true" /> <!-- strip off leading/trailing whitespace -->
+								<echo message="buildQualifier: ${buildQualifier}" level="info" />
+
+								<property name="outputTimestamp" value="${buildQualifier}" />
+								<propertyregex property="qualifiedVersion" input="${project.version}" regexp="-SNAPSHOT" replace=".${buildQualifier}" />
+								<echo message="qualifiedVersion: ${qualifiedVersion}" level="info" />
+
+								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/commitId" failonerror="true">
+									<arg value="log" />
+									<arg value="-n 1" />
+									<arg value="--pretty=format:%H" />
+								</exec>
+								<loadfile property="gitCommitId" srcFile="${project.build.directory}/git/commitId" />
+								<delete file="${project.build.directory}/git/commitId" />
+								<propertyregex property="gitCommitId" input="${gitCommitId}" regexp="\s" replace="" override="true" /> <!-- strip off leading/trailing whitespace -->
+								<echo message="gitCommitHash: ${gitCommitId}" level="info" />
+
+								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/relativePath" failonerror="true">
+									<arg value="rev-parse" />
+									<arg value="--show-prefix" />
+								</exec>
+								<loadfile property="gitRelativePath" srcFile="${project.build.directory}/git/relativePath" />
+								<delete file="${project.build.directory}/git/relativePath" />
+								<propertyregex property="gitRelativePath" input="${gitRelativePath}" regexp="\s" replace="" global="true" override="true" /> <!-- strip off leading/trailing whitespace -->
+								<echo message="gitRelativePath: ${gitRelativePath}" level="info" />
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e ignore?>
+						<id>build-sources-jar</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>package</phase>
 						<configuration>
 							<target>
 								<taskdef resource="net/sf/antcontrib/antlib.xml" />
-								<for param="jarFile">
-									<fileset dir="${project.basedir}/${dependency.sources.folder}" includes="*.jar" erroronmissingdir="false" />
-									<sequential>
-										<local name="dirName" />
-										<basename property="dirName" file="@{jarFile}" suffix=".jar" />
-										<unzip src="@{jarFile}" dest="${project.build.directory}/${dependency.sources.folder}">
-											<patternset includes="**/*.java" />
-										</unzip>
-										<unzip src="@{jarFile}" dest="${project.build.directory}/${dependency.sources.folder}/${dirName}-jar">
-											<patternset excludes="**/*.java" />
-										</unzip>
-										<!-- Delete empty directories -->
+								<if>
+									<equals arg1="${project.packaging}" arg2="pom" /> <!-- only consider children of m2e-maven-runtime project -->
+									<then>
+										<echo message="Skip packing sources jar for pom project" />
+									</then>
+									<else>
+										<!-- Delete directories that are empty after moving the java-sources to the root -->
 										<delete includeemptydirs="true">
-											<fileset dir="${project.build.directory}/${dependency.sources.folder}">
+											<fileset dir="${outputDirectory.sources}">
 												<and>
 													<size value="0" />
 													<type type="dir" />
 												</and>
 											</fileset>
 										</delete>
-									</sequential>
-								</for>
+										<jar destfile="${project.build.directory}/${project.artifactId}.source_${qualifiedVersion}.jar"
+											manifestencoding="UTF-8" defaultexcludes="false" duplicate="fail">
+											<fileset dir="src/main/java" erroronmissingdir="false" />
+											<fileset dir="src/main/resources" erroronmissingdir="false" />
+											<fileset dir="${outputDirectory.sources}" />
+										</jar>
+									</else>
+								</if>
 							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-jar-with-manifest</id>
+						<goals>
+							<goal>bnd-process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+					<skipIfEmpty>true</skipIfEmpty>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>attach-sources-artifact</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/${project.artifactId}.source_${qualifiedVersion}.jar</file>
+									<type>java-source</type>
+									<classifier>sources</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>generate-pde-source-header</id>
+						<goals>
+							<goal>generate-pde-source-header</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>attached-p2-metadata</id> <!-- Required to make this project's sources discoverable for the sources-features -->
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<supportedProjectTypes>
+								<value>jar</value>
+							</supportedProjectTypes>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
 	<profiles>
-		<profile>
-			<id>generate-osgi-metadata</id>
-			<!-- Generate the OSGi metadata for the Maven-Runtime bundles as described in the co-located README.md -->
-			<build>
-				<pluginManagement>
-					<plugins>
-						<!-- Disable Tycho plug-ins that would fail in the first pure Maven build because the MANIFEST.MF does not yet exist -->
-						<plugin>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>tycho-packaging-plugin</artifactId>
-							<executions>
-								<execution>
-									<id>default-build-qualifier</id>
-									<phase>none</phase>
-								</execution>
-								<execution>
-									<id>default-validate-id</id>
-									<phase>none</phase>
-								</execution>
-								<execution>
-									<id>default-validate-version</id>
-									<phase>none</phase>
-								</execution>
-							</executions>
-						</plugin>
-						<plugin>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>target-platform-configuration</artifactId>
-							<executions>
-								<execution>
-									<id>default-target-platform</id>
-									<phase>none</phase>
-								</execution>
-							</executions>
-						</plugin>
-						<plugin>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>tycho-compiler-plugin</artifactId>
-							<executions>
-								<execution>
-									<id>default-validate-classpath</id>
-									<phase>none</phase>
-								</execution>
-							</executions>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-clean-plugin</artifactId>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>${dependency.jars.folder}</directory>
-								</fileset>
-							</filesets>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>fetch-dependencies</id>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<phase>generate-sources</phase>
-								<configuration>
-									<outputDirectory>${project.basedir}/${dependency.jars.folder}</outputDirectory>
-								</configuration>
-							</execution>
-							<execution>
-								<id>fetch-dependency-sources</id>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<phase>generate-sources</phase>
-								<configuration>
-									<outputDirectory>${project.basedir}/${dependency.sources.folder}</outputDirectory>
-									<classifier>sources</classifier>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<!-- https://github.com/bndtools/bnd/blob/master/maven/bnd-maven-plugin/README.md -->
-						<groupId>biz.aQute.bnd</groupId>
-						<artifactId>bnd-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>generate-manifest</id>
-								<goals>
-									<goal>bnd-process</goal>
-								</goals>
-								<phase>generate-sources</phase>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>generate-classpath-file</id>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<phase>generate-sources</phase>
-								<configuration>
-									<target>
-										<taskdef resource="net/sf/antcontrib/antlib.xml" />
-										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
-										<!-- and http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
-										<if>
-											<equals arg1="${project.packaging}" arg2="pom" /> <!-- only consider children of m2e-maven-runtime project -->
-											<then>
-												<echo message="Skip creation of .classpath file for pom project" />
-											</then>
-											<else>
-												<echo file="${project.basedir}/.classpath"><![CDATA[
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="output" path="target/classes"/>
-												]]></echo>
-												<loadproperties srcFile="${project.basedir}/build.properties" prefix="buildProperties." />
-												<!-- Append source-folder entries (projects may contain multiple) -->
-												<for param="sourceFolder" list="${buildProperties.source..}" delimiter="," trim="true">
-													<sequential>
-														<echo message="&#xA;&#x9;" file="${project.basedir}/.classpath" append="true" />
-														<echo file="${project.basedir}/.classpath" append="true"><![CDATA[
-															<classpathentry kind="src" path="@{sourceFolder}"/>
-														]]></echo>
-													</sequential>
-												</for>
-												<!-- Append library-entries (one for each embedded jar) -->
-												<for param="jarFile"><!--Ant-contrib tasks already defined in calling script -->
-													<fileset dir="${project.basedir}/${dependency.jars.folder}" includes="*.jar" />
-													<sequential>
-														<local name="jarFilename" />
-														<basename property="jarFilename" file="@{jarFile}" suffix=".jar" />
-														<echo message="&#xA;&#x9;" file="${project.basedir}/.classpath" append="true" />
-														<echo file="${project.basedir}/.classpath" append="true"><![CDATA[
-															<classpathentry exported="true" kind="lib" path="${dependency.jars.folder}/${jarFilename}.jar" sourcepath="${dependency.sources.folder}/${jarFilename}-sources.jar"/>
-														]]></echo>
-													</sequential>
-												</for>
-												<echo message="&#xA;" file="${project.basedir}/.classpath" append="true" />
-												<echo file="${project.basedir}/.classpath" append="true"><![CDATA[</classpath>]]></echo>
-												<echo message="&#xA;" file="${project.basedir}/.classpath" append="true" />
-											</else>
-										</if>
-									</target>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<profile>
 			<id>eclipse-sign</id>
 			<properties>
@@ -370,6 +368,7 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
+								<?m2e ignore?>
 								<id>sign-jnilibs-files</id>
 								<goals>
 									<goal>run</goal>

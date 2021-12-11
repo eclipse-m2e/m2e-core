@@ -20,7 +20,7 @@
 
 	<artifactId>org.eclipse.m2e.archetype.common</artifactId>
 	<version>3.2.101-SNAPSHOT</version>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>jar</packaging>
 
 	<name>M2E Maven Archetype Common</name>
 
