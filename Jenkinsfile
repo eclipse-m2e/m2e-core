@@ -33,7 +33,6 @@ pipeline {
 		}
 		stage('Build') {
 			steps {
-				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -V -Dtycho.mode=maven -Pgenerate-osgi-metadata'
 				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
 				wrap([$class: 'Xvnc', useXauthority: true]) {
 					sh 'mvn clean verify -B -V \

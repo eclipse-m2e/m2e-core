@@ -20,7 +20,7 @@
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
 	<version>3.8.602-SNAPSHOT</version>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
@@ -157,8 +157,8 @@
 							slf4jBinding=maven-slf4j-provider-${maven-core.version}.jar
 							M2E-SLF4JBinding=jars/${slf4jBinding}
 							-includeresource: \
-								jars/=jars/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
-								jars/=jars/${slf4jBinding};lib:=false
+								jars/=${jars.directory}/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
+								jars/=${jars.directory}/${slf4jBinding};lib:=false
 							-exportcontents: \
 								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								META-INF.sisu;-noimport:=true;x-internal:=true,\

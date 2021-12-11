@@ -19,7 +19,5 @@ jobs:
     uses: eclipse/dash-licenses/.github/workflows/mavenLicenseCheck.yml@master
     with:
       projectId: technology.m2e
-      setupScript: |
-        mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata
     secrets:
       gitlabAPIToken: ${{ secrets.M2E_GITLAB_API_TOKEN }}

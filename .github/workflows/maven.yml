@@ -33,8 +33,6 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml', '**/*.target') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-    - name: Generated Meta data
-      run: mvn generate-sources -f m2e-maven-runtime -B -V -Pgenerate-osgi-metadata -Dtycho.mode=maven
     - name: Build m2e-core
       uses: GabrielBB/xvfb-action@v1
       with:

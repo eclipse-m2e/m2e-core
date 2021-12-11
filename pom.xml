@@ -92,6 +92,19 @@
 		<module>org.eclipse.m2e.pde.connector.tests</module>
 	</modules>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.m2e</groupId>
+			<artifactId>org.eclipse.m2e.archetype.common</artifactId>
+			<version>3.2.101-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.m2e</groupId>
+			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+			<version>3.8.602-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -104,6 +117,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<configuration>
+					<pomDependencies>consider</pomDependencies>
 					<target>
 						<artifact>
 							<groupId>org.eclipse.m2e</groupId>
