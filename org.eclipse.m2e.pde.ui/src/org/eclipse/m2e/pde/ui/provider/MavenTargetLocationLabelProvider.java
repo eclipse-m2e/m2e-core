@@ -25,14 +25,18 @@ import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
+@SuppressWarnings("restriction")
 public class MavenTargetLocationLabelProvider implements ILabelProvider {
 	private Image image;
 
-	@SuppressWarnings("restriction")
 	@Override
 	public String getText(Object element) {
 		if (element instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) element;
+			String name = location.getLabel();
+			if (name != null && !name.isBlank()) {
+				return name;
+			}
 			IFeature featureTemplate = location.getFeatureTemplate();
 			if (featureTemplate != null) {
 				String label = featureTemplate.getLabel();

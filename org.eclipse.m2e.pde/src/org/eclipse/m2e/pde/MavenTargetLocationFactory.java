@@ -103,7 +103,8 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			IFeature templateFeature = IntStream.range(0, featuresNodeList.getLength())
 					.mapToObj(index -> featuresNodeList.item(index)).map(DomXmlFeature::new).findFirst().orElse(null);
 
-			return new MavenTargetLocation(dependencies, repositories, mode, dependencyScope,
+			return new MavenTargetLocation(location.getAttribute(MavenTargetLocation.ATTRIBUTE_LABEL), dependencies,
+					repositories, mode, dependencyScope,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
 					instructions, excludes, templateFeature);
 		} catch (Exception e) {

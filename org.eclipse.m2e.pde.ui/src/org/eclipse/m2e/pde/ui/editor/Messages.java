@@ -22,11 +22,12 @@ public class Messages extends NLS {
 	public static String MavenTargetDependencyEditor_5;
 	public static String MavenTargetDependencyEditor_6;
 	public static String MavenTargetLocationWizard_8;
-	public static String MavenTargetLocationWizard_13;
 	public static String MavenTargetLocationWizard_9;
 	public static String MavenTargetLocationWizard_10;
 	public static String MavenTargetLocationWizard_11;
 	public static String MavenTargetLocationWizard_12;
+	public static String MavenTargetLocationWizard_13;
+	public static String MavenTargetLocationWizard_14;
 	public static String MavenTargetRepositoryEditor_1;
 	public static String ClipboardParser_1;
 	public static String MavenTargetLocationWizard_15;

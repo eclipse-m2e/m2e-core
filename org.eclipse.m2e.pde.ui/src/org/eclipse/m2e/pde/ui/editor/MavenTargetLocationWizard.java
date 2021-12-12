@@ -21,6 +21,7 @@ import java.util.Objects;
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -52,6 +53,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class MavenTargetLocationWizard extends Wizard implements ITargetLocationWizard {
@@ -68,6 +70,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private WizardPage page;
 	private FeatureSpecPage featureSpecPage;
 	private PluginListPage pluginListPage;
+	private Text locationLabel;
 
 	public MavenTargetLocationWizard() {
 		this(null);
@@ -102,6 +105,23 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				gd_dep.heightHint = 200;
 				dependencyEditor.getControl().setLayoutData(gd_dep);
 
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_14);
+				locationLabel = new Text(composite, SWT.BORDER);
+				ModifyListener modifyListener = new ModifyListener() {
+
+					@Override
+					public void modifyText(ModifyEvent e) {
+						String text = locationLabel.getText();
+						if (text.isBlank()) {
+							setWindowTitle(Messages.MavenTargetLocationWizard_0);
+						} else {
+							setWindowTitle(Messages.MavenTargetLocationWizard_0 + " - " + text);
+						}
+
+					}
+				};
+				locationLabel.addModifyListener(modifyListener);
+				GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(locationLabel);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_9);
 				createMetadataCombo(composite);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
@@ -127,6 +147,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					includeSource.setSelection(targetLocation.isIncludeSource());
 					IFeature template = targetLocation.getFeatureTemplate();
 					createFeature.setSelection(template != null);
+					locationLabel.setText(Objects.requireNonNullElse(targetLocation.getLabel(), ""));
+					modifyListener.modifyText(null);
 				} else {
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
@@ -307,16 +329,16 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				featureModel = new TemplateFeatureModel(null);
 			}
 			try {
-				featureSpecPage.update(featureModel, iscreate);
+				featureSpecPage.update(featureModel, iscreate || targetLocation.getFeatureTemplate() == null);
 				pluginListPage.update(featureModel);
 			} catch (CoreException e) {
 				Platform.getLog(Activator.class).log(e.getStatus());
-				e.printStackTrace();
 			}
 			featureModel.makeReadOnly();
 		}
 		IFeature f = createFeature ? featureModel.getFeature() : null;
-		MavenTargetLocation location = new MavenTargetLocation(dependencyEditor.getRoots(), repositoryList,
+		MavenTargetLocation location = new MavenTargetLocation(locationLabel.getText(), dependencyEditor.getRoots(),
+				repositoryList,
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
 				includeSource.getSelection(), list, excludes, f);
 		if (iscreate) {
