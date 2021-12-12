@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -21,16 +21,29 @@ import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory;
 import org.eclipse.m2e.pde.ui.editor.Messages;
+import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 public class MavenTargetLocationLabelProvider implements ILabelProvider {
 	private Image image;
 
+	@SuppressWarnings("restriction")
 	@Override
 	public String getText(Object element) {
 		if (element instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) element;
+			IFeature featureTemplate = location.getFeatureTemplate();
+			if (featureTemplate != null) {
+				String label = featureTemplate.getLabel();
+				if (label != null && !label.isBlank()) {
+					return label;
+				}
+				String id = featureTemplate.getId();
+				if (id != null && !id.isBlank()) {
+					return id;
+				}
+			}
 			List<MavenTargetDependency> roots = location.getRoots();
 			if (roots.size() == 1) {
 				MavenTargetDependency dependency = roots.get(0);
