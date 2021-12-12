@@ -15,6 +15,8 @@
 
 package org.eclipse.m2e.pde.ui.editor;
 
+import java.util.Objects;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.m2e.pde.MavenTargetLocation;
@@ -102,10 +104,10 @@ public class FeatureSpecPage extends AbstractFeatureSpecPage {
 		if (targetLocation != null) {
 			IFeature template = targetLocation.getFeatureTemplate();
 			if (template != null) {
-				fFeatureIdText.setText(template.getId());
-				fFeatureNameText.setText(template.getLabel());
-				fFeatureVersionText.setText(template.getVersion());
-				fFeatureProviderCombo.setText(template.getProviderName());
+				fFeatureIdText.setText(Objects.requireNonNullElse(template.getId(), ""));
+				fFeatureNameText.setText(Objects.requireNonNullElse(template.getLabel(), ""));
+				fFeatureVersionText.setText(Objects.requireNonNullElse(template.getVersion(), ""));
+				fFeatureProviderCombo.setText(Objects.requireNonNullElse(template.getProviderName(), ""));
 				IFeatureInstallHandler handler = template.getInstallHandler();
 				if (handler != null) {
 					fLibraryText.setText(handler.getHandlerName());
