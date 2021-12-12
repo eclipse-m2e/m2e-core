@@ -85,6 +85,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_REPOSITORIES = "repositories";
 	public static final String ELEMENT_FEATURE = "feature";
 
+	public static final String ATTRIBUTE_LABEL = "label";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
@@ -107,11 +108,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final List<MavenTargetDependency> roots;
 	private final List<MavenTargetRepository> extraRepositories;
 	private final IFeature featureTemplate;
+	private String label;
 
-	public MavenTargetLocation(Collection<MavenTargetDependency> rootDependecies,
+	public MavenTargetLocation(String label, Collection<MavenTargetDependency> rootDependecies,
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
 			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
 			Collection<String> excludes, IFeature featureTemplate) {
+		this.label = label;
 		this.featureTemplate = featureTemplate;
 		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
@@ -170,6 +173,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			targetBundles = bundles;
 		}
 		return Optional.ofNullable(targetBundles);
+	}
+
+	public String getLabel() {
+		return label;
 	}
 
 	private void generateFeature(TargetBundles bundles, boolean source) throws CoreException {
@@ -354,7 +361,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 
-		return new MavenTargetLocation(latest, extraRepositories, metadataMode, dependencyScope, includeSource,
+		return new MavenTargetLocation(label, latest, extraRepositories, metadataMode, dependencyScope, includeSource,
 				instructionsMap.values(), excludedArtifacts, featureTemplate);
 
 	}
@@ -364,7 +371,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
-		return new MavenTargetLocation(roots, extraRepositories, metadataMode, dependencyScope, includeSource,
+		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyScope, includeSource,
 				instructions, excludedArtifacts, featureTemplate);
 	}
 
@@ -455,10 +462,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public String serialize() {
 		StringBuilder xml = new StringBuilder();
 		xml.append("<location");
-		attribute(xml, "type", getType());
+		attribute(xml, ATTRIBUTE_LABEL, label);
 		attribute(xml, ATTRIBUTE_MISSING_META_DATA, metadataMode.name().toLowerCase());
 		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
 		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
+		attribute(xml, "type", getType());
 		xml.append(">");
 		if (featureTemplate != null) {
 			try (PrintWriter writer = new PrintWriter(new StringBuilderWriter(xml))) {

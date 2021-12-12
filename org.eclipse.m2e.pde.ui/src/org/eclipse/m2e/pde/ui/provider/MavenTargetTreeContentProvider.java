@@ -12,12 +12,15 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.provider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
+import org.eclipse.pde.core.target.TargetFeature;
 
 public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 
@@ -26,31 +29,37 @@ public class MavenTargetTreeContentProvider implements ITreeContentProvider {
 		return getChildren(inputElement);
 	}
 
+	@SuppressWarnings("restriction")
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) parentElement;
+			List<Object> childs = new ArrayList<Object>();
 			List<MavenTargetDependency> roots = location.getRoots();
 			if (roots.size() == 1) {
-				return getDependecyChilds(roots.get(0), parentElement);
+				childs.addAll(Arrays.asList(getDependencyChilds(roots.get(0), parentElement)));
+			} else {
+				childs.addAll(roots);
 			}
-			Object[] array = roots.toArray();
-			return array;
+			TargetFeature[] features = location.getFeatures();
+			if (features != null && features.length > 0) {
+				childs.addAll(Arrays.asList(features));
+			}
+			return childs.toArray();
 		} else if (parentElement instanceof DependencyNode) {
 			DependencyNode[] dependencyNodes = ((DependencyNode) parentElement).getChildren().stream()
-					.filter(d -> d.getArtifact().getFile() != null)
-					.toArray(DependencyNode[]::new);
+					.filter(d -> d.getArtifact().getFile() != null).toArray(DependencyNode[]::new);
 			for (DependencyNode dependencyNode : dependencyNodes) {
 				dependencyNode.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parentElement);
 			}
 			return dependencyNodes;
 		} else if (parentElement instanceof MavenTargetDependency) {
-			return getDependecyChilds((MavenTargetDependency) parentElement, parentElement);
+			return getDependencyChilds((MavenTargetDependency) parentElement, parentElement);
 		}
 		return new Object[0];
 	}
 
-	private Object[] getDependecyChilds(MavenTargetDependency targetDependency, Object parentElement) {
+	private Object[] getDependencyChilds(MavenTargetDependency targetDependency, Object parentElement) {
 
 		List<DependencyNode> nodes = targetDependency.getDependencyNodes();
 		if (nodes != null) {

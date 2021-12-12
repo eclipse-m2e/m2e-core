@@ -63,6 +63,10 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 		return null;
 	}
 
+	public Artifact getArtifact() {
+		return artifact;
+	}
+
 	@Override
 	public void load() throws CoreException {
 		editable = true;
