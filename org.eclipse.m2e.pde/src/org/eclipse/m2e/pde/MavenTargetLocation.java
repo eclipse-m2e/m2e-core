@@ -31,16 +31,13 @@ import java.util.function.Predicate;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.eclipse.aether.RepositoryException;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
@@ -58,6 +55,8 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
@@ -219,46 +218,30 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	private Artifact resolveDependency(MavenTargetDependency root, IMaven maven, List<ArtifactRepository> repositories,
 			TargetBundles targetBundles, CacheManager cacheManager, IProgressMonitor monitor) throws CoreException {
-		Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(root.getGroupId(), root.getArtifactId(),
-				root.getVersion(), root.getType(), root.getClassifier(), repositories, monitor));
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+		IMavenProjectRegistry registry = MavenPlugin.getMavenProjectRegistry();
+		IMavenProjectFacade workspaceProject = registry.getMavenProject(root.getGroupId(), root.getArtifactId(),
+				root.getVersion());
+		Artifact artifact;
+		if (workspaceProject != null && workspaceProject.getPackaging().equals(root.getType())) {
+			MavenProject mavenProject = workspaceProject.getMavenProject(subMonitor.split(80));
+			artifact = new WorkspaceArtifact(RepositoryUtils.toArtifact(mavenProject.getArtifact()), workspaceProject);
+		} else {
+			artifact = RepositoryUtils.toArtifact(maven.resolve(root.getGroupId(), root.getArtifactId(),
+					root.getVersion(), root.getType(), root.getClassifier(), repositories, subMonitor.split(80)));
+		}
 		if (artifact != null) {
-			boolean isPomType = isPomType(artifact);
+			boolean isPomType = POM_PACKAGE_TYPE.equals(artifact.getExtension());
 			boolean fetchTransitive = dependencyScope != null && !dependencyScope.isBlank();
 			if (isPomType || fetchTransitive) {
-				IMavenExecutionContext context = maven.createExecutionContext();
-				PreorderNodeListGenerator dependecies = context.execute(new ICallable<PreorderNodeListGenerator>() {
-
-					@Override
-					public PreorderNodeListGenerator call(IMavenExecutionContext context, IProgressMonitor monitor)
-							throws CoreException {
-						try {
-							CollectRequest collectRequest = new CollectRequest();
-							collectRequest.setRoot(new Dependency(artifact, dependencyScope));
-							collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
-
-							RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-							DependencyNode node = repoSystem
-									.collectDependencies(context.getRepositorySession(), collectRequest).getRoot();
-							node.setData(DEPENDENCYNODE_PARENT, MavenTargetLocation.this);
-							node.setData(DEPENDENCYNODE_ROOT, root);
-							DependencyRequest dependencyRequest = new DependencyRequest();
-							dependencyRequest.setRoot(node);
-							dependencyRequest
-									.setFilter(new MavenTargetDependencyFilter(fetchTransitive, dependencyScope));
-							repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
-							PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-							node.accept(nlg);
-							return nlg;
-						} catch (RepositoryException e) {
-							throw new CoreException(
-									new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
-											"Resolving dependencies failed", e));
-						} catch (RuntimeException e) {
-							throw new CoreException(new Status(IStatus.ERROR,
-									MavenTargetLocation.class.getPackage().getName(), "Internal error", e));
-						}
-					}
-				}, monitor);
+				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, fetchTransitive, dependencyScope, repositories,
+						this);
+				PreorderNodeListGenerator dependecies;
+				if (workspaceProject == null) {
+					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
+				} else {
+					dependecies = registry.execute(workspaceProject, callable, subMonitor);
+				}
 				for (Artifact a : dependecies.getArtifacts(true)) {
 					if (a.getFile() == null) {
 						// this is a filtered dependency
@@ -271,6 +254,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				addBundleForArtifact(artifact, cacheManager, maven, targetBundles);
 			}
 		}
+
 		return artifact;
 	}
 

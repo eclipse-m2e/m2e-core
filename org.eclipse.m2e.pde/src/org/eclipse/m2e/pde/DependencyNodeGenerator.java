@@ -1,0 +1,85 @@
+/*******************************************************************************
+ * Copyright (c) 2018, 2021 Christoph Läubrich
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *      Christoph Läubrich - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.m2e.pde;
+
+import java.util.List;
+
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.eclipse.aether.RepositoryException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+
+@SuppressWarnings("restriction")
+final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerator> {
+		private final Artifact artifact;
+		private final List<ArtifactRepository> repositories;
+		private final boolean fetchTransitive;
+		private final MavenTargetDependency root;
+		private String dependencyScope;
+		private MavenTargetLocation parent;
+
+		DependencyNodeGenerator(MavenTargetDependency root, Artifact artifact, boolean fetchTransitive,
+				String dependencyScope, List<ArtifactRepository> repositories, MavenTargetLocation parent) {
+			this.artifact = artifact;
+			this.repositories = repositories;
+			this.fetchTransitive = fetchTransitive;
+			this.root = root;
+			this.dependencyScope = dependencyScope;
+			this.parent = parent;
+		}
+
+
+		@Override
+		public PreorderNodeListGenerator call(IMavenExecutionContext context, IProgressMonitor monitor)
+				throws CoreException {
+			try {
+				CollectRequest collectRequest = new CollectRequest();
+				collectRequest.setRoot(new Dependency(artifact, dependencyScope));
+				collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
+
+				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+				DependencyNode node = repoSystem
+						.collectDependencies(context.getRepositorySession(), collectRequest).getRoot();
+				node.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parent);
+				node.setData(MavenTargetLocation.DEPENDENCYNODE_ROOT, root);
+				DependencyRequest dependencyRequest = new DependencyRequest();
+				dependencyRequest.setRoot(node);
+				dependencyRequest
+						.setFilter(new MavenTargetDependencyFilter(fetchTransitive, dependencyScope));
+				repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
+				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+				node.accept(nlg);
+				return nlg;
+			} catch (RepositoryException e) {
+				throw new CoreException(
+						new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
+								"Resolving dependencies failed", e));
+			} catch (RuntimeException e) {
+				throw new CoreException(new Status(IStatus.ERROR,
+						MavenTargetLocation.class.getPackage().getName(), "Internal error", e));
+			}
+		}
+	}
