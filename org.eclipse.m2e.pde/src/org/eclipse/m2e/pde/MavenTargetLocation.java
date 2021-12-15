@@ -234,8 +234,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			boolean isPomType = POM_PACKAGE_TYPE.equals(artifact.getExtension());
 			boolean fetchTransitive = dependencyScope != null && !dependencyScope.isBlank();
 			if (isPomType || fetchTransitive) {
-				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, fetchTransitive, dependencyScope, repositories,
-						this);
+				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact,
+						fetchTransitive, dependencyScope, repositories, this);
 				PreorderNodeListGenerator dependecies;
 				if (workspaceProject == null) {
 					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
@@ -265,8 +265,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven,
 			TargetBundles targetBundles) {
 		if (isPomType(artifact)) {
-			MavenTargetFeature feature = new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles));
-			targetBundles.features.add(feature);
+			targetBundles.features
+					.add(new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles, false)));
+			if (includeSource) {
+				targetBundles.features
+						.add(new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles, true)));
+			}
 			return;
 		}
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
@@ -275,7 +279,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			// then
 			bndInstructions = instructionsMap.get("");
 		}
-		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
+		MavenTargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.bundles.put(artifact, bundle);
@@ -284,8 +288,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
 							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
 							maven.getArtifactRepositories(), new NullProgressMonitor()));
-					targetBundles.bundles.put(resolve,
-							new MavenSourceBundle(bundle.getBundleInfo(), resolve, cacheManager));
+					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve,
+							cacheManager);
+					targetBundles.bundles.put(resolve, sourceBundle);
+					targetBundles.sourceBundles.put(artifact, sourceBundle);
 				} catch (Exception e) {
 					// Source not available / usable
 				}
@@ -568,7 +574,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public MavenTargetBundle getMavenTargetBundle(Artifact artifact) {
 		TargetBundles bundles = targetBundles;
 		if (bundles != null) {
-			return bundles.getTargetBundle(artifact).orElse(null);
+			return bundles.getMavenTargetBundle(artifact).orElse(null);
 		}
 		return null;
 	}

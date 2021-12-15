@@ -36,18 +36,24 @@ class TargetBundles {
 	final Set<Artifact> ignoredArtifacts = new HashSet<>();
 	final List<TargetFeature> features = new ArrayList<>();
 	final Map<MavenTargetDependency, List<DependencyNode>> dependencyNodes = new HashMap<>();
+	final Map<Artifact, MavenSourceBundle> sourceBundles = new HashMap<>();
 
 	Optional<DependencyNode> getDependencyNode(Artifact artifact) {
 		return dependencyNodes.values().stream().flatMap(l -> l.stream())
 				.filter(node -> artifact.equals(node.getArtifact())).findAny();
 	}
 
-	Optional<MavenTargetBundle> getTargetBundle(Artifact artifact) {
-		TargetBundle targetBundle = bundles.get(artifact);
-		if (targetBundle instanceof MavenTargetBundle) {
-			return Optional.of((MavenTargetBundle) targetBundle);
+	Optional<MavenTargetBundle> getMavenTargetBundle(Artifact artifact) {
+		return Optional.ofNullable(bundles.get(artifact)).filter(MavenTargetBundle.class::isInstance)
+				.map(MavenTargetBundle.class::cast);
+	}
+
+	Optional<TargetBundle> getTargetBundle(Artifact artifact, boolean source) {
+		if (source) {
+			return Optional.ofNullable(sourceBundles.get(artifact));
+		} else {
+			return Optional.ofNullable(bundles.get(artifact));
 		}
-		return Optional.empty();
 	}
 
 	Optional<MavenTargetBundle> getTargetBundle(MavenTargetDependency dependency) {
@@ -56,7 +62,7 @@ class TargetBundles {
 			Optional<Artifact> artifact = list.stream()
 					.filter(node -> node.getData().get(MavenTargetLocation.DEPENDENCYNODE_ROOT) == dependency)
 					.findFirst().map(DependencyNode::getArtifact);
-			return artifact.flatMap(this::getTargetBundle);
+			return artifact.flatMap(this::getMavenTargetBundle);
 		}
 		return Optional.empty();
 	}

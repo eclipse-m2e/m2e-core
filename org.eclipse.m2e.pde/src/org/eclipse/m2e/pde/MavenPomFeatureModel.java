@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.internal.core.NLResourceHelper;
 import org.eclipse.pde.internal.core.feature.AbstractFeatureModel;
 import org.eclipse.pde.internal.core.feature.Feature;
@@ -53,9 +54,12 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 	private Artifact artifact;
 	private TargetBundles targetBundles;
 
-	MavenPomFeatureModel(Artifact artifact, TargetBundles bundles) {
+	private boolean isSourceFeature;
+
+	MavenPomFeatureModel(Artifact artifact, TargetBundles bundles, boolean isSourceFeature) {
 		this.artifact = artifact;
 		this.targetBundles = bundles;
+		this.isSourceFeature = isSourceFeature;
 	}
 
 	@Override
@@ -74,9 +78,17 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 			Model model = MavenPlugin.getMaven().readModel(stream);
 
 			IFeature f = getFeature();
-			f.setId(model.getGroupId() + "." + model.getArtifactId() + "." + model.getPackaging());
+			String id = model.getGroupId() + "." + model.getArtifactId() + "." + model.getPackaging();
+			if (isSourceFeature) {
+				id += ".source";
+			}
+			f.setId(id);
 			f.setVersion(TargetBundles.createOSGiVersion(model.getVersion()).toString());
-			f.setLabel(model.getName());
+			String name = model.getName();
+			if (isSourceFeature) {
+				name += " (Source)";
+			}
+			f.setLabel(name);
 			String description = model.getDescription();
 			String url = model.getUrl();
 			IFeatureInfo info = f.getModel().getFactory().createInfo(IFeature.INFO_DESCRIPTION);
@@ -93,12 +105,13 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 				}).collect(Collectors.joining("--------------------------------------------------\r\n"));
 			}
 			Optional<DependencyNode> dependencyNode = targetBundles.getDependencyNode(artifact);
-			MavenTargetBundle[] dependencies = dependencyNode.map(node -> {
+			TargetBundle[] dependencies = dependencyNode.map(node -> {
 				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 				node.accept(nlg);
 				return nlg;
 			}).map(nlg -> nlg.getArtifacts(true)).stream().flatMap(Collection::stream).filter(a -> a.getFile() != null)
-					.flatMap(a -> targetBundles.getTargetBundle(a).stream()).toArray(MavenTargetBundle[]::new);
+					.flatMap(a -> targetBundles.getTargetBundle(a, isSourceFeature).stream())
+					.toArray(TargetBundle[]::new);
 			IFeaturePlugin[] featurePlugins = new IFeaturePlugin[dependencies.length];
 			for (int i = 0; i < featurePlugins.length; i++) {
 				FeaturePlugin plugin = new MavenFeaturePlugin(dependencies[i], this);
