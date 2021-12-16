@@ -29,13 +29,13 @@
   <description>Maven Integration for Eclipse JDT Annotation Processor Toolkit</description>
   <inceptionYear>2011</inceptionYear>
   <properties>
-    <tycho-version>1.5.1</tycho-version>
+    <tycho-version>1.7.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
     <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
     <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
     <m2e-core-version>1.13</m2e-core-version>
     <surefire.timeout>500</surefire.timeout>
-    <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
+    <site-compressed>https://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
 
   <modules>
@@ -50,19 +50,19 @@
     <repository>
       <id>jbt</id>
       <layout>p2</layout>
-      <url>http://download.jboss.org/jbosstools/static/oxygen/stable/updates/core/</url>
+      <url>https://download.jboss.org/jbosstools/static/oxygen/stable/updates/core/</url>
     </repository>
 
     <repository>
       <id>eclipse</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/2019-09</url>
+      <url>https://download.eclipse.org/releases/2019-09</url>
     </repository>
 
     <repository>
       <id>m2e</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/technology/m2e/releases/${m2e-core-version}</url>
+      <url>https://download.eclipse.org/technology/m2e/releases/${m2e-core-version}</url>
     </repository>
   </repositories>
 
