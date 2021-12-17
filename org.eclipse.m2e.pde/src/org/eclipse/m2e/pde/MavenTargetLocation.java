@@ -86,6 +86,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public static final String ATTRIBUTE_LABEL = "label";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
+
+	public static final String ATTRIBUTE_DEPENDENCY_DEPTH = "includeDependencyDepth";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
@@ -95,6 +97,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String POM_PACKAGE_TYPE = "pom";
 	public static final String DEPENDENCYNODE_PARENT = "dependencynode.parent";
 	public static final String DEPENDENCYNODE_ROOT = "dependencynode.root";
+	public static final DependencyDepth DEFAULT_INCLUDE_MODE = DependencyDepth.NONE;
 
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
@@ -108,14 +111,16 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final List<MavenTargetRepository> extraRepositories;
 	private final IFeature featureTemplate;
 	private String label;
+	private DependencyDepth dependencyDepth;
 
 	public MavenTargetLocation(String label, Collection<MavenTargetDependency> rootDependecies,
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
-			String dependencyScope, boolean includeSource, Collection<BNDInstructions> instructions,
-			Collection<String> excludes, IFeature featureTemplate) {
+			DependencyDepth dependencyDepth, String dependencyScope, boolean includeSource,
+			Collection<BNDInstructions> instructions, Collection<String> excludes, IFeature featureTemplate) {
 		this.label = label;
+		this.dependencyDepth = dependencyDepth;
 		this.featureTemplate = featureTemplate;
-		this.roots = new ArrayList<MavenTargetDependency>(rootDependecies);
+		this.roots = new ArrayList<>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
@@ -231,11 +236,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					root.getVersion(), root.getType(), root.getClassifier(), repositories, subMonitor.split(80)));
 		}
 		if (artifact != null) {
-			boolean isPomType = POM_PACKAGE_TYPE.equals(artifact.getExtension());
-			boolean fetchTransitive = dependencyScope != null && !dependencyScope.isBlank();
-			if (isPomType || fetchTransitive) {
-				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact,
-						fetchTransitive, dependencyScope, repositories, this);
+			DependencyDepth depth = dependencyDepth;
+			if (POM_PACKAGE_TYPE.equals(artifact.getExtension()) && depth == DependencyDepth.NONE) {
+				// fetching only the pom but no dependencies does not makes much sense...
+				depth = DependencyDepth.DIRECT;
+			}
+			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
+				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, depth,
+						dependencyScope, repositories, this);
 				PreorderNodeListGenerator dependecies;
 				if (workspaceProject == null) {
 					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
@@ -307,7 +315,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
 
-		List<MavenTargetDependency> latest = new ArrayList<MavenTargetDependency>();
+		List<MavenTargetDependency> latest = new ArrayList<>();
 		int updated = 0;
 		for (MavenTargetDependency dependency : roots) {
 			Artifact artifact = new DefaultArtifact(
@@ -351,8 +359,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 
-		return new MavenTargetLocation(label, latest, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructionsMap.values(), excludedArtifacts, featureTemplate);
+		return new MavenTargetLocation(label, latest, extraRepositories, metadataMode, dependencyDepth, dependencyScope,
+				includeSource, instructionsMap.values(), excludedArtifacts, featureTemplate);
 
 	}
 
@@ -361,8 +369,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
-		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyScope, includeSource,
-				instructions, excludedArtifacts, featureTemplate);
+		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyDepth, dependencyScope,
+				includeSource, instructions, excludedArtifacts, featureTemplate);
 	}
 
 	public IFeature getFeatureTemplate() {
@@ -455,6 +463,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		attribute(xml, ATTRIBUTE_LABEL, label);
 		attribute(xml, ATTRIBUTE_MISSING_META_DATA, metadataMode.name().toLowerCase());
 		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
+		attribute(xml, ATTRIBUTE_DEPENDENCY_DEPTH, dependencyDepth.name().toLowerCase());
 		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
 		attribute(xml, "type", getType());
 		xml.append(">");
@@ -545,6 +554,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return dependencyScope;
 		}
 		return DEFAULT_DEPENDENCY_SCOPE;
+	}
+
+	public DependencyDepth getDependencyDepth() {
+		return dependencyDepth;
 	}
 
 	public boolean isIgnored(Artifact artifact) {
