@@ -36,16 +36,16 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerator> {
 		private final Artifact artifact;
 		private final List<ArtifactRepository> repositories;
-		private final boolean fetchTransitive;
 		private final MavenTargetDependency root;
 		private String dependencyScope;
 		private MavenTargetLocation parent;
+		private DependencyDepth dependencyDepth;
 
-		DependencyNodeGenerator(MavenTargetDependency root, Artifact artifact, boolean fetchTransitive,
+		DependencyNodeGenerator(MavenTargetDependency root, Artifact artifact, DependencyDepth dependencyDepth,
 				String dependencyScope, List<ArtifactRepository> repositories, MavenTargetLocation parent) {
 			this.artifact = artifact;
+			this.dependencyDepth = dependencyDepth;
 			this.repositories = repositories;
-			this.fetchTransitive = fetchTransitive;
 			this.root = root;
 			this.dependencyScope = dependencyScope;
 			this.parent = parent;
@@ -57,7 +57,7 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 				throws CoreException {
 			try {
 				CollectRequest collectRequest = new CollectRequest();
-				collectRequest.setRoot(new Dependency(artifact, dependencyScope));
+				collectRequest.setRoot(new Dependency(artifact, null));
 				collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
 
 				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
@@ -68,7 +68,7 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 				DependencyRequest dependencyRequest = new DependencyRequest();
 				dependencyRequest.setRoot(node);
 				dependencyRequest
-						.setFilter(new MavenTargetDependencyFilter(fetchTransitive, dependencyScope));
+						.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScope));
 				repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
 				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 				node.accept(nlg);

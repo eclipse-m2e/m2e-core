@@ -20,17 +20,18 @@ import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 
 import java.util.List;
 
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 
 public class MavenTargetDependencyFilter implements DependencyFilter {
 
 	private static final String[] VALID_EXTENSIONS = { "jar", "pom" };
-	private boolean fetchTransitive;
 	private String locationScope;
+	private DependencyDepth dependencyDepth;
 
-	public MavenTargetDependencyFilter(boolean fetchTransitive, String scope) {
-		this.fetchTransitive = fetchTransitive;
+	public MavenTargetDependencyFilter(DependencyDepth dependencyDepth, String scope) {
+		this.dependencyDepth = dependencyDepth;
 		this.locationScope = scope;
 	}
 
@@ -40,27 +41,31 @@ public class MavenTargetDependencyFilter implements DependencyFilter {
 		for (String valid : VALID_EXTENSIONS) {
 			// only for a valid extension...
 			if (valid.equalsIgnoreCase(extension)) {
-				return (fetchTransitive || parents.size() <= 1) && isValidScope(node.getDependency().getScope());
+				if (dependencyDepth == DependencyDepth.INFINITE
+						|| (dependencyDepth == DependencyDepth.DIRECT && parents.size() <= 1)) {
+					return isValidScope(node.getDependency());
+				}
 			}
 		}
 		return false;
 	}
 
-	private boolean isValidScope(String scope) {
-		if (locationScope == null || locationScope.isBlank() || scope == null || scope.isBlank()) {
+	private boolean isValidScope(Dependency dependency) {
+		String dependecyScope = dependency.getScope();
+		if (dependecyScope == null || dependecyScope.isBlank()) {
 			return true;
 		}
-		if (SCOPE_COMPILE.equalsIgnoreCase(locationScope)) {
-			return SCOPE_COMPILE.equalsIgnoreCase(scope);
+		if (locationScope == null || locationScope.isBlank() || SCOPE_COMPILE.equalsIgnoreCase(locationScope)) {
+			return SCOPE_COMPILE.equalsIgnoreCase(dependecyScope);
 		}
 		if (SCOPE_PROVIDED.equalsIgnoreCase(locationScope)) {
-			return SCOPE_PROVIDED.equalsIgnoreCase(scope) || SCOPE_COMPILE.equalsIgnoreCase(scope)
-					|| SCOPE_SYSTEM.equalsIgnoreCase(scope) || SCOPE_RUNTIME.equalsIgnoreCase(scope);
+			return SCOPE_PROVIDED.equalsIgnoreCase(dependecyScope) || SCOPE_COMPILE.equalsIgnoreCase(dependecyScope)
+					|| SCOPE_SYSTEM.equalsIgnoreCase(dependecyScope) || SCOPE_RUNTIME.equalsIgnoreCase(dependecyScope);
 		}
 		if (SCOPE_TEST.equalsIgnoreCase(locationScope)) {
-			return SCOPE_TEST.equalsIgnoreCase(scope) || SCOPE_COMPILE.equalsIgnoreCase(scope)
-					|| SCOPE_PROVIDED.equalsIgnoreCase(scope) || SCOPE_SYSTEM.equalsIgnoreCase(scope)
-					|| SCOPE_RUNTIME.equalsIgnoreCase(scope);
+			return SCOPE_TEST.equalsIgnoreCase(dependecyScope) || SCOPE_COMPILE.equalsIgnoreCase(dependecyScope)
+					|| SCOPE_PROVIDED.equalsIgnoreCase(dependecyScope) || SCOPE_SYSTEM.equalsIgnoreCase(dependecyScope)
+					|| SCOPE_RUNTIME.equalsIgnoreCase(dependecyScope);
 		}
 		return false;
 	}

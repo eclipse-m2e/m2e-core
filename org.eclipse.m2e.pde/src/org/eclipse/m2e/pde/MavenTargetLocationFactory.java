@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@SuppressWarnings("restriction")
 public class MavenTargetLocationFactory implements ITargetLocationFactory {
 
 	@Override
@@ -100,11 +101,29 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				}
 			}
 			NodeList featuresNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_FEATURE);
+
 			IFeature templateFeature = IntStream.range(0, featuresNodeList.getLength())
 					.mapToObj(index -> featuresNodeList.item(index)).map(DomXmlFeature::new).findFirst().orElse(null);
 
+			DependencyDepth dependencyDepth;
+			if (location.hasAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_DEPTH)) {
+				try {
+					dependencyDepth = DependencyDepth.valueOf(
+							location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_DEPTH).toUpperCase());
+				} catch (IllegalArgumentException e) {
+					// fall back to safe default
+					dependencyDepth = DependencyDepth.NONE;
+				}
+			} else {
+				// backward compatibility for older formats
+				if (dependencyScope.isEmpty()) {
+					dependencyDepth = DependencyDepth.NONE;
+				} else {
+					dependencyDepth = DependencyDepth.INFINITE;
+				}
+			}
 			return new MavenTargetLocation(location.getAttribute(MavenTargetLocation.ATTRIBUTE_LABEL), dependencies,
-					repositories, mode, dependencyScope,
+					repositories, mode, dependencyDepth, dependencyScope,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
 					instructions, excludes, templateFeature);
 		} catch (Exception e) {
