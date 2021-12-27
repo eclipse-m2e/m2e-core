@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="org.eclipse.m2e.launching.mavenLaunchParticipants">
+      <mavenLaunchParticipant
+            class="org.eclipse.m2e.debug.setup.DebugLaunchParticipant"
+            id="org.eclipse.m2e.debug.setup.DebugLaunchParticipant"
+            modes="debug"
+            name="M2E Debug Support Launch Participant">
+      </mavenLaunchParticipant>
+   </extension>
+
+</fragment>

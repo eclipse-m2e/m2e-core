@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: M2E Debug Support
+Bundle-SymbolicName: org.eclipse.m2e.debug;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse.org - m2e
+Fragment-Host: org.eclipse.m2e.maven.runtime
+Automatic-Module-Name: org.eclipse.m2e.debug
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: javax.inject;version="1.0.0"
+Require-Bundle: org.eclipse.m2e.launching,
+ org.eclipse.debug.core,
+ org.eclipse.equinox.common,
+ org.eclipse.m2e.core

@@ -98,14 +98,12 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           testName = text.substring(RUNNING_MARKER.length());
           offset += RUNNING_MARKER.length();
 
-        } else if(text.startsWith(LISTENING_MARKER)) {
+        } else if((index = text.indexOf(LISTENING_MARKER)) > -1) {
           // create and start remote Java app launch configuration
           String baseDir = getBaseDir(launchConfiguration);
           if(baseDir != null) {
-            String portString = text.substring(LISTENING_MARKER.length()).trim();
-            MavenDebugHyperLink link = new MavenDebugHyperLink(baseDir, portString);
-            console.addLink(link, offset, LISTENING_MARKER.length() + portString.length());
-            // launchRemoteJavaApp(baseDir, portString);
+            String portString = text.substring(index + LISTENING_MARKER.length()).trim();
+            launchRemoteJavaApp(baseDir, portString);
           }
 
         } else {
@@ -149,7 +147,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     }
   }
 
-  static void launchRemoteJavaApp(String baseDir, String portString) throws CoreException {
+  private static void launchRemoteJavaApp(String baseDir, String portString) throws CoreException {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType launchConfigurationType = launchManager
         .getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_REMOTE_JAVA_APPLICATION);
@@ -163,14 +161,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         <mapEntry key="port" value="8000"/>
         <mapEntry key="hostname" value="localhost"/>
       </mapAttribute>
-
+    
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
         <listEntry value="/foo-launch"/>
       </listAttribute>
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="4"/>
       </listAttribute>
-
+    
       <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
       </listAttribute>
@@ -253,37 +251,4 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     }
 
   }
-
-  /**
-   * Creates debug launch configuration for remote Java application. For example, with surefire plugin the following
-   * property can be specified: -Dmaven.surefire.debug=
-   * "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
-   */
-  public class MavenDebugHyperLink implements IHyperlink {
-
-    private final String baseDir;
-
-    private final String portString;
-
-    public MavenDebugHyperLink(String baseDir, String portString) {
-      this.baseDir = baseDir;
-      this.portString = portString;
-    }
-
-    public void linkActivated() {
-      try {
-        launchRemoteJavaApp(baseDir, portString);
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-      }
-    }
-
-    public void linkEntered() {
-    }
-
-    public void linkExited() {
-    }
-
-  }
-
 }
