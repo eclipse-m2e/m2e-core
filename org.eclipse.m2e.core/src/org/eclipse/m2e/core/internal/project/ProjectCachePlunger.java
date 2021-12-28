@@ -14,14 +14,14 @@
 package org.eclipse.m2e.core.internal.project;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
@@ -41,16 +41,16 @@ abstract class ProjectCachePlunger<Key> {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  final Multimap<File, Key> projectKeys = HashMultimap.create();
+  final Map<File, Set<Key>> projectKeys = new HashMap<>();
 
-  final Multimap<Key, File> keyProjects = HashMultimap.create();
+  final Map<Key, Set<File>> keyProjects = new HashMap<>();
 
   public void register(MavenProject project, Key cacheKey) {
     // project.file is null for parent pom.xml resolved from repositories
     File file = project.getFile();
     if(file != null) {
-      projectKeys.put(file, cacheKey);
-      keyProjects.put(cacheKey, file);
+      projectKeys.computeIfAbsent(file, f -> new HashSet<>()).add(cacheKey);
+      keyProjects.computeIfAbsent(cacheKey, f -> new HashSet<>()).add(file);
     }
   }
 
@@ -62,14 +62,14 @@ abstract class ProjectCachePlunger<Key> {
     }
     final Set<File> affectedProjects = new HashSet<>();
 
-    for(Key cacheKey : projectKeys.removeAll(pom)) {
-      keyProjects.remove(cacheKey, pom);
+    for(Key cacheKey : removeAll(projectKeys, pom)) {
+      remove(keyProjects, cacheKey, pom);
       if(forceDependencyUpdate && RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals(session.getUpdatePolicy())
           && session.getCache().get(session, cacheKey) == null) {
         session.getCache().put(session, cacheKey, Boolean.TRUE);
-        for(File affectedPom : keyProjects.removeAll(cacheKey)) {
+        for(File affectedPom : removeAll(keyProjects, cacheKey)) {
           affectedProjects.add(affectedPom);
-          projectKeys.remove(affectedPom, cacheKey);
+          remove(projectKeys, affectedPom, cacheKey);
         }
       }
       if(!keyProjects.containsKey(cacheKey)) {
@@ -77,8 +77,19 @@ abstract class ProjectCachePlunger<Key> {
         log.debug("Flushed cache entry for {}", cacheKey);
       }
     }
-
     return affectedProjects;
+  }
+
+  private static <K, V> Set<V> removeAll(Map<K, Set<V>> map, K key) {
+    Set<V> removed = map.remove(key);
+    return removed != null ? removed : Collections.emptySet();
+  }
+
+  private static <K, V> void remove(Map<K, Set<V>> map, K key, V value) {
+    map.computeIfPresent(key, (k, values) -> {
+      values.remove(value);
+      return values.isEmpty() ? null : values;
+    });
   }
 
   protected void disposeClassRealm(ClassRealm realm) {

@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.internal.markers;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,8 +23,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Throwables;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -166,8 +166,9 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     if(ex.getMessage() != null) {
       message.append(ex.getMessage()).append("\n\n");
     }
-    message.append(Throwables.getStackTraceAsString(ex));
-    return message.toString();
+    StringWriter errorStackTrace = new StringWriter();
+    ex.printStackTrace(new PrintWriter(errorStackTrace));
+    return message.append(errorStackTrace).toString();
   }
 
   private Throwable getRootCause(Throwable ex) {

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -36,10 +37,9 @@ import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.nexus.CompositeIndex;
 
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @SuppressWarnings("restriction")
@@ -124,14 +124,17 @@ public class MavenArtifactIdentifier {
     }
 
     try {
-      String sha1 = Files.hash(file, Hashing.sha1()).toString(); // TODO use Locations for caching
+      String sha1;
+      try (InputStream fis = new FileInputStream(file)){
+        sha1 = DigestUtils.sha1Hex(fis); // TODO use Locations for caching
+      }
       URL url = new URL("https://search.maven.org/solrsearch/select?q=1:" + sha1);
       try (InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
         Set<ArtifactKey> result = new LinkedHashSet<>();
         JsonObject container = new Gson().fromJson(reader, JsonObject.class);
         JsonArray docs = container.get("response").getAsJsonObject().get("docs").getAsJsonArray();
-        for (int i = 0; i < docs.size(); i++) {
-          JsonObject doc = docs.get(i).getAsJsonObject();
+        for (JsonElement element : docs) {
+            JsonObject doc = element.getAsJsonObject();
           String g = doc.get("g").getAsString();
           String a = doc.get("a").getAsString();
           String v = doc.get("v").getAsString();
