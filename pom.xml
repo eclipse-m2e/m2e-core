@@ -216,6 +216,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho-version}</version>
 				<executions>
 					<execution>
 						<id>p2-metadata</id>
@@ -227,6 +228,15 @@
 				</executions>
 				<configuration>
 					<defaultP2Metadata>false</defaultP2Metadata>
+					<baselineReplace>all</baselineReplace>
+					<baselineRepositories>
+						<repository>
+							<url>https://download.eclipse.org/technology/m2e/releases/latest/</url>
+						</repository>
+						<repository>
+							<url>https://download.eclipse.org/technology/m2e/snapshots/latest/</url>
+						</repository>
+					</baselineRepositories>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -281,22 +291,6 @@
 							<include>**/*Test.java</include>
 						</includes>
 						<forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-p2-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<baselineRepositories>
-							<repository>
-								<url>https://download.eclipse.org/technology/m2e/releases/latest/</url>
-							</repository>
-							<repository>
-								<url>https://download.eclipse.org/technology/m2e/snapshots/latest/</url>
-							</repository>
-						</baselineRepositories>
-						<baselineReplace>common</baselineReplace>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -368,21 +362,14 @@
 
 	<profiles>
 		<profile>
-			<id>eclipse-sign</id>
+			<id>write-feature-version-file</id>
+			<activation>
+				<file>
+					<exists>feature.xml</exists>
+				</file>
+			</activation>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.eclipse.cbi.maven.plugins</groupId>
-						<artifactId>eclipse-jarsigner-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign</id>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
@@ -394,15 +381,10 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<target> <!-- Write project.versions file read during build for the m2e-SDK feature -->
-										<taskdef resource="net/sf/antcontrib/antlib.xml" />
-										<if>
-											<equals arg1="${project.artifactId}" arg2="org.eclipse.m2e.sdk.feature" /> <!-- version-file file only required for m2e.sdk feature -->
-											<then>
-												<echo message="Write '${unqualifiedVersion}' to ${project.build.directory}/m2e.version" level="info" />
-												<echo message="${unqualifiedVersion}" file="${project.build.directory}/m2e.version" level="info" />
-											</then>
-										</if>
+									<target>
+										<!-- Write project.versions file read during build for the m2e-SDK feature -->
+										<echo message="Write '${unqualifiedVersion}' to ${project.build.directory}/m2e.version" level="info" />
+										<echo message="${unqualifiedVersion}" file="${project.build.directory}/m2e.version" level="info" />
 									</target>
 								</configuration>
 							</execution>
