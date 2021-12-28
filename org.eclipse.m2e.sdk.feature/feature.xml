@@ -24,7 +24,15 @@
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.m2e.feature.source"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.m2e.lemminx.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.lemminx.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -32,11 +40,23 @@
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.m2e.logback.feature.source"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.m2e.pde.feature"
          version="0.0.0"/>
 
    <includes
+         id="org.eclipse.m2e.pde.feature.source"
+         version="0.0.0"/>
+
+   <includes
          id="org.eclipse.m2e.sse.ui.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.sse.ui.feature.source"
          version="0.0.0"/>
 
    <plugin
@@ -48,174 +68,6 @@
 
    <plugin
          id="org.eclipse.m2e.tests.common.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.model.edit.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.core.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.launching.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.jdt.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.jdt.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.editor.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.editor.xml.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.refactoring.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.discovery.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.core.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.scm.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.profiles.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.profiles.core.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.logback.configuration.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.logback.appender.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.sourcelookup.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.sourcelookup.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.binaryproject.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.binaryproject.ui.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.importer.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="biz.aQute.bndlib.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.editor.lemminx.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.pde.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.pde.ui.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
