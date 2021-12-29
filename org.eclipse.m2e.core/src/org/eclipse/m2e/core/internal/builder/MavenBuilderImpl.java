@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2021 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 
 import org.apache.maven.execution.MavenExecutionResult;
@@ -58,6 +57,7 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -229,9 +229,9 @@ public class MavenBuilderImpl {
   private void refreshResources(IProject project, Collection<File> resources, IProgressMonitor monitor)
       throws CoreException {
     for(File file : resources) {
-      IPath path = getProjectRelativePath(project, file);
+      IPath path = MavenProjectUtils.getProjectRelativePath(project, file.getAbsolutePath());
       if(path == null) {
-        log.debug("Could not get relative path for file: ", file.getAbsoluteFile());
+        log.debug("Could not get relative path for file: {}", file.getAbsoluteFile());
         continue; // odd
       }
 
@@ -239,7 +239,7 @@ public class MavenBuilderImpl {
       if(path.isEmpty()) {
         resource = project;
       } else if(!file.exists()) {
-        resource = project.findMember(path);
+        resource = project.findMember(path); // null if path does not exist in the workspace
       } else if(file.isDirectory()) {
         resource = project.getFolder(path);
       } else {
@@ -259,24 +259,6 @@ public class MavenBuilderImpl {
         }
       }
     }
-  }
-
-  public static IPath getProjectRelativePath(IProject project, File file) {
-    if(project == null || file == null) {
-      return null;
-    }
-
-    IPath projectPath = project.getLocation();
-    if(projectPath == null) {
-      return null;
-    }
-
-    IPath filePath = new Path(file.getAbsolutePath());
-    if(!projectPath.isPrefixOf(filePath)) {
-      return null;
-    }
-
-    return filePath.removeFirstSegments(projectPath.segmentCount());
   }
 
   private void processBuildResults(IProject project, MavenProject mavenProject, MavenExecutionResult result,
@@ -324,11 +306,7 @@ public class MavenBuilderImpl {
 
   private void deleteBuildParticipantMarkers(IProject project, IMavenMarkerManager markerManager, File file,
       String buildParticipantId) {
-    IPath path = getProjectRelativePath(project, file);
-    IResource resource = null;
-    if(path != null) {
-      resource = project.findMember(path);
-    }
+    IResource resource = MavenProjectUtils.getProjectResource(project, file);
     if(resource == null) {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
@@ -343,11 +321,7 @@ public class MavenBuilderImpl {
   private void addBuildParticipantMarker(IProject project, IMavenMarkerManager markerManager, Message buildMessage,
       String buildParticipantId) {
 
-    IPath path = getProjectRelativePath(project, buildMessage.file);
-    IResource resource = null;
-    if(path != null) {
-      resource = project.findMember(path);
-    }
+    IResource resource = MavenProjectUtils.getProjectResource(project, buildMessage.file);
     if(resource == null) {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
