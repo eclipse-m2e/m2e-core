@@ -89,11 +89,57 @@
 							.classpath
 							.settings/
 							.polyglot.*
+							build.properties
 						</jgit.ignore>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.2.0</version>
+					<configuration>
+						<overWriteReleases>true</overWriteReleases>
+						<overWriteSnapshots>true</overWriteSnapshots>
+						<excludeScope>provided</excludeScope>
+						<includeScope>runtime</includeScope> <!-- only include runtime and compile time dependencies, not test or provided! -->
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-source-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<additionalFileSets>
+							<fileSet>
+								<directory>${project.build.directory}/${dependency.sources.folder}</directory>
+								<includes>
+									<include>**/*.java</include>
+								</includes>
+							</fileSet>
+						</additionalFileSets>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>fetch-flat-dependency-sources</id> <!-- These are used to build source-plugins -->
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<outputDirectory>${project.build.directory}/${dependency.sources.folder}</outputDirectory>
+							<classifier>sources</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<profiles>
@@ -139,13 +185,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
-						<version>3.2.0</version>
-						<configuration>
-							<overWriteReleases>true</overWriteReleases>
-							<overWriteSnapshots>true</overWriteSnapshots>
-							<excludeScope>provided</excludeScope>
-							<includeScope>runtime</includeScope><!-- only include runtime and compile time dependencies, not test or provided! -->
-						</configuration>
 						<executions>
 							<execution>
 								<id>fetch-dependencies</id>
@@ -158,7 +197,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>fetch-dependency-sources</id>
+								<id>fetch-dependency-sources</id> <!-- These are used in the workspace -->
 								<goals>
 									<goal>copy-dependencies</goal>
 								</goals>

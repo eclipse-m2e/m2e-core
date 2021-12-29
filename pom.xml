@@ -166,10 +166,6 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<plugin id="org.eclipse.m2e.archetype.common" />
-								<plugin id="org.eclipse.m2e.maven.indexer" />
-								<plugin id="org.eclipse.m2e.maven.runtime" />
-								<plugin id="org.eclipse.m2e.maven.runtime.slf4j.simple" />
 								<plugin id="org.eclipse.m2e.workspace.cli" />
 							</excludes>
 						</configuration>
