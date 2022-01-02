@@ -315,8 +315,6 @@ public class Messages extends NLS {
 
   public static String PomTemplateContext_resolvingPlugin;
 
-  public static String MavenImpl_error_lookup;
-
   public static String PomTextHover_jump_to;
 
   public static String PomTextHover_category_fix;
