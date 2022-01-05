@@ -90,7 +90,7 @@ public class SourceLocation {
   public String toString() {
     String s = lineNumber + "," + columnStart + "-" + columnEnd + ":" + resourcePath;
     if(linkedLocation != null) {
-      s += "->" + linkedLocation.toString();
+      s += "->" + linkedLocation;
     }
     return s;
   }
