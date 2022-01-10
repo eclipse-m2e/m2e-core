@@ -63,7 +63,7 @@ public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
     Set<String> actualProfileIds = profiles.stream().map(ProfileData::getId).collect(Collectors.toSet());
 
     assertEquals(
-        new HashSet<>(Arrays.asList("module-one", "module-two", "api-one", "api-two", "parent-one", "parent-two", "resolved-one", "resolved-two")),
+        new HashSet<>(Arrays.asList("module-one", "module-two", "api-one", "api-two", "parent-one", "parent-two", "resolved-one", "resolved-two", "active-settings-profile")),
         actualProfileIds);
   }
 }
