@@ -13,23 +13,18 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
@@ -37,7 +32,6 @@ import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -49,9 +43,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IPathEditorInput;
-import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -59,6 +50,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
 import org.apache.maven.artifact.Artifact;
@@ -82,6 +74,19 @@ import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
  * @author Eugene Kuleshov
  */
 public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
+
+  /**
+   * @deprecated use StaticMavenStorageEditorInput directly
+   */
+  @Deprecated(forRemoval = true)
+  public class MavenStorageEditorInput extends StaticMavenStorageEditorInput {
+
+    public MavenStorageEditorInput(String name, String tooltip, String path, byte[] content) {
+      super(name, tooltip, path, content);
+    }
+
+  }
+
   private static final Logger log = LoggerFactory.getLogger(OpenPomAction.class);
 
   String type = IIndex.SEARCH_ARTIFACT;
@@ -189,17 +194,16 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
         File file = artifact.getFile();
         if(file != null) {
-          return openPomEditor(
-              new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(), Files.readAllBytes(file.toPath())),
-              name);
+          IFileStore store = EFS.getStore(file.toURI());
+          if (store != null) {
+            return openPomEditor(
+                new FileStoreEditorInput(store),
+                name);
+          }
         }
 
         openDialog(NLS.bind(Messages.OpenPomAction_error_download, name));
 
-      } catch(IOException ex) {
-        String msg = NLS.bind(Messages.OpenPomAction_error_open_pom, name);
-        log.error(msg, ex);
-        openDialog(msg + "\n" + ex.toString()); //$NON-NLS-1$
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
         openDialog(ex.getMessage() + "\n" + ex.toString()); //$NON-NLS-1$
@@ -246,124 +250,4 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     }
   }
 
-  /**
-   * Storage editor input implementation for Maven poms
-   */
-  public static class MavenStorageEditorInput implements IStorageEditorInput {
-
-    private final String name;
-
-    private final String path;
-
-    private final String tooltip;
-
-    private final byte[] content;
-
-    public MavenStorageEditorInput(String name, String tooltip, String path, byte[] content) {
-      this.name = name;
-      this.path = path;
-      this.tooltip = tooltip;
-      this.content = content;
-    }
-
-    // IStorageEditorInput
-
-    @Override
-    public boolean exists() {
-      return true;
-    }
-
-    @Override
-    public String getName() {
-      return this.name;
-    }
-
-    @Override
-    public String getToolTipText() {
-      return this.tooltip;
-    }
-
-    @Override
-    public IStorage getStorage() {
-      return new MavenStorage(name, path, content);
-    }
-
-    @Override
-    public ImageDescriptor getImageDescriptor() {
-      return null;
-    }
-
-    @Override
-    public IPersistableElement getPersistable() {
-      return null;
-    }
-
-    @Override
-    public <T> T getAdapter(Class<T> adapter) {
-      return null;
-    }
-
-    public IPath getPath() {
-      return path == null ? null : new Path(path);
-    }
-
-  }
-
-  public static class MavenPathStorageEditorInput extends MavenStorageEditorInput implements IPathEditorInput {
-    public MavenPathStorageEditorInput(String name, String tooltip, String path, byte[] content) {
-      super(name, tooltip, path, content);
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    //implemented as hinted by IPathEditorInput javadoc.
-    @Override
-    public boolean equals(Object obj) {
-      IPath path = getPath();
-      if(path != null && obj instanceof MavenPathStorageEditorInput) {
-        return path.equals(((MavenPathStorageEditorInput) obj).getPath());
-      }
-      return super.equals(obj);
-    }
-  }
-
-  private static class MavenStorage implements IStorage {
-    private final String name;
-
-    private final String path;
-
-    private final byte[] content;
-
-    public MavenStorage(String name, String path, byte[] content) {
-      this.name = name;
-      this.path = path;
-      this.content = content;
-    }
-
-    @Override
-    public String getName() {
-      return name;
-    }
-
-    @Override
-    public IPath getFullPath() {
-      return path == null ? null : new Path(path);
-    }
-
-    @Override
-    public InputStream getContents() {
-      return new ByteArrayInputStream(content);
-    }
-
-    @Override
-    public boolean isReadOnly() {
-      return true;
-    }
-
-    @Override
-    public <T> T getAdapter(Class<T> adapter) {
-      return null;
-    }
-  }
 }
