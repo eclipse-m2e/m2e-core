@@ -14,10 +14,6 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +23,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -36,10 +31,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
-
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 
 
 public class XMLEditorUtility {
@@ -56,22 +47,8 @@ public class XMLEditorUtility {
       IWorkbenchPage page = window.getActivePage();
       if(page != null) {
         try {
-          if(!fileStore.getName().endsWith(".pom")) { //.pom means stuff from local repository?
-            IEditorPart part = IDE.openEditorOnFileStore(page, fileStore);
-            reveal(selectEditorPage(part), line, column);
-          } else {
-            //we need special EditorInput for stuff from repository
-            name = name + ".pom"; //$NON-NLS-1$
-            File file = new File(fileStore.toURI());
-            try {
-              IEditorInput input = new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
-                  Files.readAllBytes(file.toPath()));
-              IEditorPart part = OpenPomAction.openEditor(input, name);
-              reveal(selectEditorPage(part), line, column);
-            } catch(IOException e) {
-              log.error("failed opening editor", e);
-            }
-          }
+          IEditorPart part = IDE.openEditorOnFileStore(page, fileStore);
+          reveal(selectEditorPage(part), line, column);
         } catch(PartInitException e) {
           MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
               org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_error_title,
@@ -102,14 +79,11 @@ public class XMLEditorUtility {
       return;
     }
     IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-    if(doc instanceof IStructuredDocument) {
-      IStructuredDocument document = (IStructuredDocument) doc;
-      try {
-        int offset = document.getLineOffset(line - 1);
-        editor.selectAndReveal(offset + column - 1, 0);
-      } catch(BadLocationException e) {
-        log.error("failed selecting part of editor", e);
-      }
+    try {
+      int offset = doc.getLineOffset(line - 1);
+      editor.selectAndReveal(offset + column - 1, 0);
+    } catch(BadLocationException e) {
+      log.error("failed selecting part of editor", e);
     }
   }
 
