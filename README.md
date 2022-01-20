@@ -27,15 +27,15 @@ into your Eclipse-IDE, or use the Eclipse Marketplace Client directly from withi
 
 ⚠️ _Some other entries exist that look like m2e. They're usually outdated or incorrect. Please use the official one, linked above._
 
-Alternatively, you can install the lastest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository: https://download.eclipse.org/technology/m2e/releases/latest/
+Alternatively, you can install the lastest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository:<br> https://download.eclipse.org/technology/m2e/releases/latest/
 
 To use the latest snapshot build, you can use this p2 repository:<br>
-`https://download.eclipse.org/technology/m2e/snapshots/latest/`
+https://download.eclipse.org/technology/m2e/snapshots/latest/
 
-If you only want to use snapshots for the current version under development you can add a p2 repository like the following as available software site:<br>
+To use snapshots only for the current version under development, you can add a p2 repository like the following as available software site:<br>
 `https://download.eclipse.org/technology/m2e/snapshots/<version-under-development>`<br>
 This version-specific snapshot repository is deleted at the next release so you will automatically fallback to the regular release updates.
-The variable `<version-under-development>` has to be replaced by the current version under development version:
+The variable `<version-under-development>` has to be replaced by the current version under development version.
 
 ## 📢 Release notes
 
