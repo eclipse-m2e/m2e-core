@@ -64,8 +64,6 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 		List<File> mavenRuntimeJars = new ArrayList<>();
 		// Add all jars from org.eclipse.m2e.maven.runtime
 		addJarsFromBundle(FrameworkUtil.getBundle(org.apache.maven.Maven.class), "/jars/", mavenRuntimeJars);
-		// Add all jars from org.eclipse.m2e.maven.indexer
-		addJarsFromBundle(FrameworkUtil.getBundle(org.apache.maven.index.Indexer.class), "/jars/", mavenRuntimeJars);
 		// Libraries that are also required and not included in
 		// org.eclipse.m2e.maven.runtime
 		try {
