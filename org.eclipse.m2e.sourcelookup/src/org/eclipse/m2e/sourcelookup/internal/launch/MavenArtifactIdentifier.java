@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2016 Igor Fedorenko
+ * Copyright (c) 2011, 2022 Igor Fedorenko and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,6 @@ import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.nexus.CompositeIndex;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
@@ -138,7 +137,7 @@ public class MavenArtifactIdentifier {
           String v = doc.get("v").getAsString();
           result.add(new ArtifactKey(g, a, v, null));
         }
-        return !result.isEmpty() ? ImmutableSet.copyOf(result) : null;
+        return !result.isEmpty() ? Set.copyOf(result) : null;
       }
     } catch (IOException e) {
       // TODO maybe log, ignore otherwise
@@ -156,6 +155,6 @@ public class MavenArtifactIdentifier {
         artifacts.add(new ArtifactKey(groupId, artifactId, version, /* classifier= */null));
       }
     }
-    return ImmutableSet.copyOf(artifacts);
+    return Set.copyOf(artifacts);
   }
 }
