@@ -28,6 +28,7 @@ import org.eclipse.jdt.launching.sourcelookup.advanced.AdvancedSourceLookup;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.actions.StaticMavenStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.sourcelookup.internal.launch.MetaInfMavenScanner;
 import org.eclipse.ui.IEditorInput;
@@ -80,9 +81,7 @@ public class OpenPomCommandHandler extends AbstractHandler {
     return null;
   }
 
-  static MavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
-    try(is) {
-      return new MavenStorageEditorInput(name, name, null, is.readAllBytes());
-    }
+  static StaticMavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
+    return new StaticMavenStorageEditorInput(name, name, null, is.readAllBytes());
   }
 }
