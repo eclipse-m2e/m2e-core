@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Anton Tanasenko.
+ * Copyright (c) 2016, 2022 Anton Tanasenko and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
+
+import static java.util.Map.entry;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +28,6 @@ import java.util.Map;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -233,9 +234,9 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
 
   private static final Splitter EXECUTE_SPLITTER = Splitter.on(',').omitEmptyStrings();
 
-  private static final Map<String, String> EXECUTE_OPTIONS = new ImmutableMap.Builder<String, String>()
-      .put("onConfiguration", LifecycleMappingFactory.ELEMENT_RUN_ON_CONFIGURATION) //$NON-NLS-1$
-      .put("onIncremental", LifecycleMappingFactory.ELEMENT_RUN_ON_INCREMENTAL).build(); //$NON-NLS-1$
+  private static final Map<String, String> EXECUTE_OPTIONS = Map.ofEntries(
+      entry("onConfiguration", LifecycleMappingFactory.ELEMENT_RUN_ON_CONFIGURATION), //$NON-NLS-1$
+      entry("onIncremental", LifecycleMappingFactory.ELEMENT_RUN_ON_INCREMENTAL)); //$NON-NLS-1$
 
   private static Xpp3Dom parse(String pi) {
 
