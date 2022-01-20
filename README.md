@@ -32,7 +32,7 @@ Alternatively, you can install the lastest M2Eclipse release by using the _Insta
 To use the latest snapshot build, you can use this p2 repository:<br>
 https://download.eclipse.org/technology/m2e/snapshots/latest/
 
-To use snapshots only for the current version under development, you can add a p2 repository like the following as available software site:<br>
+To use snapshots only for the current version under development, you can add a p2 repository like the following:<br>
 `https://download.eclipse.org/technology/m2e/snapshots/<version-under-development>`<br>
 This version-specific snapshot repository is deleted at the next release so you will automatically fallback to the regular release updates.
 The variable `<version-under-development>` has to be replaced by the current version under development version.
