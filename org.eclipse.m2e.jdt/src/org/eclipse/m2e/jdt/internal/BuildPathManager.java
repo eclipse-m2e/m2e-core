@@ -82,8 +82,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.index.IndexManager;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -132,8 +130,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final IMavenConfiguration mavenConfiguration;
 
-  final IndexManager indexManager;
-
   final BundleContext bundleContext;
 
   final IMaven maven;
@@ -146,10 +142,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private final DefaultClasspathManagerDelegate defaultDelegate;
 
-  public BuildPathManager(IMavenProjectRegistry projectManager, IndexManager indexManager, BundleContext bundleContext,
-      File stateLocationDir) {
+  public BuildPathManager(IMavenProjectRegistry projectManager, BundleContext bundleContext, File stateLocationDir) {
     this.projectManager = projectManager;
-    this.indexManager = indexManager;
     this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     this.bundleContext = bundleContext;
     this.stateLocationDir = stateLocationDir;
@@ -404,16 +398,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     for(IClasspathEntry entry : entries) {
       ArtifactKey artifact = findArtifactByArtifactKey(entry);
 
-      if(artifact == null) {
-        artifact = findArtifactInIndex(project, entry);
-        if(artifact == null) {
-          // console.logError("Can't find artifact for " + entry.getPath());
-        } else {
-          // console.logMessage("Found indexed artifact " + artifact + " for " + entry.getPath());
-          artifacts.add(artifact);
-        }
-      } else {
-        // console.logMessage("Found artifact " + artifact + " for " + entry.getPath());
+      if(artifact != null) {
         artifacts.add(artifact);
       }
     }
@@ -453,19 +438,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     if(groupId != null && artifactId != null && version != null) {
       return new ArtifactKey(groupId, artifactId, version, classifier);
     }
-    return null;
-  }
-
-  private ArtifactKey findArtifactInIndex(IProject project, IClasspathEntry entry) throws CoreException {
-    IFile jarFile = project.getWorkspace().getRoot().getFile(entry.getPath());
-    File file = jarFile == null || jarFile.getLocation() == null ? entry.getPath().toFile()
-        : jarFile.getLocation().toFile();
-
-    IndexedArtifactFile iaf = indexManager.getIndex(project).identify(file);
-    if(iaf != null) {
-      return new ArtifactKey(iaf.group, iaf.artifact, iaf.version, iaf.classifier);
-    }
-
     return null;
   }
 

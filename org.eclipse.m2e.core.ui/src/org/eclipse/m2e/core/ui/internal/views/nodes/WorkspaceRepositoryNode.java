@@ -13,7 +13,7 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -22,10 +22,10 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  *
  * @author igor
  */
-public class WorkspaceRepositoryNode extends AbstractIndexedRepositoryNode {
+public class WorkspaceRepositoryNode extends RepositoryNode {
 
-  public WorkspaceRepositoryNode(NexusIndex index) {
-    super(index);
+  public WorkspaceRepositoryNode() {
+    super(MavenPlugin.getRepositoryRegistry().getWorkspaceRepository());
   }
 
   @Override

@@ -15,9 +15,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,17 +61,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import org.apache.lucene.search.BooleanQuery;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.UserInputSearchExpression;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -238,7 +231,7 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   protected boolean showClassifiers() {
-    return (IIndex.SEARCH_ARTIFACT.equals(queryType));
+    return true;
   }
 
   public void init(String queryText, String queryType, IProject project, Set<ArtifactKey> artifacts,
@@ -391,14 +384,12 @@ public class MavenPomSelectionComponent extends Composite {
   void scheduleSearch(String query, boolean delay) {
     if(query != null && query.length() > 2) {
       if(searchJob == null) {
-        IndexManager indexManager = MavenPlugin.getIndexManager();
-        searchJob = new SearchJob(queryType, indexManager);
+        searchJob = new SearchJob(queryType);
       } else {
         if(!searchJob.cancel()) {
           //for already running ones, just create new instance so that the previous one can peacefully die
           //without preventing the new one from completing first
-          IndexManager indexManager = MavenPlugin.getIndexManager();
-          searchJob = new SearchJob(queryType, indexManager);
+          searchJob = new SearchJob(queryType);
         }
       }
       searchJob.setQuery(query.toLowerCase());
@@ -423,18 +414,15 @@ public class MavenPomSelectionComponent extends Composite {
    */
   private class SearchJob extends Job {
 
-    private final IndexManager indexManager;
-
     private String query;
 
     private final String field;
 
     private volatile boolean stop = false;
 
-    public SearchJob(String field, IndexManager indexManager) {
+    public SearchJob(String field) {
       super(Messages.MavenPomSelectionComponent_searchJob);
       this.field = field;
-      this.indexManager = indexManager;
     }
 
     public void setQuery(String query) {
@@ -447,52 +435,18 @@ public class MavenPomSelectionComponent extends Composite {
       return super.shouldRun();
     }
 
-    public int getClassifier() {
-      // mkleint: no more allowing people to opt in/out displaying javadoc and sources..
-      // allow tests and every other classifier..
-      return IIndex.SEARCH_JARS + IIndex.SEARCH_TESTS;
-    }
-
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-      int classifier = showClassifiers() ? getClassifier() : IIndex.SEARCH_ALL;
       if(searchResultViewer == null || searchResultViewer.getControl() == null
           || searchResultViewer.getControl().isDisposed()) {
         return Status.CANCEL_STATUS;
       }
       if(query != null) {
         String activeQuery = query;
-        try {
-          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_searching, activeQuery.toLowerCase()),
-              null);
-
-          Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search(
-              new UserInputSearchExpression(activeQuery), field, classifier);
-
-          //335139 have the managed entries always come up as first results
-          LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<>();
-          LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<>();
-          for(Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
-            String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId(); //$NON-NLS-1$
-            if(managedKeys.contains(key)) {
-              managed.put(art.getKey(), art.getValue());
-            } else {
-              nonManaged.put(art.getKey(), art.getValue());
-            }
-          }
-          managed.putAll(nonManaged);
-          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, activeQuery, res.size()), managed);
-        } catch(BooleanQuery.TooManyClauses ex) {
-          setResult(IStatus.ERROR, Messages.MavenPomSelectionComponent_toomany,
-              Collections.<String, IndexedArtifact> emptyMap());
-        } catch(final RuntimeException ex) {
-          setResult(IStatus.ERROR, NLS.bind(Messages.MavenPomSelectionComponent_error, ex.toString()),
-              Collections.<String, IndexedArtifact> emptyMap());
-        } catch(final Exception ex) {
-          setResult(IStatus.ERROR, NLS.bind(Messages.MavenPomSelectionComponent_error, ex.getMessage()),
-              Collections.<String, IndexedArtifact> emptyMap());
-        }
+        setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_searching, activeQuery.toLowerCase()), null);
       }
+      // TODO used to be indexer, replace with Central search
+
       return Status.OK_STATUS;
     }
 
@@ -566,14 +520,14 @@ public class MavenPomSelectionComponent extends Composite {
     public Image getImage(Object element) {
       if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
-        if(managedKeys.contains(getKey(f))) {
-          return MavenImages.getOverlayImage(f.sourcesExists == IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC
-              : MavenImages.PATH_VERSION, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
-        }
+//        if(managedKeys.contains(getKey(f))) {
+//          return MavenImages.getOverlayImage(f.sourcesExists == IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC
+//              : MavenImages.PATH_VERSION, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
+//        }
 
-        if(f.sourcesExists == IIndex.PRESENT) {
-          return MavenImages.IMG_VERSION_SRC;
-        }
+//        if(f.sourcesExists == IIndex.PRESENT) {
+//          return MavenImages.IMG_VERSION_SRC;
+//        }
         return MavenImages.IMG_VERSION;
       } else if(element instanceof IndexedArtifact) {
         IndexedArtifact i = (IndexedArtifact) element;

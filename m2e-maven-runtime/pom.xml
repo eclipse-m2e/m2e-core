@@ -31,7 +31,6 @@
 
 	<modules>
 		<module>org.eclipse.m2e.archetype.common</module>
-		<module>org.eclipse.m2e.maven.indexer</module>
 		<module>org.eclipse.m2e.maven.runtime</module>
 		<module>org.eclipse.m2e.maven.runtime.slf4j.simple</module>
 	</modules>

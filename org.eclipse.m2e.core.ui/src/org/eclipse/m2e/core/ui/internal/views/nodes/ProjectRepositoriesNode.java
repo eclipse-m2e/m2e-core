@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -31,17 +29,13 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class ProjectRepositoriesNode implements IMavenRepositoryNode {
 
-  private final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
-
   private final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   @Override
   public Object[] getChildren() {
     ArrayList<Object> nodes = new ArrayList<>();
     for(IRepository repo : repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_PROJECT)) {
-      NexusIndex index = indexManager.getIndex(repo);
-      RepositoryNode node = new RepositoryNode(index);
-      nodes.add(node);
+      nodes.add(new RepositoryNode(repo));
     }
     return nodes.toArray(new Object[nodes.size()]);
   }

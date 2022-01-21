@@ -242,23 +242,19 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       pomFileNameText.setText(""); //$NON-NLS-1$
     }
 
-    try {
-      IndexedArtifactFile iaf = MavenPlugin.getIndexManager().getAllIndexes().identify(file);
-      if(iaf != null) {
-        groupIdCombo.setText(iaf.group);
-        artifactIdCombo.setText(iaf.artifact);
-        versionCombo.setText(iaf.version);
-        if(iaf.classifier != null) {
-          classifierCombo.setText(iaf.classifier);
-        }
-
-        String name = iaf.group + ":" + iaf.artifact + "-" + iaf.version // //$NON-NLS-1$ //$NON-NLS-2$
-            + (iaf.classifier == null ? "" : iaf.classifier); //$NON-NLS-1$
-        setMessage(NLS.bind(Messages.MavenInstallFileArtifactWizardPage_message, name), WARNING);
-        return;
+    IndexedArtifactFile iaf = null; // TODO used to be some indexer request
+    if(iaf != null) {
+      groupIdCombo.setText(iaf.group);
+      artifactIdCombo.setText(iaf.artifact);
+      versionCombo.setText(iaf.version);
+      if(iaf.classifier != null) {
+        classifierCombo.setText(iaf.classifier);
       }
-    } catch(CoreException ex) {
-      log.error(ex.getMessage(), ex);
+
+      String name = iaf.group + ":" + iaf.artifact + "-" + iaf.version // //$NON-NLS-1$ //$NON-NLS-2$
+          + (iaf.classifier == null ? "" : iaf.classifier); //$NON-NLS-1$
+      setMessage(NLS.bind(Messages.MavenInstallFileArtifactWizardPage_message, name), WARNING);
+      return;
     }
 
     if(n > -1) {

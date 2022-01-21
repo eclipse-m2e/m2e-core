@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -66,7 +65,6 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -151,10 +149,6 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
           mavenConfiguration.setUserSettingsFile(userSettings);
 
           File newRepositoryDir = new File(maven.getLocalRepository().getBasedir());
-          if(!newRepositoryDir.equals(localRepositoryDir)) {
-            IndexManager indexManager = MavenPlugin.getIndexManager();
-            indexManager.getWorkspaceIndex().updateIndex(true, monitor);
-          }
           if(updateProjects[0]) {
             IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
             ArrayList<IProject> allProjects = new ArrayList<>();
@@ -257,19 +251,6 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     localRepositoryText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
     localRepositoryText.setData("name", "localRepositoryText"); //$NON-NLS-1$ //$NON-NLS-2$
     localRepositoryText.setEditable(false);
-    Button reindexButton = new Button(composite, SWT.NONE);
-    reindexButton.setLayoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1));
-    reindexButton.setText(Messages.preferencesReindexButton);
-    reindexButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-      new WorkspaceJob(Messages.MavenSettingsPreferencePage_job_indexing) {
-        @Override
-        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-          IndexManager indexManager = MavenPlugin.getIndexManager();
-          indexManager.getWorkspaceIndex().updateIndex(true, monitor);
-          return Status.OK_STATUS;
-        }
-      }.schedule();
-    }));
 
     ModifyListener settingsModifyListener = modifyevent -> {
       updateLocalRepository();

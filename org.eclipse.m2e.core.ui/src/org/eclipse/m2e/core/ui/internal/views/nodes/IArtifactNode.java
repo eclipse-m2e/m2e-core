@@ -13,6 +13,9 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
+import org.eclipse.aether.artifact.Artifact;
+
+
 /**
  * AbstractArtifactNode
  *
@@ -20,4 +23,9 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
  */
 public interface IArtifactNode {
   String getDocumentKey();
+
+  /**
+   * @return
+   */
+  Artifact getArtifact();
 }

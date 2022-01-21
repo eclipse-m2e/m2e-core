@@ -97,30 +97,6 @@ public abstract class ArchetypeCatalogFactory {
   }
 
   /**
-   * Factory for Nexus Indexer ArchetypeCatalog
-   */
-  public static class NexusIndexerCatalogFactory extends ArchetypeCatalogFactory {
-    public static final String ID = "nexusIndexer"; //$NON-NLS-1$
-
-    public NexusIndexerCatalogFactory() {
-      super(ID, Messages.ArchetypeCatalogFactory_indexer_catalog, false);
-    }
-
-    @Override
-    public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
-      try {
-        ArchetypeDataSource source = MavenPluginActivator.getDefault().getIndexManager().getArchetypeCatalog();
-        return source.getArchetypeCatalog(new Properties());
-      } catch(ArchetypeDataSourceException ex) {
-        String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());
-        log.error(msg, ex);
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
-      }
-    }
-
-  }
-
-  /**
    * Factory for internal ArchetypeCatalog
    */
   public static class InternalCatalogFactory extends ArchetypeCatalogFactory {

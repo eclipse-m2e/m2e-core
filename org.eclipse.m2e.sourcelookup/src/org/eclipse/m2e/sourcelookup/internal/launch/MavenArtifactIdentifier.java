@@ -21,21 +21,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.nexus.CompositeIndex;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -75,47 +68,12 @@ public class MavenArtifactIdentifier {
     // checksum-based lookup in central
     // GAV extracted from pom.properties
 
-    Collection<ArtifactKey> classesArtifacts = identifyNexusIndexer(classesLocation);
-    if (classesArtifacts == null) {
-      classesArtifacts = identifyCentralSearch(classesLocation);
-    }
+    Collection<ArtifactKey> classesArtifacts = identifyCentralSearch(classesLocation);
     if (classesArtifacts == null) {
       classesArtifacts = scanPomProperties(classesLocation);
     }
 
     return classesArtifacts;
-  }
-
-  protected Collection<ArtifactKey> identifyNexusIndexer(File file) {
-    if (!file.isFile()) {
-      return null;
-    }
-
-    try {
-      IIndex index = MavenPlugin.getIndexManager().getAllIndexes();
-
-      List<IndexedArtifactFile> identified;
-      if (index instanceof CompositeIndex) {
-        identified = ((CompositeIndex) index).identifyAll(file);
-      } else {
-        IndexedArtifactFile indexed = index.identify(file);
-        if (indexed != null) {
-          identified = Collections.singletonList(indexed);
-        } else {
-          identified = Collections.emptyList();
-        }
-      }
-
-      for (IndexedArtifactFile indexed : identified) {
-        if (indexed.sourcesExists == IIndex.PRESENT) {
-          return Collections.singleton(indexed.getArtifactKey());
-        }
-      }
-    } catch (CoreException e) {
-      // TODO maybe log, but ignore otherwise
-    }
-
-    return null;
   }
 
   protected Collection<ArtifactKey> identifyCentralSearch(File file) {
