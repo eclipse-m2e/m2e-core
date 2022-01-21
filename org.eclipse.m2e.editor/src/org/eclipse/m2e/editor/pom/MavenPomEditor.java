@@ -94,8 +94,8 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.actions.StaticMavenStorageEditorInput;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.internal.Messages;
 
@@ -152,7 +152,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private boolean resourceChangeEventSkip = false;
 
-  private MavenStorageEditorInput effectivePomEditorInput;
+  private StaticMavenStorageEditorInput effectivePomEditorInput;
 
   private boolean disposed = false;
 
@@ -367,7 +367,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(sourceDocument == null) {
       sourceDocument = sourcePage.getDocumentProvider().getDocument(this.getEditorInput());
     }
+//    if (sourceDocument instanceof IStructuredDocument) {
     this.structuredModel = (IDOMModel) this.modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
+//    } else {
+//      this.structuredModel = this.modelManager.
+//    }
   }
 
   protected void selectActivePage() {
@@ -555,7 +559,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(effectivePomEditorInput == null) {
       String content = Messages.MavenPomEditor_loading;
       String name = getPartName() + Messages.MavenPomEditor_effective;
-      effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes(StandardCharsets.UTF_8));
+      effectivePomEditorInput = new StaticMavenStorageEditorInput(name, name, null,
+          content.getBytes(StandardCharsets.UTF_8));
     }
     return effectivePomEditorInput;
   }

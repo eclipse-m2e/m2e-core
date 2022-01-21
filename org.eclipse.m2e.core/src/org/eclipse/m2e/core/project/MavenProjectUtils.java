@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2021 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -36,13 +36,13 @@ public class MavenProjectUtils {
   }
 
   /**
-   * Returns project resource for given filesystem location or null the location is outside of project.
+   * Returns project resource path for given file-system location or null if the location is outside of project.
    *
-   * @param resourceLocation absolute filesystem location
-   * @return IPath the full, absolute workspace path resourceLocation
+   * @param resourceLocation absolute file-system location
+   * @return IPath the full, absolute workspace path of resourceLocation
    */
   public static IPath getProjectRelativePath(IProject project, String resourceLocation) {
-    if(resourceLocation == null) {
+    if(project == null || resourceLocation == null) {
       return null;
     }
     IPath projectLocation = project.getLocation();
@@ -50,7 +50,6 @@ public class MavenProjectUtils {
     if(projectLocation == null || !projectLocation.isPrefixOf(directory)) {
       return null;
     }
-
     return directory.removeFirstSegments(projectLocation.segmentCount()).makeRelative().setDevice(null);
   }
 
@@ -74,28 +73,22 @@ public class MavenProjectUtils {
   }
 
   /**
+   * Returns the {@link IResource} of the given project that has the same absolute path in the local file system like
+   * the given file or null if the file does not point into the project or no such resource <b>exists in the
+   * workspace</b>.
+   */
+  public static IResource getProjectResource(IProject project, File file) {
+    String resourceLocation = file != null ? file.getAbsolutePath() : null;
+    IPath relativePath = getProjectRelativePath(project, resourceLocation);
+    return relativePath != null ? project.findMember(relativePath) : null;
+  }
+
+  /**
    * Returns the full, absolute path of the given file relative to the workspace. Returns null if the file does not
    * exist or is not a member of this project.
    */
   public static IPath getFullPath(IProject project, File file) {
-    if(project == null || file == null) {
-      return null;
-    }
-
-    IPath projectPath = project.getLocation();
-    if(projectPath == null) {
-      return null;
-    }
-
-    IPath filePath = new Path(file.getAbsolutePath());
-    if(!projectPath.isPrefixOf(filePath)) {
-      return null;
-    }
-    IResource resource = project.findMember(filePath.removeFirstSegments(projectPath.segmentCount()));
-    if(resource == null) {
-      return null;
-    }
-    return resource.getFullPath();
+    IResource resource = getProjectResource(project, file);
+    return resource != null ? resource.getFullPath() : null;
   }
-
 }

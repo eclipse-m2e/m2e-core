@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.sourcelookup;singleton:=true
-Bundle-Version: 1.17.4.qualifier
+Bundle-Version: 1.17.5.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Bundle-Name: M2E Source Lookup Core
 Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.16.0,2.0.0)",

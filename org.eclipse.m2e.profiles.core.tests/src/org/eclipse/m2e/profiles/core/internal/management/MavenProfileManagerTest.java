@@ -16,12 +16,15 @@ package org.eclipse.m2e.profiles.core.internal.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.eclipse.core.resources.IProject;
@@ -37,7 +40,6 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
 
   private final IProfileManager profileManager = MavenProfilesCoreActivator.getDefault().getProfileManager();
-
 
   @Test
   public void testLoadingProfilesFromPomsResolvedViaTheirRelativePath() throws Exception {
@@ -61,7 +63,7 @@ public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
     Set<String> actualProfileIds = profiles.stream().map(ProfileData::getId).collect(Collectors.toSet());
 
     assertEquals(
-        new HashSet<>(Arrays.asList("module-one", "module-two", "api-one", "api-two", "parent-one", "parent-two")),
+        new HashSet<>(Arrays.asList("module-one", "module-two", "api-one", "api-two", "parent-one", "parent-two", "resolved-one", "resolved-two", "active-settings-profile")),
         actualProfileIds);
   }
 }
