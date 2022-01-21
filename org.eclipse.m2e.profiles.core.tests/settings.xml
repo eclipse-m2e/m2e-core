@@ -1,0 +1,24 @@
+<settings>
+  
+  <localRepository>target/localrepo</localRepository>
+
+  <profiles>
+    <profile>
+      <id>active-settings-profile</id>
+      <repositories>
+      	<repository>
+        	<id>testrepo</id>
+       		<url>file:repositories/testrepo</url>
+       		<snapshots><enabled>true</enabled></snapshots>
+       		<releases><enabled>true</enabled></releases>
+			<updatePolicy>true</updatePolicy>
+     	</repository>
+      </repositories>      
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>active-settings-profile</activeProfile>
+  </activeProfiles>
+
+</settings>

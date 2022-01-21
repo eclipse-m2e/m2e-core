@@ -263,6 +263,12 @@ public class ProfileManager implements IProfileManager {
         MavenXpp3Reader mavenreader = new MavenXpp3Reader();
         FileReader reader = new FileReader(parentPomFile);
         final Model parentModel = mavenreader.read(reader);
+
+        // Verify that the POM found via the relative path has co-ordinates that match the parent we are searching for, if no match then return null.
+        if(!modelEqualsParent(parentModel, model.getParent())) {
+          return null;
+        }
+
         parentModel.setPomFile(parentPomFile);
         return parentModel;
       }
@@ -273,6 +279,43 @@ public class ProfileManager implements IProfileManager {
     }
 
     return null; // If we have got here then we failed to locate the parent POM file
+  }
+
+  /*
+   * Verifies that the co-ordinates of the model matches the parent. Note that for the
+   * group ID and version we are lenient; if for whatever reason the model does not
+   * have a groupId or version then we assume these properties of the co-ordinates are
+   * a match. In the future this assumption could be challenged and the logic reversed
+   * in order to be more strict.
+   */
+  private boolean modelEqualsParent(Model pomModel, Parent pomParent) {
+    String pomModelGroupId = getPomModelGroupId(pomModel);
+    if(pomModelGroupId != null && !pomModelGroupId.equals(pomParent.getGroupId())) {
+      return false;
+    }
+
+    if(!pomModel.getArtifactId().equals(pomParent.getArtifactId())) {
+      return false;
+    }
+
+    String pomModelVersion = getPomModelVersion(pomModel);
+    return pomModelVersion == null || pomModelVersion.equals(pomParent.getVersion());
+  }
+
+  private String getPomModelGroupId(Model pomModel) {
+    if(pomModel.getGroupId() == null && pomModel.getParent() != null) {
+      return pomModel.getParent().getGroupId();
+    }
+
+    return pomModel.getGroupId();
+  }
+
+  private String getPomModelVersion(Model pomModel) {
+    if(pomModel.getVersion() == null && pomModel.getParent() != null) {
+      return pomModel.getParent().getVersion();
+    }
+
+    return pomModel.getVersion();
   }
 
   private List<ArtifactRepository> getProjectRepositories(Model projectModel) {

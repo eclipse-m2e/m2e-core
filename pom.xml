@@ -81,6 +81,7 @@
 		<module>org.eclipse.m2e.editor.lemminx</module>
 		<module>org.eclipse.m2e.pde</module>
 		<module>org.eclipse.m2e.pde.ui</module>
+		<module>org.eclipse.m2e.pde.connector</module>
 
 		<!-- common test helpers -->
 		<module>org.eclipse.m2e.tests.common</module>
