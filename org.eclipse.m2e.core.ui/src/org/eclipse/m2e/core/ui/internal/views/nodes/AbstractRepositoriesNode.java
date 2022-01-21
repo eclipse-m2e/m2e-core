@@ -19,8 +19,6 @@ import java.util.List;
 import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -33,8 +31,6 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
  */
 public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
-  protected final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
-
   protected final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   @Override
@@ -44,8 +40,7 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
     ArrayList<Object> globalRepoNodes = new ArrayList<>();
 
     for(IRepository repo : getRepositories()) {
-      NexusIndex index = indexManager.getIndex(repo);
-      RepositoryNode node = new RepositoryNode(index);
+      RepositoryNode node = new RepositoryNode(repo);
       if(repo.getMirrorOf() != null) {
         mirrorNodes.add(node);
       } else {

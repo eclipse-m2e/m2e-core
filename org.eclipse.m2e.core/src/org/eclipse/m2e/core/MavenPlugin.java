@@ -18,7 +18,6 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
@@ -56,10 +55,6 @@ public final class MavenPlugin {
 
   public static IRepositoryRegistry getRepositoryRegistry() {
     return MavenPluginActivator.getDefault().getRepositoryRegistry();
-  }
-
-  public static IndexManager getIndexManager() {
-    return MavenPluginActivator.getDefault().getIndexManager();
   }
 
   public static IMavenConfiguration getMavenConfiguration() {

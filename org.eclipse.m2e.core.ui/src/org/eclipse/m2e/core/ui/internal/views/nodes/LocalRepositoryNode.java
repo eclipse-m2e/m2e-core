@@ -13,8 +13,7 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
-import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -23,15 +22,14 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  *
  * @author igor
  */
-public class LocalRepositoryNode extends AbstractIndexedRepositoryNode {
+public class LocalRepositoryNode extends RepositoryNode {
 
-  public LocalRepositoryNode(NexusIndex index) {
-    super(index);
+  public LocalRepositoryNode() {
+    super(MavenPlugin.getRepositoryRegistry().getLocalRepository());
   }
 
   @Override
   public String getName() {
-    IRepository repository = index.getRepository();
     StringBuilder sb = new StringBuilder();
     sb.append(Messages.LocalRepositoryNode_local);
     if(repository.getBasedir() != null) {

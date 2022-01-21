@@ -13,42 +13,54 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.swt.graphics.Image;
 
+import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
- * LocalRepositoryNode
+ * AbstractIndexedRepository
  *
- * @author dyocum
+ * @author igor
  */
-public class LocalRepositoryRootNode implements IMavenRepositoryNode {
+public abstract class RemoteRepositoryNode implements IMavenRepositoryNode {
+  private static final Logger log = LoggerFactory.getLogger(RemoteRepositoryNode.class);
+
+  protected static final Object[] NO_CHILDREN = new Object[0];
+
+  protected final IRepository repository;
+
+  protected RemoteRepositoryNode(IRepository repository) {
+    this.repository = repository;
+  }
 
   @Override
   public Object[] getChildren() {
-    return new Object[] {new LocalRepositoryNode(), new WorkspaceRepositoryNode()};
-  }
-
-  @Override
-  public String getName() {
-    return Messages.LocalRepositoryRootNode_name;
-  }
-
-  @Override
-  public boolean hasChildren() {
-    return true;
+    return NO_CHILDREN;
   }
 
   @Override
   public Image getImage() {
-    return MavenImages.IMG_INDEXES;
+    return MavenImages.IMG_INDEX;
+  }
+
+  @Override
+  public boolean hasChildren() {
+    return false;
   }
 
   @Override
   public boolean isUpdating() {
     return false;
+  }
+
+
+  public String getRepositoryUrl() {
+    return repository.getUrl();
   }
 
 }

@@ -84,7 +84,7 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
 
   @Override
   public Color getForeground(Object element) {
-    if(element instanceof RepositoryNode && !((RepositoryNode) element).isEnabledIndex()) {
+    if(element instanceof RepositoryNode && !(((RepositoryNode) element).hasChildren())) {
         return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
     }
     return null;

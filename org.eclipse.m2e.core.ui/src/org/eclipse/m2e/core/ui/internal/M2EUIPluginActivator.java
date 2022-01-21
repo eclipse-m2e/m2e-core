@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -31,13 +30,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.index.filter.FilteredIndex;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
-import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 
@@ -127,8 +123,8 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return console != null;
   }
 
-  public SearchEngine getSearchEngine(IProject project) throws CoreException {
-    return new IndexSearchEngine(new FilteredIndex(project, MavenPlugin.getIndexManager().getIndex(project)));
+  public SearchEngine getSearchEngine(IProject project) {
+    return null; // used to be only Index based search, need to hook other engines
   }
 
   public synchronized IMavenDiscovery getMavenDiscovery() {

@@ -85,17 +85,12 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeUtil;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.internal.index.IMutableIndex;
-import org.eclipse.m2e.core.internal.index.IndexListener;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
@@ -105,7 +100,7 @@ import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
  * Maven Archetype selection wizard page presents the user with a list of available Maven Archetypes available for
  * creating new project.
  */
-public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage implements IndexListener {
+public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
   private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypePage.class);
 
   private static final String KEY_CATALOG = "catalog"; //$NON-NLS-1$
@@ -179,7 +174,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
 
-    MavenPlugin.getIndexManager().addIndexListener(this);
     setControl(composite);
   }
 
@@ -526,7 +520,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       job.cancel();
       job = null;
     }
-    MavenPlugin.getIndexManager().removeIndexListener(this);
     archetypesCache.clear();
     super.dispose();
   }
@@ -614,8 +607,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getActiveArchetypeCatalogs();
           if(catalogs.isEmpty()) {
             error = Messages.MavenProjectWizardArchetypePage_error_noEnabledCatalogs;
-          } else if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
-            error = Messages.MavenProjectWizardArchetypePage_error_emptyNexusIndexer;
           } else {
             error = Messages.MavenProjectWizardArchetypePage_error_emptyCatalog;
           }
@@ -831,9 +822,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             }
 
             monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_indexing);
-            IndexManager indexManager = MavenPlugin.getIndexManager();
-            IMutableIndex localIndex = indexManager.getLocalIndex();
-            localIndex.addArtifact(jarFile, new ArtifactKey(pomArtifact));
 
             //save out the archetype
             //TODO move this logic out of UI code!
@@ -1009,11 +997,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
   }
 
-  @Override
-  public void indexAdded(IRepository repository) {
-
-  }
-
   //reload the table when index updating finishes
   //try to preserve selection in case this is a rebuild
   protected void reloadViewer() {
@@ -1031,19 +1014,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         }
       }
     });
-  }
-
-  @Override
-  public void indexChanged(IRepository repository) {
-    reloadViewer();
-  }
-
-  @Override
-  public void indexRemoved(IRepository repository) {
-  }
-
-  @Override
-  public void indexUpdating(IRepository repository) {
   }
 
   private class RetrievingArchetypesJob extends Job {

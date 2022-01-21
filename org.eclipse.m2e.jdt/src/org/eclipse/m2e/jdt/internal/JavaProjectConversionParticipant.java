@@ -50,8 +50,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.SearchExpression;
@@ -460,46 +458,41 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Assert.isNotNull(artifactId, "artifactId can not be null");
     String version = referenceVersion;
     String partialKey = artifactId + " : " + groupId; //$NON-NLS-1$
-    try {
-      IIndex index = MavenPlugin.getIndexManager().getAllIndexes();
-      SearchExpression a = new SourcedSearchExpression(artifactId);
+    SearchExpression a = new SourcedSearchExpression(artifactId);
 
-      //For some reason, an exact search using :
-      //ISearchEngine searchEngine  = M2EUIPluginActivator.getDefault().getSearchEngine(null)
-      //searchEngine.findVersions(groupId, artifactId, searchExpression, packaging)
-      //
-      //doesn't yield the expected results (the latest versions are not returned), so we rely on a fuzzier search
-      //and refine the results.
-      Map<String, IndexedArtifact> values = index.search(a, IIndex.SEARCH_PLUGIN);
-      if(!values.isEmpty()) {
-        SortedSet<ComparableVersion> versions = new TreeSet<>();
-        ComparableVersion referenceComparableVersion = referenceVersion == null ? null
-            : new ComparableVersion(referenceVersion);
+    //For some reason, an exact search using :
+    //ISearchEngine searchEngine  = M2EUIPluginActivator.getDefault().getSearchEngine(null)
+    //searchEngine.findVersions(groupId, artifactId, searchExpression, packaging)
+    //
+    //doesn't yield the expected results (the latest versions are not returned), so we rely on a fuzzier search
+    //and refine the results.
+    Map<String, IndexedArtifact> values = Map.of(); // was using index, but should use searchEngine as mentioned above
+    if(!values.isEmpty()) {
+      SortedSet<ComparableVersion> versions = new TreeSet<>();
+      ComparableVersion referenceComparableVersion = referenceVersion == null ? null
+          : new ComparableVersion(referenceVersion);
 
-        for(Map.Entry<String, IndexedArtifact> e : values.entrySet()) {
-          if(!(e.getKey().endsWith(partialKey))) {
-            continue;
-          }
-          for(IndexedArtifactFile f : e.getValue().getFiles()) {
-            if(groupId.equals(f.group) && artifactId.equals(f.artifact) && !f.version.contains("SNAPSHOT")) {
-              ComparableVersion v = new ComparableVersion(f.version);
-              if(referenceComparableVersion == null || v.compareTo(referenceComparableVersion) > 0) {
-                versions.add(v);
-              }
+      for(Map.Entry<String, IndexedArtifact> e : values.entrySet()) {
+        if(!(e.getKey().endsWith(partialKey))) {
+          continue;
+        }
+        for(IndexedArtifactFile f : e.getValue().getFiles()) {
+          if(groupId.equals(f.group) && artifactId.equals(f.artifact) && !f.version.contains("SNAPSHOT")) {
+            ComparableVersion v = new ComparableVersion(f.version);
+            if(referenceComparableVersion == null || v.compareTo(referenceComparableVersion) > 0) {
+              versions.add(v);
             }
-          }
-          if(!versions.isEmpty()) {
-            List<String> sorted = new ArrayList<>(versions.size());
-            for(ComparableVersion v : versions) {
-              sorted.add(v.toString());
-            }
-            Collections.reverse(sorted);
-            version = sorted.iterator().next();
           }
         }
+        if(!versions.isEmpty()) {
+          List<String> sorted = new ArrayList<>(versions.size());
+          for(ComparableVersion v : versions) {
+            sorted.add(v.toString());
+          }
+          Collections.reverse(sorted);
+          version = sorted.iterator().next();
+        }
       }
-    } catch(CoreException e) {
-      log.error("Can not retrieve latest version of " + partialKey, e);
     }
     return version;
   }

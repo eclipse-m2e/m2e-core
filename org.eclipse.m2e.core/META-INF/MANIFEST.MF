@@ -2,14 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.core;singleton:=true
-Bundle-Version: 1.18.4.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.m2e.core.internal.MavenPluginActivator
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.osgi;bundle-version="3.10.0",
- org.eclipse.m2e.maven.runtime;bundle-version="[1.16.0,2.0.0)",
- org.eclipse.m2e.archetype.common;bundle-version="[1.16.0,2.0.0)",
- org.eclipse.m2e.maven.indexer;bundle-version="[1.17.1,2.0.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="1.16.0",
+ org.eclipse.m2e.archetype.common;bundle-version="1.16.0",
  org.eclipse.m2e.workspace.cli;bundle-version="0.1.0",
  org.eclipse.core.runtime;bundle-version="3.12.0",
  org.eclipse.core.resources;bundle-version="3.9.0",
@@ -29,7 +28,6 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.internal.equinox;x-internal:=true,
  org.eclipse.m2e.core.internal.index;x-internal:=true,
  org.eclipse.m2e.core.internal.index.filter;x-internal:=true,
- org.eclipse.m2e.core.internal.index.nexus;x-internal:=true,
  org.eclipse.m2e.core.internal.jobs;x-internal:=true,
  org.eclipse.m2e.core.internal.launch;x-internal:=true,
  org.eclipse.m2e.core.internal.lifecyclemapping;x-internal:=true,

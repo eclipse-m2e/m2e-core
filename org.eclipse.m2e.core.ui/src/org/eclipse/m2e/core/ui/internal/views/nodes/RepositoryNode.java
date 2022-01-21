@@ -13,7 +13,8 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
@@ -23,13 +24,12 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  *
  * @author dyocum
  */
-public class RepositoryNode extends AbstractIndexedRepositoryNode {
+public class RepositoryNode implements IMavenRepositoryNode {
 
-  private final IRepository repository;
+  protected final IRepository repository;
 
-  public RepositoryNode(NexusIndex index) {
-    super(index);
-    this.repository = index.getRepository();
+  public RepositoryNode(IRepository repository) {
+    this.repository = repository;
   }
 
   @Override
@@ -49,13 +49,33 @@ public class RepositoryNode extends AbstractIndexedRepositoryNode {
     return sb.toString();
   }
 
-  @Override
-  public String getRepositoryUrl() {
-    return repository.getUrl();
-  }
 
   public String getRepoName() {
     return repository.toString();
+  }
+
+  @Override
+  public Object[] getChildren() {
+    return new Object[0];
+  }
+
+  @Override
+  public Image getImage() {
+    return null;
+  }
+
+  @Override
+  public boolean hasChildren() {
+    return false;
+  }
+
+  @Override
+  public boolean isUpdating() {
+    return false;
+  }
+
+  public String getRepositoryUrl() {
+    return repository.getUrl();
   }
 
 }

@@ -59,7 +59,6 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.repository.legacy.WagonManager;
@@ -71,9 +70,6 @@ import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
-import org.eclipse.m2e.core.internal.index.nexus.IndexesExtensionReader;
-import org.eclipse.m2e.core.internal.index.nexus.IndexingTransferListener;
-import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -105,8 +101,6 @@ public class MavenPluginActivator extends Plugin {
   private final Collection<PlexusContainer> toDisposeContainers = new HashSet<>();
 
   private MavenModelManager modelManager;
-
-  private NexusIndexManager indexManager;
 
   private BundleContext bundleContext;
 
@@ -277,7 +271,6 @@ public class MavenPluginActivator extends Plugin {
 
   private static ArchetypeManager newArchetypeManager(PlexusContainer container, File stateLocationDir) {
     ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES));
-    archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.NexusIndexerCatalogFactory());
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.InternalCatalogFactory());
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory());
     for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions()) {
@@ -325,9 +318,6 @@ public class MavenPluginActivator extends Plugin {
     this.mavenBackgroundJob = null;
 
     this.projectManager.removeMavenProjectChangedListener(this.configurationManager);
-    if(indexManager != null) {
-      this.projectManager.removeMavenProjectChangedListener(indexManager);
-    }
     this.projectManager.removeMavenProjectChangedListener(repositoryRegistry);
     this.projectManager = null;
 
@@ -360,27 +350,6 @@ public class MavenPluginActivator extends Plugin {
 
   public ProjectRegistryManager getMavenProjectManagerImpl() {
     return this.managerImpl;
-  }
-
-  public NexusIndexManager getIndexManager() {
-    synchronized(this) {
-      if(this.indexManager == null) {
-        try {
-          PlexusContainer indexerContainer = newPlexusContainer(IndexUpdater.class.getClassLoader());
-          toDisposeContainers.add(indexerContainer);
-          this.indexManager = new NexusIndexManager(indexerContainer, getMavenProjectManager(), getRepositoryRegistry(),
-              getStateLocation().toFile());
-          getMavenProjectManager().addMavenProjectChangedListener(indexManager);
-          getMaven().addLocalRepositoryListener(new IndexingTransferListener(indexManager));
-          ((RepositoryRegistry) getRepositoryRegistry()).addRepositoryIndexer(indexManager);
-          ((RepositoryRegistry) getRepositoryRegistry())
-              .addRepositoryDiscoverer(new IndexesExtensionReader(indexManager));
-        } catch(PlexusContainerException ex1) {
-          log.error("Failed to initialize the NexusIndexManager", ex1);
-        }
-      }
-    }
-    return this.indexManager;
   }
 
   public MavenRuntimeManagerImpl getMavenRuntimeManager() {

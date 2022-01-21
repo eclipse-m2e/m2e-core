@@ -29,12 +29,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.m2e.maven.indexer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.m2e.model.edit"
          download-size="0"
          install-size="0"
