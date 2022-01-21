@@ -12,9 +12,6 @@
    <feature id="org.eclipse.m2e.lemminx.feature">
       <category name="m2e"/>
    </feature>
-   <feature id="org.eclipse.m2e.sse.ui.feature">
-      <category name="m2e"/>
-   </feature>
    <feature id="org.eclipse.m2e.pde.feature">
       <category name="m2e"/>
    </feature>
