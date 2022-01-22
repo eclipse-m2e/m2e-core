@@ -14,10 +14,10 @@
 package org.eclipse.m2e.core.internal.repository;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -125,26 +125,7 @@ public class RepositoryInfo implements IRepository {
     if(username != null) {
       sb.append('|').append(username);
     }
-    String uid;
-    try {
-      MessageDigest digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
-      digest.update(sb.toString().getBytes());
-      byte messageDigest[] = digest.digest();
-      StringBuilder hexString = new StringBuilder();
-      for(byte element : messageDigest) {
-        String hex = Integer.toHexString(0xFF & element);
-        if(hex.length() == 1) {
-          hexString.append('0');
-        }
-        hexString.append(hex);
-      }
-      uid = hexString.toString();
-    } catch(NoSuchAlgorithmException ex) {
-      //this shouldn't happen with MD5
-      uid = sb.toString();
-      uid = uid.replace(':', '_').replace('/', '_').replace('|', '_');
-    }
-    return uid;
+    return DigestUtils.md5Hex(sb.toString());
   }
 
   @Override
