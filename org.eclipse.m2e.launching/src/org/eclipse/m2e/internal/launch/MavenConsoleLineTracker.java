@@ -75,8 +75,6 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final String RUNNING_MARKER = "Running ";
 
-  private static final Pattern TEST_CLASS_PATTERN = Pattern.compile("(?:  )test.+\\(([\\w\\.]+)\\)"); //TODO: what does this match?
-
   private boolean isMavenBuildProcess;
 
   private IConsole console;
@@ -120,13 +118,6 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           // create and start remote Java app launch configuration
           String portString = text.substring(index + LISTENING_MARKER.length()).trim();
           launchRemoteJavaApp(mavenProject.getProject(), portString);
-
-        } else {
-          Matcher m = TEST_CLASS_PATTERN.matcher(text);
-          if(m.find()) {
-            testName = m.group(1);
-            offset += m.start(1);
-          }
         }
 
         if(testName != null) {

@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.ui.tests;
 
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,7 +67,6 @@ import org.eclipse.ui.console.IConsoleListener;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.internal.console.ConsoleHyperlinkPosition;
-import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -137,8 +137,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		});
 		String activePartTitle = display.syncCall( // get titel in subsequent display.syncCall to await updates
 				() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getTitle());
-		assertEquals("Click Test-Report link should open JUnit-view", "JUnit (simpleProjectWithJUnit5Test.SimpleTest)",
-				activePartTitle);
+		assertThat("Click Test-Report link should open JUnit-view", activePartTitle,
+				containsString("simpleProjectWithJUnit5Test.SimpleTest"));
 	}
 
 	@Test
@@ -154,7 +154,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 		// Check for Listening debugee print-out
 		String consoleText = display.syncCall(document::get); // final document content could have changed
-		assertThat(consoleText, CoreMatchers.containsString("Listening for transport dt_socket at address: 5005"));
+		assertThat(consoleText, containsString("Listening for transport dt_socket at address: 5005"));
 
 		// Check for a corresponding remote-java-debugging launch
 		ILaunch[] launches = launchManager.getLaunches();
