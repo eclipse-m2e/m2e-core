@@ -10,19 +10,28 @@
  ************************************************************************************/
 package org.jboss.tools.maven.apt.tests;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.AssertionFailedException;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
@@ -32,17 +41,21 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
+import org.junit.Before;
 
 @SuppressWarnings("restriction")
 abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenProjectTestCase {
 	static final String COMPILER_OUTPUT_DIR = "target/generated-sources/annotations";
 	static final String PROCESSOR_OUTPUT_DIR = "target/generated-sources/apt";
+	static final String JPA_MODELGEN_VERSION = "5.6.4.Final";
 	
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
@@ -50,12 +63,6 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		setAutoBuilding(true);
 	}
 
-
-	protected List<FactoryContainer> getFactoryContainers(IJavaProject project) {
-		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(project);
-        return new ArrayList<>(factoryPath.getEnabledContainers().keySet());
-	}
-	
 	protected boolean contains(Collection<FactoryContainer> containers, String id) {
         Stream<FactoryContainer> stream = containers.stream();
         return stream.filter(fc -> id.equals(fc.getId())).findAny().isPresent();
@@ -65,11 +72,6 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		defaultTest(projectName, expectedOutputFolder, expectedTestOutputFolder, true);
 	}
 	protected void defaultTest(String projectName, String expectedOutputFolder, String expectedTestOutputFolder, boolean expectTestAttribute) throws Exception {
-		try {
-			AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
-		} catch (NoSuchMethodException | SecurityException ex) {
-			expectedTestOutputFolder = null;
-		}
 
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
 		waitForJobsToComplete();
@@ -90,14 +92,8 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		}
 
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
-        Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
-        FactoryContainer jpaModelGen = ite.next();
-        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaModelGen.getType());
-        assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar", jpaModelGen.getId());
-
-        FactoryContainer jpaApi = ite.next();
-        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaApi.getType());
-        assertEquals("M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.0.Final/hibernate-jpa-2.0-api-1.0.0.Final.jar", jpaApi.getId());
+        assertFactoryContainerContains(factoryPath, "hibernate-jpamodelgen:"+JPA_MODELGEN_VERSION);
+        assertFactoryContainerContains(factoryPath, "hibernate-jpa-2.0-api:1.0.0.Final");
 
         IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
@@ -154,5 +150,39 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 				throw new AssertionFailedException("Unexpected "+path+ " was found in the Classpath");
 			}
 		}
+		
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase#importProjects(java.lang.String, java.lang.String[], org.eclipse.m2e.core.project.ResolverConfiguration, boolean, org.eclipse.m2e.core.project.IProjectCreationListener)
+	 */
+	@Override
+	protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration,
+			boolean skipSanityCheck, IProjectCreationListener listener) throws IOException, CoreException {
+		//Avoid project import freezing because of https://github.com/eclipse-mirrors/org.eclipse.jdt.core/commit/298e47435e19b1217e5593f3c29652720857f6e1#diff-35069a9c6c893e0c29b0b97b820cff43e828fda949767f7b00a64a4b869aacafR504-R512
+		try {
+			Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
+		} catch (OperationCanceledException | InterruptedException e) {
+			//ignore
+		}
+		
+		return super.importProjects(basedir, pomNames, configuration, skipSanityCheck, listener);
+	}
+
+	
+	protected void assertFactoryContainerContains(FactoryPath factoryPath, String artifactIdVersion) {
+		String[] av = artifactIdVersion.split(":");
+		String targetArtifact = av[0]+"-"+av[1]+".jar";
+		Supplier<Stream<String>> ids = () -> factoryPath.getEnabledContainers().keySet().stream().map(fc -> fc.getId());
+		boolean found = ids.get()
+			.filter( id -> id.endsWith(targetArtifact))
+			.findFirst().isPresent();
+		
+		
+		if (!found) {
+			fail(targetArtifact + " is missing from "+ids.get().collect(Collectors.joining(",")));
+		}
+		
+	}
+
 }

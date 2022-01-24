@@ -29,13 +29,12 @@
   <description>Maven Integration for Eclipse JDT Annotation Processor Toolkit</description>
   <inceptionYear>2011</inceptionYear>
   <properties>
-    <tycho-version>1.7.0</tycho-version>
+    <tycho-version>2.6.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
     <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
     <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
-    <m2e-core-version>1.13</m2e-core-version>
+    <m2e-core-version>1.19.0</m2e-core-version>
     <surefire.timeout>500</surefire.timeout>
-    <site-compressed>https://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
 
   <modules>
@@ -56,7 +55,7 @@
     <repository>
       <id>eclipse</id>
       <layout>p2</layout>
-      <url>https://download.eclipse.org/releases/2019-09</url>
+      <url>https://download.eclipse.org/releases/2021-12</url>
     </repository>
 
     <repository>
