@@ -14,29 +14,19 @@
 
 package org.eclipse.m2e.internal.launch;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -49,10 +39,16 @@ import org.eclipse.debug.ui.console.IConsoleLineTracker;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.ide.IDE;
+
+import org.codehaus.plexus.util.DirectoryScanner;
 
 import org.apache.maven.project.MavenProject;
 
@@ -74,6 +70,8 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final String LISTENING_MARKER = "Listening for transport dt_socket at address: ";
 
   private static final String RUNNING_MARKER = "Running ";
+
+  private static final Pattern TEST_CLASS_PATTERN = Pattern.compile("(?:  )test.+\\(([\\w\\.]+)\\)"); //TODO: what does this match?
 
   private boolean isMavenBuildProcess;
 
@@ -118,6 +116,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           // create and start remote Java app launch configuration
           String portString = text.substring(index + LISTENING_MARKER.length()).trim();
           launchRemoteJavaApp(mavenProject.getProject(), portString);
+
+        } else {
+          Matcher m = TEST_CLASS_PATTERN.matcher(text);
+          if(m.find()) {
+            testName = m.group(1);
+            offset += m.start(1);
+          }
         }
 
         if(testName != null) {
@@ -246,54 +251,38 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
     private final String testName;
 
-    private Path baseDir;
+    private File baseDir;
 
     public MavenConsoleHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
       this.testName = testName;
       MavenProject mavenProject = mavenProjectFacade.getMavenProject();
-      baseDir = Path.of(mavenProject.getBuild().getDirectory());
+      baseDir = new File(mavenProject.getBuild().getDirectory());
     }
 
     @Override
     public void linkActivated() {
-      List<Path> reportFiles = getTestSummaryFiles(baseDir, testName);
+      DirectoryScanner ds = new DirectoryScanner();
+      ds.setBasedir(baseDir);
+      ds.setIncludes(new String[] {"**/" + testName + ".txt"}); //$NON-NLS-1$ //$NON-NLS-2$
+      ds.scan();
+      String[] includedFiles = ds.getIncludedFiles();
+
       // TODO show selection dialog when there is more then one result found
-      if(!reportFiles.isEmpty()) {
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        for(Path reportFile : reportFiles) {
-          IFile[] files = wsRoot.findFilesForLocationURI(reportFile.toUri());
-          for(IFile file : files) {
-            try {
-              file.refreshLocal(IResource.DEPTH_ZERO, null);
-              IDE.openEditor(page, file);
-              break;
-            } catch(CoreException ex) {
-              log.error(ex.getMessage(), ex);
-            }
-          }
+      if(includedFiles != null && includedFiles.length > 0) {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        IWorkbenchPage page = window.getActivePage();
+
+        IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor("foo.txt"); //$NON-NLS-1$
+
+        File reportFile = new File(baseDir, includedFiles[0]);
+
+        try {
+          IDE.openEditor(page, new MavenFileEditorInput(reportFile.getAbsolutePath()), desc.getId());
+        } catch(PartInitException ex) {
+          log.error(ex.getMessage(), ex);
         }
       }
-    }
-
-    private static List<Path> getTestSummaryFiles(Path baseDir, String testName) {
-      List<Path> jUnitXMLFiles = new ArrayList<>();
-      List<Path> plainTextFiles = new ArrayList<>();
-      Path jUnitReportFile = Path.of("TEST-" + testName + ".xml");
-      Path plainTextSummaryFile = Path.of(testName + ".txt");
-      try (Stream<Path> s = Files.walk(baseDir)) {
-        s.forEach(p -> {
-          if(p.endsWith(jUnitReportFile) && Files.isRegularFile(p)) {
-            jUnitXMLFiles.add(p);
-          } else if(p.endsWith(plainTextSummaryFile) && Files.isRegularFile(p)) {
-            plainTextFiles.add(p);
-          }
-        });
-      } catch(IOException e) {
-        log.error("Failed to search test summary files", e);
-        return Collections.emptyList();
-      }
-      return !jUnitXMLFiles.isEmpty() ? jUnitXMLFiles : plainTextFiles;
     }
 
     @Override
