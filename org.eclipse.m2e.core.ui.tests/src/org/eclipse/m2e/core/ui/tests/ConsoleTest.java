@@ -40,6 +40,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -199,6 +201,9 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 			IProjectConfigurationManager pcm = MavenPlugin.getProjectConfigurationManager();
 			pcm.importProjects(projectInfos, importConfiguration, null, new NullProgressMonitor());
+			// build project to make it available in the ProjectRegistryManager
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		}
 	}
 

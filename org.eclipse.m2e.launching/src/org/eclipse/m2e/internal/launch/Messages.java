@@ -27,8 +27,6 @@ public class Messages extends NLS {
 
   public static String ExecutePomAction_executing;
 
-  public static String MavenFileEditorInput_0;
-
   public static String MavenLaunchDelegate_error_cannot_create_conf;
 
   public static String MavenLaunchDelegate_job_name;
