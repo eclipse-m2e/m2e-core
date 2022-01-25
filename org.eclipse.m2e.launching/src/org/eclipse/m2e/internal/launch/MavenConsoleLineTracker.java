@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,16 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Hannes Wellmann - Major rework of MavenConsoleLineTracker
  *******************************************************************************/
 
 package org.eclipse.m2e.internal.launch;
 
 import java.io.File;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,16 +26,13 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.console.IConsole;
 import org.eclipse.debug.ui.console.IConsoleLineTracker;
@@ -49,7 +50,8 @@ import org.eclipse.ui.ide.IDE;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 
-import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -69,47 +71,54 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final String RUNNING_MARKER = "Running ";
 
-  private static final String TEST_TEMPLATE = "(?:  )test.+\\(([\\w\\.]+)\\)"; //$NON-NLS-1$
+  private static final Pattern TEST_CLASS_PATTERN = Pattern.compile("(?:  )test.+\\(([\\w\\.]+)\\)"); //TODO: what does this match?
 
-  private static final Pattern PATTERN2 = Pattern.compile(TEST_TEMPLATE);
+  private boolean isMavenBuildProcess;
 
   private IConsole console;
 
+  private boolean initialized = false;
+
+  @Override
   public void init(IConsole console) {
+    if(initialized) { // make sure that for each process launch a new tracker is created (which is the case a.t.m.)
+      throw new IllegalStateException("MavenConsoleLineTracker already connected to console");
+    }
     this.console = console;
+    ILaunchConfiguration launchConfiguration = console.getProcess().getLaunch().getLaunchConfiguration();
+    isMavenBuildProcess = launchConfiguration != null && isMavenProcess(launchConfiguration);
+    this.initialized = true; // Initialized
   }
 
-  public void lineAppended(IRegion line) {
-    IProcess process = console.getProcess();
-    ILaunch launch = process.getLaunch();
-    ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
+  private IMavenProjectFacade mavenProject;
 
-    if(launchConfiguration != null && isMavenProcess(launchConfiguration)) {
+  @Override
+  public void lineAppended(IRegion line) {
+    if(isMavenBuildProcess) {
       try {
         int offset = line.getOffset();
         int length = line.getLength();
+        String text = console.getDocument().get(offset, length).strip();
 
-        String text = console.getDocument().get(offset, length);
+        readProjectDefinition(text);
+        if(mavenProject == null) {
+          return;
+        }
 
         String testName = null;
 
         int index = text.indexOf(RUNNING_MARKER);
         if(index > -1) {
-          testName = text.substring(RUNNING_MARKER.length());
-          offset += RUNNING_MARKER.length();
+          testName = text.substring(index + RUNNING_MARKER.length());
+          offset += index + RUNNING_MARKER.length();
 
-        } else if(text.startsWith(LISTENING_MARKER)) {
+        } else if((index = text.indexOf(LISTENING_MARKER)) > -1) {
           // create and start remote Java app launch configuration
-          String baseDir = getBaseDir(launchConfiguration);
-          if(baseDir != null) {
-            String portString = text.substring(LISTENING_MARKER.length()).trim();
-            MavenDebugHyperLink link = new MavenDebugHyperLink(baseDir, portString);
-            console.addLink(link, offset, LISTENING_MARKER.length() + portString.length());
-            // launchRemoteJavaApp(baseDir, portString);
-          }
+          String portString = text.substring(index + LISTENING_MARKER.length()).trim();
+          launchRemoteJavaApp(mavenProject.getProject(), portString);
 
         } else {
-          Matcher m = PATTERN2.matcher(text);
+          Matcher m = TEST_CLASS_PATTERN.matcher(text);
           if(m.find()) {
             testName = m.group(1);
             offset += m.start(1);
@@ -117,11 +126,8 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         }
 
         if(testName != null) {
-          String baseDir = getBaseDir(launchConfiguration);
-          if(baseDir != null) {
-            MavenConsoleHyperLink link = new MavenConsoleHyperLink(baseDir, testName);
-            console.addLink(link, offset, testName.length());
-          }
+          MavenConsoleHyperLink link = new MavenConsoleHyperLink(mavenProject, testName);
+          console.addLink(link, offset, testName.length());
         }
 
       } catch(BadLocationException ex) {
@@ -130,13 +136,6 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         log.error(ex.getMessage(), ex);
       }
     }
-  }
-
-  private String getBaseDir(ILaunchConfiguration launchConfiguration) throws CoreException {
-    return launchConfiguration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, (String) null);
-  }
-
-  public void dispose() {
   }
 
   private boolean isMavenProcess(ILaunchConfiguration launchConfiguration) {
@@ -149,7 +148,58 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     }
   }
 
-  static void launchRemoteJavaApp(String baseDir, String portString) throws CoreException {
+  private static final Pattern GROUP_ARTIFACT_LINE = Pattern
+      .compile("^\\[INFO\\] -+< (?<groupId>[\\w\\.\\-]+):(?<artifactId>[\\w\\.\\-]+) >-+$");
+
+  private static final Pattern VERSION_LINE = Pattern
+      .compile("^\\[INFO\\] Building .+ (?<version>[\\w\\.\\-]+)( +\\[\\d+/\\d+\\])?$");
+
+  private static final Pattern PACKAGING_TYPE_LINE = Pattern.compile("^\\[INFO\\] -+\\[ [\\w\\-\\. ]+ \\]-+$");
+
+  private final Deque<String> projectDefinitionLines = new ArrayDeque<>(3);
+
+  private void readProjectDefinition(String lineText) {
+    projectDefinitionLines.add(lineText);
+    if(projectDefinitionLines.size() < 3) {
+      return;
+    }
+    // Read groupId, artifactId and version from a sequence like the following lines:
+    // [INFO] -----------< org.eclipse.m2e:org.eclipse.m2e.maven.runtime >------------
+    // [INFO] Building M2E Embedded Maven Runtime (includes Incubating components) 1.18.2-SNAPSHOT [4/5]
+    // [INFO] ---------------------------[ eclipse-plugin ]---------------------------
+
+    Iterator<String> descendingIterator = projectDefinitionLines.descendingIterator();
+    String line3 = descendingIterator.next();
+    if(PACKAGING_TYPE_LINE.matcher(line3).matches()) {
+
+      String line2 = descendingIterator.next();
+      Matcher vMatcher = VERSION_LINE.matcher(line2);
+      if(vMatcher.matches()) {
+        String version = vMatcher.group("version");
+
+        String line1 = descendingIterator.next();
+        Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line1);
+        if(gaMatcher.matches()) {
+          String groupId = gaMatcher.group("groupId");
+          String artifactId = gaMatcher.group("artifactId");
+
+          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+          mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
+        }
+      }
+    }
+    projectDefinitionLines.remove(); // only latest three lines are relevant -> use it as ring-buffer
+  }
+
+  @Override
+  public void dispose() {
+    isMavenBuildProcess = false;
+    projectDefinitionLines.clear();
+    mavenProject = null;
+    initialized = false;
+  }
+
+  private static void launchRemoteJavaApp(IProject project, String portString) throws CoreException {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType launchConfigurationType = launchManager
         .getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_REMOTE_JAVA_APPLICATION);
@@ -163,14 +213,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         <mapEntry key="port" value="8000"/>
         <mapEntry key="hostname" value="localhost"/>
       </mapAttribute>
-
+    
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
         <listEntry value="/foo-launch"/>
       </listAttribute>
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="4"/>
       </listAttribute>
-
+    
       <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
       </listAttribute>
@@ -187,40 +237,29 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     connectMap.put("hostname", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
     workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CONNECT_MAP, connectMap);
 
-    IProject project = getProject(baseDir);
-    if(project != null) {
+    if(project != null && project.exists()) {
       workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getName());
     }
 
-    DebugUITools.launch(workingCopy, "debug"); //$NON-NLS-1$
-  }
-
-  static IProject getProject(String baseDir) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
-      IContainer base = projectFacade.getPom().getParent();
-      String baseLocation = base.getLocation().toPortableString();
-      if(baseDir.equals(baseLocation)) {
-        return projectFacade.getProject();
-      }
-    }
-    return null;
+    DebugUITools.launch(workingCopy, ILaunchManager.DEBUG_MODE); //$NON-NLS-1$
   }
 
   /**
    * Opens a text editor for Maven test report
    */
-  public class MavenConsoleHyperLink implements IHyperlink {
-
-    private final String baseDir;
+  private static class MavenConsoleHyperLink implements IHyperlink {
 
     private final String testName;
 
-    public MavenConsoleHyperLink(String baseDir, String testName) {
-      this.baseDir = baseDir;
+    private File baseDir;
+
+    public MavenConsoleHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
       this.testName = testName;
+      MavenProject mavenProject = mavenProjectFacade.getMavenProject();
+      baseDir = new File(mavenProject.getBuild().getDirectory());
     }
 
+    @Override
     public void linkActivated() {
       DirectoryScanner ds = new DirectoryScanner();
       ds.setBasedir(baseDir);
@@ -246,44 +285,12 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       }
     }
 
-    public void linkEntered() {
+    @Override
+    public void linkEntered() { // nothing to do
     }
 
-    public void linkExited() {
+    @Override
+    public void linkExited() { // nothing to do
     }
-
   }
-
-  /**
-   * Creates debug launch configuration for remote Java application. For example, with surefire plugin the following
-   * property can be specified: -Dmaven.surefire.debug=
-   * "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
-   */
-  public class MavenDebugHyperLink implements IHyperlink {
-
-    private final String baseDir;
-
-    private final String portString;
-
-    public MavenDebugHyperLink(String baseDir, String portString) {
-      this.baseDir = baseDir;
-      this.portString = portString;
-    }
-
-    public void linkActivated() {
-      try {
-        launchRemoteJavaApp(baseDir, portString);
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-      }
-    }
-
-    public void linkEntered() {
-    }
-
-    public void linkExited() {
-    }
-
-  }
-
 }
