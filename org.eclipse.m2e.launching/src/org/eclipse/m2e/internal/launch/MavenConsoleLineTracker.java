@@ -71,9 +71,10 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 
-  private static final String LISTENING_MARKER = "Listening for transport dt_socket at address: ";
+  private static final Pattern LISTENING_MARKER = Pattern
+      .compile("Listening for transport dt_socket at address: (?<debuggerPort>\\d+)$");
 
-  private static final String RUNNING_MARKER = "Running ";
+  private static final Pattern RUNNING_TEST_CLASS = Pattern.compile("Running (?<testClassName>[\\w\\.]+)$");
 
   private boolean isMavenBuildProcess;
 
@@ -99,30 +100,29 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     if(isMavenBuildProcess) {
       try {
         int offset = line.getOffset();
-        int length = line.getLength();
-        String text = console.getDocument().get(offset, length).strip();
+        String text = console.getDocument().get(offset, line.getLength()).strip();
 
         readProjectDefinition(text);
         if(mavenProject == null) {
           return;
         }
 
-        String testName = null;
+        Matcher runningTestMatcher = RUNNING_TEST_CLASS.matcher(text);
+        if(runningTestMatcher.find()) {
 
-        int index = text.indexOf(RUNNING_MARKER);
-        if(index > -1) {
-          testName = text.substring(index + RUNNING_MARKER.length());
-          offset += index + RUNNING_MARKER.length();
+          String testName = runningTestMatcher.group("testClassName");
+          offset += runningTestMatcher.start("testClassName");
 
-        } else if((index = text.indexOf(LISTENING_MARKER)) > -1) {
-          // create and start remote Java app launch configuration
-          String portString = text.substring(index + LISTENING_MARKER.length()).trim();
-          launchRemoteJavaApp(mavenProject.getProject(), portString);
-        }
-
-        if(testName != null) {
-          MavenConsoleHyperLink link = new MavenConsoleHyperLink(mavenProject, testName);
+          IHyperlink link = new MavenConsoleHyperLink(mavenProject, testName);
           console.addLink(link, offset, testName.length());
+          return;
+        }
+        Matcher listeningMatcher = LISTENING_MARKER.matcher(text);
+        if(listeningMatcher.find()) {
+
+          String portString = listeningMatcher.group("debuggerPort");
+          // create and start remote Java app launch configuration
+          launchRemoteJavaApp(mavenProject.getProject(), portString);
         }
 
       } catch(BadLocationException ex) {
@@ -246,18 +246,20 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
     private final String testName;
 
-    private Path baseDir;
+    private final Path baseDir;
 
     public MavenConsoleHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
       this.testName = testName;
       MavenProject mavenProject = mavenProjectFacade.getMavenProject();
-      baseDir = Path.of(mavenProject.getBuild().getDirectory());
+      baseDir = mavenProject != null ? Path.of(mavenProject.getBuild().getDirectory()) : null;
     }
 
     @Override
     public void linkActivated() {
+      if(baseDir == null) {
+        return; // happens when the project was not yet build
+      }
       List<Path> reportFiles = getTestReportFiles(baseDir, testName);
-      // TODO show selection dialog when there is more then one result found
       if(!reportFiles.isEmpty()) {
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
