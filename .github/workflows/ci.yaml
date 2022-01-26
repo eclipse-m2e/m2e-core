@@ -1,6 +1,10 @@
 name: Tycho Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -22,8 +26,8 @@ jobs:
         ./mvnw -B verify
         
     - name: Deploy snapshot p2 repo to Github Pages
-      uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.ref == 'ref/head/master' }}
+      uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ github.token }}
         publish_dir: ./org.jboss.tools.maven.apt.site/target/repository
