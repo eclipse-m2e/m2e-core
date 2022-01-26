@@ -26,7 +26,7 @@ jobs:
         ./mvnw -B verify
         
     - name: Deploy snapshot p2 repo to Github Pages
-      if: ${{ github.ref == 'ref/head/master' }}
+      if: ${{ github.ref == 'refs/head/master' }}
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ github.token }}
