@@ -22,7 +22,7 @@ jobs:
 
     - name: Build with Maven
       run: |
-        echo {{github.ref}}
+        echo ${{github.ref}}
         xvfb-run \
         ./mvnw -B verify
         
