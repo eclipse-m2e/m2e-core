@@ -21,12 +21,13 @@ jobs:
         cache: 'maven'
 
     - name: Build with Maven
-      run: >
-        xvfb-run
+      run: |
+        echo {{github.ref}}
+        xvfb-run \
         ./mvnw -B verify
         
     - name: Deploy snapshot p2 repo to Github Pages
-      if: github.ref == 'refs/head/master'
+      if: contains( github.ref, 'master' )
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ github.token }}
