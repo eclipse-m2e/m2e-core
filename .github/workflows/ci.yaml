@@ -19,3 +19,11 @@ jobs:
       run: >
         xvfb-run
         ./mvnw -B verify
+        
+    - name: Deploy latest p2 repo to Github Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'ref/head/master'
+      with:
+        github_token: ${{ github.token }}
+        publish_dir: ./org.jboss.tools.maven.apt.site/target/repository
+        destination_dir: snapshots/

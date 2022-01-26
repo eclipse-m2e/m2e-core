@@ -43,7 +43,7 @@ For example in Eclipse 2020-09 (which runs on JDK11+ only), in case a project ne
 m2e-apt can be installed from :
 
 * the m2e discovery catalog : Window > Preferences > Maven > Discovery > Open Catalog
-* the Stable update site :  http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
-* the Dev builds update site : https://jbosstools.github.io/m2e-apt/latest/
+* the Stable update site :  https://jbosstools.github.io/m2e-apt/latest/
+* the Dev builds update site : https://jbosstools.github.io/m2e-apt/snapshots/
 
 m2e-apt **requires [m2e 1.5+](http://download.eclipse.org/technology/m2e/releases/)**
