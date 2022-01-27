@@ -32,6 +32,9 @@ public class DebugEventSpy extends AbstractEventSpy {
 		return "-D" + DebugEventSpy.DEBUG_DATA_PROPERTY + "=" + "true";
 	}
 
+	// TODO: name this entire fragment m2e.debug.extension to reflect that it is an
+	// extension to the maven-runtime?
+
 	// TODO: specify the debug setup of the supported plug-ins at a more suitable
 	// location. Ideally within the Maven-plugins directly (like for lifecycle
 	// mappings) LifecycleMappingFactory.readMavenPluginEmbeddedMetadata(), or with

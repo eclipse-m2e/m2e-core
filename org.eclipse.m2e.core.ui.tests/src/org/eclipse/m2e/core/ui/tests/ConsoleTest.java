@@ -151,23 +151,32 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 		launchManager.removeLaunches(launchManager.getLaunches());
 
-		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE,
-				Map.entry("maven.surefire.debug", "true"));
+		Map<String, Map<String, String>> launchConfigs = Map.of(//
+				ILaunchManager.RUN_MODE, Map.of("maven.surefire.debug", "true"), // explicit debug mode
+				ILaunchManager.DEBUG_MODE, Map.of()); // automatic debug mode of surefire plugin
 
-		// Check for Listening debugee print-out
-		String consoleText = display.syncCall(document::get); // final document content could have changed
-		assertThat(consoleText, containsString("Listening for transport dt_socket at address: 5005"));
+		for (Entry<String, Map<String, String>> entry : launchConfigs.entrySet()) {
+			String launchMode = entry.getKey();
+			@SuppressWarnings("unchecked")
+			Entry<String, String>[] args = entry.getValue().entrySet().toArray(Entry[]::new);
 
-		// Check for a corresponding remote-java-debugging launch
-		ILaunch[] launches = launchManager.getLaunches();
-		assertEquals(2, launches.length, 2);
-		ILaunch debugLaunch = launches[1]; // the first launch is the maven build itself
-		assertEquals(IJavaLaunchConfigurationConstants.ID_REMOTE_JAVA_APPLICATION,
-				debugLaunch.getLaunchConfiguration().getType().getIdentifier());
-		assertEquals("simpleProjectWithJUnit5Test", debugLaunch.getLaunchConfiguration()
-				.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""));
-		assertEquals("debug", debugLaunch.getLaunchMode());
-		assertTrue(debugLaunch.isTerminated());
+			IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", launchMode, args);
+
+			// Check for Listening debugee print-out
+			String consoleText = display.syncCall(document::get); // final document content could have changed
+			assertThat(consoleText, containsString("Listening for transport dt_socket at address: 5005"));
+
+			// Check for a corresponding remote-java-debugging launch
+			ILaunch[] launches = launchManager.getLaunches();
+			assertEquals(2, launches.length, 2);
+			ILaunch debugLaunch = launches[1]; // the first launch is the maven build itself
+			assertEquals(IJavaLaunchConfigurationConstants.ID_REMOTE_JAVA_APPLICATION,
+					debugLaunch.getLaunchConfiguration().getType().getIdentifier());
+			assertEquals("simpleProjectWithJUnit5Test", debugLaunch.getLaunchConfiguration()
+					.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""));
+			assertEquals("debug", debugLaunch.getLaunchMode());
+			assertTrue(debugLaunch.isTerminated());
+		}
 	}
 
 	private static File getTestProjectPomFile(String testProjectName) throws URISyntaxException, IOException {
