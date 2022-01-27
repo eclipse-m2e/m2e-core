@@ -87,6 +87,9 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final int FAILED_ARTIFACT_ID = 1;
 
+  private static final Pattern ESCAPE_CHARACTERS = Pattern.compile("\\e\\[[\\d;]*?[^\\d;]");
+  // captures ANSI escape characters added when -Dstyle.color=always is set
+
   private boolean isMavenBuildProcess;
 
   private IConsole console;
@@ -96,6 +99,8 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private IMavenProjectFacade mavenProject;
 
   private final Deque<IRegion> projectDefinitionLines = new ArrayDeque<>(2);
+
+  private final List<int[]> removedLineLocations = new ArrayList<>();
 
   @Override
   public void init(IConsole console) {
@@ -121,9 +126,12 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         if(runningTestMatcher.find()) {
           String testName = runningTestMatcher.group(TEST_CLASS_NAME);
           int start = runningTestMatcher.start(TEST_CLASS_NAME);
+          int end = start + testName.length();
+          start = getOriginalIndex(start, removedLineLocations);
+          end = getOriginalIndex(end, removedLineLocations);
 
           IHyperlink link = new MavenTestReportHyperLink(mavenProject, testName);
-          console.addLink(link, line.getOffset() + start, testName.length());
+          console.addLink(link, line.getOffset() + start, end - start);
           return;
         }
 
@@ -137,7 +145,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
         Matcher failureMatcher = EXECUTION_FAILURE.matcher(text);
         if(failureMatcher.find()) {
-          addProjectLink(line, failureMatcher, FAILED_ARTIFACT_ID, FAILED_ARTIFACT_ID);
+          addProjectLink(line, failureMatcher, FAILED_ARTIFACT_ID, FAILED_ARTIFACT_ID, removedLineLocations);
         }
       } catch(BadLocationException ex) {
         // ignore
@@ -172,7 +180,8 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final Pattern PACKAGING_TYPE_LINE = Pattern.compile("^\\[INFO\\] -+\\[ [\\w\\-\\. ]+ \\]-+$");
 
   private String getText(IRegion lineRegion) throws BadLocationException {
-    String line0 = getLineText(lineRegion);
+    removedLineLocations.clear();
+    String line0 = getLineText(lineRegion, removedLineLocations);
 
     if(projectDefinitionLines.size() < 2) {
       projectDefinitionLines.add(lineRegion);
@@ -187,14 +196,15 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       Iterator<IRegion> previousLines = projectDefinitionLines.descendingIterator();
 
       IRegion line1Region = previousLines.next();
-      String line1 = getLineText(line1Region);
+      String line1 = getLineText(line1Region, null);
 
       Matcher vMatcher = VERSION_LINE.matcher(line1);
       if(vMatcher.matches()) {
         String version = vMatcher.group(VERSION);
 
         IRegion line2Region = previousLines.next();
-        String line2 = getLineText(line2Region);
+        List<int[]> removedLine2Locations = new ArrayList<>();
+        String line2 = getLineText(line2Region, removedLine2Locations);
         Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line2);
         if(gaMatcher.matches()) {
           String groupId = gaMatcher.group(GROUP_ID);
@@ -203,7 +213,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
 
-          addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID);
+          addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine2Locations);
         }
       }
     }
@@ -212,14 +222,27 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     return line0;
   }
 
-  private String getLineText(IRegion lineRegion) throws BadLocationException {
-    return console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
+  private String getLineText(IRegion region, List<int[]> removedLocations) throws BadLocationException {
+    String rawText = console.getDocument().get(region.getOffset(), region.getLength()).strip();
+    Matcher m = ESCAPE_CHARACTERS.matcher(rawText);
+    return removedLocations == null ? m.replaceAll("") : m.replaceAll(mr -> {
+      removedLocations.add(new int[] {mr.start(), mr.end() - mr.start()});
+      return "";
+    });
   }
 
-  private void addProjectLink(IRegion line, Matcher matcher, int startGroup, int endGroup) {
+  private static int getOriginalIndex(int index, List<int[]> removedLocations) {
+    for(int i = 0; i < removedLocations.size() && removedLocations.get(i)[0] < index; i++ ) {
+      index += removedLocations.get(i)[1];
+    }
+    return index;
+  }
+
+  private void addProjectLink(IRegion line, Matcher matcher, int startGroup, int endGroup,
+      List<int[]> removedLocations) {
     IHyperlink link = new MavenProjectHyperLink(mavenProject);
-    int start = matcher.start(startGroup);
-    int end = matcher.end(endGroup);
+    int start = getOriginalIndex(matcher.start(startGroup), removedLocations);
+    int end = getOriginalIndex(matcher.end(endGroup), removedLocations);
     console.addLink(link, line.getOffset() + start, end - start);
   }
 

@@ -17,6 +17,8 @@ package org.eclipse.m2e.core.ui.tests;
 import static java.util.Map.entry;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.m2e.actions.MavenLaunchConstants.ATTR_COLOR_VALUE_ALWAYS;
+import static org.eclipse.m2e.actions.MavenLaunchConstants.ATTR_COLOR_VALUE_NEVER;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -103,7 +105,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		Path tempProjectFolder = copyTestProjectIntoWorkspace("simplePomOK");
 		File pomFile = tempProjectFolder.resolve(IMavenConstants.POM_FILE_NAME).toFile();
 
-		IDocument document = runMavenBuild(pomFile.getParent(), ILaunchManager.RUN_MODE);
+		IDocument document = runMavenBuild(pomFile.getParent(), ILaunchManager.RUN_MODE, ATTR_COLOR_VALUE_NEVER);
 
 		String consoleText = display.syncCall(document::get); // final document content could have changed
 
@@ -121,7 +123,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		importMavenProjectIntoWorkspace(MAVEN_PROJECT);
 
 		IDocument document = runMavenBuild("${project_loc:" + MAVEN_PROJECT + "}", ILaunchManager.RUN_MODE,
-				entry("maven.surefire.debug", "true"));
+				ATTR_COLOR_VALUE_NEVER, entry("maven.surefire.debug", "true"));
 
 		assertLinkTextAndOpenedEditor(1, "simple.SimpleTest", //
 				TestRunnerViewPart.class, "JUnit (simple.SimpleTest)", document);
@@ -130,6 +132,26 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
 		assertLinkTextAndOpenedEditor(3, MAVEN_PROJECT, //
+				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
+
+		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
+	}
+
+	@Test
+	public void testConsole_debuggerAttachmentAndLinkAlignmentAndBehavior_withColoredPrintout() throws Exception {
+
+		importMavenProjectIntoWorkspace(MAVEN_PROJECT);
+
+		IDocument document = runMavenBuild("${project_loc:" + MAVEN_PROJECT + "}", ILaunchManager.RUN_MODE,
+				ATTR_COLOR_VALUE_ALWAYS, entry("maven.surefire.debug", "true"));
+
+		assertLinkTextAndOpenedEditor(1, "simple.\u001B[1mSimpleTest", //
+				TestRunnerViewPart.class, "JUnit (simple.SimpleTest)", document);
+
+		assertLinkTextAndOpenedEditor(0, "\u001B[0;36morg.eclipse.m2e.tests:" + MAVEN_PROJECT, //
+				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
+
+		assertLinkTextAndOpenedEditor(3, "\u001B[36msimple.projectWithJUnit-5_Test", //
 				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
 		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
@@ -214,8 +236,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	}
 
 	@SafeVarargs
-	private static IDocument runMavenBuild(String pomDir, String mode, Entry<String, String>... properties)
-			throws Exception {
+	private static IDocument runMavenBuild(String pomDir, String mode, int attrColorValue,
+			Entry<String, String>... properties) throws Exception {
 
 		CompletableFuture<IConsole> consoleAfterStartSupplier = getConsoleAfterLaunchSupplier();
 
@@ -226,8 +248,9 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		var wc = configType.newInstance(null, configName);
 		wc.setAttribute(MavenLaunchConstants.ATTR_GOALS, "clean verify");
 		wc.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, pomDir);
-		// The ANSI codes produced when color is enabled break the detection of certain significant lines
-		wc.setAttribute(MavenLaunchConstants.ATTR_COLOR, MavenLaunchConstants.ATTR_COLOR_VALUE_NEVER);
+		// The ANSI codes produced when color is enabled break the detection of certain
+		// significant lines
+		wc.setAttribute(MavenLaunchConstants.ATTR_COLOR, attrColorValue);
 		wc.setAttribute(MavenLaunchConstants.ATTR_PROPERTIES,
 				Arrays.stream(properties).map(e -> e.getKey() + "=" + e.getValue()).collect(toList()));
 		wc.launch(mode, new NullProgressMonitor());
@@ -259,8 +282,11 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	}
 
 	private static boolean isBuildFinished(String text) {
-		return lines(text).anyMatch(l -> l.startsWith("[INFO] Finished at"));
+		return lines(text)
+				.anyMatch(l -> l.startsWith("[INFO] Finished at: ")
+						|| l.startsWith("[\u001B[1;34mINFO\u001B[m] Finished at: "));
 	}
+
 
 	private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
 
