@@ -13,7 +13,8 @@
 
 package org.eclipse.m2e.core.internal.builder;
 
-import com.google.common.base.Throwables;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
@@ -30,7 +31,8 @@ class BuildProblemInfo extends MavenProblemInfo {
     if(mojoExecutionKey != null) {
       msg.append(" (").append(mojoExecutionKey.getKeyString()).append(')'); //$NON-NLS-1$ $NON-NLS-2$
     }
-    msg.append("\n\n").append(Throwables.getStackTraceAsString(error)); //$NON-NLS-1$
-    return msg.toString();
+    StringWriter errorStackTrace = new StringWriter();
+    error.printStackTrace(new PrintWriter(errorStackTrace));
+    return msg.append("\n\n").append(errorStackTrace).toString(); //$NON-NLS-1$
   }
 }

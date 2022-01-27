@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Anton Tanasenko.
+ * Copyright (c) 2016, 2022 Anton Tanasenko and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -18,15 +18,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -229,17 +229,17 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     return pis;
   }
 
-  private static final Splitter PI_SPLITTER = Splitter.on(CharMatcher.whitespace()).omitEmptyStrings().limit(2);
+  private static final Pattern PI_SPLITTER = Pattern.compile("\\s");
 
-  private static final Splitter EXECUTE_SPLITTER = Splitter.on(',').omitEmptyStrings();
+  private static final Pattern EXECUTE_SPLITTER = Pattern.compile(",");
 
-  private static final Map<String, String> EXECUTE_OPTIONS = new ImmutableMap.Builder<String, String>()
-      .put("onConfiguration", LifecycleMappingFactory.ELEMENT_RUN_ON_CONFIGURATION) //$NON-NLS-1$
-      .put("onIncremental", LifecycleMappingFactory.ELEMENT_RUN_ON_INCREMENTAL).build(); //$NON-NLS-1$
+  private static final Map<String, String> EXECUTE_OPTIONS = Map.of( //
+      "onConfiguration", LifecycleMappingFactory.ELEMENT_RUN_ON_CONFIGURATION, //$NON-NLS-1$
+      "onIncremental", LifecycleMappingFactory.ELEMENT_RUN_ON_INCREMENTAL); //$NON-NLS-1$
 
   private static Xpp3Dom parse(String pi) {
 
-    List<String> split = PI_SPLITTER.splitToList(pi);
+    List<String> split = Arrays.stream(PI_SPLITTER.split(pi, 2)).map(String::strip).collect(Collectors.toList());
 
     PluginExecutionAction a = getAction(split.get(0));
     if(a == null) {
@@ -262,15 +262,12 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
       case execute:
         Xpp3Dom exec = new Xpp3Dom("execute"); //$NON-NLS-1$
         if(split.size() > 1) {
-          for(String option : EXECUTE_SPLITTER.split(split.get(1))) {
-            String value = EXECUTE_OPTIONS.get(option);
-            if(value == null) {
-              return null;
-            }
-            Xpp3Dom opt = new Xpp3Dom(value);
-            opt.setValue("true"); //$NON-NLS-1$
-            exec.addChild(opt);
-          }
+          EXECUTE_SPLITTER.splitAsStream(split.get(1)).map(String::strip).map(EXECUTE_OPTIONS::get)
+              .filter(Objects::nonNull).forEach(value -> {
+                Xpp3Dom opt = new Xpp3Dom(value);
+                opt.setValue("true"); //$NON-NLS-1$
+                exec.addChild(opt);
+              });
         }
         return exec;
 

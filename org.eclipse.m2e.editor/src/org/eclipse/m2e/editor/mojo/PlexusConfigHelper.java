@@ -36,7 +36,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -425,7 +424,7 @@ public class PlexusConfigHelper {
 
   static {
     // @formatter:off
-    INLINE_TYPES = ImmutableSet.<String>of(
+    INLINE_TYPES = Set.of(
       byte.class.getName(),
       Byte.class.getName(),
       short.class.getName(),

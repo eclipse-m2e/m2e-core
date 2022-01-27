@@ -33,19 +33,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalCause;
-import com.google.common.cache.RemovalListener;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
@@ -55,7 +47,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -165,7 +156,7 @@ public class ProjectRegistryManager {
    */
   private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<>();
 
-  private final Cache<MavenProjectFacade, MavenProject> mavenProjectCache;
+  private final Map<MavenProjectFacade, MavenProject> mavenProjectCache;
 
   /**
    * @noreference For tests only
@@ -706,24 +697,21 @@ public class ProjectRegistryManager {
   private Map<IFile, MavenProjectFacade> readMavenProjectFacades(final Collection<IFile> poms,
       final MutableProjectRegistry state, final IProgressMonitor monitor)
       throws CoreException {
+    SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
     for(IFile pom : poms) {
       markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
     }
 
     final Map<IFile, ResolverConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
-    final Multimap<ResolverConfiguration, IFile> groupsToImport = LinkedHashMultimap.create();
-    for(IFile pom : poms) {
-      if(monitor.isCanceled()) {
-        return null;
-      }
+    Map<ResolverConfiguration, Collection<IFile>> groupsToImport = poms.stream().collect(Collectors.groupingBy(pom -> {
+      subMonitor.checkCanceled();
       ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
       resolverConfigurations.put(pom, resolverConfiguration);
-      groupsToImport.put(resolverConfiguration, pom);
-    }
+      return resolverConfiguration;
+    }, LinkedHashMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
     Map<IFile, MavenProjectFacade> result = new HashMap<>(poms.size(), 1.f);
-    SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
-    for(Entry<ResolverConfiguration, Collection<IFile>> entry : groupsToImport.asMap().entrySet()) {
+    for(Entry<ResolverConfiguration, Collection<IFile>> entry : groupsToImport.entrySet()) {
       ResolverConfiguration resolverConfiguration = entry.getKey();
       Collection<IFile> pomFiles = entry.getValue();
       result.putAll(execute(state, poms.size() == 1 ? pomFiles.iterator().next() : null, resolverConfiguration,
@@ -824,8 +812,8 @@ public class ProjectRegistryManager {
     return projectRegistry.getProjectFacade(groupId, artifactId, version);
   }
 
-  MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
-      IProgressMonitor monitor) throws CoreException {
+  private MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
+      IProgressMonitor monitor) {
     Map<File, MavenExecutionResult> results = readProjectsWithDependencies(projectRegistry,
         Collections.singletonList(pomFile), resolverConfiguration, monitor);
     if(results.size() != 1) {
@@ -836,12 +824,11 @@ public class ProjectRegistryManager {
     if(mavenProject != null && !hasError(result)) {
       return mavenProject;
     }
-    MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
-    List<Throwable> exceptions = result.getExceptions();
-    for(Throwable e : exceptions) {
-      status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
+    MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error);
+    for(Throwable e : result.getExceptions()) {
+      status.add(Status.error(e.getMessage(), e));
     }
-    throw new CoreException(status);
+    throw new IllegalStateException(new CoreException(status).fillInStackTrace());
   }
 
   private static boolean hasError(MavenExecutionResult mavenExecutionResult) {
@@ -1057,21 +1044,16 @@ public class ProjectRegistryManager {
       return mavenProject;
     }
     Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
-    mavenProject = mavenProjects.get(facade);
-    if(mavenProject == null) {
-      try {
-        mavenProject = mavenProjectCache.get(facade,
-            () -> readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(), monitor));
-      } catch(ExecutionException ex) {
-        Throwable cause = ex.getCause();
-        if(cause instanceof CoreException) {
-          throw (CoreException) cause;
-        }
-        throw new RuntimeException(cause); // this really should never happen
+    try {
+      return mavenProjects.computeIfAbsent(facade, fac -> mavenProjectCache.computeIfAbsent(fac,
+          f -> readProjectWithDependencies(f.getPom(), f.getResolverConfiguration(), monitor)));
+    } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
+      Throwable cause = ex.getCause();
+      if(cause instanceof CoreException) {
+        throw (CoreException) cause;
       }
-      mavenProjects.put(facade, mavenProject);
+      throw new CoreException(Status.error("Unexpected internal Error occured", ex)); // this really should never happen
     }
-    return mavenProject;
   }
 
   MavenProject getMavenProject(MavenProjectFacade facade) {
@@ -1080,7 +1062,7 @@ public class ProjectRegistryManager {
       mavenProject = legacyMavenProjects.get(facade);
     }
     if(mavenProject == null) {
-      mavenProject = mavenProjectCache.getIfPresent(facade);
+      mavenProject = mavenProjectCache.get(facade);
       if(mavenProject != null) {
         putMavenProject(facade, mavenProject);
       }
@@ -1113,7 +1095,7 @@ public class ProjectRegistryManager {
    *
    * @return
    */
-  Map<MavenProjectFacade, MavenProject> getContextProjects() {
+  private Map<MavenProjectFacade, MavenProject> getContextProjects() {
     Map<MavenProjectFacade, MavenProject> projects = null;
     MavenExecutionContext context = MavenExecutionContext.getThreadContext(false);
     if(context != null) {
@@ -1123,39 +1105,37 @@ public class ProjectRegistryManager {
         context.setValue(CTX_MAVENPROJECTS, projects);
       }
     }
-    if(projects == null) {
-      projects = new IdentityHashMap<>();
-    }
-    return projects;
+    return projects != null ? projects : new IdentityHashMap<>();
   }
 
-  private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
-    final RemovalListener<MavenProjectFacade, MavenProject> removalListener = notification -> {
-      if(notification.getCause() == RemovalCause.SIZE || notification.getCause() == RemovalCause.REPLACED) {
-        // there is currently no good way to determine if MavenProject instance is still being used or not
-        // for now assume that cache entries removed from project cache can only be referenced by context map
-        final MavenProjectFacade facade = notification.getKey();
-        final MavenProject mavenProject = notification.getValue();
-        final Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
-        if(contextProjects != null && !contextProjects.containsKey(facade)) {
-          flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), mavenProject, false);
+  private Map<MavenProjectFacade, MavenProject> createProjectCache() {
+    int maxCacheSize = 5;
+    return Collections.synchronizedMap(new LinkedHashMap<>(maxCacheSize * 4 / 3 + 1, 0.75f, true) {
+      private static final long serialVersionUID = 8022606648487974598L;
+      @Override
+      protected boolean removeEldestEntry(java.util.Map.Entry<MavenProjectFacade, MavenProject> eldest) {
+        if(size() > maxCacheSize) {
+          // there is currently no good way to determine if MavenProject instance is still being used or not
+          // for now assume that cache entries removed from project cache can only be referenced by context map
+          MavenProjectFacade facade = eldest.getKey();
+          Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
+          if(!contextProjects.containsKey(facade)) {
+            flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), false);
+          }
+          return true;
         }
+        return false;
       }
-    };
-    return CacheBuilder.newBuilder().maximumSize(5).removalListener(removalListener).build();
+    });
   }
 
   private Set<IFile> flushCaches(MutableProjectRegistry newState, IFile pom, MavenProjectFacade facade,
       boolean forceDependencyUpdate) {
-    ArtifactKey key = null;
-    MavenProject project = null;
-
     if(facade != null) {
-      key = facade.getArtifactKey();
-      project = getMavenProject(facade); // cached only
-      mavenProjectCache.invalidate(facade);
+      ArtifactKey key = facade.getArtifactKey();
+      mavenProjectCache.remove(facade);
       Set<IFile> ifiles = new HashSet<>();
-      for(File file : flushMavenCaches(facade.getPomFile(), key, project, forceDependencyUpdate)) {
+      for(File file : flushMavenCaches(facade.getPomFile(), key, forceDependencyUpdate)) {
         MavenProjectFacade affected = projectRegistry.getProjectFacade(file);
         if(affected != null) {
           ifiles.add(affected.getPom());
@@ -1170,7 +1150,7 @@ public class ProjectRegistryManager {
   /**
    * Flushes caches maintained by Maven core.
    */
-  Set<File> flushMavenCaches(File pom, ArtifactKey key, MavenProject project, boolean force) {
+  private Set<File> flushMavenCaches(File pom, ArtifactKey key, boolean force) {
     Set<File> affected = new HashSet<>();
     affected.addAll(flushMavenCache(ProjectRealmCache.class, pom, key, force));
     affected.addAll(flushMavenCache(ExtensionRealmCache.class, pom, key, force));

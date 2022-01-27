@@ -17,13 +17,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 import org.eclipse.core.resources.IFile;
 
@@ -136,14 +134,13 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
-    Multimap<ArtifactKey, IFile> artifacts = HashMultimap.create();
-    for(Map.Entry<ArtifactKey, Set<IFile>> entry : workspaceArtifacts.entrySet()) {
-      ArtifactKey workspaceKey = entry.getKey();
-      if(groupId.equals(workspaceKey.getGroupId()) && artifactId.equals(workspaceKey.getArtifactId())) {
-        artifacts.putAll(workspaceKey, entry.getValue());
+    Map<ArtifactKey, Collection<IFile>> artifacts = new HashMap<>();
+    workspaceArtifacts.forEach((wsKey, files) -> {
+      if(!files.isEmpty() && groupId.equals(wsKey.getGroupId()) && artifactId.equals(wsKey.getArtifactId())) {
+        artifacts.computeIfAbsent(wsKey, k -> new HashSet<>()).addAll(files);
       }
-    }
-    return artifacts.asMap();
+    });
+    return artifacts;
   }
 
   protected void clear() {

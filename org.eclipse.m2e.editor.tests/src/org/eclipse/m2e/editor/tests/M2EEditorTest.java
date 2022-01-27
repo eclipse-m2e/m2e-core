@@ -11,6 +11,7 @@ package org.eclipse.m2e.editor.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -20,13 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.widgets.Display;
@@ -68,5 +74,21 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 			assertTrue(document.get().contains("my-app"));
 			assertFalse(document.get().contains("Loading"));
 		}
+	}
+	
+	@Test
+	public void testOpenPomEditor() throws Exception {
+		IProject project = null;
+		try (InputStream stream = getClass().getResourceAsStream("pom.xml")) {
+			project = createProject("basic", stream);
+			IProjectDescription desc = project.getDescription();
+			desc.setNatureIds(new String[] { IMavenConstants.NATURE_ID });
+			project.setDescription(desc, monitor);
+			refreshMavenProject(project);
+		}
+		waitForJobsToComplete();
+		MavenPomEditor editor = (MavenPomEditor) new OpenPomAction().openPomEditor("org.apache.commons", "commons-math3", "3.2", MavenPlugin.getMavenProjectRegistry().getProject(project).getMavenProject(),
+				new NullProgressMonitor());
+ 		assertNotEquals(-1, editor.getActivePage());
 	}
 }
