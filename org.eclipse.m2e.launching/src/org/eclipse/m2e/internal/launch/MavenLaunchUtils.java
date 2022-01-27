@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +31,7 @@ import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
+import org.eclipse.m2e.workspace.WorkspaceState;
 
 
 /**
@@ -52,15 +54,11 @@ public class MavenLaunchUtils {
   }
 
   public static List<String> getCliResolver(AbstractMavenRuntime runtime) {
-    String resolverBundleId;
-    String runtimeVersion = runtime.getVersion();
-    if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
-      resolverBundleId = "org.eclipse.m2e.workspace.cli"; //$NON-NLS-1$
-    } else {
-      return Collections.emptyList(); // unsupported version of maven
+    if(runtime.getVersion().startsWith("3.")) { //$NON-NLS-1$
+      Bundle m2eWorkspaceCLIBundle = FrameworkUtil.getBundle(WorkspaceState.class);
+      return Bundles.getClasspathEntries(m2eWorkspaceCLIBundle);
     }
-    Bundle resolver = Bundles.findDependencyBundle(MavenLaunchPlugin.getDefault().getBundle(), resolverBundleId);
-    return Bundles.getClasspathEntries(resolver);
+    return Collections.emptyList(); // unsupported version of maven
   }
 
   /**

@@ -165,11 +165,6 @@
 						<goals>
 							<goal>feature-source</goal>
 						</goals>
-						<configuration>
-							<excludes>
-								<plugin id="org.eclipse.m2e.workspace.cli" />
-							</excludes>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
