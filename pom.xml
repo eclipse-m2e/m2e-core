@@ -66,7 +66,6 @@
 		<module>org.eclipse.m2e.jdt</module>
 		<module>org.eclipse.m2e.jdt.ui</module>
 		<module>org.eclipse.m2e.refactoring</module>
-		<module>org.eclipse.m2e.editor.xml</module>
 		<module>org.eclipse.m2e.editor</module>
 		<module>org.eclipse.m2e.lifecyclemapping.defaults</module>
 		<module>org.eclipse.m2e.discovery</module>
@@ -93,7 +92,6 @@
 		<!-- features and update site -->
 		<module>org.eclipse.m2e.feature</module>
 		<module>org.eclipse.m2e.lemminx.feature</module>
-		<module>org.eclipse.m2e.sse.ui.feature</module>
 		<module>org.eclipse.m2e.sdk.feature</module>
 		<module>org.eclipse.m2e.logback.feature</module>
 		<module>org.eclipse.m2e.pde.feature</module>
@@ -107,7 +105,6 @@
 		<module>org.eclipse.m2e.editor.tests</module>
 		<module>org.eclipse.m2e.editor.lemminx.tests</module>
 		<module>org.eclipse.m2e.jdt.tests</module>
-		<module>org.eclipse.m2e.editor.xml.sse.tests</module>
 		<module>org.eclipse.m2e.profiles.core.tests</module>
 	</modules>
 
