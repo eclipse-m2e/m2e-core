@@ -67,7 +67,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     for(LifecycleMappingMetadata _mapping : lifecycleMappings) {
       if(packagingType.equals(_mapping.getPackagingType())) {
         if(mapping != null) {
-          throw new DuplicateMappingException();
+          throw new DuplicateMappingException(mapping.getSource(), _mapping.getSource());
         }
         mapping = _mapping;
       }

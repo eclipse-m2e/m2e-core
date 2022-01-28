@@ -536,8 +536,9 @@ public class LifecycleMappingFactory {
           break;
         }
       } catch(DuplicateMappingException e) {
-        log.error("Duplicate lifecycle mapping metadata for {}.", mavenProject);
-        result.addProblem(new MavenProblemInfo(1, NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging())));
+        log.error("Duplicate lifecycle mapping metadata for {}.", mavenProject, e);
+        result.addProblem(new MavenProblemInfo(1,
+            NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging(), e.getMessage())));
         return; // fatal error
       }
     }
@@ -607,8 +608,7 @@ public class LifecycleMappingFactory {
             for(PluginExecutionMetadata executionMetadata : entry.getValue()) {
               if(isPrimaryMapping(executionMetadata, sorter)) {
                 if(primaryMetadata != null) {
-                  primaryMetadata = null;
-                  throw new DuplicateMappingException();
+                  throw new DuplicateMappingException(primaryMetadata.getSource(), executionMetadata.getSource());
                 }
                 primaryMetadata = executionMetadata;
               }
@@ -618,9 +618,11 @@ public class LifecycleMappingFactory {
             }
           }
         } catch(DuplicateMappingException e) {
-          log.debug("Duplicate plugin execution mapping metadata for {}.", executionKey);
+          primaryMetadata = null;
+          log.debug("Duplicate plugin execution mapping metadata for {}.", executionKey, e);
           result.addProblem(
-              new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString())));
+              new MavenProblemInfo(1,
+                  NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString(), e.getMessage())));
         }
 
         if(primaryMetadata != null && !isValidPluginExecutionMetadata(primaryMetadata)) {
