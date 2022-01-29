@@ -88,7 +88,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private IMavenProjectFacade mavenProject;
 
-  private final Deque<String> projectDefinitionLines = new ArrayDeque<>(3);
+  private final Deque<IRegion> projectDefinitionLines = new ArrayDeque<>(2);
 
   @Override
   public void init(IConsole console) {
@@ -161,39 +161,52 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final Pattern PACKAGING_TYPE_LINE = Pattern.compile("^\\[INFO\\] -+\\[ [\\w\\-\\. ]+ \\]-+$");
 
   private String getText(IRegion lineRegion) throws BadLocationException {
-    String lineText = console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
+    String line0 = getLineText(lineRegion);
 
-    projectDefinitionLines.add(lineText);
-    if(projectDefinitionLines.size() < 3) {
-      return lineText;
+    if(projectDefinitionLines.size() < 2) {
+      projectDefinitionLines.add(lineRegion);
+      return line0;
     }
     // Read groupId, artifactId and version from a sequence like the following lines:
     // [INFO] -----------< org.eclipse.m2e:org.eclipse.m2e.maven.runtime >------------
     // [INFO] Building M2E Embedded Maven Runtime (includes Incubating components) 1.18.2-SNAPSHOT [4/5]
     // [INFO] ---------------------------[ eclipse-plugin ]---------------------------
 
-    Iterator<String> descendingIterator = projectDefinitionLines.descendingIterator();
-    String line3 = descendingIterator.next();
-    if(PACKAGING_TYPE_LINE.matcher(line3).matches()) {
+    if(PACKAGING_TYPE_LINE.matcher(line0).matches()) {
+      Iterator<IRegion> previousLines = projectDefinitionLines.descendingIterator();
 
-      String line2 = descendingIterator.next();
-      Matcher vMatcher = VERSION_LINE.matcher(line2);
+      IRegion line1Region = previousLines.next();
+      String line1 = getLineText(line1Region);
+
+      Matcher vMatcher = VERSION_LINE.matcher(line1);
       if(vMatcher.matches()) {
         String version = vMatcher.group(VERSION);
 
-        String line1 = descendingIterator.next();
-        Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line1);
+        IRegion line2Region = previousLines.next();
+        String line2 = getLineText(line2Region);
+        Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line2);
         if(gaMatcher.matches()) {
           String groupId = gaMatcher.group(GROUP_ID);
           String artifactId = gaMatcher.group(ARTIFACT_ID);
 
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
+
+          int start = gaMatcher.start(GROUP_ID);
+          int end = gaMatcher.end(ARTIFACT_ID);
+
+          IHyperlink link = new MavenProjectHyperLink(mavenProject);
+          console.addLink(link, line2Region.getOffset() + start, end - start);
         }
       }
     }
     projectDefinitionLines.remove(); // only latest three lines are relevant -> use it as ring-buffer
-    return lineText;
+    projectDefinitionLines.add(lineRegion);
+    return line0;
+  }
+
+  private String getLineText(IRegion lineRegion) throws BadLocationException {
+    return console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
   }
 
   @Override
@@ -300,6 +313,28 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         return Collections.emptyList();
       }
       return !jUnitXMLFiles.isEmpty() ? jUnitXMLFiles : plainTextFiles;
+    }
+
+    @Override
+    public void linkEntered() { // nothing to do
+    }
+
+    @Override
+    public void linkExited() { // nothing to do
+    }
+  }
+
+  private static class MavenProjectHyperLink implements IHyperlink {
+
+    private final IMavenProjectFacade mavenProjectFacade;
+
+    public MavenProjectHyperLink(IMavenProjectFacade mavenProjectFacade) {
+      this.mavenProjectFacade = mavenProjectFacade;
+    }
+
+    public void linkActivated() {
+      IFile pom = mavenProjectFacade.getPom();
+      openFileInStandardEditor(pom);
     }
 
     @Override

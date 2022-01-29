@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -56,7 +55,6 @@ import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
-import org.eclipse.jface.text.Position;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -124,38 +122,51 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testConsole_testReportLinkAlignmentAndClickability() throws Exception {
+		@SuppressWarnings("unused")
+		// This test needs the bundle org.eclipse.jdt.junit in its runtime environment
+		// (even in Tycho builds), to properly test if the JUnit test-reports are found.
+		// This field just ensures the mentioned required-bundle is not removed.
+		JUnitLaunchShortcut jdtJunitReference = null;
 
 		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
 
 		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE);
 
-		ConsoleHyperlinkPosition linkPosition = getOnlyConsoleHyperLink(document);
+		ConsoleHyperlinkPosition linkPosition = getConsoleHyperLink(document, 1);
 		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
 
 		assertEquals("Invalid aligmnent of Test-Report link text", "simpleProjectWithJUnit5Test.SimpleTest", linkText);
-		assertLinkActivationOpensTestReportView(linkPosition, "simpleProjectWithJUnit5Test.SimpleTest");
+		assertLinkActivationOpensPartWithTitle(linkPosition, "JUnit (simpleProjectWithJUnit5Test.SimpleTest)");
 	}
 
-	private static ConsoleHyperlinkPosition getOnlyConsoleHyperLink(IDocument doc) throws BadPositionCategoryException {
-		Position[] positions = doc.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY);
-		assertEquals(1, positions.length);
-		return (ConsoleHyperlinkPosition) positions[0];
+	@Test
+	public void testConsole_testMavenProjectLinkAlignmentAndClickability() throws Exception {
+
+		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
+
+		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE);
+
+		ConsoleHyperlinkPosition linkPosition = getConsoleHyperLink(document, 0);
+		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
+
+		assertEquals("Invalid aligmnent of pom link text", "org.eclipse.m2e.tests.projects:simpleProjectWithJUnit5Test",
+				linkText);
+		assertLinkActivationOpensPartWithTitle(linkPosition, "simpleProjectWithJUnit5Test/pom.xml");
 	}
 
-	private static void assertLinkActivationOpensTestReportView(ConsoleHyperlinkPosition link, String testName) {
-		@SuppressWarnings("unused")
-		// This test needs the bundle org.eclipse.jdt.junit in its runtime environment
-		// (even in Tycho builds), to properly test if the JUnit test-reports are found.
-		// This field ensures the mentioned required-bundle is not removed.
-		JUnitLaunchShortcut jdtJunitReference = null;
+	private static ConsoleHyperlinkPosition getConsoleHyperLink(IDocument doc, int index)
+			throws BadPositionCategoryException {
+		return (ConsoleHyperlinkPosition) doc.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY)[index];
+	}
 
+	private static void assertLinkActivationOpensPartWithTitle(ConsoleHyperlinkPosition link, String expectedTitle) {
 		display.syncCall(() -> { // click hyper-link in console
 			link.getHyperLink().linkActivated();
 			return true; // syncExec does not re-throw exceptions
 		});
 		String activePartTitle = display.syncCall( // get titel in subsequent display.syncCall to await updates
 				() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getTitle());
-		assertEquals("Click Test-Report link should open JUnit-view", "JUnit (" + testName + ")", activePartTitle);
+		assertEquals("Expected window part has not been opened", expectedTitle, activePartTitle);
 	}
 
 	@Test
@@ -164,7 +175,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
 
 		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE,
-				Map.entry("maven.surefire.debug", "true"));
+				entry("maven.surefire.debug", "true"));
 
 		assertDebugeePrintOutAndDebuggerLaunch(document, "simpleProjectWithJUnit5Test");
 	}
