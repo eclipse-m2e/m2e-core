@@ -14,6 +14,7 @@
 
 package org.eclipse.m2e.core.ui.tests;
 
+import static java.util.Map.entry;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -49,7 +50,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -126,21 +129,33 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE);
 
-		Position[] positions = document.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY);
-		assertEquals(1, positions.length);
-		ConsoleHyperlinkPosition linkPosition = (ConsoleHyperlinkPosition) positions[0];
-
+		ConsoleHyperlinkPosition linkPosition = getOnlyConsoleHyperLink(document);
 		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
+
 		assertEquals("Invalid aligmnent of Test-Report link text", "simpleProjectWithJUnit5Test.SimpleTest", linkText);
+		assertLinkActivationOpensTestReportView(linkPosition, "simpleProjectWithJUnit5Test.SimpleTest");
+	}
+
+	private static ConsoleHyperlinkPosition getOnlyConsoleHyperLink(IDocument doc) throws BadPositionCategoryException {
+		Position[] positions = doc.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY);
+		assertEquals(1, positions.length);
+		return (ConsoleHyperlinkPosition) positions[0];
+	}
+
+	private static void assertLinkActivationOpensTestReportView(ConsoleHyperlinkPosition link, String testName) {
+		@SuppressWarnings("unused")
+		// This test needs the bundle org.eclipse.jdt.junit in its runtime environment
+		// (even in Tycho builds), to properly test if the JUnit test-reports are found.
+		// This field ensures the mentioned required-bundle is not removed.
+		JUnitLaunchShortcut jdtJunitReference = null;
 
 		display.syncCall(() -> { // click hyper-link in console
-			linkPosition.getHyperLink().linkActivated();
+			link.getHyperLink().linkActivated();
 			return true; // syncExec does not re-throw exceptions
 		});
 		String activePartTitle = display.syncCall( // get titel in subsequent display.syncCall to await updates
 				() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getTitle());
-		assertThat("Click Test-Report link should open JUnit-view", activePartTitle,
-				containsString("simpleProjectWithJUnit5Test.SimpleTest"));
+		assertEquals("Click Test-Report link should open JUnit-view", "JUnit (" + testName + ")", activePartTitle);
 	}
 
 	@Test
@@ -148,27 +163,31 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
 
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-		launchManager.removeLaunches(launchManager.getLaunches());
-
 		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE,
 				Map.entry("maven.surefire.debug", "true"));
 
+		assertDebugeePrintOutAndDebuggerLaunch(document, "simpleProjectWithJUnit5Test");
+	}
+
+	private static void assertDebugeePrintOutAndDebuggerLaunch(IDocument document, String debugLaunchName)
+			throws CoreException {
 		// Check for Listening debugee print-out
 		String consoleText = display.syncCall(document::get); // final document content could have changed
 		assertThat(consoleText, containsString("Listening for transport dt_socket at address: 5005"));
 
 		// Check for a corresponding remote-java-debugging launch
-		ILaunch[] launches = launchManager.getLaunches();
-		assertEquals(2, launches.length, 2);
+		ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
+		assertEquals(2, launches.length);
 		ILaunch debugLaunch = launches[1]; // the first launch is the maven build itself
 		assertEquals(IJavaLaunchConfigurationConstants.ID_REMOTE_JAVA_APPLICATION,
 				debugLaunch.getLaunchConfiguration().getType().getIdentifier());
-		assertEquals("simpleProjectWithJUnit5Test", debugLaunch.getLaunchConfiguration()
+		assertEquals(debugLaunchName, debugLaunch.getLaunchConfiguration()
 				.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""));
 		assertEquals("debug", debugLaunch.getLaunchMode());
 		assertTrue(debugLaunch.isTerminated());
 	}
+
+	// --- common utility methods ---
 
 	private static File getTestProjectPomFile(String testProjectName) throws URISyntaxException, IOException {
 		String projectPath = "/resources/projects/" + testProjectName;
@@ -214,6 +233,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		CompletableFuture<IConsole> consoleAfterStartSupplier = getConsoleAfterLaunchSupplier();
 
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+		launchManager.removeLaunches(launchManager.getLaunches()); // clear existing launches
 		String configName = launchManager.generateLaunchConfigurationName("testConsole");
 		var configType = launchManager.getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID);
 		var wc = configType.newInstance(null, configName);
