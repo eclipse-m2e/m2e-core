@@ -50,6 +50,7 @@ import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,10 +62,14 @@ import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.Notification;
@@ -240,6 +245,8 @@ public class OverviewPage extends MavenPomEditorPage {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
   }
 
+  public static String PACKAGING_TYPE_EXT = "artifactPackagingTypes";
+
   @Override
   protected void createFormContent(IManagedForm managedForm) {
     FormToolkit toolkit = managedForm.getToolkit();
@@ -349,6 +356,7 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactPackagingCombo.add("ear"); //$NON-NLS-1$
     artifactPackagingCombo.add("pom"); //$NON-NLS-1$
     artifactPackagingCombo.add("maven-plugin"); //$NON-NLS-1$
+    getPackagingTypes().stream().forEach(type -> artifactPackagingCombo.add(type));
 // uncomment this only if you are able to not to break the project
 //    artifactPackagingCombo.add("osgi-bundle");
 //    artifactPackagingCombo.add("eclipse-feature");
@@ -1391,5 +1399,21 @@ public class OverviewPage extends MavenPomEditorPage {
       }
       return super.getImage(element);
     }
+  }
+
+  private List<String> getPackagingTypes() {
+    IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(IMavenConstants.PLUGIN_ID,
+        PACKAGING_TYPE_EXT);
+    List<String> types = new ArrayList<>();
+    if(extensionPoint == null) {
+      return types;
+    }
+
+    IExtension[] extensions = extensionPoint.getExtensions();
+    for(IExtension extension : extensions) {
+      IConfigurationElement[] configElements = extension.getConfigurationElements();
+      Arrays.asList(configElements).stream().forEach(element -> types.add(element.getAttribute("name")));
+    }
+    return types;
   }
 }

@@ -22,6 +22,7 @@
    <extension-point id="conversionEnabler" name="%extension-point.conversionEnabler.name" schema="schema/conversionEnabler.exsd"/>
    <extension-point id="incrementalBuildFrameworks" name="%extension-point.incrementalBuildFrameworks.name" schema="schema/incrementalBuildFrameworks.exsd"/>
    <extension-point id="workspaceClassifierResolvers" name="%extension-point.workspaceClassifierResolvers.name" schema="schema/workspaceClassifierResolvers.exsd"/>
+   <extension-point id="artifactPackagingTypes" name="%extension-point.artifactPackagingTypes.name" schema="schema/artifactPackagingTypes.exsd"/>
 
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"
