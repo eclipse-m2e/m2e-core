@@ -25,9 +25,11 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetad
 public class DuplicateMappingException extends RuntimeException {
   private static final String DESCRIPTION_UNKNOWN_SOURCE = "unknown source";
 
-  private static final long serialVersionUID = 6916144930019743563L;
+  private static final long serialVersionUID = -7303637464019592307L;
 
-  private final LifecycleMappingMetadataSource source1, source2;
+  private final LifecycleMappingMetadataSource source1;
+
+  private final LifecycleMappingMetadataSource source2;
 
   public DuplicateMappingException(LifecycleMappingMetadataSource source1, LifecycleMappingMetadataSource source2) {
     this.source1 = source1;
