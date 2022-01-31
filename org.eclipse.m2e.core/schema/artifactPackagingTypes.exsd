@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.m2e.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.eclipse.m2e.core" id="artifactPackagingType" name="%extension-point.artifactPackagingType.name"/>
+         <meta.schema plugin="org.eclipse.m2e.core" id="artifactPackagingTypes" name="%extension-point.artifactPackagingTypes.name"/>
       </appInfo>
       <documentation>
          Allows plugins to contribute their own Maven packaging types to the POM editor.
