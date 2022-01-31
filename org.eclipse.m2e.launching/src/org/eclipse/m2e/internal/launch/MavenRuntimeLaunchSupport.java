@@ -41,7 +41,6 @@ import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.workspace.WorkspaceState;
-import org.eclipse.m2e.workspace.WorkspaceState2;
 
 
 /**
@@ -278,7 +277,7 @@ public class MavenRuntimeLaunchSupport {
 
   public static void applyWorkspaceArtifacts(VMArguments properties) {
     File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
-    properties.appendProperty(WorkspaceState2.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath()));
+    properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath()));
   }
 
   public IVMRunner decorateVMRunner(final IVMRunner runner) {

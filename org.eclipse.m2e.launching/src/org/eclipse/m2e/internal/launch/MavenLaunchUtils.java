@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
-import org.eclipse.m2e.workspace.WorkspaceState2;
+import org.eclipse.m2e.workspace.WorkspaceState;
 
 
 /**
@@ -55,7 +55,7 @@ public class MavenLaunchUtils {
 
   public static List<String> getCliResolver(AbstractMavenRuntime runtime) {
     if(runtime.getVersion().startsWith("3.")) { //$NON-NLS-1$
-      Bundle m2eWorkspaceCLIBundle = FrameworkUtil.getBundle(WorkspaceState2.class);
+      Bundle m2eWorkspaceCLIBundle = FrameworkUtil.getBundle(WorkspaceState.class);
       return Bundles.getClasspathEntries(m2eWorkspaceCLIBundle);
     }
     return Collections.emptyList(); // unsupported version of maven
