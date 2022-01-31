@@ -72,15 +72,23 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 
   private static final Pattern LISTENING_MARKER = Pattern
-      .compile("Listening for transport dt_socket at address: (?<debuggerPort>\\d+)$");
+      .compile("Listening for transport dt_socket at address: (\\d+)$");
 
-  private static final Pattern RUNNING_TEST_CLASS = Pattern.compile("Running (?<testClassName>[\\w\\.]+)$");
+  private static final int DEBUGGER_PORT = 1;
+
+  private static final Pattern RUNNING_TEST_CLASS = Pattern.compile("Running ([\\w\\.]+)$");
+
+  private static final int TEST_CLASS_NAME = 1;
 
   private boolean isMavenBuildProcess;
 
   private IConsole console;
 
   private boolean initialized = false;
+
+  private IMavenProjectFacade mavenProject;
+
+  private final Deque<String> projectDefinitionLines = new ArrayDeque<>(3);
 
   @Override
   public void init(IConsole console) {
@@ -90,19 +98,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     this.console = console;
     ILaunchConfiguration launchConfiguration = console.getProcess().getLaunch().getLaunchConfiguration();
     isMavenBuildProcess = launchConfiguration != null && isMavenProcess(launchConfiguration);
-    this.initialized = true; // Initialized
+    initialized = true; // Initialized
   }
-
-  private IMavenProjectFacade mavenProject;
 
   @Override
   public void lineAppended(IRegion line) {
     if(isMavenBuildProcess) {
       try {
-        int offset = line.getOffset();
-        String text = console.getDocument().get(offset, line.getLength()).strip();
-
-        readProjectDefinition(text);
+        String text = getText(line);
         if(mavenProject == null) {
           return;
         }
@@ -110,17 +113,17 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         Matcher runningTestMatcher = RUNNING_TEST_CLASS.matcher(text);
         if(runningTestMatcher.find()) {
 
-          String testName = runningTestMatcher.group("testClassName");
-          offset += runningTestMatcher.start("testClassName");
+          String testName = runningTestMatcher.group(TEST_CLASS_NAME);
+          int start = runningTestMatcher.start(TEST_CLASS_NAME);
 
-          IHyperlink link = new MavenConsoleHyperLink(mavenProject, testName);
-          console.addLink(link, offset, testName.length());
+          IHyperlink link = new MavenTestReportHyperLink(mavenProject, testName);
+          console.addLink(link, line.getOffset() + start, testName.length());
           return;
         }
         Matcher listeningMatcher = LISTENING_MARKER.matcher(text);
         if(listeningMatcher.find()) {
 
-          String portString = listeningMatcher.group("debuggerPort");
+          String portString = listeningMatcher.group(DEBUGGER_PORT);
           // create and start remote Java app launch configuration
           launchRemoteJavaApp(mavenProject.getProject(), portString);
         }
@@ -144,19 +147,25 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   }
 
   private static final Pattern GROUP_ARTIFACT_LINE = Pattern
-      .compile("^\\[INFO\\] -+< (?<groupId>[\\w\\.\\-]+):(?<artifactId>[\\w\\.\\-]+) >-+$");
+      .compile("^\\[INFO\\] -+< ([\\w\\.\\-]+):([\\w\\.\\-]+) >-+$");
+
+  private static final int GROUP_ID = 1;
+
+  private static final int ARTIFACT_ID = 2;
 
   private static final Pattern VERSION_LINE = Pattern
-      .compile("^\\[INFO\\] Building .+ (?<version>[\\w\\.\\-]+)( +\\[\\d+/\\d+\\])?$");
+      .compile("^\\[INFO\\] Building .+ ([\\w\\.\\-]+)( +\\[\\d+/\\d+\\])?$");
+
+  private static final int VERSION = 1;
 
   private static final Pattern PACKAGING_TYPE_LINE = Pattern.compile("^\\[INFO\\] -+\\[ [\\w\\-\\. ]+ \\]-+$");
 
-  private final Deque<String> projectDefinitionLines = new ArrayDeque<>(3);
+  private String getText(IRegion lineRegion) throws BadLocationException {
+    String lineText = console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
 
-  private void readProjectDefinition(String lineText) {
     projectDefinitionLines.add(lineText);
     if(projectDefinitionLines.size() < 3) {
-      return;
+      return lineText;
     }
     // Read groupId, artifactId and version from a sequence like the following lines:
     // [INFO] -----------< org.eclipse.m2e:org.eclipse.m2e.maven.runtime >------------
@@ -170,13 +179,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       String line2 = descendingIterator.next();
       Matcher vMatcher = VERSION_LINE.matcher(line2);
       if(vMatcher.matches()) {
-        String version = vMatcher.group("version");
+        String version = vMatcher.group(VERSION);
 
         String line1 = descendingIterator.next();
         Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line1);
         if(gaMatcher.matches()) {
-          String groupId = gaMatcher.group("groupId");
-          String artifactId = gaMatcher.group("artifactId");
+          String groupId = gaMatcher.group(GROUP_ID);
+          String artifactId = gaMatcher.group(ARTIFACT_ID);
 
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
@@ -184,6 +193,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       }
     }
     projectDefinitionLines.remove(); // only latest three lines are relevant -> use it as ring-buffer
+    return lineText;
   }
 
   @Override
@@ -242,37 +252,31 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   /**
    * Opens a text editor for Maven test report
    */
-  private static class MavenConsoleHyperLink implements IHyperlink {
+  private static class MavenTestReportHyperLink implements IHyperlink {
 
     private final String testName;
 
-    private final Path baseDir;
+    private final IMavenProjectFacade mavenProjectFacade;
 
-    public MavenConsoleHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
+    public MavenTestReportHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
       this.testName = testName;
-      MavenProject mavenProject = mavenProjectFacade.getMavenProject();
-      baseDir = mavenProject != null ? Path.of(mavenProject.getBuild().getDirectory()) : null;
+      this.mavenProjectFacade = mavenProjectFacade;
     }
 
     @Override
     public void linkActivated() {
-      if(baseDir == null) {
+      MavenProject mavenProject = mavenProjectFacade.getMavenProject();
+      if(mavenProject == null) {
         return; // happens when the project was not yet build
       }
+      Path baseDir = Path.of(mavenProject.getBuild().getDirectory());
       List<Path> reportFiles = getTestReportFiles(baseDir, testName);
       if(!reportFiles.isEmpty()) {
-        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         for(Path reportFile : reportFiles) {
           IFile[] files = wsRoot.findFilesForLocationURI(reportFile.toUri());
-          for(IFile file : files) {
-            try {
-              file.refreshLocal(IResource.DEPTH_ZERO, null);
-              IDE.openEditor(page, file);
-              break;
-            } catch(CoreException ex) {
-              log.error(ex.getMessage(), ex);
-            }
+          if(files.length > 0) {
+            openFileInStandardEditor(files[0]);
           }
         }
       }
@@ -304,6 +308,16 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
     @Override
     public void linkExited() { // nothing to do
+    }
+  }
+
+  private static void openFileInStandardEditor(IFile file) {
+    try {
+      file.refreshLocal(IResource.DEPTH_ZERO, null);
+      IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      IDE.openEditor(page, file);
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
     }
   }
 }

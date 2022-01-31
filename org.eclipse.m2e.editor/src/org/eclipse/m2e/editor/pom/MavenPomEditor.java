@@ -14,6 +14,7 @@
 package org.eclipse.m2e.editor.pom;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -77,10 +78,10 @@ import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
+import org.eclipse.wst.sse.core.internal.util.DocumentInputStream;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.contenttype.ContentTypeIdForXML;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
@@ -136,7 +137,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private final Map<String, org.eclipse.aether.graph.DependencyNode> rootNodes = new HashMap<>();
 
-  IDOMModel structuredModel;
+  IStructuredModel structuredModel;
 
   private MavenProject mavenProject;
 
@@ -367,11 +368,17 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(sourceDocument == null) {
       sourceDocument = sourcePage.getDocumentProvider().getDocument(this.getEditorInput());
     }
-//    if (sourceDocument instanceof IStructuredDocument) {
-    this.structuredModel = (IDOMModel) this.modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
-//    } else {
-//      this.structuredModel = this.modelManager.
-//    }
+    if(sourceDocument instanceof IStructuredDocument) {
+      this.structuredModel = this.modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
+    } else {
+      // create a read-only copy of the document
+      try (InputStream docStream = new DocumentInputStream(sourceDocument)) {
+        this.structuredModel = this.modelManager.getModelForRead(getEditorInput().getName(), docStream, null);
+      } catch(IOException ex) {
+        // TODO Auto-generated catch block
+        log.error(ex.getMessage(), ex);
+      }
+    }
   }
 
   protected void selectActivePage() {
@@ -503,7 +510,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
       String error = Messages.MavenPomEditor_error_loading_effective_pom;
       IDocument doc = getEffectivePomSourcePage().getDocumentProvider().getDocument(getEffectivePomEditorInput());
-      doc.set(error);
+      if(Display.getCurrent() != null) {
+        doc.set(error);
+      } else {
+        getSite().getShell().getDisplay().asyncExec(() -> doc.set(error));
+      }
     }
 
     @Override
