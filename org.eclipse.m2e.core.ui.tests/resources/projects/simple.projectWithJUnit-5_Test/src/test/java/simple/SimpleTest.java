@@ -1,4 +1,4 @@
-package simpleProjectWithJUnit5Test;
+package simple;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -6,6 +6,6 @@ import org.junit.jupiter.api.Test;
 public class SimpleTest {
 	@Test
 	public void testSimple() {
-		Assertions.assertTrue(true); // NoOp Test
+		Assertions.assertTrue(false); // NoOp Test
 	}
 }
