@@ -216,11 +216,11 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     return console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
   }
 
-  private void addProjectLink(IRegion line2Region, Matcher gaMatcher, int startGroup, int endGroup) {
-    int start = gaMatcher.start(startGroup);
-    int end = gaMatcher.end(endGroup);
+  private void addProjectLink(IRegion line, Matcher matcher, int startGroup, int endGroup) {
     IHyperlink link = new MavenProjectHyperLink(mavenProject);
-    console.addLink(link, line2Region.getOffset() + start, end - start);
+    int start = matcher.start(startGroup);
+    int end = matcher.end(endGroup);
+    console.addLink(link, line.getOffset() + start, end - start);
   }
 
   @Override
