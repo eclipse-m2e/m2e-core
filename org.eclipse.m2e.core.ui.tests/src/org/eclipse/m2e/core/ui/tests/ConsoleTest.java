@@ -106,6 +106,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		}
 	}
 
+	private static final String SIMPLE_PROJECT = "simple.projectWithJUnit-5_Test";
+
 	@Test
 	public void testConsole_hasOutputAndHasNoMultipleSLF4Jwarnings() throws Exception {
 		File pomFile = getTestProjectPomFile("simplePomOK");
@@ -128,30 +130,35 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		// This field just ensures the mentioned required-bundle is not removed.
 		JUnitLaunchShortcut jdtJunitReference = null;
 
-		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
+		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
 
-		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE);
+		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE);
 
 		ConsoleHyperlinkPosition linkPosition = getConsoleHyperLink(document, 1);
 		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
 
-		assertEquals("Invalid aligmnent of Test-Report link text", "simpleProjectWithJUnit5Test.SimpleTest", linkText);
-		assertLinkActivationOpensPartWithTitle(linkPosition, "JUnit (simpleProjectWithJUnit5Test.SimpleTest)");
+		assertEquals("Test-Report link text", "simple.SimpleTest", linkText);
+		assertLinkActivationOpensPartWithTitle(linkPosition, "JUnit (simple.SimpleTest)");
 	}
 
 	@Test
 	public void testConsole_testMavenProjectLinkAlignmentAndClickability() throws Exception {
 
-		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
+		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
 
-		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE);
+		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE);
 
-		ConsoleHyperlinkPosition linkPosition = getConsoleHyperLink(document, 0);
-		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
+		ConsoleHyperlinkPosition projectHeadlineLink = getConsoleHyperLink(document, 0);
+		String headlineLinkText = document.get(projectHeadlineLink.getOffset(), projectHeadlineLink.getLength());
 
-		assertEquals("Invalid aligmnent of pom link text", "org.eclipse.m2e.tests.projects:simpleProjectWithJUnit5Test",
-				linkText);
-		assertLinkActivationOpensPartWithTitle(linkPosition, "simpleProjectWithJUnit5Test/pom.xml");
+		assertEquals("Pom link text", "org.eclipse.m2e.tests.projects:" + SIMPLE_PROJECT, headlineLinkText);
+		assertLinkActivationOpensPartWithTitle(projectHeadlineLink, SIMPLE_PROJECT + "/pom.xml");
+
+		ConsoleHyperlinkPosition failedProjectLink = getConsoleHyperLink(document, 3);
+		String failedProjectText = document.get(failedProjectLink.getOffset(), failedProjectLink.getLength());
+
+		assertEquals("Pom link text", SIMPLE_PROJECT, failedProjectText);
+		assertLinkActivationOpensPartWithTitle(failedProjectLink, SIMPLE_PROJECT + "/pom.xml");
 	}
 
 	private static ConsoleHyperlinkPosition getConsoleHyperLink(IDocument doc, int index)
@@ -172,12 +179,12 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void testConsole_automaticDebuggerAttachment() throws Exception {
 
-		importMavenProjectIntoWorkspace("simpleProjectWithJUnit5Test");
+		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
 
-		IDocument document = runMavenBuild("${project_loc:simpleProjectWithJUnit5Test}", ILaunchManager.RUN_MODE,
+		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE,
 				entry("maven.surefire.debug", "true"));
 
-		assertDebugeePrintOutAndDebuggerLaunch(document, "simpleProjectWithJUnit5Test");
+		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
 	}
 
 	private static void assertDebugeePrintOutAndDebuggerLaunch(IDocument document, String debugLaunchName)
@@ -278,6 +285,10 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 			fail("Build timed out.");
 		}
 		return document;
+	}
+
+	private static String projectLocVariable(String projectName) {
+		return "${project_loc:" + projectName + "}";
 	}
 
 	private static boolean isBuildFinished(String text) {

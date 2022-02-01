@@ -71,6 +71,8 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 
+  private static final String IDENTIFIER = "([\\w\\.\\-]+)";
+
   private static final Pattern LISTENING_MARKER = Pattern
       .compile("Listening for transport dt_socket at address: (\\d+)$");
 
@@ -79,6 +81,11 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final Pattern RUNNING_TEST_CLASS = Pattern.compile("Running ([\\w\\.]+)$");
 
   private static final int TEST_CLASS_NAME = 1;
+
+  private static final Pattern EXECUTION_FAILURE = Pattern
+      .compile("^\\[ERROR\\] Failed to execute goal .+ on project " + IDENTIFIER);
+
+  private static final int FAILED_ARTIFACT_ID = 1;
 
   private boolean isMavenBuildProcess;
 
@@ -112,7 +119,6 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
         Matcher runningTestMatcher = RUNNING_TEST_CLASS.matcher(text);
         if(runningTestMatcher.find()) {
-
           String testName = runningTestMatcher.group(TEST_CLASS_NAME);
           int start = runningTestMatcher.start(TEST_CLASS_NAME);
 
@@ -120,14 +126,19 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           console.addLink(link, line.getOffset() + start, testName.length());
           return;
         }
+
         Matcher listeningMatcher = LISTENING_MARKER.matcher(text);
         if(listeningMatcher.find()) {
-
           String portString = listeningMatcher.group(DEBUGGER_PORT);
           // create and start remote Java app launch configuration
           launchRemoteJavaApp(mavenProject.getProject(), portString);
+          return;
         }
 
+        Matcher failureMatcher = EXECUTION_FAILURE.matcher(text);
+        if(failureMatcher.find()) {
+          addProjectLink(line, failureMatcher, FAILED_ARTIFACT_ID, FAILED_ARTIFACT_ID);
+        }
       } catch(BadLocationException ex) {
         // ignore
       } catch(CoreException ex) {
@@ -147,14 +158,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   }
 
   private static final Pattern GROUP_ARTIFACT_LINE = Pattern
-      .compile("^\\[INFO\\] -+< ([\\w\\.\\-]+):([\\w\\.\\-]+) >-+$");
+      .compile("^\\[INFO\\] -+< " + IDENTIFIER + ":" + IDENTIFIER + " >-+$");
 
   private static final int GROUP_ID = 1;
 
   private static final int ARTIFACT_ID = 2;
 
   private static final Pattern VERSION_LINE = Pattern
-      .compile("^\\[INFO\\] Building .+ ([\\w\\.\\-]+)( +\\[\\d+/\\d+\\])?$");
+      .compile("^\\[INFO\\] Building .+ " + IDENTIFIER + "( +\\[\\d+/\\d+\\])?$");
 
   private static final int VERSION = 1;
 
@@ -192,11 +203,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
 
-          int start = gaMatcher.start(GROUP_ID);
-          int end = gaMatcher.end(ARTIFACT_ID);
-
-          IHyperlink link = new MavenProjectHyperLink(mavenProject);
-          console.addLink(link, line2Region.getOffset() + start, end - start);
+          addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID);
         }
       }
     }
@@ -207,6 +214,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private String getLineText(IRegion lineRegion) throws BadLocationException {
     return console.getDocument().get(lineRegion.getOffset(), lineRegion.getLength()).strip();
+  }
+
+  private void addProjectLink(IRegion line2Region, Matcher gaMatcher, int startGroup, int endGroup) {
+    int start = gaMatcher.start(startGroup);
+    int end = gaMatcher.end(endGroup);
+    IHyperlink link = new MavenProjectHyperLink(mavenProject);
+    console.addLink(link, line2Region.getOffset() + start, end - start);
   }
 
   @Override
