@@ -187,6 +187,16 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
 	}
 
+	@Test
+	public void testConsole_automaticDebuggerAttachment_fromDebugLaunch() throws Exception {
+
+		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
+
+		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.DEBUG_MODE);
+
+		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
+	}
+
 	private static void assertDebugeePrintOutAndDebuggerLaunch(IDocument document, String debugLaunchName)
 			throws CoreException {
 		// Check for Listening debugee print-out
