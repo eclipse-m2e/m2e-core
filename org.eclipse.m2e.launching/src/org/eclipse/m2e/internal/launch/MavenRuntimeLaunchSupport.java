@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -135,7 +139,8 @@ public class MavenRuntimeLaunchSupport {
 
       final File cwconfFile;
       try {
-        File state = MavenLaunchPlugin.getDefault().getStateLocation().toFile();
+        Bundle bundle = FrameworkUtil.getBundle(MavenRuntimeLaunchSupport.class);
+        File state = Platform.getStateLocation(bundle).toFile();
         File dir = new File(state, "launches"); //$NON-NLS-1$
         dir.mkdirs();
         cwconfFile = File.createTempFile("m2conf", ".tmp", dir); //$NON-NLS-1$ //$NON-NLS-2$

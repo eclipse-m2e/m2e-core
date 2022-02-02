@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 
 /**
@@ -37,8 +36,6 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 abstract class BasicProjectRegistry implements Serializable {
 
   private static final long serialVersionUID = 6232274446642339434L;
-
-  private final String m2e_version = MavenPluginActivator.getQualifiedVersion();
 
   /**
    * Maps ArtifactKey to IFile of the POM file that defines this artifact.
@@ -153,8 +150,7 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public boolean isValid() {
-    return MavenPluginActivator.getQualifiedVersion().equals(m2e_version) //
-        && workspaceArtifacts != null //
+    return workspaceArtifacts != null //
         && workspacePoms != null //
         && workspacePomFiles != null //
         && requiredCapabilities != null //
