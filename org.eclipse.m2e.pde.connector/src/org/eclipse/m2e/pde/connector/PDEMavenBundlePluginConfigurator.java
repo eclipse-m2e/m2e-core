@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2021 Sonatype, Inc.
+ * Copyright (c) 2008, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,15 +8,12 @@
 package org.eclipse.m2e.pde.connector;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,83 +50,75 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 	private static final String FELIX_PARAM_SUPPORTINCREMENTALBUILD = "supportIncrementalBuild";
 	private static final String FELIX_MANIFEST_GOAL = "manifest";
 	private static final String BND_PARAM_MANIFESTLOCATION = "manifestPath";
-	private static final String[] BND_MANIFEST_GOALS = { "bnd-process", "bnd-process-tests", "jar", "test-jar" };
+	private static final List<String> BND_MANIFEST_GOALS = List.of("bnd-process", "bnd-process-tests", "jar",
+			"test-jar");
 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		List<MojoExecution> executions = getMojoExecutions(request, monitor);
-		List<MavenProblemInfo> problems = new ArrayList<MavenProblemInfo>();
 		boolean hasManifestExecution = false;
 		for (MojoExecution execution : executions) {
 			Plugin plugin = execution.getPlugin();
 			if (isFelix(plugin)) {
-				MavenProject mavenProject = request.getMavenProject();
-				IMaven maven = MavenPlugin.getMaven();
-				if (isFelixBundleGoal(execution)) {
-					Boolean supportIncremental = maven.getMojoParameterValue(mavenProject, execution,
+				if (isFelixManifestGoal(execution)) {
+					IMaven maven = MavenPlugin.getMaven();
+					Boolean supportIncremental = maven.getMojoParameterValue(request.getMavenProject(), execution,
 							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
 					if (supportIncremental == null || !supportIncremental.booleanValue()) {
-						SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(),
-								"configuration");
-						MavenProblemInfo problem = new MavenProblemInfo(
-								"Incremental updates are currently disabled, set supportIncrementalBuild=true to support automatic manifest updates for this project.",
-								IMarker.SEVERITY_WARNING, location);
-						problems.add(problem);
+						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
+								"Incremental updates are currently disabled, set supportIncrementalBuild=true to support automatic manifest updates for this project.");
 					}
+
 					hasManifestExecution = true;
 				}
-			} else if (isBND(plugin)) {
-				if (isBNDBundleGoal(execution)) {
-					hasManifestExecution = true;
-				}
+			} else if (isBND(plugin) && isBNDBundleGoal(execution)) {
+				hasManifestExecution = true;
 			}
 		}
-		if (!hasManifestExecution) {
-			for (MojoExecution execution : executions) {
-				SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(), "executions");
-				MavenProblemInfo problem = new MavenProblemInfo(
-						"There is currently no execution that generates a manifest, consider adding an execution for one of the following goal: "
-								+ (isFelix(execution.getPlugin()) ? FELIX_MANIFEST_GOAL
-										: Arrays.toString(BND_MANIFEST_GOALS))
-								+ ".",
-						IMarker.SEVERITY_WARNING, location);
-				problems.add(problem);
-				break;
-			}
+		if (!hasManifestExecution && !executions.isEmpty()) {
+			MojoExecution execution = executions.get(0);
+			createWarningMarker(request, execution, "executions",
+					"There is currently no execution that generates a manifest, consider adding an execution for one of the following goal: "
+							+ (isFelix(execution.getPlugin()) ? FELIX_MANIFEST_GOAL : BND_MANIFEST_GOALS) + ".");
 		}
-		if (problems.size() > 0) {
-			this.markerManager.addErrorMarkers(request.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, problems);
-		}
-		IProject project = request.getProject();
+
 		IMavenProjectFacade facade = request.getMavenProjectFacade();
-
 		IPath metainfPath = getMetainfPath(facade, executions, monitor);
-
-		PDEProjectHelper.addPDENature(project, metainfPath, monitor);
+		PDEProjectHelper.addPDENature(facade.getProject(), metainfPath, monitor);
 	}
 
-	private boolean isFelixBundleGoal(MojoExecution execution) {
+	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
+			String message) {
+		SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(), attribute);
+
+		String[] gav = location.getResourceId().split(":");
+		IMavenProjectFacade facade = projectManager.getMavenProject(gav[0], gav[1], gav[2]);
+		if (facade == null) {
+			// attribute specifying project (probably parent) is not in the workspace.
+			// The following code returns the location of the project's parent-element.
+			location = SourceLocationHelper.findLocation(request.getMavenProject(), new MojoExecutionKey(execution));
+			facade = request.getMavenProjectFacade();
+		}
+		MavenProblemInfo problem = new MavenProblemInfo(message, IMarker.SEVERITY_WARNING, location);
+		markerManager.addErrorMarker(facade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, problem);
+	}
+
+	private boolean isFelixManifestGoal(MojoExecution execution) {
 		return FELIX_MANIFEST_GOAL.equals(execution.getGoal());
 	}
 
 	private boolean isBNDBundleGoal(MojoExecution execution) {
-		String executionGoal = execution.getGoal();
-		for (String goal : BND_MANIFEST_GOALS) {
-			if (goal.equals(executionGoal)) {
-				return true;
-			}
-		}
-		return false;
+		return BND_MANIFEST_GOALS.contains(execution.getGoal());
 	}
 
 	@Override
 	public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
-			throws CoreException {
+			throws CoreException { // nothing to do
 	}
 
 	@Override
 	public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
-			IProgressMonitor monitor) throws CoreException {
+			IProgressMonitor monitor) throws CoreException { // nothing to do
 	}
 
 	private IPath getMetainfPath(IMavenProjectFacade facade, List<MojoExecution> executions, IProgressMonitor monitor)
@@ -137,9 +126,9 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 		IMaven maven = MavenPlugin.getMaven();
 		for (MojoExecution execution : executions) {
 			Plugin plugin = execution.getPlugin();
-			MavenProject mavenProject = facade.getMavenProject(monitor);
-			File location = maven.getMojoParameterValue(mavenProject, execution,
-					isBND(plugin) ? BND_PARAM_MANIFESTLOCATION : FELIX_PARAM_MANIFESTLOCATION, File.class, monitor);
+			MavenProject project = facade.getMavenProject(monitor);
+			String manifestParameter = isBND(plugin) ? BND_PARAM_MANIFESTLOCATION : FELIX_PARAM_MANIFESTLOCATION;
+			File location = maven.getMojoParameterValue(project, execution, manifestParameter, File.class, monitor);
 			if (location != null) {
 				return facade.getProjectRelativePath(location.getAbsolutePath());
 			}
@@ -165,7 +154,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 	@Override
 	public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
 			IPluginExecutionMetadata executionMetadata) {
-		if ((isFelix(execution.getPlugin()) && isFelixBundleGoal(execution))
+		if ((isFelix(execution.getPlugin()) && isFelixManifestGoal(execution))
 				|| (isBND(execution.getPlugin()) && isBNDBundleGoal(execution))) {
 			return new MojoExecutionBuildParticipant(execution, true, true);
 		}

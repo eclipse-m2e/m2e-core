@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2018 Sonatype, Inc. and others.
+ * Copyright (c) 2010, 2022 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -16,11 +16,13 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.service.url.URLConstants;
@@ -62,7 +64,6 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.repository.legacy.WagonManager;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -94,7 +95,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 
 public class MavenPluginActivator extends Plugin {
-  private final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
+  private final Logger log = LoggerFactory.getLogger(MavenPluginActivator.class);
 
   public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
@@ -128,8 +129,6 @@ public class MavenPluginActivator extends Plugin {
   private ArtifactFilterManager artifactFilterManager;
 
   private String version = "0.0.0"; //$NON-NLS-1$
-
-  private String qualifiedVersion = "0.0.0.qualifier"; //$NON-NLS-1$
 
   private IMavenConfiguration mavenConfiguration;
 
@@ -197,8 +196,7 @@ public class MavenPluginActivator extends Plugin {
     this.bundleContext = context;
 
     try {
-      this.qualifiedVersion = getBundle().getHeaders().get(Constants.BUNDLE_VERSION);
-      Version bundleVersion = Version.parseVersion(this.qualifiedVersion);
+      Version bundleVersion = getBundle().getVersion();
       this.version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
     } catch(IllegalArgumentException e) {
       // ignored
@@ -206,7 +204,6 @@ public class MavenPluginActivator extends Plugin {
 
     this.mavenConfiguration = new MavenConfigurationImpl();
     File stateLocationDir = getStateLocation().toFile();
-
 
     this.mavenMarkerManager = new MavenMarkerManager(mavenConfiguration);
 
@@ -223,8 +220,8 @@ public class MavenPluginActivator extends Plugin {
     this.mavenBackgroundJob = new ProjectRegistryRefreshJob(managerImpl, mavenConfiguration);
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    workspace.addResourceChangeListener(mavenBackgroundJob, IResourceChangeEvent.POST_CHANGE
-        | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE);
+    workspace.addResourceChangeListener(mavenBackgroundJob,
+        IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE);
 
     this.projectManager = new MavenProjectManager(managerImpl, mavenBackgroundJob, stateLocationDir);
     this.projectManager.addMavenProjectChangedListener(new WorkspaceStateWriter(projectManager));
@@ -258,10 +255,9 @@ public class MavenPluginActivator extends Plugin {
     this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
     ResourcesPlugin.getWorkspace().addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
     //register URL handler, we can't use DS here because this triggers loading of m2e too early
-    Hashtable<String, Object>               properties = new Hashtable<>();
-    properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
+    Map<String, Object> properties = Map.of(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
     this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
-        new MvnProtocolHandlerService(), properties);
+        new MvnProtocolHandlerService(), FrameworkUtil.asDictionary(properties));
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -293,7 +289,8 @@ public class MavenPluginActivator extends Plugin {
   /**
    * @deprecated provided for backwards compatibility only. all component lookup must go though relevant subsystem --
    *             {@link MavenImpl}, {@link NexusIndexManager} or {@link ArchetypeManager}.
-   *             <p>In most case, use <code>MavenPlugin.getMaven().lookup(...)</code> instead.
+   *             <p>
+   *             In most case, use <code>MavenPlugin.getMaven().lookup(...)</code> instead.
    */
   @Deprecated
   public PlexusContainer getPlexusContainer() {
@@ -436,17 +433,12 @@ public class MavenPluginActivator extends Plugin {
     return plugin.version;
   }
 
-  public static String getQualifiedVersion() {
-    return plugin.qualifiedVersion;
-  }
-
   public static String getUserAgent() {
     // cast is necessary for eclipse 3.6 compatibility
-    String osgiVersion = Platform
-        .getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
-    String m2eVersion = plugin.qualifiedVersion;
+    Bundle m2eCore = FrameworkUtil.getBundle(MavenPluginActivator.class);
+    Version osgiVersion = m2eCore.getBundleContext().getBundle(Constants.SYSTEM_BUNDLE_LOCATION).getVersion();
     String javaVersion = System.getProperty("java.version", "unknown"); //$NON-NLS-1$ $NON-NLS-1$
-    return "m2e/" + osgiVersion + "/" + m2eVersion + "/" + javaVersion; //$NON-NLS-1$ $NON-NLS-1$
+    return "m2e/" + osgiVersion + "/" + m2eCore.getVersion() + "/" + javaVersion; //$NON-NLS-1$ $NON-NLS-1$
   }
 
   public IRepositoryRegistry getRepositoryRegistry() {

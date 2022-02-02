@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2021 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.framework.wiring.BundleRevision;
@@ -38,9 +38,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
+import org.apache.maven.Maven;
+
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Bundles;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -57,19 +58,15 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(MavenEmbeddedRuntime.class);
 
-  private static final String MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME = "org.eclipse.m2e.maven.runtime"; //$NON-NLS-1$
-
   private static final String MAVEN_EXECUTOR_CLASS = org.apache.maven.cli.MavenCli.class.getName();
 
   public static final String PLEXUS_CLASSWORLD_NAME = "plexus.core"; //$NON-NLS-1$
 
-  private static String[] LAUNCHER_CLASSPATH;
+  private static List<String> LAUNCHER_CLASSPATH;
 
-  private static String[] CLASSPATH;
+  private static List<String> CLASSPATH;
 
   private static volatile String mavenVersion;
-
-  private static final Bundle m2eCore = MavenPluginActivator.getDefault().getBundle();
 
   public MavenEmbeddedRuntime() {
     super(MavenRuntimeManagerImpl.EMBEDDED);
@@ -95,7 +92,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       throws CoreException {
     collector.setMainType(MAVEN_EXECUTOR_CLASS, PLEXUS_CLASSWORLD_NAME);
 
-    initClasspath(findMavenEmbedderBundle());
+    initClasspath();
 
     collector.addRealm(IMavenLauncherConfiguration.LAUNCHER_REALM);
     for(String entry : LAUNCHER_CLASSPATH) {
@@ -112,8 +109,9 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private synchronized void initClasspath(Bundle mavenRuntimeBundle) {
+  private synchronized void initClasspath() {
     if(CLASSPATH == null) {
+      Bundle mavenRuntimeBundle = findMavenEmbedderBundle();
       Set<String> allEntries = new LinkedHashSet<>();
 
       addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
@@ -134,15 +132,11 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       List<String> lcp = new ArrayList<>();
 
       for(String entry : allEntries) {
-        if(entry.contains("plexus-classworlds")) { //$NON-NLS-1$
-          lcp.add(entry);
-        } else {
-          cp.add(entry);
-        }
+        List<String> path = entry.contains("plexus-classworlds") ? lcp : cp; //$NON-NLS-1$ 
+        path.add(entry);
       }
-
-      CLASSPATH = cp.toArray(new String[cp.size()]);
-      LAUNCHER_CLASSPATH = lcp.toArray(new String[lcp.size()]);
+      CLASSPATH = List.copyOf(cp);
+      LAUNCHER_CLASSPATH = List.copyOf(lcp);
     }
   }
 
@@ -156,42 +150,28 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private Bundle findMavenEmbedderBundle() {
-    return Bundles.findDependencyBundle(m2eCore, MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME);
+  private static Bundle findMavenEmbedderBundle() {
+    return FrameworkUtil.getBundle(Maven.class);
   }
 
   @Override
   public String toString() {
     Bundle embedder = findMavenEmbedderBundle();
-
     if(embedder != null) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(getVersion(embedder));
-      String version = embedder.getHeaders().get(Constants.BUNDLE_VERSION);
-      sb.append('/').append(version);
-      return sb.toString();
+      return getVersion() + '/' + embedder.getVersion();
     }
-
-    return MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME;
+    return "org.eclipse.m2e.maven.runtime";
   }
 
-  private synchronized String getVersion(Bundle bundle) {
+  @Override
+  public synchronized String getVersion() {
     if(mavenVersion != null) {
       return mavenVersion;
     }
-    initClasspath(bundle);
+    initClasspath();
     try {
-      String mavenCoreJarPath = null;
-      for(String path : CLASSPATH) {
-        if(path.contains("maven-core")) {
-          mavenCoreJarPath = path;
-          break;
-        }
-      }
-
-      if(mavenCoreJarPath == null) {
-        throw new IllegalStateException("Could not find maven core jar file");
-      }
+      String mavenCoreJarPath = CLASSPATH.stream().filter(p -> p.contains("maven-core")).findFirst()
+          .orElseThrow(() -> new IllegalStateException("Could not find maven core jar file"));
 
       Properties pomProperties = new Properties();
 
@@ -220,11 +200,5 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
 
     return Messages.MavenEmbeddedRuntime_unknown;
-  }
-
-  @Override
-  public String getVersion() {
-    Bundle bundle = findMavenEmbedderBundle();
-    return getVersion(bundle);
   }
 }
