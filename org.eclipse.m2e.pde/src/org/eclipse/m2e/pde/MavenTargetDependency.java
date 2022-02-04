@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich
+ * Copyright (c) 2021, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
 package org.eclipse.m2e.pde;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.model.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
@@ -21,8 +22,8 @@ public final class MavenTargetDependency extends Dependency {
 
 	private MavenTargetLocation location;
 
-	public MavenTargetDependency(String groupId, String artifactId, String version,
-			String artifactType, String classifier) {
+	public MavenTargetDependency(String groupId, String artifactId, String version, String artifactType,
+			String classifier) {
 		setGroupId(groupId);
 		setArtifactId(artifactId);
 		setVersion(version);
@@ -69,8 +70,14 @@ public final class MavenTargetDependency extends Dependency {
 	}
 
 	public MavenTargetDependency copy() {
-		return new MavenTargetDependency(getGroupId(), getArtifactId(), getVersion(), getType(),
-				getClassifier());
+		return new MavenTargetDependency(getGroupId(), getArtifactId(), getVersion(), getType(), getClassifier());
+	}
+
+	public boolean matches(Dependency other) {
+		return Objects.equals(other.getGroupId(), getGroupId())
+				&& Objects.equals(other.getArtifactId(), getArtifactId())
+				&& Objects.equals(other.getVersion(), getVersion()) && Objects.equals(other.getType(), getType())
+				&& Objects.equals(other.getClassifier(), getClassifier());
 	}
 
 }

@@ -34,6 +34,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.DependencyDepth;
+import org.eclipse.m2e.pde.MavenTargetDependency;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.MavenTargetRepository;
 import org.eclipse.m2e.pde.MissingMetadataMode;
@@ -78,6 +79,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private PluginListPage pluginListPage;
 	private Text locationLabel;
 
+	private MavenTargetDependency selectedRoot;
+
 	public MavenTargetLocationWizard() {
 		this(null);
 	}
@@ -108,6 +111,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				createRepositoryLink(composite);
 				dependencyEditor = new MavenTargetDependencyEditor(composite,
 						targetLocation == null ? Collections.emptyList() : targetLocation.getRoots());
+				dependencyEditor.setSelected(selectedRoot);
 				GridData gd_dep = new GridData(GridData.FILL_BOTH);
 				gd_dep.horizontalSpan = 2;
 				gd_dep.heightHint = 200;
@@ -453,6 +457,10 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 			}
 		});
+	}
+
+	public void setSelectedRoot(MavenTargetDependency selectedRoot) {
+		this.selectedRoot = selectedRoot;
 	}
 
 }
