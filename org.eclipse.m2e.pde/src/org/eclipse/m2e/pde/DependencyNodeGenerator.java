@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
@@ -37,17 +38,18 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 		private final Artifact artifact;
 		private final List<ArtifactRepository> repositories;
 		private final MavenTargetDependency root;
-		private String dependencyScope;
+		private Collection<String> dependencyScopes;
 		private MavenTargetLocation parent;
 		private DependencyDepth dependencyDepth;
 
 		DependencyNodeGenerator(MavenTargetDependency root, Artifact artifact, DependencyDepth dependencyDepth,
-				String dependencyScope, List<ArtifactRepository> repositories, MavenTargetLocation parent) {
+				Collection<String> dependencyScopes, List<ArtifactRepository> repositories,
+				MavenTargetLocation parent) {
 			this.artifact = artifact;
 			this.dependencyDepth = dependencyDepth;
 			this.repositories = repositories;
 			this.root = root;
-			this.dependencyScope = dependencyScope;
+			this.dependencyScopes = dependencyScopes;
 			this.parent = parent;
 		}
 
@@ -68,7 +70,7 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 				DependencyRequest dependencyRequest = new DependencyRequest();
 				dependencyRequest.setRoot(node);
 				dependencyRequest
-						.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScope));
+						.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScopes));
 				repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
 				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 				node.accept(nlg);

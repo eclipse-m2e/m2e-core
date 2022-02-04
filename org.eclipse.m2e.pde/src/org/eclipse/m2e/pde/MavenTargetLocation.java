@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
@@ -88,10 +89,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 
 	public static final String ATTRIBUTE_DEPENDENCY_DEPTH = "includeDependencyDepth";
+	@Deprecated
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
+	public static final String ATTRIBUTE_DEPENDENCY_SCOPES = "includeDependencyScopes";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
-	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
+	public static final List<String> DEFAULT_DEPENDENCY_SCOPES = List
+			.of(org.apache.maven.artifact.Artifact.SCOPE_COMPILE);
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
 	public static final String DEFAULT_PACKAGE_TYPE = "jar";
 	public static final String POM_PACKAGE_TYPE = "pom";
@@ -99,7 +103,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String DEPENDENCYNODE_ROOT = "dependencynode.root";
 	public static final DependencyDepth DEFAULT_INCLUDE_MODE = DependencyDepth.NONE;
 
-	private final String dependencyScope;
+	private final Collection<String> dependencyScopes;
 	private final MissingMetadataMode metadataMode;
 	private TargetBundles targetBundles;
 
@@ -115,7 +119,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MavenTargetLocation(String label, Collection<MavenTargetDependency> rootDependecies,
 			Collection<MavenTargetRepository> extraRepositories, MissingMetadataMode metadataMode,
-			DependencyDepth dependencyDepth, String dependencyScope, boolean includeSource,
+			DependencyDepth dependencyDepth, Collection<String> dependencyScopes, boolean includeSource,
 			Collection<BNDInstructions> instructions, Collection<String> excludes, IFeature featureTemplate) {
 		this.label = label;
 		this.dependencyDepth = dependencyDepth;
@@ -123,7 +127,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		this.roots = new ArrayList<>(rootDependecies);
 		this.extraRepositories = Collections.unmodifiableList(new ArrayList<>(extraRepositories));
 		this.metadataMode = metadataMode;
-		this.dependencyScope = dependencyScope;
+		this.dependencyScopes = dependencyScopes;
 		this.includeSource = includeSource;
 		for (BNDInstructions instr : instructions) {
 			instructionsMap.put(instr.getKey(), instr);
@@ -243,7 +247,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
 				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, depth,
-						dependencyScope, repositories, this);
+						dependencyScopes, repositories, this);
 				PreorderNodeListGenerator dependecies;
 				if (workspaceProject == null) {
 					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
@@ -359,7 +363,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 
-		return new MavenTargetLocation(label, latest, extraRepositories, metadataMode, dependencyDepth, dependencyScope,
+		return new MavenTargetLocation(label, latest, extraRepositories, metadataMode, dependencyDepth,
+				dependencyScopes,
 				includeSource, instructionsMap.values(), excludedArtifacts, featureTemplate);
 
 	}
@@ -369,7 +374,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
-		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyDepth, dependencyScope,
+		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyDepth, dependencyScopes,
 				includeSource, instructions, excludedArtifacts, featureTemplate);
 	}
 
@@ -433,7 +438,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(roots, dependencyScope, failedArtifacts, metadataMode);
+		return Objects.hash(roots, dependencyScopes, failedArtifacts, metadataMode);
 	}
 
 	@Override
@@ -448,7 +453,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return false;
 		}
 		MavenTargetLocation other = (MavenTargetLocation) obj;
-		return Objects.equals(roots, other.roots) && Objects.equals(dependencyScope, other.dependencyScope)
+		return Objects.equals(roots, other.roots) && Objects.equals(dependencyScopes, other.dependencyScopes)
 				&& Objects.equals(failedArtifacts, other.failedArtifacts);
 	}
 
@@ -462,7 +467,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		xml.append("<location");
 		attribute(xml, ATTRIBUTE_LABEL, label);
 		attribute(xml, ATTRIBUTE_MISSING_META_DATA, metadataMode.name().toLowerCase());
-		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
+		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPES, dependencyScopes.stream().collect(Collectors.joining(",")));
 		attribute(xml, ATTRIBUTE_DEPENDENCY_DEPTH, dependencyDepth.name().toLowerCase());
 		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
 		attribute(xml, "type", getType());
@@ -549,11 +554,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		clearResolutionStatus();
 	}
 
-	public String getDependencyScope() {
-		if (dependencyScope != null && !dependencyScope.trim().isEmpty()) {
-			return dependencyScope;
+	public Collection<String> getDependencyScopes() {
+		if (dependencyScopes.isEmpty()) {
+			return DEFAULT_DEPENDENCY_SCOPES;
 		}
-		return DEFAULT_DEPENDENCY_SCOPE;
+		return dependencyScopes;
 	}
 
 	public DependencyDepth getDependencyDepth() {

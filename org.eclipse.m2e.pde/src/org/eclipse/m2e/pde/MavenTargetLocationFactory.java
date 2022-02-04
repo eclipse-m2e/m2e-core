@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ package org.eclipse.m2e.pde;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -50,6 +52,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				// fall back to safe default
 				mode = MissingMetadataMode.ERROR;
 			}
+			@SuppressWarnings("deprecation")
 			String dependencyScope = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPE);
 			List<MavenTargetDependency> dependencies = new ArrayList<>();
 			List<MavenTargetRepository> repositories = new ArrayList<>();
@@ -122,8 +125,17 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 					dependencyDepth = DependencyDepth.INFINITE;
 				}
 			}
+			Collection<String> locationScopesSet = new LinkedHashSet<>();
+			if (location.hasAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPES)) {
+				String dependencyScopes = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPES);
+				for (String scope : dependencyScopes.split(",")) {
+					locationScopesSet.add(scope.strip().toLowerCase());
+				}
+			} else {
+				locationScopesSet.addAll(MavenTargetDependencyFilter.expandScope(dependencyScope));
+			}
 			return new MavenTargetLocation(location.getAttribute(MavenTargetLocation.ATTRIBUTE_LABEL), dependencies,
-					repositories, mode, dependencyDepth, dependencyScope,
+					repositories, mode, dependencyDepth, locationScopesSet,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
 					instructions, excludes, templateFeature);
 		} catch (Exception e) {
