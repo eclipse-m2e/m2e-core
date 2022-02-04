@@ -20,8 +20,8 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.maven.artifact.Artifact;
 import org.eclipse.m2e.pde.MavenTargetDependency;
-import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,22 +46,27 @@ public class ClipboardParser {
 				for (int i = 0; i < dependencies.getLength(); i++) {
 					Node item = dependencies.item(i);
 					if (item instanceof Element) {
-						Element element = (Element) item;
-						String groupId = getTextFor("groupId", element, "");
-						String artifactId = getTextFor("artifactId", element, "");
-						String version = getTextFor("version", element, "");
-						String classifier = getTextFor("classifier", element, "");
-						String type = getTextFor("type", element, MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
-						this.dependencies
-								.add(new MavenTargetDependency(groupId, artifactId, version, type, classifier));
+						parseElement((Element) item);
 					}
-
+				}
+				if (this.dependencies.isEmpty()) {
+					parseElement(doc.getDocumentElement());
 				}
 			} catch (Exception e) {
 				// we can't use the clipboard content then...
 				this.error = e;
 			}
 		}
+	}
+
+	private void parseElement(Element element) {
+		String groupId = getTextFor("groupId", element, "");
+		String artifactId = getTextFor("artifactId", element, "");
+		String version = getTextFor("version", element, "");
+		String classifier = getTextFor("classifier", element, "");
+		String type = getTextFor("type", element, Artifact.SCOPE_COMPILE);
+		this.dependencies
+				.add(new MavenTargetDependency(groupId, artifactId, version, type, classifier));
 	}
 
 	private String getTextFor(String element, Element doc, String defaultValue) {

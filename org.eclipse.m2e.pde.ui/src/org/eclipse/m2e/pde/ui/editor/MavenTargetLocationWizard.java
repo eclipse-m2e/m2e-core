@@ -15,6 +15,7 @@ package org.eclipse.m2e.pde.ui.editor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,8 +60,11 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class MavenTargetLocationWizard extends Wizard implements ITargetLocationWizard {
 
+	private static final List<String> MAVEN_SCOPES = List.of(Artifact.SCOPE_COMPILE, Artifact.SCOPE_PROVIDED,
+			Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_IMPORT);
+
 	private MavenTargetLocation targetLocation;
-	private CCombo scope;
+	private Button[] scopes;
 	private ComboViewer metadata;
 	private ComboViewer include;
 	private ITargetDefinition targetDefinition;
@@ -92,7 +96,6 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				targetLocation == null ? Messages.MavenTargetLocationWizard_1 : Messages.MavenTargetLocationWizard_2) {
 
 			private Link editInstructionsButton;
-			private Label scopeDescriptionLabel;
 
 			private Label includeLabel;
 			private Label scopeLabel;
@@ -133,7 +136,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				createIncludeCombo(composite);
 				scopeLabel = new Label(composite, SWT.NONE);
 				scopeLabel.setText(Messages.MavenTargetLocationWizard_10);
-				createScopeCombo(composite);
+				createScopes(composite);
 				includeSource = createCheckBox(composite, Messages.MavenTargetLocationWizard_8);
 				createFeature = createCheckBox(composite, Messages.MavenTargetLocationWizard_13);
 				createFeature.addSelectionListener(new SelectionListener() {
@@ -149,11 +152,12 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					}
 				});
 				if (targetLocation != null) {
-					String dependencyScope = targetLocation.getDependencyScope();
-					if (dependencyScope == null || dependencyScope.isBlank()) {
-						dependencyScope = Artifact.SCOPE_COMPILE;
+					Collection<String> dependencyScopes = targetLocation.getDependencyScopes();
+					for (int i = 0; i < scopes.length; i++) {
+						if (dependencyScopes.contains(MAVEN_SCOPES.get(i))) {
+							scopes[i].setSelection(true);
+						}
 					}
-					scope.setText(dependencyScope);
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 					include.setSelection(new StructuredSelection(targetLocation.getDependencyDepth()));
 					bndInstructions = targetLocation.getInstructions(null);
@@ -204,26 +208,30 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				include.addSelectionChangedListener(e -> updateUI());
 			}
 
-			private void createScopeCombo(Composite parent) {
+			private void createScopes(Composite parent) {
 				Composite composite = new Composite(parent, SWT.NONE);
-				GridLayout layout = new GridLayout(2, false);
-				layout.horizontalSpacing = 20;
+				GridLayout layout = new GridLayout(MAVEN_SCOPES.size() + 1, false);
+				layout.horizontalSpacing = 10;
 				layout.marginWidth = 0;
 				layout.marginHeight = 0;
 				composite.setLayout(layout);
-				scope = combo(new CCombo(composite, SWT.READ_ONLY | SWT.BORDER | SWT.FLAT));
-				scopeDescriptionLabel = new Label(composite, SWT.NONE);
-				scopeDescriptionLabel.setText(Messages.MavenTargetLocationWizard_15);
-				scope.add(Artifact.SCOPE_COMPILE);
-				scope.add(Artifact.SCOPE_PROVIDED);
-				scope.add(Artifact.SCOPE_TEST);
-				scope.addModifyListener(new ModifyListener() {
+				scopes = new Button[MAVEN_SCOPES.size()];
+				for (int i = 0; i < scopes.length; i++) {
+					scopes[i] = new Button(composite, SWT.CHECK);
+					scopes[i].setText(MAVEN_SCOPES.get(i));
+					scopes[i].addSelectionListener(new SelectionListener() {
 
-					@Override
-					public void modifyText(ModifyEvent e) {
-						updateUI();
-					}
-				});
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							updateUI();
+						}
+
+						@Override
+						public void widgetDefaultSelected(SelectionEvent e) {
+
+						}
+					});
+				}
 			}
 
 			private void createMetadataCombo(Composite parent) {
@@ -274,13 +282,15 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				editInstructionsButton.setVisible(
 						metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE);
 				if (include.getStructuredSelection().getFirstElement() == DependencyDepth.NONE) {
-					scopeDescriptionLabel.setVisible(false);
-					scope.setEnabled(false);
+					for (Button button : scopes) {
+						button.setEnabled(false);
+					}
 					scopeLabel.setEnabled(false);
 				} else {
 					scopeLabel.setEnabled(true);
-					scope.setEnabled(true);
-					scopeDescriptionLabel.setVisible(true);
+					for (Button button : scopes) {
+						button.setEnabled(true);
+					}
 				}
 				getContainer().updateButtons();
 			}
@@ -384,10 +394,16 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		}
 		@SuppressWarnings("restriction")
 		IFeature f = createFeature ? featureModel.getFeature() : null;
+		Collection<String> selectedScopes = new LinkedHashSet<>();
+		for (int i = 0; i < scopes.length; i++) {
+			if (scopes[i].getSelection()) {
+				selectedScopes.add(MAVEN_SCOPES.get(i));
+			}
+		}
 		DependencyDepth depth = (DependencyDepth) include.getStructuredSelection().getFirstElement();
 		MavenTargetLocation location = new MavenTargetLocation(locationLabel.getText(), dependencyEditor.getRoots(),
 				repositoryList, (MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), depth,
-				scope.getText(), includeSource.getSelection(), list, excludes, f);
+				selectedScopes, includeSource.getSelection(), list, excludes, f);
 		if (iscreate) {
 			targetLocation = location;
 		} else {

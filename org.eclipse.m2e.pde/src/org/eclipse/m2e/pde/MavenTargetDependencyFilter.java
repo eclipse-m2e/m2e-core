@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich
+ * Copyright (c) 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import static org.apache.maven.artifact.Artifact.SCOPE_RUNTIME;
 import static org.apache.maven.artifact.Artifact.SCOPE_SYSTEM;
 import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.aether.graph.Dependency;
@@ -27,12 +28,12 @@ import org.eclipse.aether.graph.DependencyNode;
 public class MavenTargetDependencyFilter implements DependencyFilter {
 
 	private static final String[] VALID_EXTENSIONS = { "jar", "pom" };
-	private String locationScope;
+	private Collection<String> locationScopes;
 	private DependencyDepth dependencyDepth;
 
-	public MavenTargetDependencyFilter(DependencyDepth dependencyDepth, String scope) {
+	public MavenTargetDependencyFilter(DependencyDepth dependencyDepth, Collection<String> dependencyScopes) {
 		this.dependencyDepth = dependencyDepth;
-		this.locationScope = scope;
+		this.locationScopes = dependencyScopes;
 	}
 
 	@Override
@@ -55,18 +56,27 @@ public class MavenTargetDependencyFilter implements DependencyFilter {
 		if (dependecyScope == null || dependecyScope.isBlank()) {
 			return true;
 		}
-		if (locationScope == null || locationScope.isBlank() || SCOPE_COMPILE.equalsIgnoreCase(locationScope)) {
+		if (locationScopes.isEmpty()) {
 			return SCOPE_COMPILE.equalsIgnoreCase(dependecyScope);
 		}
-		if (SCOPE_PROVIDED.equalsIgnoreCase(locationScope)) {
-			return SCOPE_PROVIDED.equalsIgnoreCase(dependecyScope) || SCOPE_COMPILE.equalsIgnoreCase(dependecyScope)
-					|| SCOPE_SYSTEM.equalsIgnoreCase(dependecyScope) || SCOPE_RUNTIME.equalsIgnoreCase(dependecyScope);
-		}
-		if (SCOPE_TEST.equalsIgnoreCase(locationScope)) {
-			return SCOPE_TEST.equalsIgnoreCase(dependecyScope) || SCOPE_COMPILE.equalsIgnoreCase(dependecyScope)
-					|| SCOPE_PROVIDED.equalsIgnoreCase(dependecyScope) || SCOPE_SYSTEM.equalsIgnoreCase(dependecyScope)
-					|| SCOPE_RUNTIME.equalsIgnoreCase(dependecyScope);
+		for (String locationScope : locationScopes) {
+			if (dependecyScope.equalsIgnoreCase(locationScope)) {
+				return true;
+			}
 		}
 		return false;
+	}
+
+	static final Collection<String> expandScope(String scope) {
+		if (scope == null || scope.isBlank() || SCOPE_COMPILE.equalsIgnoreCase(scope)) {
+			return List.of(SCOPE_COMPILE);
+		}
+		if (SCOPE_PROVIDED.equalsIgnoreCase(scope)) {
+			return List.of(SCOPE_PROVIDED, SCOPE_COMPILE, SCOPE_SYSTEM, SCOPE_RUNTIME);
+		}
+		if (SCOPE_TEST.equalsIgnoreCase(scope)) {
+			return List.of(SCOPE_TEST, SCOPE_COMPILE, SCOPE_PROVIDED, SCOPE_SYSTEM, SCOPE_RUNTIME);
+		}
+		return List.of();
 	}
 }
