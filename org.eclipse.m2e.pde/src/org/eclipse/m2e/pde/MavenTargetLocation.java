@@ -89,8 +89,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 
 	public static final String ATTRIBUTE_DEPENDENCY_DEPTH = "includeDependencyDepth";
-	@Deprecated
-	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
+
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPES = "includeDependencyScopes";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
@@ -373,10 +372,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return roots;
 	}
 
-	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
-		return new MavenTargetLocation(label, roots, extraRepositories, metadataMode, dependencyDepth, dependencyScopes,
-				includeSource, instructions, excludedArtifacts, featureTemplate);
-	}
 
 	public IFeature getFeatureTemplate() {
 		return featureTemplate;
@@ -611,6 +606,19 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public Collection<BNDInstructions> getInstructions() {
 		return Collections.unmodifiableCollection(instructionsMap.values());
+	}
+
+	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
+		return new MavenTargetLocation(label, roots.stream().map(MavenTargetDependency::copy).collect(Collectors.toList()), extraRepositories, metadataMode, dependencyDepth, dependencyScopes,
+				includeSource, instructions, excludedArtifacts, featureTemplate);
+	}
+
+	public MavenTargetLocation withoutRoot(MavenTargetDependency toRemove) {
+		return new MavenTargetLocation(label,
+				roots.stream().filter(root -> root != toRemove).map(root -> root.copy()).collect(Collectors.toList()),
+				extraRepositories,
+				metadataMode, dependencyDepth, dependencyScopes, includeSource, instructionsMap.values(),
+				excludedArtifacts, featureTemplate);
 	}
 
 }

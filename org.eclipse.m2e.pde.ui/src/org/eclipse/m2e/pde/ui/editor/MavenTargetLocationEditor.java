@@ -196,6 +196,41 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	}
 
 	@Override
+	public boolean canRemove(ITargetDefinition target, TreePath treePath) {
+		Object segment = treePath.getFirstSegment();
+		if (segment instanceof MavenTargetLocation) {
+			Object lastSegment = treePath.getLastSegment();
+			if (lastSegment instanceof MavenTargetDependency) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public IStatus remove(ITargetDefinition target, TreePath[] treePaths) {
+		ITargetLocation[] targetLocations = target.getTargetLocations();
+		for (TreePath treePath : treePaths) {
+			Object segment = treePath.getFirstSegment();
+			if (segment instanceof MavenTargetLocation) {
+				MavenTargetLocation mavenTargetLocation = (MavenTargetLocation) segment;
+				Object lastSegment = treePath.getLastSegment();
+				if (lastSegment instanceof MavenTargetDependency) {
+					MavenTargetDependency mavenTargetDependency = (MavenTargetDependency) lastSegment;
+					for (int i = 0; i < targetLocations.length; i++) {
+						ITargetLocation location = targetLocations[i];
+						if (location == mavenTargetLocation) {
+							targetLocations[i] = mavenTargetLocation.withoutRoot(mavenTargetDependency);
+						}
+					}
+				}
+			}
+		}
+		target.setTargetLocations(targetLocations);
+		return Status.OK_STATUS;
+	}
+
+	@Override
 	public IStatus toggle(ITargetDefinition target, TreePath[] treePaths) {
 		int toggled = 0;
 		for (TreePath treePath : treePaths) {

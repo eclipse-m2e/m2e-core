@@ -36,6 +36,8 @@ import org.w3c.dom.NodeList;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocationFactory implements ITargetLocationFactory {
+	// For backward compat
+	private static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 
 	@Override
 	public ITargetLocation getTargetLocation(String type, String serializedXML) throws CoreException {
@@ -52,8 +54,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				// fall back to safe default
 				mode = MissingMetadataMode.ERROR;
 			}
-			@SuppressWarnings("deprecation")
-			String dependencyScope = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPE);
+			String dependencyScope = location.getAttribute(ATTRIBUTE_DEPENDENCY_SCOPE);
 			List<MavenTargetDependency> dependencies = new ArrayList<>();
 			List<MavenTargetRepository> repositories = new ArrayList<>();
 

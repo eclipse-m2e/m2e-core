@@ -20,8 +20,8 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.maven.artifact.Artifact;
 import org.eclipse.m2e.pde.MavenTargetDependency;
+import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -64,7 +64,7 @@ public class ClipboardParser {
 		String artifactId = getTextFor("artifactId", element, "");
 		String version = getTextFor("version", element, "");
 		String classifier = getTextFor("classifier", element, "");
-		String type = getTextFor("type", element, Artifact.SCOPE_COMPILE);
+		String type = getTextFor("type", element, MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 		this.dependencies
 				.add(new MavenTargetDependency(groupId, artifactId, version, type, classifier));
 	}
