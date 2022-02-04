@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -43,10 +43,13 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			if (treePath.getSegmentCount() == 1) {
 				return true;
 			}
+			Object lastSegment = treePath.getLastSegment();
+			if (lastSegment instanceof MavenTargetDependency) {
+				return true;
+			}
 			// it must use generate mode
 			if (location.getMetadataMode() == MissingMetadataMode.GENERATE) {
 				// and the selected child must be a dependency node
-				Object lastSegment = treePath.getLastSegment();
 				if (lastSegment instanceof DependencyNode) {
 					DependencyNode node = (DependencyNode) lastSegment;
 					MavenTargetBundle bundle = location.getMavenTargetBundle(node.getArtifact());
@@ -74,6 +77,13 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 				return wizard;
 			}
 			Object lastSegment = treePath.getLastSegment();
+			if (lastSegment instanceof MavenTargetDependency) {
+				MavenTargetDependency selectedRoot = (MavenTargetDependency) lastSegment;
+				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location);
+				wizard.setTarget(target);
+				wizard.setSelectedRoot(selectedRoot);
+				return wizard;
+			}
 			if (lastSegment instanceof DependencyNode) {
 				DependencyNode node = (DependencyNode) lastSegment;
 				return edit(target, location, node.getArtifact());

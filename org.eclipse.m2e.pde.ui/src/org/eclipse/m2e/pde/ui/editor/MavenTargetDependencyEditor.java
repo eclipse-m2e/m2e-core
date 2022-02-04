@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich
+ * Copyright (c) 2021, 2022 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.maven.model.Dependency;
 import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
@@ -190,5 +191,19 @@ public class MavenTargetDependencyEditor {
 	public Collection<MavenTargetDependency> getRoots() {
 		return Arrays.stream(tabFolder.getItems()).map(item -> item.getData(DEPENDENCY_KEY)).filter(Objects::nonNull)
 				.map(MavenTargetDependency.class::cast).collect(Collectors.toList());
+	}
+
+	public void setSelected(MavenTargetDependency selected) {
+		if (selected == null) {
+			tabFolder.setSelection(1);
+			return;
+		}
+		for (CTabItem item : tabFolder.getItems()) {
+			Object data = item.getData(DEPENDENCY_KEY);
+			if (data != null && selected.matches((Dependency) data)) {
+				tabFolder.setSelection(item);
+				return;
+			}
+		}
 	}
 }
