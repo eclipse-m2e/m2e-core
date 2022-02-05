@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,14 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - #549 - Improve conflict handling of lifecycle mappings 
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
@@ -59,20 +61,21 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
   }
 
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType)
+      throws DuplicateLifecycleMappingMetadataException {
     if(packagingType == null) {
       return null;
     }
-    LifecycleMappingMetadata mapping = null;
-    for(LifecycleMappingMetadata _mapping : lifecycleMappings) {
-      if(packagingType.equals(_mapping.getPackagingType())) {
-        if(mapping != null) {
-          throw new DuplicateMappingException(mapping.getSource(), _mapping.getSource());
-        }
-        mapping = _mapping;
-      }
+
+    List<LifecycleMappingMetadata> matching = lifecycleMappings.stream()
+        .filter(mapping -> packagingType.equals(mapping.getPackagingType())).collect(Collectors.toList());
+    if(matching.isEmpty()) {
+      return null;
     }
-    return mapping;
+    if(matching.size() == 1) {
+      return matching.get(0);
+    }
+    throw new DuplicateLifecycleMappingMetadataException(matching.toArray(LifecycleMappingMetadata[]::new));
   }
 
   @Override

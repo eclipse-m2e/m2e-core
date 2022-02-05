@@ -79,6 +79,9 @@ public class LifecycleMappingResult {
   }
 
   public AbstractLifecycleMapping getLifecycleMapping() {
+    if(getProblems().stream().anyMatch(p -> p.getError() instanceof DuplicateLifecycleMappingMetadataException)) {
+      return null;
+    }
     return lifecycleMapping;
   }
 
