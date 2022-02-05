@@ -547,6 +547,11 @@
             class="org.eclipse.m2e.core.ui.internal.views.MavenRepositoryView"
             icon="icons/maven_indexes.png"
             name="%view.repos.name"/>
+     <view id="org.eclipse.m2e.core.views.MavenLifecycleMappingsView"
+            category="org.eclipse.m2e.core.views.repositories"
+            class="org.eclipse.m2e.core.ui.internal.views.MavenLifecycleMappingsView"
+            icon="icons/main_tab.png"
+            name="%view.mappings.name"/>
       <view
             allowMultiple="false"
             category="org.eclipse.m2e.core.views.repositories"
