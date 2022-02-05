@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - #549 - Improve conflict handling of lifecycle mappings
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.markers;
@@ -29,13 +30,30 @@ public class MavenProblemInfo {
 
   private final int severity;
 
+  private Throwable error;
+
   public MavenProblemInfo(int line, Throwable error) {
     this(new SourceLocation(line, 0, 0), error);
   }
 
   public MavenProblemInfo(SourceLocation location, Throwable error) {
     this.location = location;
+    this.error = error;
     this.message = getErrorMessage(error);
+    this.severity = IMarker.SEVERITY_ERROR;
+  }
+
+  public MavenProblemInfo(SourceLocation location, String message, Throwable error) {
+    this.location = location;
+    this.error = error;
+    this.message = message;
+    this.severity = IMarker.SEVERITY_ERROR;
+  }
+
+  public MavenProblemInfo(int line, String message, Throwable error) {
+    this.error = error;
+    this.location = new SourceLocation(line, 0, 0);
+    this.message = message;
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
@@ -55,12 +73,6 @@ public class MavenProblemInfo {
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
-  public MavenProblemInfo(int line, String message) {
-    //TODO
-    this.location = new SourceLocation(line, 0, 0);
-    this.message = message;
-    this.severity = IMarker.SEVERITY_ERROR;
-  }
 
   public MavenProblemInfo(String message, SourceLocation location) {
     this(message, IMarker.SEVERITY_ERROR, location);
@@ -111,6 +123,13 @@ public class MavenProblemInfo {
 
   public SourceLocation getLocation() {
     return location;
+  }
+
+  /**
+   * @return Returns the error.
+   */
+  public Throwable getError() {
+    return this.error;
   }
 
   private String getErrorMessage(Throwable e) {

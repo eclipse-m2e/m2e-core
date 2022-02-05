@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2015 Sonatype, Inc. and others.
+ * Copyright (c) 2008, 2022 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
  *      Andrew Eisenberg - Work on Bug 350414
  *      Fred Bricon (Red Hat) - project configurator sort (Bug #449495)
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
+ *      Christoph Läubrich - #549 - Improve conflict handling of lifecycle mappings
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
@@ -536,10 +537,14 @@ public class LifecycleMappingFactory {
           break;
         }
       } catch(DuplicateMappingException e) {
+        SourceLocation location = SourceLocationHelper.findPackagingLocation(mavenProject);
         log.error("Duplicate lifecycle mapping metadata for {}.", mavenProject, e);
-        result.addProblem(new MavenProblemInfo(1,
-            NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging(), e.getMessage())));
-        return; // fatal error
+        result.addProblem(new DuplicateMappingSourceProblem(location,
+            NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging(), e.getMessage()), "packaging",
+            mavenProject.getPackaging(), e));
+        originalMetadataSource = new FailedMappingMetadataSource(source, e);
+        metadataSources.add(i, originalMetadataSource);
+        break;
       }
     }
 
@@ -598,7 +603,8 @@ public class LifecycleMappingFactory {
         } catch(CycleDetectedException ex) {
           log.error(ex.getMessage(), ex);
           result.addProblem(new MavenProblemInfo(1,
-              NLS.bind("Cyclic dependency detected between project configurators for {0}", mavenProject.toString())));
+              NLS.bind("Cyclic dependency detected between project configurators for {0}", mavenProject.toString()),
+              ex));
           return;// fatal error
         }
 
@@ -608,7 +614,7 @@ public class LifecycleMappingFactory {
             for(PluginExecutionMetadata executionMetadata : entry.getValue()) {
               if(isPrimaryMapping(executionMetadata, sorter)) {
                 if(primaryMetadata != null) {
-                  throw new DuplicateMappingException(primaryMetadata.getSource(), executionMetadata.getSource());
+                  throw new DuplicatePluginExecutionMetadataException(primaryMetadata, executionMetadata);
                 }
                 primaryMetadata = executionMetadata;
               }
@@ -617,18 +623,20 @@ public class LifecycleMappingFactory {
               break;
             }
           }
-        } catch(DuplicateMappingException e) {
+        } catch(DuplicatePluginExecutionMetadataException e) {
           primaryMetadata = null;
+          SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
           log.debug("Duplicate plugin execution mapping metadata for {}.", executionKey, e);
           result.addProblem(
-              new MavenProblemInfo(1,
-                  NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString(), e.getMessage())));
+              new DuplicateMappingSourceProblem(location,
+                  NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString(), e.getMessage()), "goal",
+                  executionKey.getGoal(), e));
         }
 
         if(primaryMetadata != null && !isValidPluginExecutionMetadata(primaryMetadata)) {
           log.debug("Invalid plugin execution mapping metadata for {}.", executionKey);
           result.addProblem(
-              new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingInvalid, executionKey.toString())));
+              new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingInvalid, executionKey.toString()), null));
           primaryMetadata = null;
         }
 
@@ -695,7 +703,7 @@ public class LifecycleMappingFactory {
     return false;
   }
 
-  private static boolean isConfigurator(PluginExecutionMetadata metadata) {
+  static boolean isConfigurator(PluginExecutionMetadata metadata) {
     if(PluginExecutionAction.configurator == metadata.getAction()) {
       try {
         getProjectConfiguratorId(metadata);
@@ -1299,7 +1307,7 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata,
+  static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata,
       ProjectConfigurationElementSorter sorter) {
     if(executionMetadata == null) {
       return false;
