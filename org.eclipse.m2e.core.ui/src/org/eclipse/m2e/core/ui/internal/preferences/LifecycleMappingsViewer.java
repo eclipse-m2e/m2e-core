@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2011, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -10,27 +10,29 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Andrew Eisenberg - adapted for workspace preferences
+ *      Christoph Läubrich -  #563  Make the life-cycle-mapping available as a view in eclipse
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -48,14 +50,14 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -82,7 +84,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 @SuppressWarnings("restriction")
-class LifecycleMappingsViewer {
+public class LifecycleMappingsViewer {
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingsViewer.class);
 
   /*package*/TreeViewer mappingsTreeViewer;
@@ -91,18 +93,26 @@ class LifecycleMappingsViewer {
 
   /*package*/boolean showIgnoredExecutions = true;
 
-  /*package*/Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mappings;
+  /*package*/final AtomicReference<Map<MojoExecutionKey, List<IPluginExecutionMetadata>>> mappings = new AtomicReference<>(
+      Collections.emptyMap());
 
-  /*package*/Map<String, List<MojoExecutionKey>> phases;
+  /*package*/final AtomicReference<Map<String, List<MojoExecutionKey>>> phases = new AtomicReference<>(
+      Collections.emptyMap());
 
   private Shell shell;
 
+  private IProject project;
+
   void updateMappingsTreeViewer() {
+    if(mappingsTreeViewer == null) {
+      return;
+    }
     mappingsTreeViewer.refresh();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> map = mappings.get();
     if(showPhases) {
       // reveal non-empty mappings
       mappingsTreeViewer.collapseAll();
-      for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.entrySet()) {
+      for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : map.entrySet()) {
         boolean expand = false;
         if(isErrorMapping(entry.getKey())) {
           expand = true;
@@ -229,14 +239,14 @@ class LifecycleMappingsViewer {
       @Override
       public Object[] getElements(Object inputElement) {
         if(showPhases) {
-          return phases.keySet().toArray();
+          return phases.get().keySet().toArray();
         }
         Set<MojoExecutionKey> executions;
         if(showIgnoredExecutions) {
-          executions = mappings.keySet();
+          executions = mappings.get().keySet();
         } else {
           executions = new LinkedHashSet<>();
-          for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.entrySet()) {
+          for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.get().entrySet()) {
             if(!isIgnoreMapping(entry.getKey(), entry.getValue())) {
               executions.add(entry.getKey());
             }
@@ -247,7 +257,7 @@ class LifecycleMappingsViewer {
 
       @Override
       public Object[] getChildren(Object parentElement) {
-        List<MojoExecutionKey> executions = phases.get(parentElement);
+        List<MojoExecutionKey> executions = phases.get().get(parentElement);
         if(executions == null || executions.isEmpty()) {
           return null;
         }
@@ -259,7 +269,7 @@ class LifecycleMappingsViewer {
         Iterator<MojoExecutionKey> iter = executions.iterator();
         while(iter.hasNext()) {
           MojoExecutionKey execution = iter.next();
-          if(isIgnoreMapping(execution, mappings.get(execution))) {
+          if(isIgnoreMapping(execution, mappings.get().get(execution))) {
             iter.remove();
           }
         }
@@ -302,9 +312,9 @@ class LifecycleMappingsViewer {
             case 0:
               return LifecycleMappingsViewer.this.toString(execution);
             case 1:
-              return LifecycleMappingsViewer.this.toString(execution, mappings.get(execution));
+              return LifecycleMappingsViewer.this.toString(execution, mappings.get().get(execution));
             case 2:
-              return getSourcelabel(execution, mappings.get(execution), false);
+              return getSourcelabel(execution, mappings.get().get(execution), false);
           }
         }
         return columnIndex == 0 ? element.toString() : null;
@@ -312,27 +322,38 @@ class LifecycleMappingsViewer {
     });
 
     Composite actionsComposite = new Composite(container, SWT.NONE);
-    actionsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-    actionsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
-
+    actionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+    actionsComposite.setLayout(new GridLayout(2, false));
+    Label infoLabel = new Label(actionsComposite, SWT.NONE);
+    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
     Button btnCopyToClipboard = new Button(actionsComposite, SWT.NONE);
     btnCopyToClipboard.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> copyToClipboard()));
     btnCopyToClipboard.setText(Messages.LifecycleMappingPropertyPage_copyToClipboard);
 
     mappingsTreeViewer.setInput(phases);
+    mappingsTreeViewer.addSelectionChangedListener(e -> {
+      Object element = e.getStructuredSelection().getFirstElement();
+      if(element instanceof MojoExecutionKey) {
+        MojoExecutionKey execution = (MojoExecutionKey) element;
+        infoLabel.setText(getSourcelabel(execution, mappings.get().get(execution), true));
+      } else {
+        infoLabel.setText("");
+      }
+    });
 
     updateMappingsTreeViewer();
     return container;
   }
 
   void copyToClipboard() {
-    if(mappings == null) {
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> map = mappings.get();
+    if(map.isEmpty()) {
       return;
     }
 
     LifecycleMappingMetadata meta = new LifecycleMappingMetadata();
 
-    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : this.mappings.entrySet()) {
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : this.mappings.get().entrySet()) {
       MojoExecutionKey execution = entry.getKey();
       List<IPluginExecutionMetadata> mappings = entry.getValue();
       if(mappings != null && !mappings.isEmpty()) {
@@ -388,7 +409,7 @@ class LifecycleMappingsViewer {
   }
 
   boolean isErrorMapping(MojoExecutionKey execution) {
-    List<IPluginExecutionMetadata> mappings = this.mappings.get(execution);
+    List<IPluginExecutionMetadata> mappings = this.mappings.get().get(execution);
     if(mappings == null || mappings.isEmpty()) {
       return LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase());
     }
@@ -509,7 +530,7 @@ class LifecycleMappingsViewer {
 
     // only show execution id if necessary
     int count = 0;
-    for(MojoExecutionKey other : mappings.keySet()) {
+    for(MojoExecutionKey other : mappings.get().keySet()) {
       if(eq(execution.getGroupId(), other.getGroupId()) && eq(execution.getArtifactId(), other.getArtifactId())
           && eq(execution.getGoal(), other.getGoal())) {
         count++ ;
@@ -526,45 +547,45 @@ class LifecycleMappingsViewer {
   }
 
   public void setTarget(final IProject project) {
-    if(project == null) {
-      // TODO FIXADE find the mojo execution mapping for the workspace...How do I do this?
-    } else {
-      try {
-        PlatformUI.getWorkbench().getProgressService().run(false, false, monitor -> {
-          final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
-          final IMavenProjectFacade facade = projectRegistry.getProject(project);
-          if(facade == null) {
-            return;
-          }
-          try {
-            projectRegistry.execute(facade, (context, monitor1) -> {
-              MavenProject mavenProject = facade.getMavenProject(monitor1);
-              List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor1);
-              LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
-                  mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1);
-              mappings = mappingResult.getMojoExecutionMapping();
-              return null;
-            }, monitor);
-          } catch(CoreException ex) {
-            throw new InvocationTargetException(ex);
-          }
-        });
-      } catch(InvocationTargetException ex) {
-        log.error(ex.getMessage(), ex);
-      } catch(InterruptedException ex) {
-        log.error(ex.getMessage(), ex);
-      }
+    if(this.project == project) {
+      return;
     }
-    phases = new LinkedHashMap<>();
-    if(mappings != null) {
-      for(MojoExecutionKey execution : mappings.keySet()) {
-        List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
-        if(executions == null) {
-          executions = new ArrayList<>();
-          phases.put(execution.getLifecyclePhase(), executions);
+    this.project = project;
+
+    phases.set(Collections.emptyMap());
+    mappings.set(Collections.emptyMap());
+    updateMappingsTreeViewer();
+    if(project != null) {
+      Job job = Job.create("Compute Mappings for project " + project.getName(), monitor -> {
+        final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
+        final IMavenProjectFacade facade = projectRegistry.getProject(project);
+        if(facade == null) {
+          return;
         }
-        executions.add(execution);
-      }
+        projectRegistry.execute(facade, (context, monitor1) -> {
+          MavenProject mavenProject = facade.getMavenProject(monitor1);
+          List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor1);
+          LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
+              mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1);
+          Map<MojoExecutionKey, List<IPluginExecutionMetadata>> result = mappingResult.getMojoExecutionMapping();
+          Map<String, List<MojoExecutionKey>> phases = new LinkedHashMap<>();
+          if(result != null) {
+            for(MojoExecutionKey execution : result.keySet()) {
+              List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
+              if(executions == null) {
+                executions = new ArrayList<>();
+                phases.put(execution.getLifecyclePhase(), executions);
+              }
+              executions.add(execution);
+            }
+            this.phases.set(phases);
+            this.mappings.set(result);
+          }
+          Display.getDefault().asyncExec(this::updateMappingsTreeViewer);
+          return null;
+        }, monitor);
+      });
+      job.schedule();
     }
   }
 
@@ -575,7 +596,4 @@ class LifecycleMappingsViewer {
     this.shell = shell;
   }
 
-  protected boolean isValid() {
-    return mappings != null;
-  }
 }
