@@ -26,7 +26,6 @@
 
 	<properties>
 		<jars.directory>target/jars</jars.directory>
-		<jars.sources.directory>target/jars-sources</jars.sources.directory>
 		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
 		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
@@ -83,7 +82,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.10.1</version>
 					<configuration>
-						<release>1.8</release>
+						<source>1.8</source>
+						<target>1.8</target>
 						<proc>none</proc>
 					</configuration>
 				</plugin>

@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -44,7 +45,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -67,6 +70,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.pde.internal.ui.editor.plugin.ManifestEditor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -157,6 +161,29 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
 	}
 
+	private static final String TYCHO_PROJECT = "simple-tycho";
+	private static final String TYCHO_TEST_PROJECT = "simple.tests";
+
+	@Test
+	public void testConsole_debuggerAttachmentAndLinkAlignmentAndBehavior_tychoProject() throws Exception {
+
+		Path parentParentPath = importProjectIntoWorkspace(TYCHO_PROJECT, TYCHO_TEST_PROJECT);
+
+		IDocument document = runMavenBuild(parentParentPath.toString(), ILaunchManager.RUN_MODE, ATTR_COLOR_VALUE_NEVER,
+				entry("debugPort", "8000"));
+
+		assertLinkTextAndOpenedEditor(1, "simple.SimpleTest", //
+				TestRunnerViewPart.class, "JUnit (simple.SimpleTest)", document);
+
+		assertLinkTextAndOpenedEditor(0, "org.eclipse.m2e.tests:" + TYCHO_TEST_PROJECT, //
+				ManifestEditor.class, TYCHO_TEST_PROJECT, document);
+
+		assertLinkTextAndOpenedEditor(3, TYCHO_TEST_PROJECT, //
+				ManifestEditor.class, TYCHO_TEST_PROJECT, document);
+
+		assertDebugeePrintOutAndDebuggerLaunch(document, TYCHO_TEST_PROJECT, "8000");
+	}
+
 	private void assertLinkTextAndOpenedEditor(int index, String expectedLinkText, Class<?> expectedPartType,
 			String expectedEditorTitle, IDocument document) throws Exception {
 
@@ -212,6 +239,28 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		}
 	}
+
+	private static Path importProjectIntoWorkspace(String containerPath, String testProjectName) throws Exception {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject project = workspace.getRoot().getProject(testProjectName);
+		if (!project.exists()) { // re-use project if already imported
+
+			Path tempProjectFolder = copyTestProjectIntoWorkspace(containerPath);
+			Path projectPath = tempProjectFolder.resolve(testProjectName);
+			try (InputStream input = Files.newInputStream(projectPath.resolve(".project"))) {
+				IProjectDescription description = workspace.loadProjectDescription(input);
+				description.setLocationURI(projectPath.toUri());
+				project.create(description, null);
+			}
+			project.open(monitor);
+			// build project to make it available in the PluginRegistryManager
+			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+			return tempProjectFolder;
+		}
+		return Path.of(project.getLocationURI()).getParent();
+	}
+
 
 	private static Path copyTestProjectIntoWorkspace(String projectName) throws IOException, URISyntaxException {
 		String projectPath = "/resources/projects/" + projectName;
@@ -275,7 +324,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		// First check if the full build print-out was already written. If not, wait
 		// for the document-listener's signal
 		String consoleText = display.syncCall(document::get);
-		if (!isBuildFinished(consoleText) && !finishedRead.await(30, TimeUnit.SECONDS)) {
+		if (!isBuildFinished(consoleText) && !finishedRead.await(120, TimeUnit.SECONDS)) {
 			fail("Build timed out.");
 		}
 		return document;

@@ -19,15 +19,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -36,8 +43,10 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -53,11 +62,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.ide.IDE;
 
-import org.apache.maven.project.MavenProject;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.project.IBuildProjectFileResolver;
+import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenProjectBuildData;
 
 
 /**
@@ -84,18 +91,23 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final Pattern EXECUTION_FAILURE = Pattern
       .compile("^\\[ERROR\\] Failed to execute goal .+ on project " + IDENTIFIER);
 
-  private static final int FAILED_ARTIFACT_ID = 1;
+  private static final int FAILED_PROJECT_ID = 1;
 
   private static final Pattern ESCAPE_CHARACTERS = Pattern.compile("\\e\\[[\\d;]*?[^\\d;]");
   // captures ANSI escape characters added when -Dstyle.color=always is set
+
+  private static record ProjectReference(IProject project, MavenProjectBuildData buildProject) {
+  }
 
   private boolean isMavenBuildProcess;
 
   private IConsole console;
 
+  ILaunch launch;
+
   private boolean initialized = false;
 
-  private IMavenProjectFacade mavenProject;
+  private ProjectReference mavenProject;
 
   private final Deque<IRegion> projectDefinitionLines = new ArrayDeque<>(2);
 
@@ -107,8 +119,10 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       throw new IllegalStateException("MavenConsoleLineTracker already connected to console");
     }
     this.console = console;
-    ILaunchConfiguration launchConfiguration = console.getProcess().getLaunch().getLaunchConfiguration();
+    launch = console.getProcess().getLaunch();
+    ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
     isMavenBuildProcess = launchConfiguration != null && isMavenProcess(launchConfiguration);
+
     initialized = true; // Initialized
   }
 
@@ -138,13 +152,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         if(listeningMatcher.find()) {
           String portString = listeningMatcher.group(DEBUGGER_PORT);
           // create and start remote Java app launch configuration
-          launchRemoteJavaApp(mavenProject.getProject(), portString);
+          launchRemoteJavaApp(mavenProject.project(), portString);
           return;
         }
 
         Matcher failureMatcher = EXECUTION_FAILURE.matcher(text);
         if(failureMatcher.find()) {
-          addProjectLink(line, failureMatcher, FAILED_ARTIFACT_ID, FAILED_ARTIFACT_ID, removedLineLocations);
+          addProjectLink(line, failureMatcher, FAILED_PROJECT_ID, FAILED_PROJECT_ID, removedLineLocations);
         }
       } catch(BadLocationException ex) {
         // ignore
@@ -209,10 +223,10 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           String groupId = gaMatcher.group(GROUP_ID);
           String artifactId = gaMatcher.group(ARTIFACT_ID);
 
-          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-          mavenProject = projectManager.getMavenProject(groupId, artifactId, version);
-
-          addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine2Locations);
+          mavenProject = getProject(groupId, artifactId, version);
+          if(mavenProject != null) {
+            addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine2Locations);
+          }
         }
       }
     }
@@ -239,10 +253,24 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private void addProjectLink(IRegion line, Matcher matcher, int startGroup, int endGroup,
       List<int[]> removedLocations) {
-    IHyperlink link = new MavenProjectHyperLink(mavenProject);
+    IHyperlink link = new ProjectHyperLink(mavenProject);
     int start = getOriginalIndex(matcher.start(startGroup), removedLocations);
     int end = getOriginalIndex(matcher.end(endGroup), removedLocations);
     console.addLink(link, line.getOffset() + start, end - start);
+  }
+
+  private ProjectReference getProject(String groupId, String artifactId, String version) {
+    MavenProjectBuildData buildProject = MavenBuildProjectDataConnection.getBuildProject(launch, groupId, artifactId,
+        version);
+    if(buildProject == null) {
+      return null;
+    }
+    Optional<IProject> project = Arrays
+        .stream(
+            ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(buildProject.projectBasedir.toUri()))
+        .filter(IProject.class::isInstance).map(IProject.class::cast).findFirst();
+    //if project is absent, the project build in Maven is not in the workspace
+    return project.isPresent() ? new ProjectReference(project.get(), buildProject) : null;
   }
 
   @Override
@@ -305,21 +333,16 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
     private final String testName;
 
-    private final IMavenProjectFacade mavenProjectFacade;
+    private final ProjectReference project;
 
-    public MavenTestReportHyperLink(IMavenProjectFacade mavenProjectFacade, String testName) {
+    public MavenTestReportHyperLink(ProjectReference project, String testName) {
       this.testName = testName;
-      this.mavenProjectFacade = mavenProjectFacade;
+      this.project = project;
     }
 
     @Override
     public void linkActivated() {
-      MavenProject mavenProject = mavenProjectFacade.getMavenProject();
-      if(mavenProject == null) {
-        return; // happens when the project was not yet build
-      }
-      Path baseDir = Path.of(mavenProject.getBuild().getDirectory());
-      List<Path> reportFiles = getTestReportFiles(baseDir, testName);
+      List<Path> reportFiles = getTestReportFiles(project.buildProject().projectBuildDirectory, testName);
       if(!reportFiles.isEmpty()) {
         IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         for(Path reportFile : reportFiles) {
@@ -360,17 +383,45 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     }
   }
 
-  private static class MavenProjectHyperLink implements IHyperlink {
+  private static class ProjectHyperLink implements IHyperlink {
 
-    private final IMavenProjectFacade mavenProjectFacade;
+    private final ProjectReference project;
 
-    public MavenProjectHyperLink(IMavenProjectFacade mavenProjectFacade) {
-      this.mavenProjectFacade = mavenProjectFacade;
+    public ProjectHyperLink(ProjectReference project) {
+      this.project = project;
     }
 
     public void linkActivated() {
-      IFile pom = mavenProjectFacade.getPom();
-      openFileInStandardEditor(pom);
+      Path relativePath = project.buildProject().projectBasedir.relativize(project.buildProject().projectFile);
+      IFile projectFile;
+      String filename = relativePath.getFileName().toString();
+      if(IMavenConstants.POM_FILE_NAME.equals(filename)) {
+        projectFile = project.project().getFile(IMavenConstants.POM_FILE_NAME);
+      } else {
+        Optional<IPath> resolvedPomfile = resolvePath(filename);
+        IPath projectFilePath = org.eclipse.core.runtime.Path.fromOSString(relativePath.toString());
+        if(resolvedPomfile.isPresent()) {
+          projectFilePath = projectFilePath.removeLastSegments(1).append(resolvedPomfile.get());
+        }
+        projectFile = project.project().getFile(projectFilePath);
+      }
+      openFileInStandardEditor(projectFile);
+    }
+
+    private Optional<IPath> resolvePath(String filename) {
+      BundleContext ctx = FrameworkUtil.getBundle(MavenConsoleLineTracker.class).getBundleContext();
+      try {
+        return ctx.getServiceReferences(IBuildProjectFileResolver.class, null).stream().map(reference -> {
+          IBuildProjectFileResolver resolver = ctx.getService(reference);
+          try {
+            return resolver != null ? resolver.resolveProjectFile(filename) : null;
+          } finally {
+            ctx.ungetService(reference);
+          }
+        }).filter(Objects::nonNull).findFirst();
+      } catch(InvalidSyntaxException e) {
+        throw new AssertionError("Unexpected exception", e);
+      }
     }
 
     @Override
@@ -391,4 +442,5 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       log.error(ex.getMessage(), ex);
     }
   }
+
 }

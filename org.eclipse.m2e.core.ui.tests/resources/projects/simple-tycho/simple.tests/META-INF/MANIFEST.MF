@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: simple.tests
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: simple.project
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.junit

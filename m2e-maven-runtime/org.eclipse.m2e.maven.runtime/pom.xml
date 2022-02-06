@@ -162,6 +162,7 @@
 							-exportcontents: \
 								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								META-INF.sisu;-noimport:=true;x-internal:=true,\
+								org.eclipse.m2e.internal.maven.listener;x-friends:="org.eclipse.m2e.launching",\
 								org.apache.maven.*;provider=m2e;mandatory:=provider,\
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
@@ -186,5 +187,22 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.sisu</groupId>
+				<artifactId>sisu-maven-plugin</artifactId>
+				<version>0.3.5</version>
+				<executions>
+					<execution>
+						<?m2e execute onIncremental?>
+						<id>index-plexus</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>main-index</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 </project>
