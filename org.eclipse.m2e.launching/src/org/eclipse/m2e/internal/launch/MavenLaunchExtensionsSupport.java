@@ -98,6 +98,7 @@ public class MavenLaunchExtensionsSupport {
     for(IMavenLaunchParticipant participant : participants) {
       arguments.append(participant.getVMArguments(configuration, launch, monitor));
     }
+    MavenBuildProjectDataConnection.openListenerConnection(launch, arguments);
   }
 
 }

@@ -1,5 +1,19 @@
 # Eclipse m2e - Release notes
 
+## 2.1.0
+
+* 📅 Release Date: _expected_ December 2022
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/2.0.2...2.1.0
+
+### Console support for polyglot Maven projects and projects without Maven nature
+
+The M2E Maven-Console now also supports tracking of so called _polyglot_ Maven-projects. Those are projects that don't have a standard `pom.xml` and whose Maven-model is instead created from another source. One prominent example in the Eclipse world are Eclipse-PDE projects that are build with Tycho(-pomless).
+
+Due to this new support, polyglot Maven projects now also benefit from the 
+[Improved links to JUnit test-reports and project file in the Console](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#improved-links-to-junit-test-reports-and-project-pomxml-in-the-console-of-a-maven-build)
+as well as the capability to
+[Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#automatically-launch-and-attach-remote-application-debugger-when-maven-plug-in-starts-a-forked-jvm-that-waits-for-a-debugger) introduced in previous releases.
+
 ## 2.0.2
 
 * 📅 Release Date: August 30th 2022
@@ -83,7 +97,6 @@ Further information, how to activate the debug mode of forked JVMs for the plug-
 - [Tycho-Surefire](https://www.eclipse.org/tycho/sitedocs/tycho-surefire-plugin/test-mojo.html#debugPort)
 - [Tycho-Eclipserun](https://www.eclipse.org/tycho/sitedocs/tycho-extras/tycho-eclipserun-plugin/eclipse-run-mojo.html#jvmArgs)
 
-
 #### Improved links to JUnit test-reports and project pom.xml in the Console of a Maven build
 
 Clicking on the link placed at the name of a running test-class now opens the `JUnit` view that displays the test-reports of the executed tests:
@@ -97,7 +110,6 @@ For each project build a link is now added to the project's headline, which open
 In case of a build failure another link, that opens the `pom.xml` of the failed project, is added to the line that that describes the failure at the very end of the Maven build print-out:
 
 ![grafik](https://user-images.githubusercontent.com/44067969/152247987-01ee209a-ad6c-454e-92c1-e2aa75388931.png)
-
 
 #### the m2e-pde editor now supports generation of a feature from a location:
 
