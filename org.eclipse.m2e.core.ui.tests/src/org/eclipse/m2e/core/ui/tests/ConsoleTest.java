@@ -177,12 +177,22 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	}
 
 	@Test
-	public void testConsole_automaticDebuggerAttachment() throws Exception {
+	public void testConsole_automaticDebuggerAttachment_explicit() throws Exception {
 
 		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
 
 		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE,
 				entry("maven.surefire.debug", "true"));
+
+		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
+	}
+
+	@Test
+	public void testConsole_automaticDebuggerAttachment_fromDebugLaunch() throws Exception {
+
+		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
+
+		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.DEBUG_MODE);
 
 		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
 	}

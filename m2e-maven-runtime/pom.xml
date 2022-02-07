@@ -68,7 +68,7 @@
 							<_nodefaultversion>true</_nodefaultversion>
 							<_snapshot>qualifier</_snapshot>
 
-							<Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
+							<Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
 							<Bundle-RequiredExecutionEnvironment>JavaSE-11</Bundle-RequiredExecutionEnvironment>
 							<Bundle-Name>${project.name}</Bundle-Name>
 							<Bundle-Vendor>Eclipse.org - m2e</Bundle-Vendor>

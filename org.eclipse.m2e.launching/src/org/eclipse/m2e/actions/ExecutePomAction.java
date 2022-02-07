@@ -215,10 +215,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
       if(path != null) {
         workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, path.toPortableString());
       }
-
-      // TODO when launching Maven with debugger consider to add the following property
-      // -Dmaven.surefire.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
-
       return workingCopy;
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);

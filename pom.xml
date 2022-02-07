@@ -82,6 +82,7 @@
 		<module>org.eclipse.m2e.pde</module>
 		<module>org.eclipse.m2e.pde.ui</module>
 		<module>org.eclipse.m2e.pde.connector</module>
+		<module>org.eclipse.m2e.debug</module>
 
 		<!-- common test helpers -->
 		<module>org.eclipse.m2e.tests.common</module>
