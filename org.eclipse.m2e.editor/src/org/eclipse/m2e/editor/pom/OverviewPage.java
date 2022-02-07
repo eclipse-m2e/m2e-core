@@ -107,9 +107,13 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
@@ -289,6 +293,7 @@ public class OverviewPage extends MavenPomEditorPage {
     super.createFormContent(managedForm);
   }
 
+  @SuppressWarnings("restriction") // org.eclipse.m2e.core packaging types
   private void createArtifactSection(FormToolkit toolkit, Composite composite, WidthGroup widthGroup) {
     Section artifactSection = toolkit.createSection(composite, ExpandableComposite.TITLE_BAR);
     artifactSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -349,6 +354,17 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactPackagingCombo.add("ear"); //$NON-NLS-1$
     artifactPackagingCombo.add("pom"); //$NON-NLS-1$
     artifactPackagingCombo.add("maven-plugin"); //$NON-NLS-1$
+
+    MavenProject thisProj = getPomEditor().getMavenProject();
+    if(thisProj != null) {
+      MavenProjectFacade facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
+          .getMavenProject(thisProj.getGroupId(), thisProj.getArtifactId(), thisProj.getVersion());
+      if(facade != null) {
+        for(String packagingType : facade.getAvailablePackagingTypes()) {
+          artifactPackagingCombo.add(packagingType);
+        }
+      }
+    }
 // uncomment this only if you are able to not to break the project
 //    artifactPackagingCombo.add("osgi-bundle");
 //    artifactPackagingCombo.add("eclipse-feature");
