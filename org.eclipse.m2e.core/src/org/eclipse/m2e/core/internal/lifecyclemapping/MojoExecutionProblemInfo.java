@@ -40,6 +40,10 @@ public abstract class MojoExecutionProblemInfo extends MavenProblemInfo {
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
 
+    setExecutionInfo(mojoExecutionKey, marker);
+  }
+
+  static void setExecutionInfo(MojoExecutionKey mojoExecutionKey, IMarker marker) throws CoreException {
     //TODO what parameters are important here for the hints?
     marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecutionKey.getGroupId());
     marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecutionKey.getArtifactId());

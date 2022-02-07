@@ -16,8 +16,11 @@ package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -37,10 +40,13 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
 
   private final List<PluginExecutionMetadata> pluginExecutions = new ArrayList<>();
 
+  private final List<LifecycleMappingFilter> mappingFilters = new ArrayList<>();
+
   public SimpleMappingMetadataSource(LifecycleMappingMetadataSource source) {
     this.sources.add(source);
     this.lifecycleMappings.addAll(source.getLifecycleMappings());
     this.pluginExecutions.addAll(source.getPluginExecutions());
+    this.mappingFilters.addAll(source.getLifecycleMappingFilters());
   }
 
   public SimpleMappingMetadataSource(List<LifecycleMappingMetadataSource> sources) {
@@ -48,6 +54,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     for(LifecycleMappingMetadataSource source : sources) {
       this.lifecycleMappings.addAll(source.getLifecycleMappings());
       this.pluginExecutions.addAll(source.getPluginExecutions());
+      this.mappingFilters.addAll(source.getLifecycleMappingFilters());
     }
   }
 
@@ -61,14 +68,18 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
   }
 
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType)
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter)
       throws DuplicateLifecycleMappingMetadataException {
     if(packagingType == null) {
       return null;
     }
 
-    List<LifecycleMappingMetadata> matching = lifecycleMappings.stream()
-        .filter(mapping -> packagingType.equals(mapping.getPackagingType())).collect(Collectors.toList());
+    Stream<LifecycleMappingMetadata> stream = lifecycleMappings.stream()
+        .filter(mapping -> packagingType.equals(mapping.getPackagingType()));
+    if(filter != null) {
+      stream = stream.filter(Predicate.not(filter));
+    }
+    List<LifecycleMappingMetadata> matching = stream.collect(Collectors.toList());
     if(matching.isEmpty()) {
       return null;
     }
@@ -89,6 +100,14 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
       }
     }
     return mappings;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
+   */
+  @Override
+  public List<LifecycleMappingFilter> getFilters() {
+    return mappingFilters;
   }
 
 }

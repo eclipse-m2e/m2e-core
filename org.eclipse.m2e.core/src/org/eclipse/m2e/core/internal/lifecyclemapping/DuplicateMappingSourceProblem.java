@@ -72,11 +72,13 @@ public class DuplicateMappingSourceProblem extends MavenProblemInfo {
       String prefix = IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES + "." + i + ".";
       Version version = bundle.getVersion();
       String v = version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
-      marker.setAttribute(prefix + "bundleName",
+      marker.setAttribute(prefix + IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES_NAME,
           Objects.requireNonNullElse(bundle.getHeaders().get(Constants.BUNDLE_NAME), bundle.getSymbolicName()));
-      marker.setAttribute(prefix + "bundleSymbolicName", bundle.getSymbolicName());
-      marker.setAttribute(prefix + "bundleVersionRange", "[" + v + ",)");
+      marker.setAttribute(prefix + IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES_BSN, bundle.getSymbolicName());
+      marker.setAttribute(prefix + IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES_VERSION, v);
     }
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
+        IMavenConstants.EDITOR_HINT_CONFLICTING_LIFECYCLEMAPPING);
   }
 
 }

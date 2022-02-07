@@ -14,6 +14,8 @@
 
 package org.eclipse.m2e.editor.internal.markers;
 
+import java.util.stream.IntStream;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator;
@@ -21,6 +23,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.editor.internal.lifecycle.ConflictingLifecycleMappingResolution;
 import org.eclipse.m2e.editor.internal.lifecycle.LifecycleMappingResolution;
 import org.eclipse.m2e.editor.internal.lifecycle.WorkspaceLifecycleMappingResolution;
 
@@ -58,6 +61,12 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
           new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED),
           new OpenManagedVersionDefinitionResolution(marker)};
     }
+    if(IMavenConstants.EDITOR_HINT_CONFLICTING_LIFECYCLEMAPPING.equals(hint)) {
+      int conflicting = marker.getAttribute(IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES, 0);
+      return IntStream.range(0, conflicting).mapToObj(index -> new ConflictingLifecycleMappingResolution(marker, index))
+          .toArray(IMarkerResolution[]::new);
+    }
+
     if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       return new IMarkerResolution[] {new LifecycleMappingResolution(marker, PluginExecutionAction.ignore),
           new WorkspaceLifecycleMappingResolution(marker, PluginExecutionAction.ignore),};
