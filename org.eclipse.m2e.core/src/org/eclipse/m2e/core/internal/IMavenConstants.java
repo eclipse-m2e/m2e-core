@@ -110,6 +110,8 @@ public interface IMavenConstants {
 
   String EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING = "implicit_lifecyclemaping";//$NON-NLS-1$
 
+  String EDITOR_HINT_CONFLICTING_LIFECYCLEMAPPING = "conflicting_lifecyclemaping";//$NON-NLS-1$
+
   String EDITOR_HINT_UNKNOWN_LIFECYCLE_ID = "unknown_lifecycle_id";//$NON-NLS-1$
 
   String EDITOR_HINT_MISSING_CONFIGURATOR = "missing_configurator";//$NON-NLS-1$
@@ -133,5 +135,15 @@ public interface IMavenConstants {
   String MARKER_DUPLICATEMAPPING_VALUE = "duplicateMappingValue";
 
   String MARKER_DUPLICATEMAPPING_SOURCES = "duplicateMappingSources";
+
+  String MARKER_DUPLICATEMAPPING_SOURCES_NAME = "name";
+
+  String MARKER_DUPLICATEMAPPING_SOURCES_BSN = "bundleSymbolicName";
+
+  String MARKER_DUPLICATEMAPPING_SOURCES_VERSION = "bundleVersionRange";
+
+  String MARKER_DUPLICATEMAPPING_TYPE_PACKAGING = "packaging";
+
+  String MARKER_DUPLICATEMAPPING_TYPE_GOAL = "goal";
 
 }

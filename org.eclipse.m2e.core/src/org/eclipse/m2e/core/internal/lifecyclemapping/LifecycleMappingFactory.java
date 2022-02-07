@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -64,6 +65,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
@@ -79,6 +83,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilter;
@@ -335,6 +340,62 @@ public class LifecycleMappingFactory {
     }
   }
 
+  public static void addLifecycleMappingPackagingFilter(LifecycleMappingMetadataSource mapping, String bsn,
+      String version, String packaging) {
+    LifecycleMappingFilter filter = getLifecycleMappingFilter(bsn, version, mapping);
+    filter.getPackagingTypes().add(packaging);
+  }
+
+  public static void addLifecycleMappingExecutionFilter(LifecycleMappingMetadataSource mapping, String bsn,
+      String bundleVersion, String executionGroupId, String executionArtifactId, String executionVersion, String goal) {
+    LifecycleMappingFilter filter = getLifecycleMappingFilter(bsn, bundleVersion, mapping);
+    PluginExecutionFilter executionFilter = getPluginExecutionFilter(executionGroupId, executionArtifactId,
+        executionVersion, filter);
+    executionFilter.getGoals().add(goal);
+  }
+
+  private static PluginExecutionFilter getPluginExecutionFilter(String executionGroupId, String executionArtifactId,
+      String executionVersion, LifecycleMappingFilter filter) {
+    for(PluginExecutionFilter executionFilter : filter.getPluginExecutions()) {
+      if(Objects.equals(executionFilter.getGroupId(), executionGroupId)
+          && Objects.equals(executionFilter.getArtifactId(), executionArtifactId)) {
+        try {
+          VersionRange filterRange = VersionRange.createFromVersionSpec(executionFilter.getVersionRange());
+          if(filterRange.containsVersion(new DefaultArtifactVersion(executionVersion))) {
+            return executionFilter;
+          }
+        } catch(InvalidVersionSpecificationException ex) {
+          //can't check it then...
+        }
+      }
+    }
+    PluginExecutionFilter executionFilter = new PluginExecutionFilter(executionGroupId, executionArtifactId,
+        "[" + executionVersion + ",)", new LinkedHashSet<String>());
+    filter.getPluginExecutions().add(executionFilter);
+    return executionFilter;
+  }
+
+  private static LifecycleMappingFilter getLifecycleMappingFilter(String bsn, String version,
+      LifecycleMappingMetadataSource mapping) {
+    for(LifecycleMappingFilter filter : mapping.getLifecycleMappingFilters()) {
+      if(eq(bsn, filter.getSymbolicName())) {
+        try {
+          VersionRange filterRange = VersionRange.createFromVersionSpec(filter.getVersionRange());
+          if(filterRange.containsVersion(new DefaultArtifactVersion(version))) {
+            return filter;
+          }
+        } catch(InvalidVersionSpecificationException ex) {
+          //can't check it then...
+        }
+      }
+    }
+    LifecycleMappingFilter filter = new LifecycleMappingFilter();
+    filter.setSymbolicName(bsn);
+    filter.setVersionRange("[" + version + ",)");
+    mapping.addLifecycleMappingFilter(filter);
+    return filter;
+  }
+
   private static PluginExecutionMetadata getPluginExecutionMetadata(LifecycleMappingMetadataSource mapping,
       String groupId, String artifactId, String version, PluginExecutionAction action) {
     for(PluginExecutionMetadata execution : mapping.getPluginExecutions()) {
@@ -527,10 +588,13 @@ public class LifecycleMappingFactory {
     LifecycleMappingMetadata lifecycleMappingMetadata = null;
     MappingMetadataSource originalMetadataSource = null;
 
+    String packaging = mavenProject.getPackaging();
+    PackagingTypeFilter packagingTypeFilter = new PackagingTypeFilter(metadataSources, packaging);
     for(int i = 0; i < metadataSources.size(); i++ ) {
       MappingMetadataSource source = metadataSources.get(i);
       try {
-        lifecycleMappingMetadata = source.getLifecycleMappingMetadata(mavenProject.getPackaging());
+        lifecycleMappingMetadata = source.getLifecycleMappingMetadata(packaging,
+            packagingTypeFilter);
         if(lifecycleMappingMetadata != null) {
           originalMetadataSource = new SimpleMappingMetadataSource(lifecycleMappingMetadata);
           metadataSources.add(i, originalMetadataSource);
@@ -540,8 +604,9 @@ public class LifecycleMappingFactory {
         SourceLocation location = SourceLocationHelper.findPackagingLocation(mavenProject);
         log.error("Duplicate lifecycle mapping metadata for {}.", mavenProject, e);
         result.addProblem(new DuplicateMappingSourceProblem(location,
-            NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging(), e.getMessage()), "packaging",
-            mavenProject.getPackaging(), e));
+            NLS.bind(Messages.LifecycleDuplicate, packaging, e.getMessage()),
+            IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE_PACKAGING,
+            packaging, e));
         originalMetadataSource = new FailedMappingMetadataSource(source, e);
         metadataSources.add(i, originalMetadataSource);
         break;
@@ -551,7 +616,7 @@ public class LifecycleMappingFactory {
     if(lifecycleMappingMetadata == null && applyDefaultStrategy) {
       lifecycleMappingMetadata = new LifecycleMappingMetadata();
       lifecycleMappingMetadata.setLifecycleMappingId("DEFAULT"); // TODO proper constant
-      lifecycleMappingMetadata.setPackagingType(mavenProject.getPackaging());
+      lifecycleMappingMetadata.setPackagingType(packaging);
     }
 
     // TODO if lifecycleMappingMetadata.lifecycleMappingId==null, convert to error lifecycle mapping metadata
@@ -568,8 +633,8 @@ public class LifecycleMappingFactory {
       Map<String, IConfigurationElement> elements = getProjectConfiguratorExtensions();
 
       for(MojoExecution execution : mojoExecutions) {
-
         MojoExecutionKey executionKey = new MojoExecutionKey(execution);
+        MojoExecutionFilter goalFilter = new MojoExecutionFilter(metadataSources, executionKey);
 
         Map<String, PluginExecutionMetadata> configuratorMetadataMap = new HashMap<>();
 
@@ -612,6 +677,9 @@ public class LifecycleMappingFactory {
         try {
           for(Map.Entry<MappingMetadataSource, List<PluginExecutionMetadata>> entry : metadatasPerSource.entrySet()) {
             for(PluginExecutionMetadata executionMetadata : entry.getValue()) {
+              if(goalFilter.test(executionMetadata)) {
+                continue;
+              }
               if(isPrimaryMapping(executionMetadata, sorter)) {
                 if(primaryMetadata != null) {
                   throw new DuplicatePluginExecutionMetadataException(primaryMetadata, executionMetadata);
@@ -627,10 +695,9 @@ public class LifecycleMappingFactory {
           primaryMetadata = null;
           SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
           log.debug("Duplicate plugin execution mapping metadata for {}.", executionKey, e);
-          result.addProblem(
-              new DuplicateMappingSourceProblem(location,
-                  NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString(), e.getMessage()), "goal",
-                  executionKey.getGoal(), e));
+          result.addProblem(new DuplicateExecutionMappingSourceProblem(location,
+              NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString(), e.getMessage()), executionKey,
+              e));
         }
 
         if(primaryMetadata != null && !isValidPluginExecutionMetadata(primaryMetadata)) {
@@ -675,7 +742,6 @@ public class LifecycleMappingFactory {
 
     List<PluginExecutionMetadata> result = new ArrayList<>();
     all_metadatas: for(PluginExecutionMetadata metadata : metadatas) {
-      @SuppressWarnings("unchecked")
       Map<String, String> parameters = metadata.getFilter().getParameters();
       if(!parameters.isEmpty()) {
         for(Entry<String, String> entry : parameters.entrySet()) {

@@ -43,6 +43,13 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>lifecycleMappingFilters</name>
+          <association>
+            <type>LifecycleMappingFilter</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -198,6 +205,71 @@
     return getGoals().contains(mojoExecution.getGoal());
   }
             ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    
+    <class xml.tagName="lifecycleMappingFilter" xml.standaloneRead="true" java.clone="deep">
+      <name>LifecycleMappingFilter</name>
+      <fields>
+        <field required="true">
+          <name>symbolicName</name>
+          <identifier>true</identifier>
+          <type>String</type>
+        </field>
+        <field required="true" java.setter="false">
+          <name>versionRange</name>
+          <identifier>true</identifier>
+          <type>String</type>
+        </field>
+        <field required="true">
+          <name>pluginExecutions</name>
+          <identifier>true</identifier>
+          <type>Set</type>
+          <association>
+            <type>PluginExecutionFilter</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field required="true">
+          <name>packagingTypes</name>
+          <identifier>true</identifier>
+          <type>Set</type>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  private transient org.apache.maven.artifact.versioning.VersionRange parsedVersionRange;
+
+  public void setVersionRange(String versionRange) {
+    this.versionRange = versionRange;
+    try {
+      parsedVersionRange = org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec(versionRange);
+    } catch(org.apache.maven.artifact.versioning.InvalidVersionSpecificationException e) {
+      throw new IllegalArgumentException("Cannot parse version range: " + versionRange, e);
+    }
+  }
+
+  public boolean matches(String version) {
+    if(parsedVersionRange == null) {
+      try {
+        parsedVersionRange = org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec(versionRange);
+      } catch(org.apache.maven.artifact.versioning.InvalidVersionSpecificationException e) {
+        throw new IllegalArgumentException("Cannot parse version range: " + versionRange, e);
+      }
+    }
+    org.apache.maven.artifact.versioning.DefaultArtifactVersion artifactVersion = new org.apache.maven.artifact.versioning.DefaultArtifactVersion(
+        version);
+    return parsedVersionRange.containsVersion(artifactVersion);
+
+  }
+          ]]>
           </code>
         </codeSegment>
       </codeSegments>

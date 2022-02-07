@@ -12,8 +12,11 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -42,7 +45,7 @@ public class FailedMappingMetadataSource implements MappingMetadataSource {
    * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getLifecycleMappingMetadata(java.lang.String)
    */
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
     throw failure;
   }
 
@@ -66,6 +69,14 @@ public class FailedMappingMetadataSource implements MappingMetadataSource {
    */
   public MappingMetadataSource getSource() {
     return this.source;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
+   */
+  @Override
+  public List<LifecycleMappingFilter> getFilters() {
+    return Collections.emptyList();
   }
 
 }

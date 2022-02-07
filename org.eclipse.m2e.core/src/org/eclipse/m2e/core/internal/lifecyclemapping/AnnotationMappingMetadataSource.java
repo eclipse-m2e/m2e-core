@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilter;
@@ -137,7 +139,7 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
   }
 
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
     return null;
   }
 
@@ -308,5 +310,13 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
       this.c = c;
       this.action = action;
     }
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
+   */
+  @Override
+  public List<LifecycleMappingFilter> getFilters() {
+    return Collections.emptyList();
   }
 }
