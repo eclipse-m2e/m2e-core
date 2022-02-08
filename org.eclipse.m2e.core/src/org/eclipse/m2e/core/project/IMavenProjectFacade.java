@@ -156,18 +156,4 @@ public interface IMavenProjectFacade {
   String getLifecycleMappingId();
 
   Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
-
-  /**
-   * Iterates through the project's build plugins and finds any custom packaging types that are available
-   */
-  void updateAvailablePackagingTypes();
-
-  /**
-   * Gets any custom packaging types found using updateAvailablePackagingTypes. If this method is called while
-   * availablePackagingTypes is empty, updateAvailablePackagingTypes will be called
-   * 
-   * @see IMavenProjectFacade#updateAvailablePackagingTypes()
-   * @return A set of all custom packaging types available to this project, or an empty set if none are found
-   */
-  Set<String> getAvailablePackagingTypes();
 }

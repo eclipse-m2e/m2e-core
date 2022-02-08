@@ -24,16 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -41,12 +31,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -54,7 +40,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -73,12 +58,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public static final String PROP_LIFECYCLE_MAPPING = MavenProjectFacade.class.getName() + "/lifecycleMapping";
 
   public static final String PROP_CONFIGURATORS = MavenProjectFacade.class.getName() + "/configurators";
-
-  private static final String COMPONENTS_PATH = "META-INF/plexus/components.xml";
-
-  private static final String ARTIFACT_HANDLER_ROLE = "org.apache.maven.artifact.handler.ArtifactHandler";
-
-  private final String[] PACKAGING_TYPES_IGNORING = new String[] {"jar", "war", "ear", "ejb", "pom", "maven-plugin"};
 
   private final ProjectRegistryManager manager;
 
@@ -114,8 +93,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private final Set<ArtifactRepositoryRef> artifactRepositories;
 
   private final Set<ArtifactRepositoryRef> pluginArtifactRepositories;
-
-  private Set<String> availablePackagingTypes;
 
   // TODO make final
   private Set<ArtifactRef> artifacts; // dependencies are resolved after facade instance is created
@@ -168,8 +145,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.pluginArtifactRepositories.add(new ArtifactRepositoryRef(repository));
     }
 
-    this.availablePackagingTypes = new LinkedHashSet<>();
-
     timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
     IProject project = getProject();
     int i = 0;
@@ -205,8 +180,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.artifactRepositories = new LinkedHashSet<>(other.artifactRepositories);
 
     this.pluginArtifactRepositories = new LinkedHashSet<>(other.pluginArtifactRepositories);
-
-    this.availablePackagingTypes = new LinkedHashSet<>(other.availablePackagingTypes);
 
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
   }
@@ -554,84 +527,5 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public List<MojoExecution> getExecutionPlan(String lifecycle, IProgressMonitor monitor) throws CoreException {
     Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
     return executionPlans != null ? executionPlans.get(lifecycle) : null;
-  }
-
-  @Override
-  public void updateAvailablePackagingTypes() {
-    if(getMavenProject() != null) {
-      for(Plugin plugin : getMavenProject().getBuildPlugins()) {
-        if(plugin.isExtensions()) {
-          Artifact artifact = new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-              null, "maven-plugin", null, new DefaultArtifactHandler());
-          addPluginPackagingTypes(this.availablePackagingTypes, artifact);
-        }
-      }
-    }
-  }
-
-  @Override
-  public Set<String> getAvailablePackagingTypes() {
-    if(availablePackagingTypes == null || availablePackagingTypes.size() == 0) {
-      availablePackagingTypes = new LinkedHashSet<>();
-      updateAvailablePackagingTypes(); // try and update if there are none
-    }
-    return availablePackagingTypes;
-  }
-
-  /**
-   * Parses the plugin's META-INF/plexus/components.xml file for available packaging types
-   * 
-   * @param packagingTypes Set of packaging types that this method will add to
-   * @param artifact The artifact of the build plugin
-   * @apiNote If any exceptions occur during this method, such as an XML parsing exception or file not found, this
-   *          method will immediately stop. It is assumed that there is something wrong with the user's project or
-   *          repository setup which prevents this method from completing.
-   */
-  void addPluginPackagingTypes(Set<String> packagingTypes, Artifact artifact) {
-    ArtifactRepository localRepository;
-    try {
-      localRepository = MavenPluginActivator.getDefault().getMaven().getLocalRepository();
-    } catch(CoreException ex) { // No local repo, can't add packaging types
-      return;
-    }
-    Artifact found = localRepository.find(artifact);
-    if(found != null && found.getFile() != null) {
-      try (JarFile jarFile = new JarFile(found.getFile().getAbsoluteFile() + ".jar")) {
-        DocumentBuilder db = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
-        JarEntry componentsxml = jarFile.getJarEntry(COMPONENTS_PATH);
-        Document doc = db.parse(jarFile.getInputStream(componentsxml));
-        doc.getDocumentElement().normalize();
-        NodeList components = doc.getElementsByTagName("component");
-        for(int i = 0; i < components.getLength(); i++ ) {
-          Node component = components.item(i);
-          if(component.getNodeType() == Node.ELEMENT_NODE) {
-            Element element = (Element) component;
-            String role = element.getElementsByTagName("role").item(0).getTextContent();
-            if(ARTIFACT_HANDLER_ROLE.equals(role)) {
-              Node config = element.getElementsByTagName("configuration").item(0);
-              if(config.getNodeType() == Node.ELEMENT_NODE) {
-                Element configEl = (Element) config;
-                String name = configEl.getElementsByTagName("type").item(0).getTextContent();
-                if(!isDefaultPackagingType(name)) { // don't duplicate built-in packaging types
-                  packagingTypes.add(name);
-                }
-              }
-            }
-          }
-        }
-      } catch(Exception e) {
-      }
-    }
-  }
-
-  /**
-   * Filters out default packaging types in case a build plugin has it defined again. Default packaging types include
-   * jar, war, ear, ejb, pom, and maven-plugin.
-   * 
-   * @param type The type to check
-   * @return True if the provided type is a "default" type, false otherwise
-   */
-  boolean isDefaultPackagingType(String type) {
-    return Arrays.asList(PACKAGING_TYPES_IGNORING).contains(type);
   }
 }
