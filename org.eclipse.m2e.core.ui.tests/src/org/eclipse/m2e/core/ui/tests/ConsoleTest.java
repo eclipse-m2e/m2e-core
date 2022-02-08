@@ -18,6 +18,8 @@ import static java.util.Map.entry;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,20 +51,22 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.junit.launcher.JUnitLaunchShortcut;
+import org.eclipse.jdt.internal.junit.ui.TestRunnerViewPart;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.jface.text.Position;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
@@ -70,17 +74,12 @@ import org.eclipse.ui.console.IConsoleListener;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.internal.console.ConsoleHyperlinkPosition;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 @SuppressWarnings("restriction")
 public class ConsoleTest extends AbstractMavenProjectTestCase {
 
-	@ClassRule
-	public static final TemporaryFolder TEMP_DIRECOTRY = new TemporaryFolder();
 	private static Display display;
 
 	@BeforeClass
@@ -99,18 +98,10 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		}
 	}
 
-	@AfterClass
-	public static void tearDownAfterClass() throws CoreException {
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			project.delete(true, null);
-		}
-	}
-
-	private static final String SIMPLE_PROJECT = "simple.projectWithJUnit-5_Test";
-
 	@Test
 	public void testConsole_hasOutputAndHasNoMultipleSLF4Jwarnings() throws Exception {
-		File pomFile = getTestProjectPomFile("simplePomOK");
+		Path tempProjectFolder = copyTestProjectIntoWorkspace("simplePomOK");
+		File pomFile = tempProjectFolder.resolve(IMavenConstants.POM_FILE_NAME).toFile();
 
 		IDocument document = runMavenBuild(pomFile.getParent(), ILaunchManager.RUN_MODE);
 
@@ -122,76 +113,51 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 				lines(consoleText).noneMatch(l -> l.contains("SLF4J: Class path contains multiple SLF4J bindings")));
 	}
 
-	@Test
-	public void testConsole_testReportLinkAlignmentAndClickability() throws Exception {
-		@SuppressWarnings("unused")
-		// This test needs the bundle org.eclipse.jdt.junit in its runtime environment
-		// (even in Tycho builds), to properly test if the JUnit test-reports are found.
-		// This field just ensures the mentioned required-bundle is not removed.
-		JUnitLaunchShortcut jdtJunitReference = null;
-
-		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
-
-		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE);
-
-		ConsoleHyperlinkPosition linkPosition = getConsoleHyperLink(document, 1);
-		String linkText = document.get(linkPosition.getOffset(), linkPosition.getLength());
-
-		assertEquals("Test-Report link text", "simple.SimpleTest", linkText);
-		assertLinkActivationOpensPartWithTitle(linkPosition, "JUnit (simple.SimpleTest)");
-	}
+	private static final String MAVEN_PROJECT = "simple.projectWithJUnit-5_Test";
 
 	@Test
-	public void testConsole_testMavenProjectLinkAlignmentAndClickability() throws Exception {
+	public void testConsole_debuggerAttachmentAndLinkAlignmentAndBehavior_mavenProject() throws Exception {
 
-		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
+		importMavenProjectIntoWorkspace(MAVEN_PROJECT);
 
-		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE);
+		IDocument document = runMavenBuild("${project_loc:" + MAVEN_PROJECT + "}", ILaunchManager.RUN_MODE,
+				entry("maven.surefire.debug", "true"));
 
-		ConsoleHyperlinkPosition projectHeadlineLink = getConsoleHyperLink(document, 0);
-		String headlineLinkText = document.get(projectHeadlineLink.getOffset(), projectHeadlineLink.getLength());
+		assertLinkTextAndOpenedEditor(1, "simple.SimpleTest", //
+				TestRunnerViewPart.class, "JUnit (simple.SimpleTest)", document);
 
-		assertEquals("Pom link text", "org.eclipse.m2e.tests.projects:" + SIMPLE_PROJECT, headlineLinkText);
-		assertLinkActivationOpensPartWithTitle(projectHeadlineLink, SIMPLE_PROJECT + "/pom.xml");
+		assertLinkTextAndOpenedEditor(0, "org.eclipse.m2e.tests:" + MAVEN_PROJECT, //
+				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
-		ConsoleHyperlinkPosition failedProjectLink = getConsoleHyperLink(document, 3);
-		String failedProjectText = document.get(failedProjectLink.getOffset(), failedProjectLink.getLength());
+		assertLinkTextAndOpenedEditor(3, MAVEN_PROJECT, //
+				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
-		assertEquals("Pom link text", SIMPLE_PROJECT, failedProjectText);
-		assertLinkActivationOpensPartWithTitle(failedProjectLink, SIMPLE_PROJECT + "/pom.xml");
+		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
 	}
 
-	private static ConsoleHyperlinkPosition getConsoleHyperLink(IDocument doc, int index)
-			throws BadPositionCategoryException {
-		return (ConsoleHyperlinkPosition) doc.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY)[index];
-	}
+	private void assertLinkTextAndOpenedEditor(int index, String expectedLinkText, Class<?> expectedPartType,
+			String expectedEditorTitle, IDocument document) throws Exception {
 
-	private static void assertLinkActivationOpensPartWithTitle(ConsoleHyperlinkPosition link, String expectedTitle) {
+		Position[] positions = document.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY);
+		ConsoleHyperlinkPosition link = (ConsoleHyperlinkPosition) positions[index];
+
+		assertEquals(expectedLinkText, document.get(link.getOffset(), link.getLength()));
+
 		display.syncCall(() -> { // click hyper-link in console
 			link.getHyperLink().linkActivated();
 			return true; // syncExec does not re-throw exceptions
 		});
-		String activePartTitle = display.syncCall( // get titel in subsequent display.syncCall to await updates
-				() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getTitle());
-		assertEquals("Expected window part has not been opened", expectedTitle, activePartTitle);
+		IWorkbenchPart activePart = display.syncCall( // get activePart in subsequent display.syncCall to await updates
+				() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
+		assertEquals("Expected window part has not been opened", expectedEditorTitle, activePart.getTitle());
+		assertThat("Expected window part has not been opened", activePart, is(instanceOf((Class<?>) expectedPartType)));
 	}
 
-	@Test
-	public void testConsole_automaticDebuggerAttachment() throws Exception {
-
-		importMavenProjectIntoWorkspace(SIMPLE_PROJECT);
-
-		IDocument document = runMavenBuild(projectLocVariable(SIMPLE_PROJECT), ILaunchManager.RUN_MODE,
-				entry("maven.surefire.debug", "true"));
-
-		assertDebugeePrintOutAndDebuggerLaunch(document, SIMPLE_PROJECT);
-	}
-
-	private static void assertDebugeePrintOutAndDebuggerLaunch(IDocument document, String debugLaunchName)
+	private static void assertDebugeePrintOutAndDebuggerLaunch(IDocument document, String debugLaunchName, String port)
 			throws CoreException {
 		// Check for Listening debugee print-out
 		String consoleText = display.syncCall(document::get); // final document content could have changed
-		assertThat(consoleText, containsString("Listening for transport dt_socket at address: 5005"));
+		assertThat(consoleText, containsString("Listening for transport dt_socket at address: " + port));
 
 		// Check for a corresponding remote-java-debugging launch
 		ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
@@ -207,31 +173,12 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 	// --- common utility methods ---
 
-	private static File getTestProjectPomFile(String testProjectName) throws URISyntaxException, IOException {
-		String projectPath = "/resources/projects/" + testProjectName;
-		Path tempProjectFolder = TEMP_DIRECOTRY.newFolder(testProjectName).toPath();
-		URL pomResource = ConsoleTest.class.getResource(projectPath);
-		Path sourceFolder = Path.of(FileLocator.toFileURL(pomResource).toURI());
-		// Copy project resources to not pollute git repo with files generated at import
-		copyFiles(sourceFolder, tempProjectFolder);
-		return tempProjectFolder.resolve(IMavenConstants.POM_FILE_NAME).toFile();
-	}
-
-	private static void copyFiles(Path source, Path target) throws IOException {
-		try (Stream<Path> files = Files.walk(source).filter(Files::isRegularFile)) {
-			for (Path filePath : (Iterable<Path>) files::iterator) {
-				Path targetFile = target.resolve(source.relativize(filePath));
-				Files.createDirectories(targetFile.getParent());
-				Files.copy(filePath, targetFile, StandardCopyOption.REPLACE_EXISTING);
-			}
-		}
-	}
-
-	private static void importMavenProjectIntoWorkspace(String testProjectName)
-			throws CoreException, URISyntaxException, IOException {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(testProjectName);
+	private static void importMavenProjectIntoWorkspace(String projectName) throws Exception {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (!project.exists()) { // re-use project if already imported
-			File pomFile = getTestProjectPomFile(testProjectName);
+
+			Path tempProjectFolder = copyTestProjectIntoWorkspace(projectName);
+			File pomFile = tempProjectFolder.resolve(IMavenConstants.POM_FILE_NAME).toFile();
 
 			List<MavenProjectInfo> projectInfos = List.of(new MavenProjectInfo("/pom.xml", pomFile, null, null));
 			ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
@@ -241,6 +188,28 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 			// build project to make it available in the ProjectRegistryManager
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 			project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+		}
+	}
+
+	private static Path copyTestProjectIntoWorkspace(String projectName) throws IOException, URISyntaxException {
+		String projectPath = "/resources/projects/" + projectName;
+		// import project into workspace, the super class cleans up after each test
+		Path workspaceLocation = Path.of(ResourcesPlugin.getWorkspace().getRoot().getLocationURI());
+		Path tempProjectFolder = workspaceLocation.resolve(projectName);
+		URL pomResource = ConsoleTest.class.getResource(projectPath);
+		Path sourceFolder = Path.of(FileLocator.toFileURL(pomResource).toURI());
+		// Copy project resources to not pollute git repo with files generated at import
+		copyFiles(sourceFolder, tempProjectFolder);
+		return tempProjectFolder;
+	}
+
+	private static void copyFiles(Path source, Path target) throws IOException {
+		try (Stream<Path> files = Files.walk(source).filter(Files::isRegularFile)) {
+			for (Path filePath : (Iterable<Path>) files::iterator) {
+				Path targetFile = target.resolve(source.relativize(filePath));
+				Files.createDirectories(targetFile.getParent());
+				Files.copy(filePath, targetFile, StandardCopyOption.REPLACE_EXISTING);
+			}
 		}
 	}
 
@@ -285,10 +254,6 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 			fail("Build timed out.");
 		}
 		return document;
-	}
-
-	private static String projectLocVariable(String projectName) {
-		return "${project_loc:" + projectName + "}";
 	}
 
 	private static boolean isBuildFinished(String text) {
