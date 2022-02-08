@@ -569,7 +569,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     //put a msg in the editor saying that the effective pom is loading, in case this is a long running job
     if(effectivePomEditorInput == null) {
       String content = Messages.MavenPomEditor_loading;
-      String name = getPartName() + Messages.MavenPomEditor_effective;
+      String name = Messages.MavenPomEditor_effective + getPartName();
       effectivePomEditorInput = new StaticMavenStorageEditorInput(name, name, null,
           content.getBytes(StandardCharsets.UTF_8));
     }
