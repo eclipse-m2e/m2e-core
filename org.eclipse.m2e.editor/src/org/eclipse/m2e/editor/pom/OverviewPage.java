@@ -256,8 +256,6 @@ public class OverviewPage extends MavenPomEditorPage {
 
   protected GridData projectSectionData;
 
-  private Set<String> packagingTypes;
-
   public OverviewPage(MavenPomEditor pomEditor) {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
   }
@@ -365,7 +363,7 @@ public class OverviewPage extends MavenPomEditorPage {
     Label packagingLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblPackaging, SWT.NONE);
 
     artifactPackagingCombo = new CCombo(artifactComposite, SWT.FLAT);
-    packagingTypes = new LinkedHashSet<>();
+    Set<String> packagingTypes = new LinkedHashSet<>();
 
     packagingTypes.add("jar"); //$NON-NLS-1$
     packagingTypes.add("war"); //$NON-NLS-1$
@@ -373,7 +371,7 @@ public class OverviewPage extends MavenPomEditorPage {
     packagingTypes.add("ear"); //$NON-NLS-1$
     packagingTypes.add("pom"); //$NON-NLS-1$
     packagingTypes.add("maven-plugin"); //$NON-NLS-1$
-    updateAvailablePackagingTypes(); // dynamically load available packging types from build plugins
+    updateAvailablePackagingTypes(packagingTypes); // dynamically load available packaging types from build plugins
     packagingTypes.forEach(type -> artifactPackagingCombo.add(type));
 
 // uncomment this only if you are able to not to break the project
@@ -1420,7 +1418,7 @@ public class OverviewPage extends MavenPomEditorPage {
     }
   }
 
-  public void updateAvailablePackagingTypes() {
+  public void updateAvailablePackagingTypes(Set<String> packagingTypes) {
     if(getPomEditor().getMavenProject() != null) {
       for(Plugin plugin : getPomEditor().getMavenProject().getBuildPlugins()) {
         if(plugin.isExtensions()) {
