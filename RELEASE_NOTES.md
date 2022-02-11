@@ -1,6 +1,11 @@
 # Eclipse m2e - Release notes
 
-### Next release
+## 1.20.0
+
+* 📅 Release Date: February 11th 2022
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.19.0...1.20.0
+
+📢 This is most probably the last 1.x release of m2e. m2e will then start working on a 2.0 version, with some disruptive changes. If you're using m2e in your application and rely on its API, please consider following closely future development to facilitate integration of further versions.
 
 #### Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger
 
@@ -49,6 +54,21 @@ If one likes he can add additional plugins as well that should be mentioned in t
 Afterwards this will end up in the target source and one can add/edit/adjust additional data, effectivly everything the feature.xml supports is allowed here:
 
 ![grafik](https://user-images.githubusercontent.com/1331477/139413236-f04d9b5f-54a5-4240-b83f-86167c7519b2.png)
+
+#### Include and use Maven 3.8.4
+
+Maven 3.8.4 is now used internally in m2e. This allows to benefit from various improvements of recent Maven versions
+
+#### Improved LemMinX-based editor with newer LemMinX-Maven
+
+LemMinX-Maven 0.5.1 is now used and provide many major improvements. A noticeable one is the search.maven.org engine is now used instead of the indexer. This will greatly improve the "warmup" time of the editor. Other bugfixes and performance improvements have a very positive and visible impact on the user experience when using the Generic Editor.
+
+#### Other noticeable changes
+
+* Performance boost in parent project resolution https://github.com/eclipse-m2e/m2e-core/commit/ec12bd6222c377f93e21af0dc1988fba2134123d
+* Downgrade the "Plugin Execution not covered by lifecycle configuration" error to warning #424 https://github.com/eclipse-m2e/m2e-core/commit/e13899b1345da44fd888d851bb249daefc044d20
+* `*.pom` files are treated as regular Maven `pom.xml` files and should now benefit from similar edition assistance
+* Overview page in the Pom Editor now also lists the packaging types provided by Maven extensions that are accessible from the current project.
 
 ## 1.19.0
 
