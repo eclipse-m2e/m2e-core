@@ -67,12 +67,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.internal.genericeditor.ExtensionBasedTextEditor;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
 import org.eclipse.ui.part.MultiPageEditorSite;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
@@ -350,14 +352,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     if(sourcePage == null) {
       sourcePage = new ExtensionBasedTextEditor();
-      ExtensionBasedTextEditor editor = (ExtensionBasedTextEditor) sourcePage;
-
       int dex;
       try {
         dex = addPage(sourcePage, getEditorInput());
         setPageText(dex, MavenPomEditor.POM_XML);
         setSourcePage(sourcePage);
-        sourceDocument = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+        initializeSourceDocument();
       } catch(PartInitException ex) {
         log.error(ex.getMessage(), ex);
       }
@@ -366,7 +366,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private void setModel() {
     if(sourceDocument == null) {
-      sourceDocument = sourcePage.getDocumentProvider().getDocument(this.getEditorInput());
+      initializeSourceDocument();
     }
     if(sourceDocument instanceof IStructuredDocument) {
       this.structuredModel = this.modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
@@ -376,6 +376,25 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         this.structuredModel = this.modelManager.getModelForRead(getEditorInput().getName(), docStream, null);
       } catch(IOException ex) {
         // TODO Auto-generated catch block
+        log.error(ex.getMessage(), ex);
+      }
+    }
+  }
+
+  private void initializeSourceDocument() {
+    IDocumentProvider p = sourcePage.getDocumentProvider();
+    if(p == null) {
+      return;
+    }
+    sourceDocument = p.getDocument(this.getEditorInput());
+    if(p instanceof TextFileDocumentProvider) {
+      try {
+        // not clear why, but some documents are sometimes not synchronized at this stage
+        // and this causes some strange dirtiness behavior or non-working refactorings.
+        // It's most probably some disposal issue but no better solution was found yet.
+        // so let's force synchronization...
+        ((TextFileDocumentProvider) p).synchronize(getEditorInput());
+      } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }
     }
@@ -673,6 +692,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       sourceDocument = null;
       documentListener = null;
     }
+    // should properly dispose the document
+    sourcePage.dispose();
 
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
 
