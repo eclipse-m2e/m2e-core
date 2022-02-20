@@ -4,3 +4,4 @@ src-gen/
 .DS_Store
 .polyglot*
 indexer-jars/
+.tycho-consumer-pom.xml
