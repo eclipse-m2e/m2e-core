@@ -41,13 +41,13 @@ pipeline {
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}
-							ssh genie.m2e@projects-storage.eclipse.org "mkdir -p ${1}"
+							ssh genie.m2e@projects-storage.eclipse.org "\
+								rm -rf  ${1}/* && \
+								mkdir -p ${1}"
 							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						M2E_VERSION=$(<"org.eclipse.m2e.sdk.feature/target/m2e.version")
 						echo M2E_VERSION=$M2E_VERSION
-
-						ssh genie.m2e@projects-storage.eclipse.org "rm -rf /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/*"
 
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
