@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,12 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -58,6 +65,7 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
+import org.eclipse.m2e.jdt.JreSystemVersion;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -80,6 +88,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public static final String COMPILER_PLUGIN_ARTIFACT_ID = "maven-compiler-plugin";
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
+
+  private static final String GOAL_ENFORCE = "enforce"; //$NON-NLS-1$
+
+  public static final String ENFORCER_PLUGIN_ARTIFACT_ID = "maven-enforcer-plugin"; //$NON-NLS-1$
+
+  public static final String ENFORCER_PLUGIN_GROUP_ID = "org.apache.maven.plugins"; //$NON-NLS-1$
 
   protected static final List<String> RELEASES;
 
@@ -156,9 +170,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     addProjectSourceFolders(classpath, options, request, monitor);
 
-    String environmentId = getExecutionEnvironmentId(options);
-
-    addJREClasspathContainer(classpath, environmentId);
+    String executionEnvironmentId = getExecutionEnvironmentId(options);
+    String buildEnvironmentId = getMinimumJavaBuildEnvironmentId(request, monitor);
+    addJREClasspathContainer(classpath, buildEnvironmentId != null ? buildEnvironmentId : executionEnvironmentId);
 
     addMavenClasspathContainer(classpath);
 
@@ -235,6 +249,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
+    if(environmentId == null
+        || JreSystemVersion.WORKSPACE_DEFAULT == MavenJdtPlugin.getDefault().getJreSystemVersion()) {
+      return null;
+    }
     IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
     for(IExecutionEnvironment environment : manager.getExecutionEnvironments()) {
       if(environment.getId().equals(environmentId)) {
@@ -738,6 +756,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
+  protected List<MojoExecution> getEnforcerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
+      throws CoreException {
+    return request.getMavenProjectFacade().getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID, ENFORCER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_ENFORCE);
+  }
+
   private String getCompilerLevel(MavenProject mavenProject, MojoExecution execution, String parameter, String source,
       List<String> levels, IProgressMonitor monitor) {
     int levelIdx = getLevelIndex(source, levels);
@@ -778,6 +802,61 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
     return idx;
+  }
+
+  private String getMinimumJavaBuildEnvironmentId(ProjectConfigurationRequest request, IProgressMonitor monitor) {
+    try {
+      List<MojoExecution> mojoExecutions = getEnforcerMojoExecutions(request, monitor);
+      for(MojoExecution mojoExecution : mojoExecutions) {
+        String version = getMinimumJavaBuildEnvironmentId(mojoExecution);
+        if(version != null) {
+          return version;
+        }
+      }
+    } catch(CoreException | InvalidVersionSpecificationException ex) {
+      log.error("Failed to determine minimum build version, assuming default", ex);
+    }
+    return null;
+  }
+
+  private String getMinimumJavaBuildEnvironmentId(MojoExecution mojoExecution)
+      throws InvalidVersionSpecificationException {
+    // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
+    Xpp3Dom dom = mojoExecution.getConfiguration();
+    Xpp3Dom rules = dom.getChild("rules");
+    if(rules == null) {
+      return null;
+    }
+    Xpp3Dom requireJavaVersion = rules.getChild("requireJavaVersion");
+    if(requireJavaVersion == null) {
+      return null;
+    }
+    Xpp3Dom version = requireJavaVersion.getChild("version");
+    if(version == null) {
+      return null;
+    }
+    return getMinimumJavaBuildEnvironmentId(version.getValue());
+  }
+
+  private String getMinimumJavaBuildEnvironmentId(String versionSpec) throws InvalidVersionSpecificationException {
+    VersionRange vr = VersionRange.createFromVersionSpec(versionSpec);
+    ArtifactVersion recommendedVersion = vr.getRecommendedVersion();
+    // find lowest matching environment id
+    for(Entry<String, String> entry : ENVIRONMENTS.entrySet()) {
+      ArtifactVersion environmentVersion = new DefaultArtifactVersion(entry.getKey());
+      boolean foundMatchingVersion = false;
+      if(recommendedVersion == null) {
+        foundMatchingVersion = vr.containsVersion(environmentVersion);
+      } else {
+        // only singular versions ever have a recommendedVersion
+        int compareTo = recommendedVersion.compareTo(environmentVersion);
+        foundMatchingVersion = compareTo <= 0;
+      }
+      if(foundMatchingVersion) {
+        return entry.getValue();
+      }
+    }
+    return null;
   }
 
   private double asDouble(String level) {

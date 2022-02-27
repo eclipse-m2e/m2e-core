@@ -40,6 +40,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -65,6 +69,8 @@ public class MavenJdtPlugin extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 
+  public static final String PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION = "jreSystemLibraryVersion"; //$NON-NLS-1$
+
   private static MavenJdtPlugin instance;
 
   MavenLaunchConfigurationListener launchConfigurationListener;
@@ -74,6 +80,10 @@ public class MavenJdtPlugin extends Plugin {
   IMavenClassifierManager mavenClassifierManager;
 
   WorkspaceSourceDownloadJob workspaceSourceDownloadJob;
+
+  private final IPreferencesService preferencesService;
+
+  private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
   /**
    * @noreference see class javadoc
@@ -85,6 +95,9 @@ public class MavenJdtPlugin extends Plugin {
       System.err.println("### executing constructor " + PLUGIN_ID); //$NON-NLS-1$
       new Throwable().printStackTrace();
     }
+    preferencesService = Platform.getPreferencesService();
+    preferencesLookup[0] = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
+    preferencesLookup[1] = DefaultScope.INSTANCE.getNode(PLUGIN_ID);
   }
 
   /**
@@ -201,6 +214,11 @@ public class MavenJdtPlugin extends Plugin {
    */
   public IMavenClassifierManager getMavenClassifierManager() {
     return this.mavenClassifierManager;
+  }
+
+  public JreSystemVersion getJreSystemVersion() {
+    return JreSystemVersion
+        .valueOf(preferencesService.get(PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION, PLUGIN_ID, preferencesLookup));
   }
 
   private class WorkspaceSourceDownloadJob extends Job implements IBackgroundProcessingQueue {
