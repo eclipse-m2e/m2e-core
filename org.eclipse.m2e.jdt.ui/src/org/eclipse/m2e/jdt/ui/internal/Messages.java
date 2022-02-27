@@ -32,6 +32,16 @@ public class Messages extends NLS {
 
   public static String MavenClasspathContainerPage_title;
 
+  public static String MavenPreferencePage_workspaceDefaultJreLink;
+
+  public static String MavenPreferencePage_executionEnvironmentJreLink;
+
+  public static String MavenPreferencePage_jreSystemLibraryVersion;
+
+  public static String MavenPreferencePage_useExecutionEnvironment;
+
+  public static String MavenPreferencePage_useWorkspaceDefault;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

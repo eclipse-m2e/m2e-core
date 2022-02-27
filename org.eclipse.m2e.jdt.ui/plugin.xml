@@ -313,5 +313,27 @@
                label="%action.javadoc4.label"
                enablesFor="1"/>
       </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+            class="org.eclipse.m2e.jdt.ui.internal.MavenJavaConfiguratorPreferencePage"
+            id="org.eclipse.m2e.core.preferences.MavenJdtPreferencePage"
+            name="%m2.page.javaconfigurator.name">
+         <keywordReference
+               id="org.eclipse.m2e.core.maven">
+         </keywordReference>
+         <keywordReference
+               id="org.eclipse.m2e.jdt.keyword">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="org.eclipse.m2e.jdt.keyword"
+            label="java">
+      </keyword>
    </extension>   
 </fragment>
