@@ -26,6 +26,7 @@
 	<properties>
 		<dependency.jars.folder>jars</dependency.jars.folder>
 		<dependency.sources.folder>jars/sources</dependency.sources.folder>
+		<failIfMacSigningFailed>false</failIfMacSigningFailed>
 	</properties>
 
 	<modules>
@@ -313,6 +314,12 @@
 			</build>
 		</profile>
 		<profile>
+			<id>eclipse-sign</id>
+			<properties>
+				<failIfMacSigningFailed>true</failIfMacSigningFailed>
+			</properties>
+		</profile>
+		<profile>
 			<id>eclipse-sign-jnilibs</id>
 			<activation>
 				<file>
@@ -361,14 +368,14 @@
 														<local name="jnilibFile" />
 														<property name="jnilibFile" value="@{jnilibFileAbsolute}" relative="true" basedir="${signingDir}" />
 														<move file="@{jnilibFileAbsolute}" tofile="@{jnilibFileAbsolute}-tosign" />
-														<exec executable="curl" dir="${signingDir}" failonerror="true">
+														<exec executable="curl" dir="${signingDir}" failonerror="${failIfMacSigningFailed}">
 															<arg value="-o" />
 															<arg value="${jnilibFile}" />
 															<arg value="-F" />
 															<arg value="file=@${jnilibFile}-tosign" />
 															<arg value="https://cbi.eclipse.org/macos/codesign/sign" />
 														</exec>
-														<exec executable="jar" dir="${signingDir}" failonerror="true">
+														<exec executable="jar" dir="${signingDir}" failonerror="${failIfMacSigningFailed}">
 															<arg value="--update" />
 															<arg value="--file=@{jarFile}" />
 															<arg value="${jnilibFile}" />
