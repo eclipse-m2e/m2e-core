@@ -312,5 +312,78 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>eclipse-sign-jnilibs</id>
+			<activation>
+				<file>
+					<exists>eclipse-sign-jnilibs.properties</exists>
+				</file>
+			</activation>
+			<!-- 
+			To activate jnilib signing for a bundle, create a file in the project called 'eclipse-sign-jnilibs.properties' and
+			define as value of the key 'jars.directory' the directory that contains the jars whose *.jnilib files have to be signed.
+			The following ant-script then extracts all .jnilib files, sign them and repacks them into the jar file. 
+			-->
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-jnilibs-files</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>generate-resources</phase> <!-- Do this before extracting sources-->
+								<configuration>
+									<target>
+										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
+										<!-- and http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
+										<taskdef resource="net/sf/antcontrib/antlib.xml" />
+										<loadproperties srcFile="${project.basedir}/eclipse-sign-jnilibs.properties" prefix="signProperties." />
+										<for param="jarFile">
+											<fileset dir="${project.basedir}/${signProperties.jars.directory}" includes="**/*.jar" />
+											<sequential>
+												<local name="jarFilename" />
+												<basename property="jarFilename" file="@{jarFile}" suffix=".jar" />
+												<local name="signingDir" />
+												<property name="signingDir" value="${project.build.directory}/jnilibs-signing/${jarFilename}" />
+
+												<unzip src="@{jarFile}" dest="${signingDir}">
+													<patternset includes="**/*.jnilib" />
+												</unzip>
+
+												<for param="jnilibFileAbsolute">
+													<fileset dir="${signingDir}" includes="**/*.jnilib" erroronmissingdir="false" />
+													<sequential>
+														<echo level="info" message="Mac-sign @{jnilibFileAbsolute}" />
+														<local name="jnilibFile" />
+														<property name="jnilibFile" value="@{jnilibFileAbsolute}" relative="true" basedir="${signingDir}" />
+														<move file="@{jnilibFileAbsolute}" tofile="@{jnilibFileAbsolute}-tosign" />
+														<exec executable="curl" dir="${signingDir}" failonerror="true">
+															<arg value="-o" />
+															<arg value="${jnilibFile}" />
+															<arg value="-F" />
+															<arg value="file=@${jnilibFile}-tosign" />
+															<arg value="https://cbi.eclipse.org/macos/codesign/sign" />
+														</exec>
+														<exec executable="jar" dir="${signingDir}" failonerror="true">
+															<arg value="--update" />
+															<arg value="--file=@{jarFile}" />
+															<arg value="${jnilibFile}" />
+														</exec>
+													</sequential>
+												</for>
+											</sequential>
+										</for>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>
