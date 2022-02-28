@@ -192,6 +192,26 @@
 								</execution>
 							</executions>
 						</plugin>
+						<plugin>
+							<groupId>org.eclipse.tycho</groupId>
+							<artifactId>target-platform-configuration</artifactId>
+							<executions>
+								<execution>
+									<id>default-target-platform</id>
+									<phase>none</phase>
+								</execution>
+							</executions>
+						</plugin>
+						<plugin>
+							<groupId>org.eclipse.tycho</groupId>
+							<artifactId>tycho-compiler-plugin</artifactId>
+							<executions>
+								<execution>
+									<id>default-validate-classpath</id>
+									<phase>none</phase>
+								</execution>
+							</executions>
+						</plugin>
 					</plugins>
 				</pluginManagement>
 				<plugins>
