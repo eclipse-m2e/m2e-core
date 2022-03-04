@@ -13,6 +13,16 @@ The legacy textual editor is removed as it doesn't receive enough update/mainten
 
 m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e and are shipped by default with m2e installations. So annotation processing should be better supported out of the box.
 
+## 1.20.1
+
+* 📅 Release Date: March 04th 2022
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.0...1.20.1
+
+### Sign *.jnilib files for macOS ###
+
+Embedded *.jnilib files are now signed for macOS to fulfill macOS-notarization requirements.
+
+
 ## 1.20.0
 
 * 📅 Release Date: February 11th 2022
