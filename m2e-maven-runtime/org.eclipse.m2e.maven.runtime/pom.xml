@@ -19,14 +19,14 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>1.18.3-SNAPSHOT</version>
+	<version>1.18.4-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.8.4</maven-core.version>
+		<maven-core.version>3.8.5</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
