@@ -24,11 +24,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
-import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.framework.VersionRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +35,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.osgi.service.resolver.VersionRange;
-
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.core.runtime.Platform;
 
 
 /**
@@ -54,16 +50,13 @@ public class ProjectRegistryReader {
 
   private final File stateFile;
 
-  private static PackageAdmin packageAdmin;
-
   public ProjectRegistryReader(File stateLocationDir) {
     this.stateFile = new File(stateLocationDir, WORKSPACE_STATE);
   }
 
   public ProjectRegistry readWorkspaceState(final ProjectRegistryManager managerImpl) {
     if(stateFile.exists()) {
-      final PackageAdmin packageAdmin = getPackageAdmin();
-      try (ObjectInputStream is = createObjectInputStream(managerImpl, packageAdmin)) {
+      try (ObjectInputStream is = createObjectInputStream(managerImpl)) {
         return (ProjectRegistry) is.readObject();
       } catch(Exception ex) {
         log.error("Can't read workspace state", ex);
@@ -72,8 +65,7 @@ public class ProjectRegistryReader {
     return null;
   }
 
-  private ObjectInputStream createObjectInputStream(final ProjectRegistryManager managerImpl,
-      final PackageAdmin packageAdmin) throws IOException {
+  private ObjectInputStream createObjectInputStream(ProjectRegistryManager managerImpl) throws IOException {
     return new ObjectInputStream(new BufferedInputStream(new FileInputStream(stateFile))) {
       {
         enableResolveObject(true);
@@ -92,16 +84,15 @@ public class ProjectRegistryReader {
       }
 
       @Override
-      protected java.lang.Class<?> resolveClass(java.io.ObjectStreamClass desc)
-          throws IOException, ClassNotFoundException {
+      protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         String symbolicName = (String) readObject();
         if(symbolicName == null) {
           return super.resolveClass(desc);
         }
         String versionStr = (String) readObject();
         Version version = Version.parseVersion(versionStr);
-        VersionRange versionRange = new VersionRange(version, true, version, true);
-        Bundle[] bundles = packageAdmin.getBundles(symbolicName, versionRange.toString());
+        VersionRange range = new VersionRange(VersionRange.LEFT_CLOSED, version, version, VersionRange.RIGHT_CLOSED);
+        Bundle[] bundles = Platform.getBundles(symbolicName, range.toString());
         if(bundles == null || bundles.length != 1) {
           throw new ClassNotFoundException("Could not find bundle " + symbolicName + "/" + version //$NON-NLS-1$ //$NON-NLS-2$
               + " required to load class " + desc.getName()); //$NON-NLS-1$
@@ -111,20 +102,8 @@ public class ProjectRegistryReader {
     };
   }
 
-  private static synchronized PackageAdmin getPackageAdmin() {
-    // TODO inject dependencies already!
-    if(packageAdmin == null) {
-      BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
-      ServiceReference<PackageAdmin> serviceReference = context.getServiceReference(PackageAdmin.class);
-      packageAdmin = context.getService(serviceReference);
-    }
-    return packageAdmin;
-  }
-
   public void writeWorkspaceState(ProjectRegistry state) {
-    final ClassLoader thisClassloader = getClass().getClassLoader();
-
-    try (ObjectOutputStream os = createObjectOutputStream(thisClassloader)) {
+    try (ObjectOutputStream os = createObjectOutputStream()) {
       synchronized(state) { // see MNGECLIPSE-860
         os.writeObject(state);
       }
@@ -133,7 +112,8 @@ public class ProjectRegistryReader {
     }
   }
 
-  private ObjectOutputStream createObjectOutputStream(final ClassLoader thisClassloader) throws IOException {
+  private ObjectOutputStream createObjectOutputStream() throws IOException {
+    ClassLoader thisClassloader = getClass().getClassLoader();
     return new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(stateFile))) {
       {
         enableReplaceObject(true);
@@ -152,7 +132,7 @@ public class ProjectRegistryReader {
       }
 
       @Override
-      protected void annotateClass(java.lang.Class<?> cl) throws IOException {
+      protected void annotateClass(Class<?> cl) throws IOException {
         // if the class is visible through this classloader, assume it will be during reading stream back
         try {
           Class<?> target = cl;
