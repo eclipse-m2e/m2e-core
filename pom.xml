@@ -22,6 +22,7 @@
 		for Maven into the IDE</description>
 	<url>https://www.eclipse.org/m2e</url>
 	<inceptionYear>2005</inceptionYear>
+	<!-- Some change -->
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
