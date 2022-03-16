@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,7 @@ import org.eclipse.ui.internal.genericeditor.ExtensionBasedTextEditor;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
 import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.IElementStateListener;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
@@ -196,7 +198,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     //handle project delete
     if(event.getType() == IResourceChangeEvent.PRE_CLOSE || event.getType() == IResourceChangeEvent.PRE_DELETE) {
       if(pomFile.getProject().equals(event.getResource())) {
-        Display.getDefault().asyncExec(() -> close(false));
+
       }
       return;
     }
@@ -382,22 +384,51 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   private void initializeSourceDocument() {
-    IDocumentProvider p = sourcePage.getDocumentProvider();
-    if(p == null) {
+    documentProvider = sourcePage.getDocumentProvider();
+    if(documentProvider == null) {
       return;
     }
-    sourceDocument = p.getDocument(this.getEditorInput());
-    if(p instanceof TextFileDocumentProvider) {
+    sourceDocument = documentProvider.getDocument(this.getEditorInput());
+    if(documentProvider instanceof TextFileDocumentProvider) {
       try {
         // not clear why, but some documents are sometimes not synchronized at this stage
         // and this causes some strange dirtiness behavior or non-working refactorings.
         // It's most probably some disposal issue but no better solution was found yet.
         // so let's force synchronization...
-        ((TextFileDocumentProvider) p).synchronize(getEditorInput());
+        ((TextFileDocumentProvider) documentProvider).synchronize(getEditorInput());
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }
     }
+    closeEditorOnDocumentDeletion = new IElementStateListener() {
+      @Override
+      public void elementMoved(Object originalElement, Object movedElement) {
+        // TODO handle move
+      }
+
+      @Override
+      public void elementDirtyStateChanged(Object element, boolean isDirty) {
+        // nothing to do
+      }
+
+      @Override
+      public void elementDeleted(Object element) {
+        if(Objects.equals(element, getEditorInput())) {
+          Display.getDefault().asyncExec(() -> close(false));
+        }
+      }
+
+      @Override
+      public void elementContentReplaced(Object element) {
+        // nothing to do
+      }
+
+      @Override
+      public void elementContentAboutToBeReplaced(Object element) {
+        // nothing to do
+      }
+    };
+    documentProvider.addElementStateListener(closeEditorOnDocumentDeletion);
   }
 
   protected void selectActivePage() {
@@ -687,11 +718,15 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   public void dispose() {
     disposed = true;
 
-    if(sourceDocument != null && documentListener != null) {
-      sourceDocument.removeDocumentListener(documentListener);
-      sourceDocument = null;
-      documentListener = null;
+    if(sourceDocument != null) {
+      if(closeEditorOnDocumentDeletion != null && documentProvider != null) {
+        documentProvider.removeElementStateListener(closeEditorOnDocumentDeletion);
+      }
+      if(documentListener != null) {
+        sourceDocument.removeDocumentListener(documentListener);
+      }
     }
+    sourceDocument = null;
     // should properly dispose the document
     sourcePage.dispose();
 
@@ -838,6 +873,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   private boolean checkedWritableStatus;
 
   private boolean readOnly;
+
+  private IDocumentProvider documentProvider;
+
+  private IElementStateListener closeEditorOnDocumentDeletion;
 
   /**
    * read/write check for read only pom files -- called when the file is opened and will validateEdit -- so files will
