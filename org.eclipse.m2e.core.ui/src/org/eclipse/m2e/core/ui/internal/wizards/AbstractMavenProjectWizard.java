@@ -50,12 +50,6 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
     }
   }
 
-  @Override
-  public void dispose() {
-    M2EUIPluginActivator.getDefault().ungetMavenDiscovery(discovery);
-    super.dispose();
-  }
-
   public ProjectImportConfiguration getProjectImportConfiguration() {
     return importConfiguration;
   }

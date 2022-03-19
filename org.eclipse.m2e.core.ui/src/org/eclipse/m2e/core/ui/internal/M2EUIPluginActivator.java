@@ -14,6 +14,11 @@
 
 package org.eclipse.m2e.core.ui.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -22,16 +27,31 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.ResourceLocator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.ui.progress.UIJob;
+
+import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
@@ -87,6 +107,17 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     mavenUpdateConfigurationChangeListener = new MavenUpdateConfigurationChangeListener();
     workspace.addResourceChangeListener(mavenUpdateConfigurationChangeListener, IResourceChangeEvent.POST_CHANGE);
 
+    // Automatically delete obsolete caches 
+    // TODO: can be removed when some time has passed and it is unlikely old workspaces that need clean-up are used.
+    MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
+    IPath nexusCache = Platform.getStateLocation(mavenPlugin.getBundle()).append("nexus");
+    FileUtils.deleteDirectory(nexusCache.toFile());
+
+    File localRepo = mavenPlugin.getRepositoryRegistry().getLocalRepository().getBasedir();
+    Path m2eCache = localRepo.toPath().resolve(".cache/m2e/");
+    if(Files.isDirectory(m2eCache)) {
+      deleteLegacyCacheDirectory(m2eCache);
+    }
   }
 
   @Override
@@ -146,14 +177,6 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   }
 
   /**
-   * @param discovery
-   */
-  public void ungetMavenDiscovery(IMavenDiscovery discovery) {
-    // TODO Auto-generated method ungetMavenDiscovery
-
-  }
-
-  /**
    * @return
    */
   public IMavenDiscoveryUI getImportWizardPageFactory() {
@@ -178,6 +201,50 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
       }
     }
     return this.archetypeManager.getService();
+  }
+
+  private static void deleteLegacyCacheDirectory(Path m2eCache) {
+    Path resolve = m2eCache.resolve("DELETE_ME.txt");
+    if(Files.isRegularFile(resolve) || Boolean.parseBoolean(System.getProperty("m2e.keep.legacy.cache"))) {
+      return;
+    }
+    new UIJob("Delete legacy M2E cache") {
+      @Override
+      public IStatus runInUIThread(IProgressMonitor monitor) {
+        boolean[] askAgain = new boolean[] {true};
+        MessageDialog dialog = new MessageDialog(getDisplay().getActiveShell(), "Delete obsolete M2E cache?", null,
+            "A cache directory used by previous M2E versions was detected:\n\n" + m2eCache + "\n\n"
+                + "It's no longer used by newer M2E versions and, unless older Eclipse installations need it, can be safely deleted.",
+            MessageDialog.QUESTION, 0, "Keep Cache", "Delete Cache") {
+          @Override
+          protected Control createCustomArea(Composite parent) {
+            Button checkbox = new Button(parent, SWT.CHECK);
+            checkbox.setText("Don't ask me again?");
+            checkbox.addSelectionListener(
+                SelectionListener.widgetSelectedAdapter(e -> askAgain[0] = !checkbox.getSelection()));
+            return super.createCustomArea(parent);
+          }
+        };
+        int selection = dialog.open();
+        if(selection == 1) {
+          try {
+            FileUtils.deleteDirectory(m2eCache.toFile());
+          } catch(IOException e) {
+            return Status.error("Failed to delete legacy M2E cache", e);
+          }
+        } else if(!askAgain[0]) {
+          try {
+            Files.writeString(resolve,
+                """
+                    This cache directory was created by a previous Maven2Eclipse 1.x version and is no longer used since M2E 2.0.
+                    Unless older Eclipse installations need it, it can be deleted safely."
+                    """);
+          } catch(IOException ex) { // Ignore
+          }
+        }
+        return Status.OK_STATUS;
+      }
+    }.schedule(10_000);
   }
 
 }
