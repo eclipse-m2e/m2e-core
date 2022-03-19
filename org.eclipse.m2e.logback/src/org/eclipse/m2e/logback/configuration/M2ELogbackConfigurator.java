@@ -14,10 +14,11 @@
 
 package org.eclipse.m2e.logback.configuration;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.Timer;
@@ -69,22 +70,35 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
   private synchronized void configureLogback(LoggerContext lc) {
     try {
       Bundle bundle = Platform.getBundle("org.eclipse.m2e.logback"); // This is a fragment -> FrameworkUtil.getBundle() returns host
-      File stateDir = Platform.getStateLocation(bundle).toFile();
-      File configFile = new File(stateDir, "logback." + bundle.getVersion() + ".xml"); //$NON-NLS-1$  //$NON-NLS-2$
-      LOG.info("Logback config file: " + configFile.getAbsolutePath()); //$NON-NLS-1$
+      Path stateDir = Platform.getStateLocation(bundle).toFile().toPath();
+      Path configFile = stateDir.resolve("logback." + bundle.getVersion() + ".xml"); //$NON-NLS-1$  //$NON-NLS-2$
+      LOG.info("Logback config file: " + configFile.toAbsolutePath()); //$NON-NLS-1$
 
-      if(!configFile.isFile()) {
+      if(!Files.isRegularFile(configFile)) {
         // Copy the default config file to the actual config file, to allow user adjustments
         try (InputStream is = bundle.getEntry("defaultLogbackConfiguration/logback.xml").openStream()) { //$NON-NLS-1$
-          configFile.getParentFile().mkdirs();
-          Files.copy(is, configFile.toPath());
+          Files.createDirectories(configFile.getParent());
+          Files.copy(is, configFile);
         }
       }
       if(System.getProperty(PROPERTY_LOG_DIRECTORY, "").length() <= 0) { //$NON-NLS-1$
-        System.setProperty(PROPERTY_LOG_DIRECTORY, stateDir.getAbsolutePath());
+        System.setProperty(PROPERTY_LOG_DIRECTORY, stateDir.toAbsolutePath().toString());
       }
-      loadConfiguration(lc, configFile.toURI().toURL());
+      loadConfiguration(lc, configFile.toUri().toURL());
 
+      //Delete old logs in legacy logback plug-in's state location. Can sum up to 1GB of disk-space. 
+      // TODO: can be removed when some time has passed and it is unlikely old workspaces that need clean-up are used.
+      Path legacyLogbackState = stateDir.resolveSibling("org.eclipse.m2e.logback.configuration");
+      if(Files.isDirectory(legacyLogbackState)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(legacyLogbackState)) {
+          for(Path path : stream) {
+            if(Files.isRegularFile(path)) {
+              Files.delete(path);
+            }
+          }
+        }
+        Files.delete(legacyLogbackState);
+      }
     } catch(Exception e) {
       LOG.log(Status.warning("Exception while setting up logging:" + e.getMessage(), e)); //$NON-NLS-1$
     }

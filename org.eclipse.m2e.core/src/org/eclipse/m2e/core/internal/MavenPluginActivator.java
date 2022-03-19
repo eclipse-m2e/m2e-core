@@ -31,12 +31,9 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.util.FileUtils;
 
 import org.apache.maven.project.DefaultProjectBuilder;
 
@@ -118,9 +115,6 @@ public class MavenPluginActivator extends Plugin {
     this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
         new MvnProtocolHandlerService(), FrameworkUtil.asDictionary(properties));
 
-    // Automatically delete now obsolete nexus cache (can be removed again if some time has passed and it is unlikely an old workspace that need to be cleaned up is used).
-    IPath nexusCache = Platform.getStateLocation(context.getBundle()).append("nexus");
-    FileUtils.deleteDirectory(nexusCache.toFile());
   }
 
   /**
