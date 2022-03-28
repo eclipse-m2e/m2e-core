@@ -75,14 +75,14 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 		return mavenRuntimeJars;
 	}
 
-	private static void addJarsFromBundle(Bundle bundle, String resource, List<File> jarFiles) {
+	private static void addJarsFromBundle(Bundle bundle, String folder, List<File> jarFiles) {
 		try {
-			URL fileURL = FileLocator.toFileURL(bundle.getResource(resource));
-			Path jarDir = Path.of(fileURL.toURI());
+			URL fileURL = FileLocator.toFileURL(bundle.getResource(folder));
+			Path jarDir = Path.of(fileURL.getFile());
 			try (Stream<Path> paths = Files.walk(jarDir, 1)) {
 				paths.filter(Files::isRegularFile).map(Path::toFile).forEach(jarFiles::add);
 			}
-		} catch (IOException | URISyntaxException e) {
+		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
