@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.lsp4e.LanguageServersRegistry;
 import org.eclipse.lsp4e.LanguageServersRegistry.LanguageServerDefinition;
 import org.eclipse.lsp4e.LanguageServiceAccessor;
@@ -78,11 +79,11 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 	private static void addJarsFromBundle(Bundle bundle, String folder, List<File> jarFiles) {
 		try {
 			URL fileURL = FileLocator.toFileURL(bundle.getResource(folder));
-			Path jarDir = Path.of(fileURL.getFile());
+			Path jarDir = Path.of(URIUtil.toURI(fileURL));
 			try (Stream<Path> paths = Files.walk(jarDir, 1)) {
 				paths.filter(Files::isRegularFile).map(Path::toFile).forEach(jarFiles::add);
 			}
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			LOG.error(e.getMessage(), e);
 		}
 	}
