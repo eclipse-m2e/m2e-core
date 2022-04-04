@@ -30,6 +30,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -138,6 +139,13 @@ public interface IMavenProjectFacade {
   Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
   /**
+   * Gets an access to a Maven instance, configured according to this project.
+   * 
+   * @return a Maven instance, configured according to this project
+   */
+  IMaven getMaven();
+
+  /**
    * Returns fully setup MojoExecution instance bound to project build lifecycle that matches provided mojoExecutionKey.
    * Returns null if no such mojo execution.
    */
@@ -156,4 +164,5 @@ public interface IMavenProjectFacade {
   String getLifecycleMappingId();
 
   Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
+
 }

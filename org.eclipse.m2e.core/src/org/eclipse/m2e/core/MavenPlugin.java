@@ -18,6 +18,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
@@ -41,6 +42,11 @@ public final class MavenPlugin {
     return INSTANCE;
   }
 
+  /**
+   * Use {@link IMavenProjectFacade#getMaven()} instead whenever possible
+   * 
+   * @return a generic Maven instance (not customized by project).
+   */
   public static IMaven getMaven() {
     return MavenPluginActivator.getDefault().getMaven();
   }
