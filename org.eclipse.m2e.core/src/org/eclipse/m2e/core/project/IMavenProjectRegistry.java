@@ -73,6 +73,8 @@ public interface IMavenProjectRegistry {
   IMavenProjectFacade[] getProjects();
 
   /**
+   * You can also use <code>Adapters.adapt(resource, IMavenProjectFacade.class)</code>.
+   * 
    * @return IMavenProjectFacade cached IMavenProjectFacade corresponding to the project or null if there is no cache
    *         entry for the project.
    */
