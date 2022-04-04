@@ -134,15 +134,5 @@
             class="org.eclipse.m2e.core.internal.project.WorkspaceTestsClassifierResolver">
       </resolver>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.core.resources.IResource"
-            class="org.eclipse.m2e.core.internal.project.registry.ProjectFacadeAdapterFactory">
-         <adapter
-               type="org.eclipse.m2e.core.project.IMavenProjectFacade">
-         </adapter>
-      </factory>
-   </extension>
    
 </plugin>

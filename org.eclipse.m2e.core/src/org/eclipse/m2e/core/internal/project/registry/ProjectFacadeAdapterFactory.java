@@ -9,12 +9,17 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.internal.project.registry;
 
+import org.osgi.service.component.annotations.Component;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdapterFactory;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
+
+@Component(service = IAdapterFactory.class, property = {
+    IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.core.resources.IResource"})
 public class ProjectFacadeAdapterFactory implements IAdapterFactory {
 
   private static final Class<?>[] ADAPTER_LIST = {IMavenProjectFacade.class};
