@@ -36,6 +36,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
@@ -527,5 +528,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public List<MojoExecution> getExecutionPlan(String lifecycle, IProgressMonitor monitor) throws CoreException {
     Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
     return executionPlans != null ? executionPlans.get(lifecycle) : null;
+  }
+
+  @Override
+  public IMaven getMaven() {
+    // TODO: if project has Maven customization (such as a .mvn, MAVEN_OPTS...)
+    return MavenPlugin.getMaven();
   }
 }
