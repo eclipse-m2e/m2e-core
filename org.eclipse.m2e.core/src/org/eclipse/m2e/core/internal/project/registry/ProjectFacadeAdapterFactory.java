@@ -10,12 +10,13 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdapterFactory;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 @Component(service = IAdapterFactory.class, property = {
@@ -24,10 +25,16 @@ public class ProjectFacadeAdapterFactory implements IAdapterFactory {
 
   private static final Class<?>[] ADAPTER_LIST = {IMavenProjectFacade.class};
 
+  @Reference
+  private IMavenProjectRegistry mavenProjectRegistry;
+
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-    if(adaptableObject instanceof IResource && adapterType == IMavenProjectFacade.class) {
-      return (T) MavenPlugin.getMavenProjectRegistry().getProject(((IResource) adaptableObject).getProject());
+    if(adaptableObject instanceof IResource) {
+      IResource resource = (IResource) adaptableObject;
+      if(adapterType == IMavenProjectFacade.class) {
+        return adapterType.cast(mavenProjectRegistry.getProject(resource.getProject()));
+      }
     }
     return null;
   }

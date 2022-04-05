@@ -85,6 +85,7 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -258,6 +259,8 @@ public class MavenPluginActivator extends Plugin {
     // Automatically delete now obsolete nexus cache (can be removed again if some time has passed and it is unlikely an old workspace that need to be cleaned up is used).
     IPath nexusCache = Platform.getStateLocation(context.getBundle()).append("nexus");
     FileUtils.deleteDirectory(nexusCache.toFile());
+    //register as service to make static method access obsolete...
+    bundleContext.registerService(IMavenProjectRegistry.class, projectManager, null);
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
