@@ -1,0 +1,21 @@
+# This workflow will check for Maven projects if the licenses of all (transitive) dependencies are vetted.
+
+name: License vetting status check
+
+on:
+  pull_request:
+    branches: 
+      - 'master'
+  issue_comment:
+    types: [created]
+
+jobs:
+  call-license-check:
+    uses: HannesWell/dash-licenses/.github/workflows/mavenLicenseCheck.yml@master
+    with:
+      projectId: technology.m2e
+      setupScript: |
+        mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata
+    secrets:
+      githubToken: ${{ secrets.GITHUB_TOKEN }}
+      gitlabAPIToken: ${{ secrets.M2E_GITLAB_API_TOKEN }}
