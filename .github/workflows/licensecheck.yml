@@ -11,21 +11,15 @@ on:
     branches: 
      - 'master'
      - 'm2e-*'
+  issue_comment:
+    types: [created]
 
 jobs:
-  check-licenses:
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - uses: actions/checkout@v3
-    - uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: 'maven'
-
-    - run: mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata
-
-    - name: Check license vetting status
-      run: mvn -U -B -ntp org.eclipse.dash:license-tool-plugin:license-check -Ddash.fail=true
+  call-license-check:
+    uses: eclipse/dash-licenses/.github/workflows/mavenLicenseCheck.yml@master
+    with:
+      projectId: technology.m2e
+      setupScript: |
+        mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata
+    secrets:
+      gitlabAPIToken: ${{ secrets.M2E_GITLAB_API_TOKEN }}
