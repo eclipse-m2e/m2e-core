@@ -26,7 +26,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<tycho-version>2.7.0</tycho-version>
+		<tycho-version>2.7.1</tycho-version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -351,10 +351,6 @@
 	</build>
 
 	<pluginRepositories>
-		<pluginRepository>
-			<id>tycho-snapshots</id>
-			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
-		</pluginRepository>
 		<pluginRepository>
 			<id>cbi-releases</id>
 			<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
