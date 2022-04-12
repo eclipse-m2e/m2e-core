@@ -15,9 +15,6 @@ package org.eclipse.m2e.core.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,8 +41,6 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  */
 public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo> {
-  private final File workspaceRoot;
-
   private final List<String> folders;
 
   private final boolean basedirRemameRequired;
@@ -54,13 +49,9 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   private final MavenModelManager modelManager;
 
-  public LocalProjectScanner(File workspaceRoot, String folder, boolean needsRename, MavenModelManager modelManager) {
-    this(workspaceRoot, Collections.singletonList(folder), needsRename, modelManager);
-  }
 
-  public LocalProjectScanner(File workspaceRoot, List<String> folders, boolean basedirRemameRequired,
+  public LocalProjectScanner(List<String> folders, boolean basedirRemameRequired,
       MavenModelManager modelManager) {
-    this.workspaceRoot = workspaceRoot;
     this.folders = folders;
     this.basedirRemameRequired = basedirRemameRequired;
     this.modelManager = modelManager;
@@ -144,12 +135,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       if(!pomFile.exists()) {
         return null;
       }
-
-      Model model = null;
-      try (InputStream pomStream = Files.newInputStream(pomFile.toPath())) {
-        model = modelManager.readMavenModel(pomStream);
-      }
-
+      Model model = modelManager.readMavenModel(pomFile);
       String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
 
       if(model.getArtifactId() == null) {

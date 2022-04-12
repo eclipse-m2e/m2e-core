@@ -866,8 +866,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       // XXX Archetyper don't allow to specify project folder
       String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
 
-      LocalProjectScanner scanner = new LocalProjectScanner(workspaceRoot.getLocation().toFile(), //
-          projectFolder, true, mavenModelManager);
+      LocalProjectScanner scanner = new LocalProjectScanner(List.of(projectFolder), true, mavenModelManager);
       scanner.run(monitor);
 
       Set<MavenProjectInfo> projectSet = collectProjects(scanner.getProjects());
@@ -964,7 +963,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
       projectInfo.setModel(model);
     }
-
+    model.setPomFile(pomFile);
     String projectName = configuration.getProjectName(model);
 
     File projectDir = pomFile.getParentFile();

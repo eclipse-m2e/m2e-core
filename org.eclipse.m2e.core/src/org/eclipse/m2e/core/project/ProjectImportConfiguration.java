@@ -35,13 +35,13 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 public class ProjectImportConfiguration {
 
-  private static final String GROUP_ID = "\\[groupId\\]"; //$NON-NLS-1$
+  private static final String GROUP_ID = "[groupId]"; //$NON-NLS-1$
 
-  private static final String ARTIFACT_ID = "\\[artifactId\\]"; //$NON-NLS-1$
+  private static final String ARTIFACT_ID = "[artifactId]"; //$NON-NLS-1$
 
-  private static final String VERSION = "\\[version\\]"; //$NON-NLS-1$
+  private static final String VERSION = "[version]"; //$NON-NLS-1$
 
-  private static final String NAME = "\\[name\\]"; //$NON-NLS-1$
+  private static final String NAME = "[name]"; //$NON-NLS-1$
 
   /** resolver configuration bean */
   private final ResolverConfiguration resolverConfiguration;
@@ -82,8 +82,12 @@ public class ProjectImportConfiguration {
   @Deprecated
   public String getProjectName(Model model) {
     // XXX should use resolved MavenProject or Model
-    if(projectNameTemplate.length() == 0) {
-      return cleanProjectNameComponent(model.getArtifactId(), false);
+    if(projectNameTemplate.isEmpty()) {
+      String cleanProjectNameComponent = cleanProjectNameComponent(model.getArtifactId(), false);
+      if(cleanProjectNameComponent != null && !cleanProjectNameComponent.isEmpty()) {
+        return cleanProjectNameComponent;
+      }
+      return model.getPomFile().getParentFile().getName();
     }
 
     String artifactId = model.getArtifactId();
@@ -101,10 +105,10 @@ public class ProjectImportConfiguration {
     }
 
     // XXX needs MavenProjectManager update to resolve groupId and version
-    return projectNameTemplate.replaceAll(GROUP_ID, cleanProjectNameComponent(groupId, true))
-        .replaceAll(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
-        .replaceAll(NAME, cleanProjectNameComponent(name, true))
-        .replaceAll(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
+    return projectNameTemplate.replace(GROUP_ID, cleanProjectNameComponent(groupId, true))
+        .replace(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
+        .replace(NAME, cleanProjectNameComponent(name, true))
+        .replace(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
   }
 
   private static final String cleanProjectNameComponent(String value, boolean quote) {

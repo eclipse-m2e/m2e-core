@@ -85,7 +85,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
   final List<IWorkingSet> workingSets;
 
-  public MavenProjectCheckoutJob(ProjectImportConfiguration importConfiguration, boolean checkoutAllProjects,
+  MavenProjectCheckoutJob(ProjectImportConfiguration importConfiguration, boolean checkoutAllProjects,
       List<IWorkingSet> workingSets) {
     super(Messages.MavenProjectCheckoutJob_title);
     this.configuration = importConfiguration;
@@ -114,8 +114,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
       MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
 
-      LocalProjectScanner scanner = new LocalProjectScanner(workspace.getLocation().toFile(), operation.getLocations(),
-          true, modelManager);
+      LocalProjectScanner scanner = new LocalProjectScanner(operation.getLocations(), true, modelManager);
       scanner.run(monitor);
 
       this.projects = MavenPlugin.getProjectConfigurationManager().collectProjects(scanner.getProjects());

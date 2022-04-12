@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.m2e.importer.tests;
+package org.eclipse.m2e.core.ui.tests;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,23 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.project.MavenProjectConfigurator;
+import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
+import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.apache.commons.io.FileUtils;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
-import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.importer.internal.MavenProjectConfigurator;
-import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 
 
 public class MavenImporterTest extends AbstractMavenProjectTestCase {
@@ -47,7 +44,7 @@ public class MavenImporterTest extends AbstractMavenProjectTestCase {
   public void setUp() throws IOException {
     projectDirectory = new File(Files.createTempDirectory("m2e-tests").toFile(), "example1");
     projectDirectory.mkdirs();
-    copyDir(new File("resources/examples/example1"), projectDirectory);
+    copyDir(new File("resources/projects/example1"), projectDirectory);
 
     // Make sure projects don't have Eclipse metadata set
     new File(projectDirectory, ".project").delete();

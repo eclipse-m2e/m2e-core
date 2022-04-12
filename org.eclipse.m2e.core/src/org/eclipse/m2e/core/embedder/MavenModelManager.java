@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.embedder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -55,6 +56,7 @@ import org.eclipse.aether.util.graph.visitor.CloningDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.FilteringDependencyVisitor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -64,6 +66,7 @@ import org.eclipse.osgi.util.NLS;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -94,22 +97,24 @@ public class MavenModelManager {
     return maven.readModel(reader);
   }
 
-  /**
-   * @deprecated use {@link #readMavenModel(InputStream)} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
   public org.apache.maven.model.Model readMavenModel(File pomFile) throws CoreException {
-    return maven.readModel(pomFile);
+    try (FileInputStream stream = new FileInputStream(pomFile)) {
+      Model model = readMavenModel(stream);
+      model.setPomFile(pomFile);
+      return model;
+    } catch(IOException ex) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, ex.getMessage(), ex));
+    }
   }
 
-  /**
-   * @deprecated use {@link #readMavenModel(InputStream)} instead.
-   */
-  @Deprecated
   public org.apache.maven.model.Model readMavenModel(IFile pomFile) throws CoreException {
     try (InputStream is = pomFile.getContents()) {
-      return maven.readModel(is);
+      Model model = maven.readModel(is);
+      IPath location = pomFile.getLocation();
+      if(location != null) {
+        model.setPomFile(location.toFile());
+      }
+      return model;
     } catch(IOException ex) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, null, ex));
     }
