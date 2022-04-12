@@ -32,7 +32,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.importer.internal.MavenProjectConfigurator;
+import org.eclipse.m2e.core.ui.internal.project.MavenProjectConfigurator;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
@@ -46,7 +46,8 @@ public class ImportJavaProjectTest extends AbstractMavenProjectTestCase {
 
   private File parentproject;
 
-  @Before
+  @Override
+@Before
   public void setUp() throws IOException {
     parentproject = createProjectDirectory("projects/parentproject", "parentproject");
   }
@@ -64,7 +65,8 @@ public class ImportJavaProjectTest extends AbstractMavenProjectTestCase {
     return file;
   }
 
-  @After
+  @Override
+@After
   public void tearDown() throws IOException {
     FileUtils.deleteDirectory(this.parentproject.getParentFile());
   }

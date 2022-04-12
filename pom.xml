@@ -72,7 +72,6 @@
 		<module>org.eclipse.m2e.scm</module>
 		<module>org.eclipse.m2e.profiles.core</module>
 		<module>org.eclipse.m2e.profiles.ui</module>
-		<module>org.eclipse.m2e.importer</module>
 		<module>org.eclipse.m2e.binaryproject</module>
 		<module>org.eclipse.m2e.binaryproject.ui</module>
 		<module>org.eclipse.m2e.sourcelookup</module>
@@ -102,7 +101,6 @@
 		<!-- testing -->
 		<module>org.eclipse.m2e.core.tests</module>
 		<module>org.eclipse.m2e.core.ui.tests</module>
-		<module>org.eclipse.m2e.importer.tests</module>
 		<module>org.eclipse.m2e.binaryproject.tests</module>
 		<module>org.eclipse.m2e.editor.tests</module>
 		<module>org.eclipse.m2e.editor.lemminx.tests</module>

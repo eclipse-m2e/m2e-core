@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-package org.eclipse.m2e.importer.internal;
+package org.eclipse.m2e.core.ui.internal.project;
 
 import java.io.File;
 import java.util.Collection;
@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,6 +32,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
+import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
@@ -42,10 +44,9 @@ import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.wizards.LifecycleMappingDiscoveryHelper;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
-import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
-import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 public class MavenProjectConfigurator implements ProjectConfigurator {
 
@@ -75,7 +76,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                 getJobManager().join(SmartImportJob.class, monitor);
             } catch (InterruptedException ex) {
                 throw new CoreException(new Status(IStatus.WARNING,
-                        Activator.getDefault().getBundle().getSymbolicName(), ex.getMessage(), ex));
+                    M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
             }
             synchronized (this.toProcess) {
                 this.started = true;
@@ -171,7 +172,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                             false, false, monitor);
                 }
             }
-            return new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(),
+            return new Status(IStatus.CANCEL, M2EUIPluginActivator.PLUGIN_ID,
                     "Cancelled by user");
         }
 
@@ -184,13 +185,13 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
     @Override
     public Set<File> findConfigurableLocations(File root, IProgressMonitor monitor) {
-        LocalProjectScanner scanner = new LocalProjectScanner(
-                ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile(), root.getAbsolutePath(), false,
+      LocalProjectScanner scanner = new LocalProjectScanner(List.of(root.getAbsolutePath()), false,
                 MavenPlugin.getMavenModelManager());
         try {
             scanner.run(monitor);
         } catch (Exception ex) {
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
+          M2EUIPluginActivator.getDefault().getLog()
+              .log(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
             return null;
         }
         Queue<MavenProjectInfo> projects = new LinkedList<>();
@@ -260,7 +261,8 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                 UpdateMavenConfigurationJob.getInstance().schedule();
             }
         } catch (Exception ex) {
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
+          M2EUIPluginActivator.getDefault().getLog()
+              .log(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
         }
     }
 

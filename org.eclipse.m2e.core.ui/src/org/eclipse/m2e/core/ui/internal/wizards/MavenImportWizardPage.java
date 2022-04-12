@@ -47,7 +47,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -287,13 +286,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         return false;
       }
 
-      @Override
-      public void dispose() {
-      }
-
-      @Override
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      }
     });
 
     projectTreeViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new ProjectLabelProvider()));
@@ -390,13 +382,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return _rootDirectory == null || !_rootDirectory.equals(rootDirectory);
   }
 
-  @Override
-  public void dispose() {
-    super.dispose();
-  }
-
   public void scanProjects() {
-
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
     try {
       getWizard().getContainer().run(true, true, monitor -> projectScanner.run(monitor));
@@ -436,7 +422,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     } catch(InterruptedException ex) {
       // canceled
-
     } catch(InvocationTargetException ex) {
       Throwable e = ex.getCause() == null ? ex : ex.getCause();
       String msg;
@@ -601,15 +586,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
-    File root = workspaceRoot.getLocation().toFile();
     MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
     if(showLocation) {
       String location = rootDirectoryCombo.getText().trim();
-      if(location.length() > 0) {
-        return new LocalProjectScanner(root, location, basedirRemameRequired, modelManager);
+      if(!location.isEmpty()) {
+        return new LocalProjectScanner(List.of(location), basedirRemameRequired, modelManager);
       }
     } else if(locations != null && !locations.isEmpty()) {
-      return new LocalProjectScanner(root, locations, basedirRemameRequired, modelManager);
+      return new LocalProjectScanner(locations, basedirRemameRequired, modelManager);
     }
 
     // empty scanner
@@ -621,6 +605,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       @Override
       public void run(IProgressMonitor monitor) {
+        // do nothing
       }
     };
   }

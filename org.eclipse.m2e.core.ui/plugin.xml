@@ -720,4 +720,14 @@
             </command>
       </menuContribution>
    </extension>
+
+	<extension point="org.eclipse.ui.ide.projectConfigurators">
+		<projectConfigurator
+			class="org.eclipse.m2e.core.ui.internal.project.MavenProjectConfigurator"
+			label="Maven">
+			<activeWhen>
+				<hasFileRecursively filename="pom.xml"/>
+			</activeWhen>
+		</projectConfigurator>
+	</extension>
 </plugin>
