@@ -326,24 +326,6 @@
 						<resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.0.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>ant-contrib</groupId>
-							<artifactId>ant-contrib</artifactId>
-							<version>1.0b3</version>
-							<exclusions>
-								<exclusion>
-									<groupId>ant</groupId>
-									<artifactId>ant</artifactId>
-								</exclusion>
-							</exclusions>
-						</dependency>
-					</dependencies>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -373,31 +355,6 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>write-m2e.version-file</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<target> <!-- Write project.versions file read during build for the m2e-SDK feature -->
-										<taskdef resource="net/sf/antcontrib/antlib.xml" />
-										<if>
-											<equals arg1="${project.artifactId}" arg2="org.eclipse.m2e.sdk.feature" /> <!-- version-file file only required for m2e.sdk feature -->
-											<then>
-												<echo message="Write '${unqualifiedVersion}' to ${project.build.directory}/m2e.version" level="info" />
-												<echo message="${unqualifiedVersion}" file="${project.build.directory}/m2e.version" level="info" />
-											</then>
-										</if>
-									</target>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>

@@ -46,8 +46,17 @@ pipeline {
 								mkdir -p ${1}"
 							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
-						M2E_VERSION=$(<"org.eclipse.m2e.sdk.feature/target/m2e.version")
-						echo M2E_VERSION=$M2E_VERSION
+						# Read M2E branding version
+						regex='<feature id="org\.eclipse\.m2e\.sdk\.feature" version="([0-9]\.[0-9]\.[0-9])\.qualifier" '
+						content=$(echo $(<"org.eclipse.m2e.sdk.feature/feature.xml")) # replaces consecutive newline and tabs by single space
+						if [[ $content  =~ $regex ]]
+						then
+							M2E_VERSION="${BASH_REMATCH[1]}"
+							echo M2E_VERSION=$M2E_VERSION
+						else
+							echo Failed to read M2E_VERSION. Abort deployment.
+							exit 1
+						fi
 
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
