@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E PDE Integration
 Bundle-SymbolicName: org.eclipse.m2e.pde;singleton:=true
-Bundle-Version: 1.20.0.qualifier
+Bundle-Version: 2.0.0.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.19.0",
@@ -17,5 +17,6 @@ Bundle-Activator: org.eclipse.m2e.pde.Activator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.apache.commons.codec.digest;version="1.14.0",
  org.apache.commons.io;version="2.6.0",
- org.apache.commons.io.output;version="2.8.0"
+ org.apache.commons.io.output;version="2.8.0",
+ org.slf4j
 Bundle-Vendor: Eclipse.org - m2e

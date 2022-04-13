@@ -9,10 +9,14 @@
  *
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
+ *      Patrick Ziegler - Support contribution of Eclipse features via Maven repositories
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +31,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -62,14 +70,19 @@ import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
+import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MavenTargetLocation.class);
 	private static final String SOURCE_SUFFIX = ".source";
+	private static final String NOT_A_FEATURE = "not_a_feature";
 	public static final String ELEMENT_CLASSIFIER = "classifier";
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_VERSION = "version";
@@ -273,8 +286,66 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return POM_PACKAGE_TYPE.equals(artifact.getExtension());
 	}
 
+	private File getFeatureFile(Artifact artifact, CacheManager cacheManager) {
+		File baseFile = artifact.getFile();
+		
+		if(baseFile == null) {
+			return null;
+		} else if (baseFile.isDirectory()) {
+			File featureFile = new File(baseFile, ICoreConstants.FEATURE_FILENAME_DESCRIPTOR);
+			return featureFile.exists() ? featureFile : null;
+		} else if (DEFAULT_PACKAGE_TYPE.equals(FilenameUtils.getExtension(baseFile.getName()))) {
+			return unpackFeatureFile(artifact, cacheManager);
+		}
+		
+		return null;
+	}
+	
+	private File unpackFeatureFile(Artifact artifact, CacheManager cacheManager) {
+		try {
+			return cacheManager.accessArtifactFile(artifact, file -> {
+				// Unpack feature.xml into the same directory as the jar
+				File featureFile = new File(file.getParentFile(), ICoreConstants.FEATURE_FILENAME_DESCRIPTOR);
+				
+				// May have already been unpacked -> reuse
+				if(featureFile.exists()) {
+					return featureFile;
+				}
+				
+				File markerFile = new File(file.getParentFile(), NOT_A_FEATURE);
+				
+				// Artifact has already been checked during an earlier cycle
+				if(markerFile.exists() && markerFile.lastModified() >= file.lastModified()) {
+					return null;
+				}
+				
+				try (JarFile jar = new JarFile(artifact.getFile())) {
+					ZipEntry entry = jar.getEntry(ICoreConstants.FEATURE_FILENAME_DESCRIPTOR);
+					
+					// feature.xml is missing -> not an Eclipse feature
+					if(entry == null) {
+						FileUtils.touch(markerFile);
+						return null;
+					}
+					
+					Files.copy(jar.getInputStream(entry), featureFile.toPath());
+					
+					return featureFile;
+				} catch(IOException e) {
+					LOGGER.error(e.getLocalizedMessage(), e);
+					return null;
+				}
+			});
+		} catch(Exception e) {
+			LOGGER.error(e.getLocalizedMessage(), e);
+			return null;
+		}
+	}
+
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven,
 			TargetBundles targetBundles) {
+		File featureFile = getFeatureFile(artifact, cacheManager);
+		
 		if (isPomType(artifact)) {
 			targetBundles.features
 					.add(new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles, false)));
@@ -283,7 +354,15 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 						.add(new MavenTargetFeature(new MavenPomFeatureModel(artifact, targetBundles, true)));
 			}
 			return;
-		}
+		} else if (featureFile != null) {
+			try {
+				targetBundles.features.add(new TargetFeature(featureFile));
+			} catch (CoreException e) {
+				failedArtifacts.add(artifact);
+				LOGGER.error(e.getLocalizedMessage(), e);
+			}
+			return;
+		}		
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
 		if (bndInstructions == null) {
 			// no specific instructions for this artifact, try using the location default
