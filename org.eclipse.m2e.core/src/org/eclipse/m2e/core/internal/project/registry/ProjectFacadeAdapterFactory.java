@@ -20,7 +20,8 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 @Component(service = IAdapterFactory.class, property = {
-    IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.core.resources.IResource"})
+    IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.core.resources.IResource",
+    IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.m2e.core.project.IMavenProjectFacade"})
 public class ProjectFacadeAdapterFactory implements IAdapterFactory {
 
   private static final Class<?>[] ADAPTER_LIST = {IMavenProjectFacade.class};
