@@ -252,6 +252,7 @@
 							.settings/
 							.polyglot.*
 							pom.xml
+							README.md
 						</jgit.ignore>
 						<jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
 						<timestampProvider>jgit</timestampProvider>
