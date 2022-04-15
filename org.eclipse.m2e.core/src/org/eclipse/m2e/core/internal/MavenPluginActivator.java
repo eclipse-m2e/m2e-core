@@ -15,7 +15,9 @@ package org.eclipse.m2e.core.internal;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -23,10 +25,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +41,10 @@ import com.google.inject.Module;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ISaveContext;
 import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -161,6 +166,8 @@ public class MavenPluginActivator extends Plugin {
 
   private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
 
+  private ServiceTracker<IWorkspace, IWorkspace> workspaceTracker;
+
   public MavenPluginActivator() {
     plugin = this;
 
@@ -216,15 +223,45 @@ public class MavenPluginActivator extends Plugin {
 
     this.mavenBackgroundJob = new ProjectRegistryRefreshJob(managerImpl, mavenConfiguration);
 
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    workspace.addResourceChangeListener(mavenBackgroundJob,
-        IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE);
+    context.registerService(IResourceChangeListener.class, mavenBackgroundJob, getMaskProperties(
+        IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE));
 
     this.projectManager = new MavenProjectManager(managerImpl, mavenBackgroundJob, stateLocationDir);
     this.projectManager.addMavenProjectChangedListener(new WorkspaceStateWriter(projectManager));
+    workspaceTracker = new ServiceTracker<>(bundleContext, IWorkspace.class,
+        new ServiceTrackerCustomizer<IWorkspace, IWorkspace>() {
+
+          @Override
+          public IWorkspace addingService(ServiceReference<IWorkspace> reference) {
+            //TODO there should be a declarative way to do this!
+            IWorkspace workspace = bundleContext.getService(reference);
+            if(workspace != null) {
+              try {
+                workspace.addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
+              } catch(CoreException ex) {
+                getLog().log(ex.getStatus());
+              }
+            }
+            return workspace;
+          }
+
+          @Override
+          public void modifiedService(ServiceReference<IWorkspace> reference, IWorkspace workspace) {
+            //we don't care about property changes
+          }
+
+          @Override
+          public void removedService(ServiceReference<IWorkspace> reference, IWorkspace workspace) {
+            workspace.removeSaveParticipant(IMavenConstants.PLUGIN_ID);
+          }
+        });
+    workspaceTracker.open();
     if(updateProjectsOnStartup || managerImpl.getProjects().length == 0) {
-      this.projectManager.refresh(new MavenUpdateRequest(workspace.getRoot().getProjects(), //
+      IWorkspace workspace = workspaceTracker.getService();
+      if(workspace != null) {
+        this.projectManager.refresh(new MavenUpdateRequest(workspace.getRoot().getProjects(), //
           mavenConfiguration.isOffline() /*offline*/, false /* updateSnapshots */));
+      }
     }
 
     this.modelManager = new MavenModelManager(maven, projectManager);
@@ -234,7 +271,8 @@ public class MavenPluginActivator extends Plugin {
     this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager, mavenMarkerManager,
         mavenConfiguration);
     this.projectManager.addMavenProjectChangedListener(this.configurationManager);
-    workspace.addResourceChangeListener(configurationManager, IResourceChangeEvent.PRE_DELETE);
+    context.registerService(IResourceChangeListener.class, configurationManager,
+        getMaskProperties(IResourceChangeEvent.PRE_DELETE));
 
     //create repository registry
     this.repositoryRegistry = new RepositoryRegistry(maven, projectManager);
@@ -250,7 +288,6 @@ public class MavenPluginActivator extends Plugin {
     this.projectConversionManager = new ProjectConversionManager();
 
     this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
-    ResourcesPlugin.getWorkspace().addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
     //register URL handler, we can't use DS here because this triggers loading of m2e too early
     Map<String, Object> properties = Map.of(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
     this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
@@ -261,6 +298,12 @@ public class MavenPluginActivator extends Plugin {
     FileUtils.deleteDirectory(nexusCache.toFile());
     //register as service to make static method access obsolete...
     bundleContext.registerService(IMavenProjectRegistry.class, projectManager, null);
+  }
+
+  private static Dictionary<String, ?> getMaskProperties(int mask) {
+    Dictionary<String, Object> properties = new Hashtable<>();
+    properties.put("event.mask", mask);
+    return properties;
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -321,9 +364,7 @@ public class MavenPluginActivator extends Plugin {
     } catch(InterruptedException ex) {
       // ignored
     }
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    workspace.removeSaveParticipant(IMavenConstants.PLUGIN_ID);
-    workspace.removeResourceChangeListener(this.mavenBackgroundJob);
+    workspaceTracker.close();
     this.mavenBackgroundJob = null;
 
     this.projectManager.removeMavenProjectChangedListener(this.configurationManager);
@@ -333,7 +374,6 @@ public class MavenPluginActivator extends Plugin {
     toDisposeContainers.forEach(PlexusContainer::dispose);
     this.maven.disposeContainer();
 
-    workspace.removeResourceChangeListener(configurationManager);
     this.configurationManager = null;
     LifecycleMappingFactory.setBundleMetadataSources(null);
 
