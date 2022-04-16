@@ -16,7 +16,6 @@ package org.eclipse.m2e.core;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -28,18 +27,8 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 public final class MavenPlugin {
 
-  private static final MavenPlugin INSTANCE = new MavenPlugin();
-
   private MavenPlugin() {
 
-  }
-
-  /**
-   * @deprecated Use static getCOMPONENT methods instead
-   */
-  @Deprecated
-  public static MavenPlugin getDefault() {
-    return INSTANCE;
   }
 
   /**
@@ -65,15 +54,6 @@ public final class MavenPlugin {
 
   public static IMavenConfiguration getMavenConfiguration() {
     return MavenPluginActivator.getDefault().getMavenConfiguration();
-  }
-
-  /**
-   * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public static MavenRuntimeManager getMavenRuntimeManager() {
-    return new MavenRuntimeManager(MavenPluginActivator.getDefault().getMavenRuntimeManager());
   }
 
   public static MavenModelManager getMavenModelManager() {

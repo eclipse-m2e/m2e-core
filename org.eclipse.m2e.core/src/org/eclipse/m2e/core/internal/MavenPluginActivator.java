@@ -60,18 +60,10 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.util.FileUtils;
 
 import org.apache.maven.archetype.ArchetypeGenerationRequest;
-import org.apache.maven.archetype.common.ArchetypeArtifactManager;
-import org.apache.maven.archetype.source.ArchetypeDataSource;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.repository.legacy.WagonManager;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
@@ -463,51 +455,12 @@ public class MavenPluginActivator extends Plugin {
     return repositoryRegistry;
   }
 
-  /**
-   * @deprecated use {@link ArchetypeManager#getArchetypeDataSource(String)}
-   */
-  @Deprecated
-  public ArchetypeDataSource getArchetypeDataSource(String hint) {
-    return getArchetypeManager().getArchetypeDataSource(hint);
-  }
-
-  /**
-   * @deprecated use {@link ArchetypeManager#getArchetypeArtifactManager()}
-   */
-  @Deprecated
-  public ArchetypeArtifactManager getArchetypeArtifactManager() {
-    return getArchetypeManager().getArchetypeArtifactManager();
-  }
-
   public WagonManager getWagonManager() {
     return maven.lookupComponent(WagonManager.class);
   }
 
-  public ArtifactFactory getArtifactFactory() {
-    return maven.lookupComponent(ArtifactFactory.class);
-  }
-
-  public ArtifactMetadataSource getArtifactMetadataSource() {
-    return maven.lookupComponent(ArtifactMetadataSource.class);
-  }
-
-  public ArtifactCollector getArtifactCollector() {
-    return maven.lookupComponent(ArtifactCollector.class);
-  }
-
   public RepositorySystem getRepositorySystem() {
     return maven.lookupComponent(RepositorySystem.class);
-  }
-
-  /**
-   * @deprecated use {@link IMavenExecutionContext} instead.
-   */
-  @Deprecated
-  public MavenSession setSession(MavenSession session) {
-    LegacySupport legacy = maven.lookupComponent(LegacySupport.class);
-    MavenSession old = legacy.getSession();
-    legacy.setSession(session);
-    return old;
   }
 
   public ArtifactFilterManager getArifactFilterManager() {
