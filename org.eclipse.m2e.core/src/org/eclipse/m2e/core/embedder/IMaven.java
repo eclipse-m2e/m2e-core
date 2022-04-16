@@ -377,4 +377,11 @@ public interface IMaven {
    * @since 1.10
    */
   <T> T lookup(Class<T> clazz) throws CoreException;
+
+  /**
+   * @param <T>
+   * @param clazz
+   * @return
+   */
+  <T> T lookupComponent(Class<T> clazz);
 }

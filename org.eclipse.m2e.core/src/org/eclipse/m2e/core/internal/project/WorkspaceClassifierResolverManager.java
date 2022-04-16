@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.project;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
  * @author atanasenko
  * @since 1.9
  */
+@Component(service = IWorkspaceClassifierResolverManager.class)
 public class WorkspaceClassifierResolverManager implements IWorkspaceClassifierResolverManager {
 
   protected static final Logger log = LoggerFactory.getLogger(WorkspaceClassifierResolverManager.class);

@@ -47,6 +47,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
+//@Component(service = URLStreamHandlerService.class, property = URLConstants.URL_HANDLER_PROTOCOL + "=mvn", immediate = true)
 public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
 
   public MvnProtocolHandlerService() {

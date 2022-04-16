@@ -15,23 +15,20 @@ package org.eclipse.m2e.core.internal;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +37,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.ISaveContext;
-import org.eclipse.core.resources.ISaveParticipant;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
@@ -63,29 +54,20 @@ import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.repository.legacy.WagonManager;
 
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
-import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
-import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
-import org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager;
-import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
-import org.eclipse.m2e.core.internal.project.conversion.ProjectConversionManager;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
-import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
@@ -100,65 +82,17 @@ public class MavenPluginActivator extends Plugin {
 
   private final Collection<PlexusContainer> toDisposeContainers = new HashSet<>();
 
-  private MavenModelManager modelManager;
-
   private BundleContext bundleContext;
-
-  private MavenProjectManager projectManager;
-
-  private MavenRuntimeManagerImpl runtimeManager;
-
-  private ProjectConfigurationManager configurationManager;
-
-  private ProjectRegistryRefreshJob mavenBackgroundJob;
 
   private ArchetypeManager archetypeManager;
 
-  private ProjectRegistryManager managerImpl;
-
-  private IMavenMarkerManager mavenMarkerManager;
-
-  private RepositoryRegistry repositoryRegistry;
-
-  private ArtifactFilterManager artifactFilterManager;
-
   private String version = "0.0.0"; //$NON-NLS-1$
-
-  private IMavenConfiguration mavenConfiguration;
 
   private final BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
 
-  private final ISaveParticipant saveParticipant = new ISaveParticipant() {
-
-    @Override
-    public void saving(ISaveContext context) {
-      if(managerImpl != null) {
-        managerImpl.writeWorkspaceState();
-      }
-    }
-
-    @Override
-    public void rollback(ISaveContext context) {
-    }
-
-    @Override
-    public void prepareToSave(ISaveContext context) {
-    }
-
-    @Override
-    public void doneSaving(ISaveContext context) {
-    }
-  };
-
-  private MavenImpl maven;
-
-  private IProjectConversionManager projectConversionManager;
-
-  private IWorkspaceClassifierResolverManager workspaceClassifierResolverManager;
-
   private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
 
-  private ServiceTracker<IWorkspace, IWorkspace> workspaceTracker;
+  private Map<Class<?>, ServiceTracker<?, ?>> trackers = new ConcurrentHashMap<>();
 
   public MavenPluginActivator() {
     plugin = this;
@@ -169,8 +103,24 @@ public class MavenPluginActivator extends Plugin {
     }
   }
 
-  public MavenImpl getMaven() {
-    return maven;
+  public IMaven getMaven() {
+    return getService(IMaven.class);
+  }
+
+  /**
+   * @param class1
+   * @return
+   */
+  private <T> T getService(Class<T> service) {
+    BundleContext context = getBundleContext();
+    if(context == null) {
+      return null;
+    }
+    return service.cast(trackers.computeIfAbsent(service, key -> {
+      ServiceTracker<?, ?> tracker = new ServiceTracker<>(context, key, null);
+      tracker.open();
+      return tracker;
+    }).getService());
   }
 
   /**
@@ -179,18 +129,10 @@ public class MavenPluginActivator extends Plugin {
   @Override
   public void start(final BundleContext context) throws Exception {
     super.start(context);
-
     if(Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
       System.err.println("### executing start() " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
-      new Throwable().printStackTrace();
+      Thread.dumpStack();
     }
-    // Workaround MNG-6530
-    System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
-
-    URLConnectionCaches.disable();
-
-    this.bundleContext = context;
-
     try {
       Version bundleVersion = getBundle().getVersion();
       this.version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -198,88 +140,11 @@ public class MavenPluginActivator extends Plugin {
       // ignored
     }
 
-    this.mavenConfiguration = new MavenConfigurationImpl();
-    File stateLocationDir = getStateLocation().toFile();
-
-    this.mavenMarkerManager = new MavenMarkerManager(mavenConfiguration);
-
-    boolean updateProjectsOnStartup = mavenConfiguration.isUpdateProjectsOnStartup();
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    this.maven = new MavenImpl(mavenConfiguration);
-
-    // TODO eagerly reads workspace state cache
-    this.managerImpl = new ProjectRegistryManager(maven, stateLocationDir, !updateProjectsOnStartup /* readState */,
-        mavenMarkerManager);
-
-    this.mavenBackgroundJob = new ProjectRegistryRefreshJob(managerImpl, mavenConfiguration);
-
-    context.registerService(IResourceChangeListener.class, mavenBackgroundJob, getMaskProperties(
-        IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE));
-
-    this.projectManager = new MavenProjectManager(managerImpl, mavenBackgroundJob, stateLocationDir);
-    this.projectManager.addMavenProjectChangedListener(new WorkspaceStateWriter(projectManager));
-    workspaceTracker = new ServiceTracker<>(bundleContext, IWorkspace.class,
-        new ServiceTrackerCustomizer<IWorkspace, IWorkspace>() {
-
-          @Override
-          public IWorkspace addingService(ServiceReference<IWorkspace> reference) {
-            //TODO there should be a declarative way to do this!
-            IWorkspace workspace = bundleContext.getService(reference);
-            if(workspace != null) {
-              try {
-                workspace.addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
-              } catch(CoreException ex) {
-                getLog().log(ex.getStatus());
-              }
-            }
-            return workspace;
-          }
-
-          @Override
-          public void modifiedService(ServiceReference<IWorkspace> reference, IWorkspace workspace) {
-            //we don't care about property changes
-          }
-
-          @Override
-          public void removedService(ServiceReference<IWorkspace> reference, IWorkspace workspace) {
-            workspace.removeSaveParticipant(IMavenConstants.PLUGIN_ID);
-          }
-        });
-    workspaceTracker.open();
-    if(updateProjectsOnStartup || managerImpl.getProjects().length == 0) {
-      IWorkspace workspace = workspaceTracker.getService();
-      if(workspace != null) {
-        this.projectManager.refresh(new MavenUpdateRequest(workspace.getRoot().getProjects(), //
-          mavenConfiguration.isOffline() /*offline*/, false /* updateSnapshots */));
-      }
-    }
-
-    this.modelManager = new MavenModelManager(maven, projectManager);
-
-    this.runtimeManager = new MavenRuntimeManagerImpl();
-
-    this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager, mavenMarkerManager,
-        mavenConfiguration);
-    this.projectManager.addMavenProjectChangedListener(this.configurationManager);
-    context.registerService(IResourceChangeListener.class, configurationManager,
-        getMaskProperties(IResourceChangeEvent.PRE_DELETE));
-
-    //create repository registry
-    this.repositoryRegistry = new RepositoryRegistry(maven, projectManager);
-    this.maven.addSettingsChangeListener(repositoryRegistry);
-    this.projectManager.addMavenProjectChangedListener(repositoryRegistry);
-
-    //
-    this.artifactFilterManager = new ArtifactFilterManager();
-
-    // fork repository registry update. must after index manager registered as a listener
-    this.repositoryRegistry.updateRegistry();
-
-    this.projectConversionManager = new ProjectConversionManager();
-
-    this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
+    // Workaround MNG-6530
+    System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
+    URLConnectionCaches.disable();
+    // For static access, this also enables any of the services and keep them running forever...
+    this.bundleContext = context;
     //register URL handler, we can't use DS here because this triggers loading of m2e too early
     Map<String, Object> properties = Map.of(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
     this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
@@ -288,14 +153,6 @@ public class MavenPluginActivator extends Plugin {
     // Automatically delete now obsolete nexus cache (can be removed again if some time has passed and it is unlikely an old workspace that need to be cleaned up is used).
     IPath nexusCache = Platform.getStateLocation(context.getBundle()).append("nexus");
     FileUtils.deleteDirectory(nexusCache.toFile());
-    //register as service to make static method access obsolete...
-    bundleContext.registerService(IMavenProjectRegistry.class, projectManager, null);
-  }
-
-  private static Dictionary<String, ?> getMaskProperties(int mask) {
-    Dictionary<String, Object> properties = new Hashtable<>();
-    properties.put("event.mask", mask);
-    return properties;
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -324,22 +181,6 @@ public class MavenPluginActivator extends Plugin {
   }
 
   /**
-   * @deprecated provided for backwards compatibility only. all component lookup must go though relevant subsystem --
-   *             {@link MavenImpl}, {@link NexusIndexManager} or {@link ArchetypeManager}.
-   *             <p>
-   *             In most case, use <code>MavenPlugin.getMaven().lookup(...)</code> instead.
-   */
-  @Deprecated
-  public PlexusContainer getPlexusContainer() {
-    try {
-      return getMaven().getPlexusContainer();
-    } catch(CoreException ex) {
-      getLog().log(ex.getStatus());
-      return null;
-    }
-  }
-
-  /**
    * This method is called when the plug-in is stopped
    */
   @Override
@@ -350,26 +191,9 @@ public class MavenPluginActivator extends Plugin {
     }
     context.removeBundleListener(bundleListener);
 
-    this.mavenBackgroundJob.cancel();
-    try {
-      this.mavenBackgroundJob.join();
-    } catch(InterruptedException ex) {
-      // ignored
-    }
-    workspaceTracker.close();
-    this.mavenBackgroundJob = null;
-
-    this.projectManager.removeMavenProjectChangedListener(this.configurationManager);
-    this.projectManager.removeMavenProjectChangedListener(repositoryRegistry);
-    this.projectManager = null;
-
     toDisposeContainers.forEach(PlexusContainer::dispose);
-    this.maven.disposeContainer();
 
-    this.configurationManager = null;
     LifecycleMappingFactory.setBundleMetadataSources(null);
-
-    this.projectConversionManager = null;
 
     plugin = null;
   }
@@ -382,19 +206,19 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public MavenModelManager getMavenModelManager() {
-    return this.modelManager;
+    return getService(MavenModelManager.class);
   }
 
-  public MavenProjectManager getMavenProjectManager() {
-    return this.projectManager;
+  public IMavenProjectRegistry getMavenProjectManager() {
+    return getService(IMavenProjectRegistry.class);
   }
 
   public ProjectRegistryManager getMavenProjectManagerImpl() {
-    return this.managerImpl;
+    return getService(ProjectRegistryManager.class);
   }
 
   public MavenRuntimeManagerImpl getMavenRuntimeManager() {
-    return this.runtimeManager;
+    return getService(MavenRuntimeManagerImpl.class);
   }
 
   public ArchetypeManager getArchetypeManager() {
@@ -419,11 +243,11 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public IMavenMarkerManager getMavenMarkerManager() {
-    return this.mavenMarkerManager;
+    return getService(IMavenMarkerManager.class);
   }
 
   public IMavenConfiguration getMavenConfiguration() {
-    return this.mavenConfiguration;
+    return getService(IMavenConfiguration.class);
   }
 
   public BundleContext getBundleContext() {
@@ -431,12 +255,12 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public IProjectConfigurationManager getProjectConfigurationManager() {
-    return configurationManager;
+    return getService(IProjectConfigurationManager.class);
   }
 
   /** for use by unit tests */
   public ProjectRegistryRefreshJob getProjectManagerRefreshJob() {
-    return mavenBackgroundJob;
+    return getService(ProjectRegistryRefreshJob.class);
   }
 
   public static String getVersion() {
@@ -452,30 +276,30 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public IRepositoryRegistry getRepositoryRegistry() {
-    return repositoryRegistry;
+    return getService(IRepositoryRegistry.class);
   }
 
   public WagonManager getWagonManager() {
-    return maven.lookupComponent(WagonManager.class);
+    return getMaven().lookupComponent(WagonManager.class);
   }
 
   public RepositorySystem getRepositorySystem() {
-    return maven.lookupComponent(RepositorySystem.class);
+    return getMaven().lookupComponent(RepositorySystem.class);
   }
 
   public ArtifactFilterManager getArifactFilterManager() {
-    return artifactFilterManager;
+    return getService(ArtifactFilterManager.class);
   }
 
   /**
    * @return
    */
   public IProjectConversionManager getProjectConversionManager() {
-    return projectConversionManager;
+    return getService(IProjectConversionManager.class);
   }
 
   public IWorkspaceClassifierResolverManager getWorkspaceClassifierResolverManager() {
-    return workspaceClassifierResolverManager;
+    return getService(IWorkspaceClassifierResolverManager.class);
   }
 
 }

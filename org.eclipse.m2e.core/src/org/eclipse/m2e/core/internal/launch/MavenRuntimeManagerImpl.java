@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
@@ -36,6 +37,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 /**
  * @since 1.5
  */
+@Component(service = MavenRuntimeManagerImpl.class)
 public class MavenRuntimeManagerImpl {
   public static final String DEFAULT = "DEFAULT"; //$NON-NLS-1$
 
@@ -47,10 +49,10 @@ public class MavenRuntimeManagerImpl {
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
-  private final IPreferencesService preferenceStore;
+  @Reference
+  private IPreferencesService preferenceStore;
 
   public MavenRuntimeManagerImpl() {
-    this.preferenceStore = Platform.getPreferencesService();
     this.preferencesLookup[0] = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
     this.preferencesLookup[1] = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
   }

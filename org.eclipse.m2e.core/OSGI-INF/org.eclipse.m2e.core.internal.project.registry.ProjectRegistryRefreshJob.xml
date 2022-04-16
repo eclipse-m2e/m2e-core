@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" deactivate="shutdown" name="org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob">
+   <property name="event.mask" type="Integer" value="7"/>
+   <service>
+      <provide interface="org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob"/>
+      <provide interface="org.eclipse.core.resources.IResourceChangeListener"/>
+   </service>
+   <reference cardinality="1..1" field="manager" interface="org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager" name="manager"/>
+   <reference cardinality="1..1" field="mavenConfiguration" interface="org.eclipse.m2e.core.embedder.IMavenConfiguration" name="mavenConfiguration"/>
+   <implementation class="org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob"/>
+</scr:component>

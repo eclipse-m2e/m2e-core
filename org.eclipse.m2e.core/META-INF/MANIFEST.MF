@@ -50,4 +50,19 @@ Import-Package: javax.inject;version="1.0.0",
  org.osgi.service.component.annotations;version="1.3.0",
  org.slf4j;version="1.6.2"
 Automatic-Module-Name: org.eclipse.m2e.core
-Service-Component: OSGI-INF/org.eclipse.m2e.core.internal.project.registry.ProjectFacadeAdapterFactory.xml
+Service-Component: OSGI-INF/org.eclipse.m2e.core.embedder.MavenModelManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.embedder.MavenImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.markers.MavenMarkerManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.ProjectConfigurationManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.WorkspaceStateWriter.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.conversion.ProjectConversionManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.registry.MavenProjectManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.registry.ProjectFacadeAdapterFactory.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.registry.ProjectRegistryReader.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.repository.RepositoryRegistry.xml

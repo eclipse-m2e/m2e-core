@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,8 @@ import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 
+@Component(service = {ProjectRegistryRefreshJob.class, IResourceChangeListener.class}, property = "event.mask:Integer="
+    + (IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE))
 public class ProjectRegistryRefreshJob extends Job implements IResourceChangeListener, IPreferenceChangeListener,
     IBackgroundProcessingQueue {
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
@@ -53,19 +58,30 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   private final Set<MavenUpdateRequest> queue = new LinkedHashSet<>();
 
-  /*package*/final ProjectRegistryManager manager;
+  @Reference
+  /*package*/ ProjectRegistryManager manager;
 
-  private final IMavenConfiguration mavenConfiguration;
+  @Reference
+  private IMavenConfiguration mavenConfiguration;
 
-  public ProjectRegistryRefreshJob(ProjectRegistryManager manager, IMavenConfiguration mavenConfiguration) {
+  public ProjectRegistryRefreshJob() {
     super(Messages.ProjectRegistryRefreshJob_title);
-    this.manager = manager;
-    this.mavenConfiguration = mavenConfiguration;
   }
 
   public void refresh(MavenUpdateRequest updateRequest) {
     queue(updateRequest);
     schedule(SCHEDULE_DELAY);
+  }
+
+  @Deactivate
+  void shutdown() {
+    cancel();
+    try {
+      //TODO do we really need/want to block until cancel?
+      join();
+    } catch(InterruptedException ex) {
+      // ignored
+    }
   }
 
   // Job

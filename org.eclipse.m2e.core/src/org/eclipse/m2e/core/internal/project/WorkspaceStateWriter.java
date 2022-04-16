@@ -16,14 +16,16 @@ package org.eclipse.m2e.core.internal.project;
 import java.io.File;
 import java.io.IOException;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -42,23 +44,26 @@ import org.eclipse.m2e.workspace.MutableWorkspaceState;
 /**
  * Maintains map file of maven artifacts present in workspace.
  */
+
+@Component(service = {IMavenProjectChangedListener.class})
 public class WorkspaceStateWriter implements IMavenProjectChangedListener {
   private static QualifiedName PPROP_EXTENSION = new QualifiedName(WorkspaceStateWriter.class.getName(), "extension"); //$NON-NLS-1$
 
   private static final Logger log = LoggerFactory.getLogger(WorkspaceStateWriter.class);
 
-  private final MavenProjectManager projectManager;
+  @Reference
+  private MavenProjectManager projectManager;
 
-  public WorkspaceStateWriter(MavenProjectManager projectManager) {
-    this.projectManager = projectManager;
-  }
+  @Reference
+  private IWorkspace workspace;
+
 
   @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     try {
       MutableWorkspaceState state = new MutableWorkspaceState();
 
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IWorkspaceRoot root = workspace.getRoot();
       for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
         IProject project = projectFacade.getProject();
         if(!project.isAccessible()) {

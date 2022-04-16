@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +53,15 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
  *
  * @author igor
  */
+@Component(service = {IRepositoryRegistry.class, IMavenProjectChangedListener.class, ISettingsChangeListener.class})
 public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectChangedListener, ISettingsChangeListener {
   private static final Logger log = LoggerFactory.getLogger(RepositoryRegistry.class);
 
-  private final IMaven maven;
+  @Reference
+  private IMaven maven;
 
-  private final IMavenProjectRegistry projectManager;
+  @Reference
+  private IMavenProjectRegistry projectManager;
 
   /**
    * Maps repositoryUrl to IndexInfo of repository index
@@ -80,10 +86,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   private final RepositoryRegistryUpdateJob job = new RepositoryRegistryUpdateJob(this);
 
-  public RepositoryRegistry(IMaven maven, IMavenProjectRegistry projectManager) {
-    this.maven = maven;
-    this.projectManager = projectManager;
-
+  public RepositoryRegistry() {
     this.workspaceRepository = new RepositoryInfo(null/*id*/,
         "workspace://"/*url*/, null/*basedir*/, SCOPE_WORKSPACE, null/*auth*/); //$NON-NLS-1$
   }
@@ -293,12 +296,14 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     return result;
   }
 
+  @Activate
   public void updateRegistry() {
     job.updateRegistry();
   }
 
   public void addRepositoryIndexer(IRepositoryIndexer indexer) {
     this.indexers.add(indexer);
+    updateRegistry();
   }
 
   public void addRepositoryDiscoverer(IRepositoryDiscoverer discoverer) {

@@ -97,6 +97,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -783,7 +784,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
 
     reloadMavenProjectCache();
-    MavenPluginActivator.getDefault().getMavenProjectManager().addMavenProjectChangedListener(this);
+    IMavenProjectRegistry projectRegistry = MavenPluginActivator.getDefault().getMavenProjectManager();
+    projectRegistry.addMavenProjectChangedListener(this);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
   }
