@@ -47,7 +47,7 @@ pipeline {
 							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						# Read M2E branding version
-						regex='<feature id="org\.eclipse\.m2e\.sdk\.feature" version="([0-9]\.[0-9]\.[0-9])\.qualifier" '
+						regex='<feature id="org\\.eclipse\\.m2e\\.sdk\\.feature" version="([0-9]\\.[0-9]\\.[0-9])\\.qualifier" '
 						content=$(echo $(<"org.eclipse.m2e.sdk.feature/feature.xml")) # replaces consecutive newline and tabs by single space
 						if [[ $content  =~ $regex ]]
 						then
