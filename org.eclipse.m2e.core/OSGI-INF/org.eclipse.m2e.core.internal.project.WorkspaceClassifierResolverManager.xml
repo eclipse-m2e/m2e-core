@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager">
+   <service>
+      <provide interface="org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager"/>
+   </service>
+   <implementation class="org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager"/>
+</scr:component>

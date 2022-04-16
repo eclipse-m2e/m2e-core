@@ -40,7 +40,6 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -83,7 +82,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
         return null;
       }
 
-      final MavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
+      final IMavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
 
       return context.execute((context2, monitor2) -> {
         final IMavenProjectFacade projectFacade = getProjectFacade(project, monitor2);

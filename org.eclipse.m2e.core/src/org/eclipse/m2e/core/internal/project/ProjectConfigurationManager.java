@@ -31,6 +31,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +82,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
-import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
@@ -107,29 +108,26 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  *
  * @author igor
  */
+@Component(service = {IProjectConfigurationManager.class, IMavenProjectChangedListener.class,
+    IResourceChangeListener.class}, property = "event.mask:Integer=" + IResourceChangeEvent.PRE_DELETE)
 public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener,
     IResourceChangeListener {
   /*package*/static final Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
-  final ProjectRegistryManager projectManager;
+  @Reference
+  ProjectRegistryManager projectManager;
 
-  final MavenModelManager mavenModelManager;
+  @Reference
+  MavenModelManager mavenModelManager;
 
-  final IMavenMarkerManager mavenMarkerManager;
+  @Reference
+  IMavenMarkerManager mavenMarkerManager;
 
-  final IMaven maven;
+  @Reference
+  IMaven maven;
 
-  final IMavenConfiguration mavenConfiguration;
-
-  public ProjectConfigurationManager(IMaven maven, ProjectRegistryManager projectManager,
-      MavenModelManager mavenModelManager, IMavenMarkerManager mavenMarkerManager,
-      IMavenConfiguration mavenConfiguration) {
-    this.projectManager = projectManager;
-    this.mavenModelManager = mavenModelManager;
-    this.mavenMarkerManager = mavenMarkerManager;
-    this.maven = maven;
-    this.mavenConfiguration = mavenConfiguration;
-  }
+  @Reference
+  IMavenConfiguration mavenConfiguration;
 
   @Override
   public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos,
@@ -503,7 +501,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
     project.setDefaultCharset(sourceEncoding, monitor);
 
-    MavenExecutionContext executionContext = projectManager.createExecutionContext(mavenProjectFacade.getPom(),
+    IMavenExecutionContext executionContext = projectManager.createExecutionContext(mavenProjectFacade.getPom(),
         mavenProjectFacade.getResolverConfiguration());
 
     executionContext.execute(mavenProject, (context, monitor1) -> {

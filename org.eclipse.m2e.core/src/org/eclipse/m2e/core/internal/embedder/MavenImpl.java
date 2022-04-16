@@ -37,6 +37,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,6 +175,7 @@ import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
+@Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
 public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private static final Logger log = LoggerFactory.getLogger(MavenImpl.class);
 
@@ -182,7 +186,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private DefaultPlexusContainer plexus;
 
-  private final IMavenConfiguration mavenConfiguration;
+  @Reference
+  private IMavenConfiguration mavenConfiguration;
 
   private final ConverterLookup converterLookup = new DefaultConverterLookup();
 
@@ -200,11 +205,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   /** Last modified timestamp of cached user settings */
   private long settings_timestamp;
-
-  public MavenImpl(IMavenConfiguration mavenConfiguration) {
-    this.mavenConfiguration = mavenConfiguration;
-    mavenConfiguration.addConfigurationChangeListener(this);
-  }
 
   @Override
   @SuppressWarnings("deprecation")
@@ -1336,6 +1336,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   /**
    * @since 1.5
    */
+  @Override
   public <T> T lookupComponent(Class<T> clazz) {
     try {
       return getPlexusContainer0().lookup(clazz);
@@ -1379,6 +1380,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return new DefaultPlexusContainer(mavenCoreCC, logginModule, new ExtensionModule(), coreExportsModule);
   }
 
+  @Deactivate
   public synchronized void disposeContainer() {
     if(plexus != null) {
       plexus.dispose();

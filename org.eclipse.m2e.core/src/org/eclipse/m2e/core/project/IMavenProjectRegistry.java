@@ -20,10 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-
 import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
 /**
@@ -53,16 +50,6 @@ public interface IMavenProjectRegistry {
    * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
    * lock on the workspace's root.
    *
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #refresh(Collection, IProgressMonitor)} instead.
-   */
-  @Deprecated void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Performs requested Maven project update synchronously. In other words, this method does not return until all
-   * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
-   * lock on the workspace's root.
-   *
    * @since 1.4
    */
   void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException;
@@ -86,18 +73,6 @@ public interface IMavenProjectRegistry {
    * @TODO decide what to do if multiple workspace projects have the same g/a/v.
    */
   IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version);
-
-  /**
-   * @deprecated This method does not properly join {@link IMavenExecutionContext}
-   */
-  @Deprecated MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
-      IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * @deprecated This method does not properly join {@link IMavenExecutionContext}
-   */
-  @Deprecated MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
-      throws CoreException;
 
   /**
    * @since 1.4

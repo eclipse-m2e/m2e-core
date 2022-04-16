@@ -24,9 +24,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 import org.osgi.framework.VersionRange;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,15 +46,23 @@ import org.eclipse.core.runtime.Platform;
  *
  * @author Eugene Kuleshov
  */
+@Component(service = {ProjectRegistryReader.class})
 public class ProjectRegistryReader {
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryReader.class);
 
   private static final String WORKSPACE_STATE = "workspaceState.ser"; //$NON-NLS-1$
 
-  private final File stateFile;
+  private File stateFile;
 
-  public ProjectRegistryReader(File stateLocationDir) {
-    this.stateFile = new File(stateLocationDir, WORKSPACE_STATE);
+  @Activate
+  void init(BundleContext bundleContext) {
+    IPath result = Platform.getStateLocation(bundleContext.getBundle());
+    File bundleStateLocation = result.toFile();
+    setStateLocation(bundleStateLocation);
+  }
+
+  public void setStateLocation(File bundleStateLocation) {
+    this.stateFile = new File(bundleStateLocation, WORKSPACE_STATE);
   }
 
   public ProjectRegistry readWorkspaceState(final ProjectRegistryManager managerImpl) {

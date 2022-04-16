@@ -52,8 +52,8 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClassifierManager;
 import org.eclipse.m2e.jdt.internal.Messages;
@@ -113,7 +113,7 @@ public class MavenJdtPlugin extends Plugin {
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-    MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     File stateLocationDir = getStateLocation().toFile();
@@ -184,7 +184,7 @@ public class MavenJdtPlugin extends Plugin {
     workspaceSourceDownloadJob = null;
     MavenPluginActivator mplugin = MavenPluginActivator.getDefault();
     if(mplugin != null) {
-      MavenProjectManager projectManager = mplugin.getMavenProjectManager();
+      IMavenProjectRegistry projectManager = mplugin.getMavenProjectManager();
       projectManager.removeMavenProjectChangedListener(buildpathManager);
       projectManager.removeMavenProjectChangedListener(launchConfigurationListener);
     }

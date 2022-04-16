@@ -36,6 +36,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +48,9 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,8 +63,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
-
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -82,6 +88,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -89,7 +96,6 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -112,7 +118,8 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * This class keeps track of all maven projects present in the workspace and provides mapping between Maven and the
  * workspace.
  */
-public class ProjectRegistryManager {
+@Component(service = ProjectRegistryManager.class)
+public class ProjectRegistryManager implements ISaveParticipant {
   static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
 
   static final String ARTIFACT_TYPE_POM = "pom"; //$NON-NLS-1$
@@ -139,13 +146,19 @@ public class ProjectRegistryManager {
 
   private static final String CTX_MAVENPROJECTS = ProjectRegistryManager.class.getName() + "/mavenProjects";
 
-  private final ProjectRegistry projectRegistry;
+  private ProjectRegistry projectRegistry;
 
-  /*package*/final MavenImpl maven;
+  @Reference
+  /*package*/ IMaven maven;
 
-  /*package*/final IMavenMarkerManager markerManager;
+  @Reference
+  /*package*/IMavenMarkerManager markerManager;
 
-  private final ProjectRegistryReader stateReader;
+  @Reference
+  private IMavenConfiguration configuration;
+
+  @Reference
+  private ProjectRegistryReader stateReader;
 
   private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<>();
 
@@ -163,17 +176,21 @@ public class ProjectRegistryManager {
    */
   Consumer<Map<MavenProjectFacade, MavenProject>> addContextProjectListener;
 
-  public ProjectRegistryManager(MavenImpl maven, File stateLocationDir, boolean readState,
-      IMavenMarkerManager mavenMarkerManager) {
-    this.markerManager = mavenMarkerManager;
-    this.maven = maven;
+  public ProjectRegistryManager() {
+    this.mavenProjectCache = createProjectCache();
+  }
 
-    this.stateReader = new ProjectRegistryReader(stateLocationDir);
-
-    ProjectRegistry state = readState && stateReader != null ? stateReader.readWorkspaceState(this) : null;
+  @Activate
+  void init() {
+    //TODO this should really happen in the background!
+    ProjectRegistry state;
+    if(configuration.isUpdateProjectsOnStartup()) {
+      state = null;
+    } else {
+      state = stateReader.readWorkspaceState(this);
+    }
     this.projectRegistry = (state != null && state.isValid()) ? state : new ProjectRegistry();
 
-    this.mavenProjectCache = createProjectCache();
   }
 
   /**
@@ -284,7 +301,7 @@ public class ProjectRegistryManager {
   }
 
   private boolean isForceDependencyUpdate() throws CoreException {
-    MavenExecutionContext context = maven.getExecutionContext();
+    IMavenExecutionContext context = maven.getExecutionContext();
     return context != null && context.getExecutionRequest().isUpdateSnapshots();
   }
 
@@ -779,6 +796,7 @@ public class ProjectRegistryManager {
     return state.removeWorkspaceModules(pom, mavenProject);
   }
 
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
   public void addMavenProjectChangedListener(IMavenProjectChangedListener listener) {
     synchronized(projectChangeListeners) {
       projectChangeListeners.add(listener);
@@ -1009,14 +1027,14 @@ public class ProjectRegistryManager {
     return createExecutionContext(state, pom, resolverConfiguration).execute(callable, monitor);
   }
 
-  private MavenExecutionContext createExecutionContext(final IProjectRegistry state, final IFile pom,
+  private IMavenExecutionContext createExecutionContext(final IProjectRegistry state, final IFile pom,
       final ResolverConfiguration resolverConfiguration) throws CoreException {
-    MavenExecutionContext context = maven.createExecutionContext();
+    IMavenExecutionContext context = maven.createExecutionContext();
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;
   }
 
-  public MavenExecutionContext createExecutionContext(final IFile pom,
+  public IMavenExecutionContext createExecutionContext(final IFile pom,
       final ResolverConfiguration resolverConfiguration) throws CoreException {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
   }
@@ -1162,10 +1180,8 @@ public class ProjectRegistryManager {
 
   private Set<File> flushMavenCache(Class<?> clazz, File pom, ArtifactKey key, boolean force) {
     try {
-      IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(clazz);
+      IManagedCache cache = (IManagedCache) maven.lookup(clazz);
       return cache.removeProject(pom, key, force);
-    } catch(ComponentLookupException ex) {
-      // can't really happen
     } catch(CoreException ex) {
       // can't really happen
     }
@@ -1189,5 +1205,35 @@ public class ProjectRegistryManager {
       log.warn("Failed to create local file representation of " + file);
       return null;
     }
+  }
+
+  @Reference(policy = ReferencePolicy.DYNAMIC, cardinality = ReferenceCardinality.OPTIONAL)
+  void setWorkspace(IWorkspace workspace) throws CoreException {
+    //TODO better be declarative see https://github.com/eclipse-platform/eclipse.platform.resources/issues/55
+    workspace.addSaveParticipant(IMavenConstants.PLUGIN_ID, this);
+  }
+
+  void unsetWorkspace(IWorkspace workspace) {
+    workspace.removeSaveParticipant(IMavenConstants.PLUGIN_ID);
+  }
+
+  @Override
+  public void doneSaving(ISaveContext context) {
+
+  }
+
+  @Override
+  public void prepareToSave(ISaveContext context) {
+
+  }
+
+  @Override
+  public void rollback(ISaveContext context) {
+
+  }
+
+  @Override
+  public void saving(ISaveContext context) {
+    writeWorkspaceState();
   }
 }

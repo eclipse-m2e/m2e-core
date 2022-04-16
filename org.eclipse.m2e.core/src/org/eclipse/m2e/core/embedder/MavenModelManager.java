@@ -31,6 +31,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,17 +83,15 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  *
  * @author Eugene Kuleshov XXX fix circular dependency
  */
+@Component(service = {MavenModelManager.class})
 public class MavenModelManager {
   private static final Logger log = LoggerFactory.getLogger(MavenModelManager.class);
 
-  private final IMavenProjectRegistry projectManager;
+  @Reference
+  private IMavenProjectRegistry projectManager;
 
-  private final IMaven maven;
-
-  public MavenModelManager(IMaven maven, IMavenProjectRegistry projectManager) {
-    this.maven = maven;
-    this.projectManager = projectManager;
-  }
+  @Reference
+  private IMaven maven;
 
   public org.apache.maven.model.Model readMavenModel(InputStream reader) throws CoreException {
     return maven.readModel(reader);

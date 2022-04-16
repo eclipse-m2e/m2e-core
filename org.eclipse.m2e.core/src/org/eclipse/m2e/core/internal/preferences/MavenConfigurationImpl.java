@@ -15,6 +15,11 @@ package org.eclipse.m2e.core.internal.preferences;
 
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +28,6 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
@@ -45,20 +49,16 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 
 
+@Component(service = {IMavenConfiguration.class})
 public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener, INodeChangeListener {
   private static final Logger log = LoggerFactory.getLogger(MavenConfigurationImpl.class);
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
-  private final IPreferencesService preferenceStore;
+  @Reference
+  private IPreferencesService preferenceStore;
 
   private final ListenerList<IMavenConfigurationChangeListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
-
-  public MavenConfigurationImpl() {
-    preferenceStore = Platform.getPreferencesService();
-
-    init();
-  }
 
   private boolean exists(IEclipsePreferences preferenceNode) {
     if(preferenceNode == null) {
@@ -72,7 +72,8 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
   }
 
-  private void init() {
+  @Activate
+  void init() {
     if(exists(preferencesLookup[0])) {
       ((IEclipsePreferences) preferencesLookup[0].parent()).removeNodeChangeListener(this);
       preferencesLookup[0].removePreferenceChangeListener(this);
@@ -189,9 +190,14 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
         .parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_UPDATE_INDEXES, null, preferencesLookup));
   }
 
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
   @Override
   public synchronized void addConfigurationChangeListener(IMavenConfigurationChangeListener listener) {
     this.listeners.add(listener);
+  }
+
+  public synchronized void removeConfigurationChangeListener(IMavenConfigurationChangeListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override

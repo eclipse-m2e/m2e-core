@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,15 +49,14 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 
 
+@Component(service = {IMavenMarkerManager.class})
 public class MavenMarkerManager implements IMavenMarkerManager {
 
   private static Logger log = LoggerFactory.getLogger(MavenMarkerManager.class);
 
-  private final IMavenConfiguration mavenConfiguration;
+  @Reference
+  private IMavenConfiguration mavenConfiguration;
 
-  public MavenMarkerManager(IMavenConfiguration mavenConfiguration) {
-    this.mavenConfiguration = mavenConfiguration;
-  }
 
   @Override
   public void addMarkers(IResource pomResource, String type, MavenExecutionResult result) {

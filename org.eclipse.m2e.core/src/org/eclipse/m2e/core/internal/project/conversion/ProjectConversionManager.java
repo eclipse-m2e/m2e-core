@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
  * @author Fred Bricon
  * @since 1.1
  */
+@Component(service = IProjectConversionManager.class)
 public class ProjectConversionManager implements IProjectConversionManager {
 
   private static final String CONVERSION_PARTICIPANTS_EXTENSION_POINT = "org.eclipse.m2e.core.projectConversionParticipants";
