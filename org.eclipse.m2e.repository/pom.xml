@@ -18,7 +18,7 @@
 		<version>1.16.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>org.eclipse.m2e.site</artifactId>
+	<artifactId>org.eclipse.m2e.repository</artifactId>
 	<packaging>eclipse-repository</packaging>
 
 	<name>Maven Integration for Eclipse Update Site</name>
