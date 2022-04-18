@@ -77,7 +77,7 @@
 		<module>org.eclipse.m2e.sourcelookup</module>
 		<module>org.eclipse.m2e.sourcelookup.ui</module>
 		<module>org.eclipse.m2e.editor.lemminx</module>
-		<module>org.eclipse.m2e.pde</module>
+		<module>org.eclipse.m2e.pde.target</module>
 		<module>org.eclipse.m2e.pde.ui</module>
 		<module>org.eclipse.m2e.pde.connector</module>
 		<module>org.eclipse.m2e.apt.core</module>

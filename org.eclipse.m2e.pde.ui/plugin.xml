@@ -5,7 +5,7 @@
     <extension
           point="org.eclipse.pde.ui.targetLocationProvisioners">
        <locationProvider
-             class="org.eclipse.m2e.pde.ui.editor.MavenTargetLocationWizard"
+             class="org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationWizard"
              icon="icons/m2.gif"
              id="org.eclipse.m2e.pde.ui.editor.MavenTargetLocationWizard"
              name="Maven">
@@ -18,8 +18,8 @@
     <extension
           point="org.eclipse.core.runtime.adapters">
        <factory
-             adaptableType="org.eclipse.m2e.pde.MavenTargetLocation"
-             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory">
+             adaptableType="org.eclipse.m2e.pde.target.MavenTargetLocation"
+             class="org.eclipse.m2e.pde.ui.target.adapter.MavenTargetAdapterFactory">
           <adapter
                 type="org.eclipse.jface.viewers.ILabelProvider">
           </adapter>
@@ -34,8 +34,8 @@
     <extension
           point="org.eclipse.core.runtime.adapters">
        <factory
-             adaptableType="org.eclipse.m2e.pde.MavenTargetBundle"
-             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetBundleAdapterFactory">
+             adaptableType="org.eclipse.m2e.pde.target.MavenTargetBundle"
+             class="org.eclipse.m2e.pde.ui.target.adapter.MavenTargetBundleAdapterFactory">
           <adapter
                 type="org.eclipse.jface.viewers.ILabelProvider">
           </adapter>
@@ -45,7 +45,7 @@
           point="org.eclipse.core.runtime.adapters">
        <factory
              adaptableType="org.eclipse.aether.graph.DependencyNode"
-             class="org.eclipse.m2e.pde.ui.adapter.DependencyNodeAdapterFactory">
+             class="org.eclipse.m2e.pde.ui.target.adapter.DependencyNodeAdapterFactory">
           <adapter
                 type="org.eclipse.jface.viewers.ITreeContentProvider">
           </adapter>
@@ -60,8 +60,8 @@
     <extension
           point="org.eclipse.core.runtime.adapters">
        <factory
-             adaptableType="org.eclipse.m2e.pde.MavenTargetDependency"
-             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetDependencyAdapterFactory">
+             adaptableType="org.eclipse.m2e.pde.target.MavenTargetDependency"
+             class="org.eclipse.m2e.pde.ui.target.adapter.MavenTargetDependencyAdapterFactory">
           <adapter
                 type="org.eclipse.jface.viewers.ILabelProvider">
           </adapter>

@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.pde.feature"
       label="%featureName"
-      version="1.20.100.qualifier"
+      version="2.0.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.core"
       license-feature="org.eclipse.license"
@@ -40,7 +40,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.m2e.pde"
+         id="org.eclipse.m2e.pde.target"
          download-size="0"
          install-size="0"
          version="0.0.0"
