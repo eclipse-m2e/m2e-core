@@ -10,32 +10,29 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.pde.ui;
+package org.eclipse.m2e.pde.target;
 
-import org.eclipse.m2e.pde.ui.target.adapter.DependencyNodeAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetBundleAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetDependencyAdapterFactory;
+import java.util.concurrent.TimeUnit;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 
-	public static final String ID = "org.eclipse.m2e.pde.ui";
-
 	@Override
 	public void start(BundleContext context) throws Exception {
-
+		CacheManager.setBasedir(context.getBundle().getDataFile(""));
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		DependencyNodeAdapterFactory.LABEL_PROVIDER.dispose();
-		DependencyNodeAdapterFactory.TREE_CONTENT_PROVIDER.dispose();
-		MavenTargetAdapterFactory.LABEL_PROVIDER.dispose();
-		MavenTargetAdapterFactory.TREE_CONTENT_PROVIDER.dispose();
-		MavenTargetBundleAdapterFactory.LABEL_PROVIDER.dispose();
-		MavenTargetDependencyAdapterFactory.LABEL_PROVIDER.dispose();
+		// clear all locations older than 14 days, this can be improved by
+		// 1) watch for changes in the workspace -> if target is deleted/removed from
+		// workspace we can clear the cache
+		// 2) we can add a preference page where the user can force clearing the cache
+		// or set the cache days
+		CacheManager.clearFilesOlderThan(14, TimeUnit.DAYS);
+		CacheManager.setBasedir(null);
 	}
 
 }
