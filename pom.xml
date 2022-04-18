@@ -96,7 +96,7 @@
 		<module>org.eclipse.m2e.sdk.feature</module>
 		<module>org.eclipse.m2e.logback.feature</module>
 		<module>org.eclipse.m2e.pde.feature</module>
-		<module>org.eclipse.m2e.site</module>
+		<module>org.eclipse.m2e.repository</module>
 
 		<!-- testing -->
 		<module>org.eclipse.m2e.core.tests</module>

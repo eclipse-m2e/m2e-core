@@ -44,7 +44,7 @@ pipeline {
 							ssh genie.m2e@projects-storage.eclipse.org "\
 								rm -rf  ${1}/* && \
 								mkdir -p ${1}"
-							scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
+							scp -r org.eclipse.m2e.repository/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						# Read M2E branding version
 						regex='<feature id="org\\.eclipse\\.m2e\\.sdk\\.feature" version="([0-9]\\.[0-9]\\.[0-9])\\.qualifier" '
