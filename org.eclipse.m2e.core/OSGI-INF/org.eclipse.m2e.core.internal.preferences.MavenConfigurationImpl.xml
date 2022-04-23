@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" activate="init" name="org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl">
-   <service>
-      <provide interface="org.eclipse.m2e.core.embedder.IMavenConfiguration"/>
-   </service>
-   <reference bind="addConfigurationChangeListener" cardinality="0..n" interface="org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener" name="ConfigurationChangeListener" policy="dynamic" unbind="removeConfigurationChangeListener"/>
-   <reference cardinality="1..1" field="preferenceStore" interface="org.eclipse.core.runtime.preferences.IPreferencesService" name="preferenceStore"/>
-   <implementation class="org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl"/>
-</scr:component>
