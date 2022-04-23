@@ -16,6 +16,7 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.target.provider.DependencyNodeLabelProvider;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetTreeContentProvider;
@@ -26,6 +27,10 @@ public class DependencyNodeAdapterFactory implements IAdapterFactory {
 	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
 	public static final ILabelProvider LABEL_PROVIDER = new DependencyNodeLabelProvider();
 	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
+	static {
+		Activator.runOnBundleStop(TREE_CONTENT_PROVIDER::dispose);
+		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
+	}
 
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
