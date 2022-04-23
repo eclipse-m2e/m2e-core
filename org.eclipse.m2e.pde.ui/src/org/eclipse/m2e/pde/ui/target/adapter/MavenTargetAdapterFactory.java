@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
+import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetLocationLabelProvider;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetTreeContentProvider;
@@ -26,7 +27,10 @@ public class MavenTargetAdapterFactory implements IAdapterFactory {
 	public static final ILabelProvider LABEL_PROVIDER = new MavenTargetLocationLabelProvider();
 	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
 	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
-
+	static {
+		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
+		Activator.runOnBundleStop(TREE_CONTENT_PROVIDER::dispose);
+	}
 	@Override
 	public Class<?>[] getAdapterList() {
 		return new Class[] { ILabelProvider.class, ITreeContentProvider.class, ITargetLocationHandler.class };

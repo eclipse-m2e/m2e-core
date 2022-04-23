@@ -12,16 +12,21 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui;
 
-import org.eclipse.m2e.pde.ui.target.adapter.DependencyNodeAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetBundleAdapterFactory;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetDependencyAdapterFactory;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 
 	public static final String ID = "org.eclipse.m2e.pde.ui";
+
+	private static final Set<Runnable> STOP_ACTIONS = new HashSet<>();
+
+	public static void runOnBundleStop(Runnable action) {
+		STOP_ACTIONS.add(action);
+	}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
@@ -30,12 +35,6 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		DependencyNodeAdapterFactory.LABEL_PROVIDER.dispose();
-		DependencyNodeAdapterFactory.TREE_CONTENT_PROVIDER.dispose();
-		MavenTargetAdapterFactory.LABEL_PROVIDER.dispose();
-		MavenTargetAdapterFactory.TREE_CONTENT_PROVIDER.dispose();
-		MavenTargetBundleAdapterFactory.LABEL_PROVIDER.dispose();
-		MavenTargetDependencyAdapterFactory.LABEL_PROVIDER.dispose();
+		STOP_ACTIONS.forEach(Runnable::run);
 	}
-
 }

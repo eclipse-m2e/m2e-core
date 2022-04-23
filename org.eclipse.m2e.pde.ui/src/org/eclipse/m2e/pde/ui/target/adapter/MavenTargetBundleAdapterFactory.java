@@ -15,12 +15,15 @@ package org.eclipse.m2e.pde.ui.target.adapter;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.m2e.pde.target.MavenTargetBundle;
+import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetBundleLabelProvider;
 
 public class MavenTargetBundleAdapterFactory implements IAdapterFactory {
 
 	public static final ILabelProvider LABEL_PROVIDER = new MavenTargetBundleLabelProvider();
-
+	static {
+		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
+	}
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adaptableObject instanceof MavenTargetBundle) {
