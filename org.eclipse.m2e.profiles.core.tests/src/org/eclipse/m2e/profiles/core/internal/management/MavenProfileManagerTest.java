@@ -27,16 +27,33 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
-import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
 
 
 @SuppressWarnings("restriction")
 public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
 
-  private final IProfileManager profileManager = MavenProfilesCoreActivator.getDefault().getProfileManager();
+	private static ServiceTracker<IProfileManager, IProfileManager> profileManagerTracker;
+
+	@BeforeClass
+	public static void setUpProfileManagerTracker() throws BundleException {
+		BundleContext context = FrameworkUtil.getBundle(MavenProfileManagerTest.class).getBundleContext();
+		profileManagerTracker = new ServiceTracker<>(context, IProfileManager.class, null);
+		profileManagerTracker.open();
+	}
+
+	@AfterClass
+	public static void tearDownProfileManagerTracker() {
+		profileManagerTracker.close();
+	}
 
   @Test
   public void testLoadingProfilesFromPomsResolvedViaTheirRelativePath() throws Exception {
@@ -53,7 +70,7 @@ public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
 
     // -- When...
     //
-    List<ProfileData> profiles = profileManager.getProfileDatas(facade, monitor);
+	List<ProfileData> profiles = profileManagerTracker.getService().getProfileDatas(facade, monitor);
 
     // -- Then...
     //
