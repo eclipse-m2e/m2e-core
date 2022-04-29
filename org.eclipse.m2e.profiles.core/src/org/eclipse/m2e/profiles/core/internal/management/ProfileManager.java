@@ -23,9 +23,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -52,7 +57,6 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
-import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
 import org.eclipse.m2e.profiles.core.internal.ProfileState;
 
@@ -63,15 +67,22 @@ import org.eclipse.m2e.profiles.core.internal.ProfileState;
  * @author Fred Bricon
  * @since 1.5.0
  */
+@Component(service = IProfileManager.class)
 public class ProfileManager implements IProfileManager {
+
+  private static final ILog log = Platform.getLog(ProfileManager.class);
+
+  @Reference
+  IProjectConfigurationManager configurationManager;
+
+  @Reference
+  IMaven maven;
 
   public void updateActiveProfiles(final IMavenProjectFacade mavenProjectFacade, final List<String> profiles,
       final boolean isOffline, final boolean isForceUpdate, IProgressMonitor monitor) throws CoreException {
     if(mavenProjectFacade == null) {
       return;
     }
-    final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-
     IProject project = mavenProjectFacade.getProject();
 
     final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
@@ -93,7 +104,7 @@ public class ProfileManager implements IProfileManager {
 
   public Map<Profile, Boolean> getAvailableSettingsProfiles() throws CoreException {
     Map<Profile, Boolean> settingsProfiles = new LinkedHashMap<>();
-    Settings settings = MavenPlugin.getMaven().getSettings();
+    Settings settings = maven.getSettings();
     List<String> activeProfiles = settings.getActiveProfiles();
 
     for(org.apache.maven.settings.Profile sp : settings.getProfiles()) {
@@ -228,7 +239,6 @@ public class ProfileManager implements IProfileManager {
       return parentModel;
     }
 
-    IMaven maven = MavenPlugin.getMaven();
     List<ArtifactRepository> repositories = new ArrayList<>();
     repositories.addAll(getProjectRepositories(projectModel));
     repositories.addAll(maven.getArtifactRepositories());
@@ -272,9 +282,8 @@ public class ProfileManager implements IProfileManager {
         return parentModel;
       }
     } catch(Exception e) {
-      MavenProfilesCoreActivator.getDefault().getLog()
-          .error("" + "Error building Maven model for parent POM file with relative path ["
-              + relativeFileSystemPathToParentPom + "] from child POM path [" + pomFileSystemPath + "]", e);
+      log.error("" + "Error building Maven model for parent POM file with relative path ["
+          + relativeFileSystemPathToParentPom + "] from child POM path [" + pomFileSystemPath + "]", e);
     }
 
     return null; // If we have got here then we failed to locate the parent POM file
@@ -330,7 +339,7 @@ public class ProfileManager implements IProfileManager {
             repos.add(ar);
           }
         } catch(InvalidRepositoryException e) {
-          MavenProfilesCoreActivator.log(e);
+          log.error("can't read repository", e);
         }
       }
     }
@@ -340,13 +349,12 @@ public class ProfileManager implements IProfileManager {
   private RepositorySystem getRepositorySystem() {
     try {
       //TODO find an alternative way to get the Maven RepositorySystem, or use Aether directly to resolve models??
-      IMaven maven = MavenPlugin.getMaven();
       return maven.lookup(RepositorySystem.class);
     } catch(CoreException e) {
       if(e.getStatus().getException() instanceof ComponentLookupException) {
         throw new NoSuchComponentException((ComponentLookupException) e.getStatus().getException());
       }
-      MavenProfilesCoreActivator.log(e.getStatus().getException());
+      log.log(e.getStatus());
       throw new NoSuchComponentException(null);
     }
   }
@@ -356,7 +364,6 @@ public class ProfileManager implements IProfileManager {
     monitor.subTask(NLS.bind("Resolving {0}:{1}:{2}", new Object[] {groupId, artifactId, version}));
 
     IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
-    IMaven maven = MavenPlugin.getMaven();
 
     if(facade != null) {
       return facade.getMavenProject(monitor).getModel();
