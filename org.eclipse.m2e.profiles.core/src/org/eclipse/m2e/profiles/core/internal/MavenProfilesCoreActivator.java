@@ -10,13 +10,13 @@
  * Contributors:
  *     Fred Bricon / JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
+
 package org.eclipse.m2e.profiles.core.internal;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.m2e.profiles.core.internal.management.ProfileManager;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
+
 
 /**
  * The activator class controls the plug-in life cycle
@@ -24,69 +24,45 @@ import org.osgi.framework.BundleContext;
  * @author Fred Bricon
  * @since 1.5.0
  */
-public class MavenProfilesCoreActivator extends Plugin {
+public class MavenProfilesCoreActivator implements BundleActivator {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.m2e.profiles.core.internal"; //$NON-NLS-1$
+  private static MavenProfilesCoreActivator instance;
 
-	private IProfileManager profileManager;
+  private ServiceTracker<IProfileManager, IProfileManager> profileManagerTracker;
 
-	// The shared instance
-	private static MavenProfilesCoreActivator plugin;
+  private BundleContext context;
 
-	/**
-	 * The constructor
-	 */
-	public MavenProfilesCoreActivator() {
-	}
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+   */
+  public void start(BundleContext context) throws Exception {
+    this.context = context;
+    instance = this;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-		profileManager = new ProfileManager();
-	}
+  /*
+   * (non-Javadoc)
+   * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+   */
+  public void stop(BundleContext context) throws Exception {
+    instance = null;
+  }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+  /**
+   * Returns the shared instance
+   *
+   * @return the shared instance
+   */
+  public static MavenProfilesCoreActivator getDefault() {
+    return instance;
+  }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static MavenProfilesCoreActivator getDefault() {
-		return plugin;
-	}
-
-	public static IStatus getStatus(String message) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, message);
-	}
-
-	public static IStatus getStatus(String message, Throwable e) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, message,e);
-	}
-
-	public static void log(Throwable e) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, e.getLocalizedMessage(), e);
-		getDefault().getLog().log(status);
-	}
-
-	public static void log(String message) {
-		IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, message);
-		getDefault().getLog().log(status);
-	}
-
-	public IProfileManager getProfileManager() {
-		return profileManager;
-	}
+  @Deprecated(forRemoval = true) //only used for test code at the moment...
+  public synchronized IProfileManager getProfileManager() {
+    if(profileManagerTracker == null) {
+      profileManagerTracker = new ServiceTracker<>(context, IProfileManager.class, null);
+    }
+    return profileManagerTracker.getService();
+  }
 }

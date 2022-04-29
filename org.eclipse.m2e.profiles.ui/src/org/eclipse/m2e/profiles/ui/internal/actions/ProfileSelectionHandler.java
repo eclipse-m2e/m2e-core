@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
@@ -56,7 +59,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
-import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
 import org.eclipse.m2e.profiles.core.internal.ProfileState;
 import org.eclipse.m2e.profiles.ui.internal.MavenProfilesUIActivator;
@@ -75,9 +77,20 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ProfileSelectionHandler.class);
 
+  @Inject
+  private IProfileManager profileManager;
+
+  /**
+   * 
+   */
+  public ProfileSelectionHandler() {
+    ContextInjectionFactory.inject(this, MavenProfilesUIActivator.getServiceContext());
+  }
+
   /**
    * Opens the Maven profile selection Dialog window.
    */
+  @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
     IProject[] projects = getSelectedProjects(event);
@@ -103,9 +116,6 @@ public class ProfileSelectionHandler extends AbstractHandler {
       display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
       return null;
     }
-
-    final IProfileManager profileManager = MavenProfilesCoreActivator.getDefault().getProfileManager();
-
     GetProfilesJob getProfilesJob = new GetProfilesJob(facades, profileManager);
     getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, profileManager, shell));
     getProfilesJob.setUser(true);

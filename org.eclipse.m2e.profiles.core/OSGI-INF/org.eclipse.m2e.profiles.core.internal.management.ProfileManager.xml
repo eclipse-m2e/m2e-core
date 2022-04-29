@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" name="org.eclipse.m2e.profiles.core.internal.management.ProfileManager">
+   <service>
+      <provide interface="org.eclipse.m2e.profiles.core.internal.IProfileManager"/>
+   </service>
+   <reference cardinality="1..1" field="configurationManager" interface="org.eclipse.m2e.core.project.IProjectConfigurationManager" name="configurationManager"/>
+   <reference cardinality="1..1" field="log" interface="org.eclipse.core.runtime.ILog" name="log"/>
+   <reference cardinality="1..1" field="maven" interface="org.eclipse.m2e.core.embedder.IMaven" name="maven"/>
+   <implementation class="org.eclipse.m2e.profiles.core.internal.management.ProfileManager"/>
+</scr:component>
