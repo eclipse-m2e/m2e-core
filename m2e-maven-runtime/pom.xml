@@ -65,7 +65,7 @@
 							-failok: true
 							-nouses: true
 							-nodefaultversion: true
-							-noextraheaders
+							-noextraheaders: true
 							-snapshot: qualifier
 
 							Import-Package: !*
