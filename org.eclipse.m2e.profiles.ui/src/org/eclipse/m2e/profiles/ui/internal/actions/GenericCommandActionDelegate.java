@@ -29,7 +29,6 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -44,8 +43,6 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
-
-import org.eclipse.m2e.profiles.ui.internal.MavenProfilesUIActivator;
 
 
 /**
@@ -129,14 +126,11 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
     } else if(data instanceof Map) {
       parameterMap = (Map<?, ?>) data;
       if(parameterMap.get(PARM_COMMAND_ID) == null) {
-        Status status = new Status(IStatus.ERROR, MavenProfilesUIActivator.PLUGIN_ID,
-            "The '" + id + "' action won't work without a commandId");
-        throw new CoreException(status);
+        throw new CoreException(Status.error("The '" + id + "' action won't work without a commandId"));
       }
     } else {
-      Status status = new Status(IStatus.ERROR, MavenProfilesUIActivator.PLUGIN_ID,
-          "The '" + id + "' action won't work without some initialization parameters");
-      throw new CoreException(status);
+      throw new CoreException(
+          Status.error("The '" + id + "' action won't work without some initialization parameters"));
     }
   }
 
