@@ -59,7 +59,6 @@ import org.eclipse.m2e.profiles.core.internal.IProfileManager;
 import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
 import org.eclipse.m2e.profiles.core.internal.ProfileState;
-import org.eclipse.m2e.profiles.ui.internal.MavenProfilesUIActivator;
 import org.eclipse.m2e.profiles.ui.internal.Messages;
 import org.eclipse.m2e.profiles.ui.internal.dialog.ProfileSelection;
 import org.eclipse.m2e.profiles.ui.internal.dialog.SelectProfilesDialog;
@@ -190,8 +189,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
         this.allProfiles = getAllProfiles(facades, profileManager);
         this.sharedProfiles = getSharedProfiles(allProfiles);
       } catch(CoreException e) {
-        return new Status(IStatus.ERROR, MavenProfilesUIActivator.PLUGIN_ID,
-            Messages.ProfileSelectionHandler_Unable_to_open_profile_dialog, e);
+        return Status.error(Messages.ProfileSelectionHandler_Unable_to_open_profile_dialog, e);
       }
       return Status.OK_STATUS;
     }
