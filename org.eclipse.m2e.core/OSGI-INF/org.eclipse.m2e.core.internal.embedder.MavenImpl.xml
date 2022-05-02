@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" deactivate="disposeContainer" name="org.eclipse.m2e.core.internal.embedder.MavenImpl">
-   <service>
-      <provide interface="org.eclipse.m2e.core.embedder.IMaven"/>
-      <provide interface="org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener"/>
-   </service>
-   <reference cardinality="1..1" field="mavenConfiguration" interface="org.eclipse.m2e.core.embedder.IMavenConfiguration" name="mavenConfiguration"/>
-   <implementation class="org.eclipse.m2e.core.internal.embedder.MavenImpl"/>
-</scr:component>
