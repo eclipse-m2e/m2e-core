@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - M2Eclipse gets stuck in endless update loop
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.project;
@@ -37,7 +38,7 @@ public class DependencyResolutionContext {
     return pomFiles.isEmpty();
   }
 
-  public synchronized void forcePomFiles(Set<IFile> pomFiles) {
+  public synchronized void forcePomFiles(Collection<IFile> pomFiles) {
     this.pomFiles.addAll(pomFiles);
   }
 
@@ -47,4 +48,9 @@ public class DependencyResolutionContext {
     i.remove();
     return pom;
   }
+
+  synchronized Set<IFile> getCurrent() {
+    return new LinkedHashSet<>(pomFiles);
+  }
+
 }
