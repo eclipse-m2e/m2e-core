@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - M2Eclipse gets stuck in endless update loop
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.project.registry;
@@ -103,6 +104,7 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MarkerUtils;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
+import org.eclipse.m2e.core.internal.project.ProjectProcessingTracker;
 import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
@@ -478,6 +480,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     context.forcePomFiles(allProcessedPoms);
 
     // phase 2: resolve project dependencies
+    ProjectProcessingTracker tracker = new ProjectProcessingTracker(context);
+    do {
     while(!context.isEmpty()) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
@@ -488,41 +492,44 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
 
       final IFile pom = context.pop();
+      if(tracker.shouldProcess(pom)) {
 
-      MavenProjectFacade newFacade = null;
-      if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-        newFacade = newState.getProjectFacade(pom);
-      }
-      if(newFacade != null) {
-        MavenProject mavenProject = getMavenProject(newFacade);
-        if(!allProcessedPoms.contains(newFacade.getPom())) {
-          // facade from workspace state that has not been refreshed yet
-          newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
-        } else {
-          // recreate facade instance to trigger project changed event
-          // this is only necessary for facades that are refreshed because their dependencies changed
-          // but this is relatively cheap, so all facades are recreated here
-          putMavenProject(newFacade, null);
-          newFacade = new MavenProjectFacade(newFacade);
-          putMavenProject(newFacade, mavenProject);
+        MavenProjectFacade newFacade = null;
+        if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
+          newFacade = newState.getProjectFacade(pom);
         }
-      }
+        if(newFacade != null) {
+          MavenProject mavenProject = getMavenProject(newFacade);
+          if(!allProcessedPoms.contains(newFacade.getPom())) {
+            // facade from workspace state that has not been refreshed yet
+            newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
+          } else {
+            // recreate facade instance to trigger project changed event
+            // this is only necessary for facades that are refreshed because their dependencies changed
+            // but this is relatively cheap, so all facades are recreated here
+            putMavenProject(newFacade, null);
+            newFacade = new MavenProjectFacade(newFacade);
+            putMavenProject(newFacade, mavenProject);
+          }
+        }
 
-      if(newFacade != null) {
-        final MavenProjectFacade _newFacade = newFacade;
-        final ResolverConfiguration resolverConfiguration = _newFacade.getResolverConfiguration();
-        createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
-            (executionContext, pm) -> {
-              refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, _newFacade, pm);
-              return null;
-            }, monitor);
-      } else {
-        refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
-      }
+        if(newFacade != null) {
+          final MavenProjectFacade _newFacade = newFacade;
+          final ResolverConfiguration resolverConfiguration = _newFacade.getResolverConfiguration();
+          createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
+              (executionContext, pm) -> {
+                refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, _newFacade, pm);
+                return null;
+              }, monitor);
+        } else {
+          refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
+        }
 
-      monitor.worked(1);
+        monitor.worked(1);
+      }
     }
-  }
+  } while(tracker.needsImprovement());
+}
 
   void refreshPhase2(MutableProjectRegistry newState, DependencyResolutionContext context,
       Map<IFile, Set<Capability>> originalCapabilities, Map<IFile, Set<RequiredCapability>> originalRequirements,
