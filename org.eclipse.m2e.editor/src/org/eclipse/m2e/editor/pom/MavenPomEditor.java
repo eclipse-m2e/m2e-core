@@ -857,16 +857,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return mavenpomEditorPages;
   }
 
-  /**
-   * use the <code>getMavenPomEditorPages()</code> method instead
-   *
-   * @return
-   */
-  @Deprecated
-  public List<MavenPomEditorPage> getPages() {
-    return getMavenPomEditorPages();
-  }
-
   public void showDependencyHierarchy(ArtifactKey artifactKey) {
     setActivePage(dependencyTreePage.getId());
     dependencyTreePage.selectDepedency(artifactKey);

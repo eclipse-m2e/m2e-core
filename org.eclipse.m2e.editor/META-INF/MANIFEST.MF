@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.m2e.editor;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-Activator: org.eclipse.m2e.editor.MavenEditorPlugin
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.jobs,
  org.eclipse.core.resources,
  org.eclipse.search,
  org.eclipse.ui.ide,
