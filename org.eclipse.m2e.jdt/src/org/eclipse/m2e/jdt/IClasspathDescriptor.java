@@ -18,10 +18,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 
-import org.apache.maven.artifact.Artifact;
-
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-
 
 /**
  * Instances of this class can be used to incrementally define IClasspathEntry[] arrays used by JDT to describe Java
@@ -51,8 +47,8 @@ public interface IClasspathDescriptor {
    * Adds project source folder to the classpath. The source folder must exist in the workspace unless generated is
    * true. In the latter case, the source classpath entry will be marked as optional.
    */
-  IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion,
-      IPath[] exclusion, boolean generated);
+  IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion, IPath[] exclusion,
+      boolean generated);
 
   /**
    * Adds fully populated IClasspathEntry instance to the classpath.
@@ -111,19 +107,4 @@ public interface IClasspathDescriptor {
    */
   List<IClasspathEntryDescriptor> getEntryDescriptors();
 
-  // deprecated, to be removed before 1.0
-
-  /**
-   * Adds Maven artifact with corresponding sources and javadoc paths to the classpath.
-   *
-   * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
-   */
-  @Deprecated IClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl);
-
-  /**
-   * Adds worksapce Maven project dependency to the classpath
-   *
-   * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
-   */
-  @Deprecated IClasspathEntryDescriptor addProjectEntry(Artifact artifact, IMavenProjectFacade projectFacade);
 }
