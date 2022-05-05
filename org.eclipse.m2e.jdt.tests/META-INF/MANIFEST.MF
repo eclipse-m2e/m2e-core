@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.jdt.tests;singleton:=true
 Bundle-Version: 1.16.3.qualifier
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.jobs,
  org.eclipse.jdt.core,
  org.eclipse.ui.ide,
  org.eclipse.core.resources,

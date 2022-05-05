@@ -71,6 +71,18 @@ public class MavenClassifierManager implements IMavenClassifierManager {
     public String toString() {
       return "No-Op Classifier Classpath Provider";
     }
+
+    @Override
+    public void setTestClasspath(Set<IRuntimeClasspathEntry> testClasspath, IMavenProjectFacade mavenProjectFacade,
+        IProgressMonitor monitor, int classpathProperty) {
+      // Nothing to do
+    }
+
+    @Override
+    public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath,
+        IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor, int classpathProperty) {
+      // Nothing to do
+    }
   };
 
   private static class WorkspaceClassifierResolverDelegatingProvider extends AbstractClassifierClasspathProvider {

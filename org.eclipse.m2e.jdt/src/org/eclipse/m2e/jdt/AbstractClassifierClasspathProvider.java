@@ -50,47 +50,6 @@ public abstract class AbstractClassifierClasspathProvider
   private String name;
 
   /**
-   * @throws CoreException
-   * @deprecated replaced by
-   *             {@link IClassifierClasspathProvider#setTestClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
-   */
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public void setTestClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-  }
-
-  /**
-   * @throws CoreException
-   * @deprecated replaced by
-   *             {@link IClassifierClasspathProvider#setRuntimeClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
-   */
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-  }
-
-  @Deprecated
-  protected void addTestFolder(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-    addTestFolder(runtimeClasspath, mavenProjectFacade, monitor, IRuntimeClasspathEntry.USER_CLASSES);
-  }
-
-  @Deprecated
-  protected void addMainFolder(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-    addMainFolder(runtimeClasspath, mavenProjectFacade, monitor, IRuntimeClasspathEntry.USER_CLASSES);
-  }
-
-  @Deprecated
-  protected void addFolders(Set<IRuntimeClasspathEntry> runtimeClasspath, IProject project, Set<IPath> folders) {
-    addFolders(runtimeClasspath, project, folders, IRuntimeClasspathEntry.USER_CLASSES);
-  }
-
-  /**
    * Adds test classes folder to the runtime classpath.
    *
    * @param requiredModules

@@ -22,16 +22,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 
-import org.apache.maven.artifact.Artifact;
-
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 
@@ -186,35 +181,9 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public ClasspathEntryDescriptor addProjectEntry(Artifact a, IMavenProjectFacade projectFacade) {
-    ClasspathEntryDescriptor entry = addProjectEntry(projectFacade.getFullPath());
-    entry.setArtifactKey(new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier()));
-    entry.setScope(a.getScope());
-    entry.setOptionalDependency(a.isOptional());
-    return entry;
-  }
-
-  @Override
   public ClasspathEntryDescriptor addProjectEntry(IPath entryPath) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(IClasspathEntry.CPE_PROJECT, entryPath);
     addEntryDescriptor(entry);
-    return entry;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public ClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl) {
-    ArtifactKey artifactKey = new ArtifactKey(artifact);
-    IPath entryPath = new Path(artifact.getFile().getAbsolutePath());
-
-    ClasspathEntryDescriptor entry = addLibraryEntry(entryPath);
-    entry.setArtifactKey(artifactKey);
-
-    if(javaDocUrl != null) {
-      entry.setClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, javaDocUrl);
-    }
-
     return entry;
   }
 
