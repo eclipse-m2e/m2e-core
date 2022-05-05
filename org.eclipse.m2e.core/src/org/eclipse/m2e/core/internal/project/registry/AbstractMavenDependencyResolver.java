@@ -20,8 +20,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -47,16 +45,6 @@ public abstract class AbstractMavenDependencyResolver {
 
   protected ProjectRegistryManager getManager() {
     return manager;
-  }
-
-  /**
-   * @deprecated implement {@link #resolveProjectDependencies(IMavenProjectFacade, Set, Set, IProgressMonitor)} instead
-   */
-  @Deprecated
-  public void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
-      Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
-      throws CoreException {
-    resolveProjectDependencies(facade, capabilities, requirements, monitor);
   }
 
   /**

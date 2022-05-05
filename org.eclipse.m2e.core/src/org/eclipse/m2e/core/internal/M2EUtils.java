@@ -30,7 +30,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.model.Plugin;
@@ -40,19 +39,6 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class M2EUtils {
-
-  /**
-   * Helper method which creates a folder and, recursively, all its parent folders.
-   *
-   * @param folder The folder to create.
-   * @param derived true if folder should be marked as derived
-   * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
-   * @deprecated use {@link #createFolder(IFolder, boolean, IProgressMonitor)}
-   */
-  @Deprecated
-  public static void createFolder(IFolder folder, boolean derived) throws CoreException {
-    createFolder(folder, derived, new NullProgressMonitor());
-  }
 
   /**
    * Helper method which creates a folder and, recursively, all its parent folders.

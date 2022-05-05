@@ -98,22 +98,6 @@ public interface MavenPreferenceConstants {
   String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
 
   /**
-   * boolean
-   *
-   * @deprecated Use {@link MavenPreferenceConstants#P_DUP_OF_PARENT_GROUPID_PB} instead
-   */
-  @Deprecated String P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING = PREFIX
-      + ".disableGroupIdDuplicateOfParentWarning"; //$NON-NLS-1$
-
-  /**
-   * boolean
-   *
-   * @deprecated Use {@link MavenPreferenceConstants#P_DISABLE_VERSION_DUP_OF_PARENT_WARNING} instead
-   */
-  @Deprecated String P_DISABLE_VERSION_DUP_OF_PARENT_WARNING = PREFIX
-      + ".disableVersionDuplicateOfParentWarning"; //$NON-NLS-1$
-
-  /**
    * @since 1.5
    **/
   String PROBLEM_PREFIX = PREFIX + "problem.";

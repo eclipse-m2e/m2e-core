@@ -50,14 +50,6 @@ public class ResolverConfiguration implements Serializable {
     return this.resolveWorkspaceProjects;
   }
 
-  /**
-   * @deprecated use {@link #getSelectedProfiles()} instead.
-   */
-  @Deprecated
-  public String getActiveProfiles() {
-    return getSelectedProfiles();
-  }
-
   public String getSelectedProfiles() {
     return this.selectedProfiles;
   }
@@ -72,14 +64,6 @@ public class ResolverConfiguration implements Serializable {
 
   public void setResolveWorkspaceProjects(boolean resolveWorkspaceProjects) {
     this.resolveWorkspaceProjects = resolveWorkspaceProjects;
-  }
-
-  /**
-   * @deprecated use {@link #setSelectedProfiles(String)} instead.
-   */
-  @Deprecated
-  public void setActiveProfiles(String activeProfiles) {
-    setSelectedProfiles(activeProfiles);
   }
 
   public void setSelectedProfiles(String profiles) {

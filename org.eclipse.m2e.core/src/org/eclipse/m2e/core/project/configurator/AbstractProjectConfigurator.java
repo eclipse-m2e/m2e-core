@@ -35,9 +35,6 @@ import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -45,7 +42,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -180,20 +176,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       description.setNatureIds(newNatures);
       project.setDescription(description, updateFlags, monitor);
     }
-  }
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String)} instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session, MojoExecution mojoExecution)
-      throws CoreException {
-    PluginExecution execution = new PluginExecution();
-    execution.setConfiguration(mojoExecution.getConfiguration());
-    return maven.getMojoParameterValue(parameter, asType, session, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal());
   }
 
   /**

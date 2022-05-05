@@ -56,6 +56,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
   private transient String version;
 
   public MavenExternalRuntime(String location) {
+    super(MavenRuntimeManagerImpl.EXTERNAL);
     this.location = location;
   }
 

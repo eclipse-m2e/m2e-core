@@ -69,11 +69,6 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
 
   private List<ClasspathEntry> extensions;
 
-  @Deprecated
-  protected AbstractMavenRuntime() {
-    this.name = null;
-  }
-
   protected AbstractMavenRuntime(String name) {
     this.name = name;
   }

@@ -293,18 +293,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return result;
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public MavenSession createSession(MavenExecutionRequest request, MavenProject project) {
-    RepositorySystemSession repoSession = createRepositorySession(request);
-    MavenExecutionResult result = new DefaultMavenExecutionResult();
-    MavenSession mavenSession = new MavenSession(plexus, repoSession, request, result);
-    if(project != null) {
-      mavenSession.setProjects(Collections.singletonList(project));
-    }
-    return mavenSession;
-  }
-
   /*package*/FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
     try {
       DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup(Maven.class))
@@ -597,23 +585,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor)
-      throws CoreException {
-    final RepositorySystemSession repositorySession = createRepositorySession(request);
-    return readMavenProject(request.getPom(), repositorySession, request);
-  }
-
-  @Deprecated
-  /*package*/MavenExecutionResult readMavenProject(File pomFile, RepositorySystemSession repositorySession,
-      MavenExecutionRequest request) throws CoreException {
-    ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
-    configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-    configuration.setRepositorySession(repositorySession);
-    return readMavenProject(pomFile, configuration);
-  }
-
-  @Override
   public MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration)
       throws CoreException {
     long start = System.currentTimeMillis();
@@ -683,16 +654,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public void detachFromSession(MavenProject project) throws CoreException {
     project.getProjectBuildingRequest().setRepositorySession(lookup(ContextRepositorySystemSession.class));
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject child, IProgressMonitor monitor)
-      throws CoreException {
-    final ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
-    final RepositorySystemSession repositorySession = createRepositorySession(request);
-    return resolveParentProject(repositorySession, child, configuration);
   }
 
   /*package*/MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,

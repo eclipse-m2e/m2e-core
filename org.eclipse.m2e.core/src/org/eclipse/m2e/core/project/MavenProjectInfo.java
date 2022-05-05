@@ -83,18 +83,6 @@ public class MavenProjectInfo {
     this.pomFile = pomFile;
   }
 
-  /** @deprecated use set/get BasedirRename */
-  @Deprecated
-  public void setNeedsRename(boolean needsRename) {
-    setBasedirRename(needsRename ? RENAME_REQUIRED : RENAME_NO);
-  }
-
-  /** @deprecated use set/get BasedirRenamePolicy */
-  @Deprecated
-  public boolean isNeedsRename() {
-    return getBasedirRename() == RENAME_REQUIRED;
-  }
-
   /**
    * See {@link #RENAME_NO}, {@link #RENAME_REQUIRED}
    */

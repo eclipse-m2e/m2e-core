@@ -110,12 +110,6 @@ public interface IMaven {
   MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #readMavenProject(File, IProgressMonitor)} instead.
-   */
-  @Deprecated MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException;
-
-  /**
    * @since 1.4
    * @see {@link #readMavenProjects(File, ProjectBuildingRequest)} to group requests and improve performance (RAM and
    *      CPU)
@@ -139,16 +133,6 @@ public interface IMaven {
 
   /**
    * Returns MavenProject parent project or null if no such project.
-   *
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #resolveParentProject(MavenProject, IProgressMonitor)} instead.
-   * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
-   */
-  @Deprecated MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
-      throws CoreException;
-
-  /**
-   * Returns MavenProject parent project or null if no such project.
    * 
    * @param project
    * @param monitor
@@ -166,11 +150,6 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}
    */
   @Deprecated MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor);
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}
-   */
-  @Deprecated MavenSession createSession(MavenExecutionRequest request, MavenProject project);
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
