@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -604,4 +606,7 @@ public abstract class AbstractMavenProjectTestCase {
         null);
   }
 
+  public static Set<IFile> getPomFiles(IProject... projects) {
+    return Stream.of(projects).map(p -> p.getFile(IMavenConstants.POM_FILE_NAME)).collect(Collectors.toSet());
+  }
 }
