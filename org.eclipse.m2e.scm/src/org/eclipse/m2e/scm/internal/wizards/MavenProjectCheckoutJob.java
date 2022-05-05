@@ -54,12 +54,14 @@ import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.wizards.ImportMavenProjectsJob;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.internal.Messages;
@@ -128,7 +130,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
             projectInfo.setModel(model);
           }
 
-          String projectName = configuration.getProjectName(model);
+          String projectName = ProjectConfigurationManager.getProjectName(configuration, model);
           IProject project = workspace.getProject(projectName);
           if(project.exists()) {
             checkoutAllProjects = false;

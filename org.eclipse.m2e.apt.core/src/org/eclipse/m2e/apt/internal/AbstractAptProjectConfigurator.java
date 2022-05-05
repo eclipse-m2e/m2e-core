@@ -22,7 +22,6 @@ import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.apt.MavenJdtAptPlugin;
@@ -88,19 +87,19 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
 
     AnnotationProcessingMode mode = getAnnotationProcessorMode(mavenProjectFacade);
 
-    MavenSession mavenSession = request.getMavenSession();
+    mavenProjectFacade.getMaven().createExecutionContext().execute((c, m) -> {
+      AptConfiguratorDelegate configuratorDelegate = getDelegate(mode);
+      configuratorDelegate.setSession(c.getSession());
+      configuratorDelegate.setFacade(mavenProjectFacade);
 
-    AptConfiguratorDelegate configuratorDelegate = getDelegate(mode);
-    configuratorDelegate.setSession(mavenSession);
-    configuratorDelegate.setFacade(mavenProjectFacade);
-
-    // Configure APT
-    if(!configuratorDelegate.isIgnored(monitor)) {
-      configuratorDelegate.configureProject(monitor);
-    }
+      // Configure APT
+      if(!configuratorDelegate.isIgnored(monitor)) {
+        configuratorDelegate.configureProject(monitor);
+      }
+      return null;
+    }, monitor);
 
     configureAptReconcile(mavenProjectFacade.getProject());
-
   }
 
   /**
@@ -156,15 +155,16 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
       return;
     }
 
-    AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
-    delegate.setFacade(request.getMavenProjectFacade());
-    delegate.setSession(request.getMavenSession());
-    // If this isn't a Java project, we have nothing to do
-
-    if(!delegate.isIgnored(monitor)) {
-      delegate.configureClasspath(classpath, monitor);
-    }
-
+    request.getMavenProjectFacade().getMaven().execute((c, m) -> {
+      AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
+      delegate.setFacade(request.getMavenProjectFacade());
+      delegate.setSession(c.getSession());
+      // If this isn't a Java project, we have nothing to do
+      if(!delegate.isIgnored(monitor)) {
+        delegate.configureClasspath(classpath, monitor);
+      }
+      return null;
+    }, monitor);
   }
 
   @Override

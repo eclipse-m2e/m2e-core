@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -134,13 +133,5 @@ public abstract class AbstractEclipseBuildContext implements BuildContext, IIncr
   @Override
   public void release() {
     ThreadBuildContext.setThreadBuildContext(null);
-  }
-
-  /**
-   * @deprecated BuildContext consumers should not care which files were modified during a build.
-   */
-  @Deprecated
-  public Set<File> getFiles() {
-    return results.getFiles();
   }
 }

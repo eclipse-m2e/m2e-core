@@ -270,7 +270,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     }
 
     // validate project name
-    IStatus nameStatus = getImportConfiguration().validateProjectName(artifactComponent.getModel());
+    IStatus nameStatus = MavenProjectWizard.validateProjectName(getImportConfiguration(), artifactComponent.getModel());
     if(!nameStatus.isOK()) {
       return nameStatus.getMessage();
     }

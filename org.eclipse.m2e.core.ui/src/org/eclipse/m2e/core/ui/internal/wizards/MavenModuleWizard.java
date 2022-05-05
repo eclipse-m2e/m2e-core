@@ -52,6 +52,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
@@ -215,8 +216,8 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
-          String projectName = importConfiguration.getProjectName(model);
-          IProject project = importConfiguration.getProject(ResourcesPlugin.getWorkspace().getRoot(), model);
+          String projectName = ProjectConfigurationManager.getProjectName(importConfiguration, model);
+          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 
           // XXX respect parent's setting for separate projects for modules
           // XXX should run update sources on parent instead of creating new module project

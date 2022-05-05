@@ -268,8 +268,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }));
 
     propertiesTable.addSelectionListener(
-        SelectionListener.widgetSelectedAdapter(e -> removeButton.setEnabled(propertiesTable.getSelectionCount() > 0)
-      ));
+        SelectionListener.widgetSelectedAdapter(e -> removeButton.setEnabled(propertiesTable.getSelectionCount() > 0)));
   }
 
   /**
@@ -325,7 +324,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     // validate project name
-    IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
+    IStatus nameStatus = MavenProjectWizard.validateProjectName(getImportConfiguration(), getModel());
     if(!nameStatus.isOK()) {
       return NLS.bind(Messages.wizardProjectPageMaven2ValidatorProjectNameInvalid, nameStatus.getMessage());
     }
@@ -424,9 +423,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     @Override
     public void run(IProgressMonitor monitor) {
       String archetypeName = getName(archetype);
-      monitor.beginTask(NLS.bind(
-          org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName),
-          IProgressMonitor.UNKNOWN);
+      monitor
+          .beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task,
+              archetypeName), IProgressMonitor.UNKNOWN);
 
       try {
 

@@ -78,6 +78,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -465,7 +466,8 @@ public abstract class AbstractMavenProjectTestCase {
     workspace.run((IWorkspaceRunnable) monitor -> {
       MavenPlugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo),
           importConfiguration, monitor);
-      IProject project = workspace.getRoot().getProject(importConfiguration.getProjectName(projectInfo.getModel()));
+      IProject project = workspace.getRoot()
+          .getProject(ProjectConfigurationManager.getProjectName(importConfiguration, projectInfo.getModel()));
       assertNotNull("Failed to import project " + projectInfo, project);
     }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 

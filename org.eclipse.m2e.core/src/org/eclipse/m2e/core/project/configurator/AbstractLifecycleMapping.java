@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,6 +40,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.builder.InternalBuildParticipant;
 import org.eclipse.m2e.core.internal.builder.MavenBuilderImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -59,10 +61,9 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   private static final MavenBuilderImpl builder = new MavenBuilderImpl() {
     @Override
-    protected boolean isApplicable(org.eclipse.m2e.core.internal.builder.InternalBuildParticipant participant,
-        int kind, org.eclipse.core.resources.IResourceDelta delta) {
+    protected boolean isApplicable(InternalBuildParticipant participant, int kind, IResourceDelta delta) {
       return true;
-    };
+    }
   };
 
   /**
@@ -112,8 +113,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
             participants.put(entry.getKey(), participants2);
           }
         }
-        builder.build(request.getMavenSession(), projectFacade, AbstractBuildParticipant2.PRECONFIGURE_BUILD,
-            Collections.<String, String> emptyMap(), participants, monitor);
+        projectFacade.getMaven().execute((c, m) -> builder.build(c.getSession(), projectFacade,
+            AbstractBuildParticipant2.PRECONFIGURE_BUILD, Collections.emptyMap(), participants, m), monitor);
 
         //perform configuration
         for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {

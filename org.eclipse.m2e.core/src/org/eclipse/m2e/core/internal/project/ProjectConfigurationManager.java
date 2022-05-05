@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -948,7 +949,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       projectInfo.setModel(model);
     }
     model.setPomFile(pomFile);
-    String projectName = configuration.getProjectName(model);
+    String projectName = getProjectName(configuration, model);
 
     File projectDir = pomFile.getParentFile();
     String projectParent = projectDir.getParentFile().getAbsolutePath();
@@ -1108,4 +1109,55 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
     return existingProjects;
   }
+
+  private static final String GROUP_ID = "[groupId]"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_ID = "[artifactId]"; //$NON-NLS-1$
+
+  private static final String VERSION = "[version]"; //$NON-NLS-1$
+
+  private static final String NAME = "[name]"; //$NON-NLS-1$ 
+
+  /** Calculates the project name for the given model. */
+  public static String getProjectName(ProjectImportConfiguration importConfig, Model model) {
+    // XXX should use resolved MavenProject or Model
+    //TODO: This method does not take into account MavenProjectInfo.basedirRename
+    if(importConfig.getProjectNameTemplate().isEmpty()) {
+      String cleanProjectNameComponent = cleanProjectNameComponent(model.getArtifactId(), false);
+      if(cleanProjectNameComponent != null && !cleanProjectNameComponent.isEmpty()) {
+        return cleanProjectNameComponent;
+      }
+      return model.getPomFile().getParentFile().getName();
+    }
+
+    String artifactId = model.getArtifactId();
+    String groupId = model.getGroupId();
+    if(groupId == null && model.getParent() != null) {
+      groupId = model.getParent().getGroupId();
+    }
+    String version = model.getVersion();
+    if(version == null && model.getParent() != null) {
+      version = model.getParent().getVersion();
+    }
+    String name = model.getName();
+    if(name == null || name.trim().isEmpty()) {
+      name = artifactId;
+    }
+
+    // XXX needs MavenProjectManager update to resolve groupId and version
+    return importConfig.getProjectNameTemplate().replace(GROUP_ID, cleanProjectNameComponent(groupId, true))
+        .replace(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
+        .replace(NAME, cleanProjectNameComponent(name, true))
+        .replace(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
+  }
+
+  private static final String cleanProjectNameComponent(String value, boolean quote) {
+    // remove property placeholders
+    value = value.replaceAll("\\$\\{[^\\}]++\\}", ""); //$NON-NLS-1$ $NON-NLS-2$
+    if(quote) {
+      value = Matcher.quoteReplacement(value);
+    }
+    return value;
+  }
+
 }

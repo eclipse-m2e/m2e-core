@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -25,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -44,6 +46,8 @@ import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -70,6 +74,7 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
  * </ul>
  * </p>
  */
+@SuppressWarnings("restriction")
 public class MavenProjectWizard extends AbstractMavenProjectWizard implements INewWizard {
 
   /** The wizard page for gathering general project information. */
@@ -116,7 +121,8 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       /** Skips the archetype selection page if the user chooses a simple project. */
       @Override
       public IWizardPage getNextPage() {
-        return getPage(simpleProject.getSelection() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage"); //$NON-NLS-1$ //$NON-NLS-2$
+        return getPage(
+            simpleProject.getSelection() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage"); //$NON-NLS-1$ //$NON-NLS-2$
       }
     };
     locationPage.setLocationPath(SelectionUtil.getSelectedLocation(selection));
@@ -185,19 +191,17 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     // the default workspace location for a project, we have to pass null
     // instead of the actual location.
     final Model model = getModel();
-    final String projectName = importConfiguration.getProjectName(model);
-    IStatus nameStatus = importConfiguration.validateProjectName(model);
+    final String projectName = ProjectConfigurationManager.getProjectName(importConfiguration, model);
+    IStatus nameStatus = validateProjectName(importConfiguration, model);
     if(!nameStatus.isOK()) {
       MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName),
           nameStatus.getMessage());
       return false;
     }
 
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
     final IPath location = locationPage.isInWorkspace() ? null : locationPage.getLocationPath();
-    final IWorkspaceRoot root = workspace.getRoot();
-    final IProject project = importConfiguration.getProject(root, model);
+    final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    final IProject project = root.getProject(projectName);
 
     boolean pomExists = (locationPage.isInWorkspace() ? root.getLocation().append(project.getName()) : location)
         .append(IMavenConstants.POM_FILE_NAME).toFile().exists();
@@ -263,4 +267,20 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     return true;
   }
 
+
+  static IStatus validateProjectName(ProjectImportConfiguration configuration, Model model) {
+    String projectName = ProjectConfigurationManager.getProjectName(configuration, model);
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+    // check if the project name is valid
+    IStatus nameStatus = workspace.validateName(projectName, IResource.PROJECT);
+    if(!nameStatus.isOK()) {
+      return nameStatus;
+    }
+    // check if project already exists
+    if(workspace.getRoot().getProject(projectName).exists()) {
+      return Status.error(NLS.bind(org.eclipse.m2e.core.internal.Messages.importProjectExists, projectName));
+    }
+    return Status.OK_STATUS;
+  }
 }

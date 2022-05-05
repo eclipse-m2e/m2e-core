@@ -16,11 +16,8 @@ package org.eclipse.m2e.core.project.configurator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -45,18 +42,6 @@ public class ProjectConfigurationRequest {
 
   public MavenProject getMavenProject() {
     return mavenProject;
-  }
-
-  /**
-   * @deprecated see {@link IMavenExecutionContext}.
-   */
-  @Deprecated
-  public MavenSession getMavenSession() {
-    final IMavenExecutionContext context = MavenPlugin.getMaven().getExecutionContext();
-    if(context == null) {
-      throw new IllegalStateException();
-    }
-    return context.getSession();
   }
 
   public IFile getPom() {
