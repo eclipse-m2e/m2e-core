@@ -75,18 +75,6 @@ import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
  */
 public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
 
-  /**
-   * @deprecated use StaticMavenStorageEditorInput directly
-   */
-  @Deprecated(forRemoval = true)
-  public class MavenStorageEditorInput extends StaticMavenStorageEditorInput {
-
-    public MavenStorageEditorInput(String name, String tooltip, String path, byte[] content) {
-      super(name, tooltip, path, content);
-    }
-
-  }
-
   private static final Logger log = LoggerFactory.getLogger(OpenPomAction.class);
 
   String type = IIndex.SEARCH_ARTIFACT;

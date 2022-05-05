@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.StaticMavenStorageEditorInput;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.sourcelookup.internal.launch.MetaInfMavenScanner;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;

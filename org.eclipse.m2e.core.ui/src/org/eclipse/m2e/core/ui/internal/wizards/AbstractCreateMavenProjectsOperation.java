@@ -27,31 +27,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.ui.IWorkingSet;
 
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.WorkingSets;
 
 
 public abstract class AbstractCreateMavenProjectsOperation implements IRunnableWithProgress {
-
-  @Deprecated
-  private List<IWorkingSet> workingSets;
-
-  /**
-   * @since 1.8
-   */
-  public AbstractCreateMavenProjectsOperation() {
-  }
-
-  /**
-   * A no-arg constructor should be used along with a {@link MavenProjectWorkspaceAssigner} instead.
-   */
-  @Deprecated
-  public AbstractCreateMavenProjectsOperation(List<IWorkingSet> workingSets) {
-    this.workingSets = workingSets;
-  }
 
   private List<IProject> createdProjects;
 
@@ -74,9 +55,6 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     try {
       try {
         this.createdProjects = doCreateMavenProjects(monitor);
-        if(workingSets != null) {
-          WorkingSets.addToWorkingSets(createdProjects, workingSets);
-        }
       } catch(CoreException e) {
         throw new InvocationTargetException(e);
       }
