@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -20,9 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
@@ -41,7 +39,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 
@@ -57,26 +54,9 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
  */
 public interface IMaven {
 
-  /**
-   * Creates new Maven execution request. This method is not long running, but created execution request is configured
-   * to report progress to provided progress monitor. Monitor can be null.
-   *
-   * @deprecated see {@link IMavenExecutionContext}.
-   */
-  @Deprecated MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException;
-
   // POM Model read/write operations
 
   Model readModel(InputStream in) throws CoreException;
-
-  /**
-   * Using {@link File} representations in Eclipse workspaces is prone to errors, since remote filesystems must be
-   * cached via {@link IFileStore#toLocalFile}. Simple transformations via {@link IPath#toFile()} do not work for remote
-   * files.
-   *
-   * @deprecated use {@link #readModel(InputStream)} instead.
-   */
-  @Deprecated Model readModel(File pomFile) throws CoreException;
 
   void writeModel(Model model, OutputStream out) throws CoreException;
 
@@ -131,43 +111,12 @@ public interface IMaven {
    */
   void detachFromSession(MavenProject project) throws CoreException;
 
-  /**
-   * Returns MavenProject parent project or null if no such project.
-   * 
-   * @param project
-   * @param monitor
-   * @return
-   * @throws CoreException
-   * @deprecated directly use <code>project.getParent()</code> whenever possible, and if parent needs to be re-resolved,
-   *             it's a responsibility of the consumer to do it in its code.
-   */
-  @Deprecated
-  MavenProject resolveParentProject(MavenProject project, IProgressMonitor monitor) throws CoreException;
-
   // execution
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}
-   */
-  @Deprecated MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor);
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #execute(MojoExecution, IProgressMonitor)} instead.
-   */
-  @Deprecated void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor);
 
   /**
    * @since 1.4
    */
   void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #calculateExecutionPlan(MavenProject, List, boolean, IProgressMonitor)} instead.
-   */
-  @Deprecated MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
-      boolean setup, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.4
@@ -176,37 +125,16 @@ public interface IMaven {
       IProgressMonitor monitor) throws CoreException;
 
   /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #setupMojoExecution(MavenProject, MojoExecution)} instead.
-   */
-  @Deprecated MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
-      throws CoreException;
-
-  /**
    * @since 1.4
    */
   MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException;
 
   /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #getMojoParameterValue(MojoExecution, String, Class)} instead.
-   */
-  @Deprecated <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
-      Class<T> asType) throws CoreException;
-
-  /**
    * @since 1.4
    */
   <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String)} instead.
-   */
-  @Deprecated <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
-      ConfigurationContainer configuration, String goal) throws CoreException;
 
   /**
    * @since 1.4
@@ -268,15 +196,6 @@ public interface IMaven {
 
   /** @provisional */
   void removeLocalRepositoryListener(ILocalRepositoryListener listener);
-
-  /**
-   * Creates wagon TransferListener that can be used with Archetype, NexusIndexer and other components that use wagon
-   * API directly. The listener will adopt wagon transfer events to corresponding calls to IProgressMonitor and all
-   * registered ILocalRepositoryListeners.
-   *
-   * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener
-   */
-  @Deprecated TransferListener createTransferListener(IProgressMonitor monitor);
 
   ProxyInfo getProxyInfo(String protocol) throws CoreException;
 

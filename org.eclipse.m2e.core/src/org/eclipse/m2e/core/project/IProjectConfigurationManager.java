@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -54,15 +54,6 @@ public interface IProjectConfigurationManager {
   void createSimpleProject(IProject project, IPath location, Model model, String[] folders,
       ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
           throws CoreException;
-
-  /**
-   * @deprecated use
-   *             {@link #createArchetypeProjects(IPath, Archetype, String, String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
-   */
-  @Deprecated
-  void createArchetypeProject(IProject project, IPath location, Archetype archetype, //
-      String groupId, String artifactId, String version, String javaPackage, Properties properties, //
-      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Creates project structure using Archetype and then imports the created project(s)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2022 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -82,6 +82,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
@@ -764,21 +765,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   /**
    * Creates project structure using Archetype and then imports created project(s)
    *
-   * @deprecated use
-   *             {@link #createArchetypeProjects(IPath, Archetype, String, String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
-   */
-  @Override
-  @Deprecated
-  public void createArchetypeProject(IProject project, IPath location, Archetype archetype, String groupId,
-      String artifactId, String version, String javaPackage, Properties properties,
-      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-    createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, configuration,
-        monitor);
-  }
-
-  /**
-   * Creates project structure using Archetype and then imports created project(s)
-   *
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
@@ -828,7 +814,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       ArchetypeGenerationRequest request = new ArchetypeGenerationRequest()
           //
-          .setTransferListener(maven.createTransferListener(monitor))
+          .setTransferListener(((MavenImpl) maven).createTransferListener(monitor))
           //
           .setArchetypeGroupId(artifact.getGroupId())
           //

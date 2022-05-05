@@ -363,8 +363,9 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       MojoExecution mojoExecution) throws CoreException {
     PluginExecution execution = new PluginExecution();
     execution.setConfiguration(mojoExecution.getConfiguration());
-    return maven.getMojoParameterValue(parameter, asType, session, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal());
+    MavenProject mavenProject = mavenFacade.getMavenProject();
+    return maven.getMojoParameterValue(mavenProject, parameter, asType, mojoExecution.getPlugin(), execution,
+        mojoExecution.getGoal(), null);
   }
 
 }
