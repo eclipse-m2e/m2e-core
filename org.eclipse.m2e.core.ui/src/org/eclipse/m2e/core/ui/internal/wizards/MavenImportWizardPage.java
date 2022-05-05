@@ -73,6 +73,7 @@ import org.apache.maven.model.Parent;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -465,7 +466,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     // derive working set name from project name
     if(rootProject != null) {
-      updateWorkingSet(getImportConfiguration().getProjectName(rootProject.getModel()), //
+      updateWorkingSet(ProjectConfigurationManager.getProjectName(getImportConfiguration(), rootProject.getModel()), //
           !rootProject.getProjects().isEmpty());
     } else {
       updateWorkingSet(null, false);
@@ -536,7 +537,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   boolean isAlreadyExists(MavenProjectInfo info) {
     if(info != null) {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      String name = getImportConfiguration().getProjectName(info.getModel());
+      String name = ProjectConfigurationManager.getProjectName(getImportConfiguration(), info.getModel());
       if(name != null && name.length() > 0) {
         IProject project = workspace.getRoot().getProject(name);
         return project.exists();
@@ -634,13 +635,13 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   protected String validateProjectInfo(MavenProjectInfo info) {
     if(info != null) {
       if(isWorkspaceFolder(info)) {
-        String projectName = getImportConfiguration().getProjectName(info.getModel());
+        String projectName = ProjectConfigurationManager.getProjectName(getImportConfiguration(), info.getModel());
         return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName);
       } else if(isAlreadyImported(info)) {
-        String projectName = getImportConfiguration().getProjectName(info.getModel());
+        String projectName = ProjectConfigurationManager.getProjectName(getImportConfiguration(), info.getModel());
         return NLS.bind(Messages.wizardImportValidatorProjectImported, projectName);
       } else if(isAlreadyExists(info)) {
-        String projectName = getImportConfiguration().getProjectName(info.getModel());
+        String projectName = ProjectConfigurationManager.getProjectName(getImportConfiguration(), info.getModel());
         return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName);
       }
     }

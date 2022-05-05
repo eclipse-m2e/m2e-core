@@ -13,35 +13,10 @@
 
 package org.eclipse.m2e.core.project;
 
-import java.util.regex.Matcher;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.util.NLS;
-
-import org.apache.maven.model.Model;
-
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.Messages;
-
-
 /**
  * Project import configuration bean.
  */
 public class ProjectImportConfiguration {
-
-  private static final String GROUP_ID = "[groupId]"; //$NON-NLS-1$
-
-  private static final String ARTIFACT_ID = "[artifactId]"; //$NON-NLS-1$
-
-  private static final String VERSION = "[version]"; //$NON-NLS-1$
-
-  private static final String NAME = "[name]"; //$NON-NLS-1$
 
   /** resolver configuration bean */
   private final ResolverConfiguration resolverConfiguration;
@@ -72,83 +47,5 @@ public class ProjectImportConfiguration {
   /** Returns the project name template. */
   public String getProjectNameTemplate() {
     return projectNameTemplate;
-  }
-
-  /**
-   * Calculates the project name for the given model.
-   *
-   * @deprecated This method does not take into account MavenProjectInfo.basedirRename
-   */
-  @Deprecated
-  public String getProjectName(Model model) {
-    // XXX should use resolved MavenProject or Model
-    if(projectNameTemplate.isEmpty()) {
-      String cleanProjectNameComponent = cleanProjectNameComponent(model.getArtifactId(), false);
-      if(cleanProjectNameComponent != null && !cleanProjectNameComponent.isEmpty()) {
-        return cleanProjectNameComponent;
-      }
-      return model.getPomFile().getParentFile().getName();
-    }
-
-    String artifactId = model.getArtifactId();
-    String groupId = model.getGroupId();
-    if(groupId == null && model.getParent() != null) {
-      groupId = model.getParent().getGroupId();
-    }
-    String version = model.getVersion();
-    if(version == null && model.getParent() != null) {
-      version = model.getParent().getVersion();
-    }
-    String name = model.getName();
-    if(name == null || name.trim().isEmpty()) {
-      name = artifactId;
-    }
-
-    // XXX needs MavenProjectManager update to resolve groupId and version
-    return projectNameTemplate.replace(GROUP_ID, cleanProjectNameComponent(groupId, true))
-        .replace(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
-        .replace(NAME, cleanProjectNameComponent(name, true))
-        .replace(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
-  }
-
-  private static final String cleanProjectNameComponent(String value, boolean quote) {
-    // remove property placeholders
-    value = value.replaceAll("\\$\\{[^\\}]++\\}", ""); //$NON-NLS-1$ $NON-NLS-2$
-    if(quote) {
-      value = Matcher.quoteReplacement(value);
-    }
-    return value;
-  }
-
-  /**
-   * @deprecated This method does not take into account MavenProjectInfo.basedirRename. Use
-   *             IMavenProjectImportResult#getProject instead
-   */
-  @Deprecated
-  public IProject getProject(IWorkspaceRoot root, Model model) {
-    return root.getProject(getProjectName(model));
-  }
-
-  /**
-   * @deprecated business logic does not belong to a value object
-   */
-  @Deprecated
-  public IStatus validateProjectName(Model model) {
-    String projectName = getProjectName(model);
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-    // check if the project name is valid
-    IStatus nameStatus = workspace.validateName(projectName, IResource.PROJECT);
-    if(!nameStatus.isOK()) {
-      return nameStatus;
-    }
-
-    // check if project already exists
-    if(workspace.getRoot().getProject(projectName).exists()) {
-      return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
-          NLS.bind(Messages.importProjectExists, projectName), null);
-    }
-
-    return Status.OK_STATUS;
   }
 }
