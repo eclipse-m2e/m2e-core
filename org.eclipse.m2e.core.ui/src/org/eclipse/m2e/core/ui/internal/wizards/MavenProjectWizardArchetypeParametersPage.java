@@ -73,9 +73,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
 
-  @Deprecated
-  public static final String _DEFAULT_PACKAGE = ""; //$NON-NLS-1$
-
   Table propertiesTable;
 
   TableViewer propertiesViewer;

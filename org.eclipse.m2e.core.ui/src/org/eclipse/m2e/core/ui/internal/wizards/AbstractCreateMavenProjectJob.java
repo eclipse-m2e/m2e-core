@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.progress.IProgressConstants;
 
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -32,9 +31,6 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 
 public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
-
-  @Deprecated
-  private List<IWorkingSet> workingSets;
 
   private List<IProject> createdProjects;
 
@@ -45,21 +41,11 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
     super(name);
   }
 
-  /**
-   * A {@link #AbstractCreateMavenProjectJob(String)} constructor should be used along with a
-   * {@link MavenProjectWorkspaceAssigner} instead.
-   */
-  @Deprecated
-  public AbstractCreateMavenProjectJob(String name, List<IWorkingSet> workingSets) {
-    super(name);
-    this.workingSets = workingSets;
-  }
-
   @Override
   public final IStatus runInWorkspace(IProgressMonitor monitor) {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     createdProjects = null;
-    AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation(workingSets) {
+    AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation() {
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
         return AbstractCreateMavenProjectJob.this.doCreateMavenProjects(monitor);

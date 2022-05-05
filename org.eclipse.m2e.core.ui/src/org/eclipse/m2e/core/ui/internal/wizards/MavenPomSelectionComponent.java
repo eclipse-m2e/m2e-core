@@ -65,6 +65,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
@@ -109,24 +110,6 @@ public class MavenPomSelectionComponent extends Composite {
   private IStatus status;
 
   private ISelectionChangedListener selectionListener;
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public static final String P_SEARCH_INCLUDE_JAVADOC = "searchIncludesJavadoc"; //$NON-NLS-1$
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public static final String P_SEARCH_INCLUDE_SOURCES = "searchIncludesSources"; //$NON-NLS-1$
-
-  /**
-   * @deprecated
-   */
-  @Deprecated
-  public static final String P_SEARCH_INCLUDE_TESTS = "searchIncludesTests"; //$NON-NLS-1$
 
   private static final long SHORT_DELAY = 150L;
 
