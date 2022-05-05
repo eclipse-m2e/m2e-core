@@ -16,7 +16,6 @@ package org.eclipse.m2e.editor.mojo;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
@@ -48,16 +47,5 @@ public interface IMojoParameterMetadataProvider {
    * Calculates available configuration of a single plugin class.
    */
   MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className) throws CoreException;
-
-  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo, IProgressMonitor monitor)
-      throws CoreException;
-
-  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos, IProgressMonitor monitor)
-      throws CoreException;
-
-  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException;
-
-  @Deprecated MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className, IProgressMonitor monitor)
-      throws CoreException;
 
 }
