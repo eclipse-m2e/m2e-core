@@ -585,15 +585,4 @@ public class PomFactoryImpl extends EFactoryImpl implements PomFactory {
     return (PomPackage) getEPackage();
   }
 
-  /**
-   * <!-- begin-user-doc --> <!-- end-user-doc -->
-   *
-   * @deprecated
-   * @generated
-   */
-  @Deprecated
-  public static PomPackage getPackage() {
-    return PomPackage.eINSTANCE;
-  }
-
 } // PomFactoryImpl
