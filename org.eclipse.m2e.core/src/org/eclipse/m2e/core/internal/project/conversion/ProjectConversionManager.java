@@ -151,12 +151,6 @@ public class ProjectConversionManager implements IProjectConversionManager {
   }
 
   @Override
-  @Deprecated
-  public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project) throws CoreException {
-    return getConversionParticipants(project, null);
-  }
-
-  @Override
   public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
       throws CoreException {
     List<AbstractProjectConversionParticipant> allParticipants = lookupConversionParticipants(project);

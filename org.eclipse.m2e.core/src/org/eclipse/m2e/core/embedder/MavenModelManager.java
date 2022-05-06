@@ -175,29 +175,6 @@ public class MavenModelManager {
     }
   }
 
-  /**
-   * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
-   *             supports workspace dependency resolution
-   */
-  @Deprecated
-  public synchronized DependencyNode readDependencyTree(IFile file, String classpath, IProgressMonitor monitor)
-      throws CoreException {
-    monitor.setTaskName(Messages.MavenModelManager_monitor_reading);
-    MavenProject mavenProject = readMavenProject(file, monitor);
-
-    return readDependencyTree(mavenProject, classpath, monitor);
-  }
-
-  /**
-   * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
-   *             supports workspace dependency resolution
-   */
-  @Deprecated
-  public DependencyNode readDependencyTree(MavenProject mavenProject, String classpath, IProgressMonitor monitor)
-      throws CoreException {
-    return readDependencyTree(null, mavenProject, classpath, monitor);
-  }
-
   public synchronized DependencyNode readDependencyTree(IMavenProjectFacade context, final MavenProject mavenProject,
       final String scope, IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_building);
