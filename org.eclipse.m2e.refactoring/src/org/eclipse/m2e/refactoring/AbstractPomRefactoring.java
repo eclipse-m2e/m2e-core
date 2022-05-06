@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc.
+ * Copyright (c) 2008, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -234,7 +234,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
           }
         }
       }
-    } catch(final PomRefactoringException ex) {
+    } catch(PomRefactoringException ex) {
       return new Change() {
         @Override
         public RefactoringStatus isValid(IProgressMonitor pm) throws OperationCanceledException {
@@ -277,10 +277,11 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     return res;
   }
 
-  protected MavenProject getParentProject(IMavenProjectFacade project, final MavenProject current,
-      final IProgressMonitor monitor) throws CoreException {
+  protected MavenProject getParentProject(IMavenProjectFacade project, MavenProject current, IProgressMonitor monitor)
+      throws CoreException {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    return projectManager.execute(project, (context, monitor1) -> MavenPlugin.getMaven().resolveParentProject(current, monitor1), monitor);
+    return projectManager.execute(project,
+        (context, monitor1) -> MavenPlugin.getMaven().resolveParentProject(current, monitor1), monitor);
   }
 
   // title for a composite change

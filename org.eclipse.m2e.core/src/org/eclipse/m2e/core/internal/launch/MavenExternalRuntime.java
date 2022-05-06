@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -27,15 +28,15 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import org.codehaus.plexus.classworlds.ClassWorldException;
+import org.codehaus.plexus.classworlds.launcher.ConfigurationException;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationHandler;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationParser;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -80,16 +81,12 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return location;
   }
 
-  public String getMainTypeName() {
-    return "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
-  }
-
   private File getLauncherConfigurationFile() {
     return new File(location, "bin/m2.conf"); //$NON-NLS-1$
   }
 
   @Override
-  public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, final IProgressMonitor monitor)
+  public void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException {
 
     collector.addRealm(IMavenLauncherConfiguration.LAUNCHER_REALM);
@@ -155,8 +152,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
       if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException) {
         throw (CoreException) e.getCause();
       }
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenExternalRuntime_error_cannot_parse, e));
+      throw new CoreException(Status.error(Messages.MavenExternalRuntime_error_cannot_parse, e));
     }
 
     // XXX show error dialog and fail launch
@@ -202,6 +198,30 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
   }
 
   private String getVersion0() {
+    try {
+      File zipFile = getVersionedZipFile();
+      if(zipFile != null) {
+        try (ZipFile zip = new ZipFile(zipFile)) {
+          ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
+          if(zipEntry != null) {
+            Properties pomProperties = new Properties();
+            pomProperties.load(zip.getInputStream(zipEntry));
+
+            String versionProperty = pomProperties.getProperty("version"); //$NON-NLS-1$
+            if(versionProperty != null) {
+              return versionProperty;
+            }
+          }
+        }
+      }
+    } catch(Exception e) {
+      // most likely a bad location, but who knows
+      log.error("Could not parse classwords configuration file", e);
+    }
+    return Messages.MavenExternalRuntime_unknown;
+  }
+
+  private File getVersionedZipFile() throws IOException, ClassWorldException, ConfigurationException {
     class VersionHandler implements ConfigurationHandler {
       File mavenCore;
 
@@ -239,39 +259,14 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     copyProperties(properties, System.getProperties());
     properties.put(PROPERTY_MAVEN_HOME, location);
 
-    ConfigurationParser parser = new ConfigurationParser(handler, properties);
-
-    try {
-      try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
-        parser.parse(is);
-      }
-
-      File zipFile = null;
-      if(handler.mavenCore != null) {
-        zipFile = handler.mavenCore;
-      } else if(handler.uber != null) {
-        zipFile = handler.uber;
-      }
-      if(zipFile != null) {
-        try (ZipFile zip = new ZipFile(zipFile)) {
-          String suffix = "";
-          ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
-          if(zipEntry != null) {
-            Properties pomProperties = new Properties();
-            pomProperties.load(zip.getInputStream(zipEntry));
-
-            String version = pomProperties.getProperty("version"); //$NON-NLS-1$
-            if(version != null) {
-              return version + suffix;
-            }
-          }
-        }
-      }
-    } catch(Exception e) {
-      // most likely a bad location, but who knows
-      log.error("Could not parse classwords configuration file", e);
+    try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
+      new ConfigurationParser(handler, properties).parse(is);
     }
-
-    return Messages.MavenExternalRuntime_unknown;
+    if(handler.mavenCore != null) {
+      return handler.mavenCore;
+    } else if(handler.uber != null) {
+      return handler.uber;
+    }
+    return null;
   }
 }

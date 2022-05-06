@@ -14,7 +14,6 @@
 package org.eclipse.m2e.internal.launch;
 
 import static org.eclipse.m2e.actions.MavenLaunchConstants.ATTR_WORKSPACE_RESOLUTION;
-import static org.eclipse.m2e.actions.MavenLaunchConstants.PLUGIN_ID;
 import static org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration.LAUNCHER_REALM;
 import static org.eclipse.m2e.internal.launch.MavenLaunchUtils.quote;
 
@@ -22,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
@@ -29,7 +29,6 @@ import org.osgi.framework.FrameworkUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -128,9 +127,9 @@ public class MavenRuntimeLaunchSupport {
 
     public MavenRuntimeLaunchSupport build(IProgressMonitor monitor) throws CoreException {
 
-      final AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+      AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
 
-      final MavenLauncherConfigurationHandler cwconf = new MavenLauncherConfigurationHandler();
+      MavenLauncherConfigurationHandler cwconf = new MavenLauncherConfigurationHandler();
       runtime.createLauncherConfiguration(cwconf, monitor);
       if(injectWorkspaceResolver) {
         for(String entry : MavenLaunchUtils.getCliResolver(runtime)) {
@@ -138,7 +137,7 @@ public class MavenRuntimeLaunchSupport {
         }
       }
 
-      final File cwconfFile;
+      File cwconfFile;
       try {
         Bundle bundle = FrameworkUtil.getBundle(MavenRuntimeLaunchSupport.class);
         File state = Platform.getStateLocation(bundle).toFile();
@@ -149,10 +148,8 @@ public class MavenRuntimeLaunchSupport {
           cwconf.save(os);
         }
       } catch(IOException e) {
-        throw new CoreException(
-            new Status(IStatus.ERROR, PLUGIN_ID, -1, Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
+        throw new CoreException(Status.error(Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
       }
-
       return new MavenRuntimeLaunchSupport(runtime, cwconf, cwconfFile, resolveWorkspaceArtifacts);
     }
   }
@@ -162,9 +159,9 @@ public class MavenRuntimeLaunchSupport {
    * org.eclipse.ui.externaltools.internal.program.launchConfigurations.BackgroundResourceRefresher
    */
   private class BackgroundResourceRefresher implements IDebugEventSetListener {
-    final ILaunchConfiguration configuration;
+    private final ILaunchConfiguration configuration;
 
-    final IProcess process;
+    private final IProcess process;
 
     public BackgroundResourceRefresher(ILaunchConfiguration configuration, ILaunch launch) {
       this.configuration = configuration;
@@ -186,28 +183,22 @@ public class MavenRuntimeLaunchSupport {
     }
 
     public void handleDebugEvents(DebugEvent[] events) {
-      for(DebugEvent event : events) {
-        if(event.getSource() == process && event.getKind() == DebugEvent.TERMINATE) {
-          DebugPlugin.getDefault().removeDebugEventListener(this);
-          processResources();
-          break;
-        }
+      if(Arrays.stream(events).anyMatch(e -> e.getSource() == process && e.getKind() == DebugEvent.TERMINATE)) {
+        DebugPlugin.getDefault().removeDebugEventListener(this);
+        processResources();
       }
     }
 
     protected void processResources() {
       getClassworldConfFile().delete();
-      Job job = new Job(Messages.MavenLaunchDelegate_job_name) {
-        public IStatus run(IProgressMonitor monitor) {
-          try {
-            RefreshTab.refreshResources(configuration, monitor);
-            return Status.OK_STATUS;
-          } catch(CoreException e) {
-            return e.getStatus();
-          }
+      Job.create(Messages.MavenLaunchDelegate_job_name, monitor -> {
+        try {
+          RefreshTab.refreshResources(configuration, monitor);
+          return Status.OK_STATUS;
+        } catch(CoreException e) {
+          return e.getStatus();
         }
-      };
-      job.schedule();
+      }).schedule();
     }
   }
 
@@ -223,8 +214,8 @@ public class MavenRuntimeLaunchSupport {
     return new Builder(configuration);
   }
 
-  public static MavenRuntimeLaunchSupport create(ILaunchConfiguration configuration, ILaunch launch,
-      IProgressMonitor monitor) throws CoreException {
+  public static MavenRuntimeLaunchSupport create(ILaunchConfiguration configuration, IProgressMonitor monitor)
+      throws CoreException {
     return builder(configuration).build(monitor);
   }
 
@@ -288,15 +279,14 @@ public class MavenRuntimeLaunchSupport {
     properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath()));
   }
 
-  public IVMRunner decorateVMRunner(final IVMRunner runner) {
+  public IVMRunner decorateVMRunner(IVMRunner runner) {
     return (runnerConfiguration, launch, monitor) -> {
       runner.run(runnerConfiguration, launch, monitor);
 
       IProcess[] processes = launch.getProcesses();
       if(processes != null && processes.length > 0) {
         ILaunchConfiguration configuration = launch.getLaunchConfiguration();
-        BackgroundResourceRefresher refresher = new BackgroundResourceRefresher(configuration, launch);
-        refresher.init();
+        new BackgroundResourceRefresher(configuration, launch).init();
       } else {
         // the process didn't start, remove temp classworlds.conf right away
         getClassworldConfFile().delete();

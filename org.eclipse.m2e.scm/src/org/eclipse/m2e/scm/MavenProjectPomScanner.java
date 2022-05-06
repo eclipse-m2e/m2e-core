@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -68,8 +68,8 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
   public String getDescription() {
     if(dependencies.length == 1) {
       Dependency d = dependencies[0];
-      return d.getGroupId()
-          + ":" + d.getArtifactId() + ":" + d.getVersion() + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion() //$NON-NLS-1$//$NON-NLS-2$
+          + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$
     }
     return "" + dependencies.length + " projects"; //$NON-NLS-1$
   }
@@ -201,8 +201,8 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
 
   private Model resolveModel(String groupId, String artifactId, String version, IProgressMonitor monitor)
       throws CoreException {
-    monitor.subTask(NLS.bind(Messages.MavenProjectPomScanner_task_resolving,
-        new Object[] {groupId, artifactId, version}));
+    monitor
+        .subTask(NLS.bind(Messages.MavenProjectPomScanner_task_resolving, new Object[] {groupId, artifactId, version}));
 
     List<ArtifactRepository> repositories = maven.getArtifactRepositories();
     Artifact artifact = maven.resolve(groupId, artifactId, version, "pom", null, repositories, monitor); //$NON-NLS-1$

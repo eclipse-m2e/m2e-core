@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -14,17 +14,13 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,7 +34,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
@@ -56,8 +51,6 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
 
   private IFile selectedFile;
 
-  private IFile pomFile;
-
   private MavenInstallFileArtifactWizardPage artifactPage;
 
   public MavenInstallFileWizard() {
@@ -69,9 +62,6 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   public void addPages() {
     artifactPage = new MavenInstallFileArtifactWizardPage(selectedFile);
     addPage(artifactPage);
-
-    // repositoryPage = new MavenInstallFileRepositoryWizardPage(pomFile);
-    // addPage(repositoryPage);
   }
 
   @Override
@@ -100,35 +90,26 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
       properties.setProperty("createChecksum", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    new Job(Messages.MavenInstallFileWizard_job) {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
-        try {
-          // Run the install:install-file goal
-          IMaven maven = MavenPlugin.getMaven();
-          MavenExecutionRequest request = maven.createExecutionRequest(monitor);
-          request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
-          request.setUserProperties(properties);
-          MavenExecutionResult executionResult = maven.execute(request, monitor);
+    Job job = Job.create(Messages.MavenInstallFileWizard_job, monitor -> {
+      try {
+        // Run the install:install-file goal
+        IMaven maven = MavenPlugin.getMaven();
+        MavenExecutionRequest request = maven.createExecutionRequest(monitor);
+        request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
+        request.setUserProperties(properties);
+        MavenExecutionResult executionResult = maven.execute(request, monitor);
 
-          List<Throwable> exceptions = executionResult.getExceptions();
-          if(!exceptions.isEmpty()) {
-            for(Throwable exception : exceptions) {
-              String msg = Messages.MavenInstallFileWizard_error;
-              msg += "; " + exception.toString(); //$NON-NLS-1$
-              log.error(msg, exception);
-            }
-          }
-
-          // TODO update index for local maven repository
-        } catch(CoreException ex) {
-          log.error("Failed to install artifact:" + ex.getMessage(), ex);
+        for(Throwable exception : executionResult.getExceptions()) {
+          log.error(Messages.MavenInstallFileWizard_error + "; " + exception, exception);
         }
-        return Status.OK_STATUS;
+        // TODO update index for local maven repository
+      } catch(CoreException ex) {
+        log.error("Failed to install artifact:" + ex.getMessage(), ex);
       }
-    }.schedule();
-
+      return Status.OK_STATUS;
+    });
+    job.setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
+    job.schedule();
     return true;
   }
 
@@ -137,19 +118,6 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
     Object element = selection.getFirstElement();
     if(element instanceof IFile) {
       selectedFile = (IFile) element;
-      setPomFile(selectedFile.getProject());
-    } else if(element instanceof IProject) {
-      setPomFile((IProject) element);
     }
   }
-
-  private void setPomFile(IProject project) {
-    if(project.isAccessible()) {
-      IFile pomFile = project.getFile(IMavenConstants.POM_FILE_NAME);
-      if(pomFile != null && pomFile.isAccessible()) {
-        this.pomFile = pomFile;
-      }
-    }
-  }
-
 }

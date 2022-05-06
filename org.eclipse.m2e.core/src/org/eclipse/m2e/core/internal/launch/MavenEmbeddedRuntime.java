@@ -157,10 +157,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   @Override
   public String toString() {
     Bundle embedder = findMavenEmbedderBundle();
-    if(embedder != null) {
-      return getVersion() + '/' + embedder.getVersion();
-    }
-    return "org.eclipse.m2e.maven.runtime";
+    return embedder != null ? getVersion() + '/' + embedder.getVersion() : "org.eclipse.m2e.maven.runtime";
   }
 
   @Override
@@ -188,17 +185,14 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
           pomProperties.load(r);
         }
       }
-
       String version = pomProperties.getProperty("version"); //$NON-NLS-1$
       if(version != null) {
         mavenVersion = version;
         return mavenVersion;
       }
-
     } catch(Exception e) {
       log.warn("Could not determine embedded maven version", e);
     }
-
     return Messages.MavenEmbeddedRuntime_unknown;
   }
 }

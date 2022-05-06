@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 eBusiness Information, Excilys Group and others.
+ * Copyright (c) 2011, 2022 eBusiness Information, Excilys Group and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,12 @@
 package org.eclipse.m2e.apt.internal.processor;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.codehaus.plexus.util.Scanner;
@@ -44,7 +46,7 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
 
   @Override
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
-    IMaven maven = MavenPlugin.getMaven();
+
     BuildContext buildContext = getBuildContext();
 
     monitor.setTaskName("Executing " + getMojoExecution().getArtifactId() + ":" + getMojoExecution().getGoal());
@@ -53,43 +55,34 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
     if(!buildContext.hasDelta(getMavenProjectFacade().getPomFile())) {
 
       // check if any of the java files changed
-      File source = maven.getMojoParameterValue(getSession(), getMojoExecution(),
-          MavenProcessorJdtAptDelegate.SOURCE_DIRECTORY_PARAMETER, File.class);
+      File source = getFileParameter(MavenProcessorJdtAptDelegate.SOURCE_DIRECTORY_PARAMETER);
       Scanner ds = buildContext.newScanner(source); // delta or full scanner
       ds.scan();
       String[] includedFiles = ds.getIncludedFiles();
-      if((includedFiles == null) || (includedFiles.length <= 0)) {
+      if(includedFiles == null || includedFiles.length <= 0) {
         return null;
       }
-
-      if(getBuildContext().isIncremental()) {
-        boolean interestingFileChanged = false;
-        for(String f : includedFiles) {
-          if(f.endsWith(".java")) {
-            interestingFileChanged = true;
-            break;
-          }
-        }
-
-        if(!interestingFileChanged) {
-          return Collections.emptySet();
-        }
+      if(getBuildContext().isIncremental() && Arrays.stream(includedFiles).noneMatch(f -> f.endsWith(".java"))) {
+        return Collections.emptySet();
       }
     }
     // execute mojo
     Set<IProject> result = super.build(kind, monitor);
 
     // tell m2e builder to refresh generated files
-    File generated = maven.getMojoParameterValue(getSession(), getMojoExecution(),
-        MavenProcessorJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, File.class);
+    File generated = getFileParameter(MavenProcessorJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER);
     if(generated == null) {
-      generated = maven.getMojoParameterValue(getSession(), getMojoExecution(),
-          MavenProcessorJdtAptDelegate.DEFAULT_OUTPUT_DIRECTORY_PARAMETER, File.class);
+      generated = getFileParameter(MavenProcessorJdtAptDelegate.DEFAULT_OUTPUT_DIRECTORY_PARAMETER);
     }
     if(generated != null) {
       buildContext.refresh(generated);
     }
 
     return result;
+  }
+
+  private File getFileParameter(String propertyId) throws CoreException {
+    IMaven maven = MavenPlugin.getMaven();
+    return maven.getMojoParameterValue(getSession(), getMojoExecution(), propertyId, File.class);
   }
 }
