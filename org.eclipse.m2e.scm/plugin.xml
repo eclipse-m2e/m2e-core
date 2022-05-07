@@ -77,9 +77,9 @@
      <wizard id="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
              class="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
              category="org.eclipse.m2e"
-             name="%wizard.checkout2.name"
+             name="%wizard.checkout.name"
              icon="icons/import_m2_project.gif">
-       <description>%wizard.checkout2.description</description>
+       <description>%wizard.checkout.description</description>
      </wizard>
    </extension>
 

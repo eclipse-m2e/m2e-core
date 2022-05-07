@@ -302,7 +302,7 @@
           adaptable="false">
         <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
                 class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
-                label="%action.javadoc3.label"
+                label="%action.javadoc.label"
                 enablesFor="1" icon="icons/javadoc.gif"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.openJavaDocDependency"
@@ -310,7 +310,7 @@
             adaptable="false">
          <action id="org.eclipse.m2e.ui.openJavaDocDependency"
                class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
-               label="%action.javadoc4.label"
+               label="%action.javadoc.label"
                enablesFor="1"/>
       </objectContribution>
    </extension>
