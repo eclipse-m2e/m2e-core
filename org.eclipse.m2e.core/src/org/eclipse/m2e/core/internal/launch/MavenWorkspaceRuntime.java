@@ -27,7 +27,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -39,7 +38,6 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * @author Igor Fedorenko
  * @author Jason van Zyl
  */
-@SuppressWarnings("deprecation")
 public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
 
   private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey( //

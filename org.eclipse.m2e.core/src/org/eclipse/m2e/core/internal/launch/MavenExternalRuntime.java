@@ -36,7 +36,6 @@ import org.codehaus.plexus.classworlds.launcher.ConfigurationHandler;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationParser;
 import org.codehaus.plexus.util.DirectoryScanner;
 
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -46,7 +45,6 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
-@SuppressWarnings("deprecation")
 public class MavenExternalRuntime extends AbstractMavenRuntime {
   private static final Logger log = LoggerFactory.getLogger(MavenExternalRuntime.class);
 
