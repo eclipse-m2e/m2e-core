@@ -179,7 +179,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
         mavenSession.setCurrentProject(project);
         mavenSession.setProjects(Collections.singletonList(project));
       }
-      return callable.call(this, monitor);
+      return callable.call(this, IProgressMonitor.nullSafe(monitor));
     } finally {
       Thread.currentThread().setContextClassLoader(origTCCL);
       repositorySession.setTransferListener(origTransferListener);

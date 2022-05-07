@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.osgi.util.NLS;
 
@@ -49,7 +48,7 @@ abstract class AbstractTransferListenerAdapter {
 
   protected AbstractTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
     this.maven = maven;
-    this.monitor = monitor == null ? new NullProgressMonitor() : monitor;
+    this.monitor = IProgressMonitor.nullSafe(monitor);
   }
 
   protected void formatBytes(long n, StringBuilder sb) {
