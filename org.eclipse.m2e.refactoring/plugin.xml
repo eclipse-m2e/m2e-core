@@ -70,7 +70,7 @@
             class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
             enablesFor="+"
             icon="icons/exclude.gif"
-            label="%action.exclude3.label"
+            label="%action.exclude.label"
             menubarPath="additions"/>
      </objectContribution>
 
@@ -96,7 +96,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.refactoring.DependencyExclude"
                  class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-                 label="%action.exclude3.label"
+                 label="%action.exclude.label"
                  icon="icons/exclude.gif"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenu/open"
@@ -110,7 +110,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.refactoring.DependencyExclude"
                  class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-                 label="%action.exclude3.label"
+                 label="%action.exclude.label"
                  icon="icons/exclude.gif"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"

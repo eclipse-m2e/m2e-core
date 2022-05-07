@@ -254,7 +254,7 @@
           adaptable="false">
         <action id="org.eclipse.m2e.core.ui.openPomDependency"
                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
-                label="%openpomaction.label3"
+                label="%openpomaction.label"
                 enablesFor="1"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.core.openPomDependency"
@@ -262,7 +262,7 @@
             adaptable="false">
         <action id="org.eclipse.m2e.core.ui.openPomDependency"
                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
-                label="%openpomaction.label4"
+                label="%openpomaction.label"
                 enablesFor="1"/>
       </objectContribution>
       <objectContribution
