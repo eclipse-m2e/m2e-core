@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2018 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2022 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,7 +74,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
-  
+
   private static Method setGenTestSrcDirMethod = null;
   static {
     try {
@@ -135,7 +135,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     File generatedSourcesDirectory = configuration.getOutputDirectory();
     File generatedTestSourcesDirectory = configuration.getTestOutputDirectory();
-    
+
     // If this project has no valid generatedSourcesDirectory, we have nothing to do
     if(generatedSourcesDirectory == null && generatedTestSourcesDirectory == null) {
       return;
@@ -145,7 +145,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     //The plugin dependencies are added first to the classpath
     LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<>(getJars(configuration.getDependencies()));
-    
+
     // Get the project's dependencies
     if(configuration.isAddProjectDependencies()) {
       List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
@@ -168,15 +168,16 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       // Configure APT output path
       File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
       String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
-  
+
       AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
     }
     if(generatedTestSourcesDirectory != null && setGenTestSrcDirMethod != null) {
       // Configure APT output path
-      File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedTestSourcesDirectory);
+      File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
+          generatedTestSourcesDirectory);
       String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
       try {
-          setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
+        setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
       } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       }
     }
@@ -200,8 +201,8 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     //Quick fix for https://github.com/jbosstools/m2e-apt/issues/65: Disable all plugins APs.
     //Since they're unknown to Maven, they represent a configuration mismatch between Maven and Eclipse
-    for ( FactoryContainer fc : ((FactoryPath)factoryPath).getEnabledContainers().keySet()) {
-      if (FactoryType.PLUGIN.equals(fc.getType())) {
+    for(FactoryContainer fc : ((FactoryPath) factoryPath).getEnabledContainers().keySet()) {
+      if(FactoryType.PLUGIN.equals(fc.getType())) {
         factoryPath.disablePlugin(fc.getId());
       }
     }
@@ -232,14 +233,14 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   }
 
   private List<File> getJars(List<File> files) {
-    if (files == null || files.isEmpty()) {
+    if(files == null || files.isEmpty()) {
       return Collections.emptyList();
     }
     List<File> jars = new ArrayList<>(files);
     Iterator<File> ite = jars.iterator();
     while(ite.hasNext()) {
       File jar = ite.next();
-      if (!ProjectUtils.isJar(jar)){
+      if(!ProjectUtils.isJar(jar)) {
         ite.remove();
       }
     }
@@ -348,7 +349,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().equals(fullPath)) {
         matchingDescriptor = cped;
-      } else if(Boolean.valueOf(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
+      } else if(Boolean.parseBoolean(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
         stalePaths.add(cped.getPath());
       }
     }

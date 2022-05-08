@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.internal.launch;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,16 +55,15 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 @SuppressWarnings({"restriction", "deprecation"})
 public class MavenSourcePathComputer implements ISourcePathComputer {
 
-  public MavenSourcePathComputer() {
-  }
-
+  @Override
   public String getId() {
     return "org.eclipse.m2e.launching.MavenSourceComputer"; //$NON-NLS-1$
   }
 
+  @Override
   public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
-    final List<IRuntimeClasspathEntry> entries = new ArrayList<>();
+    List<IRuntimeClasspathEntry> entries = new ArrayList<>();
 
     IRuntimeClasspathEntry jreEntry = JavaRuntime.computeJREEntry(configuration);
     if(jreEntry != null) {
@@ -102,7 +100,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     return JavaRuntime.getSourceContainers(resolved);
   }
 
-  protected void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath) {
+  private void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath) {
     File entryFile = new File(entryPath);
 
     if(!entryFile.exists()) {
@@ -117,17 +115,15 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
       ds.scan();
       String[] files = ds.getIncludedFiles();
       for(String file : files) {
-        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(entryFile, file)))) {
+        try (InputStream is = new FileInputStream(new File(entryFile, file))) {
           addArchiveRuntimeClasspathEntry(entries, entryPath, is);
         } catch(IOException e) {
           // ignore it
         }
-
       }
     } else {
       try (JarFile jar = new JarFile(entryFile)) {
-        Enumeration<JarEntry> zes = jar.entries();
-        while(zes.hasMoreElements()) {
+        for(Enumeration<JarEntry> zes = jar.entries(); zes.hasMoreElements();) {
           JarEntry ze = zes.nextElement();
           String name = ze.getName();
           if(!ze.isDirectory() && name.startsWith("META-INF/maven/") && name.endsWith("pom.properties")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -138,7 +134,6 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
         // ignore it
       }
     }
-
   }
 
   private void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath, InputStream is)

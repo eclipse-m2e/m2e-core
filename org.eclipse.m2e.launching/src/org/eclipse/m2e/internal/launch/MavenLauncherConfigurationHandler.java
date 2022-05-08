@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2022 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -69,13 +69,13 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
   }
 
   public void addProjectEntry(IMavenProjectFacade facade) {
-    final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     IFolder output = root.getFolder(facade.getOutputLocation());
     if(output.isAccessible()) {
       addArchiveEntry(output.getLocation().toFile().getAbsolutePath());
     }
     // add custom classpath entries
-    final IJavaProject javaProject = JavaCore.create(facade.getProject());
+    IJavaProject javaProject = JavaCore.create(facade.getProject());
     try {
       for(IClasspathEntry cpe : javaProject.getRawClasspath()) {
         if(cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {

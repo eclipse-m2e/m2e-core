@@ -81,6 +81,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     allowAdvancedSourcelookup();
   }
 
+  @Override
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     this.launch = launch;
@@ -88,7 +89,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     this.programArguments = null;
 
     try {
-      this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, launch, monitor);
+      this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, monitor);
       this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
 
       log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
@@ -105,25 +106,30 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     }
   }
 
+  @Override
   public IVMRunner getVMRunner(final ILaunchConfiguration configuration, String mode) throws CoreException {
     return launchSupport.decorateVMRunner(super.getVMRunner(configuration, mode));
   }
 
+  @Override
   public String getMainTypeName(ILaunchConfiguration configuration) {
     return launchSupport.getVersion().startsWith("3.") ? LAUNCHER_TYPE3 : LAUNCHER_TYPE; //$NON-NLS-1$
   }
 
+  @Override
   public String[] getClasspath(ILaunchConfiguration configuration) {
     List<String> cp = launchSupport.getBootClasspath();
-    return cp.toArray(new String[cp.size()]);
+    return cp.toArray(String[]::new);
   }
 
+  @Override
   public String[][] getClasspathAndModulepath(ILaunchConfiguration configuration) {
     String[][] paths = new String[2][];
     paths[0] = getClasspath(configuration);
     return paths;
   }
 
+  @Override
   public String getProgramArguments(ILaunchConfiguration configuration) throws CoreException {
     if(programArguments == null) {
       String goals = getGoals(configuration);
@@ -140,6 +146,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     return programArguments;
   }
 
+  @Override
   @SuppressWarnings("restriction")
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
     VMArguments arguments = launchSupport.getVMArguments();
@@ -159,6 +166,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     return configuration.getAttribute(MavenLaunchConstants.ATTR_GOALS, ""); //$NON-NLS-1$
   }
 
+  @Override
   public boolean buildForLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) {
     return false;
   }
@@ -188,8 +196,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         }
       }
     } catch(CoreException e) {
-      String msg = "Exception while getting configuration attribute " + ATTR_PROPERTIES;
-      log.error(msg, e);
+      log.error("Exception while getting configuration attribute " + ATTR_PROPERTIES, e);
       throw e;
     }
 
@@ -199,8 +206,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         sb.append(" -P").append(profiles.replaceAll("\\s+", ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
     } catch(CoreException ex) {
-      String msg = "Exception while getting configuration attribute " + ATTR_PROFILES;
-      log.error(msg, ex);
+      log.error("Exception while getting configuration attribute " + ATTR_PROFILES, ex);
       throw ex;
     }
   }

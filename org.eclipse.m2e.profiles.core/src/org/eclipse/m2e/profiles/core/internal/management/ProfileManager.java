@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2011-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2011-2022 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,6 @@ import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -341,7 +340,7 @@ public class ProfileManager implements IProfileManager {
   private RepositorySystem getRepositorySystem() {
     try {
       //TODO find an alternative way to get the Maven RepositorySystem, or use Aether directly to resolve models??
-      IMaven maven = MavenPluginActivator.getDefault().getMaven();
+      IMaven maven = MavenPlugin.getMaven();
       return maven.lookup(RepositorySystem.class);
     } catch(CoreException e) {
       if(e.getStatus().getException() instanceof ComponentLookupException) {

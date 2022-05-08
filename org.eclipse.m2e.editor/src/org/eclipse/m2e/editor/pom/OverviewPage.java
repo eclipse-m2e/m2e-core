@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -124,9 +124,9 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -1442,7 +1442,7 @@ public class OverviewPage extends MavenPomEditorPage {
   void addPluginPackagingTypes(Set<String> packagingTypes, Artifact artifact) {
     ArtifactRepository localRepository;
     try {
-      localRepository = MavenPluginActivator.getDefault().getMaven().getLocalRepository();
+      localRepository = MavenPlugin.getMaven().getLocalRepository();
     } catch(CoreException ex) { // No local repo, can't add packaging types
       return;
     }

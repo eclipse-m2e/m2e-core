@@ -142,7 +142,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * Path of project metadata files, relative to the project. These files are used to determine if project dependencies
    * need to be updated.
    */
-  public static final List<? extends IPath> METADATA_PATH = Arrays.asList( //
+  public static final List<IPath> METADATA_PATH = List.of( //
       new Path("pom.xml"), // //$NON-NLS-1$
       new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -297,8 +297,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
   @Deprecated
   public void refresh(final MavenUpdateRequest request, final IProgressMonitor monitor) throws CoreException {
     getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), (context, pm) -> {
-        refresh(request.getPomFiles(), monitor);
-        return null;
+      refresh(request.getPomFiles(), monitor);
+      return null;
     }, monitor);
   }
 
@@ -313,7 +313,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
    *
    * @since 1.4
    */
-  public void refresh(final Collection<IFile> pomFiles, final IProgressMonitor monitor) throws CoreException {
+  public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectRegistryManager_task_refreshing, 100);
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
     Job.getJobManager().beginRule(rule, progress);
@@ -328,17 +328,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  void refresh(final MutableProjectRegistry newState, Collection<IFile> pomFiles, IProgressMonitor monitor)
+  void refresh(MutableProjectRegistry newState, Collection<IFile> pomFiles, IProgressMonitor monitor)
       throws CoreException {
     log.debug("Refreshing: {}", pomFiles); //$NON-NLS-1$
 
     // 442524 safety guard
     URLConnectionCaches.assertDisabled();
 
-    final DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
+    DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
 
     // safety net -- do not force refresh of the same installed/resolved artifact more than once
-    final Set<ArtifactKey> installedArtifacts = new HashSet<>();
+    Set<ArtifactKey> installedArtifacts = new HashSet<>();
 
     ILocalRepositoryListener listener = (repositoryBasedir, baseArtifact, artifact, artifactFile) -> {
       if(artifactFile == null) {
@@ -373,13 +373,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
     log.debug("Refreshed: {}", pomFiles); //$NON-NLS-1$
   }
 
-  private void refresh(final MutableProjectRegistry newState, final DependencyResolutionContext context,
-      IProgressMonitor monitor) throws CoreException {
+  private void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
+      throws CoreException {
     Set<IFile> allProcessedPoms = new HashSet<>();
     Set<IFile> allNewFacades = new HashSet<>();
 
-    final Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
-    final Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<>();
+    Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
+    Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<>();
 
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
@@ -482,54 +482,54 @@ public class ProjectRegistryManager implements ISaveParticipant {
     // phase 2: resolve project dependencies
     ProjectProcessingTracker tracker = new ProjectProcessingTracker(context);
     do {
-    while(!context.isEmpty()) {
-      if(monitor.isCanceled()) {
-        throw new OperationCanceledException();
-      }
-
-      if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
-        throw new StaleMutableProjectRegistryException();
-      }
-
-      final IFile pom = context.pop();
-      if(tracker.shouldProcess(pom)) {
-
-        MavenProjectFacade newFacade = null;
-        if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-          newFacade = newState.getProjectFacade(pom);
+      while(!context.isEmpty()) {
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
         }
-        if(newFacade != null) {
-          MavenProject mavenProject = getMavenProject(newFacade);
-          if(!allProcessedPoms.contains(newFacade.getPom())) {
-            // facade from workspace state that has not been refreshed yet
-            newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
-          } else {
-            // recreate facade instance to trigger project changed event
-            // this is only necessary for facades that are refreshed because their dependencies changed
-            // but this is relatively cheap, so all facades are recreated here
-            putMavenProject(newFacade, null);
-            newFacade = new MavenProjectFacade(newFacade);
-            putMavenProject(newFacade, mavenProject);
+
+        if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
+          throw new StaleMutableProjectRegistryException();
+        }
+
+        IFile pom = context.pop();
+        if(tracker.shouldProcess(pom)) {
+
+          MavenProjectFacade newFacade = null;
+          if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
+            newFacade = newState.getProjectFacade(pom);
           }
-        }
+          if(newFacade != null) {
+            MavenProject mavenProject = getMavenProject(newFacade);
+            if(!allProcessedPoms.contains(newFacade.getPom())) {
+              // facade from workspace state that has not been refreshed yet
+              newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
+            } else {
+              // recreate facade instance to trigger project changed event
+              // this is only necessary for facades that are refreshed because their dependencies changed
+              // but this is relatively cheap, so all facades are recreated here
+              putMavenProject(newFacade, null);
+              newFacade = new MavenProjectFacade(newFacade);
+              putMavenProject(newFacade, mavenProject);
+            }
+          }
 
-        if(newFacade != null) {
-          final MavenProjectFacade _newFacade = newFacade;
-          final ResolverConfiguration resolverConfiguration = _newFacade.getResolverConfiguration();
-          createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
-              (executionContext, pm) -> {
-                refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, _newFacade, pm);
-                return null;
-              }, monitor);
-        } else {
-          refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
-        }
+          if(newFacade != null) {
+            MavenProjectFacade facade = newFacade;
+            ResolverConfiguration resolverConfiguration = facade.getResolverConfiguration();
+            createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
+                (executionContext, pm) -> {
+                  refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade, pm);
+                  return null;
+                }, monitor);
+          } else {
+            refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
+          }
 
-        monitor.worked(1);
+          monitor.worked(1);
+        }
       }
-    }
-  } while(tracker.needsImprovement());
-}
+    } while(tracker.needsImprovement());
+  }
 
   void refreshPhase2(MutableProjectRegistry newState, DependencyResolutionContext context,
       Map<IFile, Set<Capability>> originalCapabilities, Map<IFile, Set<RequiredCapability>> originalRequirements,
@@ -718,15 +718,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return new DefaultMavenDependencyResolver(this, markerManager);
   }
 
-  private Map<IFile, MavenProjectFacade> readMavenProjectFacades(final Collection<IFile> poms,
-      final MutableProjectRegistry state, final IProgressMonitor monitor)
-      throws CoreException {
+  private Map<IFile, MavenProjectFacade> readMavenProjectFacades(Collection<IFile> poms, MutableProjectRegistry state,
+      IProgressMonitor monitor) throws CoreException {
     SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
     for(IFile pom : poms) {
       markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
     }
 
-    final Map<IFile, ResolverConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
+    Map<IFile, ResolverConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
     Map<ResolverConfiguration, Collection<IFile>> groupsToImport = poms.stream().collect(Collectors.groupingBy(pom -> {
       subMonitor.checkCanceled();
       ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
@@ -745,32 +744,30 @@ public class ProjectRegistryManager implements ISaveParticipant {
                 executionContext.newProjectBuildingRequest());
 
             Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
-            for (IFile pom : pomFiles) {
-              if (!pom.isAccessible()) {
+            for(IFile pom : pomFiles) {
+              if(!pom.isAccessible()) {
                 continue;
               }
               MavenExecutionResult mavenResult = mavenResults.get(ProjectRegistryManager.toJavaIoFile(pom));
               MavenProject mavenProject = mavenResult.getProject();
-              MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject,
-                      IMavenConstants.MARKER_POM_LOADING_ID);
+              MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
               markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
               if(mavenProject != null && mavenProject.getArtifact() != null) {
-                MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
-                          resolverConfiguration);
+                MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
+                    mavenProject, resolverConfiguration);
                 putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
                 facades.put(pom, mavenProjectFacade);
               }
             }
 
             return facades;
-          }, subMonitor.split(pomFiles.size())
-      ));
+          }, subMonitor.split(pomFiles.size())));
     }
     return result;
   }
 
-      /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
-          IProgressMonitor monitor) {
+  /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
+      IProgressMonitor monitor) {
     Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<>();
     executionPlans.put(LIFECYCLE_CLEAN, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_CLEAN, monitor));
     executionPlans.put(LIFECYCLE_DEFAULT, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_DEFAULT, monitor));
@@ -778,8 +775,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return executionPlans;
   }
 
-  private List<MojoExecution> calculateExecutionPlan(IFile pom, final MavenProject mavenProject, final String lifecycle,
-      final IProgressMonitor monitor) {
+  private List<MojoExecution> calculateExecutionPlan(IFile pom, MavenProject mavenProject, String lifecycle,
+      IProgressMonitor monitor) {
     List<MojoExecution> mojoExecutions = null;
     try {
       MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProject, Arrays.asList(lifecycle), false,
@@ -871,19 +868,16 @@ public class ProjectRegistryManager implements ISaveParticipant {
     try {
       return execute(state, pomFiles.size() == 1 ? pomFiles.iterator().next() : null, resolverConfiguration,
           (context, aMonitor) -> {
-        ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
-        configuration.setResolveDependencies(true);
-            return getMaven().readMavenProjects(
-                pomFiles.stream().map(ProjectRegistryManager::toJavaIoFile).filter(Objects::nonNull)
-                    .collect(Collectors.toList()),
-                configuration);
-      }, monitor);
+            ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
+            configuration.setResolveDependencies(true);
+            return getMaven().readMavenProjects(pomFiles.stream().map(ProjectRegistryManager::toJavaIoFile)
+                .filter(Objects::nonNull).collect(Collectors.toList()), configuration);
+          }, monitor);
     } catch(CoreException ex) {
       MavenExecutionResult result = new DefaultMavenExecutionResult();
       result.addException(ex);
       return pomFiles.stream().filter(IResource::isAccessible).map(ProjectRegistryManager::toJavaIoFile)
-          .filter(Objects::nonNull)
-          .collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
+          .filter(Objects::nonNull).collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
               (container, toFold) -> container.putAll(toFold));
     }
   }
@@ -925,10 +919,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return request;
   }
 
-      /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
-          IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
-        if(pom != null) {
-          request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
+  /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
+      IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
+    if(pom != null) {
+      request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
     }
 
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
@@ -1007,8 +1001,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return maven;
   }
 
-      /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
-          IProgressMonitor monitor) throws CoreException {
+  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = null;
     if(MavenExecutionContext.getThreadContext() == null) {
       // the intent of this code is to provide backwards compatibility for clients that request setup MojoExecution
@@ -1028,21 +1022,20 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return maven.setupMojoExecution(mavenProject, mojoExecution, monitor);
   }
 
-  private <V> V execute(final IProjectRegistry state, final IFile pom,
-      final ResolverConfiguration resolverConfiguration, final ICallable<V> callable, final IProgressMonitor monitor)
-      throws CoreException {
+  private <V> V execute(IProjectRegistry state, IFile pom, ResolverConfiguration resolverConfiguration,
+      ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     return createExecutionContext(state, pom, resolverConfiguration).execute(callable, monitor);
   }
 
-  private IMavenExecutionContext createExecutionContext(final IProjectRegistry state, final IFile pom,
-      final ResolverConfiguration resolverConfiguration) throws CoreException {
+  private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
+      ResolverConfiguration resolverConfiguration) throws CoreException {
     IMavenExecutionContext context = maven.createExecutionContext();
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;
   }
 
-  public IMavenExecutionContext createExecutionContext(final IFile pom,
-      final ResolverConfiguration resolverConfiguration) throws CoreException {
+  public IMavenExecutionContext createExecutionContext(IFile pom, ResolverConfiguration resolverConfiguration)
+      throws CoreException {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
   }
 
@@ -1060,7 +1053,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * </ul>
    */
 
-  MavenProject getMavenProject(final MavenProjectFacade facade, final IProgressMonitor monitor) throws CoreException {
+  MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject;
     synchronized(legacyMavenProjects) {
       mavenProject = legacyMavenProjects.get(facade);
@@ -1115,6 +1108,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
     }
   }
+
   /**
    * Do not modify this map directly, use {@link #putMavenProject(MavenProjectFacade, MavenProject)}
    *
@@ -1137,6 +1131,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     int maxCacheSize = 5;
     return Collections.synchronizedMap(new LinkedHashMap<>(maxCacheSize * 4 / 3 + 1, 0.75f, true) {
       private static final long serialVersionUID = 8022606648487974598L;
+
       @Override
       protected boolean removeEldestEntry(java.util.Map.Entry<MavenProjectFacade, MavenProject> eldest) {
         if(size() > maxCacheSize) {
