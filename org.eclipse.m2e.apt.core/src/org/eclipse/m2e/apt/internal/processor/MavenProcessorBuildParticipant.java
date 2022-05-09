@@ -24,11 +24,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.codehaus.plexus.util.Scanner;
 
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 
 
@@ -52,10 +54,12 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
     monitor.setTaskName("Executing " + getMojoExecution().getArtifactId() + ":" + getMojoExecution().getGoal());
 
     //Modifying the pom triggers a build, otherwise, check for java source modifications
-    if(!buildContext.hasDelta(getMavenProjectFacade().getPomFile())) {
+    IMavenProjectFacade mavenFacade = getMavenProjectFacade();
+    MavenProject mavenProject = mavenFacade.getMavenProject();
+    if(!buildContext.hasDelta(mavenFacade.getPomFile())) {
 
       // check if any of the java files changed
-      File source = getFileParameter(MavenProcessorJdtAptDelegate.SOURCE_DIRECTORY_PARAMETER);
+      File source = getFileParameter(MavenProcessorJdtAptDelegate.SOURCE_DIRECTORY_PARAMETER, mavenProject);
       Scanner ds = buildContext.newScanner(source); // delta or full scanner
       ds.scan();
       String[] includedFiles = ds.getIncludedFiles();
@@ -70,9 +74,9 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
     Set<IProject> result = super.build(kind, monitor);
 
     // tell m2e builder to refresh generated files
-    File generated = getFileParameter(MavenProcessorJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER);
+    File generated = getFileParameter(MavenProcessorJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, mavenProject);
     if(generated == null) {
-      generated = getFileParameter(MavenProcessorJdtAptDelegate.DEFAULT_OUTPUT_DIRECTORY_PARAMETER);
+      generated = getFileParameter(MavenProcessorJdtAptDelegate.DEFAULT_OUTPUT_DIRECTORY_PARAMETER, mavenProject);
     }
     if(generated != null) {
       buildContext.refresh(generated);
@@ -81,8 +85,8 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
     return result;
   }
 
-  private File getFileParameter(String propertyId) throws CoreException {
+  private File getFileParameter(String propertyId, MavenProject mavenProject) throws CoreException {
     IMaven maven = MavenPlugin.getMaven();
-    return maven.getMojoParameterValue(getSession(), getMojoExecution(), propertyId, File.class);
+    return maven.getMojoParameterValue(mavenProject, getMojoExecution(), propertyId, File.class, null);
   }
 }

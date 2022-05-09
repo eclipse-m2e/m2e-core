@@ -59,7 +59,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -205,18 +204,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   /** Last modified timestamp of cached user settings */
   private long settingsTimestamp;
 
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException {
-    MavenExecutionRequest request = createExecutionRequest();
-
-    // logging
-    request.setTransferListener(createArtifactTransferListener(monitor));
-
-    return request;
-  }
-
   /*package*/MavenExecutionRequest createExecutionRequest() throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
@@ -273,26 +260,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return path;
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  public MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor) {
-    // XXX is there a way to set per-request log level?
-
-    MavenExecutionResult result;
-    try {
-      lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
-      result = lookup(Maven.class).execute(request);
-    } catch(MavenExecutionRequestPopulationException ex) {
-      result = new DefaultMavenExecutionResult();
-      result.addException(ex);
-    } catch(Exception e) {
-      result = new DefaultMavenExecutionResult();
-      result.addException(e);
-    }
-    return result;
-  }
-
   /*package*/FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
     try {
       DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup(Maven.class))
@@ -305,9 +272,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
+  private void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
     Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
     for(MavenProject project : session.getProjects()) {
@@ -352,9 +317,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
+  private MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
       boolean setup, IProgressMonitor monitor) throws CoreException {
     try {
       return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, setup, goals.toArray(String[]::new));
@@ -370,9 +333,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         (context, pm) -> calculateExecutionPlan(context.getSession(), project, goals, setup, pm), monitor);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
+  private MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
       throws CoreException {
     MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
     clone.setMojoDescriptor(execution.getMojoDescriptor());
@@ -547,8 +508,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
   public Model readModel(File pomFile) throws CoreException {
     try (InputStream is = new FileInputStream(pomFile)) {
       return readModel(is);
@@ -654,7 +613,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     project.getProjectBuildingRequest().setRepositorySession(lookup(ContextRepositorySystemSession.class));
   }
 
-  /*package*/MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,
+  private MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,
       ProjectBuildingRequest configuration) throws CoreException {
     configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
     configuration.setRepositorySession(repositorySession);
@@ -690,8 +649,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return null;
   }
 
-  @Override
-  public MavenProject resolveParentProject(final MavenProject child, IProgressMonitor monitor) throws CoreException {
+  public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {
     return context().execute(child, (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
         context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
@@ -882,9 +840,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return directory.replace(GROUP_SEPARATOR, PATH_SEPARATOR);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
+  private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException {
     try {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -918,9 +874,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
+  private <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
       ConfigurationContainer configuration, String goal) throws CoreException {
     Xpp3Dom config = (Xpp3Dom) configuration.getConfiguration();
     config = (config != null) ? config.getChild(parameter) : null;
@@ -1101,9 +1055,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public Mirror getMirror(ArtifactRepository repo) throws CoreException {
-    MavenExecutionRequest request = createExecutionRequest(new NullProgressMonitor());
-    populateDefaults(request);
-    return lookup(RepositorySystem.class).getMirror(repo, request.getMirrors());
+    MavenExecutionContext context = createExecutionContext();
+    populateDefaults(context.getExecutionRequest());
+    return context
+        .execute((c, m) -> lookup(RepositorySystem.class).getMirror(repo, c.getExecutionRequest().getMirrors()), null);
   }
 
   @Override
@@ -1117,9 +1072,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public List<Mirror> getMirrors() throws CoreException {
-    MavenExecutionRequest request = createExecutionRequest(null);
-    populateDefaults(request);
-    return request.getMirrors();
+    MavenExecutionContext context = createExecutionContext();
+    populateDefaults(context.getExecutionRequest());
+    return context.execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
   }
 
   @Override
@@ -1146,8 +1101,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return localRepositoryListeners;
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
   public WagonTransferListenerAdapter createTransferListener(IProgressMonitor monitor) {
     return new WagonTransferListenerAdapter(this, monitor);
   }

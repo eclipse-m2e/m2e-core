@@ -110,7 +110,6 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -288,18 +287,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
     pomSet.remove(pom);
 
     return pomSet;
-  }
-
-  /**
-   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
-   *             {@link #refresh(Set, IProgressMonitor)} instead.
-   */
-  @Deprecated
-  public void refresh(final MavenUpdateRequest request, final IProgressMonitor monitor) throws CoreException {
-    getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), (context, pm) -> {
-      refresh(request.getPomFiles(), monitor);
-      return null;
-    }, monitor);
   }
 
   private boolean isForceDependencyUpdate() throws CoreException {
@@ -905,18 +892,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       this.resolverConfiguration = resolverConfiguration;
       this.pom = pom;
     }
-  }
-
-  /**
-   * @deprecated This method does not properly join {@link IMavenExecutionContext}
-   */
-  @Deprecated
-  public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
-      IProgressMonitor monitor) throws CoreException {
-    MavenExecutionRequest request = getMaven().createExecutionRequest(monitor);
-    configureExecutionRequest(request, projectRegistry, pom, resolverConfiguration);
-    MavenExecutionContext.populateSystemProperties(request);
-    return request;
   }
 
   /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
