@@ -52,8 +52,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.apt.internal.utils.ProjectUtils;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -88,12 +86,6 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
   protected MavenSession mavenSession;
 
-  protected IMaven maven;
-
-  public AbstractAptConfiguratorDelegate() {
-    maven = MavenPlugin.getMaven();
-  }
-
   @Override
   public void setSession(MavenSession mavenSession) {
     this.mavenSession = mavenSession;
@@ -105,7 +97,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   }
 
   @Override
-  public boolean isIgnored(IProgressMonitor monitor) throws CoreException {
+  public boolean isIgnored(IProgressMonitor monitor) {
     return false;
   }
 
@@ -359,13 +351,13 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     return matchingDescriptor;
   }
 
-  protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session,
-      MojoExecution mojoExecution) throws CoreException {
+  protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
+      throws CoreException {
     PluginExecution execution = new PluginExecution();
     execution.setConfiguration(mojoExecution.getConfiguration());
     MavenProject mavenProject = mavenFacade.getMavenProject();
-    return maven.getMojoParameterValue(mavenProject, parameter, asType, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal(), null);
+    return mavenFacade.getMaven().getMojoParameterValue(mavenProject, parameter, asType, mojoExecution.getPlugin(),
+        execution, mojoExecution.getGoal(), null);
   }
 
 }

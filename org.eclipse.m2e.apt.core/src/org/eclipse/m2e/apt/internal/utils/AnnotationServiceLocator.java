@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +36,8 @@ import java.util.jar.JarFile;
  * @author karldavis
  */
 public class AnnotationServiceLocator {
+  private AnnotationServiceLocator() { // prevent instantiation
+  }
 
   /**
    * The name of the {@link Class} used to load/create annotation processors in Java 5.
@@ -76,16 +79,12 @@ public class AnnotationServiceLocator {
     if(!jar.canRead()) {
       throw new IllegalArgumentException(String.format("Specified file not readable: %s", jar.getAbsolutePath()));
     }
-    if (!ProjectUtils.isJar(jar)) {
+    if(!ProjectUtils.isJar(jar)) {
       return Collections.emptySet();
     }
 
     Set<ServiceEntry> serviceEntries = new HashSet<>();
-    JarFile jarFile = null;
-
-    try {
-      jarFile = new JarFile(jar);
-
+    try (JarFile jarFile = new JarFile(jar)) {
       for(String serviceName : APT_SERVICES) {
         String providerName = "META-INF/services/" + serviceName; //$NON-NLS-1$
 
@@ -97,18 +96,9 @@ public class AnnotationServiceLocator {
 
         // Extract classnames from the service provider def file.
         InputStream is = jarFile.getInputStream(provider);
-        Set<ServiceEntry> serviceFileEntries = readServiceProvider(serviceName, is);
-        serviceEntries.addAll(serviceFileEntries);
+        readServiceProvider(serviceName, is, serviceEntries);
       }
-
       return serviceEntries;
-    } finally {
-      try {
-        if(jarFile != null) {
-          jarFile.close();
-        }
-      } catch(IOException ioe) {
-      }
     }
   }
 
@@ -118,39 +108,26 @@ public class AnnotationServiceLocator {
    * @param serviceName the name of the service that <code>servicesDeclarationFile</code> contains entries for
    * @param servicesDeclarationFile an {@link InputStream} for the <code>META-INF/services</code> file to load
    *          {@link ServiceEntry}s from
-   * @return the {@link Set} of {@link ServiceEntry}s that were found in the specified <code>META-INF/services</code>
-   *         file, or an empty {@link Set} if no entries were found in the file
+   * @param serviceEntries the {@link Set} of {@link ServiceEntry}s to which those that were found in the specified
+   *          <code>META-INF/services</code> file are added
    * @see http://download.oracle.com/javase/1.4.2/docs/guide/sound/programmer_guide/chapter13.html
    */
-  private static Set<ServiceEntry> readServiceProvider(String serviceName, InputStream servicesDeclarationFile)
-      throws IOException {
-    Set<ServiceEntry> serviceEntries = new HashSet<>();
-    BufferedReader servicesReader = null;
-
-    try {
-      servicesReader = new BufferedReader(new InputStreamReader(servicesDeclarationFile, "UTF-8")); //$NON-NLS-1$
-      for(String line = servicesReader.readLine(); line != null; line = servicesReader.readLine()) {
+  private static void readServiceProvider(String serviceName, InputStream servicesDeclarationFile,
+      Set<ServiceEntry> serviceEntries) throws IOException {
+    try (BufferedReader servicesReader = new BufferedReader(
+        new InputStreamReader(servicesDeclarationFile, StandardCharsets.UTF_8))) {
+      servicesReader.lines().forEach(line -> {
         // hack off any comments
         int iComment = line.indexOf('#');
         if(iComment >= 0) {
           line = line.substring(0, iComment);
         }
         // add the first non-whitespace token to the list
-        final String[] tokens = line.split("\\s", 2); //$NON-NLS-1$
+        String[] tokens = line.split("\\s", 2); //$NON-NLS-1$
         if(tokens[0].length() > 0) {
-          ServiceEntry serviceEntry = new ServiceEntry(serviceName, tokens[0]);
-          serviceEntries.add(serviceEntry);
+          serviceEntries.add(new ServiceEntry(serviceName, tokens[0]));
         }
-      }
-
-      return serviceEntries;
-    } finally {
-      if(servicesReader != null) {
-        try {
-          servicesReader.close();
-        } catch(IOException ioe) {
-        }
-      }
+      });
     }
   }
 

@@ -42,6 +42,8 @@ import org.eclipse.m2e.apt.internal.Messages;
 import org.eclipse.m2e.apt.internal.processor.MavenProcessorJdtAptDelegate;
 import org.eclipse.m2e.apt.internal.utils.PluginDependencyResolver;
 import org.eclipse.m2e.apt.internal.utils.ProjectUtils;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
@@ -74,7 +76,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
    * "compile" goal.
    */
   private static final String GOAL_COMPILE = "compile";
-  
+
   static final String OUTPUT_DIRECTORY_PARAMETER = "generatedSourcesDirectory";
 
   /**
@@ -113,15 +115,14 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
   @Override
   protected AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
       throws CoreException {
-
+    IMaven maven = MavenPlugin.getMaven();
     markerManager.deleteMarkers(mavenFacade.getProject(), true, IMavenAptConstants.INVALID_ARGUMENT_MARKER_ID);
-    ;
     MavenProject mavenProject = mavenFacade.getMavenProject(monitor);
     File generatedTestOutputDirectory = null;
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
-            COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_TEST_COMPILE)) {
-          generatedTestOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
-              TEST_OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
+        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_TEST_COMPILE)) {
+      generatedTestOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
+          TEST_OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
     }
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
         COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE)) {
@@ -153,10 +154,10 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
         isAnnotationProcessingEnabled = !"none".equals(proc);
       }
 
-      final Dependency[] annotationProcessorPaths = maven.getMojoParameterValue(mavenProject, mojoExecution,
+      Dependency[] annotationProcessorPaths = maven.getMojoParameterValue(mavenProject, mojoExecution,
           "annotationProcessorPaths", Dependency[].class, monitor);
 
-      final boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
+      boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
 
       PluginDependencyResolver dependencyResolver = new PluginDependencyResolver() {
         @Override

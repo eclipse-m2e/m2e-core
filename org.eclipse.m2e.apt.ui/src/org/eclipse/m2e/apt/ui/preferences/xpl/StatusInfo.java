@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.m2e.apt.ui.preferences.xpl;
 
+import org.osgi.framework.FrameworkUtil;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-
-import org.eclipse.m2e.apt.ui.MavenJdtAptUIPlugin;
 
 /**
  * A settable IStatus.
@@ -144,7 +144,7 @@ public class StatusInfo implements IStatus {
 	 * @see IStatus#getPlugin()
 	 */
 	public String getPlugin() {
-		return MavenJdtAptUIPlugin.PLUGIN_ID;
+		return FrameworkUtil.getBundle(StatusInfo.class).getSymbolicName();
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class StatusInfo implements IStatus {
 	 */
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
+	  StringBuilder buf = new StringBuilder();
 		buf.append("StatusInfo "); //$NON-NLS-1$
 		if (fSeverity == OK) {
 			buf.append("OK"); //$NON-NLS-1$

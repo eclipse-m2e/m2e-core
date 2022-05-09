@@ -22,9 +22,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
@@ -32,9 +34,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.shared.utils.StringUtils;
 
-import org.eclipse.m2e.apt.MavenJdtAptPlugin;
 import org.eclipse.m2e.apt.internal.utils.AnnotationServiceLocator.ServiceEntry;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -45,6 +45,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author Fred Bricon
  */
 public class ProjectUtils {
+  private ProjectUtils() {
+  }
 
   private static final Pattern OPTION_PATTERN = Pattern.compile("-A([^ \\t\"']+)");
 
@@ -71,11 +73,11 @@ public class ProjectUtils {
   }
 
   private static void parse(String argument, Map<String, String> results) {
-    if (StringUtils.isBlank(argument)) {
+    if(argument == null || argument.isBlank()) {
       return;
     }
-    final String key;
-    final String value;
+    String key;
+    String value;
     int optionalEqualsIndex = argument.indexOf('=');
     switch(optionalEqualsIndex) {
       case -1: { // -Akey : ok
@@ -88,7 +90,7 @@ public class ProjectUtils {
       }
       default: {
         key = argument.substring(0, optionalEqualsIndex);
-        if (containsWhitespace(key)) { // -A key = value : invalid
+        if(containsWhitespace(key)) { // -A key = value : invalid
           return;
         }
         value = argument.substring(optionalEqualsIndex + 1, argument.length());
@@ -96,7 +98,7 @@ public class ProjectUtils {
     }
     results.put(key, value);
   }
-  
+
   public static Map<String, String> parseProcessorOptions(List<String> compilerArgs) {
     if((compilerArgs == null) || compilerArgs.isEmpty()) {
       return Collections.emptyMap();
@@ -237,28 +239,11 @@ public class ProjectUtils {
    * @return the actual JAR {@link File}s available from the specified {@link Artifact}s
    */
   public static List<File> filterToResolvedJars(List<Artifact> artifacts) {
-    List<File> resolvedJarArtifacts = new ArrayList<>();
     ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
-    for(Artifact artifact : artifacts) {
-      // Ensure that this Artifact should be included
-      if(!artifact.isResolved()) {
-        continue;
-      }
-      if(!filter.include(artifact)) {
-        continue;
-      }
-
-      // Ensure that the Artifact resolves to a File that we can use
-      File artifactJarFile = artifact.getFile();
-      if(!isJar(artifactJarFile)) {
-        continue;
-      }
-
-      resolvedJarArtifacts.add(artifactJarFile);
-    }
-
-    return resolvedJarArtifacts;
+    // Ensure that this Artifact should be included and it resolves to a File that we can use
+    return artifacts.stream().filter(Artifact::isResolved).filter(filter::include).map(Artifact::getFile)
+        .filter(ProjectUtils::isJar).collect(Collectors.toList());
   }
 
   /**
@@ -279,10 +264,8 @@ public class ProjectUtils {
         }
       }
     } catch(IOException e) {
-      Status status = MavenJdtAptPlugin.createErrorStatus(e, "Error while reading artifact JARs.");
-      MavenJdtAptPlugin.getDefault().getLog().log(status);
+      Platform.getLog(ProjectUtils.class).log(Status.error("Error while reading artifact JARs.", e));
     }
-
     // No service entries were found
     return false;
   }
@@ -301,20 +284,11 @@ public class ProjectUtils {
     }
   }
 
-  public static boolean isJar(File file){
+  public static boolean isJar(File file) {
     return file.isFile() && "jar".equals(new Path(file.getAbsolutePath()).getFileExtension());
   }
-  
-  //From org.springframework.util.StringUtils, under Apache License 2.0
-  private static boolean containsWhitespace(final String seq) {
-      if (StringUtils.isBlank(seq)) {
-          return false;
-      }
-      for (int i = 0; i < seq.length(); i++) {
-          if (Character.isWhitespace(seq.charAt(i))) {
-              return true;
-          }
-      }
-      return false;
+
+  private static boolean containsWhitespace(String seq) {
+    return seq != null && !seq.isBlank() && seq.chars().anyMatch(Character::isWhitespace);
   }
 }

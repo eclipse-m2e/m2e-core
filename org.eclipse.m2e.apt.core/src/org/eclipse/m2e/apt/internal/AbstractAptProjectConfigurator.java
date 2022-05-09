@@ -12,9 +12,6 @@
 
 package org.eclipse.m2e.apt.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -66,8 +63,6 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 public abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurator
     implements IJavaProjectConfigurator {
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractAptProjectConfigurator.class);
-
   protected abstract AptConfiguratorDelegate getDelegate(AnnotationProcessingMode mode);
 
   /**
@@ -113,7 +108,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     if(project.hasNature(JavaCore.NATURE_ID)) {
       IJavaProject jp = JavaCore.create(project);
       if((jp != null) && AptConfig.isEnabled(jp)) {
-        boolean shouldEnable = MavenJdtAptPlugin.getDefault().getPreferencesManager()
+        boolean shouldEnable = MavenJdtAptPlugin.getPreferencesManager()
             .shouldEnableAnnotationProcessDuringReconcile(project);
         if(shouldEnable && !AptConfig.shouldProcessDuringReconcile(jp)) {
           AptConfig.setProcessDuringReconcile(jp, true);
@@ -125,9 +120,6 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     /*
@@ -137,9 +129,6 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
      */
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
@@ -172,25 +161,18 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
       IPluginExecutionMetadata executionMetadata) {
 
     AptConfiguratorDelegate configuratorDelegate;
-    try {
-      configuratorDelegate = getDelegate(projectFacade);
-      return configuratorDelegate.getMojoExecutionBuildParticipant(execution);
-    } catch(CoreException ex) {
-      log.error("Unable to get the build participant for annotation processing", ex);
-    }
-
-    return null;
+    configuratorDelegate = getDelegate(projectFacade);
+    return configuratorDelegate.getMojoExecutionBuildParticipant(execution);
   }
 
-  private AptConfiguratorDelegate getDelegate(IMavenProjectFacade facade) throws CoreException {
+  private AptConfiguratorDelegate getDelegate(IMavenProjectFacade facade) {
     AnnotationProcessingMode mode = getAnnotationProcessorMode(facade);
     return getDelegate(mode);
   }
 
-  protected AnnotationProcessingMode getAnnotationProcessorMode(IMavenProjectFacade facade) throws CoreException {
-    IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
-    AnnotationProcessingMode mode = preferencesManager.getAnnotationProcessorMode(facade.getProject());
-    return mode;
+  private AnnotationProcessingMode getAnnotationProcessorMode(IMavenProjectFacade facade) {
+    IPreferencesManager preferencesManager = MavenJdtAptPlugin.getPreferencesManager();
+    return preferencesManager.getAnnotationProcessorMode(facade.getProject());
   }
 
 }

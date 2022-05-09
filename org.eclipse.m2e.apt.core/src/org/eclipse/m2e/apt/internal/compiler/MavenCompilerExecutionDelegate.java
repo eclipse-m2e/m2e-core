@@ -14,9 +14,8 @@ package org.eclipse.m2e.apt.internal.compiler;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -35,15 +34,7 @@ public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate 
     super(markerManager);
   }
 
-  private static final VersionRange VALID_COMPILER_PLUGIN_RANGE;
-
-  static {
-    try {
-      VALID_COMPILER_PLUGIN_RANGE = VersionRange.createFromVersionSpec("[2.2,)");
-    } catch(InvalidVersionSpecificationException ex) {
-      throw new RuntimeException("Unable to create maven-compiler-plugin version range from [2.2,)", ex);
-    }
-  }
+  private static final ArtifactVersion MINIMUM_COMPILER_PLUGIN_VERSION = new DefaultArtifactVersion("2.2");
 
   @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {
@@ -58,7 +49,8 @@ public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate 
   @Override
   public AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution) {
     //<proc></proc> is not available for maven-compiler-plugin < 2.2
-    if(VALID_COMPILER_PLUGIN_RANGE.containsVersion(new DefaultArtifactVersion(execution.getVersion()))) {
+    DefaultArtifactVersion version = new DefaultArtifactVersion(execution.getVersion());
+    if(version.compareTo(MINIMUM_COMPILER_PLUGIN_VERSION) >= 0) {
       // Disabled for now return new MavenCompilerBuildParticipant(execution);
     }
     return null;

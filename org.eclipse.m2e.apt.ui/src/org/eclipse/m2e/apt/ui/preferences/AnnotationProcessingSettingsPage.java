@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -32,11 +33,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.apt.MavenJdtAptPlugin;
 import org.eclipse.m2e.apt.preferences.AnnotationProcessingMode;
 import org.eclipse.m2e.apt.preferences.IPreferencesManager;
-import org.eclipse.m2e.apt.ui.MavenJdtAptUIPlugin;
 import org.eclipse.m2e.apt.ui.preferences.xpl.PropertyAndPreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -57,24 +58,23 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
   private Button mavenExecutionButton;
 
   private Button disableAptReconcileButton;
-  
+
   private IPreferencesManager preferencesManager;
 
   private AnnotationProcessingMode annotationProcessingMode;
 
   private AnnotationProcessingMode initialAnnotationProcessingMode;
-  
+
   private boolean shouldEnableAptDuringReconcile;
 
   private boolean hasConfigChanged = false;
 
   private Group modeGroup;
 
-  
   public AnnotationProcessingSettingsPage() {
-    setPreferenceStore(MavenJdtAptUIPlugin.getDefault().getPreferenceStore());
+    setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, MavenJdtAptPlugin.PLUGIN_ID));
     setTitle(PreferenceMessages.AnnotationProcessingSettingsPage_Title);
-    preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+    preferencesManager = MavenJdtAptPlugin.getPreferencesManager();
   }
 
   @Override
@@ -91,7 +91,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     initialAnnotationProcessingMode = preferencesManager.getAnnotationProcessorMode(getProject());
     annotationProcessingMode = initialAnnotationProcessingMode;
     shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
-   
+
     createModeGroup(composite);
     createOptionsGroup(composite);
 
@@ -106,22 +106,19 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     modeGroup.setLayout(layout);
     GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
     modeGroup.setLayoutData(data);
-    
+
     useJdtAptButton = createRadioButton(modeGroup,
-        PreferenceMessages.AnnotationProcessingSettingsPage_Jdt_Apt_Mode_Label, 
-        AnnotationProcessingMode.jdt_apt);
+        PreferenceMessages.AnnotationProcessingSettingsPage_Jdt_Apt_Mode_Label, AnnotationProcessingMode.jdt_apt);
 
     mavenExecutionButton = createRadioButton(modeGroup,
         PreferenceMessages.AnnotationProcessingSettingsPage_Maven_Execution_Mode,
         AnnotationProcessingMode.maven_execution);
 
     disableAptButton = createRadioButton(modeGroup,
-        PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, 
-        AnnotationProcessingMode.disabled);
-    
+        PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, AnnotationProcessingMode.disabled);
+
   }
 
-  
   private void createOptionsGroup(Composite composite) {
 
     Group optionsGrp = new Group(composite, SWT.LEFT);
@@ -130,7 +127,6 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
     optionsGrp.setLayoutData(data);
     optionsGrp.setText(PreferenceMessages.AnnotationProcessingSettingsPage_Other_Options);
-
 
     disableAptReconcileButton = new Button(optionsGrp, SWT.CHECK | SWT.LEFT);
     disableAptReconcileButton.setText(PreferenceMessages.AnnotationProcessingSettingsPage_Disable_APT_Processing);
@@ -145,15 +141,15 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     });
   }
 
-  
   /**
    * @return
    */
   private String getModeGroupTitle() {
-    StringBuilder title = new StringBuilder(PreferenceMessages.AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode);
+    StringBuilder title = new StringBuilder(
+        PreferenceMessages.AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode);
     IProject p = getProject();
     AnnotationProcessingMode pomMode = preferencesManager.getPomAnnotationProcessorMode(p);
-    if (p!=null && !useProjectSettings() && pomMode != null) {
+    if(p != null && !useProjectSettings() && pomMode != null) {
       title.append(" (<m2e.apt.activation> currently set in pom.xml)");
     }
     return title.toString();
@@ -179,7 +175,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     button.setText(label);
     button.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        if (!newMode.equals(annotationProcessingMode)) {
+        if(!newMode.equals(annotationProcessingMode)) {
           annotationProcessingMode = newMode;
           resetButtons();
           hasConfigChanged = true;
@@ -197,21 +193,20 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
       preferencesManager.clearSpecificSettings(project);
       project = null;
     }
-    
 
-    if (hasConfigChanged) {
+    if(hasConfigChanged) {
       preferencesManager.setAnnotationProcessDuringReconcile(project, !disableAptReconcileButton.getSelection());
       preferencesManager.setAnnotationProcessorMode(project, annotationProcessingMode);
-      
+
       boolean res = MessageDialog.openQuestion(getShell(), "Maven Annotation Processing Settings", //
           "m2e-apt settings have changed. Do you want to update project configuration?");
-      
+
       if(res) {
         updateImpactedProjects();
         hasConfigChanged = false;
       }
     }
-    
+
     return super.performOk();
   }
 
@@ -220,11 +215,11 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     super.enableProjectSpecificSettings(useProjectSpecificSettings);
     annotationProcessingMode = null;
     //reload
-    if (!useProjectSpecificSettings && getProject() != null) {
-      annotationProcessingMode  = preferencesManager.getPomAnnotationProcessorMode(getProject()); 
+    if(!useProjectSpecificSettings && getProject() != null) {
+      annotationProcessingMode = preferencesManager.getPomAnnotationProcessorMode(getProject());
       shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
     }
-    if (annotationProcessingMode == null) {
+    if(annotationProcessingMode == null) {
       annotationProcessingMode = preferencesManager.getAnnotationProcessorMode(getProject());
       shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
     }
@@ -239,7 +234,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     disableAptReconcileButton.setSelection(!shouldEnableAptDuringReconcile);
     modeGroup.setText(getModeGroupTitle());
   }
-  
+
   /**
    * Update the configuration of maven projects impacted by the configuration change.
    */
@@ -251,11 +246,11 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 
     if(facades.isEmpty())
       return;
-    
+
     final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 
     WorkspaceJob job = new WorkspaceJob("Updating maven projects") {
-  
+
       public IStatus runInWorkspace(IProgressMonitor monitor) {
         try {
           SubMonitor progress = SubMonitor.convert(monitor, "Updating Maven projects", 100);
@@ -279,8 +274,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     };
     job.setRule(configurationManager.getRule());
     job.schedule();
-  }  
-  
+  }
 
   /**
    * Returns the list of Maven projects impacted by the configuration change.
@@ -313,6 +307,6 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
   private boolean isImpacted(IProject project) {
     //TODO find more fine grained criteria to identify apt-enabled/eligible projects
     return !preferencesManager.hasSpecificProjectSettings(project);
-  }  
-  
+  }
+
 }
