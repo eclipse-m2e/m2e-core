@@ -18,7 +18,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.apt.internal.AbstractAptConfiguratorDelegate;
@@ -57,15 +56,14 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
     if(mojoExecution == null) {
       return null;
     }
-    File generatedOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession,
-        mojoExecution);
+    File generatedOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mojoExecution);
 
     PluginDependencyResolver dependencyResolver = new PluginDependencyResolver();
     List<File> dependencies = dependencyResolver.getResolvedPluginDependencies(mavenSession,
         mavenFacade.getMavenProject(), mojoExecution.getPlugin(), monitor);
 
     @SuppressWarnings("unchecked")
-    Map<String, String> options = getParameterValue("optionMap", Map.class, mavenSession, mojoExecution);
+    Map<String, String> options = getParameterValue("optionMap", Map.class, mojoExecution);
 
     DefaultAnnotationProcessorConfiguration configuration = new DefaultAnnotationProcessorConfiguration();
     configuration.setOutputDirectory(generatedOutputDirectory);
@@ -75,8 +73,7 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
 
     MojoExecution testMojoExecution = getProcessorPluginMojoExecution(mavenFacade, GOAL_PROCESS_TEST, monitor);
     if(testMojoExecution != null) {
-      File generatedTestOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession,
-          testMojoExecution);
+      File generatedTestOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, testMojoExecution);
       configuration.setTestOutputDirectory(generatedTestOutputDirectory);
     }
 
@@ -85,19 +82,17 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
 
   protected MojoExecution getProcessorPluginMojoExecution(IMavenProjectFacade mavenProjectFacade, String goal,
       IProgressMonitor monitor) throws CoreException {
-    for(MojoExecution mojoExecution : mavenProjectFacade.getMojoExecutions(PROCESSOR_PLUGIN_GROUP_ID,
-        PROCESSOR_PLUGIN_ARTIFACT_ID, monitor, goal)) {
-      return mojoExecution;
-    }
-    return null;
+    List<MojoExecution> executions = mavenProjectFacade.getMojoExecutions(PROCESSOR_PLUGIN_GROUP_ID,
+        PROCESSOR_PLUGIN_ARTIFACT_ID, monitor, goal);
+    return !executions.isEmpty() ? executions.get(0) : null;
   }
 
   @Override
-  protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session,
-      MojoExecution mojoExecution) throws CoreException {
-    T result = super.getParameterValue(parameter, asType, session, mojoExecution);
+  protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
+      throws CoreException {
+    T result = super.getParameterValue(parameter, asType, mojoExecution);
     if(OUTPUT_DIRECTORY_PARAMETER.equals(parameter) && (result == null)) {
-      return super.getParameterValue(DEFAULT_OUTPUT_DIRECTORY_PARAMETER, asType, session, mojoExecution);
+      return super.getParameterValue(DEFAULT_OUTPUT_DIRECTORY_PARAMETER, asType, mojoExecution);
     }
     return result;
   }

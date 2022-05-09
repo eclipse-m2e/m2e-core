@@ -130,8 +130,7 @@ public class PreferencesManager implements IPreferencesManager {
     } else {
       scopeContext = new ProjectScope(project);
     }
-    IEclipsePreferences prefs = scopeContext.getNode(MavenJdtAptPlugin.PLUGIN_ID);
-    return prefs;
+    return scopeContext.getNode(MavenJdtAptPlugin.PLUGIN_ID);
   }
 
   @Override
@@ -161,10 +160,12 @@ public class PreferencesManager implements IPreferencesManager {
     }
   }
 
+  private static final Properties EMPTY = new Properties();
+
   private static Properties getMavenProperties(IProject project) {
     try {
       if(!project.isAccessible() || !project.hasNature(IMavenConstants.NATURE_ID)) {
-        return null;
+        return EMPTY;
       }
       IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
       if(facade == null) {
@@ -178,16 +179,14 @@ public class PreferencesManager implements IPreferencesManager {
     } catch(CoreException ex) {
       log.error("Error loading maven project for " + project.getName(), ex);
     }
-    return null;
+    return EMPTY;
   }
 
   @Override
   public AnnotationProcessingMode getPomAnnotationProcessorMode(IProject project) {
     if(project != null) {
       Properties properties = getMavenProperties(project);
-      if(properties != null) {
-        return AnnotationProcessingMode.getFromStringOrNull(properties.getProperty(M2E_APT_ACTIVATION_PROPERTY));
-      }
+      return AnnotationProcessingMode.getFromStringOrNull(properties.getProperty(M2E_APT_ACTIVATION_PROPERTY));
     }
     return null;
   }
@@ -196,11 +195,8 @@ public class PreferencesManager implements IPreferencesManager {
   public String getPomAnnotationProcessDuringReconcile(IProject project) {
     if(project != null) {
       Properties properties = getMavenProperties(project);
-      if(properties != null) {
-        return properties.getProperty(M2E_APT_PROCESS_DURING_RECONCILE_PROPERTY);
-      }
+      return properties.getProperty(M2E_APT_PROCESS_DURING_RECONCILE_PROPERTY);
     }
-
     return null;
   }
 

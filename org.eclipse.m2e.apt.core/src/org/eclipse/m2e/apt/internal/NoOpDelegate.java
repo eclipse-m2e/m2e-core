@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.apt.internal;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.execution.MavenSession;
@@ -30,17 +29,17 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
 public class NoOpDelegate implements AptConfiguratorDelegate {
 
   @Override
-  public void configureProject(IProgressMonitor monitor) throws CoreException {
+  public void configureProject(IProgressMonitor monitor) {
     //No-Op
   }
 
   @Override
-  public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
+  public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) {
     //No-Op
   }
 
   @Override
-  public boolean isIgnored(IProgressMonitor monitor) throws CoreException {
+  public boolean isIgnored(IProgressMonitor monitor) {
     return true;
   }
 

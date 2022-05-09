@@ -17,7 +17,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.wst.xml.core;resolution:=optional,
  org.eclipse.text;resolution:=optional
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.eclipse.m2e.apt.ui.MavenJdtAptUIPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
 Import-Package: org.slf4j;version="1.6.2"

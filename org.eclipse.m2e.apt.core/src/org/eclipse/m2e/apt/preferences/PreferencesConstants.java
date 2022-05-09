@@ -11,8 +11,6 @@
 
 package org.eclipse.m2e.apt.preferences;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.m2e.apt.MavenJdtAptPlugin;
@@ -25,23 +23,17 @@ import org.eclipse.m2e.apt.MavenJdtAptPlugin;
  */
 public class PreferencesConstants {
 
-  public static Map<String, String> DEFAULT_OPTIONS;
+  public static final String USE_PROJECT_SPECIFIC_SETTINGS = "useProjectSpecificSettings"; //$NON-NLS-1$
 
-  public static String USE_PROJECT_SPECIFIC_SETTINGS = "useProjectSpecificSettings"; //$NON-NLS-1$
+  public static final String ANNOTATION_PROCESS_DURING_RECONCILE = MavenJdtAptPlugin.PLUGIN_ID
+      + ".aptProcessDuringReconcile"; //$NON-NLS-1$
 
-  public static String ANNOTATION_PROCESS_DURING_RECONCILE = MavenJdtAptPlugin.PLUGIN_ID + ".aptProcessDuringReconcile"; //$NON-NLS-1$
+  public static final String MODE = MavenJdtAptPlugin.PLUGIN_ID + ".mode"; //$NON-NLS-1$
 
-  public static String MODE = MavenJdtAptPlugin.PLUGIN_ID + ".mode"; //$NON-NLS-1$
+  public static final Map<String, String> DEFAULT_OPTIONS = Map.of(MODE, AnnotationProcessingMode.disabled.toString(),
+      ANNOTATION_PROCESS_DURING_RECONCILE, "true");
 
-  static {
-    Map<String, String> options = new HashMap<>(1);
-    options.put(MODE, AnnotationProcessingMode.disabled.toString());
-    options.put(ANNOTATION_PROCESS_DURING_RECONCILE, "true");
-    DEFAULT_OPTIONS = Collections.unmodifiableMap(options);
-  }
-
-  private PreferencesConstants() {
-    // prevent instantiation
+  private PreferencesConstants() { // prevent instantiation
   }
 
 }

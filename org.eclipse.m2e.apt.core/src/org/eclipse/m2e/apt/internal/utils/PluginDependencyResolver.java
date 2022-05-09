@@ -39,7 +39,6 @@ import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.RepositoryUtils;
@@ -48,11 +47,11 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.apt.MavenJdtAptPlugin;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+
 
 @SuppressWarnings("restriction")
 public class PluginDependencyResolver {
@@ -110,7 +109,7 @@ public class PluginDependencyResolver {
       } catch(DependencyResolutionException e) {
         String msg = "Unable to collect dependencies for plugin";
         log.error(msg, e);
-        throw new CoreException(new Status(IStatus.ERROR, MavenJdtAptPlugin.PLUGIN_ID, -1, msg, e));
+        throw new CoreException(Status.error(msg, e));
       }
 
     } finally {

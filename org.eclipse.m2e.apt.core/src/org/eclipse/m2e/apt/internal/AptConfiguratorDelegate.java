@@ -37,7 +37,7 @@ public interface AptConfiguratorDelegate {
 
   void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException;
 
-  boolean isIgnored(IProgressMonitor monitor) throws CoreException;
+  boolean isIgnored(IProgressMonitor monitor);
 
   AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution);
 
