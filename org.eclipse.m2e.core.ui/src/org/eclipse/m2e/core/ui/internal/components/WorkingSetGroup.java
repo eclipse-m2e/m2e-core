@@ -101,8 +101,8 @@ public class WorkingSetGroup {
 
     workingsetComboViewer = new ComboViewer(workingsetCombo);
     workingsetComboViewer.setContentProvider(new IStructuredContentProvider() {
-        @Override
-        public Object[] getElements(Object input) {
+      @Override
+      public Object[] getElements(Object input) {
         if(input instanceof IWorkingSet[]) {
           return (IWorkingSet[]) input;
         } else if(input instanceof List<?>) {
@@ -113,22 +113,22 @@ public class WorkingSetGroup {
         return new IWorkingSet[0];
       }
 
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      @Override
+      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
 
-        @Override
-        public void dispose() {
+      @Override
+      public void dispose() {
       }
     });
     workingsetComboViewer.setLabelProvider(new LabelProvider() {
       private final ResourceManager images = new LocalResourceManager(JFaceResources.getResources());
 
-        @Override
-        @SuppressWarnings("deprecation")
+      @Override
       public Image getImage(Object element) {
         if(element instanceof IWorkingSet) {
-          ImageDescriptor imageDescriptor = ((IWorkingSet) element).getImage();
+
+          ImageDescriptor imageDescriptor = ((IWorkingSet) element).getImageDescriptor();
           if(imageDescriptor != null) {
             try {
               return (Image) images.create(imageDescriptor);
@@ -140,8 +140,8 @@ public class WorkingSetGroup {
         return super.getImage(element);
       }
 
-        @Override
-        public String getText(Object element) {
+      @Override
+      public String getText(Object element) {
         if(element instanceof IWorkingSet) {
           return ((IWorkingSet) element).getLabel();
         } else if(element instanceof List<?>) {
@@ -159,8 +159,8 @@ public class WorkingSetGroup {
         return super.getText(element);
       }
 
-        @Override
-        public void dispose() {
+      @Override
+      public void dispose() {
         images.dispose();
         super.dispose();
       }
