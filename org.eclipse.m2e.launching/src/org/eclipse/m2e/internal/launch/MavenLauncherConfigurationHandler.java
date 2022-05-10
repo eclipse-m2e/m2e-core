@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 

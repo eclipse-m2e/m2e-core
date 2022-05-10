@@ -30,8 +30,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -40,8 +38,29 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 /**
  * @since 1.5
  */
-@SuppressWarnings("deprecation")
-public abstract class AbstractMavenRuntime implements MavenRuntime {
+public abstract class AbstractMavenRuntime {
+
+  /**
+   * Receive notification of content of plexus configuration.
+   *
+   * @author Igor Fedorenko
+   * @see AbstractMavenRuntime#createLauncherConfiguration
+   */
+  public interface IMavenLauncherConfiguration {
+
+    /**
+     * Special realm name used for launcher classpath entries.
+     */
+    String LAUNCHER_REALM = "]launcher"; //$NON-NLS-1$
+
+    void setMainType(String type, String realm);
+
+    void addRealm(String realm);
+
+    void addProjectEntry(IMavenProjectFacade facade);
+
+    void addArchiveEntry(String entry) throws CoreException;
+  }
 
   private final String name;
 
@@ -110,7 +129,6 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return version.getMajorVersion() >= 3;
   }
 
-  @Override
   public String getSettings() {
     String settings = MavenPlugin.getMavenConfiguration().getGlobalSettingsFile();
     if(settings != null && !settings.isBlank()) {
@@ -122,4 +140,18 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return settings;
   }
 
+  public abstract boolean isEditable();
+
+  /**
+   * Reads m2.conf file and notifies configuration collector of the logical content of plexus configuration. Collector
+   * callback methods are invoked in the order corresponding configuration elements are present in m2.conf file.
+   */
+  public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+      throws CoreException;
+
+  public abstract String getLocation();
+
+  public abstract boolean isAvailable();
+
+  public abstract String getVersion();
 }

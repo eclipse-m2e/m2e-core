@@ -14,7 +14,7 @@
 package org.eclipse.m2e.internal.launch;
 
 import static org.eclipse.m2e.actions.MavenLaunchConstants.ATTR_WORKSPACE_RESOLUTION;
-import static org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration.LAUNCHER_REALM;
+import static org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime.IMavenLauncherConfiguration.LAUNCHER_REALM;
 import static org.eclipse.m2e.internal.launch.MavenLaunchUtils.quote;
 
 import java.io.File;
@@ -236,7 +236,6 @@ public class MavenRuntimeLaunchSupport {
   /**
    * Bootstrap classpath of the Maven runtime, normally only contains classworlds jar.
    */
-  @SuppressWarnings("deprecation")
   public List<String> getBootClasspath() {
     return cwconf.getRealmEntries(LAUNCHER_REALM);
   }

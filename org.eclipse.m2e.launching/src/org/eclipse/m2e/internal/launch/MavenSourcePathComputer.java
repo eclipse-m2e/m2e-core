@@ -41,8 +41,8 @@ import org.apache.maven.artifact.Artifact;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -52,7 +52,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  *
  * @author Eugene Kuleshov
  */
-@SuppressWarnings({"restriction", "deprecation"})
 public class MavenSourcePathComputer implements ISourcePathComputer {
 
   @Override

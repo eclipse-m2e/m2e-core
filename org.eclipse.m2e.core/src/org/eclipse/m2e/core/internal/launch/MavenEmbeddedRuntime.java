@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.Platform;
 
 import org.apache.maven.Maven;
 
-import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.Messages;
 
@@ -51,7 +50,6 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
-@SuppressWarnings("deprecation")
 public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private static final String MAVEN_CORE_POM_PROPERTIES = "META-INF/maven/org.apache.maven/maven-core/pom.properties"; //$NON-NLS-1$
