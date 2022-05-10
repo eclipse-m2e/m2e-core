@@ -8,8 +8,7 @@ pipeline {
 	}
 	tools {
 		maven 'apache-maven-latest'
-		// Need adoptOpenJDK because we want JDK >= 11.0.3 to avoid TLS issue https://bugs.eclipse.org/bugs/show_bug.cgi?id=577256
-		jdk 'adoptopenjdk-hotspot-jdk11-latest'
+		jdk 'temurin-jdk11-latest'
 	}
 	stages {
 		stage('get m2e-core-tests') {
