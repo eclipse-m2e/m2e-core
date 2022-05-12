@@ -22,12 +22,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -55,11 +53,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
 
@@ -155,14 +151,10 @@ public class ProjectConfigurationManager
       List<IProject> existingProjects = findExistingProjectsToHideFrom();
 
       // first, create all projects with basic configuration
+      SubMonitor subProgress = SubMonitor.convert(progress.split(10), projectInfos.size());
       for(MavenProjectInfo projectInfo : projectInfos) {
         long t11 = System.currentTimeMillis();
-        if(m.isCanceled()) {
-          throw new OperationCanceledException();
-        }
-
-        SubMonitor subProgress = SubMonitor.convert(progress.newChild(10), projectInfos.size() * 100);
-        IProject project = create(projectInfo, configuration, listener, subProgress.newChild(100));
+        IProject project = create(projectInfo, configuration, listener, subProgress.split(1));
 
         result.add(new MavenProjectImportResult(projectInfo, project));
 
@@ -175,7 +167,7 @@ public class ProjectConfigurationManager
 
       hideNestedProjectsFromParents(projects, existingProjects, m);
       // then configure maven for all projects
-      configureNewMavenProjects(projects, progress.newChild(90));
+      configureNewMavenProjects(projects, progress.split(90));
 
       long t2 = System.currentTimeMillis();
       log.info("Imported and configured {} project(s) in {} sec", total, ((t2 - t1) / 1000));
@@ -252,7 +244,7 @@ public class ProjectConfigurationManager
     }
   }
 
-  void configureNewMavenProjects(List<IProject> projects, IProgressMonitor monitor) throws CoreException {
+  private void configureNewMavenProjects(List<IProject> projects, IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_configuring, 100);
 
     // first, resolve maven dependencies for all projects
@@ -262,18 +254,15 @@ public class ProjectConfigurationManager
     }
     progress.subTask(Messages.ProjectConfigurationManager_task_refreshing);
 
-    projectManager.refresh(pomFiles, progress.newChild(75));
+    projectManager.refresh(pomFiles, progress.split(75));
 
     // TODO this emits project change events, which may be premature at this point
 
     //Creating maven facades
-    SubMonitor subProgress = SubMonitor.convert(progress.newChild(5), projects.size() * 100);
+    SubMonitor subProgress = SubMonitor.convert(progress.split(5), projects.size());
     List<IMavenProjectFacade> facades = new ArrayList<>(projects.size());
     for(IProject project : projects) {
-      if(progress.isCanceled()) {
-        throw new OperationCanceledException();
-      }
-      IMavenProjectFacade facade = projectManager.create(project, subProgress.newChild(100));
+      IMavenProjectFacade facade = projectManager.create(project, subProgress.split(1));
       if(facade != null) {
         facades.add(facade);
       }
@@ -281,17 +270,14 @@ public class ProjectConfigurationManager
 
     //MNGECLIPSE-1028 : Sort projects by build order here,
     //as dependent projects need to be configured before depending projects (in WTP integration for ex.)
-    sortProjects(facades, progress.newChild(5));
+    sortProjects(facades, progress.split(5));
     //Then, perform detailed project configuration
-    subProgress = SubMonitor.convert(progress.newChild(15), facades.size() * 100);
+    subProgress = SubMonitor.convert(progress.split(15), facades.size() * 10);
     for(IMavenProjectFacade facade : facades) {
-      if(progress.isCanceled()) {
-        throw new OperationCanceledException();
-      }
       progress.subTask(NLS.bind(Messages.ProjectConfigurationManager_task_updating, facade.getProject().getName()));
-      MavenProject mavenProject = facade.getMavenProject(subProgress.newChild(5));
+      MavenProject mavenProject = facade.getMavenProject(subProgress.split(1));
       ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, mavenProject);
-      updateProjectConfiguration(request, subProgress.newChild(90));
+      updateProjectConfiguration(request, subProgress.split(9));
     }
   }
 
@@ -364,10 +350,10 @@ public class ProjectConfigurationManager
     }
   }
 
-  Map<String, IStatus> updateProjectConfiguration0(Collection<IFile> pomFiles, boolean updateConfiguration,
-      boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor monitor) {
+  private Map<String, IStatus> updateProjectConfiguration0(Collection<IFile> pomFiles, boolean updateConfiguration,
+      boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor m) {
 
-    monitor.beginTask(Messages.ProjectConfigurationManager_task_updating_projects,
+    SubMonitor monitor = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_updating_projects,
         pomFiles.size() * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0) + (refreshFromLocal ? 1 : 0)));
 
     long l1 = System.currentTimeMillis();
@@ -383,14 +369,9 @@ public class ProjectConfigurationManager
     // refresh from local filesystem
     if(refreshFromLocal) {
       for(IFile pom : pomFiles) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
-
         IProject project = pom.getProject();
         try {
-          project.refreshLocal(IResource.DEPTH_INFINITE,
-              new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
+          project.refreshLocal(IResource.DEPTH_INFINITE, monitor.split(1, SubMonitor.SUPPRESS_SUBTASK));
           pomsToRefresh.add(pom);
         } catch(CoreException ex) {
           updateStatus.put(project.getName(), ex.getStatus());
@@ -404,7 +385,7 @@ public class ProjectConfigurationManager
     // this will ensure that project registry is up-to-date on GAV of all projects being updated
     // TODO this sends multiple update events, rework using low-level registry update methods
     try {
-      projectManager.refresh(pomsToRefresh, new SubProgressMonitor(monitor, pomFiles.size()));
+      projectManager.refresh(pomsToRefresh, monitor.split(pomFiles.size()));
 
       for(IFile pom : pomsToRefresh) {
         IProject project = pom.getProject();
@@ -424,55 +405,42 @@ public class ProjectConfigurationManager
 
     // update project configuration
     if(updateConfiguration) {
-      Iterator<Entry<IFile, IMavenProjectFacade>> iterator = projects.entrySet().iterator();
-      while(iterator.hasNext()) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
 
-        IMavenProjectFacade facade = iterator.next().getValue();
-
+      projects.values().removeIf(facade -> {
         monitor.subTask(facade.getProject().getName());
-
-        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
         try {
+          SubMonitor submonitor = monitor.split(1, SubMonitor.SUPPRESS_SUBTASK);
           ProjectConfigurationRequest cfgRequest = new ProjectConfigurationRequest(facade,
               facade.getMavenProject(submonitor));
           updateProjectConfiguration(cfgRequest, submonitor);
         } catch(CoreException ex) {
-          iterator.remove();
           updateStatus.put(facade.getProject().getName(), ex.getStatus());
+          return true;
         }
-      }
+        return false;
+      });
     }
 
     // rebuild
     if(cleanProjects) {
-      Iterator<Entry<IFile, IMavenProjectFacade>> iterator = projects.entrySet().iterator();
-      while(iterator.hasNext()) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
-
-        IMavenProjectFacade facade = iterator.next().getValue();
-
+      projects.values().removeIf(facade -> {
+        monitor.checkCanceled();
         IProject project = facade.getProject();
-
         monitor.subTask(project.getName());
 
-        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
         try {
           // only rebuild projects that were successfully updated
           IStatus status = updateStatus.get(project.getName());
           if(status == null || status.isOK()) {
-            project.build(IncrementalProjectBuilder.CLEAN_BUILD, submonitor);
+            project.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor.split(1, SubMonitor.SUPPRESS_SUBTASK));
             // TODO provide an option to build projects if the workspace is not autobuilding
           }
         } catch(CoreException ex) {
-          iterator.remove();
           updateStatus.put(project.getName(), ex.getStatus());
+          return true;
         }
-      }
+        return false;
+      });
     }
 
     long l2 = System.currentTimeMillis();
@@ -752,7 +720,7 @@ public class ProjectConfigurationManager
     }
 
     if(folder.isAccessible() && derived) {
-      folder.setDerived(true);
+      folder.setDerived(true, new NullProgressMonitor());
     }
   }
 

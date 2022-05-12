@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Model;
@@ -59,14 +58,12 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   @Override
   public void run(IProgressMonitor monitor) throws InterruptedException {
-    SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, 1);
-
-    subMonitor.beginTask(Messages.LocalProjectScanner_task_scanning, IProgressMonitor.UNKNOWN);
+    SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, folders.size());
     try {
       for(String folderName : folders) {
         try {
           File folder = new File(folderName).getCanonicalFile();
-          scanFolder(folder, "", new SubProgressMonitor(subMonitor, IProgressMonitor.UNKNOWN)); //$NON-NLS-1$
+          scanFolder(folder, "", subMonitor.split(1)); //$NON-NLS-1$
         } catch(IOException ex) {
           addError(ex);
         }
@@ -76,21 +73,18 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     }
   }
 
-  private void scanFolder(File baseDir, String rootRelPath, IProgressMonitor monitor) throws InterruptedException {
-    if(monitor.isCanceled()) {
-      throw new InterruptedException();
-    }
-
-    monitor.subTask(baseDir.toString());
-    monitor.worked(1);
+  private void scanFolder(File baseDir, String rootRelPath, IProgressMonitor m) throws InterruptedException {
+    SubMonitor monitor = SubMonitor.convert(m, baseDir.toString(), 1);
 
     // Don't scan the .metadata folder
-    if(!baseDir.exists() || !baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())) {
+    if(!baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())) {
+      monitor.done();
       return;
     }
 
     try {
       if(scannedFolders.contains(baseDir.getCanonicalFile())) {
+        monitor.done();
         return;
       }
     } catch(IOException ex1) {
@@ -101,6 +95,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null);
     if(projectInfo != null) {
       addProject(projectInfo);
+      monitor.done();
       return; // don't scan subfolders of the Maven project
     }
 
@@ -109,13 +104,11 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       addError(new Exception(NLS.bind(Messages.LocalProjectScanner_accessDeniedFromFolder, baseDir.getAbsolutePath())));
       return;
     }
-    for(File file2 : files) {
-      File file;
+    monitor.setWorkRemaining(files.length);
+    for(File file : files) {
       try {
-        file = file2.getCanonicalFile();
-        if(file.isDirectory()) {
-          scanFolder(file, rootRelPath + "/" + file.getName(), monitor); //$NON-NLS-1$
-        }
+        file = file.getCanonicalFile();
+        scanFolder(file, rootRelPath + "/" + file.getName(), monitor.split(1)); //$NON-NLS-1$
       } catch(IOException ex) {
         addError(ex);
       }
