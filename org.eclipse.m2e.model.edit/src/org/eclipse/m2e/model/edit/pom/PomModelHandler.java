@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc.
+ * Copyright (c) 2008, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -69,18 +69,17 @@ public class PomModelHandler extends ModelHandlerForXML {
 
   static class ModelQueryAdapterFactoryForPom extends ModelQueryAdapterFactoryForXML {
 
-    protected ModelQueryAdapterImpl modelQueryAdapterImpl;
+    protected ModelQueryAdapterImpl queryAdapterImpl;
 
     @Override
     protected INodeAdapter createAdapter(INodeNotifier target) {
-      if(modelQueryAdapterImpl == null) {
+      if(queryAdapterImpl == null) {
         ModelQueryAdapter mqa = (ModelQueryAdapter) super.createAdapter(target);
-        modelQueryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(),
+        queryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(),
             new PomModelQueryImpl(mqa.getCMDocumentCache(), mqa.getIdResolver()), mqa.getIdResolver());
       }
-      return modelQueryAdapterImpl;
+      return queryAdapterImpl;
     }
-
   }
 
   static class PomModelQueryImpl extends ModelQueryImpl {
@@ -88,7 +87,6 @@ public class PomModelHandler extends ModelHandlerForXML {
     public PomModelQueryImpl(CMDocumentCache cache, URIResolver idResolver) {
       super(new PomModelQueryAssociationProvider(cache, idResolver));
     }
-
   }
 
   static class PomModelQueryAssociationProvider extends XMLModelQueryAssociationProvider {
@@ -102,7 +100,6 @@ public class PomModelHandler extends ModelHandlerForXML {
       if("".equals(publicId) && "".equals(systemId)) { //$NON-NLS-1$ //$NON-NLS-2$
         return null;
       }
-
       return super.getCMDocument(publicId, systemId, type);
     }
 
@@ -112,8 +109,9 @@ public class PomModelHandler extends ModelHandlerForXML {
 
       if(result == null) {
         NamespaceTable namespaceTable = new NamespaceTable(element.getOwnerDocument());
-        List list = NamespaceTable.getElementLineage(element);
-        Element rootElement = (Element) list.get(0);
+        @SuppressWarnings("unchecked")
+        List<Element> list = NamespaceTable.getElementLineage(element);
+        Element rootElement = list.get(0);
         namespaceTable.addElement(rootElement);
 
         documentManager.setPropertyEnabled(CMDocumentManager.PROPERTY_ASYNC_LOAD, false);
@@ -124,9 +122,7 @@ public class PomModelHandler extends ModelHandlerForXML {
           result = getCMElementDeclaration(element, list, namespaceTable);
         }
       }
-
       return result;
     }
   }
-
 }
