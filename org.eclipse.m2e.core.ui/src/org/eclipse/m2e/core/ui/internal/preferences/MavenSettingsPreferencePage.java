@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc.
+ * Copyright (c) 2008, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -113,12 +111,12 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     }
   }
 
-  protected void updateSettings(final boolean updateMavenDependencies) {
+  protected void updateSettings(boolean updateMavenDependencies) {
     //Force reevaluation of local repository, in case the settings were modified externally
     updateLocalRepository();
 
-    final String userSettings = getUserSettings();
-    final String globalSettings = getGlobalSettings();
+    String userSettings = getUserSettings();
+    String globalSettings = getGlobalSettings();
 
     String currentGlobalSettings = mavenConfiguration.getGlobalSettingsFile();
     String currentUserSettings = mavenConfiguration.getUserSettingsFile();
@@ -127,7 +125,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       return;
     }
 
-    final Boolean[] updateProjects = new Boolean[1];
+    Boolean[] updateProjects = new Boolean[1];
     updateProjects[0] = updateMavenDependencies;
     if(updateMavenDependencies) {
       IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
@@ -138,42 +136,35 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       }
     }
 
-    new Job(Messages.MavenSettingsPreferencePage_job_updating) {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        try {
-          final File localRepositoryDir = new File(maven.getLocalRepository().getBasedir());
+    Job.create(Messages.MavenSettingsPreferencePage_job_updating, monitor -> {
+      try {
+        // this clears cached settings.xml instance
+        mavenConfiguration.setGlobalSettingsFile(globalSettings);
+        mavenConfiguration.setUserSettingsFile(userSettings);
 
-          // this clears cached settings.xml instance
-          mavenConfiguration.setGlobalSettingsFile(globalSettings);
-          mavenConfiguration.setUserSettingsFile(userSettings);
+        if(Boolean.TRUE.equals(updateProjects[0])) {
+          IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+          List<IProject> allProjects = new ArrayList<>();
+          if(projects != null && projects.length > 0) {
+            MavenPlugin.getMaven().reloadSettings();
 
-          File newRepositoryDir = new File(maven.getLocalRepository().getBasedir());
-          if(updateProjects[0]) {
-            IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
-            ArrayList<IProject> allProjects = new ArrayList<>();
-            if(projects != null && projects.length > 0) {
-              MavenPlugin.getMaven().reloadSettings();
-
-              SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
-              for(IMavenProjectFacade project : projects) {
-                subMonitor
-                    .beginTask(NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, project.getProject()
-                        .getName()), 1);
-                allProjects.add(project.getProject());
-              }
-              MavenPlugin.getMavenProjectRegistry().refresh(
-                  new MavenUpdateRequest(allProjects.toArray(new IProject[] {}), mavenConfiguration.isOffline(), true));
-              subMonitor.done();
+            SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
+            for(IMavenProjectFacade project : projects) {
+              subMonitor.beginTask(
+                  NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, project.getProject().getName()), 1);
+              allProjects.add(project.getProject());
             }
+            MavenPlugin.getMavenProjectRegistry().refresh(
+                new MavenUpdateRequest(allProjects.toArray(IProject[]::new), mavenConfiguration.isOffline(), true));
+            subMonitor.done();
           }
-          return Status.OK_STATUS;
-        } catch(CoreException e) {
-          log.error(e.getMessage(), e);
-          return e.getStatus();
         }
+        return Status.OK_STATUS;
+      } catch(CoreException e) {
+        log.error(e.getMessage(), e);
+        return e.getStatus();
       }
-    }.schedule();
+    }).schedule();
   }
 
   @Override
@@ -201,12 +192,11 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     globalSettingsLink.setText(Messages.MavenSettingsPreferencePage_globalSettingslink2);
     globalSettingsLink.setToolTipText(Messages.MavenSettingsPreferencePage_globalSettingslink_tooltip);
     globalSettingsLink.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-        String globalSettings = getGlobalSettings();
-        if(globalSettings != null) {
-          openEditor(globalSettings);
-        }
+      String globalSettings = getGlobalSettings();
+      if(globalSettings != null) {
+        openEditor(globalSettings);
       }
-      ));
+    }));
 
     globalSettingsText = new Text(composite, SWT.BORDER);
     globalSettingsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -297,8 +287,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   }
 
   protected void updateLocalRepository() {
-    final String globalSettings = getGlobalSettings();
-    final String userSettings = getUserSettings();
+    String globalSettings = getGlobalSettings();
+    String userSettings = getUserSettings();
     try {
       Settings settings = maven.buildSettings(globalSettings, userSettings);
       String localRepository = settings.getLocalRepository();
@@ -328,13 +318,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     if(globalSettings != null
         && !checkSettings(globalSettings, Messages.MavenSettingsPreferencePage_error_globalSettingsMissing,
             Messages.MavenSettingsPreferencePage_error_globalSettingsParse)) {
-      return;
-    }
-
-    if(userSettings != null
-        && !checkSettings(userSettings, Messages.MavenSettingsPreferencePage_error_userSettingsMissing,
-            Messages.MavenSettingsPreferencePage_error_userSettingsParse)) {
-      return;
+      //work is done in if-condition
+    } else if(userSettings != null) {
+      checkSettings(userSettings, Messages.MavenSettingsPreferencePage_error_userSettingsMissing,
+          Messages.MavenSettingsPreferencePage_error_userSettingsParse);
     }
   }
 
@@ -351,7 +338,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     return true;
   }
 
-  void openEditor(final String fileName) {
+  void openEditor(String fileName) {
     IWorkbench workbench = PlatformUI.getWorkbench();
     IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
     IWorkbenchPage page = window.getActivePage();
@@ -360,14 +347,14 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
     IEditorInput input = new FileStoreEditorInput(EFS.getLocalFileSystem().fromLocalFile(new File(fileName)));
     try {
-      final IEditorPart editor = IDE.openEditor(page, input, desc.getId());
+      IEditorPart editor = IDE.openEditor(page, input, desc.getId());
       if(editor == null) {
         //external editor was opened
         return;
       }
       editor.addPropertyListener((source, propId) -> {
         if(!editor.isDirty()) {
-          log.info("Refreshing settings " + fileName); //$NON-NLS-1$
+          log.info("Refreshing settings {}", fileName); //$NON-NLS-1$
         }
       });
     } catch(PartInitException ex) {
@@ -394,13 +381,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       dialog.setFileName(settings.getText());
     }
     String file = dialog.open();
-    if(file != null) {
-      file = file.trim();
-      if(file.length() > 0) {
-        settings.setText(file);
-        updateLocalRepository();
-        checkSettings();
-      }
+    if(file != null && !file.isBlank()) {
+      settings.setText(file.strip());
+      updateLocalRepository();
+      checkSettings();
     }
   }
 }

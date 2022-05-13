@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
@@ -204,7 +203,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   /** Last modified timestamp of cached user settings */
   private long settingsTimestamp;
 
-  /*package*/MavenExecutionRequest createExecutionRequest() throws CoreException {
+  MavenExecutionRequest createExecutionRequest() throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
     // this causes problems with unexpected "stale project configuration" error markers
@@ -249,8 +248,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public String getLocalRepositoryPath() {
     String path = null;
     try {
-      Settings settings = getSettings();
-      path = settings.getLocalRepository();
+      path = getSettings().getLocalRepository();
     } catch(CoreException ex) {
       // fall through
     }
@@ -260,7 +258,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return path;
   }
 
-  /*package*/FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
+  FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
     try {
       DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup(Maven.class))
           .newRepositorySession(request);
@@ -272,7 +270,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  private void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
+  private void execute(MavenSession session, MojoExecution execution) {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
     Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
     for(MavenProject project : session.getProjects()) {
@@ -317,8 +315,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
 
-  private MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
-      boolean setup, IProgressMonitor monitor) throws CoreException {
+  private MavenExecutionPlan calculateExecutionPlan(MavenSession session, List<String> goals, boolean setup)
+      throws CoreException {
     try {
       return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, setup, goals.toArray(String[]::new));
     } catch(Exception ex) {
@@ -329,8 +327,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException {
-    return context().execute(project,
-        (context, pm) -> calculateExecutionPlan(context.getSession(), project, goals, setup, pm), monitor);
+    return context().execute(project, (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
+        monitor);
   }
 
   private MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
@@ -376,7 +374,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return getSettings(false);
   }
 
-  public synchronized Settings getSettings(boolean force_reload) throws CoreException {
+  public synchronized Settings getSettings(boolean forceReload) throws CoreException {
     // MUST NOT use createRequest!
 
     File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
@@ -384,7 +382,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
     }
 
-    boolean reload = force_reload || settings == null;
+    boolean reload = forceReload || settings == null;
 
     if(!reload && userSettingsFile != null) {
       reload = userSettingsFile.lastModified() != settingsTimestamp || userSettingsFile.length() != settingsLength;
@@ -471,10 +469,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public void reloadSettings() throws CoreException {
-    Settings settings = getSettings(true);
+    Settings reloadedSettings = getSettings(true);
     for(ISettingsChangeListener listener : settingsListeners) {
       try {
-        listener.settingsChanged(settings);
+        listener.settingsChanged(reloadedSettings);
       } catch(CoreException e) {
         log.error(e.getMessage(), e);
       }
@@ -715,9 +713,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         }
         IStatus[] newMembers = members.toArray(IStatus[]::new);
         throw new CoreException(new MultiStatus(IMavenConstants.PLUGIN_ID, -1, newMembers,
-            NLS.bind(Messages.MavenImpl_error_resolve, artifact.toString()), null));
+            NLS.bind(Messages.MavenImpl_error_resolve, artifact), null));
       }
-
       return artifact;
     }, monitor);
   }
@@ -736,7 +733,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return repository.pathOf(artifact);
   }
 
-  /*package*/void setLastUpdated(ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+  void setLastUpdated(ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
       Artifact artifact) throws CoreException {
 
     Properties lastUpdated = loadLastUpdated(localRepository, artifact);
@@ -987,23 +984,20 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private void injectSettings(List<ArtifactRepository> repositories) throws CoreException {
-    Settings settings = getSettings();
+    Settings setting = getSettings();
     RepositorySystem repositorySystem = lookup(RepositorySystem.class);
     repositorySystem.injectMirror(repositories, getMirrors());
-    repositorySystem.injectProxy(repositories, settings.getProxies());
-    repositorySystem.injectAuthentication(repositories, settings.getServers());
+    repositorySystem.injectProxy(repositories, setting.getProxies());
+    repositorySystem.injectAuthentication(repositories, setting.getServers());
   }
 
   private void addDefaultRepository(List<ArtifactRepository> repositories) throws CoreException {
-    for(ArtifactRepository repository : repositories) {
-      if(RepositorySystem.DEFAULT_REMOTE_REPO_ID.equals(repository.getId())) {
-        return;
+    if(repositories.stream().noneMatch(r -> RepositorySystem.DEFAULT_REMOTE_REPO_ID.equals(r.getId()))) {
+      try {
+        repositories.add(0, lookup(RepositorySystem.class).createDefaultRemoteRepository());
+      } catch(InvalidRepositoryException ex) {
+        log.error("Unexpected exception", ex);
       }
-    }
-    try {
-      repositories.add(0, lookup(RepositorySystem.class).createDefaultRemoteRepository());
-    } catch(InvalidRepositoryException ex) {
-      log.error("Unexpected exception", ex);
     }
   }
 
@@ -1020,10 +1014,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private List<Profile> getActiveProfiles() throws CoreException {
-    Settings settings = getSettings();
-    List<String> activeProfilesIds = settings.getActiveProfiles();
+    Settings setting = getSettings();
+    List<String> activeProfilesIds = setting.getActiveProfiles();
     List<Profile> activeProfiles = new ArrayList<>();
-    for(org.apache.maven.settings.Profile settingsProfile : settings.getProfiles()) {
+    for(org.apache.maven.settings.Profile settingsProfile : setting.getProfiles()) {
       if((settingsProfile.getActivation() != null && settingsProfile.getActivation().isActiveByDefault())
           || activeProfilesIds.contains(settingsProfile.getId())) {
         Profile profile = SettingsUtils.convertFromSettingsProfile(settingsProfile);
@@ -1127,9 +1121,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public ProxyInfo getProxyInfo(String protocol) throws CoreException {
-    Settings settings = getSettings();
-
-    for(Proxy proxy : settings.getProxies()) {
+    for(Proxy proxy : getSettings().getProxies()) {
       if(proxy.isActive() && protocol.equalsIgnoreCase(proxy.getProtocol())) {
         ProxyInfo proxyInfo = new ProxyInfo();
         proxyInfo.setType(proxy.getProtocol());
@@ -1243,9 +1235,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public void interpolateModel(MavenProject project, Model model) throws CoreException {
     ModelBuildingRequest request = new DefaultModelBuildingRequest();
     request.setUserProperties(project.getProperties());
-    ModelProblemCollector problems = req -> {
-    };
-    lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, problems);
+    lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, req -> {
+    });
   }
 
   @Override
@@ -1265,7 +1256,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
     context().execute(project, (context, pm) -> {
-      execute(context.getSession(), execution, pm);
+      execute(context.getSession(), execution);
       return null;
     }, monitor);
   }
