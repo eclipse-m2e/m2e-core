@@ -70,6 +70,11 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     this.maven = maven;
   }
 
+  MavenExecutionContext(MavenImpl maven, MavenExecutionRequest request) {
+    this.maven = maven;
+    this.request = request;
+  }
+
   @Override
   public MavenExecutionRequest getExecutionRequest() throws CoreException {
     if(request != null && context != null) {

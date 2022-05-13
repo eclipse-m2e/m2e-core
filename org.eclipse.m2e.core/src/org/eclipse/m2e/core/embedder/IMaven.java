@@ -252,6 +252,15 @@ public interface IMaven {
   <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException;
 
   /**
+   * Execute the given {@link MavenExecutionRequest} in the context of m2eclipse and return the result, this could be
+   * seen as an embedded run of the maven cli, at least it tries to replicate as much as possible from that.
+   * 
+   * @param request a {@link MavenExecutionRequest}
+   * @return the result of the execution
+   */
+  MavenExecutionResult execute(MavenExecutionRequest request);
+
+  /**
    * Creates and returns new, possibly nested, maven execution context.
    *
    * @since 1.4
@@ -282,4 +291,5 @@ public interface IMaven {
    * @return
    */
   <T> T lookupComponent(Class<T> clazz);
+
 }
