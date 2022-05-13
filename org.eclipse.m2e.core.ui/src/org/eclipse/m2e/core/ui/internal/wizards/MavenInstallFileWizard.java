@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - use default maven execution of IMaven
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.wizards;
@@ -29,15 +30,13 @@ import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.progress.IProgressConstants;
 
-import org.apache.maven.Maven;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.MonitorExecutionListener;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
@@ -102,14 +101,8 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
         MavenExecutionRequest request = executionContext.getExecutionRequest();
         request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
         request.setUserProperties(properties);
-        MavenExecutionResult executionResult = executionContext.execute((c, m) -> {
-          try {
-            maven.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
-            return maven.lookup(Maven.class).execute(request);
-          } catch(Exception e) {
-            return new DefaultMavenExecutionResult().addException(e);
-          }
-        }, monitor);
+        request.setExecutionListener(new MonitorExecutionListener(monitor));
+        MavenExecutionResult executionResult = maven.execute(request);
 
         for(Throwable exception : executionResult.getExceptions()) {
           log.error(Messages.MavenInstallFileWizard_error + "; " + exception, exception);

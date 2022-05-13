@@ -59,6 +59,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -89,6 +90,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -1269,6 +1271,37 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionContext getExecutionContext() {
     return MavenExecutionContext.getThreadContext();
+  }
+
+  @Override
+  public MavenExecutionResult execute(MavenExecutionRequest request) {
+    try {
+      return context().execute((innerContext, monitor) -> {
+
+        MavenExecutionRequestPopulator requestPopulator = lookup(MavenExecutionRequestPopulator.class);
+        //populate the defaults (if not already given)...
+        try {
+          requestPopulator.populateDefaults(request);
+        } catch(MavenExecutionRequestPopulationException ex) {
+          return new DefaultMavenExecutionResult().addException(ex);
+        }
+        EventSpyDispatcher eventSpyDispatcher = lookup(EventSpyDispatcher.class);
+        try {
+          //notify about the start of the request ...
+          eventSpyDispatcher.onEvent(request);
+          //execute the request
+          MavenExecutionResult result = lookup(Maven.class).execute(request);
+          // notify about the results
+          eventSpyDispatcher.onEvent(result);
+          return result;
+        } finally {
+          //free up resources
+          eventSpyDispatcher.close();
+        }
+      }, new NullProgressMonitor());
+    } catch(CoreException ex) {
+      return new DefaultMavenExecutionResult().addException(ex);
+    }
   }
 
 }
