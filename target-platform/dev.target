@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?>
+<target name="dev">
+	<locations>
+		<location path="${eclipse_home}" type="Profile"/>
+		<location type="Target" uri="file:${project_loc:/target-platform}/target-platform.target"/>
+	</locations>
+</target>
