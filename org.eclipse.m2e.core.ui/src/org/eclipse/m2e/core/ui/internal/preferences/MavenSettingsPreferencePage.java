@@ -25,7 +25,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -148,9 +148,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
           if(projects != null && projects.length > 0) {
             MavenPlugin.getMaven().reloadSettings();
 
-            SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
+            SubMonitor subMonitor = SubMonitor.convert(monitor, projects.length);
             for(IMavenProjectFacade project : projects) {
-              subMonitor.beginTask(
+              subMonitor.split(1).beginTask(
                   NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, project.getProject().getName()), 1);
               allProjects.add(project.getProject());
             }

@@ -105,7 +105,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     Composite composite = (Composite) super.createDialogArea(parent);
 
     filteredTree = new FilteredTree(composite, SWT.BORDER | (useCheckboxTree ? SWT.CHECK : 0), new PatternFilter(),
-        true);
+        true, true);
     filteredTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     getViewer().setContentProvider(new MavenContainerContentProvider());
     getViewer().setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
