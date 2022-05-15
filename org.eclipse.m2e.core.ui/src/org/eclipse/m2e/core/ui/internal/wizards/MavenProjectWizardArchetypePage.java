@@ -84,6 +84,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -760,7 +761,13 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
             archetype.setRepository(repositoryUrl);
             org.apache.maven.archetype.ArchetypeManager archetyper = M2EUIPluginActivator.getDefault()
                 .getArchetypeManager().getArchetyper();
-            archetyper.updateLocalCatalog(archetype);
+            maven.createExecutionContext().execute((ctx, m) -> {
+              ProjectBuildingRequest request = ctx.newProjectBuildingRequest();
+              archetyper.updateLocalCatalog(request, archetype);
+              return null;
+            }, monitor);
+
+
 
             archetypesCache.clear();
 
