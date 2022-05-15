@@ -27,6 +27,7 @@
 		<dependency.jars.folder>jars</dependency.jars.folder>
 		<dependency.sources.folder>jars/sources</dependency.sources.folder>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
+		<mavenJavaBREE>JavaSE-1.8</mavenJavaBREE>
 	</properties>
 
 	<modules>
@@ -71,6 +72,7 @@
 							Import-Package: !*
 							Automatic-Module-Name: ${bsn}
 							Eclipse-BundleShape: dir
+							Bundle-RequiredExecutionEnvironment: ${mavenJavaBREE}
 						]]>
 						</bnd>
 					</configuration>
@@ -303,11 +305,7 @@
 												<echo file="${project.basedir}/.classpath"><![CDATA[
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/${mavenJavaBREE}"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="target/classes"/>
 												]]></echo>
