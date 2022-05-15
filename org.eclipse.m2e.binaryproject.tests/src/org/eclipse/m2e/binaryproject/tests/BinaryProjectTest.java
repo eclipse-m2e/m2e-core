@@ -17,7 +17,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.resources.ICommand;
+import java.util.Arrays;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,8 +41,7 @@ public class BinaryProjectTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testBasic() throws Exception {
-    IProject project =
-        BinaryProjectPlugin.getInstance().create("org.apache.maven", "maven-core", "3.0.4", null, monitor);
+    IProject project = BinaryProjectPlugin.create("org.apache.maven", "maven-core", "3.0.4", null, monitor);
 
     assertTrue(project.hasNature(IMavenConstants.NATURE_ID));
     assertTrue(project.hasNature(JavaCore.NATURE_ID));
@@ -64,12 +64,7 @@ public class BinaryProjectTest extends AbstractMavenProjectTestCase {
   }
 
   private boolean hasBuilder(IProject project, String builderId) throws CoreException {
-    for (ICommand command : project.getDescription().getBuildSpec()) {
-      if (builderId.equals(command.getBuilderName())) {
-        return true;
-      }
-    }
-    return false;
+    return Arrays.stream(project.getDescription().getBuildSpec())
+      .anyMatch(c -> builderId.equals(c.getBuilderName()));
   }
-
 }

@@ -19,5 +19,4 @@ Import-Package: org.slf4j;version="[1.6.2,2.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.eclipse.m2e.binaryproject.internal;x-friends:="org.eclipse.m2e.sourcelookup,org.eclipse.m2e.sourcelookup.ui"
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.eclipse.m2e.binaryproject.internal.BinaryProjectPlugin
 Automatic-Module-Name: org.eclipse.m2e.binaryproject

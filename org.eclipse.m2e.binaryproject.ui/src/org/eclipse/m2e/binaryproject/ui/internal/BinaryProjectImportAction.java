@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Igor Fedorenko
+ * Copyright (c) 2012, 2022 Igor Fedorenko and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -23,37 +23,32 @@ import org.eclipse.ui.IWorkbenchPartSite;
 
 public class BinaryProjectImportAction implements IObjectActionDelegate {
 
-  private IStructuredSelection selection;
+	private IStructuredSelection selection;
 
-  private IWorkbench workbench;
+	private IWorkbench workbench;
 
-  private IWorkbenchPartSite site;
+	private IWorkbenchPartSite site;
 
-  @Override
-  public void run(IAction action) {
-    BinaryProjectImportWizard wizard = new BinaryProjectImportWizard();
-    wizard.init(workbench, selection);
-    if (!wizard.getInitialDependencies().isEmpty()) {
-      WizardDialog dialog = new WizardDialog(site.getShell(), wizard);
-      dialog.open();
-    } else {
-      wizard.dispose();
-    }
-  }
+	@Override
+	public void run(IAction action) {
+		BinaryProjectImportWizard wizard = new BinaryProjectImportWizard();
+		wizard.init(workbench, selection);
+		if (!wizard.getInitialDependencies().isEmpty()) {
+			WizardDialog dialog = new WizardDialog(site.getShell(), wizard);
+			dialog.open();
+		} else {
+			wizard.dispose();
+		}
+	}
 
-  @Override
-  public void selectionChanged(IAction action, ISelection selection) {
-    if (selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
-    } else {
-      this.selection = null;
-    }
-  }
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {
+		this.selection = selection instanceof IStructuredSelection ? (IStructuredSelection) selection : null;
+	}
 
-  @Override
-  public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    site = targetPart.getSite();
-    workbench = site.getWorkbenchWindow().getWorkbench();
-  }
-
+	@Override
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		site = targetPart.getSite();
+		workbench = site.getWorkbenchWindow().getWorkbench();
+	}
 }

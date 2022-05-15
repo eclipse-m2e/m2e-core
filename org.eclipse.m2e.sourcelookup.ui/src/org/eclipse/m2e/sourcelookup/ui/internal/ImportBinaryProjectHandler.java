@@ -63,19 +63,17 @@ public class ImportBinaryProjectHandler extends AbstractHandler {
 
         if (status.isOK()) {
           AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant.getSourceLookup(debugElement);
-
           try {
             sourceLookup.getSourceContainer(debugElement, true, monitor);
           } catch (CoreException e) {
             status = e.getStatus();
           }
         }
-
         return status;
       }
 
       @Override
-      protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) throws CoreException {
+		protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) {
         return new MavenArtifactIdentifier().identify(location);
       }
 

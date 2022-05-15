@@ -14,11 +14,9 @@
 package org.eclipse.m2e.scm;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.scm.internal.Messages;
 
 
@@ -92,13 +90,11 @@ public class ScmUrl {
 
   public static synchronized String getType(String url) throws CoreException {
     if(!url.startsWith("scm:")) { //$NON-NLS-1$
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(Messages.ScmUrl_error,
-          url), null));
+      throw new CoreException(Status.error(NLS.bind(Messages.ScmUrl_error, url)));
     }
     int n = url.indexOf(":", 4); //$NON-NLS-1$
     if(n == -1) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(Messages.ScmUrl_error,
-          url), null));
+      throw new CoreException(Status.error(NLS.bind(Messages.ScmUrl_error, url)));
     }
     return url.substring(4, n);
   }
