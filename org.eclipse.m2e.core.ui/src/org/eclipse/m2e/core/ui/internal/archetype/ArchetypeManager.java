@@ -181,11 +181,12 @@ public class ArchetypeManager {
 
     return maven.createExecutionContext().execute((context, monitor1) -> {
       ArtifactRepository localRepository = context.getLocalRepository();
-      if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
+      if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories,
+          context.newProjectBuildingRequest())) {
         ArchetypeDescriptor descriptor;
         try {
           descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null, localRepository,
-              repositories);
+              repositories, context.newProjectBuildingRequest());
         } catch(UnknownArchetype ex) {
           throw new CoreException(Status.error("UnknownArchetype", ex));
         }
