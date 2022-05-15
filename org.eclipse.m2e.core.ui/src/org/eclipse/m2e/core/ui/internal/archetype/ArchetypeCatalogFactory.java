@@ -16,8 +16,10 @@ package org.eclipse.m2e.core.ui.internal.archetype;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,12 @@ import org.apache.maven.archetype.ArchetypeManager;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
+import org.apache.maven.archetype.source.RemoteCatalogArchetypeDataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
+import org.apache.maven.project.ProjectBuildingRequest;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
@@ -118,8 +125,8 @@ public abstract class ArchetypeCatalogFactory {
     }
 
     @Override
-    public ArchetypeCatalog getArchetypeCatalog() {
-      return getArchetyper().getDefaultLocalCatalog();
+    public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
+      return executeWithRequest(getArchetyper()::getLocalCatalog);
     }
   }
 
@@ -145,7 +152,14 @@ public abstract class ArchetypeCatalogFactory {
       ArchetypeCatalog catalog = getEmbeddedCatalog();
       if(catalog == null) {
         //local but not embedded catalog
-        catalog = getArchetyper().getLocalCatalog(getId());
+        catalog = executeWithRequest(request -> {
+          ArtifactRepository localRepository = new MavenArtifactRepository();
+          //TODO: test this
+          String path = getId();
+          localRepository.setUrl(Path.of(path).toUri().toString());
+          request.setLocalRepository(localRepository);
+          return getArchetyper().getLocalCatalog(request);
+        });
       }
       return catalog;
     }
@@ -212,14 +226,21 @@ public abstract class ArchetypeCatalogFactory {
     }
 
     @Override
-    public ArchetypeCatalog getArchetypeCatalog() {
+    public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
       String url = getId();
       int idx = url.lastIndexOf("/archetype-catalog.xml");
       if(idx > -1) {
         url = url.substring(0, idx);
       }
-      final ArchetypeCatalog catalog = getArchetyper().getRemoteCatalog(url);
       final String remoteUrl = url;
+      ArchetypeCatalog catalog = executeWithRequest(request -> {
+        ArtifactRepository archeTypeRepo = new MavenArtifactRepository();
+        archeTypeRepo.setUrl(remoteUrl);
+        archeTypeRepo.setId(RemoteCatalogArchetypeDataSource.ARCHETYPE_REPOSITORY_ID);
+        request.getRemoteRepositories().add(archeTypeRepo);
+        return getArchetyper().getRemoteCatalog(request);
+      });
+
       @SuppressWarnings("serial")
       ArchetypeCatalog catalogWrapper = new ArchetypeCatalog() {
         @Override
@@ -273,6 +294,13 @@ public abstract class ArchetypeCatalogFactory {
     public String getRepositoryUrl() {
       return repositoryUrl;
     }
+  }
+
+  private static <T> T executeWithRequest(Function<ProjectBuildingRequest, T> action) throws CoreException {
+    return MavenPlugin.getMaven().createExecutionContext().execute((ctx, m) -> {
+      ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
+      return action.apply(buildingRequest);
+    }, null);
   }
 
 }
