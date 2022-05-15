@@ -30,6 +30,7 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Test;
 
 
+@SuppressWarnings("restriction")
 public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
 	
   private static final String REPLACED_POM_STRING = "<!-- compilerArgs: replacedByArgsSets -->";

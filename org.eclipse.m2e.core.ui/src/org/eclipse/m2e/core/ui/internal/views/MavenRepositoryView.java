@@ -16,9 +16,6 @@ package org.eclipse.m2e.core.ui.internal.views;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -69,7 +66,6 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
  *
  * @author dyocum
  */
-@SuppressWarnings("restriction")
 public class MavenRepositoryView extends ViewPart {
 
   /**
@@ -82,21 +78,7 @@ public class MavenRepositoryView extends ViewPart {
    */
   private static final String MENU_UPDATE_GRP = "update";
 
-  private static final Logger log = LoggerFactory.getLogger(MavenRepositoryView.class);
-
-  private static final String ENABLE_FULL = Messages.MavenRepositoryView_enable_full;
-
-  private static final String ENABLED_FULL = Messages.MavenRepositoryView_enabled_full;
-
-  private static final String DISABLE_DETAILS = Messages.MavenRepositoryView_disable_details;
-
-  private static final String DISABLED_DETAILS = Messages.MavenRepositoryView_details_disabled;
-
-  private static final String ENABLE_MIN = Messages.MavenRepositoryView_enable_minimum;
-
-  private static final String ENABLED_MIN = Messages.MavenRepositoryView_minimum_enabled;
-
-  private static final String MENU_ID = ".repositoryViewMenu"; //$NON-NLS-1$
+  private static final String MENU_ID = ".repositoryViewMenu"; //$NON-NLS-1$ 
 
   private IAction collapseAllAction;
 

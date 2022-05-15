@@ -12,7 +12,6 @@
  *******************************************************************************/
 package org.eclipse.m2e.sourcelookup.ui.internal;
 
-import org.eclipse.jdt.internal.launching.sourcelookup.advanced.AdvancedSourceLookupSupport;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -62,7 +61,9 @@ public void init(IWorkbench workbench) {}
 
     vmArguments = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.MULTI);
 	textGridDataFactory.applyTo(vmArguments);
-    vmArguments.setText(AdvancedSourceLookupSupport.getJavaagentString());
+	@SuppressWarnings("restriction")
+	String javaagentString = org.eclipse.jdt.internal.launching.sourcelookup.advanced.AdvancedSourceLookupSupport.getJavaagentString();
+	vmArguments.setText(javaagentString);
 
     Label lblLaunchVMArguments = new Label(composite, SWT.NONE);
     lblLaunchVMArguments.setText(".launch file VM arguments:");

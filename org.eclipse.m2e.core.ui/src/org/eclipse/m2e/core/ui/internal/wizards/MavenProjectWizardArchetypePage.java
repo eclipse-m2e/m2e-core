@@ -591,6 +591,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     job = new RetrievingArchetypesJob(catalogFactory);
     job.addJobChangeListener(new JobChangeAdapter() {
       @Override
+      @SuppressWarnings("synthetic-access")
       public void done(IJobChangeEvent event) {
 
         final RetrievingArchetypesJob thisJob = (RetrievingArchetypesJob) event.getJob();
@@ -813,6 +814,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
               throw new InterruptedException();
             }
 
+            @SuppressWarnings("unused") //TODO: remove in case search is finally removed
             File jarFile = jarArtifact.getFile();
 
             monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_reading);

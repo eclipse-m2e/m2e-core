@@ -69,7 +69,6 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
-@SuppressWarnings({"restriction"})
 public class NestedProjectsComposite extends Composite implements IMenuListener {
 
   private static final Logger log = LoggerFactory.getLogger(NestedProjectsComposite.class);

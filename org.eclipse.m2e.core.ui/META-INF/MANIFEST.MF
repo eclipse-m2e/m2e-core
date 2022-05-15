@@ -6,8 +6,12 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
-Export-Package: org.eclipse.m2e.core.ui.internal;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.actions;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.editor.xml",
+Export-Package: org.eclipse.m2e.core.ui.internal;x-friends:="org.eclipse.m2e.editor",
+ org.eclipse.m2e.core.ui.internal.actions;
+  x-friends:="org.eclipse.m2e.editor,
+   org.eclipse.m2e.editor.xml,
+   org.eclipse.m2e.scm,
+   org.eclipse.m2e.jdt.ui",
  org.eclipse.m2e.core.ui.internal.components;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.core.ui.internal.console;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.dialogs;x-friends:="org.eclipse.m2e.editor",
@@ -20,7 +24,7 @@ Export-Package: org.eclipse.m2e.core.ui.internal;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.util;x-friends:="org.eclipse.m2e.editor",
  org.eclipse.m2e.core.ui.internal.views;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.views.nodes;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.wizards;x-friends:="org.eclipse.m2e.editor"
+ org.eclipse.m2e.core.ui.internal.wizards;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.scm"
 Bundle-Activator: org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.m2e.core;bundle-version="1.16.0",
@@ -30,7 +34,7 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="1.16.0",
  org.eclipse.m2e.maven.runtime;bundle-version="1.16.0",
  org.eclipse.m2e.archetype.common;bundle-version="1.16.0",
  org.eclipse.ui.console;bundle-version="3.4.0",
- org.eclipse.ui.ide;bundle-version="3.5.2",
+ org.eclipse.ui.ide;bundle-version="3.18.0",
  org.eclipse.core.filesystem;bundle-version="1.2.1",
  org.eclipse.core.expressions;bundle-version="3.4.101",
  org.eclipse.ui.forms;bundle-version="3.4.1",

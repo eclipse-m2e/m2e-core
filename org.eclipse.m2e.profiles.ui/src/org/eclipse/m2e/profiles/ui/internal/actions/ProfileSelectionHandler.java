@@ -52,9 +52,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
 import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
@@ -85,7 +83,8 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
   private IProject[] getSelectedProjects(ExecutionEvent event) {
     ISelection selection = HandlerUtil.getCurrentSelection(event);
-    IProject[] projects = SelectionUtil.getProjects(selection, false);
+    @SuppressWarnings("restriction")
+    IProject[] projects = org.eclipse.m2e.core.ui.internal.actions.SelectionUtil.getProjects(selection, false);
     if(projects.length == 0) {
       IEditorInput input = HandlerUtil.getActiveEditorInput(event);
       if(input instanceof IFileEditorInput) {
@@ -146,6 +145,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
    * @param event
    * @return the selected IMavenProjectFacade
    */
+  @SuppressWarnings("restriction")
   private Set<IMavenProjectFacade> getMavenProjects(IProject[] projects) {
     if(projects == null || projects.length == 0) {
       return Collections.emptySet();
@@ -154,8 +154,8 @@ public class ProfileSelectionHandler extends AbstractHandler {
     try {
       IProgressMonitor monitor = new NullProgressMonitor();
       for(IProject p : projects) {
-        if(p != null && p.isAccessible() && p.hasNature(IMavenConstants.NATURE_ID)) {
-          IFile pom = p.getFile(IMavenConstants.POM_FILE_NAME);
+        if(p != null && p.isAccessible() && p.hasNature(org.eclipse.m2e.core.internal.IMavenConstants.NATURE_ID)) {
+          IFile pom = p.getFile(org.eclipse.m2e.core.internal.IMavenConstants.POM_FILE_NAME);
           IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, monitor);
           facades.add(facade);
         }

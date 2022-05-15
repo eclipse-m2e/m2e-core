@@ -33,7 +33,6 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  *
  * @author igor
  */
-@SuppressWarnings("restriction")
 public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final MojoExecutionMappingConfiguration element;

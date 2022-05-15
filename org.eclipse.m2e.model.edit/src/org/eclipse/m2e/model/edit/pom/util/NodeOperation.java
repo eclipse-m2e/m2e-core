@@ -25,6 +25,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
  * @author mkleint
  * @param <T>
  */
+@SuppressWarnings("restriction")
 public interface NodeOperation<T extends Node> {
 
   void process(T node, IStructuredDocument structuredDocument);

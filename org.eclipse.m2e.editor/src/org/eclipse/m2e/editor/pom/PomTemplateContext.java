@@ -87,7 +87,6 @@ import org.eclipse.m2e.editor.mojo.MojoParameterMetadataProvider;
  * @author Lukas Krecan
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("restriction")
 public enum PomTemplateContext {
 
   UNKNOWN("unknown"), // //$NON-NLS-1$

@@ -16,16 +16,11 @@ package org.eclipse.m2e.profiles.core.internal.management;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -35,8 +30,10 @@ import org.eclipse.m2e.profiles.core.internal.IProfileManager;
 import org.eclipse.m2e.profiles.core.internal.MavenProfilesCoreActivator;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.junit.Test;
 
 
+@SuppressWarnings("restriction")
 public class MavenProfileManagerTest extends AbstractMavenProjectTestCase {
 
   private final IProfileManager profileManager = MavenProfilesCoreActivator.getDefault().getProfileManager();

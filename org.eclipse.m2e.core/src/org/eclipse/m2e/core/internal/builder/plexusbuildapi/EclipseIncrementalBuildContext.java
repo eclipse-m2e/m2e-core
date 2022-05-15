@@ -52,7 +52,6 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
   }
 
   @Override
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public boolean hasDelta(List relPaths) {
     for(String relPath : (List<String>) relPaths) {
       if(hasDelta(relPath)) {

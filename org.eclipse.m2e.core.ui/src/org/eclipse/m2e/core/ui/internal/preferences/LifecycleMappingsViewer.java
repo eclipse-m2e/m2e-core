@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.osgi.framework.Bundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
@@ -85,8 +83,6 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 @SuppressWarnings("restriction")
 public class LifecycleMappingsViewer {
-  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingsViewer.class);
-
   /*package*/TreeViewer mappingsTreeViewer;
 
   /*package*/boolean showPhases = false;

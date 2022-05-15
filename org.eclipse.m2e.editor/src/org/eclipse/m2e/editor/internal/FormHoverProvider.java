@@ -64,8 +64,7 @@ public final class FormHoverProvider {
               return;
 
             IInformationControl infoControl = mhc;
-            if(infoControl != null && !infoControl.isFocusControl()
-                && infoControl instanceof IInformationControlExtension3) {
+            if(!infoControl.isFocusControl() && infoControl instanceof IInformationControlExtension3) {
               IInformationControlExtension3 iControl3 = (IInformationControlExtension3) infoControl;
               Rectangle controlBounds = iControl3.getBounds();
               if(controlBounds != null) {
@@ -89,7 +88,7 @@ public final class FormHoverProvider {
 
           } else if(event.type == SWT.FocusOut) {
             IInformationControl iControl = mhc;
-            if(iControl != null && !iControl.isFocusControl())
+            if(!iControl.isFocusControl())
               mhc.setVisible(false);
           }
         };

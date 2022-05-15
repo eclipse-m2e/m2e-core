@@ -29,7 +29,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
  *
  * @author igor
  */
-@SuppressWarnings("restriction")
 public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final PackagingTypeMappingConfiguration element;

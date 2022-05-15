@@ -35,6 +35,7 @@ import org.eclipse.wst.sse.core.internal.provisional.INodeNotifier;
  *
  * @author Mike Poindexter
  */
+@SuppressWarnings("restriction")
 class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
   /**
      *

@@ -38,7 +38,6 @@ import org.eclipse.m2e.workspace.WorkspaceState;
  *
  * @author Igor Fedorenko
  */
-@SuppressWarnings("restriction")
 public class MavenLaunchUtils {
 
   private MavenLaunchUtils() { // static use only

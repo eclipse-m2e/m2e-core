@@ -78,6 +78,7 @@ import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
  * @author Eugene Kuleshov
  * @author Milos Kleint
  */
+@SuppressWarnings("restriction")
 public class PomHyperlinkDetector implements IHyperlinkDetector {
   @Override
   public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region,

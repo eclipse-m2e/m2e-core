@@ -62,6 +62,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
 
+@SuppressWarnings("restriction")
 public final class PomHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(PomHelper.class);
@@ -104,7 +105,6 @@ public final class PomHelper {
    * @return
    * @throws CoreException
    */
-  @SuppressWarnings("restriction")
   public static TextChange createChange(IFile file, Operation operation, String label, boolean forceSave)
       throws CoreException {
     IStructuredModel model = null;

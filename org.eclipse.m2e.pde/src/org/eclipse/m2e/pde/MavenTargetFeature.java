@@ -14,11 +14,10 @@
 package org.eclipse.m2e.pde;
 
 import org.eclipse.pde.core.target.TargetFeature;
-import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 
 public class MavenTargetFeature extends TargetFeature {
 
-	MavenTargetFeature(@SuppressWarnings("restriction") IFeatureModel model) {
+	MavenTargetFeature(@SuppressWarnings("restriction") org.eclipse.pde.internal.core.ifeature.IFeatureModel model) {
 		super(model);
 	}
 

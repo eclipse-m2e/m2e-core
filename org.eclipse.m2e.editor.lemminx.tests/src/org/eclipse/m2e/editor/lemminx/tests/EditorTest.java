@@ -45,6 +45,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("restriction")
 public class EditorTest extends AbstractMavenProjectTestCase {
 
 	private static final String GENERIC_EDITOR = "org.eclipse.ui.genericeditor.GenericEditor";

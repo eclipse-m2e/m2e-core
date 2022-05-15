@@ -31,6 +31,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
  *
  * @author Mike Poindexter
  */
+@SuppressWarnings("restriction")
 public abstract class TranslatorAdapter implements INodeAdapter {
   protected SSESyncResource resource;
 

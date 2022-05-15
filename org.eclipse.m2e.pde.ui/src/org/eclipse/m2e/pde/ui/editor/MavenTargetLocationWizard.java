@@ -42,7 +42,6 @@ import org.eclipse.m2e.pde.TemplateFeatureModel;
 import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
-import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -85,7 +84,6 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		this(null);
 	}
 
-	@SuppressWarnings("restriction")
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
@@ -166,7 +164,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					include.setSelection(new StructuredSelection(targetLocation.getDependencyDepth()));
 					bndInstructions = targetLocation.getInstructions(null);
 					includeSource.setSelection(targetLocation.isIncludeSource());
-					IFeature template = targetLocation.getFeatureTemplate();
+					var template = targetLocation.getFeatureTemplate();
 					createFeature.setSelection(template != null);
 					locationLabel.setText(Objects.requireNonNullElse(targetLocation.getLabel(), ""));
 					modifyListener.modifyText(null);
@@ -374,7 +372,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			if (bndInstructions != null) {
 				list.add(bndInstructions);
 			}
-			IFeature featureTemplate = targetLocation.getFeatureTemplate();
+			var featureTemplate = targetLocation.getFeatureTemplate();
 			if (featureTemplate != null) {
 				try {
 					featureModel = new TemplateFeatureModel(featureTemplate);
@@ -396,8 +394,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			}
 			featureModel.makeReadOnly();
 		}
-		@SuppressWarnings("restriction")
-		IFeature f = createFeature ? featureModel.getFeature() : null;
+		var f = createFeature ? featureModel.getFeature() : null;
 		Collection<String> selectedScopes = new LinkedHashSet<>();
 		for (int i = 0; i < scopes.length; i++) {
 			if (scopes[i].getSelection()) {

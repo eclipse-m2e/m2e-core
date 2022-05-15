@@ -101,7 +101,6 @@ public class PluginListPage extends BasePluginListPage {
 	}
 
 	private CheckboxTreeViewer pluginViewer;
-	private static final String S_INIT_LAUNCH = "initLaunch"; //$NON-NLS-1$
 	private MavenTargetLocation targetLocation;
 	private Map<String, String> id2version = new HashMap<>();
 

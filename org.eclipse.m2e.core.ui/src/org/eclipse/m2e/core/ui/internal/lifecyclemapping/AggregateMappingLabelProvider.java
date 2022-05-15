@@ -36,7 +36,6 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  *
  * @author mkleint
  */
-@SuppressWarnings("restriction")
 public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final List<ILifecycleMappingLabelProvider> content;

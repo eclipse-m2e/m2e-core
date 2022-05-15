@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 
 
 /**
@@ -49,7 +48,7 @@ public class MappingDiscoveryJob extends WorkspaceJob {
   @Override
   public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     //Detect and resolve Lifecycle Mapping issues
-    LifecycleMappingDiscoveryRequest discoveryRequest = LifecycleMappingDiscoveryHelper
+    var discoveryRequest = LifecycleMappingDiscoveryHelper
         .createLifecycleMappingDiscoveryRequest(projects, monitor);
     if(discoveryRequest.isMappingComplete()) {
       return Status.OK_STATUS;
@@ -62,13 +61,16 @@ public class MappingDiscoveryJob extends WorkspaceJob {
     return Status.OK_STATUS;
   }
 
-  protected void discoverProposals(LifecycleMappingDiscoveryRequest discoveryRequest, IProgressMonitor monitor)
+  protected void discoverProposals(
+      org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest discoveryRequest,
+      IProgressMonitor monitor)
       throws CoreException {
     //LifecycleMappingHelper will discover proposals only if discovery service is available
     LifecycleMappingDiscoveryHelper.discoverProposals(discoveryRequest, monitor);
   }
 
-  protected void openProposalWizard(Collection<IProject> projects, LifecycleMappingDiscoveryRequest discoveryRequest) {
+  protected void openProposalWizard(Collection<IProject> projects,
+      org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest discoveryRequest) {
 
     final MavenDiscoveryProposalWizard proposalWizard = new MavenDiscoveryProposalWizard(projects, discoveryRequest);
     proposalWizard.init(null, null);

@@ -74,7 +74,6 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
  * </ul>
  * </p>
  */
-@SuppressWarnings("restriction")
 public class MavenProjectWizard extends AbstractMavenProjectWizard implements INewWizard {
 
   /** The wizard page for gathering general project information. */

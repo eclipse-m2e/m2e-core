@@ -33,7 +33,6 @@ import org.eclipse.m2e.editor.internal.lifecycle.WorkspaceLifecycleMappingResolu
  *
  * @author dyocum
  */
-@SuppressWarnings("restriction")
 public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
   @Override

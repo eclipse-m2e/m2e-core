@@ -37,15 +37,16 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
  */
 @SuppressWarnings("restriction")
 public class ListAdapter extends TranslatorAdapter {
-  protected List list;
+  protected List<Object> list;
 
   private final EClass elementType;
 
+  @SuppressWarnings("unchecked")
   public ListAdapter(SSESyncResource resc, Element containerNode, List<?> list, EClass elementType) {
     super(resc);
     this.node = containerNode;
     this.elementType = elementType;
-    this.list = list;
+    this.list = (List<Object>) list;
     this.resource = resc;
   }
 

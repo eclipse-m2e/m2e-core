@@ -13,37 +13,11 @@
 
 package org.eclipse.m2e.core.ui.internal.search.util;
 
-import org.eclipse.m2e.core.internal.index.SearchExpression;
-import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
-
-
 /**
  * Packaging representation.
  *
  * @author Lukas Krecan
  */
 public enum Packaging {
-  ALL(null), PLUGIN("maven-plugin"), // //$NON-NLS-1$
-  POM("pom"); //$NON-NLS-1$
-
-  private final String text;
-
-  Packaging(String text) {
-    this.text = text;
-  }
-
-  /**
-   * Text representation of the packaging.
-   */
-  public String getText() {
-    return text;
-  }
-
-  public SearchExpression toSearchExpression() {
-    if(ALL.equals(this)) {
-      return null;
-    }
-
-    return new SourcedSearchExpression(getText());
-  }
+  ALL, PLUGIN, POM;
 }

@@ -16,7 +16,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.sse.core;visibility:=reexport,
  org.eclipse.wst.xml.core;visibility:=reexport
 Bundle-ActivationPolicy: lazy
-Export-Package: org.eclipse.m2e.model.edit.pom;x-internal:=true,
+Export-Package: org.eclipse.m2e.model.edit.pom;x-friends:="org.eclipse.m2e.refactoring",
  org.eclipse.m2e.model.edit.pom.impl;x-internal:=true,
  org.eclipse.m2e.model.edit.pom.provider;x-internal:=true,
  org.eclipse.m2e.model.edit.pom.util;x-internal:=true

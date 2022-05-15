@@ -49,7 +49,6 @@ import org.eclipse.m2e.core.internal.launch.MavenWorkspaceRuntime;
 /**
  * @since 1.4
  */
-@SuppressWarnings("restriction")
 public class MavenRuntimeSelector extends Composite {
 
   ComboViewer runtimeComboViewer;
