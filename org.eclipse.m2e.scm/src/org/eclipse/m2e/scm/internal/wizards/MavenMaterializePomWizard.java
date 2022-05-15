@@ -71,6 +71,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     return dependencies;
   }
 
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 
@@ -92,9 +93,9 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
   }
 
   public void addPages() {
-    selectionPage = new MavenDependenciesWizardPage(importConfiguration, //
-        Messages.MavenMaterializePomWizard_dialog_title, //
-        Messages.MavenMaterializePomWizard_dialog_message) {
+    selectionPage = new MavenDependenciesWizardPage(importConfiguration,
+        Messages.MavenMaterializePomWizard_dialog_title, Messages.MavenMaterializePomWizard_dialog_message) {
+      @Override
       protected void createAdvancedSettings(Composite composite, GridData gridData) {
         checkOutAllButton = new Button(composite, SWT.CHECK);
         checkOutAllButton.setText(Messages.MavenMaterializePomWizard_btnCheckout);
@@ -109,8 +110,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     };
     selectionPage.setDependencies(dependencies);
 
-    locationPage = new MavenProjectWizardLocationPage(
-        importConfiguration, //
+    locationPage = new MavenProjectWizardLocationPage(importConfiguration,
         Messages.MavenMaterializePomWizard_location_title, Messages.MavenMaterializePomWizard_location_message,
         workingSets);
     locationPage.setLocationPath(SelectionUtil.getSelectedLocation(selection));
@@ -127,29 +127,23 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     if(!canFinish()) {
       return false;
     }
+    List<Dependency> dependencies = selectionPage.getDependencies();
 
-    final Dependency[] dependencies = selectionPage.getDependencies();
-
-    final boolean checkoutAllProjects = checkOutAllButton.getSelection();
-    final boolean developer = useDeveloperConnectionButton.getSelection();
+    boolean checkoutAllProjects = checkOutAllButton.getSelection();
+    boolean developer = useDeveloperConnectionButton.getSelection();
 
     MavenProjectCheckoutJob job = new MavenProjectCheckoutJob(importConfiguration, checkoutAllProjects, workingSets) {
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
-        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<>(
-            developer, dependencies);
+        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<>(developer, dependencies);
         scanner.run(monitor);
         // XXX handle errors/warnings
-
         return scanner.getProjects();
       }
     };
-
     if(!locationPage.isInWorkspace()) {
       job.setLocation(locationPage.getLocationPath().toFile());
     }
-
     job.schedule();
-
     return true;
   }
 }

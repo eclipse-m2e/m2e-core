@@ -2,7 +2,6 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.binaryproject.ui;singleton:=true
 Bundle-Version: 1.18.2.qualifier
-Bundle-Activator: org.eclipse.m2e.binaryproject.ui.internal.BinaryprojectUIActivator
 Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Name: %Bundle-Name

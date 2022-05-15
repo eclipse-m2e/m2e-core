@@ -14,8 +14,10 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -34,6 +36,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TableItem;
 
 import org.apache.maven.model.Dependency;
 
@@ -144,7 +147,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
       }
     }));
 
-    final Button removeDependencyButton = new Button(composite, SWT.PUSH);
+    Button removeDependencyButton = new Button(composite, SWT.PUSH);
     removeDependencyButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
     removeDependencyButton.setText(Messages.wizardProjectPageDependenciesRemove);
     removeDependencyButton.setEnabled(false);
@@ -196,15 +199,11 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
    *
    * @return dependencies currently chosen by the user. Neither the array nor any of its elements is <code>null</code>.
    */
-  public Dependency[] getDependencies() {
-    List<Dependency> dependencies = new ArrayList<>();
-    for(int i = 0; i < dependencyViewer.getTable().getItemCount(); i++ ) {
-      Object element = dependencyViewer.getElementAt(i);
-      if(element instanceof Dependency) {
-        dependencies.add((Dependency) element);
-      }
-    }
-    return dependencies.toArray(new Dependency[dependencies.size()]);
+  public List<Dependency> getDependencies() {
+    TableItem[] items = dependencyViewer.getTable().getItems();
+    return Arrays.stream(items).map(TableItem::getData) //
+        .filter(Dependency.class::isInstance).map(Dependency.class::cast) //
+        .collect(Collectors.toUnmodifiableList());
   }
 
   /**
@@ -236,8 +235,8 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     public String getText(Object element) {
       if(element instanceof Dependency) {
         Dependency d = (Dependency) element;
-        return d.getGroupId()
-            + ":" + d.getArtifactId() + ":" + d.getVersion() + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion() //$NON-NLS-1$//$NON-NLS-2$
+            + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$
       }
       return super.getText(element);
     }

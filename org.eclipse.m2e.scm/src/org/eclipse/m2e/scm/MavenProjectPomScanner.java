@@ -56,23 +56,23 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
 
   private final boolean developer;
 
-  private final Dependency[] dependencies;
+  private final List<Dependency> dependencies;
 
   private final IMaven maven;
 
-  public MavenProjectPomScanner(boolean developer, Dependency[] dependencies) {
+  public MavenProjectPomScanner(boolean developer, List<Dependency> dependencies) {
     this.developer = developer;
     this.dependencies = dependencies;
     this.maven = MavenPlugin.getMaven();
   }
 
   public String getDescription() {
-    if(dependencies.length == 1) {
-      Dependency d = dependencies[0];
+    if(dependencies.size() == 1) {
+      Dependency d = dependencies.get(0);
       return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion() //$NON-NLS-1$//$NON-NLS-2$
           + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    return "" + dependencies.length + " projects"; //$NON-NLS-1$
+    return "" + dependencies.size() + " projects"; //$NON-NLS-1$
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException {
@@ -103,10 +103,10 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
         String tag = scm.getTag();
 
         log.info(d.getArtifactId());
-        log.info("Connection: " + scm.getConnection());
-        log.info("       dev: " + scm.getDeveloperConnection());
-        log.info("       url: " + scm.getUrl());
-        log.info("       tag: " + tag);
+        log.info("Connection: {}", scm.getConnection());
+        log.info("       dev: {}", scm.getDeveloperConnection());
+        log.info("       url: {}", scm.getUrl());
+        log.info("       tag: {}", tag);
 
         String connection;
         if(developer) {
