@@ -57,6 +57,7 @@ import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 /**
  * @author mkleint
  */
+@SuppressWarnings("restriction")
 public class XmlUtils {
   private static final Logger log = LoggerFactory.getLogger(XmlUtils.class);
 

@@ -89,7 +89,6 @@ import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelP
  *
  * @author igor
  */
-@SuppressWarnings("restriction")
 public class LifecycleMappingPage extends WizardPage {
 
   private static final Logger LOG = LoggerFactory.getLogger(LifecycleMappingPage.class);

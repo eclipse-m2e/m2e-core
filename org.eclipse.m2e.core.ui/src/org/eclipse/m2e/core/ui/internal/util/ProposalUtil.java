@@ -128,7 +128,7 @@ public class ProposalUtil {
       final Text versionText, final Text classifierText, final Packaging packaging) {
     addCompletionProposal(classifierText, new Searcher() {
       @Override
-      public Collection<String> search() throws CoreException {
+      public Collection<String> search() {
         return getSearchEngine(project).findClassifiers(
             groupIdText.getText(), artifactIdText.getText(), versionText.getText(), "", packaging);
       }
@@ -139,7 +139,7 @@ public class ProposalUtil {
       final Text artifactIdText, final Text versionText, final Packaging packaging) {
     addCompletionProposal(versionText, new Searcher() {
       @Override
-      public Collection<String> search() throws CoreException {
+      public Collection<String> search() {
         Collection<String> toRet = new ArrayList<>();
         toRet.addAll(getSearchEngine(project).findVersions(groupIdText.getText(), //
             artifactIdText.getText(), "", packaging));
@@ -167,7 +167,7 @@ public class ProposalUtil {
       final Packaging packaging) {
     addCompletionProposal(artifactIdText, new Searcher() {
       @Override
-      public Collection<String> search() throws CoreException {
+      public Collection<String> search() {
         // TODO handle artifact info
         return getSearchEngine(project).findArtifactIds(groupIdText.getText(), "",
             packaging, null);
@@ -178,7 +178,7 @@ public class ProposalUtil {
   public static void addGroupIdProposal(final IProject project, final Text groupIdText, final Packaging packaging) {
     addCompletionProposal(groupIdText, new Searcher() {
       @Override
-      public Collection<String> search() throws CoreException {
+      public Collection<String> search() {
         // TODO handle artifact info
         return getSearchEngine(project).findGroupIds(groupIdText.getText(), packaging,
             null);
@@ -186,7 +186,7 @@ public class ProposalUtil {
     });
   }
 
-  public static SearchEngine getSearchEngine(final IProject project) throws CoreException {
+  public static SearchEngine getSearchEngine(final IProject project) {
     return M2EUIPluginActivator.getDefault().getSearchEngine(project);
   }
 

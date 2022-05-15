@@ -309,7 +309,6 @@ public class OverviewPage extends MavenPomEditorPage {
     super.createFormContent(managedForm);
   }
 
-  @SuppressWarnings("restriction") // org.eclipse.m2e.core packaging types
   private void createArtifactSection(FormToolkit toolkit, Composite composite, WidthGroup widthGroup) {
     Section artifactSection = toolkit.createSection(composite, ExpandableComposite.TITLE_BAR);
     artifactSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));

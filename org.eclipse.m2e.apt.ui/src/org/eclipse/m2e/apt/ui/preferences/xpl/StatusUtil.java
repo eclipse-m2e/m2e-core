@@ -27,13 +27,9 @@ public class StatusUtil {
 	 * @param s2 second status
 	 * @return the more severe status
 	 */
-	public static IStatus getMoreSevere(IStatus s1, IStatus s2) {
-		if (s1.getSeverity() > s2.getSeverity()) {
-			return s1;
-		} else {
-			return s2;
-		}
-	}
+  public static IStatus getMoreSevere(IStatus s1, IStatus s2) {
+    return s1.getSeverity() > s2.getSeverity() ? s1 : s2;
+  }
 
 	/**
 	 * Finds the most severe status from a array of stati.

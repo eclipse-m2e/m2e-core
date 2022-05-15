@@ -399,6 +399,7 @@ public class MavenPomSelectionComponent extends Composite {
 
     private String query;
 
+    @SuppressWarnings("unused") //TODO: remove if search-capability is not restored
     private final String field;
 
     private volatile boolean stop = false;
@@ -502,7 +503,7 @@ public class MavenPomSelectionComponent extends Composite {
     @Override
     public Image getImage(Object element) {
       if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+//        IndexedArtifactFile f = (IndexedArtifactFile) element;
 //        if(managedKeys.contains(getKey(f))) {
 //          return MavenImages.getOverlayImage(f.sourcesExists == IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC
 //              : MavenImages.PATH_VERSION, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);

@@ -52,7 +52,6 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
   public boolean hasDelta(List relpath) {
     return true;
   }

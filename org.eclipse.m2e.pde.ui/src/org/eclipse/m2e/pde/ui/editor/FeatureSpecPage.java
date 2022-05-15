@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 // derived from org.eclipse.pde.internal.ui.wizards.feature.FeatureSpecPage
+@SuppressWarnings("restriction")
 public class FeatureSpecPage extends AbstractFeatureSpecPage {
 
 	private Combo fFeatureProviderCombo;
@@ -129,7 +130,6 @@ public class FeatureSpecPage extends AbstractFeatureSpecPage {
 
 	// derived from
 	// org.eclipse.pde.internal.ui.wizards.feature.AbstractCreateFeatureOperation.createFeature()
-	@SuppressWarnings("restriction")
 	public void update(IFeatureModel model, boolean createFeatureInfos) throws CoreException {
 		FeatureData featureData = getFeatureData();
 		IFeature feature = model.getFeature();

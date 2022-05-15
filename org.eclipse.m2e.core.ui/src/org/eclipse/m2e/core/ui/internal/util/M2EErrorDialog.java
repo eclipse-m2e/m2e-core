@@ -154,7 +154,7 @@ public class M2EErrorDialog extends MessageDialog {
     @Override
     public Object[] getElements(Object inputElement) {
       if(inputElement instanceof Map) {
-        return ((Map) inputElement).keySet().toArray();
+        return ((Map<?, ?>) inputElement).keySet().toArray();
       }
       return new Object[0];
     }

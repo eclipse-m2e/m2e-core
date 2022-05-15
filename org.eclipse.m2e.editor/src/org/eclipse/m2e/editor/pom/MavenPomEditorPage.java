@@ -98,6 +98,7 @@ import org.eclipse.m2e.editor.internal.Messages;
  * @author Anton Kraev
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("restriction")
 public abstract class MavenPomEditorPage extends FormPage {
   private static final String MODIFY_LISTENER = "MODIFY_LISTENER";
 

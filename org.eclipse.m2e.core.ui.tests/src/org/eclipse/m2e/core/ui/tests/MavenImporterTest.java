@@ -36,10 +36,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+@SuppressWarnings("restriction")
 public class MavenImporterTest extends AbstractMavenProjectTestCase {
 
   private File projectDirectory;
 
+  @Override
   @Before
   public void setUp() throws IOException {
     projectDirectory = new File(Files.createTempDirectory("m2e-tests").toFile(), "example1");
@@ -53,6 +55,7 @@ public class MavenImporterTest extends AbstractMavenProjectTestCase {
     new File(projectDirectory, "module1/.classpath").delete();
   }
 
+  @Override
   @After
   public void tearDown() throws IOException {
     FileUtils.deleteDirectory(this.projectDirectory.getParentFile());

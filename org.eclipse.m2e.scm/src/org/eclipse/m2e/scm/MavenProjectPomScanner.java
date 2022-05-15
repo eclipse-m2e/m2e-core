@@ -42,7 +42,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 
 
@@ -217,7 +216,11 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
     // MavenProject project = embedder.readProject(file);
 
     monitor.subTask(NLS.bind(Messages.MavenProjectPomScanner_23, new Object[] {groupId, artifactId, version}));
-    return ((MavenImpl) maven).readModel(file);
+    return readModel(file);
   }
 
+  @SuppressWarnings("restriction")
+  private Model readModel(File file) throws CoreException {
+    return ((org.eclipse.m2e.core.internal.embedder.MavenImpl) maven).readModel(file);
+  }
 }

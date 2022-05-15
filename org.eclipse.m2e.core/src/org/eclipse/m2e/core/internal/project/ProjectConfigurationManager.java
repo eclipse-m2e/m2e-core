@@ -108,7 +108,6 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  */
 @Component(service = {IProjectConfigurationManager.class, IMavenProjectChangedListener.class,
     IResourceChangeListener.class}, property = "event.mask:Integer=" + IResourceChangeEvent.PRE_DELETE)
-@SuppressWarnings("restriction")
 public class ProjectConfigurationManager
     implements IProjectConfigurationManager, IMavenProjectChangedListener, IResourceChangeListener {
   private static final Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
@@ -891,6 +890,9 @@ public class ProjectConfigurationManager
         log.error(Messages.MavenImpl_error_read_pom, ex);
       }
       projectInfo.setModel(model);
+    }
+    if(model == null) {
+      throw new IllegalStateException("Failed to load model of project " + projectInfo);
     }
     model.setPomFile(pomFile);
     String projectName = getProjectName(configuration, model);

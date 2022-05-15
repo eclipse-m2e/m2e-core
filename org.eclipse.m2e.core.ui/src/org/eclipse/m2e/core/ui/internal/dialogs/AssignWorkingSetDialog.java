@@ -40,7 +40,6 @@ import org.eclipse.m2e.core.ui.internal.components.NestedProjectsComposite;
 /**
  * @since 1.5
  */
-@SuppressWarnings("restriction")
 public class AssignWorkingSetDialog extends TitleAreaDialog {
 
   private final IProject[] initialSelection;

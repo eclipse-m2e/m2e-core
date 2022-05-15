@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
+@SuppressWarnings("restriction")
 public class ImportJavaProjectTest extends AbstractMavenProjectTestCase {
 
   private File parentproject;

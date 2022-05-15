@@ -41,7 +41,6 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.internal.Messages;
 
 
-@SuppressWarnings("restriction")
 public class LifecycleMappingResolution extends AbstractLifecycleMappingResolution {
 
   public LifecycleMappingResolution(IMarker marker, PluginExecutionAction action) {

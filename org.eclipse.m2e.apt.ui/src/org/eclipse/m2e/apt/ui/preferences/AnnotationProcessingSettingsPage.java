@@ -178,7 +178,6 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     Button button = new Button(parent, SWT.RADIO | SWT.LEFT);
     button.setText(label);
     button.addSelectionListener(new SelectionAdapter() {
-      @SuppressWarnings("synthetic-access")
       public void widgetSelected(SelectionEvent e) {
         if (!newMode.equals(annotationProcessingMode)) {
           annotationProcessingMode = newMode;

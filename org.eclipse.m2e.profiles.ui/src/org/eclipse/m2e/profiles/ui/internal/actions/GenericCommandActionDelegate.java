@@ -42,7 +42,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 
 /**
@@ -118,7 +117,8 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
    */
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
       throws CoreException {
-    String id = config.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+    @SuppressWarnings("restriction")
+    String id = config.getAttribute(org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants.ATT_ID);
     // save the data until our init(*) call, where we can get
     // the services.
     if(data instanceof String) {

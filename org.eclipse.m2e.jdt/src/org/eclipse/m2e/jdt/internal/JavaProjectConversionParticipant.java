@@ -52,8 +52,6 @@ import org.apache.maven.model.Resource;
 
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.SearchExpression;
-import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 
 
@@ -458,7 +456,6 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Assert.isNotNull(artifactId, "artifactId can not be null");
     String version = referenceVersion;
     String partialKey = artifactId + " : " + groupId; //$NON-NLS-1$
-    SearchExpression a = new SourcedSearchExpression(artifactId);
 
     //For some reason, an exact search using :
     //ISearchEngine searchEngine  = M2EUIPluginActivator.getDefault().getSearchEngine(null)

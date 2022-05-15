@@ -26,8 +26,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
-
 
 /**
  * MavenClasspathContainerPage
@@ -77,8 +75,10 @@ public class MavenClasspathContainerPage extends WizardPage
       // IWorkbenchPreferenceContainer container= (IWorkbenchPreferenceContainer) getContainer();
       // container.openPage(MavenProjectPreferencePage.ID, javaProject.getProject());
 
+      @SuppressWarnings("restriction")
+      String mavenPageId = org.eclipse.m2e.core.internal.IMavenConstants.PREFERENCE_PAGE_ID;
       PreferencesUtil.createPropertyDialogOn(getShell(), javaProject.getProject(), //
-          IMavenConstants.PREFERENCE_PAGE_ID, new String[] {IMavenConstants.PREFERENCE_PAGE_ID}, null).open();
+          mavenPageId, new String[] {mavenPageId}, null).open();
     }));
   }
 

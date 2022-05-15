@@ -46,6 +46,7 @@ import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PomFactory;
 
 
+@SuppressWarnings("restriction")
 public class SSESyncResource extends ResourceImpl {
   private static final Set<String> NO_EVENT_MODELS = new HashSet<>();
 

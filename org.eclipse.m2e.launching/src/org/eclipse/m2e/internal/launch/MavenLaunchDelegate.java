@@ -147,7 +147,6 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   @Override
-  @SuppressWarnings("restriction")
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
     VMArguments arguments = launchSupport.getVMArguments();
 
@@ -290,7 +289,6 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     }
   }
 
-  @SuppressWarnings("restriction")
   private void getArgsFromMvnDir(VMArguments arguments, ILaunchConfiguration configuration) throws CoreException {
     String pomDir = LaunchingUtils.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, ""));
     if(pomDir.isEmpty()) {

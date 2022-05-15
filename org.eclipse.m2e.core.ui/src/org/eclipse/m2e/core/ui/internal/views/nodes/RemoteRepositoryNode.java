@@ -13,9 +13,6 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.m2e.core.repository.IRepository;
@@ -28,8 +25,6 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
  * @author igor
  */
 public abstract class RemoteRepositoryNode implements IMavenRepositoryNode {
-  private static final Logger log = LoggerFactory.getLogger(RemoteRepositoryNode.class);
-
   protected static final Object[] NO_CHILDREN = new Object[0];
 
   protected final IRepository repository;

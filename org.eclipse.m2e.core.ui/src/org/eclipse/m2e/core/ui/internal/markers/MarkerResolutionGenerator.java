@@ -32,7 +32,6 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 
-@SuppressWarnings("restriction")
 public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
     @Override

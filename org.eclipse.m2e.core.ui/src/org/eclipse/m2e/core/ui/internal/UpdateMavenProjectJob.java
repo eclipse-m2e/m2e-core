@@ -34,7 +34,6 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
 
-@SuppressWarnings("restriction")
 public class UpdateMavenProjectJob extends WorkspaceJob {
 
   private final IProject[] projects;

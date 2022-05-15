@@ -47,7 +47,6 @@ import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -368,6 +367,11 @@ public class ProfileManager implements IProfileManager {
     if(file == null) {
       return null;
     }
-    return ((MavenImpl) maven).readModel(file);
+    return readModel(maven, file);
+  }
+
+  @SuppressWarnings("restriction")
+  private Model readModel(IMaven maven, File file) throws CoreException {
+    return ((org.eclipse.m2e.core.internal.embedder.MavenImpl) maven).readModel(file);
   }
 }

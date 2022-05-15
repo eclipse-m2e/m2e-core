@@ -51,7 +51,6 @@ import org.eclipse.m2e.core.embedder.AbstractMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
@@ -219,7 +218,9 @@ public class MavenJdtPlugin extends Plugin {
         .valueOf(preferencesService.get(PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION, PLUGIN_ID, preferencesLookup));
   }
 
-  private class WorkspaceSourceDownloadJob extends Job implements IBackgroundProcessingQueue {
+  @SuppressWarnings("restriction")
+  private class WorkspaceSourceDownloadJob extends Job
+      implements org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue {
 
     private boolean done;
 

@@ -50,7 +50,6 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 /**
  * This preferences page provides preferences for managing workspace-scoped lifecycle mappings
  */
-@SuppressWarnings("restriction")
 public class LifecycleMappingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingPreferencePage.class);

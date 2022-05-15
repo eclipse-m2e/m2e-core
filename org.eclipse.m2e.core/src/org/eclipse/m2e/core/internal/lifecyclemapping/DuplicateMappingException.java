@@ -33,19 +33,16 @@ public abstract class DuplicateMappingException extends RuntimeException {
 
   private final LifecycleMappingMetadataSource[] sources;
 
-
   protected DuplicateMappingException(LifecycleMappingMetadataSource... sources) {
     this.sources = sources;
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Throwable#getMessage()
-   */
+  @Override
   public String getMessage() {
     // sources might be either bundle, artifact or "default", "workspace" or MavenProject (all should provide proper toString() implementations)
-    return "Mapping defined in "
-        + Arrays.stream(sources).map(s -> s.getSource()).map(s -> s == null ? DESCRIPTION_UNKNOWN_SOURCE : s.toString())
-            .collect(Collectors.joining("' and '", "'", "'"));
+    return "Mapping defined in " + Arrays.stream(sources).map(LifecycleMappingMetadataSource::getSource)
+        .map(s -> s == null ? DESCRIPTION_UNKNOWN_SOURCE : s.toString())
+        .collect(Collectors.joining("' and '", "'", "'"));
   }
 
   /**
@@ -54,6 +51,5 @@ public abstract class DuplicateMappingException extends RuntimeException {
   public LifecycleMappingMetadataSource[] getConflictingSources() {
     return this.sources;
   }
-
 
 }

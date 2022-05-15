@@ -61,7 +61,6 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.wizards.ImportMavenProjectsJob;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
-import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.internal.Messages;

@@ -35,7 +35,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-@SuppressWarnings("restriction")
 public class MavenArtifactIdentifier {
 
   // reads META-INF/maven/**/pom.properties

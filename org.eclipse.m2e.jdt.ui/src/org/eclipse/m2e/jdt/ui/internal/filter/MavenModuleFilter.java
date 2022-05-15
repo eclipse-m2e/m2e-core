@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -39,12 +38,13 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 public class MavenModuleFilter extends ViewerFilter {
   private static final Logger log = LoggerFactory.getLogger(MavenModuleFilter.class);
 
+  @SuppressWarnings("restriction")
   public boolean select(Viewer viewer, Object parentElement, Object element) {
     if(element instanceof IFolder) {
       IFolder folder = (IFolder) element;
       IProject project = folder.getProject();
       try {
-        if(project.hasNature(IMavenConstants.NATURE_ID)) {
+        if(project.hasNature(org.eclipse.m2e.core.internal.IMavenConstants.NATURE_ID)) {
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
           IMavenProjectFacade projectFacade = projectManager.create(project, null);

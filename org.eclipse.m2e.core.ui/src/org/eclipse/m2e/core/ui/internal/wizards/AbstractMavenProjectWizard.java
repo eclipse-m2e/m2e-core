@@ -27,7 +27,6 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
-@SuppressWarnings("restriction")
 public abstract class AbstractMavenProjectWizard extends Wizard {
 
   protected IStructuredSelection selection;

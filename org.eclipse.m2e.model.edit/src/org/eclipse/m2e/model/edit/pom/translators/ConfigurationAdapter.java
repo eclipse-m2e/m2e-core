@@ -27,6 +27,7 @@ import org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl;
  *
  * @author Mike Poindexter
  */
+@SuppressWarnings("restriction")
 class ConfigurationAdapter extends TranslatorAdapter implements INodeAdapter {
 
   private final Configuration modelObject;

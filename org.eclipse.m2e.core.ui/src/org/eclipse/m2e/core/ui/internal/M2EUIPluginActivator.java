@@ -38,7 +38,6 @@ import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 
 
-@SuppressWarnings("restriction")
 public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$

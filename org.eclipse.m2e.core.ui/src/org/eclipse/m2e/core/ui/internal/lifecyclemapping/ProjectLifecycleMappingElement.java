@@ -17,7 +17,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
 /**
  * Represents instance of ILifecycleMappingElement within context of specific ProjectLifecycleMappingConfiguration
  */
-@SuppressWarnings("restriction")
 public class ProjectLifecycleMappingElement {
   private final ProjectLifecycleMappingConfiguration project;
 

@@ -19,7 +19,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 
 
-@SuppressWarnings("restriction")
 public interface IMavenDiscoveryUI {
 
   /**

@@ -19,7 +19,6 @@ import org.eclipse.aether.util.artifact.DelegatingArtifact;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.pde.internal.core.project.PDEProject;
 
 public class WorkspaceArtifact extends DelegatingArtifact {
 
@@ -48,9 +47,10 @@ public class WorkspaceArtifact extends DelegatingArtifact {
 		return mavenProject;
 	}
 
+	@SuppressWarnings("restriction")
 	public IFile getManifest() {
 		IProject project = mavenProject.getProject();
-		return PDEProject.getManifest(project);
+		return org.eclipse.pde.internal.core.project.PDEProject.getManifest(project);
 	}
 
 }

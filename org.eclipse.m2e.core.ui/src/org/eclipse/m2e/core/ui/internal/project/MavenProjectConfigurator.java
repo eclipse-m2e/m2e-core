@@ -31,13 +31,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -69,14 +66,15 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
             this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
         }
 
+        @Override
+        @SuppressWarnings("restriction")
         public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
             try {
                 // This makes job execution wait until the main Import job is completed
                 // So the mapping discovery happens as a next step, after projects are imported in workspace
-                getJobManager().join(SmartImportJob.class, monitor);
+                getJobManager().join(org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob.class, monitor);
             } catch (InterruptedException ex) {
-                throw new CoreException(new Status(IStatus.WARNING,
-                    M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
+                throw new CoreException(Status.warning(ex.getMessage(), ex));
             }
             synchronized (this.toProcess) {
                 this.started = true;
@@ -118,7 +116,9 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
      * @author mistria
      *
      */
-    public static class UpdateMavenConfigurationJob extends Job implements IBackgroundProcessingQueue {
+    @SuppressWarnings("restriction")
+    public static class UpdateMavenConfigurationJob extends Job
+        implements org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue {
 
         private static UpdateMavenConfigurationJob INSTANCE;
         private final Set<IProject> toProcess;
@@ -157,10 +157,9 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                     if (this.toProcess.isEmpty()) {
                         CumulativeMappingDiscoveryJob.getInstance().schedule();
                         return Status.OK_STATUS;
-                    } else {
-                        toProcessNow.addAll(this.toProcess);
-                        this.toProcess.removeAll(toProcessNow);
                     }
+                    toProcessNow.addAll(this.toProcess);
+                    this.toProcess.removeAll(toProcessNow);
                 }
                 if (!toProcessNow.isEmpty()) {
                     CumulativeMappingDiscoveryJob.getInstance().addProjects(toProcessNow);
@@ -172,8 +171,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                             false, false, monitor);
                 }
             }
-            return new Status(IStatus.CANCEL, M2EUIPluginActivator.PLUGIN_ID,
-                    "Cancelled by user");
+            return new Status(IStatus.CANCEL, M2EUIPluginActivator.PLUGIN_ID, "Cancelled by user");
         }
 
         @Override
@@ -190,9 +188,8 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         try {
             scanner.run(monitor);
         } catch (Exception ex) {
-          M2EUIPluginActivator.getDefault().getLog()
-              .log(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
-            return null;
+          M2EUIPluginActivator.getDefault().getLog().log(Status.error(ex.getMessage(), ex));
+          return null;
         }
         Queue<MavenProjectInfo> projects = new LinkedList<>();
         projects.addAll(scanner.getProjects());
@@ -205,8 +202,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         return res;
     }
 
-    // TODO Uncomment @Override when this method API is exposed in ProjectConfigurator
-    // @Override
+    @Override
     public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
         Set<File> toRemove = new HashSet<>();
         for (File directory : proposals.keySet()) {
@@ -232,13 +228,6 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         return shouldBeAnEclipseProject(project, monitor);
     }
 
-    // TODO this method is going to be removed from API.
-    // When done, also remove this method implementation.
-    public IWizard getConfigurationWizard() {
-        // no need for a wizard, will just set up the m2e nature
-        return null;
-    }
-
     @Override
     public void configure(final IProject project, Set<IPath> excludedDirectories, final IProgressMonitor monitor) {
         // copied from
@@ -261,8 +250,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                 UpdateMavenConfigurationJob.getInstance().schedule();
             }
         } catch (Exception ex) {
-          M2EUIPluginActivator.getDefault().getLog()
-              .log(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, ex.getMessage(), ex));
+          M2EUIPluginActivator.getDefault().getLog().log(Status.error(ex.getMessage(), ex));
         }
     }
 
@@ -287,8 +275,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         // }
     }
 
-    // Prepare for compatibility with M7
-    // @Override
+    @Override
     public Set<IFolder> getFoldersToIgnore(IProject project, IProgressMonitor monitor) {
         Set<IFolder> res = new HashSet<>();
         // TODO: get these values from pom/project config
@@ -296,11 +283,4 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         res.add(project.getFolder("target"));
         return res;
     }
-
-    // Prepare for compatibility with M7
-    // @Override
-    public Set<IFolder> getDirectoriesToIgnore(IProject project, IProgressMonitor monitor) {
-        return getFoldersToIgnore(project, monitor);
-    }
-
 }

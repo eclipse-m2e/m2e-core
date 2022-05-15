@@ -44,6 +44,7 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
  *
  * @author Mike Poindexter
  */
+@SuppressWarnings("restriction")
 public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, INodeAdapter {
   private final SSESyncResource resource;
 
