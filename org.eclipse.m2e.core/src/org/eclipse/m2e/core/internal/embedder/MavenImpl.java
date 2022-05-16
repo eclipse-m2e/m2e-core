@@ -1289,4 +1289,23 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  /**
+   * @param file a base file or directory, may be <code>null</code>
+   * @return the value for `maven.multiModuleProjectDirectory` as defined in Maven launcher
+   */
+  public static File computeMultiModuleProjectDirectory(File file) {
+    if(file == null) {
+      return null;
+    }
+    final File basedir = file.isDirectory() ? file : file.getParentFile();
+    File current = basedir;
+    while(current != null) {
+      if(new File(current, ".mvn").isDirectory()) {
+        return current;
+      }
+      current = current.getParentFile();
+    }
+    return basedir;
+  }
+
 }
