@@ -52,7 +52,6 @@ import org.codehaus.plexus.util.FileUtils;
 
 import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.project.DefaultProjectBuilder;
-import org.apache.maven.repository.legacy.WagonManager;
 
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -277,10 +276,6 @@ public class MavenPluginActivator extends Plugin {
 
   public IRepositoryRegistry getRepositoryRegistry() {
     return getService(IRepositoryRegistry.class);
-  }
-
-  public WagonManager getWagonManager() {
-    return getMaven().lookupComponent(WagonManager.class);
   }
 
   public RepositorySystem getRepositorySystem() {
