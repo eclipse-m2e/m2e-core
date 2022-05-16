@@ -170,7 +170,6 @@ import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
@@ -1168,20 +1167,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       return getPlexusContainer().lookup(clazz);
     } catch(ComponentLookupException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
-    }
-  }
-
-  /**
-   * @since 1.5
-   */
-  @Override
-  public <T> T lookupComponent(Class<T> clazz) {
-    try {
-      return getPlexusContainer0().lookup(clazz);
-    } catch(ComponentLookupException ex) {
-      throw new NoSuchComponentException(ex);
-    } catch(PlexusContainerException ex) {
-      throw new IllegalStateException(ex);
     }
   }
 

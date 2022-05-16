@@ -285,11 +285,4 @@ public interface IMaven {
    */
   <T> T lookup(Class<T> clazz) throws CoreException;
 
-  /**
-   * @param <T>
-   * @param clazz
-   * @return
-   */
-  <T> T lookupComponent(Class<T> clazz);
-
 }

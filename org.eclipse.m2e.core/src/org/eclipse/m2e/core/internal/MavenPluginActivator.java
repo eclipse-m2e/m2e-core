@@ -37,6 +37,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
@@ -278,8 +279,8 @@ public class MavenPluginActivator extends Plugin {
     return getService(IRepositoryRegistry.class);
   }
 
-  public RepositorySystem getRepositorySystem() {
-    return getMaven().lookupComponent(RepositorySystem.class);
+  public RepositorySystem getRepositorySystem() throws CoreException {
+    return getMaven().lookup(RepositorySystem.class);
   }
 
   public ArtifactFilterManager getArifactFilterManager() {
