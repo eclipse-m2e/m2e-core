@@ -97,6 +97,7 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -917,6 +918,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
     request.setLocalRepository(getMaven().getLocalRepository());
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
+    if(pom != null && pom.getLocation() != null) {
+      request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
+    }
 
     return request;
   }
