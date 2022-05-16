@@ -26,11 +26,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -78,5 +80,17 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
     } finally {
       FileUtils.deleteDirectory(tempDirectory);
     }
+  }
+
+	@Test
+	public void testMultiModuleProjectDirectoryChild() throws Exception {
+		IProject project = createExisting("simple", "resources/projects/dotMvn/", false);
+		waitForJobsToComplete(monitor);
+		IMavenProjectFacade facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project.getFile("child/pom.xml"),
+			true, monitor);
+		Assert.assertNotNull(facade);
+		File[] multiModuleDirectory = new File[] { null }; 
+		facade.getMaven().execute((context, monitor) -> multiModuleDirectory[0] = context.getExecutionRequest().getMultiModuleProjectDirectory(), null);
+		assertEquals(project.getLocation().toFile(), multiModuleDirectory[0]);
   }
 }

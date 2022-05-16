@@ -41,6 +41,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -107,6 +108,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
   private transient Map<String, Object> sessionProperties;
+
+  private IMaven maven;
 
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       ResolverConfiguration resolverConfiguration) {
@@ -532,7 +535,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IMaven getMaven() {
-    // TODO: if project has Maven customization (such as a .mvn, MAVEN_OPTS...)
-    return MavenPlugin.getMaven();
+    if(maven == null) {
+      File basedir = pomFile != null ? (pomFile.isDirectory() ? pomFile : pomFile.getParentFile()) : null;
+      maven = ((MavenImpl) MavenPlugin.getMaven()).cloneForBasedir(basedir);
+    }
+    return maven;
   }
 }

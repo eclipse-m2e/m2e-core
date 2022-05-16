@@ -174,7 +174,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
-public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
+public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Cloneable {
   private static final Logger log = LoggerFactory.getLogger(MavenImpl.class);
 
   /**
@@ -203,6 +203,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   /** Last modified timestamp of cached user settings */
   private long settingsTimestamp;
+
+  private File basedir;
 
   MavenExecutionRequest createExecutionRequest() throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -242,6 +244,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
     // the right way to disable snapshot update
     // request.setUpdateSnapshots(false);
+    if(basedir != null) {
+      request.setBaseDirectory(basedir);
+      request.setMultiModuleProjectDirectory(computeMultiModuleProjectDirectory(basedir));
+    }
     return request;
   }
 
@@ -665,7 +671,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private IMavenExecutionContext context() {
     MavenExecutionContext context = MavenExecutionContext.getThreadContext();
     if(context == null) {
-      context = new MavenExecutionContext(this);
+      context = createExecutionContext();
     }
     return context;
   }
@@ -1250,7 +1256,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext(this);
+    return new MavenExecutionContext(this, basedir);
   }
 
   @Override
@@ -1308,4 +1314,17 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return basedir;
   }
 
+  public MavenImpl cloneForBasedir(File basedir) {
+    try {
+      MavenImpl res = (MavenImpl) clone();
+      res.basedir = basedir;
+      // TODO: more customization may be needed, more fields cleared, maybe in the end no
+      // need to start from a clone at all...
+      // TODO? What about getExecutionContext() that's tied to the thread and not to this?
+      return res;
+    } catch(CloneNotSupportedException ex) {
+      // unexpected, let's just crash
+      throw new RuntimeException(ex);
+    }
+  }
 }
