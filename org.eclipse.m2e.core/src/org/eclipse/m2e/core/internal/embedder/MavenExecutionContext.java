@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
+import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -66,13 +67,17 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   // TODO maybe delegate to parent context
   private Map<String, Object> context;
 
-  public MavenExecutionContext(MavenImpl maven) {
+  private final File basedir;
+
+  public MavenExecutionContext(MavenImpl maven, File basedir) {
     this.maven = maven;
+    this.basedir = basedir == null ? null : (basedir.isDirectory() ? basedir : basedir.getParentFile());
   }
 
   MavenExecutionContext(MavenImpl maven, MavenExecutionRequest request) {
     this.maven = maven;
     this.request = request;
+    this.basedir = request.getBaseDirectory() != null ? new File(request.getBaseDirectory()) : null;
   }
 
   @Override
@@ -99,6 +104,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     if(request == null) {
       request = maven.createExecutionRequest();
     }
+    request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(basedir));
 
     return request;
   }
