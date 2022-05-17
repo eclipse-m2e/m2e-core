@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - move creation MavenExecutionRequest from MavenImpl->MavenExecutionContext
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.embedder;
@@ -47,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 
-import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.resolution.ArtifactRequest;
@@ -168,7 +168,6 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
@@ -206,51 +205,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
 
   private File basedir;
 
-  MavenExecutionRequest createExecutionRequest() throws CoreException {
-    MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-
-    // this causes problems with unexpected "stale project configuration" error markers
-    // need to think how to manage ${maven.build.timestamp} properly inside workspace
-    //request.setStartTime( new Date() );
-
-    if(mavenConfiguration.getGlobalSettingsFile() != null) {
-      request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
-    }
-    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
-    if(mavenConfiguration.getUserSettingsFile() != null) {
-      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
-    }
-    request.setUserSettingsFile(userSettingsFile);
-
-    try {
-      lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, getSettings());
-    } catch(MavenExecutionRequestPopulationException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_no_exec_req, ex));
-    }
-
-    ArtifactRepository localRepository = getLocalRepository();
-    request.setLocalRepository(localRepository);
-    request.setLocalRepositoryPath(localRepository.getBasedir());
-    request.setOffline(mavenConfiguration.isOffline());
-
-    request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
-    request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
-
-    MavenExecutionContext.populateSystemProperties(request);
-
-    request.setCacheNotFound(true);
-    request.setCacheTransferError(true);
-
-    request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
-    // the right way to disable snapshot update
-    // request.setUpdateSnapshots(false);
-    if(basedir != null) {
-      request.setBaseDirectory(basedir);
-      request.setMultiModuleProjectDirectory(computeMultiModuleProjectDirectory(basedir));
-    }
-    return request;
-  }
-
   @Override
   public String getLocalRepositoryPath() {
     String path = null;
@@ -263,6 +217,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
       path = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
     }
     return path;
+  }
+
+  /**
+   * @return Returns the mavenConfiguration.
+   */
+  IMavenConfiguration getMavenConfiguration() {
+    return this.mavenConfiguration;
   }
 
   FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
