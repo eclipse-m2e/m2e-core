@@ -42,6 +42,8 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+
 
 /**
  * Entry point for all Maven functionality in m2e. Note that this component does not directly support workspace artifact
@@ -258,7 +260,10 @@ public interface IMaven {
   MavenExecutionResult execute(MavenExecutionRequest request);
 
   /**
-   * Creates and returns new, possibly nested, maven execution context.
+   * Creates and returns new global maven execution context. such a context is suitable if one likes to perform some
+   * action without a project, this is similar to calling maven but without a pom.xml If you want to execute in the
+   * context of a project (e.g. to support project scoped extensions) you should use
+   * {@link IMavenProjectFacade#createExecutionContext()} instead.
    *
    * @since 1.4
    */

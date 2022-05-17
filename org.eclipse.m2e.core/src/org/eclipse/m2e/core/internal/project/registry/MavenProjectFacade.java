@@ -36,11 +36,12 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -108,8 +109,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
   private transient Map<String, Object> sessionProperties;
-
-  private IMaven maven;
 
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       ResolverConfiguration resolverConfiguration) {
@@ -534,11 +533,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   @Override
+  public IMavenExecutionContext createExecutionContext() {
+    return new MavenExecutionContext((MavenImpl) getMaven(), getPomFile());
+  }
+
+  @Override
   public IMaven getMaven() {
-    if(maven == null) {
-      File basedir = pomFile != null ? (pomFile.isDirectory() ? pomFile : pomFile.getParentFile()) : null;
-      maven = ((MavenImpl) MavenPlugin.getMaven()).cloneForBasedir(basedir);
-    }
-    return maven;
+    return manager.getMaven();
   }
 }
