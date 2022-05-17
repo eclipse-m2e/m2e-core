@@ -37,10 +37,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,7 +191,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
 
   private final ConverterLookup converterLookup = new DefaultConverterLookup();
 
-  private final List<ISettingsChangeListener> settingsListeners = new ArrayList<>();
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+  private final List<ISettingsChangeListener> settingsListeners = new CopyOnWriteArrayList<>();
 
   private final List<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<>();
 
@@ -1037,16 +1041,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
     MavenExecutionContext context = createExecutionContext();
     populateDefaults(context.getExecutionRequest());
     return context.execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
-  }
-
-  @Override
-  public void addSettingsChangeListener(ISettingsChangeListener listener) {
-    settingsListeners.add(listener);
-  }
-
-  @Override
-  public void removeSettingsChangeListener(ISettingsChangeListener listener) {
-    settingsListeners.remove(listener);
   }
 
   @Override

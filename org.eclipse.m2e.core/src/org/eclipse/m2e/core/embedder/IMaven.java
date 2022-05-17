@@ -183,10 +183,6 @@ public interface IMaven {
 
   Mirror getMirror(ArtifactRepository repo) throws CoreException;
 
-  void addSettingsChangeListener(ISettingsChangeListener listener);
-
-  void removeSettingsChangeListener(ISettingsChangeListener listener);
-
   void reloadSettings() throws CoreException;
 
   Server decryptPassword(Server server) throws CoreException;
