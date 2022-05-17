@@ -414,6 +414,7 @@ public abstract class AbstractMavenProjectTestCase {
       } else {
         project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
       }
+      ensureDefaultCharset(project, monitor);
     }, null);
 
     // emulate behavior when autobuild was not honored by ProjectRegistryRefreshJob
@@ -519,6 +520,7 @@ public abstract class AbstractMavenProjectTestCase {
       IMavenProjectImportResult importResult = importResults.get(i);
       assertSame(projectInfos.get(i), importResult.getMavenProjectInfo());
       projects[i] = importResult.getProject();
+      ensureDefaultCharset(projects[i], monitor);
       assertNotNull("Failed to import project " + projectInfos, projects[i]);
 
       /*
@@ -544,6 +546,12 @@ public abstract class AbstractMavenProjectTestCase {
 
     projectInfo.setBasedirRename(
         basedir.getParentFile().equals(workspaceRoot) ? MavenProjectInfo.RENAME_REQUIRED : MavenProjectInfo.RENAME_NO);
+  }
+
+  private static void ensureDefaultCharset(IProject project, IProgressMonitor monitor) throws CoreException {
+    if(project.getDefaultCharset(false) == null) {
+      project.setDefaultCharset("UTF-8", monitor);
+    }
   }
 
   protected IProject importProject(String projectName, String projectLocation, ResolverConfiguration configuration)
