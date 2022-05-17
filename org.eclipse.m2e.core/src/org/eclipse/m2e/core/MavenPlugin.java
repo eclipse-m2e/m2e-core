@@ -32,7 +32,7 @@ public final class MavenPlugin {
   }
 
   /**
-   * Use {@link IMavenProjectFacade#getMaven()} instead whenever possible
+   * Use {@link IMavenProjectFacade#createExecutionContext()} instead whenever possible
    * 
    * @return a generic Maven instance (not customized by project).
    */
