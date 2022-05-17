@@ -30,7 +30,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -70,7 +69,8 @@ import org.eclipse.m2e.profiles.core.internal.ProfileState;
 @Component(service = IProfileManager.class)
 public class ProfileManager implements IProfileManager {
 
-  private static final ILog log = Platform.getLog(ProfileManager.class);
+  @Reference
+  private ILog log;
 
   @Reference
   IProjectConfigurationManager configurationManager;
