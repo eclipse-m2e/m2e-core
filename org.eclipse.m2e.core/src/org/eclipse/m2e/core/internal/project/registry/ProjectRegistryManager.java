@@ -291,7 +291,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private boolean isForceDependencyUpdate() throws CoreException {
-    IMavenExecutionContext context = maven.getExecutionContext();
+    IMavenExecutionContext context = MavenExecutionContext.getThreadContext();
     return context != null && context.getExecutionRequest().isUpdateSnapshots();
   }
 
@@ -1008,7 +1008,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
       ResolverConfiguration resolverConfiguration) throws CoreException {
-    IMavenExecutionContext context = maven.createExecutionContext();
+
+    File basedir;
+    if(pom != null && pom.getLocation() != null) {
+      basedir = pom.getLocation().toFile();
+    } else {
+      basedir = null;
+    }
+    IMavenExecutionContext context = new MavenExecutionContext((MavenImpl) maven, basedir);
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;
   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - remove IMavenExecutionContext getExecutionContext()
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.project.registry;
@@ -32,6 +33,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -59,7 +61,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
 
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
-    ProjectBuildingRequest configuration = getMaven().getExecutionContext().newProjectBuildingRequest();
+    ProjectBuildingRequest configuration = MavenExecutionContext.getThreadContext().newProjectBuildingRequest();
     configuration.setProject(facade.getMavenProject()); // TODO do we need this?
     configuration.setResolveDependencies(true);
     MavenExecutionResult mavenResult = getMaven().readMavenProject(facade.getPomFile(), configuration);

@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Christoph Läubrich - remove IMavenExecutionContext getExecutionContext()
  *******************************************************************************/
 
 package org.eclipse.m2e.core.embedder;
@@ -262,14 +263,6 @@ public interface IMaven {
    * @since 1.4
    */
   IMavenExecutionContext createExecutionContext() throws CoreException;
-
-  /**
-   * Returns execution context associated with the current thread or <code>null</code> if the current thread does not
-   * have associated maven execution context.
-   *
-   * @since 1.4
-   */
-  IMavenExecutionContext getExecutionContext();
 
   /**
    * Lookup a component from the embedded PlexusContainer.
