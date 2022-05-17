@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Igor Fedorenko
+ * Copyright (c) 2013, 2022 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Igor Fedorenko - initial API and implementation
+ *      Christoph Läubrich - move creation MavenExecutionRequest from MavenImpl->MavenExecutionContext
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.embedder;
@@ -24,14 +25,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
@@ -42,7 +48,10 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.session.scope.internal.SessionScope;
 
 import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.Messages;
 
 
 /**
@@ -102,10 +111,56 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       request = DefaultMavenExecutionRequest.copy(parent);
     }
     if(request == null) {
-      request = maven.createExecutionRequest();
+      request = createExecutionRequest();
     }
     request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(basedir));
 
+    return request;
+  }
+
+  private MavenExecutionRequest createExecutionRequest() throws CoreException {
+    MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+
+    // this causes problems with unexpected "stale project configuration" error markers
+    // need to think how to manage ${maven.build.timestamp} properly inside workspace
+    //request.setStartTime( new Date() );
+
+    IMavenConfiguration mavenConfiguration = maven.getMavenConfiguration();
+    if(mavenConfiguration.getGlobalSettingsFile() != null) {
+      request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
+    }
+    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
+    if(mavenConfiguration.getUserSettingsFile() != null) {
+      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
+    }
+    request.setUserSettingsFile(userSettingsFile);
+
+    try {
+      maven.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, maven.getSettings());
+    } catch(MavenExecutionRequestPopulationException ex) {
+      throw new CoreException(Status.error(Messages.MavenImpl_error_no_exec_req, ex));
+    }
+
+    ArtifactRepository localRepository = maven.getLocalRepository();
+    request.setLocalRepository(localRepository);
+    request.setLocalRepositoryPath(localRepository.getBasedir());
+    request.setOffline(mavenConfiguration.isOffline());
+
+    request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
+    request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
+
+    MavenExecutionContext.populateSystemProperties(request);
+
+    request.setCacheNotFound(true);
+    request.setCacheTransferError(true);
+
+    request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
+    // the right way to disable snapshot update
+    // request.setUpdateSnapshots(false);
+    if(basedir != null) {
+      request.setBaseDirectory(basedir);
+      request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(basedir));
+    }
     return request;
   }
 
