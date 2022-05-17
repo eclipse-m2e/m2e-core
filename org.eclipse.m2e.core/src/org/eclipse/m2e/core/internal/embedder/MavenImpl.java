@@ -10,6 +10,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Christoph Läubrich - move creation MavenExecutionRequest from MavenImpl->MavenExecutionContext
+ *                         - remove IMavenExecutionContext getExecutionContext()
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.embedder;
@@ -1212,11 +1213,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
   @Override
   public MavenExecutionContext createExecutionContext() {
     return new MavenExecutionContext(this, basedir);
-  }
-
-  @Override
-  public MavenExecutionContext getExecutionContext() {
-    return MavenExecutionContext.getThreadContext();
   }
 
   @Override
