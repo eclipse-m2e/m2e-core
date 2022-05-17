@@ -90,7 +90,7 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
 			true, monitor);
 		Assert.assertNotNull(facade);
 		File[] multiModuleDirectory = new File[] { null }; 
-		facade.getMaven().execute((context, monitor) -> multiModuleDirectory[0] = context.getExecutionRequest().getMultiModuleProjectDirectory(), null);
+		facade.createExecutionContext().execute((context, monitor) -> multiModuleDirectory[0] = context.getExecutionRequest().getMultiModuleProjectDirectory(), null);
 		assertEquals(project.getLocation().toFile(), multiModuleDirectory[0]);
   }
 }

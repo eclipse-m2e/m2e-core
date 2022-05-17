@@ -31,6 +31,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -139,7 +140,17 @@ public interface IMavenProjectFacade {
   Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
   /**
-   * Gets an access to a Maven instance, configured according to this project.
+   * Creates a new execution context that is one suitable to execute in the context of this facade, that is it might
+   * include project specific extensions.
+   * 
+   * @return a new execution context for this facade
+   */
+  IMavenExecutionContext createExecutionContext();
+
+  /**
+   * Gets an access to a (possibly project specific) {@link IMaven} instance,
+   * this is the same instance that is used to create new {@link IMavenExecutionContext}s
+   * see {@link #createExecutionContext()}
    * 
    * @return a Maven instance, configured according to this project
    */

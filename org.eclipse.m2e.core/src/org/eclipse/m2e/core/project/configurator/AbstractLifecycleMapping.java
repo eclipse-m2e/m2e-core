@@ -113,7 +113,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
             participants.put(entry.getKey(), participants2);
           }
         }
-        projectFacade.getMaven().execute((c, m) -> builder.build(c.getSession(), projectFacade,
+        projectFacade.createExecutionContext().execute((c, m) -> builder.build(c.getSession(), projectFacade,
             AbstractBuildParticipant2.PRECONFIGURE_BUILD, Collections.emptyMap(), participants, m), monitor);
 
         //perform configuration

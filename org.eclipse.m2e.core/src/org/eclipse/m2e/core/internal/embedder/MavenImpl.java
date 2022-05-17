@@ -177,7 +177,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
-public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Cloneable {
+public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private static final Logger log = LoggerFactory.getLogger(MavenImpl.class);
 
   /**
@@ -207,8 +207,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
 
   /** Last modified timestamp of cached user settings */
   private long settingsTimestamp;
-
-  private File basedir;
 
   @Override
   public String getLocalRepositoryPath() {
@@ -1212,7 +1210,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext(this, basedir);
+    return new MavenExecutionContext(this, (File) null);
   }
 
   @Override
@@ -1265,17 +1263,4 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener, Clo
     return basedir;
   }
 
-  public MavenImpl cloneForBasedir(File basedir) {
-    try {
-      MavenImpl res = (MavenImpl) clone();
-      res.basedir = basedir;
-      // TODO: more customization may be needed, more fields cleared, maybe in the end no
-      // need to start from a clone at all...
-      // TODO? What about getExecutionContext() that's tied to the thread and not to this?
-      return res;
-    } catch(CloneNotSupportedException ex) {
-      // unexpected, let's just crash
-      throw new RuntimeException(ex);
-    }
-  }
 }

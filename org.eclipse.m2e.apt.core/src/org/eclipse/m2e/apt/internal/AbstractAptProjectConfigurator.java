@@ -82,7 +82,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
 
     AnnotationProcessingMode mode = getAnnotationProcessorMode(mavenProjectFacade);
 
-    mavenProjectFacade.getMaven().createExecutionContext().execute((c, m) -> {
+    mavenProjectFacade.createExecutionContext().execute((c, m) -> {
       AptConfiguratorDelegate configuratorDelegate = getDelegate(mode);
       configuratorDelegate.setSession(c.getSession());
       configuratorDelegate.setFacade(mavenProjectFacade);
@@ -144,7 +144,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
       return;
     }
 
-    request.getMavenProjectFacade().getMaven().execute((c, m) -> {
+    request.getMavenProjectFacade().createExecutionContext().execute((c, m) -> {
       AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
       delegate.setFacade(request.getMavenProjectFacade());
       delegate.setSession(c.getSession());
