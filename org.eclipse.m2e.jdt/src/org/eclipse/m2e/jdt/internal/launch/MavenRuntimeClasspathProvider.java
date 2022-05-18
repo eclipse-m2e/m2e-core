@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -52,6 +53,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -158,8 +160,15 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   public IRuntimeClasspathEntry[] resolveClasspath(final IRuntimeClasspathEntry[] entries,
       final ILaunchConfiguration configuration) throws CoreException {
     IProgressMonitor monitor = new NullProgressMonitor(); // XXX
-    return MavenPlugin.getMaven().execute((context, monitor1) -> resolveClasspath0(entries, configuration, monitor1),
-        monitor);
+    IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
+    IMavenProjectFacade projectFacade = Adapters.adapt(javaProject.getProject(), IMavenProjectFacade.class);
+    IMavenExecutionContext context;
+    if(projectFacade == null) {
+      context = IMavenExecutionContext.join();
+    } else {
+      context = projectFacade.createExecutionContext();
+    }
+    return context.execute((ctx, monitor1) -> resolveClasspath0(entries, configuration, monitor1), monitor);
   }
 
   IRuntimeClasspathEntry[] resolveClasspath0(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration,

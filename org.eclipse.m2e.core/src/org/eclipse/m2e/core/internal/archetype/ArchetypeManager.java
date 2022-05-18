@@ -43,6 +43,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
 
 
@@ -178,7 +179,7 @@ public class ArchetypeManager {
     }
 
     try {
-      return maven.execute((context, monitor1) -> {
+      return IMavenExecutionContext.join().execute((context, monitor1) -> {
         ArtifactRepository localRepository = context.getLocalRepository();
         if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
           ArchetypeDescriptor descriptor;

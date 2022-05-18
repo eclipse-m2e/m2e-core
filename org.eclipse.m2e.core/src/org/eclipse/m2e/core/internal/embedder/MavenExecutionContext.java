@@ -21,18 +21,24 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
+import org.apache.maven.Maven;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -40,7 +46,11 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.DependencyContext;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -229,6 +239,72 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       legacySupport.setSession(origLegacySession);
       request = origRequest;
       context = origContext;
+    }
+  }
+
+  @Override
+  public void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
+    execute(project, (context, pm) -> {
+      executeMojo(context.getSession(), execution);
+      return null;
+    }, monitor);
+  }
+
+  @Override
+  public MavenExecutionResult execute(MavenExecutionRequest request) {
+    try {
+      return execute((innerContext, monitor) -> {
+
+        MavenExecutionRequestPopulator requestPopulator = maven.lookup(MavenExecutionRequestPopulator.class);
+        //populate the defaults (if not already given)...
+        try {
+          requestPopulator.populateDefaults(request);
+        } catch(MavenExecutionRequestPopulationException ex) {
+          return new DefaultMavenExecutionResult().addException(ex);
+        }
+        EventSpyDispatcher eventSpyDispatcher = maven.lookup(EventSpyDispatcher.class);
+        try {
+          //notify about the start of the request ...
+          eventSpyDispatcher.onEvent(request);
+          //execute the request
+          MavenExecutionResult result = maven.lookup(Maven.class).execute(request);
+          // notify about the results
+          eventSpyDispatcher.onEvent(result);
+          return result;
+        } finally {
+          //free up resources
+          eventSpyDispatcher.close();
+        }
+      }, new NullProgressMonitor());
+    } catch(CoreException ex) {
+      return new DefaultMavenExecutionResult().addException(ex);
+    }
+  }
+
+  private void executeMojo(MavenSession session, MojoExecution execution) {
+    Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
+    Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
+    for(MavenProject project : session.getProjects()) {
+      artifacts.put(project, new LinkedHashSet<>(project.getArtifacts()));
+      snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
+    }
+    try {
+      MojoExecutor mojoExecutor = maven.lookup(MojoExecutor.class);
+      DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(execution));
+      mojoExecutor.ensureDependenciesAreResolved(execution.getMojoDescriptor(), session, dependencyContext);
+      maven.lookup(BuildPluginManager.class).executeMojo(session, execution);
+    } catch(Exception ex) {
+      session.getResult().addException(ex);
+    } finally {
+      for(MavenProject project : session.getProjects()) {
+        project.setArtifactFilter(null);
+        project.setResolvedArtifacts(null);
+        project.setArtifacts(artifacts.get(project));
+        MavenProjectMutableState snapshot = snapshots.get(project);
+        if(snapshot != null) {
+          snapshot.restore(project);
+        }
+      }
     }
   }
 

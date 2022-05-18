@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -149,8 +150,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       final DownloadRequest request = queue.poll();
       try {
         // Process requests one by one to not fill the maven context with too many projects at once and retain a lot of RAM
-        IStatus status = maven.execute((context, aMonitor) -> downloadFilesAndPopulateToUpdate(request, aMonitor),
-            subMonitor.split(1));
+        IStatus status = IMavenExecutionContext.join()
+            .execute((context, aMonitor) -> downloadFilesAndPopulateToUpdate(request, aMonitor), subMonitor.split(1));
         if(!status.isOK()) {
           // or maybe just log and ignore?
           queue.clear();

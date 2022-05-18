@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.editing.AddDependencyOperation;
 import org.eclipse.m2e.core.ui.internal.editing.AddExclusionOperation;
@@ -107,7 +108,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
   @Override
   public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-    return MavenPlugin.getMaven().execute((context, monitor) -> checkFinalConditions0(monitor), pm);
+    return IMavenExecutionContext.join().execute((context, monitor) -> checkFinalConditions0(monitor), pm);
   }
 
   RefactoringStatus checkFinalConditions0(IProgressMonitor pm) throws CoreException, OperationCanceledException {

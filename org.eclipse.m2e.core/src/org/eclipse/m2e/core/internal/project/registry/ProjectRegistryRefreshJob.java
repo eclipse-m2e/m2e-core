@@ -41,9 +41,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
@@ -96,7 +99,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     }
 
     try (MutableProjectRegistry newState = manager.newMutableProjectRegistry()) {
-      manager.getMaven().execute((context, theMonitor) -> {
+      IMavenExecutionContext.join().execute((context, theMonitor) -> {
         // group requests
         Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
         Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
@@ -121,8 +124,9 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         if(theMonitor.isCanceled()) {
           throw new OperationCanceledException();
         }
+        IMaven maven = manager.getMaven();
         if(!offlineForceDependencyUpdate.isEmpty()) {
-          manager.getMaven().execute(true, true, (aContext, aMonitor) -> {
+          MavenImpl.execute(maven, true, true, (aContext, aMonitor) -> {
             manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
             return null;
           }, theMonitor);
@@ -132,7 +136,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           throw new OperationCanceledException();
         }
         if(!offlineNotForceDependencyUpdate.isEmpty()) {
-          manager.getMaven().execute(true, false, (aContext, aMonitor) -> {
+          MavenImpl.execute(maven, true, false, (aContext, aMonitor) -> {
             manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
             return null;
           }, theMonitor);
@@ -142,7 +146,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           throw new OperationCanceledException();
         }
         if(!notOfflineForceDependencyUpdate.isEmpty()) {
-          manager.getMaven().execute(false, true, (aContext, aMonitor) -> {
+          MavenImpl.execute(maven, false, true, (aContext, aMonitor) -> {
             manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
             return null;
           }, theMonitor);
@@ -152,7 +156,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           throw new OperationCanceledException();
         }
         if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
-          manager.getMaven().execute(false, false, (aContext, aMonitor) -> {
+          MavenImpl.execute(maven, false, false, (aContext, aMonitor) -> {
             manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
             return null;
           }, theMonitor);

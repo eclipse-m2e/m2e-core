@@ -54,7 +54,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
@@ -140,7 +140,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       return Collections.emptyMap();
     }
 
-    return MavenPlugin.getMaven()
+    return IMavenExecutionContext.join()
         .execute((context, monitor1) -> discover0(mavenProject, mojoExecutions, preselected, monitor1), monitor);
   }
 

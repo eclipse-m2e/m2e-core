@@ -181,7 +181,8 @@ public class MavenModelManager {
 
     ICallable<DependencyNode> callable = (context1, monitor1) -> readDependencyTree(context1.getRepositorySession(), mavenProject, scope);
 
-    return (context != null) ? projectManager.execute(context, callable, monitor) : maven.execute(callable, monitor);
+    return (context != null) ? projectManager.execute(context, callable, monitor)
+        : IMavenExecutionContext.join().execute(callable, monitor);
   }
 
   DependencyNode readDependencyTree(RepositorySystemSession repositorySession, MavenProject mavenProject, String scope)

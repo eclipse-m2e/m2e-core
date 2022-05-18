@@ -119,11 +119,6 @@ public interface IMaven {
   /**
    * @since 1.4
    */
-  void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * @since 1.4
-   */
   MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException;
 
@@ -224,40 +219,6 @@ public interface IMaven {
    * @return The class realm of the specified project.
    */
   ClassLoader getProjectRealm(MavenProject project);
-
-  // execution context
-
-  /**
-   * This is convenience method fully equivalent to
-   *
-   * <pre>
-   * IMavenExecutionContext context = createExecutionContext();
-   * context.getExecutionRequest().setOffline(offline);
-   * context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
-   * return context.execute(callable, monitor);
-   * </pre>
-   *
-   * @since 1.4
-   */
-  <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
-      throws CoreException;
-
-  /**
-   * Either joins existing session or starts new session with default configuration and executes the callable in the
-   * context of the session.
-   *
-   * @since 1.4
-   */
-  <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Execute the given {@link MavenExecutionRequest} in the context of m2eclipse and return the result, this could be
-   * seen as an embedded run of the maven cli, at least it tries to replicate as much as possible from that.
-   * 
-   * @param request a {@link MavenExecutionRequest}
-   * @return the result of the execution
-   */
-  MavenExecutionResult execute(MavenExecutionRequest request);
 
   /**
    * Creates and returns new global maven execution context. such a context is suitable if one likes to perform some

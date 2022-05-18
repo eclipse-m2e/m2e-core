@@ -20,7 +20,7 @@ import org.junit.runners.model.Statement;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
 /**
@@ -37,7 +37,7 @@ public class MavenRunner extends BlockJUnit4ClassRunner {
     return new Statement() {
       @SuppressWarnings("synthetic-access")
       public void evaluate() throws Throwable {
-        Throwable catchedThrowable = MavenPlugin.getMaven().execute((c, m) -> {
+        Throwable catchedThrowable = IMavenExecutionContext.join().execute((c, m) -> {
           try {
             MavenRunner.super.methodInvoker(method, test);
           } catch(Throwable ex) {

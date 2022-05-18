@@ -19,10 +19,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
@@ -84,6 +89,20 @@ public interface IMavenExecutionContext {
   <V> V execute(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException;
 
   /**
+   * @since 1.4
+   */
+  void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Execute the given {@link MavenExecutionRequest} in the context of m2eclipse and return the result, this could be
+   * seen as an embedded run of the maven cli, at least it tries to replicate as much as possible from that.
+   * 
+   * @param request a {@link MavenExecutionRequest}
+   * @return the result of the execution
+   */
+  MavenExecutionResult execute(MavenExecutionRequest request);
+
+  /**
    * @throws IllegalStateException if called outside of {@link #execute(MavenProject,ICallable, IProgressMonitor)}
    * @since 1.4
    */
@@ -105,5 +124,32 @@ public interface IMavenExecutionContext {
    * @since 1.4
    */
   ProjectBuildingRequest newProjectBuildingRequest();
+
+  /**
+   * Either join the currents thread {@link IMavenExecutionContext} or creates a fresh one if this thread is currently
+   * not executing. Be aware that because of this might return an already executing context, this context can't be
+   * configured in any way, use {@link IMaven#createExecutionContext()} or
+   * {@link IMavenProjectFacade#createExecutionContext()} to create a specific context that could be configured.
+   * 
+   * @return a {@link IMavenExecutionContext} that could be used for execution
+   * @throws CoreException
+   */
+  static IMavenExecutionContext join() throws CoreException {
+    IMavenExecutionContext context = MavenExecutionContext.getThreadContext();
+    if(context == null) {
+      return MavenPlugin.getMaven().createExecutionContext();
+    }
+    return context;
+  }
+
+  /**
+   * This method allows to check if the current thread can join a running execution
+   * 
+   * @return <code>true</code> if the current thread has an attached {@link IMavenExecutionContext} or
+   *         <code>false</code> otherwise.
+   */
+  static boolean canJoin() {
+    return MavenExecutionContext.getThreadContext() != null;
+  }
 
 }
