@@ -139,7 +139,7 @@ public class ProjectConfigurationManager
       throws CoreException {
 
     // overall execution context to share repository session data and cache for all projects
-    return maven.execute((context, m) -> {
+    return IMavenExecutionContext.join(maven).execute((context, m) -> {
       SubMonitor progress = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_importing, 100);
       long t1 = System.currentTimeMillis();
       List<IMavenProjectImportResult> result = new ArrayList<>();
@@ -336,7 +336,7 @@ public class ProjectConfigurationManager
   public Map<String, IStatus> updateProjectConfiguration(MavenUpdateRequest request, boolean updateConfiguration,
       boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor monitor) {
     try {
-      return maven.execute(request.isOffline(), request.isForceDependencyUpdate(),
+      return MavenImpl.execute(maven, request.isOffline(), request.isForceDependencyUpdate(),
           (context, m) -> updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
               refreshFromLocal, m),
           monitor);
@@ -489,7 +489,7 @@ public class ProjectConfigurationManager
   public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
-    maven.execute(new AbstractRunnable() {
+    IMavenExecutionContext.join(maven).execute(new AbstractRunnable() {
       @Override
       protected void run(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         enableBasicMavenNature(project, configuration, monitor);
@@ -747,7 +747,9 @@ public class ProjectConfigurationManager
   public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, String groupId, String artifactId,
       String version, String javaPackage, Properties properties, ProjectImportConfiguration configuration,
       IProjectCreationListener listener, IProgressMonitor monitor) throws CoreException {
-    return maven.execute((context, m) -> createArchetypeProjects0(location, archetype, groupId, artifactId, version,
+    return IMavenExecutionContext.join(maven)
+        .execute((context, m) -> createArchetypeProjects0(location, archetype, groupId,
+        artifactId, version,
         javaPackage, properties, configuration, listener, m), monitor);
   }
 

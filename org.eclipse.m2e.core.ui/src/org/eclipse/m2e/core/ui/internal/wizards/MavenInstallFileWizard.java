@@ -102,7 +102,7 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
         request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
         request.setUserProperties(properties);
         request.setExecutionListener(new MonitorExecutionListener(monitor));
-        MavenExecutionResult executionResult = maven.execute(request);
+        MavenExecutionResult executionResult = executionContext.execute(request);
 
         for(Throwable exception : executionResult.getExceptions()) {
           log.error(Messages.MavenInstallFileWizard_error + "; " + exception, exception);

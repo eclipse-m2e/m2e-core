@@ -30,10 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -63,7 +61,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -94,7 +91,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -106,9 +102,7 @@ import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.model.ConfigurationContainer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -241,33 +235,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  private void execute(MavenSession session, MojoExecution execution) {
-    Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
-    Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
-    for(MavenProject project : session.getProjects()) {
-      artifacts.put(project, new LinkedHashSet<>(project.getArtifacts()));
-      snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
-    }
-    try {
-      MojoExecutor mojoExecutor = lookup(MojoExecutor.class);
-      DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(execution));
-      mojoExecutor.ensureDependenciesAreResolved(execution.getMojoDescriptor(), session, dependencyContext);
-      lookup(BuildPluginManager.class).executeMojo(session, execution);
-    } catch(Exception ex) {
-      session.getResult().addException(ex);
-    } finally {
-      for(MavenProject project : session.getProjects()) {
-        project.setArtifactFilter(null);
-        project.setResolvedArtifacts(null);
-        project.setArtifacts(artifacts.get(project));
-        MavenProjectMutableState snapshot = snapshots.get(project);
-        if(snapshot != null) {
-          snapshot.restore(project);
-        }
-      }
-    }
-  }
-
   @Override
   public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
       throws CoreException {
@@ -298,7 +265,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException {
-    return context().execute(project, (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
+    return IMavenExecutionContext.join(this).execute(project,
+        (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
         monitor);
   }
 
@@ -322,7 +290,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException {
-    return context().execute(project, (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
+    return IMavenExecutionContext.join(this).execute(project,
+        (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
         monitor);
   }
 
@@ -496,7 +465,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException {
-    return context().execute((context, pm) -> {
+    return IMavenExecutionContext.join(this).execute((context, pm) -> {
       MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
       try {
         lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -619,7 +588,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {
-    return context().execute(child, (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
+    return IMavenExecutionContext.join(this).execute(child,
+        (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
         context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
 
@@ -630,14 +600,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         classifier);
 
     return resolve(artifact, remoteRepositories, monitor);
-  }
-
-  private IMavenExecutionContext context() {
-    MavenExecutionContext context = MavenExecutionContext.getThreadContext();
-    if(context == null) {
-      context = createExecutionContext();
-    }
-    return context;
   }
 
   public Artifact resolve(Artifact artifact, List<ArtifactRepository> remoteRepositories, IProgressMonitor monitor)
@@ -652,7 +614,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
     List<ArtifactRepository> repositories = remoteRepositories;
 
-    return context().execute((context, pm) -> {
+    return IMavenExecutionContext.join(this).execute((context, pm) -> {
       org.eclipse.aether.RepositorySystem repoSystem = lookup(org.eclipse.aether.RepositorySystem.class);
 
       ArtifactRequest request = new ArtifactRequest();
@@ -838,7 +800,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
-    return context().execute(project,
+    return IMavenExecutionContext.join(this).execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
@@ -890,7 +852,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException {
-    return context().execute(project,
+    return IMavenExecutionContext.join(this).execute(project,
         (context, pm) -> getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal),
         monitor);
   }
@@ -1186,62 +1148,30 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     });
   }
 
-  @Override
-  public <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
+  /**
+   * This is convenience method fully equivalent to
+   *
+   * <pre>
+   * IMavenExecutionContext context = createExecutionContext();
+   * context.getExecutionRequest().setOffline(offline);
+   * context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
+   * return context.execute(callable, monitor);
+   * </pre>
+   *
+   * @since 1.4
+   */
+  public static <V> V execute(IMaven maven, boolean offline, boolean forceDependencyUpdate, ICallable<V> callable,
+      IProgressMonitor monitor)
       throws CoreException {
-    IMavenExecutionContext context = createExecutionContext();
+    IMavenExecutionContext context = maven.createExecutionContext();
     context.getExecutionRequest().setOffline(offline);
     context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
     return context.execute(callable, monitor);
   }
 
   @Override
-  public <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    return context().execute(callable, monitor);
-  }
-
-  @Override
-  public void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
-    context().execute(project, (context, pm) -> {
-      execute(context.getSession(), execution);
-      return null;
-    }, monitor);
-  }
-
-  @Override
   public MavenExecutionContext createExecutionContext() {
     return new MavenExecutionContext(this, (File) null);
-  }
-
-  @Override
-  public MavenExecutionResult execute(MavenExecutionRequest request) {
-    try {
-      return context().execute((innerContext, monitor) -> {
-
-        MavenExecutionRequestPopulator requestPopulator = lookup(MavenExecutionRequestPopulator.class);
-        //populate the defaults (if not already given)...
-        try {
-          requestPopulator.populateDefaults(request);
-        } catch(MavenExecutionRequestPopulationException ex) {
-          return new DefaultMavenExecutionResult().addException(ex);
-        }
-        EventSpyDispatcher eventSpyDispatcher = lookup(EventSpyDispatcher.class);
-        try {
-          //notify about the start of the request ...
-          eventSpyDispatcher.onEvent(request);
-          //execute the request
-          MavenExecutionResult result = lookup(Maven.class).execute(request);
-          // notify about the results
-          eventSpyDispatcher.onEvent(result);
-          return result;
-        } finally {
-          //free up resources
-          eventSpyDispatcher.close();
-        }
-      }, new NullProgressMonitor());
-    } catch(CoreException ex) {
-      return new DefaultMavenExecutionResult().addException(ex);
-    }
   }
 
   /**

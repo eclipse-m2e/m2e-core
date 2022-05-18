@@ -20,8 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -50,9 +49,8 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
   @Override
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
     if(appliesToBuildKind(kind)) {
-      IMaven maven = MavenPlugin.getMaven();
-
-      maven.execute(getMavenProjectFacade().getMavenProject(), getMojoExecution(), monitor);
+      IMavenProjectFacade projectFacade = getMavenProjectFacade();
+      projectFacade.createExecutionContext().execute(projectFacade.getMavenProject(), getMojoExecution(), monitor);
     }
     return null;
   }

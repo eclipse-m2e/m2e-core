@@ -31,7 +31,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -81,7 +83,8 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     pomFiles.add(dependencyProject.getFile("pom.xml"));
     MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().newMutableProjectRegistry();
     state.clear();
-    registryManager.getMaven().execute(false, false, (context, aMonitor) -> {
+    IMaven maven = registryManager.getMaven();
+	MavenImpl.execute(maven, false, false, (context, aMonitor) -> {
       registryManager.refresh(state, pomFiles, aMonitor);
       return null;
     }, monitor);

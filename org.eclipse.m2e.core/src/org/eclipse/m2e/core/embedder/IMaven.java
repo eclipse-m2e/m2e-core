@@ -42,6 +42,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -55,7 +56,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IMaven {
+public interface IMaven extends IMavenExecutionContextFactory {
 
   // POM Model read/write operations
 
@@ -117,9 +118,14 @@ public interface IMaven {
   // execution
 
   /**
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
+   *             {@link IMavenExecutionContext#join()}
    * @since 1.4
    */
-  void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
+  @Deprecated(forRemoval = true)
+  default void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
+    IMavenExecutionContext.join(this).execute(project, execution, monitor);
+  }
 
   /**
    * @since 1.4
@@ -237,27 +243,28 @@ public interface IMaven {
    * return context.execute(callable, monitor);
    * </pre>
    *
+   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private
+   *             util method
    * @since 1.4
    */
-  <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
-      throws CoreException;
+  @Deprecated(forRemoval = true)
+  default <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
+      throws CoreException {
+    return MavenImpl.execute(this, offline, forceDependencyUpdate, callable, monitor);
+  }
 
   /**
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.
    *
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
+   *             {@link IMavenExecutionContext#join()}
    * @since 1.4
    */
-  <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Execute the given {@link MavenExecutionRequest} in the context of m2eclipse and return the result, this could be
-   * seen as an embedded run of the maven cli, at least it tries to replicate as much as possible from that.
-   * 
-   * @param request a {@link MavenExecutionRequest}
-   * @return the result of the execution
-   */
-  MavenExecutionResult execute(MavenExecutionRequest request);
+  @Deprecated(forRemoval = true)
+  default <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
+    return IMavenExecutionContext.join(this).execute(callable, monitor);
+  }
 
   /**
    * Creates and returns new global maven execution context. such a context is suitable if one likes to perform some
