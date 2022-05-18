@@ -37,7 +37,7 @@ public class MavenRunner extends BlockJUnit4ClassRunner {
     return new Statement() {
       @SuppressWarnings("synthetic-access")
       public void evaluate() throws Throwable {
-        Throwable catchedThrowable = MavenPlugin.getMaven().execute((c, m) -> {
+        Throwable catchedThrowable = MavenPlugin.getMaven().createExecutionContext().execute((c, m) -> {
           try {
             MavenRunner.super.methodInvoker(method, test);
           } catch(Throwable ex) {

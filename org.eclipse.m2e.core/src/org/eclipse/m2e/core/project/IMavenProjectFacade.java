@@ -32,6 +32,7 @@ import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextFactory;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -42,7 +43,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
-public interface IMavenProjectFacade {
+public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
 
   /**
    * Returns project relative paths of resource directories
