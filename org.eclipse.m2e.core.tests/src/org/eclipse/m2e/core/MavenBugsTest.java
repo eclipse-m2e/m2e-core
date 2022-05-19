@@ -26,7 +26,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -86,8 +87,8 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
 	public void testMultiModuleProjectDirectoryChild() throws Exception {
 		IProject project = createExisting("simple", "resources/projects/dotMvn/", false);
 		waitForJobsToComplete(monitor);
-		IMavenProjectFacade facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project.getFile("child/pom.xml"),
-			true, monitor);
+		IMavenProjectFacade facade = M2EUtils.useService(MavenProjectManager.class,
+				m -> m.create(project.getFile("child/pom.xml"), true, monitor));
 		Assert.assertNotNull(facade);
 		File[] multiModuleDirectory = new File[] { null }; 
 		facade.createExecutionContext().execute((context, monitor) -> multiModuleDirectory[0] = context.getExecutionRequest().getMultiModuleProjectDirectory(), null);

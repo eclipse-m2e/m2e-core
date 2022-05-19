@@ -59,12 +59,9 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
-import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
-import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
@@ -217,10 +214,6 @@ public class MavenPluginActivator extends Plugin {
     return getService(ProjectRegistryManager.class);
   }
 
-  public MavenRuntimeManagerImpl getMavenRuntimeManager() {
-    return getService(MavenRuntimeManagerImpl.class);
-  }
-
   public ArchetypeManager getArchetypeManager() {
     synchronized(this) {
       if(this.archetypeManager == null) {
@@ -258,11 +251,6 @@ public class MavenPluginActivator extends Plugin {
     return getService(IProjectConfigurationManager.class);
   }
 
-  /** for use by unit tests */
-  public ProjectRegistryRefreshJob getProjectManagerRefreshJob() {
-    return getService(ProjectRegistryRefreshJob.class);
-  }
-
   public static String getVersion() {
     return plugin.version;
   }
@@ -281,10 +269,6 @@ public class MavenPluginActivator extends Plugin {
 
   public RepositorySystem getRepositorySystem() throws CoreException {
     return getMaven().lookup(RepositorySystem.class);
-  }
-
-  public ArtifactFilterManager getArifactFilterManager() {
-    return getService(ArtifactFilterManager.class);
   }
 
   /**

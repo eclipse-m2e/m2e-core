@@ -22,10 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +42,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
@@ -59,6 +52,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
@@ -77,15 +71,6 @@ import org.eclipse.m2e.profiles.ui.internal.dialog.SelectProfilesDialog;
 public class ProfileSelectionHandler extends AbstractHandler {
 
   private static final Logger log = LoggerFactory.getLogger(ProfileSelectionHandler.class);
-
-  @Inject
-  private IProfileManager profileManager;
-
-  public ProfileSelectionHandler() {
-    BundleContext context = FrameworkUtil.getBundle(ProfileSelectionHandler.class).getBundleContext();
-    IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(context);
-    ContextInjectionFactory.inject(this, serviceContext);
-  }
 
   /**
    * Opens the Maven profile selection Dialog window.
@@ -117,15 +102,15 @@ public class ProfileSelectionHandler extends AbstractHandler {
       display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
       return null;
     }
-    GetProfilesJob getProfilesJob = new GetProfilesJob(facades, profileManager);
-    getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, profileManager, shell));
+    GetProfilesJob getProfilesJob = new GetProfilesJob(facades);
+    getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, shell));
     getProfilesJob.setUser(true);
     getProfilesJob.schedule();
     return Status.OK_STATUS;
   }
 
-  private IJobChangeListener onProfilesFetched(final GetProfilesJob getProfilesJob,
-      final Set<IMavenProjectFacade> facades, final IProfileManager profileManager, final Shell shell) {
+  private IJobChangeListener onProfilesFetched(GetProfilesJob getProfilesJob, Set<IMavenProjectFacade> facades,
+      Shell shell) {
 
     return new JobChangeAdapter() {
 
@@ -137,7 +122,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
             Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
             final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
             if(dialog.open() == Window.OK) {
-              Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
+              Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, dialog);
               job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
               job.schedule();
             }
@@ -182,24 +167,21 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
   class GetProfilesJob extends Job {
 
-    private final IProfileManager profileManager;
-
     private final Set<IMavenProjectFacade> facades;
 
     private Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
 
     private List<ProfileSelection> sharedProfiles;
 
-    private GetProfilesJob(final Set<IMavenProjectFacade> facades, IProfileManager profileManager) {
+    private GetProfilesJob(final Set<IMavenProjectFacade> facades) {
       super(Messages.ProfileSelectionHandler_Loading_maven_profiles);
       this.facades = facades;
-      this.profileManager = profileManager;
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-      try {
-        this.allProfiles = getAllProfiles(facades, profileManager);
+      try (var profileManager = M2EUtils.useService(IProfileManager.class)) {
+        this.allProfiles = getAllProfiles(facades, profileManager.get());
         this.sharedProfiles = getSharedProfiles(allProfiles);
       } catch(CoreException e) {
         return Status.error(Messages.ProfileSelectionHandler_Unable_to_open_profile_dialog, e);
@@ -303,21 +285,18 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
     private final List<ProfileSelection> sharedProfiles;
 
-    private final IProfileManager profileManager;
-
     private final SelectProfilesDialog dialog;
 
     private UpdateProfilesJob(Map<IMavenProjectFacade, List<ProfileData>> allProfiles,
-        List<ProfileSelection> sharedProfiles, IProfileManager profileManager, SelectProfilesDialog dialog) {
+        List<ProfileSelection> sharedProfiles, SelectProfilesDialog dialog) {
       super(Messages.ProfileManager_Updating_maven_profiles);
       this.allProfiles = allProfiles;
       this.sharedProfiles = sharedProfiles;
-      this.profileManager = profileManager;
       this.dialog = dialog;
     }
 
     public IStatus runInWorkspace(IProgressMonitor monitor) {
-      try {
+      try (var profileManager = M2EUtils.useService(IProfileManager.class)) {
         SubMonitor progress = SubMonitor.convert(monitor, Messages.ProfileManager_Updating_maven_profiles, 100);
         SubMonitor subProgress = SubMonitor.convert(progress.newChild(5), allProfiles.size() * 100);
         for(Map.Entry<IMavenProjectFacade, List<ProfileData>> entry : allProfiles.entrySet()) {
@@ -327,7 +306,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
           IMavenProjectFacade facade = entry.getKey();
           List<String> activeProfiles = getActiveProfiles(sharedProfiles, entry.getValue());
 
-          profileManager.updateActiveProfiles(facade, activeProfiles, dialog.isOffline(), dialog.isForceUpdate(),
+          profileManager.get().updateActiveProfiles(facade, activeProfiles, dialog.isOffline(), dialog.isForceUpdate(),
               subProgress.newChild(100));
         }
       } catch(CoreException ex) {

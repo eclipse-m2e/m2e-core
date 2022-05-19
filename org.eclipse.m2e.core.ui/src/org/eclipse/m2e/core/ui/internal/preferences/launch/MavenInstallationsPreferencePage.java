@@ -48,7 +48,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.M2EUtils.ServiceUsage;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -61,6 +62,8 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 @SuppressWarnings("restriction")
 public class MavenInstallationsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  final ServiceUsage<MavenRuntimeManagerImpl> runtimeManagerUsage;
 
   final MavenRuntimeManagerImpl runtimeManager;
 
@@ -76,8 +79,8 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
   public MavenInstallationsPreferencePage() {
     setTitle(Messages.MavenInstallationsPreferencePage_title);
-
-    this.runtimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
+    this.runtimeManagerUsage = M2EUtils.useService(MavenRuntimeManagerImpl.class);
+    this.runtimeManager = runtimeManagerUsage.get();
     this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     this.maven = MavenPlugin.getMaven();
   }
@@ -103,6 +106,12 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     runtimeManager.setRuntimes(runtimes);
     runtimeManager.setDefaultRuntime(getDefaultRuntime());
     return true;
+  }
+
+  @Override
+  public void dispose() {
+    runtimeManagerUsage.close();
+    super.dispose();
   }
 
   @Override

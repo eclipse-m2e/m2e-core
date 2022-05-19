@@ -64,7 +64,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
@@ -256,14 +256,14 @@ public class MavenPomSelectionComponent extends Composite {
       if(!selection.isEmpty()) {
         List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles(selection);
 
-        ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
-
-        for(IndexedArtifactFile file : files) {
-          ArtifactKey key = file.getAdapter(ArtifactKey.class);
-          IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
-          if(!status.isOK()) {
-            setStatus(IStatus.ERROR, status.getMessage());
-            return; // TODO not nice to exit method like this
+        try (var filterManager = M2EUtils.useService(ArtifactFilterManager.class)) {
+          for(IndexedArtifactFile file : files) {
+            ArtifactKey key = file.getAdapter(ArtifactKey.class);
+            IStatus status = filterManager.get().filter(MavenPomSelectionComponent.this.project, key);
+            if(!status.isOK()) {
+              setStatus(IStatus.ERROR, status.getMessage());
+              return; // TODO not nice to exit method like this
+            }
           }
         }
 

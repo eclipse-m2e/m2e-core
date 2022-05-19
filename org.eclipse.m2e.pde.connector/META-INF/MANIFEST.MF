@@ -14,4 +14,3 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="1.18.4",
  org.eclipse.m2e.maven.runtime;bundle-version="1.18.1",
  org.eclipse.pde.core,
  org.eclipse.jdt.core
-Bundle-Activator: org.eclipse.m2e.pde.connector.Activator

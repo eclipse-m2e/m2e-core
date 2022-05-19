@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
@@ -54,10 +54,6 @@ public class MavenRuntimeSelector extends Composite {
   ComboViewer runtimeComboViewer;
 
   private Button configureRuntimesButton;
-
-  private static MavenRuntimeManagerImpl getRuntimeManager() {
-    return MavenPluginActivator.getDefault().getMavenRuntimeManager();
-  }
 
   public MavenRuntimeSelector(final Composite mainComposite) {
     super(mainComposite, SWT.BACKGROUND);
@@ -150,10 +146,11 @@ public class MavenRuntimeSelector extends Composite {
   }
 
   protected void setInput() {
-    MavenRuntimeManagerImpl runtimeManager = getRuntimeManager();
-    runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-    runtimeComboViewer
-        .setSelection(new StructuredSelection(runtimeManager.getRuntime(MavenRuntimeManagerImpl.DEFAULT)));
+    try (var runtimeManager = M2EUtils.useService(MavenRuntimeManagerImpl.class)) {
+      runtimeComboViewer.setInput(runtimeManager.get().getMavenRuntimes());
+      runtimeComboViewer
+          .setSelection(new StructuredSelection(runtimeManager.get().getRuntime(MavenRuntimeManagerImpl.DEFAULT)));
+    }
   }
 
   public void setSelectRuntime(AbstractMavenRuntime runtime) {
@@ -170,15 +167,14 @@ public class MavenRuntimeSelector extends Composite {
   }
 
   public void initializeFrom(ILaunchConfiguration configuration) {
-    String name = "";
-    try {
-      name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
+    try (var runtimeManager = M2EUtils.useService(MavenRuntimeManagerImpl.class)) {
+      String name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
+      AbstractMavenRuntime runtime = runtimeManager.get().getRuntime(name);
+      if(runtime != null) {
+        setSelectRuntime(runtime);
+      }
     } catch(CoreException ex) {
       // TODO log
-    }
-    AbstractMavenRuntime runtime = getRuntimeManager().getRuntime(name);
-    if(runtime != null) {
-      setSelectRuntime(runtime);
     }
   }
 

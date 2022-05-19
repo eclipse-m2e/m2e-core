@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -106,10 +108,14 @@ public abstract class AbstractMavenProjectTestCase {
   protected IWorkspace workspace;
 
   @Rule
+  public OSGiServiceInjector serviceInjector = OSGiServiceInjector.INSTANCE;
+
+  @Rule
   public TestName name = new TestName();
 
   protected File repo;
 
+  @Inject
   protected ProjectRegistryRefreshJob projectRefreshJob;
 
   protected Job downloadSourcesJob;
@@ -130,7 +136,6 @@ public abstract class AbstractMavenProjectTestCase {
     options.put(JavaCore.CORE_JAVA_BUILD_RESOURCE_COPY_FILTER, ".svn/");
     JavaCore.setOptions(options);
 
-    projectRefreshJob = MavenPluginActivator.getDefault().getProjectManagerRefreshJob();
     projectRefreshJob.sleep();
 
     downloadSourcesJob = ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).getDownloadSourcesJob();

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -150,14 +151,15 @@ public class PDEProjectHelper {
 
 	protected static void setManifestLocaton(IProject project, IPath manifestPath, IProgressMonitor monitor)
 			throws CoreException {
-		IBundleProjectService projectService = Activator.getBundleProjectService().get();
-		if (manifestPath != null && manifestPath.segmentCount() > 1) {
-			IPath metainfPath = manifestPath.removeLastSegments(1);
-			project.getFile(metainfPath).refreshLocal(IResource.DEPTH_INFINITE, monitor);
-			projectService.setBundleRoot(project, metainfPath);
-		} else {
-			// in case of configuration update, reset to the default value
-			projectService.setBundleRoot(project, null);
+		try (var projectService = M2EUtils.useService(IBundleProjectService.class)) {
+			if (manifestPath != null && manifestPath.segmentCount() > 1) {
+				IPath metainfPath = manifestPath.removeLastSegments(1);
+				project.getFile(metainfPath).refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				projectService.get().setBundleRoot(project, metainfPath);
+			} else {
+				// in case of configuration update, reset to the default value
+				projectService.get().setBundleRoot(project, null);
+			}
 		}
 	}
 

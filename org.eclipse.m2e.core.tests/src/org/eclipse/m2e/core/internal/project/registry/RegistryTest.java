@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -31,31 +33,38 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.OSGiServiceInjector;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 
 public class RegistryTest extends AbstractMavenProjectTestCase {
 
+	@Rule
+	public OSGiServiceInjector serviceInjector = OSGiServiceInjector.INSTANCE;
+
+	@Inject
+	private ProjectRegistryManager projectRegistryManager;
+
   @Test
   public void testDeletedFacadeIsRemoved() throws IOException, CoreException, InterruptedException {
     IProject project = createExisting(getClass().getSimpleName(), "resources/projects/simplePomOK", true);
     waitForJobsToComplete(monitor);
-    IMavenProjectFacade facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project,
-        monitor);
+	IMavenProjectFacade facade = projectRegistryManager.create(project, monitor);
     Assert.assertNotNull(facade);
     project.delete(true, monitor);
     waitForJobsToComplete(new NullProgressMonitor());
     Assert.assertTrue(facade.isStale());
     project = createExisting(getClass().getSimpleName(), "resources/projects/emptyPom", true);
     waitForJobsToComplete(monitor);
-    facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project, monitor);
+    facade = projectRegistryManager.create(project, monitor);
     Assert.assertNull(facade);
   }
 
@@ -63,8 +72,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
   public void testMissingParentCapabilityStored() throws IOException, CoreException, InterruptedException {
     IProject project = createExisting(getClass().getSimpleName(), "resources/projects/missingParent", true);
     waitForJobsToComplete(monitor);
-    MutableProjectRegistry registry = MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
-        .newMutableProjectRegistry();
+	MutableProjectRegistry registry = projectRegistryManager.newMutableProjectRegistry();
     MavenCapability parentCapability = MavenCapability
         .createMavenParent(new ArtifactKey("missingGroup", "missingArtifactId", "1", null));
     assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
@@ -75,14 +83,13 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
     IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
     waitForJobsToComplete(monitor);
-    ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
-    Collection<IFile> pomFiles = new ArrayList<>(2);
+	Collection<IFile> pomFiles = new ArrayList<>(2);
     pomFiles.add(dependentProject.getFile("pom.xml"));
     pomFiles.add(dependencyProject.getFile("pom.xml"));
-    MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().newMutableProjectRegistry();
+    MutableProjectRegistry state = projectRegistryManager.newMutableProjectRegistry();
     state.clear();
-    registryManager.getMaven().execute(false, false, (context, aMonitor) -> {
-      registryManager.refresh(state, pomFiles, aMonitor);
+    projectRegistryManager.getMaven().execute(false, false, (context, aMonitor) -> {
+      projectRegistryManager.refresh(state, pomFiles, aMonitor);
       return null;
     }, monitor);
     Assert.assertNotEquals(Collections.emptyMap(), state.requiredCapabilities);
@@ -115,7 +122,9 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
         request.addPomFile(parent.getFile("pom.xml"));
         IFile childPom = child.getFile("pom.xml");
         request.addPomFile(childPom);
-        MavenPluginActivator.getDefault().getProjectManagerRefreshJob().refresh(request);
+		try (var refreshJob = M2EUtils.useService(ProjectRegistryRefreshJob.class)) {
+			refreshJob.get().refresh(request);
+		}
         waitForJobsToComplete();
         IMarker[] markers = childPom.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
         assertArrayEquals(new IMarker[0], markers);

@@ -14,12 +14,20 @@
 package org.eclipse.m2e.core.internal;
 
 import java.io.File;
+import java.lang.StackWalker.Option;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -170,4 +178,73 @@ public class M2EUtils {
       }
     }
   }
+
+  public interface ServiceUsage<T> extends AutoCloseable, Supplier<T> {
+    @Override
+    void close(); // do not throw checked exception
+
+    boolean isAvailable();
+  }
+
+  private static final StackWalker WALKER = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
+
+  public static <T> ServiceUsage<T> useService(Class<T> serviceClass) {
+    Class<?> callerClass = WALKER.getCallerClass();
+    BundleContext ctx = FrameworkUtil.getBundle(callerClass).getBundleContext();
+    return useService(serviceClass, ctx);
+  }
+
+  public static <T, R> R useService(Class<T> serviceClass, Function<T, R> function) {
+    Class<?> callerClass = WALKER.getCallerClass();
+    BundleContext ctx = FrameworkUtil.getBundle(callerClass).getBundleContext();
+    try (var service = useService(serviceClass, ctx)) {
+      return function.apply(service.get());
+    }
+  }
+
+  private static <T> ServiceUsage<T> useService(Class<T> serviceClass, BundleContext ctx) {
+    ServiceReference<T> reference = ctx != null ? ctx.getServiceReference(serviceClass) : null;
+    return useService(serviceClass, reference, ctx);
+  }
+
+  private static <T> ServiceUsage<T> useService(Class<T> serviceClass, ServiceReference<T> reference,
+      BundleContext ctx) {
+    T service = reference != null ? ctx.getService(reference) : null;
+    return service == null ? getUnavailableServiceUsage(serviceClass.getName()) : new ServiceUsage<>() {
+      @Override
+      public T get() {
+        return service;
+      }
+
+      @Override
+      public boolean isAvailable() {
+        return true;
+      }
+
+      @Override
+      public void close() {
+        ctx.ungetService(reference);
+      }
+    };
+  }
+
+  private static <T> ServiceUsage<T> getUnavailableServiceUsage(String serviceName) {
+    return new ServiceUsage<>() {
+
+      @Override
+      public boolean isAvailable() {
+        return false;
+      }
+
+      @Override
+      public T get() {
+        throw new NoSuchElementException("Service '" + serviceName + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+      }
+
+      @Override
+      public void close() { // nothing to do
+      }
+    };
+  }
+
 }
