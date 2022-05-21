@@ -9,7 +9,8 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
- *      Christoph Läubrich - remove IMavenExecutionContext getExecutionContext()
+ *      Christoph Läubrich  - remove IMavenExecutionContext getExecutionContext()
+ *                          - remove  IMaven.populateDefaults(MavenExecutionRequest)
  *******************************************************************************/
 
 package org.eclipse.m2e.core.embedder;
@@ -26,7 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -161,8 +161,6 @@ public interface IMaven extends IMavenExecutionContextFactory {
   String getLocalRepositoryPath();
 
   ArtifactRepository getLocalRepository() throws CoreException;
-
-  void populateDefaults(MavenExecutionRequest request) throws CoreException;
 
   ArtifactRepository createArtifactRepository(String id, String url) throws CoreException;
 

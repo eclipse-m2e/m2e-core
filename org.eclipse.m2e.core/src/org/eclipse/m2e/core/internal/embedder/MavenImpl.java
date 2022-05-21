@@ -982,26 +982,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public Mirror getMirror(ArtifactRepository repo) throws CoreException {
-    MavenExecutionContext context = createExecutionContext();
-    populateDefaults(context.getExecutionRequest());
-    return context
+    return IMavenExecutionContext.join(this)
         .execute((c, m) -> lookup(RepositorySystem.class).getMirror(repo, c.getExecutionRequest().getMirrors()), null);
   }
 
   @Override
-  public void populateDefaults(MavenExecutionRequest request) throws CoreException {
-    try {
-      lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
-    } catch(MavenExecutionRequestPopulationException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_config, ex));
-    }
-  }
-
-  @Override
   public List<Mirror> getMirrors() throws CoreException {
-    MavenExecutionContext context = createExecutionContext();
-    populateDefaults(context.getExecutionRequest());
-    return context.execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
+    return IMavenExecutionContext.join(this).execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
   }
 
   @Override
