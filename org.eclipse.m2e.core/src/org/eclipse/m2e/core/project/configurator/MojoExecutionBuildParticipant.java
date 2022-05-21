@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -50,7 +52,9 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
     if(appliesToBuildKind(kind)) {
       IMavenProjectFacade projectFacade = getMavenProjectFacade();
-      projectFacade.createExecutionContext().execute(projectFacade.getMavenProject(), getMojoExecution(), monitor);
+      IMavenExecutionContext context = projectFacade.createExecutionContext();
+      context.getExecutionRequest().setStartTime(new Date());
+      context.execute(projectFacade.getMavenProject(), getMojoExecution(), monitor);
     }
     return null;
   }

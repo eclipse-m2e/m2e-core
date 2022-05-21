@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Red Hat Inc.
+ * Copyright (c) 2016, 2022 Red Hat Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,12 +17,16 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -93,4 +97,14 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
 		facade.createExecutionContext().execute((context, monitor) -> multiModuleDirectory[0] = context.getExecutionRequest().getMultiModuleProjectDirectory(), null);
 		assertEquals(project.getLocation().toFile(), multiModuleDirectory[0]);
   }
+
+	@Test
+	public void testBuildStartTime() throws Exception {
+		IProject project = createExisting("buildStartTime", "resources/projects/buildStartTime/", false);
+		waitForJobsToComplete(monitor);
+		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete(monitor);
+		IMarker[] markers = project.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+		assertEquals(Arrays.toString(markers), 0, markers.length);
+	}
 }
