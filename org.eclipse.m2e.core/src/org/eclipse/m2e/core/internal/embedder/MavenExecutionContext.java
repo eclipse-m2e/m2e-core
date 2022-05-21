@@ -205,7 +205,11 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       if(request == null) {
         request = newExecutionRequest();
       }
-      maven.populateDefaults(request);
+      try {
+        maven.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
+      } catch(MavenExecutionRequestPopulationException ex) {
+        throw new CoreException(Status.error(Messages.MavenImpl_error_read_config, ex));
+      }
       populateSystemProperties(request);
       setValue(CTX_LOCALREPOSITORY, request.getLocalRepository());
       final FilterRepositorySystemSession repositorySession = maven.createRepositorySession(request);
@@ -255,13 +259,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     try {
       return execute((innerContext, monitor) -> {
 
-        MavenExecutionRequestPopulator requestPopulator = maven.lookup(MavenExecutionRequestPopulator.class);
-        //populate the defaults (if not already given)...
-        try {
-          requestPopulator.populateDefaults(request);
-        } catch(MavenExecutionRequestPopulationException ex) {
-          return new DefaultMavenExecutionResult().addException(ex);
-        }
         EventSpyDispatcher eventSpyDispatcher = maven.lookup(EventSpyDispatcher.class);
         try {
           //notify about the start of the request ...
