@@ -53,23 +53,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -117,14 +112,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Plugin;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
@@ -364,13 +353,28 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactPackagingCombo = new CCombo(artifactComposite, SWT.FLAT);
     Set<String> packagingTypes = new LinkedHashSet<>();
 
-    packagingTypes.add("jar"); //$NON-NLS-1$
-    packagingTypes.add("war"); //$NON-NLS-1$
-    packagingTypes.add("ejb"); //MNGECLIPSE-688 : add EAR & EJB Support //$NON-NLS-1$
-    packagingTypes.add("ear"); //$NON-NLS-1$
-    packagingTypes.add("pom"); //$NON-NLS-1$
-    packagingTypes.add("maven-plugin"); //$NON-NLS-1$
-    updateAvailablePackagingTypes(packagingTypes); // dynamically load available packaging types from build plugins
+    IMavenProjectFacade projectFacade = Adapters.adapt(getProject(), IMavenProjectFacade.class);
+    if(projectFacade != null) {
+      try {
+        List<String> list = projectFacade.createExecutionContext().execute((context, monitor) -> {
+          return context.lookupExtensions(ArtifactHandler.class).stream().map(ArtifactHandler::getPackaging)
+              .filter(Objects::nonNull).distinct().sorted().collect(Collectors.toList());
+        }, null);
+        packagingTypes.addAll(list);
+      } catch(CoreException ex) {
+      }
+    }
+
+    if(packagingTypes.isEmpty()) {
+      //something went wrong, add at laest some basic items....
+      packagingTypes.add("jar"); //$NON-NLS-1$
+      packagingTypes.add("war"); //$NON-NLS-1$
+      packagingTypes.add("ejb"); //MNGECLIPSE-688 : add EAR & EJB Support //$NON-NLS-1$
+      packagingTypes.add("ear"); //$NON-NLS-1$
+      packagingTypes.add("pom"); //$NON-NLS-1$
+      packagingTypes.add("maven-plugin"); //$NON-NLS-1$
+    }
+//    updateAvailablePackagingTypes(packagingTypes); // dynamically load available packaging types from build plugins
     packagingTypes.forEach(type -> artifactPackagingCombo.add(type));
 
 // uncomment this only if you are able to not to break the project
@@ -1417,62 +1421,4 @@ public class OverviewPage extends MavenPomEditorPage {
     }
   }
 
-  public void updateAvailablePackagingTypes(Set<String> packagingTypes) {
-    if(getPomEditor().getMavenProject() != null) {
-      for(Plugin plugin : getPomEditor().getMavenProject().getBuildPlugins()) {
-        if(plugin.isExtensions()) {
-          Artifact artifact = new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-              null, "maven-plugin", null, new DefaultArtifactHandler());
-          addPluginPackagingTypes(packagingTypes, artifact);
-        }
-      }
-    }
-  }
-
-  /**
-   * Parses the plugin's META-INF/plexus/components.xml file for available packaging types
-   * 
-   * @param packagingTypes Set of packaging types that this method will add to
-   * @param artifact The artifact of the build plugin
-   * @apiNote If any exceptions occur during this method, such as an XML parsing exception or file not found, this
-   *          method will immediately stop. It is assumed that there is something wrong with the user's project or
-   *          repository setup which prevents this method from completing.
-   */
-  void addPluginPackagingTypes(Set<String> packagingTypes, Artifact artifact) {
-    ArtifactRepository localRepository;
-    try {
-      localRepository = MavenPlugin.getMaven().getLocalRepository();
-    } catch(CoreException ex) { // No local repo, can't add packaging types
-      return;
-    }
-    Artifact found = localRepository.find(artifact);
-    if(found != null && found.getFile() != null) {
-      try (JarFile jarFile = new JarFile(found.getFile().getAbsoluteFile() + ".jar")) {
-        DocumentBuilder db = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder();
-        JarEntry componentsxml = jarFile.getJarEntry(COMPONENTS_PATH);
-        if(componentsxml != null) {
-          Document doc = db.parse(jarFile.getInputStream(componentsxml));
-          doc.getDocumentElement().normalize();
-          NodeList components = doc.getElementsByTagName("component");
-          for(int i = 0; i < components.getLength(); i++ ) {
-            Node component = components.item(i);
-            if(component.getNodeType() == Node.ELEMENT_NODE) {
-              Element element = (Element) component;
-              String role = element.getElementsByTagName("role").item(0).getTextContent();
-              if(ArtifactHandler.ROLE.equals(role)) {
-                Node config = element.getElementsByTagName("configuration").item(0);
-                if(config.getNodeType() == Node.ELEMENT_NODE) {
-                  Element configEl = (Element) config;
-                  String name = configEl.getElementsByTagName("type").item(0).getTextContent();
-                  packagingTypes.add(name);
-                }
-              }
-            }
-          }
-        }
-      } catch(Exception e) {
-        // Broken XML, file not found, etc. Can't add packaging types.
-      }
-    }
-  }
 }

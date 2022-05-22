@@ -534,7 +534,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IMavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext((MavenImpl) getMaven(), getPomFile());
+    return new MavenExecutionContext((MavenImpl) getMaven(), this);
   }
 
   @Override

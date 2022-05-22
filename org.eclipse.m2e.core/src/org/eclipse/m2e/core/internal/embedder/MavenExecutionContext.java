@@ -18,9 +18,11 @@ import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +31,13 @@ import java.util.Set;
 
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.transfer.TransferListener;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
@@ -62,6 +67,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -88,15 +94,23 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private final File basedir;
 
-  public MavenExecutionContext(MavenImpl maven, File basedir) {
-    this.maven = maven;
-    this.basedir = basedir == null ? null : (basedir.isDirectory() ? basedir : basedir.getParentFile());
-  }
+  private IMavenProjectFacade projectFacade;
 
-  MavenExecutionContext(MavenImpl maven, MavenExecutionRequest request) {
+  public MavenExecutionContext(MavenImpl maven, IMavenProjectFacade projectFacade) {
     this.maven = maven;
-    this.request = request;
-    this.basedir = request.getBaseDirectory() != null ? new File(request.getBaseDirectory()) : null;
+    this.projectFacade = projectFacade;
+    if(projectFacade != null) {
+      File basedir;
+      IFile pom = projectFacade.getPom();
+      if(pom != null && pom.getLocation() != null) {
+        basedir = pom.getLocation().toFile();
+      } else {
+        basedir = null;
+      }
+      this.basedir = basedir == null ? null : (basedir.isDirectory() ? basedir : basedir.getParentFile());
+    } else {
+      this.basedir = null;
+    }
   }
 
   @Override
@@ -314,6 +328,9 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     final List<MavenProject> origProjects = mavenSession.getProjects();
     final ClassLoader origTCCL = Thread.currentThread().getContextClassLoader();
     try {
+      if(project == null && projectFacade != null) {
+        project = projectFacade.getMavenProject();
+      }
       if(project != null) {
         mavenSession.setCurrentProject(project);
         mavenSession.setProjects(Collections.singletonList(project));
@@ -439,5 +456,49 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    */
   public <T> void setValue(String key, T value) {
     context.put(key, value);
+  }
+
+  @Override
+  public <Extension> Collection<Extension> lookupExtensions(Class<Extension> extensionType) {
+    MavenSession session = getSession();
+    List<MavenProject> projects = session.getProjects();
+    Collection<Extension> extensions = new LinkedHashSet<>();
+    extensions.addAll(lookupList(extensionType));
+    if(projects != null && !projects.isEmpty()) {
+      extensions.addAll(getProjectScopedExtensionComponents(projects, extensionType));
+    }
+    return extensions;
+  }
+
+  private <Extension> List<Extension> lookupList(Class<Extension> extensionType) {
+    try {
+      return maven.getPlexusContainer().lookupList(extensionType);
+    } catch(CoreException | ComponentLookupException e) {
+      e.printStackTrace();
+      return List.of();
+    }
+  }
+
+  private <T> Collection<T> getProjectScopedExtensionComponents(Collection<MavenProject> projects,
+      Class<T> extensionType) {
+
+    Collection<T> result = new LinkedHashSet<>();
+    Collection<ClassLoader> realms = new HashSet<>();
+
+    Thread thread = Thread.currentThread();
+    ClassLoader ccl = thread.getContextClassLoader();
+    try {
+      for(MavenProject project : projects) {
+        ClassLoader projectRealm = project.getClassRealm();
+
+        if(projectRealm != null && realms.add(projectRealm)) {
+          thread.setContextClassLoader(projectRealm);
+          result.addAll(lookupList(extensionType));
+        }
+      }
+      return result;
+    } finally {
+      thread.setContextClassLoader(ccl);
+    }
   }
 }
