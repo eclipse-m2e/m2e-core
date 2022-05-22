@@ -1008,14 +1008,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
       ResolverConfiguration resolverConfiguration) throws CoreException {
-
-    File basedir;
-    if(pom != null && pom.getLocation() != null) {
-      basedir = pom.getLocation().toFile();
-    } else {
-      basedir = null;
-    }
-    IMavenExecutionContext context = new MavenExecutionContext((MavenImpl) maven, basedir);
+    IMavenExecutionContext context = new MavenExecutionContext((MavenImpl) maven, projectRegistry.getProjectFacade(pom));
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;
   }
@@ -1101,16 +1094,16 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * @return
    */
   private Map<MavenProjectFacade, MavenProject> getContextProjects() {
-    Map<MavenProjectFacade, MavenProject> projects = null;
     MavenExecutionContext context = MavenExecutionContext.getThreadContext(false);
     if(context != null) {
-      projects = context.getValue(CTX_MAVENPROJECTS);
+      Map<MavenProjectFacade, MavenProject> projects = context.getValue(CTX_MAVENPROJECTS);
       if(projects == null) {
         projects = new IdentityHashMap<>();
         context.setValue(CTX_MAVENPROJECTS, projects);
       }
+      return projects;
     }
-    return projects != null ? projects : new IdentityHashMap<>();
+    return new IdentityHashMap<>();
   }
 
   private Map<MavenProjectFacade, MavenProject> createProjectCache() {

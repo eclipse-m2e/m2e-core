@@ -168,6 +168,7 @@ import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
@@ -1158,7 +1159,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext(this, (File) null);
+    return new MavenExecutionContext(this, (IMavenProjectFacade) null);
   }
 
   /**
