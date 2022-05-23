@@ -14,11 +14,11 @@
 package org.eclipse.m2e.core.embedder;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -29,7 +29,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
@@ -138,23 +137,12 @@ public interface IMavenExecutionContext {
   ProjectBuildingRequest newProjectBuildingRequest();
 
   /**
-   * Either join the currents thread {@link IMavenExecutionContext} or creates a fresh one from the supplied factory if
-   * this thread is currently not executing anything. Be aware that because of this might return an already executing
-   * context, this context should not be configured in any way, use {@link IMaven#createExecutionContext()} or
-   * {@link IMavenProjectFacade#createExecutionContext()} to create a specific context that could be configured.
-   * 
-   * @return a {@link IMavenExecutionContext} that could be used for execution
-   * @throws CoreException
+   * @return the IMavenExecutionContext already in use for current thread, or {@link Optional#empty()} if absent.
+   * @since 2.0
    */
-  static IMavenExecutionContext join(IMavenExecutionContextFactory factory) throws CoreException {
-    IMavenExecutionContext context = MavenExecutionContext.getThreadContext();
-    if(context == null) {
-      if(factory == null) {
-        throw new CoreException(Status.error("Nothing to join and no factory given!"));
-      }
-      return factory.createExecutionContext();
-    }
-    return context;
+  static Optional<IMavenExecutionContext> getThreadContext() {
+    return Optional.ofNullable(MavenExecutionContext.getThreadContext());
   }
+
 
 }

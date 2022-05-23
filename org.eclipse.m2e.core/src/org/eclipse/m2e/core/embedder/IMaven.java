@@ -43,7 +43,6 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -124,7 +123,8 @@ public interface IMaven extends IMavenExecutionContextFactory {
    */
   @Deprecated(forRemoval = true)
   default void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
-    IMavenExecutionContext.join(this).execute(project, execution, monitor);
+    IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(project, execution,
+        monitor);
   }
 
   /**
@@ -261,18 +261,8 @@ public interface IMaven extends IMavenExecutionContextFactory {
    */
   @Deprecated(forRemoval = true)
   default <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(callable, monitor);
+    return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(callable, monitor);
   }
-
-  /**
-   * Creates and returns new global maven execution context. such a context is suitable if one likes to perform some
-   * action without a project, this is similar to calling maven but without a pom.xml If you want to execute in the
-   * context of a project (e.g. to support project scoped extensions) you should use
-   * {@link IMavenProjectFacade#createExecutionContext()} instead.
-   *
-   * @since 1.4
-   */
-  IMavenExecutionContext createExecutionContext() throws CoreException;
 
   /**
    * Lookup a component from the embedded PlexusContainer.

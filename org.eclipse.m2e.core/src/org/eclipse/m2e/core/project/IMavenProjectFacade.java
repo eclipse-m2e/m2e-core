@@ -141,14 +141,6 @@ public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
   Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
   /**
-   * Creates a new execution context that is one suitable to execute in the context of this facade, that is it might
-   * include project specific extensions.
-   * 
-   * @return a new execution context for this facade
-   */
-  IMavenExecutionContext createExecutionContext();
-
-  /**
    * Gets an access to a (possibly project specific) {@link IMaven} instance,
    * this is the same instance that is used to create new {@link IMavenExecutionContext}s
    * see {@link #createExecutionContext()}

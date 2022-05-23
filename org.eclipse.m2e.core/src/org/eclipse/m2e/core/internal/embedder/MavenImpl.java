@@ -266,7 +266,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
         monitor);
   }
@@ -291,7 +291,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
         monitor);
   }
@@ -466,7 +466,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute((context, pm) -> {
+    return getExecutionContext().execute((context, pm) -> {
       MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
       try {
         lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -478,6 +478,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_project, ex));
       }
     }, monitor);
+  }
+
+  private IMavenExecutionContext getExecutionContext() {
+    return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext);
   }
 
   @Override
@@ -589,7 +593,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(child,
+    return getExecutionContext().execute(child,
         (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
         context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
@@ -615,7 +619,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
     List<ArtifactRepository> repositories = remoteRepositories;
 
-    return IMavenExecutionContext.join(this).execute((context, pm) -> {
+    return getExecutionContext().execute((context, pm) -> {
       org.eclipse.aether.RepositorySystem repoSystem = lookup(org.eclipse.aether.RepositorySystem.class);
 
       ArtifactRequest request = new ArtifactRequest();
@@ -801,7 +805,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
@@ -853,7 +857,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal),
         monitor);
   }
@@ -983,13 +987,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public Mirror getMirror(ArtifactRepository repo) throws CoreException {
-    return IMavenExecutionContext.join(this)
+    return getExecutionContext()
         .execute((c, m) -> lookup(RepositorySystem.class).getMirror(repo, c.getExecutionRequest().getMirrors()), null);
   }
 
   @Override
   public List<Mirror> getMirrors() throws CoreException {
-    return IMavenExecutionContext.join(this).execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
+    return getExecutionContext().execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
   }
 
   @Override

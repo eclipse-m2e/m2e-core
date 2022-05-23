@@ -10,19 +10,16 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.embedder;
 
-import org.eclipse.core.runtime.CoreException;
-
-
 /**
  * a {@link IMavenExecutionContextFactory} is a supplier for new {@link IMavenExecutionContext}s
- *
+ * 
+ * @since 2.0
  */
 public interface IMavenExecutionContextFactory {
 
   /**
    * @return a fresh {@link IMavenExecutionContext}
-   * @throws CoreException
    */
-  IMavenExecutionContext createExecutionContext() throws CoreException;
+  IMavenExecutionContext createExecutionContext();
 
 }
