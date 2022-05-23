@@ -123,6 +123,24 @@
            </and>
          </visibility>
       </objectContribution>
+      <objectContribution id="org.eclipse.m2e.updateConfigurationAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.updateProjectAction"
+         		 definitionId="org.eclipse.m2e.core.ui.command.updateProject"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
+                 style="push"
+                 icon="icons/update_dependencies.png"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
 
       <objectContribution id="org.eclipse.m2e.disableAction"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -198,6 +216,22 @@
             <objectState name="name" value="pom.xml"/>
          </visibility>
       </objectContribution>
+	  <objectContribution id="org.eclipse.m2e.core.fileMenu.updateProjectAction"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.updateProjectAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
+                 style="push"
+                 icon="icons/update_dependencies.png"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/update"
+                 enablesFor="1"/>
+         <visibility>
+           <and>
+              <objectState name="name" value="pom.xml"/>
+           </and>
+         </visibility>
+      </objectContribution>
       <!-- MNGECLIPSE-2564 -for *not* maven project, add the Convert to Maven Project action -->
       <objectContribution id="org.eclipse.m2e.enableNatureAction"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -240,6 +274,18 @@
          </menu>
       </objectContribution>
 
+      <objectContribution id="org.eclipse.m2e.workingSet.updateConfigurationAction"
+      	     adaptable="true"
+             objectClass="org.eclipse.ui.IWorkingSet">
+         <action id="org.eclipse.m2e.updateConfigurationAction"
+         		 definitionId="org.eclipse.m2e.core.ui.command.updateProject"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
+                 style="push"
+                 icon="icons/update_dependencies.png"
+                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
+                 enablesFor="+"/>
+      </objectContribution>
 
       <objectContribution id="org.eclipse.m2e.core.openPomArtifact"
           objectClass="org.apache.maven.artifact.Artifact"
