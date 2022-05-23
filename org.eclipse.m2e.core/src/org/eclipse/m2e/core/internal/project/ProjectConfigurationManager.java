@@ -139,7 +139,7 @@ public class ProjectConfigurationManager
       throws CoreException {
 
     // overall execution context to share repository session data and cache for all projects
-    return IMavenExecutionContext.join(maven).execute((context, m) -> {
+    return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute((context, m) -> {
       SubMonitor progress = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_importing, 100);
       long t1 = System.currentTimeMillis();
       List<IMavenProjectImportResult> result = new ArrayList<>();
@@ -489,7 +489,7 @@ public class ProjectConfigurationManager
   public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
-    IMavenExecutionContext.join(maven).execute(new AbstractRunnable() {
+    IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute(new AbstractRunnable() {
       @Override
       protected void run(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         enableBasicMavenNature(project, configuration, monitor);
@@ -747,7 +747,7 @@ public class ProjectConfigurationManager
   public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, String groupId, String artifactId,
       String version, String javaPackage, Properties properties, ProjectImportConfiguration configuration,
       IProjectCreationListener listener, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(maven)
+    return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext)
         .execute((context, m) -> createArchetypeProjects0(location, archetype, groupId,
         artifactId, version,
         javaPackage, properties, configuration, listener, m), monitor);

@@ -164,7 +164,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     IMavenProjectFacade projectFacade = Adapters.adapt(javaProject.getProject(), IMavenProjectFacade.class);
     IMavenExecutionContext context;
     if(projectFacade == null) {
-      context = IMavenExecutionContext.join(MavenPlugin.getMaven());
+      context = IMavenExecutionContext.getThreadContext().orElseGet(MavenPlugin.getMaven()::createExecutionContext);
     } else {
       context = projectFacade.createExecutionContext();
     }
