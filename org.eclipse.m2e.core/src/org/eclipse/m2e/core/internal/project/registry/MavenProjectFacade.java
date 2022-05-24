@@ -537,8 +537,14 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return new MavenExecutionContext((MavenImpl) getMaven(), this);
   }
 
-  @Override
-  public IMaven getMaven() {
+  /**
+   * Gets an access to a (possibly project specific) {@link IMaven} instance,
+   * this is the same instance that is used to create new {@link IMavenExecutionContext}s
+   * see {@link #createExecutionContext()}
+   * 
+   * @return a Maven instance, configured according to this project
+   */
+  private IMaven getMaven() {
     return manager.getMaven();
   }
 }
