@@ -43,6 +43,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -55,7 +56,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenImpl;
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IMaven extends IMavenExecutionContextFactory {
+public interface IMaven {
 
   // POM Model read/write operations
 
@@ -117,8 +118,7 @@ public interface IMaven extends IMavenExecutionContextFactory {
   // execution
 
   /**
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
-   *             {@link IMavenExecutionContext#join()}
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
@@ -255,8 +255,7 @@ public interface IMaven extends IMavenExecutionContextFactory {
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.
    *
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
-   *             {@link IMavenExecutionContext#join()}
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
@@ -273,5 +272,19 @@ public interface IMaven extends IMavenExecutionContextFactory {
    * @since 1.10
    */
   <T> T lookup(Class<T> clazz) throws CoreException;
+
+
+  /**
+   * Creates and returns new, possibly nested, maven execution context for this Maven embedder.
+   * <p>
+   * <b>IMPORTANT:</b> When in the context of a particular project, it's usually better to use
+   * {@link IMavenProjectFacade#createExecutionContext()} which will include more project-specific configuration and
+   * will lead to more accurate and consistent results compared to Maven CLI commands.
+   * </p>
+   *
+   * @since 1.4
+   * @see IMavenProjectFacade#createExecutionContext()
+   */
+  IMavenExecutionContext createExecutionContext();
 
 }

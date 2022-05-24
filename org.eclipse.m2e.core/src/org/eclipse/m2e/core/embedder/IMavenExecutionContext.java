@@ -29,26 +29,27 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
  * Maven execution context. Encapsulates maven execution request, maven session and related maven session state objects.
  * Instances can be either in configuration or execution states. In configuration state, {@link #getExecutionRequest()}
- * can be used to customize maven execution configuration parameters. Context enters execution state during {@link
- * #execute(..., IProgressMonitor)} invocation. During transition from configuration state to execution state, maven
- * session is created and the the context is associated with the current thread. Maven session instance and related
- * objects can be accessed through their corresponding context getXXX methods.
+ * can be used to customize maven execution configuration parameters. Context enters execution state during
+ * {@link #execute(..., IProgressMonitor)} invocation. During transition from configuration state to execution state,
+ * maven session is created and the the context is associated with the current thread. Maven session instance and
+ * related objects can be accessed through their corresponding context getXXX methods.
  * <p>
  * Maven execution contexts can be nested, i.e. new context can be created and entered from a thread that already has
  * associated maven execution context. By default nested contexts inherit all configuration from immediate outer
- * context, but can be customised via {@link #getExecutionRequest()}. Outer context is suspended during execution of
+ * context, but can be customized via {@link #getExecutionRequest()}. Outer context is suspended during execution of
  * nested context's {@link #execute(ICallable, IProgressMonitor)} method.
  * <p>
  * Typical usage
  *
  * <pre>
- * IMavenExecutionContext context = maven.createExecutionContext();
+ * IMavenExecutionContext context = mavenProjectFacade.createExecutionContext();
  *
  * MavenProject project = context.execute(new ICallable&lt;MavenProject&gt;() {
  *   public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) {
@@ -61,7 +62,6 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  *
  * @see ICallable
  * @see IMaven#createExecutionContext()
- * @see IMaven#execute(ICallable, IProgressMonitor)
  * @see IMavenProjectRegistry#execute(org.eclipse.m2e.core.project.IMavenProjectFacade, ICallable, IProgressMonitor)
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
@@ -137,6 +137,13 @@ public interface IMavenExecutionContext {
   ProjectBuildingRequest newProjectBuildingRequest();
 
   /**
+   * Get the current thread context.
+   * <p>
+   * To trigger a new execution, it's often better to create a new project-specific context with
+   * {@link IMavenProjectFacade#createExecutionContext()} than to blindly reuse current thread context, as we do not
+   * know whether the current thread context maps the current project propertly.
+   * </p>
+   * 
    * @return the IMavenExecutionContext already in use for current thread, or {@link Optional#empty()} if absent.
    * @since 2.0
    */
