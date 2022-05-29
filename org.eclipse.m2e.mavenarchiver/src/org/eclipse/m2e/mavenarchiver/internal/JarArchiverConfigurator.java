@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.sonatype.m2e.mavenarchiver.internal;
+package org.eclipse.m2e.mavenarchiver.internal;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;

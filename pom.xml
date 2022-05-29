@@ -17,13 +17,6 @@
     <artifactId>tycho-support</artifactId>
     <version>1.1.0</version>
   </parent>
-  <licenses>
-    <license>
-      <name>Eclipse Public License - v 2.0</name>
-      <url>http://www.eclipse.org/legal/epl-v20.html</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
   <!--
   <groupId>org.sonatype.m2e.mavenarchiver</groupId>
   Use exising groupId for now until we figure out how to migrate people. If it matters.
@@ -36,9 +29,9 @@
 
   <properties>
     <repositoryPathId>m2eclipse-mavenarchiver</repositoryPathId>
-    <tychoVersion>1.6.0</tychoVersion>
-    <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/1.14/</m2e-core.url>
-    <eclipse.stream>2019-12</eclipse.stream>
+    <tychoVersion>2.7.2</tychoVersion>
+    <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/latest/</m2e-core.url>
+    <eclipse.stream>2022-03</eclipse.stream>
     <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
   </properties>
   <repositories>
@@ -54,9 +47,9 @@
     </repository>
   </repositories>
   <modules>
-    <module>org.sonatype.m2e.mavenarchiver</module>
+    <module>org.eclipse.m2e.mavenarchiver</module>
     <module>org.sonatype.m2e.mavenarchiver.feature</module>
-    <module>org.sonatype.m2e.mavenarchiver.tests</module>
+    <module>org.eclipse.m2e.mavenarchiver.tests</module>
     <module>org.sonatype.m2e.mavenarchiver.repository</module>
   </modules>
 </project>
