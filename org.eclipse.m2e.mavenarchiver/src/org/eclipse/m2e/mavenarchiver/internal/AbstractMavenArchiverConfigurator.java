@@ -38,7 +38,6 @@ import java.util.jar.Manifest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
@@ -62,16 +61,16 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -130,6 +129,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	    JDT_SUPPORTS_MODULES = isModuleSupportAvailable;
 	  }
 
+	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
 		// Nothing to configure
 	}
@@ -142,6 +142,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 */
 	protected abstract MojoExecutionKey getExecutionKey();
 
+	@Override
 	public AbstractBuildParticipant getBuildParticipant(final IMavenProjectFacade projectFacade,
 			MojoExecution execution, IPluginExecutionMetadata executionMetadata) {
 
@@ -149,6 +150,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		if (execution.getArtifactId().equals(key.getArtifactId()) && execution.getGoal().equals(key.getGoal())) {
 
 			return new AbstractBuildParticipant() {
+				@Override
 				public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
 					IResourceDelta delta = getDelta(projectFacade.getProject());
 
@@ -193,6 +195,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 		boolean foundManifest;
 
+		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			if (delta.getResource() instanceof IFile && MANIFEST.equals(delta.getResource().getName())) {
 				foundManifest = true;
@@ -205,6 +208,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 * Generates the project manifest if necessary, that is if the project manifest
 	 * configuration has changed or if the dependencies have changed.
 	 */
+	@Override
 	public void mavenProjectChanged(MavenProjectChangedEvent event, IProgressMonitor monitor) throws CoreException {
 
 		IMavenProjectFacade oldFacade = event.getOldMavenProject();
@@ -385,45 +389,51 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 		MavenProject mavenProject = mavenFacade.getMavenProject();
 		Set<Artifact> originalArtifacts = mavenProject.getArtifacts();
-		boolean parentHierarchyLoaded = false;
+		boolean parentHierarchyLoaded = loadParentHierarchy(mavenFacade, monitor);
 		try {
 			markerManager.deleteMarkers(mavenFacade.getPom(), MavenArchiverConstants.MAVENARCHIVER_MARKER_ERROR);
 
-			// Find the mojoExecution
-			MavenSession session = getMavenSession(mavenFacade, monitor);
+			IMavenExecutionContext context = mavenFacade.createExecutionContext();
+			context.getExecutionRequest().setOffline(MavenPlugin.getMavenConfiguration().isOffline());
+			context.execute((innerContext, innerMonitor) -> {
+				// Find the mojoExecution
 
-			parentHierarchyLoaded = loadParentHierarchy(mavenFacade, monitor);
+				ClassLoader originalTCL = Thread.currentThread().getContextClassLoader();
+				try {
+					ClassRealm projectRealm = mavenProject.getClassRealm();
+					if (projectRealm != null && projectRealm != originalTCL) {
+						Thread.currentThread().setContextClassLoader(projectRealm);
+					}
+					MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProject,
+							Collections.singletonList("package"), true, monitor);
+					MojoExecution mojoExecution = getExecution(executionPlan, getExecutionKey());
+					if (mojoExecution == null) {
+						return null;
+					}
 
-			ClassLoader originalTCL = Thread.currentThread().getContextClassLoader();
-			try {
-				ClassRealm projectRealm = mavenProject.getClassRealm();
-				if (projectRealm != null && projectRealm != originalTCL) {
-					Thread.currentThread().setContextClassLoader(projectRealm);
+					// Get the target manifest file
+					IFolder destinationFolder = (IFolder) manifest.getParent();
+					M2EUtils.createFolder(destinationFolder, true, monitor);
+
+					// Workspace project artifacts don't have a valid getFile(), so won't appear in
+					// the manifest
+					// We need to workaround the issue by creating fake files for such artifacts.
+					// We could also use a custom File implementation having "public boolean
+					// exists(){return true;}"
+					mavenProject.setArtifacts(fixArtifactFileNames(mavenFacade));
+
+					// Invoke the manifest generation API via reflection
+					reflectManifestGeneration(mavenFacade, mojoExecution, innerContext.getSession(),
+							new File(manifest.getLocation().toOSString()));
+				} catch (Exception e) {
+					throw new CoreException(Status.error("Something goes wrong!", e));
+				} finally {
+					Thread.currentThread().setContextClassLoader(originalTCL);
 				}
-				MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject,
-						Collections.singletonList("package"), true, monitor);
-				MojoExecution mojoExecution = getExecution(executionPlan, getExecutionKey());
-				if (mojoExecution == null) {
-					return;
-				}
 
-				// Get the target manifest file
-				IFolder destinationFolder = (IFolder) manifest.getParent();
-				M2EUtils.createFolder(destinationFolder, true, monitor);
+				return null;
+			}, monitor);
 
-				// Workspace project artifacts don't have a valid getFile(), so won't appear in
-				// the manifest
-				// We need to workaround the issue by creating fake files for such artifacts.
-				// We could also use a custom File implementation having "public boolean
-				// exists(){return true;}"
-				mavenProject.setArtifacts(fixArtifactFileNames(mavenFacade));
-
-				// Invoke the manifest generation API via reflection
-				reflectManifestGeneration(mavenFacade, mojoExecution, session,
-						new File(manifest.getLocation().toOSString()));
-			} finally {
-				Thread.currentThread().setContextClassLoader(originalTCL);
-			}
 		} catch (Exception ex) {
 			markerManager.addErrorMarkers(mavenFacade.getPom(), MavenArchiverConstants.MAVENARCHIVER_MARKER_ERROR, ex);
 
@@ -435,18 +445,6 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 			}
 		}
 
-	}
-
-	private MavenSession getMavenSession(IMavenProjectFacade mavenFacade, IProgressMonitor monitor)
-			throws CoreException {
-		IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-		IMaven maven = MavenPlugin.getMaven();
-		// Create a maven request + session
-		IFile pomResource = mavenFacade.getPom();
-		MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource,
-				mavenFacade.getResolverConfiguration(), monitor);
-		request.setOffline(MavenPlugin.getMavenConfiguration().isOffline());
-		return maven.createSession(request, mavenFacade.getMavenProject());
 	}
 
 	private void reflectManifestGeneration(IMavenProjectFacade facade, MojoExecution mojoExecution,
@@ -587,7 +585,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 * @throws CoreException
 	 */
 	private boolean loadParentHierarchy(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-		boolean loadedParent = false;
+		//TODO why is this not handled by m2e?
 		MavenProject mavenProject = facade.getMavenProject();
 		try {
 			if (mavenProject.getModel().getParent() == null || mavenProject.getParent() != null) {
@@ -598,22 +596,24 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		} catch (IllegalStateException e) {
 			// The parent can not be loaded properly
 		}
-		MavenExecutionRequest request = null;
-		while (mavenProject != null && mavenProject.getModel().getParent() != null) {
-			if (monitor.isCanceled()) {
-				break;
+		return facade.createExecutionContext().execute(mavenProject, (context, monitor2) -> {
+			boolean loadedParent = false;
+			MavenProject current = mavenProject;
+			while (current != null && current.getModel().getParent() != null) {
+				if (monitor.isCanceled()) {
+					break;
+				}
+				MavenProject parentProject = maven.readProject(
+						new File(current.getBasedir(), current.getModel().getParent().getRelativePath()),
+						monitor);
+				if (parentProject != null) {
+					current.setParent(parentProject);
+					loadedParent = true;
+				}
+				current = parentProject;
 			}
-			if (request == null) {
-				request = projectManager.createExecutionRequest(facade, monitor);
-			}
-			MavenProject parentProject = maven.resolveParentProject(request, mavenProject, monitor);
-			if (parentProject != null) {
-				mavenProject.setParent(parentProject);
-				loadedParent = true;
-			}
-			mavenProject = parentProject;
-		}
-		return loadedParent;
+			return loadedParent;
+		}, monitor);
 	}
 
 	private Object getProvidedManifest(Class manifestClass, Object archiveConfiguration) throws SecurityException,
