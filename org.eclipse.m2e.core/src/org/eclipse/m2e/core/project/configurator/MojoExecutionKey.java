@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.maven.plugin.MojoExecution;
 
@@ -69,14 +70,10 @@ public class MojoExecutionKey implements Serializable {
     if(this == obj) {
       return true;
     }
-    if(!(obj instanceof MojoExecutionKey)) {
-      return false;
-    }
-
-    MojoExecutionKey other = (MojoExecutionKey) obj;
-
-    return eq(groupId, other.groupId) && eq(artifactId, other.artifactId) && eq(version, other.version)
-        && eq(goal, other.goal) && eq(executionId, other.executionId) && eq(lifecyclePhase, other.lifecyclePhase);
+    return obj instanceof MojoExecutionKey other && //
+        Objects.equals(groupId, other.groupId) && Objects.equals(artifactId, other.artifactId)
+        && Objects.equals(version, other.version) && Objects.equals(goal, other.goal)
+        && Objects.equals(executionId, other.executionId) && Objects.equals(lifecyclePhase, other.lifecyclePhase);
   }
 
   public String getGroupId() {
@@ -120,9 +117,5 @@ public class MojoExecutionKey implements Serializable {
     return groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
         && version.equals(mojoExecution.getVersion()) && goal.equals(mojoExecution.getGoal())
         && executionId.equals(mojoExecution.getExecutionId());
-  }
-
-  private static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
   }
 }

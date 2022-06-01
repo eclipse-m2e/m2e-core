@@ -758,15 +758,11 @@ public class LifecycleMappingFactory {
   }
 
   private static boolean isValidPluginExecutionMetadata(PluginExecutionMetadata metadata) {
-    switch(metadata.getAction()) {
-      case error:
-      case execute:
-      case ignore:
-        return true;
-      case configurator:
-        return isConfigurator(metadata);
-    }
-    return false;
+    return switch(metadata.getAction()) {
+      case error, execute, ignore -> true;
+      case configurator -> isConfigurator(metadata);
+      default -> false;
+    };
   }
 
   static boolean isConfigurator(PluginExecutionMetadata metadata) {

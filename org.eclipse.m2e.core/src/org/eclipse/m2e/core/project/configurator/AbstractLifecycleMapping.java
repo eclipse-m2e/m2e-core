@@ -85,8 +85,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
         if(directory != null) {
           IContainer container = projectFacade.getProject().getFolder(projectFacade.getProjectRelativePath(directory));
           if(container != null) {
-            if(!container.exists() && container instanceof IFolder) {
-              M2EUtils.createFolder((IFolder) container, true, monitor.newChild(1));
+            if(!container.exists() && container instanceof IFolder folder) {
+              M2EUtils.createFolder(folder, true, monitor.newChild(1));
             } else {
               container.setDerived(true, monitor.newChild(1));
             }

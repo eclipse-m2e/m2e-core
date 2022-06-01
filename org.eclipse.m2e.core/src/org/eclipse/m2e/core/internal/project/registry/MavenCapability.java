@@ -68,11 +68,8 @@ public class MavenCapability extends Capability {
     if(this == obj) {
       return true;
     }
-    if(!(obj instanceof MavenCapability)) {
-      return false;
-    }
-    MavenCapability other = (MavenCapability) obj;
-    return getVersionlessKey().equals(other.getVersionlessKey()) && version.equals(other.version);
+    return obj instanceof MavenCapability other && //
+        getVersionlessKey().equals(other.getVersionlessKey()) && version.equals(other.version);
   }
 
   public static MavenCapability createMavenArtifact(ArtifactKey key) {

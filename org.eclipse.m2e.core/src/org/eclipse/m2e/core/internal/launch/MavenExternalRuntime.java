@@ -147,8 +147,8 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
       parser.parse(is);
     } catch(Exception e) {
-      if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException) {
-        throw (CoreException) e.getCause();
+      if(e instanceof ExceptionWrapper && e.getCause() instanceof CoreException coreException) {
+        throw coreException;
       }
       throw new CoreException(Status.error(Messages.MavenExternalRuntime_error_cannot_parse, e));
     }

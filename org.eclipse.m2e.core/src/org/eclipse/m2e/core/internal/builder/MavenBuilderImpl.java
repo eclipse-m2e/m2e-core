@@ -126,8 +126,8 @@ public class MavenBuilderImpl {
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
           participant.setBuildContext((AbstractEclipseBuildContext) incrementalContexts.get(0));
-          if(participant instanceof InternalBuildParticipant2) {
-            ((InternalBuildParticipant2) participant).setArgs(args);
+          if(participant instanceof InternalBuildParticipant2 participant2) {
+            participant2.setArgs(args);
           }
           long executionStartTime = System.currentTimeMillis();
           try {
@@ -146,8 +146,8 @@ public class MavenBuilderImpl {
             participant.setGetDeltaCallback(null);
             participant.setSession(null);
             participant.setBuildContext(null);
-            if(participant instanceof InternalBuildParticipant2) {
-              ((InternalBuildParticipant2) participant).setArgs(Collections.<String, String> emptyMap());
+            if(participant instanceof InternalBuildParticipant2 participant2) {
+              participant2.setArgs(Collections.<String, String> emptyMap());
             }
 
             processMavenSessionErrors(session, mojoExecutionKey, buildErrors);

@@ -1024,8 +1024,8 @@ public class ProjectConfigurationManager
 
   @Override
   public void resourceChanged(IResourceChangeEvent event) {
-    if(event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource() instanceof IProject) {
-      LifecycleMappingConfiguration.remove((IProject) event.getResource());
+    if(event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource() instanceof IProject project) {
+      LifecycleMappingConfiguration.remove(project);
     }
   }
 

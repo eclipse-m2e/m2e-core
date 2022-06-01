@@ -127,13 +127,8 @@ public class MavenUpdateRequest {
       return true;
     }
 
-    if(!(object instanceof MavenUpdateRequest)) {
-      return false;
-    }
-
-    MavenUpdateRequest request = (MavenUpdateRequest) object;
-
-    return this.offline == request.offline //
+    return object instanceof MavenUpdateRequest request && //
+        this.offline == request.offline //
         && this.forceDependencyUpdate == request.forceDependencyUpdate //
         && this.pomFiles.equals(request.pomFiles);
   }

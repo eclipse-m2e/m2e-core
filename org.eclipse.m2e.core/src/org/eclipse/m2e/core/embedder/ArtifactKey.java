@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.embedder;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -53,26 +54,15 @@ public class ArtifactKey implements Serializable {
   public boolean equals(Object o) {
     if(this == o)
       return true;
-    if(o instanceof ArtifactKey) {
-      ArtifactKey other = (ArtifactKey) o;
-      return equals(groupId, other.groupId) && equals(artifactId, other.artifactId) && equals(version, other.version)
-          && equals(classifier, other.classifier);
-    }
-    return false;
+    return o instanceof ArtifactKey other && //
+
+        Objects.equals(groupId, other.groupId) && Objects.equals(artifactId, other.artifactId)
+        && Objects.equals(version, other.version) && Objects.equals(classifier, other.classifier);
   }
 
   @Override
   public int hashCode() {
-    int hash = 17;
-    hash = hash * 31 + (groupId != null ? groupId.hashCode() : 0);
-    hash = hash * 31 + (artifactId != null ? artifactId.hashCode() : 0);
-    hash = hash * 31 + (version != null ? version.hashCode() : 0);
-    hash = hash * 31 + (classifier != null ? classifier.hashCode() : 0);
-    return hash;
-  }
-
-  private static boolean equals(Object o1, Object o2) {
-    return o1 == null ? o2 == null : o1.equals(o2);
+    return Objects.hash(groupId, artifactId, version, classifier);
   }
 
   // XXX this method does not belong here, it compares versions, while ArtifactKey uses baseVersions in many cases
@@ -83,8 +73,8 @@ public class ArtifactKey implements Serializable {
     if(a2 == null) {
       return false;
     }
-    return equals(a1.getGroupId(), a2.getGroupId()) && equals(a1.getArtifactId(), a2.getArtifactId())
-        && equals(a1.getVersion(), a2.getVersion()) && equals(a1.getClassifier(), a2.getClassifier());
+    return Objects.equals(a1.getGroupId(), a2.getGroupId()) && Objects.equals(a1.getArtifactId(), a2.getArtifactId())
+        && Objects.equals(a1.getVersion(), a2.getVersion()) && Objects.equals(a1.getClassifier(), a2.getClassifier());
   }
 
   @Override
