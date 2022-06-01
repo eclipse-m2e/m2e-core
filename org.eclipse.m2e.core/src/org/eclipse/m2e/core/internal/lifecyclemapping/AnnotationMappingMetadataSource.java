@@ -247,21 +247,19 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     if(a == null) {
       return null;
     }
-    switch(a) {
-      case ignore:
-        return new Xpp3Dom("ignore"); //$NON-NLS-1$
-
-      case configurator:
+    return switch(a) {
+      case ignore -> new Xpp3Dom("ignore"); //$NON-NLS-1$
+      case configurator -> {
         if(split.size() != 2) {
-          return null;
+          yield null;
         }
         Xpp3Dom conf = new Xpp3Dom("configurator"); //$NON-NLS-1$
         Xpp3Dom id = new Xpp3Dom("id"); //$NON-NLS-1$
         id.setValue(split.get(1));
         conf.addChild(id);
-        return conf;
-
-      case execute:
+        yield conf;
+      }
+      case execute -> {
         Xpp3Dom exec = new Xpp3Dom("execute"); //$NON-NLS-1$
         if(split.size() > 1) {
           EXECUTE_SPLITTER.splitAsStream(split.get(1)).map(String::strip).map(EXECUTE_OPTIONS::get)
@@ -271,11 +269,10 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
                 exec.addChild(opt);
               });
         }
-        return exec;
-
-      default:
-        return null;
-    }
+        yield exec;
+      }
+      default -> null;
+    };
   }
 
   private static PluginExecutionAction getAction(String value) {

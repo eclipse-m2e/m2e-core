@@ -14,6 +14,8 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
+import java.util.Objects;
+
 import org.eclipse.core.runtime.Assert;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -67,14 +69,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
         return true;
       }
 
-      if(!(obj instanceof MojoExecutionMappingRequirement)) {
-        return false;
-      }
-
-      MojoExecutionMappingRequirement other = (MojoExecutionMappingRequirement) obj;
-
-      return execution.equals(other.execution);
-
+      return obj instanceof MojoExecutionMappingRequirement other && execution.equals(other.execution);
     }
 
     /**
@@ -118,13 +113,8 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
         return true;
       }
 
-      if(!(obj instanceof ProjectConfiguratorMappingRequirement)) {
-        return false;
-      }
-
-      ProjectConfiguratorMappingRequirement other = (ProjectConfiguratorMappingRequirement) obj;
-
-      return configuratorId.equals(other.configuratorId) && execution.equals(other.execution);
+      return obj instanceof ProjectConfiguratorMappingRequirement other && configuratorId.equals(other.configuratorId)
+          && execution.equals(other.execution);
     }
 
     public MojoExecutionKey getExecution() {
@@ -212,39 +202,31 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
     if(this == obj) {
       return true;
     }
-    if(!(obj instanceof MojoExecutionMappingConfiguration)) {
-      return false;
-    }
-    MojoExecutionMappingConfiguration other = (MojoExecutionMappingConfiguration) obj;
-
-    if(!execution.equals(other.execution)) {
-      return false;
-    }
-
-    if(mapping == null) {
-      return other.mapping == null;
-    }
-
-    if(other.mapping == null) {
-      return false;
-    }
-
-    if(mapping.getAction() != other.mapping.getAction()) {
-      return false;
-    }
-
-    if(mapping.getAction() == PluginExecutionAction.configurator) {
-      String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(mapping);
-      String otherConfiguratorId = LifecycleMappingFactory.getProjectConfiguratorId(other.mapping);
-      if(!eq(configuratorId, otherConfiguratorId)) {
+    if(obj instanceof MojoExecutionMappingConfiguration other) {
+      if(!execution.equals(other.execution)) {
         return false;
       }
+
+      if(mapping == null) {
+        return other.mapping == null;
+      }
+
+      if(other.mapping == null) {
+        return false;
+      }
+
+      if(mapping.getAction() != other.mapping.getAction()) {
+        return false;
+      }
+
+      if(mapping.getAction() == PluginExecutionAction.configurator) {
+        String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(mapping);
+        String otherConfiguratorId = LifecycleMappingFactory.getProjectConfiguratorId(other.mapping);
+        if(!Objects.equals(configuratorId, otherConfiguratorId)) {
+          return false;
+        }
+      }
     }
-
-    return true;
-  }
-
-  private static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
+    return false;
   }
 }

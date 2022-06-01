@@ -194,17 +194,15 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
 
     for(Throwable ex : exceptions) {
-      if(ex instanceof org.eclipse.aether.transfer.ArtifactNotFoundException) {
-        org.eclipse.aether.transfer.ArtifactNotFoundException artifactNotFoundException = (org.eclipse.aether.transfer.ArtifactNotFoundException) ex;
+      if(ex instanceof org.eclipse.aether.transfer.ArtifactNotFoundException artifactNotFoundException) {
         ArtifactNotFoundProblemInfo problem = new ArtifactNotFoundProblemInfo(artifactNotFoundException.getArtifact(),
             mavenConfiguration.isOffline(), location);
         result.add(problem);
-      } else if(ex instanceof AbstractArtifactResolutionException) {
-        AbstractArtifactResolutionException abstractArtifactResolutionException = (AbstractArtifactResolutionException) ex;
+      } else if(ex instanceof AbstractArtifactResolutionException abstractArtifactResolutionException) {
         String errorMessage = getArtifactId(abstractArtifactResolutionException) + " " + getRootErrorMessage(ex); //$NON-NLS-1$
         result.add(new MavenProblemInfo(errorMessage, location));
-      } else if(ex instanceof ProjectBuildingException) {
-        Collection<ModelProblem> modelProblems = getModelProblems((ProjectBuildingException)ex);
+      } else if(ex instanceof ProjectBuildingException projectBuildingException) {
+        Collection<ModelProblem> modelProblems = getModelProblems(projectBuildingException);
         if (modelProblems != null && !modelProblems.isEmpty()) {
           for(ModelProblem problem : modelProblems) {
             String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage());
@@ -225,8 +223,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   private Collection<ModelProblem> getModelProblems(ProjectBuildingException ex) {
-    if (ex.getCause() instanceof ModelBuildingException) {
-      return ((ModelBuildingException)ex.getCause()).getProblems();
+    if(ex.getCause() instanceof ModelBuildingException modelBuildingException) {
+      return modelBuildingException.getProblems();
     }
     Set<ModelProblem> problems = new HashSet<>();
     for(ProjectBuildingResult projectBuildingResult : ex.getResults()) {
@@ -274,8 +272,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       if(!mavenArtifact.isResolved()) {
         org.eclipse.aether.artifact.Artifact artifact = RepositoryUtils.toArtifact(mavenArtifact);
         for(MavenProblemInfo problem : knownProblems) {
-          if(problem instanceof ArtifactNotFoundProblemInfo) {
-            ArtifactNotFoundProblemInfo artifactNotFoundProblemInfo = (ArtifactNotFoundProblemInfo) problem;
+          if(problem instanceof ArtifactNotFoundProblemInfo artifactNotFoundProblemInfo) {
             if(equals(artifactNotFoundProblemInfo.getArtifact(), artifact)) {
               continue all_artifacts_loop;
             }
@@ -290,8 +287,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   @Override
   public void addErrorMarkers(IResource resource, String type, Throwable ex) {
     Throwable cause = getRootCause(ex);
-    if(cause instanceof CoreException) {
-      CoreException cex = (CoreException) cause;
+    if(cause instanceof CoreException cex) {
       IStatus status = cex.getStatus();
       if(status != null) {
         addMarker(resource, type, status.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/);

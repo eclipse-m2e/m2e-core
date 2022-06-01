@@ -20,8 +20,8 @@ package org.eclipse.m2e.core.internal.launch;
  */
 public abstract class ClasspathEntry {
   public String toExternalForm() {
-    if(this instanceof ProjectClasspathEntry) {
-      return "P/" + ((ProjectClasspathEntry) this).getProject();
+    if(this instanceof ProjectClasspathEntry projectClasspathEntry) {
+      return "P/" + projectClasspathEntry.getProject();
     }
     throw new IllegalArgumentException();
   }

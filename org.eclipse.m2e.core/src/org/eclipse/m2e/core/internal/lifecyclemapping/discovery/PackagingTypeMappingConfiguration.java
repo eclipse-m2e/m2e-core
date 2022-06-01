@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
+import java.util.Objects;
+
 /**
  * Represents project packaging type and corresponding lifecycle mapping metadata.
  */
@@ -36,13 +38,7 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
         return true;
       }
 
-      if(!(obj instanceof PackagingTypeMappingRequirement)) {
-        return false;
-      }
-
-      PackagingTypeMappingRequirement other = (PackagingTypeMappingRequirement) obj;
-
-      return packaging.equals(other.packaging);
+      return obj instanceof PackagingTypeMappingRequirement other && packaging.equals(other.packaging);
     }
 
     public String getPackaging() {
@@ -71,13 +67,8 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
         return true;
       }
 
-      if(!(obj instanceof LifecycleStrategyMappingRequirement)) {
-        return false;
-      }
-
-      LifecycleStrategyMappingRequirement other = (LifecycleStrategyMappingRequirement) obj;
-
-      return lifecycleMappingId.equals(other.lifecycleMappingId);
+      return obj instanceof LifecycleStrategyMappingRequirement other
+          && lifecycleMappingId.equals(other.lifecycleMappingId);
     }
 
     public String getLifecycleMappingId() {
@@ -127,17 +118,8 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
       return true;
     }
 
-    if(!(obj instanceof PackagingTypeMappingConfiguration)) {
-      return false;
-    }
-
-    PackagingTypeMappingConfiguration other = (PackagingTypeMappingConfiguration) obj;
-
-    return packaging.equals(other.packaging) && eq(lifecycleMappingId, other.lifecycleMappingId);
-  }
-
-  private static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
+    return obj instanceof PackagingTypeMappingConfiguration other && //
+        packaging.equals(other.packaging) && Objects.equals(lifecycleMappingId, other.lifecycleMappingId);
   }
 
   @Override

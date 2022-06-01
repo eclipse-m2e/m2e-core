@@ -74,8 +74,8 @@ public abstract class AbstractEclipseBuildContext implements BuildContext, IIncr
       return null;
     }
     IResource baseResource = getBaseResource();
-    if(baseResource instanceof IContainer) {
-      return ((IContainer) baseResource).findMember(relpath);
+    if(baseResource instanceof IContainer container) {
+      return container.findMember(relpath);
     }
     return null;
   }

@@ -172,8 +172,7 @@ public class MavenProjectInfo {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj instanceof MavenProjectInfo) {
-      MavenProjectInfo info = (MavenProjectInfo) obj;
+    if(obj instanceof MavenProjectInfo info) {
       if(pomFile == null) {
         return info.getPomFile() == null;
       }

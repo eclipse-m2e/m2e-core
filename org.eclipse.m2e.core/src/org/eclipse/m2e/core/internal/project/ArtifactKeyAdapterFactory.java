@@ -41,14 +41,12 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
     }
 
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    if(adaptable instanceof IProject) {
-      IProject project = (IProject) adaptable;
+    if(adaptable instanceof IProject project) {
       IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());
       if(facade != null) {
         return adapterType.cast(facade.getArtifactKey());
       }
-    } else if(adaptable instanceof IFile) {
-      IFile file = (IFile) adaptable;
+    } else if(adaptable instanceof IFile file) {
       if(IMavenConstants.POM_FILE_NAME.equals(file.getName())) {
         IMavenProjectFacade facade = projectManager.create(file, true, new NullProgressMonitor());
         if(facade != null) {

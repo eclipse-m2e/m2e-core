@@ -249,8 +249,8 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     boolean offline = mavenConfiguration.isOffline();
     boolean updateSnapshots = false;
 
-    if(event.getSource() instanceof IProject) {
-      queue(new MavenUpdateRequest((IProject) event.getSource(), offline, updateSnapshots));
+    if(event.getSource() instanceof IProject project) {
+      queue(new MavenUpdateRequest(project, offline, updateSnapshots));
     }
   }
 

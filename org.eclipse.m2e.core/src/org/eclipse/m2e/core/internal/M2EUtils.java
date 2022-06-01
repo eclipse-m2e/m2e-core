@@ -114,8 +114,8 @@ public class M2EUtils {
     }
     while(path.segmentCount() > 1) {
       IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-      if(ires instanceof IFile) {
-        stack.push((IFile) ires);
+      if(ires instanceof IFile f) {
+        stack.push(f);
       }
       path = path.removeFirstSegments(1);
     }

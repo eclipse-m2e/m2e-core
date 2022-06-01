@@ -95,12 +95,12 @@ abstract class BasicProjectRegistry implements Serializable {
   private static void copy(Map from, Map to) {
     for(Map.Entry entry : (Set<Map.Entry>) from.entrySet()) {
       Object value = entry.getValue();
-      if(value instanceof Map) {
+      if(value instanceof Map mapValue) {
         Map map = new LinkedHashMap();
-        copy((Map) value, map);
+        copy(mapValue, map);
         value = map;
-      } else if(value instanceof Set) {
-        Set set = new LinkedHashSet((Set) value);
+      } else if(value instanceof Set setValue) {
+        Set set = new LinkedHashSet(setValue);
         value = set;
       }
       to.put(entry.getKey(), value);

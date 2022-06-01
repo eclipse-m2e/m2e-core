@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.embedder;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -48,11 +49,7 @@ public class ArtifactRepositoryRef implements Serializable {
 
   @Override
   public int hashCode() {
-    int hash = 17;
-    hash = hash * 31 + (id != null ? id.hashCode() : 0);
-    hash = hash * 31 + (url != null ? url.hashCode() : 0);
-    hash = hash * 31 + (username != null ? username.hashCode() : 0);
-    return hash;
+    return Objects.hash(id, url, username);
   }
 
   @Override
@@ -60,14 +57,7 @@ public class ArtifactRepositoryRef implements Serializable {
     if(o == this) {
       return true;
     }
-    if(!(o instanceof ArtifactRepositoryRef)) {
-      return false;
-    }
-    ArtifactRepositoryRef other = (ArtifactRepositoryRef) o;
-    return eq(id, other.id) && eq(url, other.url) && eq(username, other.username);
-  }
-
-  private static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
+    return o instanceof ArtifactRepositoryRef other && //
+        Objects.equals(id, other.id) && Objects.equals(url, other.url) && Objects.equals(username, other.username);
   }
 }

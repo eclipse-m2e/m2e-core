@@ -697,8 +697,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(newFacade);
 
-    if(lifecycleMapping instanceof ILifecycleMapping2) {
-      AbstractMavenDependencyResolver resolver = ((ILifecycleMapping2) lifecycleMapping).getDependencyResolver(monitor);
+    if(lifecycleMapping instanceof ILifecycleMapping2 lifecycleMapping2) {
+      AbstractMavenDependencyResolver resolver = lifecycleMapping2.getDependencyResolver(monitor);
       resolver.setManager(this);
       return resolver;
     }
@@ -1046,8 +1046,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
           f -> readProjectWithDependencies(f.getPom(), f.getResolverConfiguration(), monitor)));
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();
-      if(cause instanceof CoreException) {
-        throw (CoreException) cause;
+      if(cause instanceof CoreException coreException) {
+        throw coreException;
       }
       throw new CoreException(Status.error("Unexpected internal Error occured", ex)); // this really should never happen
     }

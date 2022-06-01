@@ -84,10 +84,10 @@ public class ProjectRegistryReader {
 
       @Override
       protected Object resolveObject(Object o) throws IOException {
-        if(o instanceof IPathReplace) {
-          return ((IPathReplace) o).getPath();
-        } else if(o instanceof IFileReplace) {
-          return ((IFileReplace) o).getFile();
+        if(o instanceof IPathReplace pathReplace) {
+          return pathReplace.getPath();
+        } else if(o instanceof IFileReplace fileReplace) {
+          return fileReplace.getFile();
         } else if(o instanceof MavenProjectManagerImplReplace) {
           return managerImpl;
         }
@@ -132,10 +132,10 @@ public class ProjectRegistryReader {
 
       @Override
       protected Object replaceObject(Object o) throws IOException {
-        if(o instanceof IPath) {
-          return new IPathReplace((IPath) o);
-        } else if(o instanceof IFile) {
-          return new IFileReplace((IFile) o);
+        if(o instanceof IPath path) {
+          return new IPathReplace(path);
+        } else if(o instanceof IFile file) {
+          return new IFileReplace(file);
         } else if(o instanceof ProjectRegistryManager) {
           return new MavenProjectManagerImplReplace();
         }

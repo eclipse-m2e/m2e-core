@@ -56,11 +56,8 @@ public class VersionlessKey implements Serializable {
     if(obj == this) {
       return true;
     }
-    if(!(obj instanceof VersionlessKey)) {
-      return false;
-    }
-    VersionlessKey other = (VersionlessKey) obj;
-    return namespace.equals(other.namespace) && id.equals(other.id);
+    return obj instanceof VersionlessKey other && //
+        namespace.equals(other.namespace) && id.equals(other.id);
   }
 
   @Override
