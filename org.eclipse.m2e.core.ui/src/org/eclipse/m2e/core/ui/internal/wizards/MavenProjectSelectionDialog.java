@@ -131,8 +131,8 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     /** Returns the children of the parent node. */
     @Override
     public Object[] getChildren(Object parent) {
-      if(parent instanceof IWorkspace) {
-        IProject[] projects = ((IWorkspace) parent).getRoot().getProjects();
+      if(parent instanceof IWorkspace workspace) {
+        IProject[] projects = workspace.getRoot().getProjects();
 
         List<IProject> children = new ArrayList<>();
         for(IProject project : projects) {
@@ -145,15 +145,14 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
           }
         }
         return children.toArray();
-      } else if(parent instanceof IContainer) {
-        IContainer container = (IContainer) parent;
+      } else if(parent instanceof IContainer container) {
         if(container.isAccessible()) {
           try {
             List<IResource> children = new ArrayList<>();
             IResource[] members = container.members();
             for(IResource member : members) {
-              if(member instanceof IContainer
-                  && ((IContainer) member).exists(new Path(IMavenConstants.POM_FILE_NAME))) {
+              if(member instanceof IContainer memberContainer
+                  && memberContainer.exists(new Path(IMavenConstants.POM_FILE_NAME))) {
                 children.add(member);
               }
             }
@@ -169,8 +168,8 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     /** Returns the parent of the given element. */
     @Override
     public Object getParent(Object element) {
-      if(element instanceof IResource) {
-        return ((IResource) element).getParent();
+      if(element instanceof IResource resource) {
+        return resource.getParent();
       }
       return null;
     }

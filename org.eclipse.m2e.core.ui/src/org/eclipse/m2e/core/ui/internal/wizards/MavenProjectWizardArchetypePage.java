@@ -36,11 +36,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -194,32 +194,15 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     catalogsComboViewer = new ComboViewer(catalogsComposite);
     catalogsComboViewer.getControl().setData("name", "catalogsCombo"); //$NON-NLS-1$ //$NON-NLS-2$
     catalogsComboViewer.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    catalogsComboViewer.setContentProvider(new IStructuredContentProvider() {
-      @Override
-      public Object[] getElements(Object input) {
-
-        if(input instanceof Collection) {
-          return ((Collection<?>) input).toArray();
-        }
-        return new Object[0];
-      }
-
-      @Override
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      }
-
-      @Override
-      public void dispose() {
-      }
-    });
+    catalogsComboViewer.setContentProvider(new ArrayContentProvider());
 
     catalogsComboViewer.setLabelProvider(new LabelProvider() {
       @Override
       public String getText(Object element) {
-        if(element instanceof ArchetypeCatalogFactory) {
-          return ((ArchetypeCatalogFactory) element).getDescription();
-        } else if(element instanceof String) {
-          return element.toString();
+        if(element instanceof ArchetypeCatalogFactory archetypeCatalogFactory) {
+          return archetypeCatalogFactory.getDescription();
+        } else if(element instanceof String s) {
+          return s;
         }
         return super.getText(element);
       }
@@ -229,11 +212,11 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
       ISelection selection = event.getSelection();
       boolean loadAll = false;
       //hide previous archetypes when switching catalog
-      if(selection instanceof IStructuredSelection) {
-        Object factory = ((IStructuredSelection) selection).getFirstElement();
+      if(selection instanceof IStructuredSelection structuredSelection) {
+        Object factory = structuredSelection.getFirstElement();
         ArchetypeCatalogFactory newCatalogFactory = null;
-        if(factory instanceof ArchetypeCatalogFactory) {
-          newCatalogFactory = (ArchetypeCatalogFactory) factory;
+        if(factory instanceof ArchetypeCatalogFactory archetypeCatalogFactory) {
+          newCatalogFactory = archetypeCatalogFactory;
         }
         if(factory != null && newCatalogFactory == null) {
           loadAll = true;
@@ -383,40 +366,23 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     viewer.setComparer(new IElementComparer() {
       @Override
       public int hashCode(Object obj) {
-        if(obj instanceof Archetype) {
-          return ArchetypeUtil.getHashCode((Archetype) obj);
+        if(obj instanceof Archetype archetype) {
+          return ArchetypeUtil.getHashCode(archetype);
         }
         return obj.hashCode();
       }
 
       @Override
       public boolean equals(Object one, Object another) {
-        if(one instanceof Archetype && another instanceof Archetype) {
-          return ArchetypeUtil.areEqual((Archetype) one, (Archetype) another);
+        if(one instanceof Archetype first && another instanceof Archetype second) {
+          return ArchetypeUtil.areEqual(first, second);
         }
         return one.equals(another);
       }
     });
 
     viewer.setFilters(versionFilter, quickViewerFilter);
-
-    viewer.setContentProvider(new IStructuredContentProvider() {
-      @Override
-      public Object[] getElements(Object inputElement) {
-        if(inputElement instanceof Collection) {
-          return ((Collection<?>) inputElement).toArray();
-        }
-        return new Object[0];
-      }
-
-      @Override
-      public void dispose() {
-      }
-
-      @Override
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      }
-    });
+    viewer.setContentProvider(new ArrayContentProvider());
 
     viewer.addSelectionChangedListener(event -> {
       Archetype archetype = getArchetype();
@@ -882,8 +848,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     /** Returns the element text */
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if(element instanceof Archetype) {
-        Archetype archetype = (Archetype) element;
+      if(element instanceof Archetype archetype) {
         switch(columnIndex) {
           case 0:
             return archetype.getGroupId();

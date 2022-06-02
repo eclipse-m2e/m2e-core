@@ -155,8 +155,7 @@ public class PomEdits {
     NodeList rootList = parent.getChildNodes();
     for(int i = 0; i < rootList.getLength(); i++ ) {
       Node nd = rootList.item(i);
-      if(nd instanceof Element) {
-        Element el = (Element) nd;
+      if(nd instanceof Element el) {
         if(name.equals(el.getNodeName())) {
           return el;
         }
@@ -171,8 +170,7 @@ public class PomEdits {
       NodeList rootList = parent.getChildNodes();
       for(int i = 0; i < rootList.getLength(); i++ ) {
         Node nd = rootList.item(i);
-        if(nd instanceof Element) {
-          Element el = (Element) nd;
+        if(nd instanceof Element el) {
           if(name.equals(el.getNodeName())) {
             toRet.add(el);
           }
@@ -189,8 +187,7 @@ public class PomEdits {
     NodeList list = element.getChildNodes();
     for(int i = 0; i < list.getLength(); i++ ) {
       Node child = list.item(i);
-      if(child instanceof Text) {
-        Text text = (Text) child;
+      if(child instanceof Text text) {
         buff.append(text.getData().trim()); //352416 the value is trimmed because of the multiline values
         //that get trimmed by maven itself as well, any comparison to resolved model needs to do the trimming
         // or risks false negative results.
@@ -310,8 +307,7 @@ public class PomEdits {
   public static void removeChild(Element parent, Element child) {
     if(child != null) {
       Node prev = child.getPreviousSibling();
-      if(prev instanceof Text) {
-        Text txt = (Text) prev;
+      if(prev instanceof Text txt) {
         int lastnewline = getLastEolIndex(txt.getData());
         if(lastnewline >= 0) {
           txt.setData(txt.getData().substring(0, lastnewline));
@@ -357,21 +353,19 @@ public class PomEdits {
     }
     if(!hasChilds) {
       Node parent = el.getParentNode();
-      if(parent instanceof Element) {
-        removeChild((Element) parent, el);
-        removeIfNoChildElement((Element) parent);
+      if(parent instanceof Element parentElement) {
+        removeChild(parentElement, el);
+        removeIfNoChildElement(parentElement);
       }
     }
   }
 
   public static Element insertAt(Element newElement, int offset) {
     Document doc = newElement.getOwnerDocument();
-    if(doc instanceof IDOMDocument) {
-      IDOMDocument domDoc = (IDOMDocument) doc;
+    if(doc instanceof IDOMDocument domDoc) {
       IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
       Node parent = ((Node) ir).getParentNode();
-      if(ir instanceof Text) {
-        Text txt = (Text) ir;
+      if(ir instanceof Text txt) {
         String data = txt.getData();
         int dataSplitIndex = offset - ir.getStartOffset();
         String beforeText = data.substring(0, dataSplitIndex);
@@ -381,12 +375,12 @@ public class PomEdits {
         parent.replaceChild(after, txt);
         parent.insertBefore(newElement, after);
         parent.insertBefore(before, newElement);
-      } else if(ir instanceof Element) {
+      } else if(ir instanceof Element element) {
         if(ir.getStartOffset() == offset) {
           // caret is before the tag, not within its bounds
-          parent.insertBefore(newElement, (Element) ir);
+          parent.insertBefore(newElement, element);
         } else {
-          ((Element) ir).appendChild(newElement);
+          element.appendChild(newElement);
         }
       } else {
         throw new IllegalArgumentException();
@@ -405,11 +399,9 @@ public class PomEdits {
    * @return
    */
   public static Element elementAtOffset(Document doc, int offset) {
-    if(doc instanceof IDOMDocument) {
-      IDOMDocument domDoc = (IDOMDocument) doc;
+    if(doc instanceof IDOMDocument domDoc) {
       IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
-      if(ir instanceof Element) {
-        Element elem = (Element) ir;
+      if(ir instanceof Element elem) {
         if(ir.getStartOffset() == offset) {
           // caret is before the tag, not within its bounds
           elem = (Element) elem.getParentNode();
@@ -417,8 +409,8 @@ public class PomEdits {
         return elem;
       }
       Node parent = ((Node) ir).getParentNode();
-      if(parent instanceof Element) {
-        return (Element) parent;
+      if(parent instanceof Element parentElement) {
+        return parentElement;
       }
     }
     return null;
@@ -434,8 +426,8 @@ public class PomEdits {
     if(parentNode != null && newNode.equals(parentNode.getLastChild())) {
       //add a new line to get the newly generated content correctly formatted.
       Document ownerDocument;
-      if(parentNode instanceof Document) {
-        ownerDocument = (Document) parentNode;
+      if(parentNode instanceof Document doc) {
+        ownerDocument = doc;
       } else {
         ownerDocument = parentNode.getOwnerDocument();
       }
@@ -479,8 +471,7 @@ public class PomEdits {
           domModel.aboutToChangeModel();
           undo = domModel.getStructuredDocument().getUndoManager();
           //let the document know we make changes
-          if(domModel.getStructuredDocument() instanceof IDocumentExtension4) {
-            IDocumentExtension4 ext4 = (IDocumentExtension4) domModel.getStructuredDocument();
+          if(domModel.getStructuredDocument() instanceof IDocumentExtension4 ext4) {
             session = ext4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
           }
           undo.beginRecording(domModel);
@@ -514,8 +505,7 @@ public class PomEdits {
           } finally {
             if(!tuple.isReadOnly()) {
               undo.endRecording(domModel);
-              if(session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
-                IDocumentExtension4 ext4 = (IDocumentExtension4) domModel.getStructuredDocument();
+              if(session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4 ext4) {
                 ext4.stopRewriteSession(session);
               }
               domModel.changedModel();

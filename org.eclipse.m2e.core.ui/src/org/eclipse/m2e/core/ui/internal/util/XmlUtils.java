@@ -115,8 +115,8 @@ public class XmlUtils {
     }
     while(path.segmentCount() > 1) {
       IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-      if(ires instanceof IFile) {
-        stack.push((IFile) ires);
+      if(ires instanceof IFile f) {
+        stack.push(f);
       }
       path = path.removeFirstSegments(1);
     }
@@ -136,8 +136,8 @@ public class XmlUtils {
 
   public static MavenProject extractMavenProject(ITextViewer sourceViewer) {
     //look in the sourceViewer's cache only
-    if(sourceViewer instanceof IAdaptable) {
-      return ((IAdaptable) sourceViewer).getAdapter(MavenProject.class);
+    if(sourceViewer instanceof IAdaptable adaptable) {
+      return adaptable.getAdapter(MavenProject.class);
     }
     return null;
   }
@@ -210,8 +210,8 @@ public class XmlUtils {
         if(inode == null) {
           inode = sModel.getIndexedRegion(offset - 1);
         }
-        if(inode instanceof Node) {
-          operation.process((Node) inode, sModel.getStructuredDocument());
+        if(inode instanceof Node node) {
+          operation.process(node, sModel.getStructuredDocument());
         }
       }
     } finally {

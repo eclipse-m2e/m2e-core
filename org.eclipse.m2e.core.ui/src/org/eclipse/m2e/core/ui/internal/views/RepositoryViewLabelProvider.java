@@ -63,16 +63,16 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
 
   @Override
   public String getText(Object obj) {
-    if(obj instanceof IMavenRepositoryNode) {
-      return ((IMavenRepositoryNode) obj).getName();
+    if(obj instanceof IMavenRepositoryNode repoNode) {
+      return repoNode.getName();
     }
     return obj.toString();
   }
 
   @Override
   public Image getImage(Object obj) {
-    if(obj instanceof IMavenRepositoryNode) {
-      return ((IMavenRepositoryNode) obj).getImage();
+    if(obj instanceof IMavenRepositoryNode repoNode) {
+      return repoNode.getImage();
     }
     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
   }
@@ -84,7 +84,7 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
 
   @Override
   public Color getForeground(Object element) {
-    if(element instanceof RepositoryNode && !(((RepositoryNode) element).hasChildren())) {
+    if(element instanceof RepositoryNode repoNode && !repoNode.hasChildren()) {
         return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
     }
     return null;
@@ -92,11 +92,7 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
 
   @Override
   public Font getFont(Object element) {
-    if(element instanceof IMavenRepositoryNode) {
-      boolean updating = ((IMavenRepositoryNode) element).isUpdating();
-      return updating ? italicFont : null;
-    }
-    return null;
+    return element instanceof IMavenRepositoryNode repoNode && repoNode.isUpdating() ? italicFont : null;
   }
 
   @Override

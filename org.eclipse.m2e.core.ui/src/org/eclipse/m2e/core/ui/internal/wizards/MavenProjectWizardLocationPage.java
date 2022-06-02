@@ -294,9 +294,9 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
       //this wizardpage is used in multiple wizards, not only in MavenProjectWizard
       // the other wizard don't seem to have any getModel() methods.
       //see MNGECLIPSE-1252 for more.
-      if(getWizard() instanceof MavenProjectWizard) {
+      if(getWizard() instanceof MavenProjectWizard mavenWizard) {
         String projectName = org.eclipse.m2e.core.internal.project.ProjectConfigurationManager
-            .getProjectName(getImportConfiguration(), ((MavenProjectWizard) getWizard()).getModel());
+            .getProjectName(getImportConfiguration(), mavenWizard.getModel());
         if(projectName.length() > 0) {
           final IStatus locationStatus = workspace.validateProjectLocation(workspace.getRoot().getProject(projectName),
               projectPath);

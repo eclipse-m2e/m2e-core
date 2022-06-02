@@ -76,10 +76,8 @@ public class UpdateMavenProjectCommandHandler extends AbstractHandler {
   private IProject[] getProjectInActiveEditor(ExecutionEvent event) {
     try {
       IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-      if(activePart instanceof IEditorPart) {
-        IEditorPart editorPart = (IEditorPart) activePart;
-        if(editorPart.getEditorInput() instanceof IFileEditorInput) {
-          IFileEditorInput fileInput = (IFileEditorInput) editorPart.getEditorInput();
+      if(activePart instanceof IEditorPart editorPart) {
+        if(editorPart.getEditorInput() instanceof IFileEditorInput fileInput) {
           IProject project = fileInput.getFile().getProject();
           if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
             return new IProject[] {project};

@@ -294,16 +294,15 @@ public class LifecycleMappingsViewer {
 
       @Override
       public Image getColumnImage(Object element, int columnIndex) {
-        if(columnIndex == 0 && element instanceof MojoExecutionKey) {
-          return isErrorMapping((MojoExecutionKey) element) ? MavenImages.IMG_ERROR : MavenImages.IMG_PASSED;
+        if(columnIndex == 0 && element instanceof MojoExecutionKey key) {
+          return isErrorMapping(key) ? MavenImages.IMG_ERROR : MavenImages.IMG_PASSED;
         }
         return null;
       }
 
       @Override
       public String getColumnText(Object element, int columnIndex) {
-        if(element instanceof MojoExecutionKey) {
-          MojoExecutionKey execution = (MojoExecutionKey) element;
+        if(element instanceof MojoExecutionKey execution) {
           switch(columnIndex) {
             case 0:
               return LifecycleMappingsViewer.this.toString(execution);
@@ -329,8 +328,7 @@ public class LifecycleMappingsViewer {
     mappingsTreeViewer.setInput(phases);
     mappingsTreeViewer.addSelectionChangedListener(e -> {
       Object element = e.getStructuredSelection().getFirstElement();
-      if(element instanceof MojoExecutionKey) {
-        MojoExecutionKey execution = (MojoExecutionKey) element;
+      if(element instanceof MojoExecutionKey execution) {
         infoLabel.setText(getSourcelabel(execution, mappings.get().get(execution), true));
       } else {
         infoLabel.setText("");
@@ -455,14 +453,14 @@ public class LifecycleMappingsViewer {
         LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
         if(metadata != null) {
           Object source = metadata.getSource();
-          if(source instanceof String) {
-            sources.add((String) source);
-          } else if(source instanceof Artifact) {
-            sources.add(getSourceLabel((Artifact) source, detailed));
-          } else if(source instanceof MavenProject) {
-            sources.add(getSourceLabel((MavenProject) source, detailed));
-          } else if(source instanceof Bundle) {
-            sources.add(getSourceLabel((Bundle) source, detailed));
+          if(source instanceof String s) {
+            sources.add(s);
+          } else if(source instanceof Artifact artifact) {
+            sources.add(getSourceLabel(artifact, detailed));
+          } else if(source instanceof MavenProject mavenProject) {
+            sources.add(getSourceLabel(mavenProject, detailed));
+          } else if(source instanceof Bundle bundle) {
+            sources.add(getSourceLabel(bundle, detailed));
           } else {
             sources.add("unknown"); //$NON-NLS-1$
           }

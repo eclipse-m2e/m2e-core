@@ -121,8 +121,8 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     Object element = selection.getFirstElement();
-    if(element instanceof IFile) {
-      selectedFile = (IFile) element;
+    if(element instanceof IFile file) {
+      selectedFile = file;
     }
   }
 }

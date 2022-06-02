@@ -48,8 +48,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
 
   @Override
   public String decorateText(String text, Object element) {
-    if(element instanceof IResource) {
-      IResource resource = (IResource) element;
+    if(element instanceof IResource resource) {
       IProject project = resource.getProject();
       if(project != null) {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();

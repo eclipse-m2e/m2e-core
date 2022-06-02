@@ -57,8 +57,8 @@ public class ModuleProjectWizardAction implements IObjectActionDelegate {
   /** Handles the selection change */
   @Override
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection sel) {
+      this.selection = sel;
     }
   }
 }
