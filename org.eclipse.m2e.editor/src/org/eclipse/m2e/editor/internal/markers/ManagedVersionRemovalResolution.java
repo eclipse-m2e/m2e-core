@@ -94,9 +94,7 @@ public class ManagedVersionRemovalResolution extends AbstractPomProblemResolutio
           continue;
         }
         Element value = XmlUtils.findChild(artifact, VERSION_NODE);
-        if(value instanceof IndexedRegion) {
-          IndexedRegion off = (IndexedRegion) value;
-
+        if(value instanceof IndexedRegion off) {
           int offset = off.getStartOffset();
           if(offset <= 0) {
             continue;

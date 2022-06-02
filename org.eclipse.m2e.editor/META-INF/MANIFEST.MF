@@ -33,7 +33,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.model.edit;bundle-version="1.16.0",
  com.google.guava;bundle-version="30.1.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.m2e.editor;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.composites;x-friends:="org.eclipse.m2e.editor.xml",

@@ -35,8 +35,8 @@ public class DependenciesComparator<T> implements Comparator<T> {
   }
 
   protected String[] toGAV(Object obj) {
-    if(obj instanceof Dependency) {
-      return toGAV((Dependency) obj);
+    if(obj instanceof Dependency dep) {
+      return toGAV(dep);
     }
     return toGAV((org.apache.maven.model.Dependency) obj);
   }

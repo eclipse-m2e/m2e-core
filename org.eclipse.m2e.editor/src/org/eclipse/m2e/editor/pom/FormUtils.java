@@ -207,21 +207,16 @@ public abstract class FormUtils {
   static void setReadonly(Composite composite, boolean readonly) {
     if(composite != null) {
       for(Control control : composite.getChildren()) {
-        if(control instanceof Text) {
-          ((Text) control).setEditable(!readonly);
-
-        } else if(control instanceof Combo) {
-          ((Combo) control).setEnabled(!readonly);
-
-        } else if(control instanceof CCombo) {
-          ((CCombo) control).setEnabled(!readonly);
-
-        } else if(control instanceof Button) {
-          ((Button) control).setEnabled(!readonly);
-
-        } else if(control instanceof Composite) {
-          setReadonly((Composite) control, readonly);
-
+        if(control instanceof Text text) {
+          text.setEditable(!readonly);
+        } else if(control instanceof Combo combo) {
+          combo.setEnabled(!readonly);
+        } else if(control instanceof CCombo ccombo) {
+          ccombo.setEnabled(!readonly);
+        } else if(control instanceof Button button) {
+          button.setEnabled(!readonly);
+        } else if(control instanceof Composite c) {
+          setReadonly(c, readonly);
         }
       }
     }

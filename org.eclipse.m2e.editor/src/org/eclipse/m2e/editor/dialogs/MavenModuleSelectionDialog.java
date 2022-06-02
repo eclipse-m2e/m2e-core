@@ -45,7 +45,7 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
       if(e.detail == SWT.CHECK) {
         TreeItem item = (TreeItem) e.item;
         Object data = item.getData();
-        if(item.getChecked() && data instanceof IResource && knownModules.contains(((IResource) data).getLocation())) {
+        if(item.getChecked() && data instanceof IResource res && knownModules.contains(res.getLocation())) {
           item.setChecked(false);
         }
       }
@@ -80,7 +80,7 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof IResource && knownModules.contains(((IResource) element).getLocation())) {
+      if(element instanceof IResource res && knownModules.contains(res.getLocation())) {
         return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
       }
       return null;

@@ -227,11 +227,11 @@ public class PlexusConfigHelper {
   }
 
   public static Class<?> getRawType(Type type) {
-    if(type instanceof Class) {
-      return (Class<?>) type;
+    if(type instanceof Class<?> clazz) {
+      return clazz;
     }
-    if(type instanceof ParameterizedType) {
-      return (Class<?>) ((ParameterizedType) type).getRawType();
+    if(type instanceof ParameterizedType parameterized) {
+      return (Class<?>) parameterized.getRawType();
     }
     return null;
   }
@@ -247,9 +247,7 @@ public class PlexusConfigHelper {
       return null;
     }
 
-    if(paramType instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType) paramType;
-
+    if(paramType instanceof ParameterizedType pt) {
       Type[] args = pt.getActualTypeArguments();
       if(args.length > 0) {
         return args[0];
@@ -374,8 +372,7 @@ public class PlexusConfigHelper {
       return getTypeDisplayName(clazz.getComponentType()) + "[]"; //$NON-NLS-1$
     }
 
-    if(type instanceof ParameterizedType) {
-      ParameterizedType ptype = (ParameterizedType) type;
+    if(type instanceof ParameterizedType ptype) {
       StringBuilder sb = new StringBuilder();
       sb.append(getTypeDisplayName(clazz)).append("&lt;"); //$NON-NLS-1$
 
@@ -424,35 +421,16 @@ public class PlexusConfigHelper {
 
   static {
     // @formatter:off
-    INLINE_TYPES = Set.of(
-      byte.class.getName(),
-      Byte.class.getName(),
-      short.class.getName(),
-      Short.class.getName(),
-      int.class.getName(),
-      Integer.class.getName(),
-      long.class.getName(),
-      Long.class.getName(),
-      float.class.getName(),
-      Float.class.getName(),
-      double.class.getName(),
-      Double.class.getName(),
-      boolean.class.getName(),
-      Boolean.class.getName(),
-      char.class.getName(),
-      Character.class.getName(),
+    INLINE_TYPES = Set.of(byte.class.getName(), Byte.class.getName(), short.class.getName(), Short.class.getName(),
+        int.class.getName(), Integer.class.getName(), long.class.getName(), Long.class.getName(), float.class.getName(),
+        Float.class.getName(), double.class.getName(), Double.class.getName(), boolean.class.getName(),
+        Boolean.class.getName(), char.class.getName(), Character.class.getName(),
 
-      String.class.getName(),
-      StringBuilder.class.getName(),
-      StringBuffer.class.getName(),
+        String.class.getName(), StringBuilder.class.getName(), StringBuffer.class.getName(),
 
-      File.class.getName(),
-      URI.class.getName(),
-      URL.class.getName(),
-      Date.class.getName(),
+        File.class.getName(), URI.class.getName(), URL.class.getName(), Date.class.getName(),
 
-      "org.codehaus.plexus.configuration.PlexusConfiguration"
-    );
+        "org.codehaus.plexus.configuration.PlexusConfiguration");
     // @formatter:on
   }
 

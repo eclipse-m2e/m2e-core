@@ -104,11 +104,7 @@ public class MarkerHoverControl extends AbstractInformationControl
   @Override
   public void setInput(Object input) {
     assert input instanceof CompoundRegion;
-    if(input instanceof CompoundRegion) {
-      region = (CompoundRegion) input;
-    } else {
-      throw new IllegalStateException("Not CompoundRegion"); //$NON-NLS-1$
-    }
+    region = (CompoundRegion) input;
     disposeDeferredCreatedContent();
     deferredCreateContent();
   }
@@ -209,8 +205,7 @@ public class MarkerHoverControl extends AbstractInformationControl
 
       boolean lifecycleMarkers = false;
       for(IRegion reg : region.getRegions()) {
-        if(reg instanceof PomHyperlinkDetector.MarkerRegion) {
-          PomHyperlinkDetector.MarkerRegion markerReg = (PomHyperlinkDetector.MarkerRegion) reg;
+        if(reg instanceof PomHyperlinkDetector.MarkerRegion markerReg) {
           IMarker mark = markerReg.getAnnotation().getMarker();
           if(MavenDiscoveryMarkerResolutionGenerator.canResolve(mark)) {
             lifecycleMarkers = true;
@@ -221,8 +216,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       fillToolbar(lifecycleMarkers);
 
       for(IRegion reg : region.getRegions()) {
-        if(reg instanceof PomHyperlinkDetector.MarkerRegion) {
-          final PomHyperlinkDetector.MarkerRegion markerReg = (PomHyperlinkDetector.MarkerRegion) reg;
+        if(reg instanceof PomHyperlinkDetector.MarkerRegion markerReg) {
           createAnnotationInformation(composite, markerReg);
           final IMarker mark = markerReg.getAnnotation().getMarker();
 
@@ -231,8 +225,7 @@ public class MarkerHoverControl extends AbstractInformationControl
             createResolutionsControl(composite, mark, resolutions);
           }
         }
-        if(reg instanceof ManagedArtifactRegion) {
-          final ManagedArtifactRegion man = (ManagedArtifactRegion) reg;
+        if(reg instanceof ManagedArtifactRegion man) {
           Composite comp = createTooltipComposite(composite, PomTextHover.getLabelForRegion(man));
           //only create the hyperlink when the origin location for jumping is present.
           //in some cases (managed version comes from imported dependencies) we don't have the location and have nowhere to jump)
@@ -245,8 +238,7 @@ public class MarkerHoverControl extends AbstractInformationControl
           }
 
         }
-        if(reg instanceof ExpressionRegion) {
-          final ExpressionRegion expr = (ExpressionRegion) reg;
+        if(reg instanceof ExpressionRegion expr) {
           Composite tooltipComposite = createTooltipComposite(composite, PomTextHover.getLabelForRegion(expr));
           if(PomHyperlinkDetector.canCreateHyperLink(expr)) {
             Link link = createHyperlink(tooltipComposite);
@@ -335,8 +327,8 @@ public class MarkerHoverControl extends AbstractInformationControl
     control.setBackground(background);
     control.setFont(font);
 
-    if(control instanceof Composite) {
-      Control[] children = ((Composite) control).getChildren();
+    if(control instanceof Composite composite) {
+      Control[] children = composite.getChildren();
       for(Control child : children) {
         setColorAndFont(child, foreground, background, font);
       }
@@ -476,10 +468,10 @@ public class MarkerHoverControl extends AbstractInformationControl
     Label proposalImage = new Label(parent, SWT.NONE);
     proposalImage.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
     Image image = null;
-    if(proposal instanceof ICompletionProposal) {
-      image = ((ICompletionProposal) proposal).getImage();
-    } else if(proposal instanceof IMarkerResolution2) {
-      image = ((IMarkerResolution2) proposal).getImage();
+    if(proposal instanceof ICompletionProposal completionProposal) {
+      image = completionProposal.getImage();
+    } else if(proposal instanceof IMarkerResolution2 resolution) {
+      image = resolution.getImage();
     }
     if(image != null) {
       proposalImage.setImage(image);
@@ -515,8 +507,8 @@ public class MarkerHoverControl extends AbstractInformationControl
   }
 
   private void apply(IMarkerResolution res, IMarker mark, ITextViewer viewer, int offset) {
-    if(res instanceof ICompletionProposal) {
-      apply((ICompletionProposal) res, viewer, offset, false);
+    if(res instanceof ICompletionProposal proposal) {
+      apply(proposal, viewer, offset, false);
     } else {
       dispose();
       res.run(mark);
@@ -531,19 +523,16 @@ public class MarkerHoverControl extends AbstractInformationControl
     try {
       IDocument document = viewer.getDocument();
 
-      if(viewer instanceof ITextViewerExtension) {
-        ITextViewerExtension extension = (ITextViewerExtension) viewer;
+      if(viewer instanceof ITextViewerExtension extension) {
         target = extension.getRewriteTarget();
       }
 
       if(target != null)
         target.beginCompoundChange();
 
-      if(p instanceof ICompletionProposalExtension2) {
-        ICompletionProposalExtension2 e = (ICompletionProposalExtension2) p;
+      if(p instanceof ICompletionProposalExtension2 e) {
         e.apply(viewer, (char) 0, isMultiFix ? SWT.CONTROL : SWT.NONE, offset);
-      } else if(p instanceof ICompletionProposalExtension) {
-        ICompletionProposalExtension e = (ICompletionProposalExtension) p;
+      } else if(p instanceof ICompletionProposalExtension e) {
         e.apply(document, (char) 0, offset);
       } else {
         p.apply(document);

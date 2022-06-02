@@ -43,8 +43,8 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
 
   @Override
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structured) {
+      this.selection = structured;
     } else {
       this.selection = null;
     }
@@ -71,8 +71,8 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
         protected IStatus run(IProgressMonitor monitor) {
           final IEditorPart editor = OpenPomAction.openEditor(projectKey.getGroupId(), //
               projectKey.getArtifactId(), projectKey.getVersion(), monitor);
-          if(editor instanceof MavenPomEditor) {
-            Display.getDefault().asyncExec(() -> ((MavenPomEditor) editor).showDependencyHierarchy(artifactKey));
+          if(editor instanceof MavenPomEditor pomEditor) {
+            Display.getDefault().asyncExec(() -> pomEditor.showDependencyHierarchy(artifactKey));
           }
           return Status.OK_STATUS;
         }
