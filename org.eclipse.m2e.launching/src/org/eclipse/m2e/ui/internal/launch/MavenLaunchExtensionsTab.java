@@ -67,8 +67,7 @@ public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {
 
     checkboxTableViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
     checkboxTableViewer.addCheckStateListener(event -> {
-      if(event.getElement() instanceof MavenLaunchParticipantInfo) {
-        MavenLaunchParticipantInfo participant = (MavenLaunchParticipantInfo) event.getElement();
+      if(event.getElement() instanceof MavenLaunchParticipantInfo participant) {
         if(event.getChecked()) {
           disabledParticipants.remove(participant.getId());
         } else {

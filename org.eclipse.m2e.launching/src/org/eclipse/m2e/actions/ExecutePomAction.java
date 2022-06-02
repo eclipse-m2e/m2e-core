@@ -93,21 +93,20 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
   public void launch(IEditorPart editor, String mode) {
     IEditorInput editorInput = editor.getEditorInput();
-    if(editorInput instanceof IFileEditorInput) {
-      launch(((IFileEditorInput) editorInput).getFile().getParent(), mode);
+    if(editorInput instanceof IFileEditorInput fileInput) {
+      launch(fileInput.getFile().getParent(), mode);
     }
   }
 
   public void launch(ISelection selection, String mode) {
-    if(selection instanceof IStructuredSelection) {
-      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
       Object object = structuredSelection.getFirstElement();
 
       IContainer basedir = null;
-      if(object instanceof IProject || object instanceof IFolder) {
-        basedir = (IContainer) object;
-      } else if(object instanceof IFile) {
-        basedir = ((IFile) object).getParent();
+      if(object instanceof IContainer container) {
+        basedir = container;
+      } else if(object instanceof IFile file) {
+        basedir = file.getParent();
       } else if(object instanceof IAdaptable) {
         IAdaptable adaptable = (IAdaptable) object;
         Object adapter = adaptable.getAdapter(IProject.class);
@@ -314,8 +313,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
                 }
 
                 public String getText(Object element) {
-                  if(element instanceof ILaunchConfiguration) {
-                    ILaunchConfiguration configuration = (ILaunchConfiguration) element;
+                  if(element instanceof ILaunchConfiguration configuration) {
                     try {
                       return labelProvider.getText(element) + " : "
                           + configuration.getAttribute(MavenLaunchConstants.ATTR_GOALS, "");
