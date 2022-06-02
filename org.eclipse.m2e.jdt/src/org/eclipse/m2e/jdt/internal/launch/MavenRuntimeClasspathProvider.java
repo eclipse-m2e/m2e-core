@@ -391,8 +391,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   }
 
   public static void enable(ILaunchConfiguration config) throws CoreException {
-    if(config instanceof ILaunchConfigurationWorkingCopy) {
-      enable((ILaunchConfigurationWorkingCopy) config);
+    if(config instanceof ILaunchConfigurationWorkingCopy wc) {
+      enable(wc);
     } else {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       enable(wc);

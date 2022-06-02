@@ -54,8 +54,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if(adapterType == ArtifactKey.class) {
-      if(adaptableObject instanceof IPackageFragmentRoot) {
-        IPackageFragmentRoot fragment = (IPackageFragmentRoot) adaptableObject;
+      if(adaptableObject instanceof IPackageFragmentRoot fragment) {
         IProject project = fragment.getJavaProject().getProject();
         if(project.isAccessible() && fragment.isArchive()) {
           try {
@@ -66,22 +65,22 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
           }
         }
 
-      } else if(adaptableObject instanceof IJavaProject) {
-        return adapterType.cast(((IJavaProject) adaptableObject).getProject().getAdapter(ArtifactKey.class));
+      } else if(adaptableObject instanceof IJavaProject javaProject) {
+        return adapterType.cast(javaProject.getProject().getAdapter(ArtifactKey.class));
 
       }
 
     } else if(adapterType == IPath.class) {
-      if(adaptableObject instanceof IJavaElement) {
-        IResource resource = ((IJavaElement) adaptableObject).getResource();
+      if(adaptableObject instanceof IJavaElement javaElement) {
+        IResource resource = javaElement.getResource();
         if(resource != null) {
           return adapterType.cast(resource.getLocation());
         }
       }
 
     } else if(adapterType == IMavenProjectFacade.class) {
-      if(adaptableObject instanceof IJavaElement) {
-        IProject project = ((IJavaElement) adaptableObject).getJavaProject().getProject();
+      if(adaptableObject instanceof IJavaElement javaElement) {
+        IProject project = javaElement.getJavaProject().getProject();
         IMavenProjectFacade projectFacade = getProjectFacade(project);
         if(projectFacade != null) {
           return adapterType.cast(projectFacade);

@@ -260,10 +260,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private IClasspathManagerDelegate getDelegate(IMavenProjectFacade projectFacade, IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(projectFacade);
-    if(lifecycleMapping instanceof IClasspathManagerDelegate) {
-      return (IClasspathManagerDelegate) lifecycleMapping;
-    }
-    return defaultDelegate;
+    return lifecycleMapping instanceof IClasspathManagerDelegate classpathManager ? classpathManager : defaultDelegate;
   }
 
   private void configureAttachedSourcesAndJavadoc(IMavenProjectFacade facade, Properties sourceAttachment,
@@ -916,8 +913,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     @Override
     public boolean visit(IResourceDelta delta) {
-      if(delta.getResource() instanceof IFile) {
-        IFile file = (IFile) delta.getResource();
+      if(delta.getResource() instanceof IFile file) {
         if(ModuleSupport.MODULE_INFO_JAVA.equals(file.getName())) {
           affectedProjects.add(file.getProject());
         }
