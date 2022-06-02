@@ -402,8 +402,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       if(resource.isHidden() || isIgnored(resourceName)) {
         return false;
       }
-      if(resource instanceof IFile) {
-        IFile file = (IFile) resource;
+      if(resource instanceof IFile file) {
         if(!"java".equals(file.getFileExtension())) {
           throw new NonJavaResourceFoundException();
         }

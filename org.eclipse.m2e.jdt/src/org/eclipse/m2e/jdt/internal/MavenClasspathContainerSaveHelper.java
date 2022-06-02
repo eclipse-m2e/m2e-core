@@ -46,16 +46,16 @@ public class MavenClasspathContainerSaveHelper {
 
       @Override
       protected Object resolveObject(Object o) throws IOException {
-        if(o instanceof ProjectEntryReplace) {
-          return ((ProjectEntryReplace) o).getEntry();
-        } else if(o instanceof LibraryEntryReplace) {
-          return ((LibraryEntryReplace) o).getEntry();
-        } else if(o instanceof ClasspathAttributeReplace) {
-          return ((ClasspathAttributeReplace) o).getAttribute();
-        } else if(o instanceof AccessRuleReplace) {
-          return ((AccessRuleReplace) o).getAccessRule();
-        } else if(o instanceof PathReplace) {
-          return ((PathReplace) o).getPath();
+        if(o instanceof ProjectEntryReplace project) {
+          return project.getEntry();
+        } else if(o instanceof LibraryEntryReplace library) {
+          return library.getEntry();
+        } else if(o instanceof ClasspathAttributeReplace classpathAttribute) {
+          return classpathAttribute.getAttribute();
+        } else if(o instanceof AccessRuleReplace accessRule) {
+          return accessRule.getAccessRule();
+        } else if(o instanceof PathReplace path) {
+          return path.getPath();
         }
         return super.resolveObject(o);
       }
@@ -71,19 +71,18 @@ public class MavenClasspathContainerSaveHelper {
 
       @Override
       protected Object replaceObject(Object o) throws IOException {
-        if(o instanceof IClasspathEntry) {
-          IClasspathEntry e = (IClasspathEntry) o;
+        if(o instanceof IClasspathEntry e) {
           if(e.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
             return new ProjectEntryReplace(e);
           } else if(e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
             return new LibraryEntryReplace(e);
           }
-        } else if(o instanceof IClasspathAttribute) {
-          return new ClasspathAttributeReplace((IClasspathAttribute) o);
-        } else if(o instanceof IAccessRule) {
-          return new AccessRuleReplace((IAccessRule) o);
-        } else if(o instanceof IPath) {
-          return new PathReplace((IPath) o);
+        } else if(o instanceof IClasspathAttribute classpthAttribute) {
+          return new ClasspathAttributeReplace(classpthAttribute);
+        } else if(o instanceof IAccessRule accessRule) {
+          return new AccessRuleReplace(accessRule);
+        } else if(o instanceof IPath path) {
+          return new PathReplace(path);
         }
         return super.replaceObject(o);
       }

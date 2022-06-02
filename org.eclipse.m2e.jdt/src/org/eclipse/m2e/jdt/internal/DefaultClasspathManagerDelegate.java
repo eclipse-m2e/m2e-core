@@ -78,8 +78,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
 
     if(lifecycleMapping != null) {
       for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(projectFacade, monitor)) {
-        if(configurator instanceof IJavaProjectConfigurator) {
-          configurators.add((IJavaProjectConfigurator) configurator);
+        if(configurator instanceof IJavaProjectConfigurator javaConfigurator) {
+          configurators.add(javaConfigurator);
         }
       }
     }

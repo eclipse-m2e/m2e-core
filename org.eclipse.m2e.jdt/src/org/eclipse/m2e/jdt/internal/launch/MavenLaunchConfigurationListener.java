@@ -89,9 +89,8 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
 
       String currentModuleName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_MODULE_NAME, (String) null);
       if(modName != null && modName.length() > 0 && !modName.equals(currentModuleName)) {
-        if(config instanceof ILaunchConfigurationWorkingCopy) {
-          ((ILaunchConfigurationWorkingCopy) config).setAttribute(IJavaLaunchConfigurationConstants.ATTR_MODULE_NAME,
-              modName);
+        if(config instanceof ILaunchConfigurationWorkingCopy wc) {
+          wc.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MODULE_NAME, modName);
         } else {
           ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
           wc.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MODULE_NAME, modName);

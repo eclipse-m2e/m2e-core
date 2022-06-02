@@ -223,8 +223,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       return;
     }
     for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
-      if(configurator instanceof IJavaProjectConfigurator) {
-        ((IJavaProjectConfigurator) configurator).configureRawClasspath(request, classpath, monitor);
+      if(configurator instanceof IJavaProjectConfigurator javaConfigurator) {
+        javaConfigurator.configureRawClasspath(request, classpath, monitor);
       }
     }
   }
@@ -723,23 +723,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private String sanitizeJavaVersion(String version) {
-    switch(version) {
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-        version = "1." + version;
-        break;
-      default:
+    return switch(version) {
+      case "5", "6", "7", "8" -> "1." + version;
+      default -> {
         if(version.startsWith("1.")) {
           String subVersion = version.substring(2);
           if(Integer.parseInt(subVersion) > 8) {
-            version = subVersion;
+            yield subVersion;
           }
         }
-        break;
-    }
-    return version;
+        yield version;
+      }
+    };
   }
 
   protected String getDefaultTargetLevel(String source) {

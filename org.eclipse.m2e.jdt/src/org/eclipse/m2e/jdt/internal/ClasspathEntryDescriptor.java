@@ -104,48 +104,35 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
 
     IAccessRule[] accessRulesArray = accessRules.toArray(new IAccessRule[accessRules.size()]);
-    IClasspathEntry entry;
-    switch(entryKind) {
-      case IClasspathEntry.CPE_CONTAINER:
-        entry = JavaCore.newContainerEntry(path, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_LIBRARY:
-        entry = JavaCore.newLibraryEntry(path, //
-            sourceAttachmentPath, //
-            sourceAttachmentRootPath, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_SOURCE:
-        entry = JavaCore.newSourceEntry(path, //
-            getInclusionPatterns(), //
-            getExclusionPatterns(), //
-            outputLocation, //
-            attributesArray);
-        break;
-      case IClasspathEntry.CPE_PROJECT:
-        entry = JavaCore.newProjectEntry(path, //
-            accessRulesArray, //
-            combineAccessRules, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_VARIABLE:
-        entry = JavaCore.newVariableEntry(path, //
-            sourceAttachmentPath, //
-            sourceAttachmentRootPath, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported IClasspathEntry kind=" + entryKind); //$NON-NLS-1$
-    }
-    return entry;
+    return switch(entryKind) {
+      case IClasspathEntry.CPE_CONTAINER -> JavaCore.newContainerEntry(path, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_LIBRARY -> JavaCore.newLibraryEntry(path, //
+          sourceAttachmentPath, //
+          sourceAttachmentRootPath, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_SOURCE -> JavaCore.newSourceEntry(path, //
+          getInclusionPatterns(), //
+          getExclusionPatterns(), //
+          outputLocation, //
+          attributesArray);
+      case IClasspathEntry.CPE_PROJECT -> JavaCore.newProjectEntry(path, //
+          accessRulesArray, //
+          combineAccessRules, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_VARIABLE -> JavaCore.newVariableEntry(path, //
+          sourceAttachmentPath, //
+          sourceAttachmentRootPath, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      default -> throw new IllegalArgumentException("Unsupported IClasspathEntry kind=" + entryKind); //$NON-NLS-1$
+    };
   }
 
   @Override

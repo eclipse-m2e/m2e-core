@@ -93,11 +93,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       if(this == o) {
         return true;
       }
-      if(!(o instanceof DownloadRequest)) {
-        return false;
-      }
-      DownloadRequest other = (DownloadRequest) o;
-      return project.equals(other.project) && Objects.equals(fragment, other.fragment)
+      return o instanceof DownloadRequest other && //
+          project.equals(other.project) && Objects.equals(fragment, other.fragment)
           && Objects.equals(artifact, other.artifact) && downloadSources == other.downloadSources
           && downloadJavaDoc == other.downloadJavaDoc;
     }
