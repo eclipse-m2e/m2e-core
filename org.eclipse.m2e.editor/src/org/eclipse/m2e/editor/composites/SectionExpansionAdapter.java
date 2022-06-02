@@ -35,9 +35,9 @@ public class SectionExpansionAdapter extends ExpansionAdapter {
 
   @Override
   public void expansionStateChanged(ExpansionEvent e) {
-    if(!inProgress && e.getSource() instanceof Section) {
+    if(!inProgress && e.getSource() instanceof Section sourceSection) {
       inProgress = true;
-      boolean expand = ((Section) e.getSource()).isExpanded();
+      boolean expand = sourceSection.isExpanded();
 
       for(Section section : sections) {
         section.setExpanded(expand);

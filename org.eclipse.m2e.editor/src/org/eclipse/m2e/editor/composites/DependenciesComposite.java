@@ -201,13 +201,11 @@ public class DependenciesComposite extends Composite {
             //TODO log
             return;
           }
-          for(Object dependency : dependencyList) {
-            if(dependency instanceof Dependency) {
-              Element dep = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, ((Dependency) dependency).groupId),
-                  childEquals(ARTIFACT_ID, ((Dependency) dependency).artifactId));
-              removeChild(deps, dep);
-            }
-          }
+          dependencyList.stream() //
+              .filter(Dependency.class::isInstance).map(Dependency.class::cast) //
+              .map(dep -> findChild(deps, DEPENDENCY, childEquals(GROUP_ID, dep.groupId),
+                  childEquals(ARTIFACT_ID, dep.artifactId))) //
+              .forEach(dep -> removeChild(deps, dep));
           removeIfNoChildElement(deps);
         }, log, "error removing dependencies");
       } finally {
@@ -217,8 +215,7 @@ public class DependenciesComposite extends Composite {
 
     dependenciesEditor.setPropertiesListener(SelectionListener.widgetSelectedAdapter(e -> {
       Object selection = dependenciesEditor.getSelection().get(0);
-      if(selection instanceof Dependency) {
-        Dependency dependency = (Dependency) selection;
+      if(selection instanceof Dependency dependency) {
         EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage.getProject(),
             editorPage.getPomEditor().getMavenProject());
         d.setDependency(toApacheDependency(dependency));
@@ -227,7 +224,7 @@ public class DependenciesComposite extends Composite {
             editorPage.performEditOperation(d.getEditOperation(), log, "Error updating dependency");
           } finally {
             setDependenciesInput();
-            dependenciesEditor.setSelection(Collections.singletonList((Object) dependency));
+            dependenciesEditor.setSelection(Collections.singletonList(dependency));
           }
         }
       } else if(selection instanceof org.apache.maven.model.Dependency) {
@@ -623,11 +620,9 @@ public class DependenciesComposite extends Composite {
 
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      if(element instanceof Dependency) {
-        Dependency d = (Dependency) element;
+      if(element instanceof Dependency d) {
         return searchMatcher.isMatchingArtifact(d.groupId, d.artifactId);
-      } else if(element instanceof org.apache.maven.model.Dependency) {
-        org.apache.maven.model.Dependency dependency = (org.apache.maven.model.Dependency) element;
+      } else if(element instanceof org.apache.maven.model.Dependency dependency) {
         return searchMatcher.isMatchingArtifact(dependency.getGroupId(), dependency.getArtifactId());
       }
       return false;

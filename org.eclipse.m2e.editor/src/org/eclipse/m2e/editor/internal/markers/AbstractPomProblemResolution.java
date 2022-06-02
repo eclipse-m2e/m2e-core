@@ -76,8 +76,7 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
   }
 
   static String previewForRemovedElement(IDocument doc, Element removed) {
-    if(removed instanceof IndexedRegion) {
-      IndexedRegion reg = (IndexedRegion) removed;
+    if(removed instanceof IndexedRegion reg) {
       try {
         int maxl = doc.getNumberOfLines() - 1;
 

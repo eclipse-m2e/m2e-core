@@ -48,10 +48,7 @@ public final class FormHoverProvider {
         Iterator<Annotation> it = sourceViewer.getAnnotationModel().getAnnotationIterator();
         while(it.hasNext()) {
           Annotation ann = it.next();
-          if(ann instanceof MarkerAnnotation) {
-            MarkerAnnotation mann = (MarkerAnnotation) ann;
-            if(markersSet.contains(mann.getMarker()))
-              ;
+          if(ann instanceof MarkerAnnotation mann) {
             compound.addRegion(new PomHyperlinkDetector.MarkerRegion(0, 0, mann));
           }
         }
@@ -64,8 +61,7 @@ public final class FormHoverProvider {
               return;
 
             IInformationControl infoControl = mhc;
-            if(!infoControl.isFocusControl() && infoControl instanceof IInformationControlExtension3) {
-              IInformationControlExtension3 iControl3 = (IInformationControlExtension3) infoControl;
+            if(!infoControl.isFocusControl() && infoControl instanceof IInformationControlExtension3 iControl3) {
               Rectangle controlBounds = iControl3.getBounds();
               if(controlBounds != null) {
                 Point mouseLoc = event.display.map((Control) event.widget, null, event.x, event.y);

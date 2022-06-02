@@ -35,8 +35,7 @@ public class ListEditorContentProvider<T> implements IStructuredContentProvider 
   @Override
   @SuppressWarnings("unchecked")
   public Object[] getElements(Object input) {
-    if(input instanceof List) {
-      List<T> list = (List<T>) input;
+    if(input instanceof List<?> list) {
       if(shouldSort) {
         T[] array = (T[]) list.toArray();
         Arrays.<T> sort(array, comparator);

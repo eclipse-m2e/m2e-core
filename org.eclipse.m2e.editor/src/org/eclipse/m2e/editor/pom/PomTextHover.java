@@ -52,10 +52,9 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   @Override
   public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
 
-    if(hoverRegion instanceof ExpressionRegion) {
-      return getLabelForRegion((ExpressionRegion) hoverRegion).toString();
-    } else if(hoverRegion instanceof ManagedArtifactRegion) {
-      ManagedArtifactRegion region = (ManagedArtifactRegion) hoverRegion;
+    if(hoverRegion instanceof ExpressionRegion expression) {
+      return getLabelForRegion(expression).toString();
+    } else if(hoverRegion instanceof ManagedArtifactRegion region) {
       return getLabelForRegion(region).toString();
     }
 
@@ -161,18 +160,16 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     if(regs[1] != null) {
       toRet.addRegion(regs[1]);
     }
-    if(textViewer instanceof ISourceViewer) {
-      ISourceViewer sourceViewer = (ISourceViewer) textViewer;
+    if(textViewer instanceof ISourceViewer sourceViewer) {
       IAnnotationModel model = sourceViewer.getAnnotationModel();
       if(model != null) { //eg. in tests
         Iterator<Annotation> it = model.getAnnotationIterator();
         while(it.hasNext()) {
           Annotation ann = it.next();
-          if(ann instanceof MarkerAnnotation) {
+          if(ann instanceof MarkerAnnotation marker) {
             Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
             if(pos.includes(offset)) {
-              toRet.addRegion(
-                  new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation) ann));
+              toRet.addRegion(new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(), marker));
             }
           }
         }

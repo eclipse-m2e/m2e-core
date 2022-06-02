@@ -55,8 +55,7 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
 
   @Override
   public void setActiveEditor(IEditorPart targetEditor) {
-    if(targetEditor instanceof MavenPomEditor) {
-      editorPart = (MavenPomEditor) targetEditor;
+    if(targetEditor instanceof MavenPomEditor editorPart) {
       setActivePage(editorPart.getActiveEditor());
     }
   }

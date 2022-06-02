@@ -47,8 +47,8 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
 
   @Override
   public String getAdditionalProposalInfo() {
-    if(resolution instanceof IMarkerResolution2) {
-      return ((IMarkerResolution2) resolution).getDescription();
+    if(resolution instanceof IMarkerResolution2 resolution) {
+      return resolution.getDescription();
     }
     String problemDesc = marker.getAttribute(IMarker.MESSAGE, null);
     return problemDesc;
@@ -66,8 +66,8 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
 
   @Override
   public Image getImage() {
-    if(resolution instanceof IMarkerResolution2) {
-      return ((IMarkerResolution2) resolution).getImage();
+    if(resolution instanceof IMarkerResolution2 resolution) {
+      return resolution.getImage();
     }
     return null; //what is the default image here??
   }

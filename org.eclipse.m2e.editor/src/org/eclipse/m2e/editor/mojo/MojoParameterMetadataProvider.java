@@ -108,11 +108,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
-      if(t instanceof CoreException) {
-        throw (CoreException) t;
+      if(t instanceof CoreException coreEx) {
+        throw coreEx;
       }
-      if(t instanceof RuntimeException) {
-        throw (RuntimeException) t;
+      if(t instanceof RuntimeException runtimeEx) {
+        throw runtimeEx;
       }
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
     }
@@ -162,11 +162,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
-      if(t instanceof CoreException) {
-        throw (CoreException) t;
+      if(t instanceof CoreException coreEx) {
+        throw coreEx;
       }
-      if(t instanceof RuntimeException) {
-        throw (RuntimeException) t;
+      if(t instanceof RuntimeException runtimeEx) {
+        throw runtimeEx;
       }
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
     }

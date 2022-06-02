@@ -31,8 +31,8 @@ public class StringLabelProvider extends LabelProvider {
 
   @Override
   public String getText(Object element) {
-    if(element instanceof String) {
-      return (String) element;
+    if(element instanceof String s) {
+      return s;
     }
     return ""; //$NON-NLS-1$
   }

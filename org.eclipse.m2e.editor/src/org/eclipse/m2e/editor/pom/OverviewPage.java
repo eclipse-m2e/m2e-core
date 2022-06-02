@@ -678,9 +678,9 @@ public class OverviewPage extends MavenPomEditorPage {
 
     modulesEditor.setCreateButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
       IEditorInput editorInput = OverviewPage.this.pomEditor.getEditorInput();
-      if(editorInput instanceof FileEditorInput) {
+      if(editorInput instanceof FileEditorInput fileInput) {
         MavenModuleWizard wizard = new MavenModuleWizard(true);
-        wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(((FileEditorInput) editorInput).getFile()));
+        wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(fileInput.getFile()));
         WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
         int res = dialog.open();
         if(res == Window.OK) {
@@ -752,8 +752,8 @@ public class OverviewPage extends MavenPomEditorPage {
 
           @Override
           public void drop(DropTargetEvent event) {
-            if(event.data instanceof Object[]) {
-              addSelectedModules((Object[]) event.data, true);
+            if(event.data instanceof Object[] array) {
+              addSelectedModules(array, true);
             }
           }
         });
@@ -1347,14 +1347,14 @@ public class OverviewPage extends MavenPomEditorPage {
       IContainer container = null;
       IFile pomFile = null;
 
-      if(selection instanceof IFile) {
-        pomFile = (IFile) selection;
+      if(selection instanceof IFile file) {
+        pomFile = file;
         if(!IMavenConstants.POM_FILE_NAME.equals(pomFile.getName())) {
           continue;
         }
         container = pomFile.getParent();
-      } else if(selection instanceof IContainer && !selection.equals(getProject())) {
-        container = (IContainer) selection;
+      } else if(selection instanceof IContainer c && !selection.equals(getProject())) {
+        container = c;
         pomFile = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
       }
 
@@ -1405,8 +1405,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
     @Override
     public Image getImage(Object element) {
-      if(element instanceof String) {
-        String moduleName = (String) element;
+      if(element instanceof String moduleName) {
         IMavenProjectFacade projectFacade = editorPage.findModuleProject(moduleName);
         if(projectFacade != null) {
           return MavenEditorImages.IMG_PROJECT;

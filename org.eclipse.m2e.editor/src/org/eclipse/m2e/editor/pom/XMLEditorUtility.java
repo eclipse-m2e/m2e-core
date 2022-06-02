@@ -64,11 +64,10 @@ public class XMLEditorUtility {
     if(part == null) {
       return null;
     }
-    if(part instanceof FormEditor) {
-      FormEditor ed = (FormEditor) part;
+    if(part instanceof FormEditor ed) {
       ed.setActivePage(null); //null means source, always or just in the case of MavenPomEditor?
-      if(ed instanceof MavenPomEditor) {
-        return ((MavenPomEditor) ed).getSourcePage();
+      if(ed instanceof MavenPomEditor pomEditor) {
+        return pomEditor.getSourcePage();
       }
     }
     return null;

@@ -226,8 +226,7 @@ public class PropertiesSection {
 
     @Override
     public String getText(Object element) {
-      if(element instanceof PropertyElement) {
-        PropertyElement pair = (PropertyElement) element;
+      if(element instanceof PropertyElement pair) {
         return NLS.bind(Messages.PropertyPairLabelProvider_0, pair.getName(), pair.getValue());
       }
       return super.getText(element);
