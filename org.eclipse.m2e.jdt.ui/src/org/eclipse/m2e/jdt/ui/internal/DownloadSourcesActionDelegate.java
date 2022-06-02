@@ -40,16 +40,13 @@ public class DownloadSourcesActionDelegate implements IEditorActionDelegate {
 
   public void setActiveEditor(IAction action, IEditorPart part) {
 
-    if(part != null && part.getEditorInput() instanceof IClassFileEditorInput) {
+    if(part != null && part.getEditorInput() instanceof IClassFileEditorInput input) {
       try {
         IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
-        IClassFileEditorInput input = (IClassFileEditorInput) part.getEditorInput();
         IJavaElement element = input.getClassFile();
         while(element.getParent() != null) {
           element = element.getParent();
-          if(element instanceof IPackageFragmentRoot) {
-            IPackageFragmentRoot root = (IPackageFragmentRoot) element;
-
+          if(element instanceof IPackageFragmentRoot root) {
             if(root.getSourceAttachmentPath() != null) {
               // do nothing if sources attached already
               break;

@@ -60,8 +60,8 @@ public class OpenJavaDocAction extends ActionDelegate {
   private IStructuredSelection selection;
 
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      this.selection = structuredSelection;
     } else {
       this.selection = null;
     }
