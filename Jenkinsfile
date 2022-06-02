@@ -9,7 +9,7 @@ pipeline {
 	}
 	tools {
 		maven 'apache-maven-latest'
-		jdk 'temurin-jdk11-latest'
+		jdk 'openjdk-latest'
 	}
 	stages {
 		stage('get m2e-core-tests') {
