@@ -37,9 +37,9 @@ public class ImportBinaryProjectHandler extends AbstractHandler {
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
-    if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
+    if (selection instanceof IStructuredSelection structuredSelection && !selection.isEmpty()) {
       try {
-        importBinaryProjects(((IStructuredSelection) selection).getFirstElement());
+        importBinaryProjects(structuredSelection.getFirstElement());
       } catch (DebugException e) {
         throw new ExecutionException("Could not import binary project", e);
       }

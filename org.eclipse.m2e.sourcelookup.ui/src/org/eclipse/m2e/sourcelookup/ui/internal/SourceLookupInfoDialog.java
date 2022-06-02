@@ -189,9 +189,8 @@ public class SourceLookupInfoDialog extends Dialog {
     StringBuilder sb = new StringBuilder();
     sb.append(container.getClass().getSimpleName()).append(" ").append(container.getName());
 
-    if (container instanceof PackageFragmentRootSourceContainer) {
-      sb.append(" ").append(
-          ((PackageFragmentRootSourceContainer) container).getPackageFragmentRoot().getJavaProject().getProject());
+    if (container instanceof PackageFragmentRootSourceContainer fragmentRoot) {
+      sb.append(" ").append(fragmentRoot.getPackageFragmentRoot().getJavaProject().getProject());
     }
 
     return sb.toString();
