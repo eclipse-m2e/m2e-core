@@ -51,8 +51,8 @@ public class JavaUiElementsAdapterFactory implements IAdapterFactory {
 
       }
     } else if(adapterType == IMavenProjectFacade.class) {
-      if(adaptableObject instanceof RequiredProjectWrapper) {
-        ClassPathContainer container = ((RequiredProjectWrapper) adaptableObject).getParentClassPathContainer();
+      if(adaptableObject instanceof RequiredProjectWrapper wrapper) {
+        ClassPathContainer container = wrapper.getParentClassPathContainer();
         IProject project = container.getJavaProject().getProject();
         IMavenProjectFacade projectFacade = getProjectFacade(project);
         if(projectFacade != null) {
