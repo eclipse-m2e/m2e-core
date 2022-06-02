@@ -109,10 +109,10 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     @Override
     public String getText(Object element) {
       ParentHierarchyEntry project = null;
-      if(element instanceof ParentHierarchyEntry) {
-        project = (ParentHierarchyEntry) element;
-      } else if(element instanceof Object[]) {
-        project = (ParentHierarchyEntry) ((Object[]) element)[0];
+      if(element instanceof ParentHierarchyEntry entry) {
+        project = entry;
+      } else if(element instanceof Object[] array) {
+        project = (ParentHierarchyEntry) array[0];
       } else {
         return ""; //$NON-NLS-1$
       }
@@ -126,8 +126,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof ParentHierarchyEntry) {
-        ParentHierarchyEntry project = (ParentHierarchyEntry) element;
+      if(element instanceof ParentHierarchyEntry project) {
         if(project.getFacade() == null) {
           // This project is not in the workspace
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -143,8 +142,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
     @Override
     public Image getImage(Object element) {
-      if(element instanceof ParentHierarchyEntry) {
-        ParentHierarchyEntry project = (ParentHierarchyEntry) element;
+      if(element instanceof ParentHierarchyEntry project) {
         if(project.getFacade() == null) {
           // This project is not in the workspace
           return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
@@ -207,12 +205,11 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
     @Override
     public Object[] getChildren(Object parentElement) {
-      if(parentElement instanceof ParentHierarchyEntry) {
+      if(parentElement instanceof ParentHierarchyEntry parent) {
         /*
          * Walk the hierarchy list until we find the parentElement and
          * return the previous element, which is the child.
          */
-        ParentHierarchyEntry parent = (ParentHierarchyEntry) parentElement;
 
         if(projects.size() == 1) {
           // No parent exists, only one element in the tree
@@ -269,10 +266,10 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
   public ParentHierarchyEntry fromSelection() {
     ISelection selection = pomsViewer.getSelection();
-    if(selection instanceof IStructuredSelection) {
-      Object obj = ((IStructuredSelection) selection).getFirstElement();
-      if(obj instanceof ParentHierarchyEntry) {
-        return (ParentHierarchyEntry) obj;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      Object obj = structuredSelection.getFirstElement();
+      if(obj instanceof ParentHierarchyEntry entry) {
+        return entry;
       }
     }
     return null;

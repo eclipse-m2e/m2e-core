@@ -262,8 +262,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           @SuppressWarnings("unchecked")
           List<MavenProjectInfo> projects = (List<MavenProjectInfo>) parentElement;
           return projects.toArray(new MavenProjectInfo[projects.size()]);
-        } else if(parentElement instanceof MavenProjectInfo) {
-          MavenProjectInfo mavenProjectInfo = (MavenProjectInfo) parentElement;
+        } else if(parentElement instanceof MavenProjectInfo mavenProjectInfo) {
           Collection<MavenProjectInfo> projects = mavenProjectInfo.getProjects();
           return projects.toArray(new MavenProjectInfo[projects.size()]);
         }
@@ -277,11 +276,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       @Override
       public boolean hasChildren(Object parentElement) {
-        if(parentElement instanceof List) {
-          List<?> projects = (List<?>) parentElement;
+        if(parentElement instanceof List<?> projects) {
           return !projects.isEmpty();
-        } else if(parentElement instanceof MavenProjectInfo) {
-          MavenProjectInfo mavenProjectInfo = (MavenProjectInfo) parentElement;
+        } else if(parentElement instanceof MavenProjectInfo mavenProjectInfo) {
           return !mavenProjectInfo.getProjects().isEmpty();
         }
         return false;
@@ -407,10 +404,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         StringBuilder sb = new StringBuilder(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
         int n = 1;
         for(Throwable ex : errors) {
-          if(ex instanceof CoreException) {
-            String msg = ((CoreException) ex).getStatus().getMessage();
+          if(ex instanceof CoreException coreEx) {
+            String msg = coreEx.getStatus().getMessage();
             sb.append("\n  ").append(n).append(" ").append(msg.trim()); //$NON-NLS-1$ //$NON-NLS-2$
-
           } else {
             String msg = ex.getMessage() == null ? ex.toString() : ex.getMessage();
             sb.append("\n  ").append(n).append(" ").append(msg.trim()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -512,8 +508,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   void updateCheckedState() {
     Object[] elements = projectTreeViewer.getCheckedElements();
     for(Object element : elements) {
-      if(element instanceof MavenProjectInfo) {
-        MavenProjectInfo info = (MavenProjectInfo) element;
+      if(element instanceof MavenProjectInfo info) {
         if(isWorkspaceFolder(info) || isAlreadyExists(info)) {
           projectTreeViewer.setChecked(info, false);
         }
@@ -654,8 +649,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
     Object[] elements = projectTreeViewer.getCheckedElements();
     for(Object element : elements) {
-      if(element instanceof MavenProjectInfo) {
-        String errorMsg = validateProjectInfo((MavenProjectInfo) element);
+      if(element instanceof MavenProjectInfo info) {
+        String errorMsg = validateProjectInfo(info);
         if(errorMsg != null) {
           setPageComplete(false);
           return;
@@ -687,8 +682,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     @Override
     public String getText(Object element) {
-      if(element instanceof MavenProjectInfo) {
-        MavenProjectInfo info = (MavenProjectInfo) element;
+      if(element instanceof MavenProjectInfo info) {
 
         if(info.getProfiles().isEmpty()) {
           return info.getLabel() + " - " + getId(info); //$NON-NLS-1$
@@ -728,8 +722,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof MavenProjectInfo) {
-        MavenProjectInfo info = (MavenProjectInfo) element;
+      if(element instanceof MavenProjectInfo info) {
         if(isWorkspaceFolder(info)) {
           return Display.getDefault().getSystemColor(SWT.COLOR_RED);
         } else if(isAlreadyExists(info)) {
@@ -746,8 +739,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     @Override
     public StyledString getStyledText(Object element) {
-      if(element instanceof MavenProjectInfo) {
-        MavenProjectInfo info = (MavenProjectInfo) element;
+      if(element instanceof MavenProjectInfo info) {
         StyledString ss = new StyledString();
         ss.append(info.getLabel() + "  "); //$NON-NLS-1$
         ss.append(getId(info), StyledString.DECORATIONS_STYLER);

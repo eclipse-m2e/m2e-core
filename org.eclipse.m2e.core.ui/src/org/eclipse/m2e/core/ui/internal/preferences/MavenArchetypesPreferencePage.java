@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -157,17 +157,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     archetypesViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
 
     archetypesViewer.setLabelProvider(new CatalogsLabelProvider());
-
-    archetypesViewer.setContentProvider(new IStructuredContentProvider() {
-
-      @Override
-      public Object[] getElements(Object input) {
-        if(input instanceof Collection) {
-          return ((Collection<?>) input).toArray();
-        }
-        return new Object[0];
-      }
-    });
+    archetypesViewer.setContentProvider(new ArrayContentProvider());
 
     Table table = archetypesViewer.getTable();
     table.setLinesVisible(false);

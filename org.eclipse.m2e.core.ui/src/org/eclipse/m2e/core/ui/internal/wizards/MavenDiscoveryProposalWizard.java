@@ -139,25 +139,25 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
           List<IProject> changed = new LinkedList<>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignore(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+              ignore(mojo.getExecution(), prov.getProjects());
             }
           }
 
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreParent()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+              ignoreAtDefinition(mojo.getExecution(), prov.getProjects());
             }
           }
 
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreWorkspace()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignoreWorkspace(((MojoExecutionMappingRequirement) req).getExecution());
+              ignoreWorkspace(mojo.getExecution());
             }
           }
 

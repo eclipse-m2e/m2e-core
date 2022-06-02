@@ -122,8 +122,8 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
       @Override
       public String getColumnText(Object element, int columnIndex) {
-        if(element instanceof Node) {
-          return getColumnText((Node) element, columnIndex);
+        if(element instanceof Node node) {
+          return getColumnText(node, columnIndex);
         }
 
         if(columnIndex == 0) {
@@ -134,15 +134,12 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
       }
 
       private String getColumnText(Node element, int columnIndex) {
-        switch(columnIndex) {
-          case 0:
-            return element.getName();
-          case 1:
-            return Integer.toString(element.getBuildCount());
-          default:
+        return switch(columnIndex) {
+          case 0 -> element.getName();
+          case 1 -> Integer.toString(element.getBuildCount());
+          default -> null;
             // fall through
-        }
-        return null;
+        };
       }
 
       @Override
@@ -163,11 +160,11 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
       @Override
       public boolean hasChildren(Object element) {
-        if(element instanceof ContainerNode) {
-          return !((ContainerNode) element).getResources().isEmpty();
+        if(element instanceof ContainerNode containerNode) {
+          return !containerNode.getResources().isEmpty();
         }
-        if(element instanceof CollectionNode<?>) {
-          return !((CollectionNode<?>) element).getMembers().isEmpty();
+        if(element instanceof CollectionNode<?> collectionNode) {
+          return !collectionNode.getMembers().isEmpty();
         }
         return false;
       }
@@ -192,10 +189,8 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
       @Override
       public Object[] getChildren(Object parentElement) {
-        if(parentElement instanceof ProjectNode) {
+        if(parentElement instanceof ProjectNode projectNode) {
           ArrayList<Object> result = new ArrayList<>();
-
-          final ProjectNode projectNode = (ProjectNode) parentElement;
 
           final List<ResourceNode> resources = new ArrayList<>(projectNode.getResources());
           if(!resources.isEmpty()) {
@@ -210,10 +205,10 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
           }
 
           return result.toArray();
-        } else if(parentElement instanceof CollectionNode<?>) {
-          return ((CollectionNode<?>) parentElement).getMembers().toArray();
-        } else if(parentElement instanceof ContainerNode) {
-          return ((ContainerNode) parentElement).getResources().toArray();
+        } else if(parentElement instanceof CollectionNode<?> collectionNode) {
+          return collectionNode.getMembers().toArray();
+        } else if(parentElement instanceof ContainerNode containerNode) {
+          return containerNode.getResources().toArray();
         }
         return null;
       }

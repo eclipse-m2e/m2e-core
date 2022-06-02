@@ -63,10 +63,7 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
 
   @Override
   public boolean hasChildren(Object parent) {
-    if(parent instanceof IMavenRepositoryNode) {
-      return ((IMavenRepositoryNode) parent).hasChildren();
-    }
-    return false;
+    return parent instanceof IMavenRepositoryNode repoNode && repoNode.hasChildren();
   }
 
   public Object[] getRootNodes() {
@@ -90,8 +87,8 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
   public Object[] getChildren(Object parent) {
     if(parent instanceof IViewSite) {
       return getRootNodes();
-    } else if(parent instanceof IMavenRepositoryNode) {
-      return ((IMavenRepositoryNode) parent).getChildren();
+    } else if(parent instanceof IMavenRepositoryNode repoNode) {
+      return repoNode.getChildren();
     }
     return new Object[0];
   }

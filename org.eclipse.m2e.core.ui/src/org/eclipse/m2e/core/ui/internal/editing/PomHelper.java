@@ -123,8 +123,8 @@ public final class PomHelper {
       if(forceSave)
         assert change instanceof TextFileChange; //if assert not fullfilled, we will not get the file saved..
 
-      if(forceSave && change instanceof TextFileChange) {
-        ((TextFileChange) change).setSaveMode(TextFileChange.FORCE_SAVE);
+      if(forceSave && change instanceof TextFileChange textFileChange) {
+        textFileChange.setSaveMode(TextFileChange.FORCE_SAVE);
       }
       return change;
     } catch(Exception exc) {

@@ -124,10 +124,10 @@ public class InputHistory {
         combos = new ArrayList<>();
         comboMap.put(id, combos);
       }
-      if(combo instanceof Combo) {
-        combos.add(new ComboWrapper((Combo) combo));
-      } else if(combo instanceof CCombo) {
-        combos.add(new CComboWrapper((CCombo) combo));
+      if(combo instanceof Combo regularCombo) {
+        combos.add(new ComboWrapper(regularCombo));
+      } else if(combo instanceof CCombo ccombo) {
+        combos.add(new CComboWrapper(ccombo));
       }
     }
   }

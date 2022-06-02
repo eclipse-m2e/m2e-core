@@ -175,8 +175,7 @@ public class LifecycleMappingPage extends WizardPage {
       @SuppressWarnings("synthetic-access")
       @Override
       protected void setValue(Object element, Object value) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           int intVal = ((Integer) value).intValue();
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
 
@@ -217,8 +216,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected Object getValue(Object element) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           if(ignore.contains(element)) {
@@ -237,8 +235,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected CellEditor getCellEditor(Object element) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           List<String> values = new ArrayList<>();
           for(IMavenDiscoveryProposal prop : all) {
@@ -254,8 +251,7 @@ public class LifecycleMappingPage extends WizardPage {
 
           Control cont = edit.getControl();
           //this attempts to disable text edits in the combo..
-          if(cont instanceof CCombo) {
-            CCombo combo = (CCombo) cont;
+          if(cont instanceof CCombo combo) {
             combo.setEditable(false);
           }
           return edit;
@@ -265,8 +261,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected boolean canEdit(Object element) {
-        if(element instanceof AggregateMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof AggregateMappingLabelProvider prov) {
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           return all != null && !all.isEmpty() || prov.getKey() instanceof MojoExecutionMappingRequirement;
         }
@@ -286,11 +281,10 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public Object[] getElements(Object inputElement) {
-        if(inputElement instanceof LifecycleMappingDiscoveryRequest) {
+        if(inputElement instanceof LifecycleMappingDiscoveryRequest request) {
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<>();
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<>();
-          Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> projects = ((LifecycleMappingDiscoveryRequest) inputElement)
-              .getProjects();
+          Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> projects = request.getProjects();
           for(final Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : projects.entrySet()) {
             final String relPath = entry.getKey().getProject().getFile(IMavenConstants.POM_FILE_NAME).getFullPath()
                 .toPortableString();
@@ -307,11 +301,10 @@ public class LifecycleMappingPage extends WizardPage {
                   @Override
                   public String getMavenText() {
                     String executionId = null;
-                    if(requirement instanceof MojoExecutionMappingRequirement) {
-                      executionId = ((MojoExecutionMappingRequirement) requirement).getExecutionId();
-                    } else if(requirement instanceof ProjectConfiguratorMappingRequirement) {
-                      executionId = ((ProjectConfiguratorMappingRequirement) requirement).getExecution()
-                          .getExecutionId();
+                    if(requirement instanceof MojoExecutionMappingRequirement mojo) {
+                      executionId = mojo.getExecutionId();
+                    } else if(requirement instanceof ProjectConfiguratorMappingRequirement conf) {
+                      executionId = conf.getExecution().getExecutionId();
                     }
 
                     if(executionId != null) {
@@ -365,8 +358,8 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public Object[] getChildren(Object parentElement) {
-        if(parentElement instanceof AggregateMappingLabelProvider) {
-          return ((AggregateMappingLabelProvider) parentElement).getChildren();
+        if(parentElement instanceof AggregateMappingLabelProvider prov) {
+          return prov.getChildren();
         }
         return new Object[0];
       }
@@ -404,13 +397,12 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public String getColumnText(Object element, int columnIndex) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           if(columnIndex == MAVEN_INFO_IDX) {
             String text = prov.getMavenText();
-            if(prov instanceof AggregateMappingLabelProvider && !isHandled(prov)) {
+            if(prov instanceof AggregateMappingLabelProvider aggProv && !isHandled(prov)) {
               text = NLS.bind(Messages.LifecycleMappingPage_errorMavenBuild,
-                  new String[] {text, String.valueOf(((AggregateMappingLabelProvider) prov).getChildren().length)});
+                  new String[] {text, String.valueOf(aggProv.getChildren().length)});
             }
             return text;
           } else if(columnIndex == ACTION_INFO_IDX && element instanceof AggregateMappingLabelProvider) {
@@ -438,8 +430,7 @@ public class LifecycleMappingPage extends WizardPage {
         if(columnIndex != 0) {
           return null;
         }
-        if(element instanceof AggregateMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof AggregateMappingLabelProvider prov) {
           if(prov.isError(mappingConfiguration)) {
             if(!isHandled(prov)) {
               return MavenImages.IMG_ERROR;
@@ -452,10 +443,8 @@ public class LifecycleMappingPage extends WizardPage {
     });
 
     treeViewer.addSelectionChangedListener(event -> {
-      if(event.getSelection() instanceof IStructuredSelection
-          && ((IStructuredSelection) event.getSelection()).size() == 1) {
-        ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
-            .getSelection()).getFirstElement();
+      if(event.getSelection() instanceof IStructuredSelection structuredSelection && structuredSelection.size() == 1) {
+        ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) structuredSelection.getFirstElement();
         if(ignore.contains(prov)) {
           details.setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
           license.setText(EMPTY_STRING);
@@ -562,9 +551,10 @@ public class LifecycleMappingPage extends WizardPage {
     if(proposal != null) {
       TreeItem[] items = treeViewer.getTree().getItems();
       for(TreeItem item : items) {
-        if(item.getData() instanceof ILifecycleMappingLabelProvider && item.getData() != prov) {
+        if(item.getData() instanceof ILifecycleMappingLabelProvider lifecycleMappingProvider
+            && item.getData() != prov) {
           if(proposal.equals(
-              mappingConfiguration.getSelectedProposal(((ILifecycleMappingLabelProvider) item.getData()).getKey()))) {
+              mappingConfiguration.getSelectedProposal(lifecycleMappingProvider.getKey()))) {
             return false;
           }
         }
@@ -677,8 +667,8 @@ public class LifecycleMappingPage extends WizardPage {
     for(TreeItem item : treeViewer.getTree().getItems()) {
       ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) item.getData();
       if(!isHandled(prov)) {
-        if(prov instanceof AggregateMappingLabelProvider) {
-          count += ((AggregateMappingLabelProvider) prov).getChildren().length;
+        if(prov instanceof AggregateMappingLabelProvider aggProv) {
+          count += aggProv.getChildren().length;
         } else {
           ++count;
         }

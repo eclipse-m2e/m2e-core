@@ -94,8 +94,8 @@ class StaticMavenPathStorageEditorInput extends StaticMavenStorageEditorInput im
   @Override
   public boolean equals(Object obj) {
     IPath path = getPath();
-    if(path != null && obj instanceof StaticMavenPathStorageEditorInput) {
-      return path.equals(((StaticMavenPathStorageEditorInput) obj).getPath());
+    if(path != null && obj instanceof StaticMavenPathStorageEditorInput other) {
+      return path.equals(other.getPath());
     }
     return super.equals(obj);
   }

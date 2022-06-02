@@ -232,16 +232,16 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
       @Override
       public void modify(Object element, String property, Object value) {
-        if(element instanceof TableItem) {
-          ((TableItem) element).setText(getTextIndex(property), String.valueOf(value));
+        if(element instanceof TableItem item) {
+          item.setText(getTextIndex(property), String.valueOf(value));
           validate();
         }
       }
 
       @Override
       public Object getValue(Object element, String property) {
-        if(element instanceof TableItem) {
-          return ((TableItem) element).getText(getTextIndex(property));
+        if(element instanceof TableItem item) {
+          return item.getText(getTextIndex(property));
         }
         return null;
       }
@@ -380,8 +380,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       List<?> properties = propertiesLoader.getProperties();
       if(properties != null) {
         for(Object o : properties) {
-          if(o instanceof RequiredProperty) {
-            RequiredProperty rp = (RequiredProperty) o;
+          if(o instanceof RequiredProperty rp) {
             requiredProperties.add(rp.getKey());
             addTableItem(rp.getKey(), rp.getDefaultValue());
           }
@@ -588,8 +587,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       TextComboBoxCellEditor comboEditor = null;
       // if there was a plain text editor previously defined, and the current
       // archetype has properties, replace it with a combo editor
-      if(ce[KEY_INDEX] instanceof TextComboBoxCellEditor) {
-        comboEditor = (TextComboBoxCellEditor) ce[KEY_INDEX];
+      if(ce[KEY_INDEX] instanceof TextComboBoxCellEditor textComboCellEditor) {
+        comboEditor = textComboCellEditor;
       } else {
         ce[KEY_INDEX].dispose();
         comboEditor = new TextComboBoxCellEditor(propertiesTable, SWT.FLAT);

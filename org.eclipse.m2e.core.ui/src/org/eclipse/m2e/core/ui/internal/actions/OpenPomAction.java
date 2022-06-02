@@ -92,11 +92,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
   @Override
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
-    } else {
-      this.selection = null;
-    }
+    this.selection = selection instanceof IStructuredSelection sel ? sel : null;
   }
 
   @Override

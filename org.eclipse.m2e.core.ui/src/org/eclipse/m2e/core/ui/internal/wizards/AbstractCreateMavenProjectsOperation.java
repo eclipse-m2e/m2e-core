@@ -65,8 +65,8 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
 
   public static IStatus toStatus(InvocationTargetException e) {
     Throwable t = e.getCause();
-    if(t instanceof CoreException) {
-      return ((CoreException) t).getStatus();
+    if(t instanceof CoreException ex) {
+      return ex.getStatus();
     }
     return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, t.getMessage(), t);
   }

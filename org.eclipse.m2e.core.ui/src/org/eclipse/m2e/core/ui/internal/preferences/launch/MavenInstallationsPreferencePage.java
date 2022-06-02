@@ -173,8 +173,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
       @Override
       public Object[] getElements(Object input) {
-        if(input instanceof List<?>) {
-          List<?> list = (List<?>) input;
+        if(input instanceof List<?> list) {
           if(!list.isEmpty()) {
             return list.toArray(new AbstractMavenRuntime[list.size()]);
           }
@@ -293,18 +292,18 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     @Override
     public String getColumnText(Object element, int columnIndex) {
       AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
-      switch(columnIndex) {
-        case 0:
-          return !runtime.isLegacy() ? runtime.getName() : null;
-        case 1:
+      return switch(columnIndex) {
+        case 0 -> !runtime.isLegacy() ? runtime.getName() : null;
+        case 1 -> {
           StringBuilder sb = new StringBuilder();
           if(!runtime.isAvailable()) {
             sb.append(Messages.MavenInstallationsPreferencePage_runtimeUnavailable);
           }
           sb.append(runtime.toString());
-          return sb.toString();
-      }
-      return null;
+          yield sb.toString();
+        }
+        default -> null;
+      };
     }
 
     @Override

@@ -84,14 +84,13 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
 
   @Override
   public void run(IAction action) {
-    if(selection instanceof IStructuredSelection) {
-      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
       for(Object element : structuredSelection) {
         IProject project = null;
-        if(element instanceof IProject) {
-          project = (IProject) element;
-        } else if(element instanceof IAdaptable) {
-          project = ((IAdaptable) element).getAdapter(IProject.class);
+        if(element instanceof IProject p) {
+          project = p;
+        } else if(element instanceof IAdaptable adaptable) {
+          project = adaptable.getAdapter(IProject.class);
         }
         if(project != null) {
           enableNature(project, structuredSelection.size() == 1);
