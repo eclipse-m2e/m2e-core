@@ -47,7 +47,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.AbstractMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -102,6 +101,7 @@ public class MavenJdtPlugin extends Plugin {
    * @noreference see class javadoc
    */
   @Override
+  @SuppressWarnings("static-access")
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
 
@@ -125,42 +125,37 @@ public class MavenJdtPlugin extends Plugin {
 
     workspaceSourceDownloadJob = new WorkspaceSourceDownloadJob();
 
-    mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
-      @Override
-      @SuppressWarnings("static-access")
-      public void mavenConfigurationChange(MavenConfigurationChangeEvent event) {
-        String key = event.getKey();
+    mavenConfiguration.addConfigurationChangeListener(event -> {
+      String key = event.getKey();
 
-        // use those constants from the event class is to have an overview of supported event keys
-        if((MavenConfigurationChangeEvent.P_DOWNLOAD_JAVADOC.equals(key) && mavenConfiguration.isDownloadJavaDoc())
-            || (MavenConfigurationChangeEvent.P_DOWNLOAD_SOURCES.equals(key)
-                && mavenConfiguration.isDownloadSources())) {
-          if(workspaceSourceDownloadJob.getState() == Job.SLEEPING
-              || workspaceSourceDownloadJob.getState() == Job.WAITING) {
-            //Cancel previously scheduled job
-            workspaceSourceDownloadJob.cancel();
+      // use those constants from the event class is to have an overview of supported event keys
+      if((MavenConfigurationChangeEvent.P_DOWNLOAD_JAVADOC.equals(key) && mavenConfiguration.isDownloadJavaDoc())
+          || (MavenConfigurationChangeEvent.P_DOWNLOAD_SOURCES.equals(key) && mavenConfiguration.isDownloadSources())) {
+        if(workspaceSourceDownloadJob.getState() == Job.SLEEPING
+            || workspaceSourceDownloadJob.getState() == Job.WAITING) {
+          //Cancel previously scheduled job
+          workspaceSourceDownloadJob.cancel();
+        }
+        workspaceSourceDownloadJob.schedule(500);
+        return;
+      }
+
+      if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(key)) {
+        return;
+      }
+
+      if(buildpathManager.setupVariables() && buildpathManager.variablesAreInUse()) {
+        WorkspaceJob job = new WorkspaceJob(Messages.MavenJdtPlugin_job_name) {
+
+          @Override
+          public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+            ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+            return Status.OK_STATUS;
           }
-          workspaceSourceDownloadJob.schedule(500);
-          return;
-        }
 
-        if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(key)) {
-          return;
-        }
-
-        if(buildpathManager.setupVariables() && buildpathManager.variablesAreInUse()) {
-          WorkspaceJob job = new WorkspaceJob(Messages.MavenJdtPlugin_job_name) {
-
-            @Override
-            public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-              ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-              return Status.OK_STATUS;
-            }
-
-          };
-          job.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-          job.schedule();
-        }
+        };
+        job.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+        job.schedule();
       }
     });
 
