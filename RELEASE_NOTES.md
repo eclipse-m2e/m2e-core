@@ -5,6 +5,10 @@
 * 📅 Release Date: ? 2022
 * All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.0...2.0.0
 
+### Require Java 17 or above
+
+Running m2e now requires a Java-17 (or higher) compliant JRE.
+
 #### Removed legacy WTP-SSE based editor
 
 The legacy textual editor is removed as it doesn't receive enough update/maintenance. The editor based on Generic Editor and LemMinX-Maven is now the only one distributed by m2e.
