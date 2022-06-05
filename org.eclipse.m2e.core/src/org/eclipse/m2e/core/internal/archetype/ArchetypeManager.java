@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -127,8 +128,8 @@ public class ArchetypeManager {
    * url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
    * <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
    *
-   * @see <a
-   *      href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
+   * @see <a href=
+   *      "http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
    * @param archetype
    * @return the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
    * @throws CoreException
@@ -170,15 +171,8 @@ public class ArchetypeManager {
       repositories.add(0, remoteArchetypeRepository);
     }
 
-    @SuppressWarnings("serial")
-    final class WrappedUnknownArchetype extends RuntimeException {
-      public WrappedUnknownArchetype(UnknownArchetype ex) {
-        super(ex);
-      }
-    }
-
     try {
-      return maven.execute((context, monitor1) -> {
+      return maven.createExecutionContext().execute((context, monitor1) -> {
         ArtifactRepository localRepository = context.getLocalRepository();
         if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
           ArchetypeDescriptor descriptor;
@@ -186,14 +180,17 @@ public class ArchetypeManager {
             descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null, localRepository,
                 repositories);
           } catch(UnknownArchetype ex) {
-            throw new WrappedUnknownArchetype(ex);
+            throw new CoreException(Status.error("UnknownArchetype", ex));
           }
           return descriptor.getRequiredProperties();
         }
         return null;
       }, monitor);
-    } catch(WrappedUnknownArchetype e) {
-      throw (UnknownArchetype) e.getCause();
+    } catch(CoreException e) {
+      if(e.getStatus().getException() instanceof UnknownArchetype archetypeException) {
+        throw archetypeException;
+      }
+      throw e;
     }
   }
 

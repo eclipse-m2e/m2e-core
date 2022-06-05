@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc.
+ * Copyright (c) 2008, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -32,7 +31,6 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 
@@ -51,11 +49,11 @@ public abstract class ArchetypeCatalogFactory {
 
   private boolean enabled;
 
-  public ArchetypeCatalogFactory(String id, String description, boolean editable) {
+  protected ArchetypeCatalogFactory(String id, String description, boolean editable) {
     this(id, description, editable, true);
   }
 
-  public ArchetypeCatalogFactory(String id, String description, boolean editable, boolean enabled) {
+  protected ArchetypeCatalogFactory(String id, String description, boolean editable, boolean enabled) {
     this.id = id;
     this.description = description;
     this.editable = editable;
@@ -89,7 +87,7 @@ public abstract class ArchetypeCatalogFactory {
     return getId();
   }
 
-  protected ArchetypeManager getArchetyper() {
+  ArchetypeManager getArchetyper() {
     return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
@@ -135,9 +133,11 @@ public abstract class ArchetypeCatalogFactory {
     }
 
     public LocalCatalogFactory(String path, String description, boolean editable, boolean enabled) {
-      super(path, description == null || description.trim().length() == 0
-          ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path)
-          : description, editable, enabled);
+      super(path,
+          description == null || description.trim().length() == 0
+              ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path)
+              : description,
+          editable, enabled);
     }
 
     @Override
@@ -161,7 +161,7 @@ public abstract class ArchetypeCatalogFactory {
       } catch(Exception ex) {
         String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());
         log.error(msg, ex);
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
+        throw new CoreException(Status.error(msg, ex));
       }
     }
 
@@ -190,32 +190,25 @@ public abstract class ArchetypeCatalogFactory {
     }
 
     public RemoteCatalogFactory(String url, String description, boolean editable, boolean enabled) {
-      super(url, description == null || description.trim().length() == 0
-          ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url)
-          : description, editable, enabled);
+      super(url,
+          description == null || description.trim().length() == 0
+              ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url)
+              : description,
+          editable, enabled);
       repositoryUrl = parseCatalogUrl(url);
     }
 
-    /**
-     * @param url
-     * @return
-     */
     private String parseCatalogUrl(String url) {
       if(url == null) {
         return null;
       }
       int length = url.length();
-      if(length > 1 && url.endsWith("/")) //$NON-NLS-1$
-      {
+      if(length > 1 && url.endsWith("/")) {
         return url.substring(0, url.length() - 1);
       }
-      int idx = url.lastIndexOf("/"); //$NON-NLS-1$
-      idx = (idx > 0) ? idx : 0;
-      if(url.lastIndexOf(".") >= idx) { //$NON-NLS-1$
-        //Assume last fragment of the url is a file, let's keep its parent folder
-        return url.substring(0, idx);
-      }
-      return url;
+      int idx = Math.max(url.lastIndexOf("/"), 0);
+      //Assume last fragment of the url is a file, let's keep its parent folder
+      return url.lastIndexOf(".") >= idx ? url.substring(0, idx) : url;
     }
 
     @Override
