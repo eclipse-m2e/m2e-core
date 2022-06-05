@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2019 Red Hat, Inc.
+ * Copyright (c) 2013, 2022 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.archetype;
+package org.eclipse.m2e.core.ui.internal.util;
 
 import java.util.Objects;
 
@@ -26,6 +26,8 @@ import org.apache.maven.archetype.catalog.Archetype;
  * @since 1.3
  */
 public class ArchetypeUtil {
+  private ArchetypeUtil() {
+  }
 
   /**
    * Checks {@link Archetype} equality by testing <code>groupId</code>, <code>artifactId</code> and <code>version</code>

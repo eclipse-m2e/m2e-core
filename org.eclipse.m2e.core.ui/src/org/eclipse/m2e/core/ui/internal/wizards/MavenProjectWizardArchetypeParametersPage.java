@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Sonatype, Inc. and others
+ * Copyright (c) 2008-2022 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -55,12 +55,12 @@ import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 
-import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
+import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;
 
 
 /**
