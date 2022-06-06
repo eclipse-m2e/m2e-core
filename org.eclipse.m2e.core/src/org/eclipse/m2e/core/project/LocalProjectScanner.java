@@ -123,20 +123,17 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         return null; // we already know this project
         //mkleint: well, if the project is first scanned standalone and later scanned via parent reference, the parent ref gets thrown away??
       }
-
-      File pomFile = new File(baseDir, IMavenConstants.POM_FILE_NAME);
-      if(!pomFile.exists()) {
+      Model model = modelManager.readMavenModel(new File(baseDir, IMavenConstants.POM_FILE_NAME));
+      if(model == null) {
         return null;
       }
-      Model model = modelManager.readMavenModel(pomFile);
-      String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
-
+      String pomName = modulePath + "/" + model.getPomFile().getName(); //$NON-NLS-1$
       if(model.getArtifactId() == null) {
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID,
             NLS.bind(Messages.LocalProjectScanner_missingArtifactId, pomName)));
       }
 
-      MavenProjectInfo projectInfo = newMavenProjectInfo(pomName, pomFile, model, parentInfo);
+      MavenProjectInfo projectInfo = newMavenProjectInfo(pomName, model.getPomFile(), model, parentInfo);
       //We only want to optionally rename the base directory not any sub directory
       if(parentInfo == null) {
         projectInfo.setBasedirRename(getBasedirRename(projectInfo));

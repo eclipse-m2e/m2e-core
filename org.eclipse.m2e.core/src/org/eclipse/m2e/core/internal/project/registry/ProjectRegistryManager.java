@@ -98,6 +98,7 @@ import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -158,6 +159,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   @Reference
   private IMavenConfiguration configuration;
+
+  @Reference
+  private PlexusContainerManager containerManager;
 
   @Reference
   private ProjectRegistryReader stateReader;
@@ -919,7 +923,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     request.setLocalRepository(getMaven().getLocalRepository());
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
     if(pom != null && pom.getLocation() != null) {
-      request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
+      request.setMultiModuleProjectDirectory(
+          PlexusContainerManager.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
     }
 
     return request;
@@ -978,6 +983,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   IMaven getMaven() {
     return maven;
+  }
+
+  PlexusContainerManager getContainerManager() {
+    return this.containerManager;
   }
 
   /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
