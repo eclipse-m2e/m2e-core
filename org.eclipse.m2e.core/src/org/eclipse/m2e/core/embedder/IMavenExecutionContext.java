@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.core.embedder;
 
-import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.aether.RepositorySystemSession;
@@ -104,16 +103,6 @@ public interface IMavenExecutionContext {
   MavenExecutionResult execute(MavenExecutionRequest request);
 
   /**
-   * Look up the given extension type, this requires an active execution
-   * 
-   * @param <Extension>
-   * @param extensionType
-   * @throws IllegalStateException if called outside of any execute call
-   * @return
-   */
-  <Extension> Collection<Extension> lookupExtensions(Class<Extension> extensionType) throws CoreException;
-
-  /**
    * @throws IllegalStateException if called outside of {@link #execute(MavenProject,ICallable, IProgressMonitor)}
    * @since 1.4
    */
@@ -135,6 +124,12 @@ public interface IMavenExecutionContext {
    * @since 1.4
    */
   ProjectBuildingRequest newProjectBuildingRequest();
+
+  /**
+   * @return the {@link IComponentLookup} to use for this context
+   * @throws IllegalStateException if called outside of any execute call
+   */
+  IComponentLookup getComponentLookup();
 
   /**
    * Get the current thread context.

@@ -30,6 +30,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -163,5 +164,12 @@ public interface IMavenProjectFacade {
    * @since 2.0
    */
   IMavenExecutionContext createExecutionContext();
+
+  /**
+   * Returns the component lookup for this projects context. This will include potentially defined
+   * <b>core</b>-extensions, but not <b>project</b>-scoped extensions! If you need project-scoped extensions as well use
+   * {@link #createExecutionContext()};
+   */
+  IComponentLookup getComponentLookup();
 
 }

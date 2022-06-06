@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,6 +31,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
+
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -39,8 +45,10 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -537,10 +545,55 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return new MavenExecutionContext((MavenImpl) getMaven(), this);
   }
 
+  @Override
+  public IComponentLookup getComponentLookup() {
+    return new IComponentLookup() {
+
+      @Override
+      public <T> T lookup(Class<T> clazz) throws CoreException {
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        try {
+          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
+          if(ccl instanceof ClassRealm) {
+            //do not change here as a specific class realm is already set!
+          } else {
+            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          }
+          return plexusContainer.lookup(clazz);
+        } catch(Exception ex) {
+          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
+        } finally {
+          Thread.currentThread().setContextClassLoader(ccl);
+        }
+      }
+
+      @Override
+      public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        try {
+          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
+          if(ccl instanceof ClassRealm) {
+            //do not change here as a specific class realm is already set!
+          } else {
+            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          }
+          Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          return plexusContainer.lookupList(type);
+        } catch(ComponentLookupException ex) {
+          return List.of();
+        } catch(Exception ex) {
+          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
+        } finally {
+          Thread.currentThread().setContextClassLoader(ccl);
+        }
+      }
+    };
+  }
+
+
   /**
-   * Gets an access to a (possibly project specific) {@link IMaven} instance,
-   * this is the same instance that is used to create new {@link IMavenExecutionContext}s
-   * see {@link #createExecutionContext()}
+   * Gets an access to a (possibly project specific) {@link IMaven} instance, this is the same instance that is used to
+   * create new {@link IMavenExecutionContext}s see {@link #createExecutionContext()}
    * 
    * @return a Maven instance, configured according to this project
    */
