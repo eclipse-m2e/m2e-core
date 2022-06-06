@@ -81,25 +81,22 @@ public class DependencyExcludeAction implements IActionDelegate {
     keys = null;
 
     // TODO move logic into adapters
-    if(selection instanceof IStructuredSelection) {
-      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
 
       List<ArtifactKey> keys = new ArrayList<>(structuredSelection.size());
       for(Object selected : structuredSelection.toArray()) {
-        if(selected instanceof Artifact) {
+        if(selected instanceof Artifact artifact) {
           file = getFileFromEditor();
-          keys.add(new ArtifactKey((Artifact) selected));
-        } else if(selected instanceof org.eclipse.aether.graph.DependencyNode) {
+          keys.add(new ArtifactKey(artifact));
+        } else if(selected instanceof org.eclipse.aether.graph.DependencyNode node) {
           file = getFileFromEditor();
-          keys.add(new ArtifactKey(((org.eclipse.aether.graph.DependencyNode) selected).getDependency().getArtifact()));
-        } else if(selected instanceof RequiredProjectWrapper) {
-          RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
+          keys.add(new ArtifactKey(node.getDependency().getArtifact()));
+        } else if(selected instanceof RequiredProjectWrapper w) {
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
         } else {
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
-          if(selected instanceof IJavaElement) {
-            IJavaElement el = (IJavaElement) selected;
+          if(selected instanceof IJavaElement el) {
             file = getFileFromProject(el.getParent().getJavaProject());
           }
         }
@@ -120,10 +117,6 @@ public class DependencyExcludeAction implements IActionDelegate {
   //mkleint: scary
   private IFile getFileFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-    if(part != null && part.getEditorInput() instanceof IFileEditorInput) {
-      IFileEditorInput input = (IFileEditorInput) part.getEditorInput();
-      return input.getFile();
-    }
-    return null;
+    return part != null && part.getEditorInput() instanceof IFileEditorInput input ? input.getFile() : null;
   }
 }

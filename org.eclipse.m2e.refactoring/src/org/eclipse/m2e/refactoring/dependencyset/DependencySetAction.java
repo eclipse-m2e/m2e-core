@@ -63,32 +63,30 @@ public class DependencySetAction implements IActionDelegate {
     file = null;
     keys = new ArrayList<>();
 
-    if(selection instanceof IStructuredSelection) {
-      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
       for(Object selected : structuredSelection.toArray()) {
         /*if (selected instanceof Artifact) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
-
-        } else*/if(selected instanceof org.eclipse.aether.graph.DependencyNode) {
+        
+        } else*/if(selected instanceof org.eclipse.aether.graph.DependencyNode node) {
           file = getFileFromEditor();
-          org.eclipse.aether.graph.DependencyNode selected2 = (org.eclipse.aether.graph.DependencyNode) selected;
-          if(selected2.getData().get("LEVEL") == null) {
-            keys.add(new ArtifactKey(selected2.getDependency().getArtifact()));
+          if(node.getData().get("LEVEL") == null) {
+            keys.add(new ArtifactKey(node.getDependency().getArtifact()));
           }
 
         } /*else if (selected instanceof RequiredProjectWrapper) {
           RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
-
+          
           } else {
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
           if (selected instanceof IJavaElement) {
             IJavaElement el = (IJavaElement) selected;
             file = getFileFromProject(el.getParent().getJavaProject());
           }
-
+          
           }
           */
       }
@@ -104,10 +102,6 @@ public class DependencySetAction implements IActionDelegate {
   //mkleint: scary
   private IFile getFileFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-    if(part != null && part.getEditorInput() instanceof IFileEditorInput) {
-      IFileEditorInput input = (IFileEditorInput) part.getEditorInput();
-      return input.getFile();
-    }
-    return null;
+    return part != null && part.getEditorInput() instanceof IFileEditorInput input ? input.getFile() : null;
   }
 }
