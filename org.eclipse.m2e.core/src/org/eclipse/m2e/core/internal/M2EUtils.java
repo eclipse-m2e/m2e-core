@@ -145,7 +145,7 @@ public class M2EUtils {
       return false;
     }
     for(Plugin p : project.getOriginalModel().getBuild().getPlugins()) {
-      if(p.getGroupId().equals(key.getGroupId()) && p.getArtifactId().equals(key.getArtifactId())) {
+      if(p.getGroupId().equals(key.groupId()) && p.getArtifactId().equals(key.artifactId())) {
         return true;
       }
     }

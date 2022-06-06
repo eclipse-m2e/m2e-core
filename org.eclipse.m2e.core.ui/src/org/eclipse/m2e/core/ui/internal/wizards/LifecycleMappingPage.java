@@ -304,7 +304,7 @@ public class LifecycleMappingPage extends WizardPage {
                     if(requirement instanceof MojoExecutionMappingRequirement mojo) {
                       executionId = mojo.getExecutionId();
                     } else if(requirement instanceof ProjectConfiguratorMappingRequirement conf) {
-                      executionId = conf.getExecution().getExecutionId();
+                      executionId = conf.getExecution().executionId();
                     }
 
                     if(executionId != null) {

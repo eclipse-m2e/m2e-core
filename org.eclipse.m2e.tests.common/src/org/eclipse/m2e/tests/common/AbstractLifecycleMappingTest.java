@@ -111,7 +111,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
 
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
       if((entry.getValue() == null || entry.getValue().isEmpty())
-          && LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
+          && LifecycleMappingFactory.isInterestingPhase(entry.getKey().lifecyclePhase())) {
         result.add(entry.getKey());
       }
     }

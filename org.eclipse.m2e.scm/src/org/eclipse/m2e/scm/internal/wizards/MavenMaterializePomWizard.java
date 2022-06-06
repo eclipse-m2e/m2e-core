@@ -81,10 +81,10 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
       if(artifactKey != null) {
         Dependency d = new Dependency();
-        d.setGroupId(artifactKey.getGroupId());
-        d.setArtifactId(artifactKey.getArtifactId());
-        d.setVersion(artifactKey.getVersion());
-        d.setClassifier(artifactKey.getClassifier());
+        d.setGroupId(artifactKey.groupId());
+        d.setArtifactId(artifactKey.artifactId());
+        d.setVersion(artifactKey.version());
+        d.setClassifier(artifactKey.classifier());
         dependencies.add(d);
       }
     }

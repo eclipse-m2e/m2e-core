@@ -262,17 +262,17 @@ public class WorkspaceHelpers {
     Assert.assertEquals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION,
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
     //TODO what parameters are important here for the hints?
-    Assert.assertEquals("Marker's groupID", mojoExecution.getGroupId(),
+    Assert.assertEquals("Marker's groupID", mojoExecution.groupId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null));
-    Assert.assertEquals("Marker's artifactId", mojoExecution.getArtifactId(),
+    Assert.assertEquals("Marker's artifactId", mojoExecution.artifactId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null));
-    Assert.assertEquals("Marker's executionId", mojoExecution.getExecutionId(),
+    Assert.assertEquals("Marker's executionId", mojoExecution.executionId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, null));
-    Assert.assertEquals("Marker's goal", mojoExecution.getGoal(),
+    Assert.assertEquals("Marker's goal", mojoExecution.goal(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null));
-    Assert.assertEquals("Marker's version", mojoExecution.getVersion(),
+    Assert.assertEquals("Marker's version", mojoExecution.version(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null));
-    Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.getLifecyclePhase(),
+    Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.lifecyclePhase(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
   }
 

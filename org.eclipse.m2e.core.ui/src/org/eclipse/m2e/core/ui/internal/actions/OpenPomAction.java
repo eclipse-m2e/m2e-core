@@ -116,7 +116,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
           new Job(Messages.OpenPomAction_job_opening) {
               @Override
               protected IStatus run(IProgressMonitor monitor) {
-              openEditor(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), getMavenProject(), monitor);
+              openEditor(ak.groupId(), ak.artifactId(), ak.version(), getMavenProject(), monitor);
               return Status.OK_STATUS;
             }
           }.schedule();

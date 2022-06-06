@@ -40,10 +40,10 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
 
     public MojoExecutionMappingRequirement(MojoExecutionKey execution) {
       Assert.isNotNull(execution);
-      this.execution = new MojoExecutionKey(execution.getGroupId(), execution.getArtifactId(), execution.getVersion(),
-          execution.getGoal(), null, null);
+      this.execution = new MojoExecutionKey(execution.groupId(), execution.artifactId(), execution.version(),
+          execution.goal(), null, null);
 
-      executionId = execution.getExecutionId();
+      executionId = execution.executionId();
     }
 
     /**
@@ -147,11 +147,11 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
   }
 
   public String getArtifactId() {
-    return execution.getArtifactId();
+    return execution.artifactId();
   }
 
   public String getGoal() {
-    return execution.getGoal();
+    return execution.goal();
   }
 
   public boolean isMapped() {

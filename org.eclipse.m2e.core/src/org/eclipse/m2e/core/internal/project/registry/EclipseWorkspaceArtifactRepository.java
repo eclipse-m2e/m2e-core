@@ -120,7 +120,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     // in vast majority of cases there will be single workspace artifact with matching groupId and artifactId
     for(ArtifactKey workspaceArtifact : workspaceArtifacts.keySet()) {
       try {
-        Version workspaceVersion = versionScheme.parseVersion(workspaceArtifact.getVersion());
+        Version workspaceVersion = versionScheme.parseVersion(workspaceArtifact.version());
         if(constraint.containsVersion(workspaceVersion)) {
           matchingArtifacts.put(workspaceVersion, workspaceArtifact);
         }
@@ -200,8 +200,8 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
 
     for(MavenProjectFacade facade : context.state.getProjects()) {
       ArtifactKey artifactKey = facade.getArtifactKey();
-      if(groupId.equals(artifactKey.getGroupId()) && artifactId.equals(artifactKey.getArtifactId())) {
-        versions.add(artifactKey.getVersion());
+      if(groupId.equals(artifactKey.groupId()) && artifactId.equals(artifactKey.artifactId())) {
+        versions.add(artifactKey.version());
       }
     }
 

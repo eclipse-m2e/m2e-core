@@ -126,7 +126,7 @@ public class MavenJdtPlugin extends Plugin {
     workspaceSourceDownloadJob = new WorkspaceSourceDownloadJob();
 
     mavenConfiguration.addConfigurationChangeListener(event -> {
-      String key = event.getKey();
+      String key = event.key();
 
       // use those constants from the event class is to have an overview of supported event keys
       if((MavenConfigurationChangeEvent.P_DOWNLOAD_JAVADOC.equals(key) && mavenConfiguration.isDownloadJavaDoc())

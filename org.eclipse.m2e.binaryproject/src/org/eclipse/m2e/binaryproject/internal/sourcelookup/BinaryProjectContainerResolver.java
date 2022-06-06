@@ -38,9 +38,9 @@ public class BinaryProjectContainerResolver extends MavenSourceContainerResolver
 
   @Override
   protected ISourceContainer resolveSourceContainer(ArtifactKey artifact, IProgressMonitor monitor) {
-    String groupId = artifact.getGroupId();
-    String artifactId = artifact.getArtifactId();
-    String version = artifact.getVersion();
+    String groupId = artifact.groupId();
+    String artifactId = artifact.artifactId();
+    String version = artifact.version();
 
     IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
 

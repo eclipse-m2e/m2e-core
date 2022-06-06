@@ -450,15 +450,15 @@ public class ProjectConfigurationManager
 
   private void updateProjectConfiguration(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    IProject project = request.getProject();
+    IProject project = request.mavenProjectFacade().getProject();
     long start = System.currentTimeMillis();
-    IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
+    IMavenProjectFacade mavenProjectFacade = request.mavenProjectFacade();
     log.debug("Updating project configuration for {}.", mavenProjectFacade); //$NON-NLS-1$
 
     addMavenNature(project, monitor);
 
     // Configure project file encoding
-    MavenProject mavenProject = request.getMavenProject();
+    MavenProject mavenProject = request.mavenProject();
     Properties mavenProperties = mavenProject.getProperties();
     String sourceEncoding = mavenProperties.getProperty("project.build.sourceEncoding");
     log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
@@ -475,7 +475,7 @@ public class ProjectConfigurationManager
 
         lifecycleMapping.configure(request, m);
 
-        LifecycleMappingConfiguration.persist(request.getMavenProjectFacade(), m);
+        LifecycleMappingConfiguration.persist(request.mavenProjectFacade(), m);
       } else {
         log.debug("LifecycleMapping is null for project {}", mavenProjectFacade); //$NON-NLS-1$
       }

@@ -152,8 +152,8 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
         repository.addProject(facade.getPom().getFullPath());
         continue;
       }
-      AuthenticationInfo auth = getAuthenticationInfo(settings, repo.getId());
-      repository = new RepositoryInfo(repo.getId(), repo.getUrl(), SCOPE_PROJECT, auth);
+      AuthenticationInfo auth = getAuthenticationInfo(settings, repo.id());
+      repository = new RepositoryInfo(repo.id(), repo.url(), SCOPE_PROJECT, auth);
       repository.addProject(facade.getPom().getFullPath());
 
       addRepository(repository, monitor);
@@ -312,7 +312,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   @Override
   public RepositoryInfo getRepository(ArtifactRepositoryRef ref) {
-    String uid = RepositoryInfo.getUid(ref.getId(), ref.getUrl(), ref.getUsername());
+    String uid = RepositoryInfo.getUid(ref.id(), ref.url(), ref.username());
     return repositories.get(uid);
   }
 

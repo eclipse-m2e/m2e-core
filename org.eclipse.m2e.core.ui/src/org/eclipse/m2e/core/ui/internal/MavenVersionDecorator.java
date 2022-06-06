@@ -61,10 +61,10 @@ public class MavenVersionDecorator implements ILabelDecorator {
             if(start > -1) {
               int n = text.indexOf(' ', start + name.length());
               if(n > -1) {
-                return text.substring(0, n) + "  " + mavenProject.getVersion() + text.substring(n); //$NON-NLS-1$
+                return text.substring(0, n) + "  " + mavenProject.version() + text.substring(n); //$NON-NLS-1$
               }
             }
-            return text + "  " + mavenProject.getVersion(); //$NON-NLS-1$
+            return text + "  " + mavenProject.version(); //$NON-NLS-1$
           }
         }
       }

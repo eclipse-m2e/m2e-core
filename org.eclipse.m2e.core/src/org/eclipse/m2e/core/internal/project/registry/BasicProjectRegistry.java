@@ -133,7 +133,7 @@ abstract class BasicProjectRegistry implements Serializable {
   public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
     Map<ArtifactKey, Collection<IFile>> artifacts = new HashMap<>();
     workspaceArtifacts.forEach((wsKey, files) -> {
-      if(!files.isEmpty() && groupId.equals(wsKey.getGroupId()) && artifactId.equals(wsKey.getArtifactId())) {
+      if(!files.isEmpty() && groupId.equals(wsKey.groupId()) && artifactId.equals(wsKey.artifactId())) {
         artifacts.computeIfAbsent(wsKey, k -> new HashSet<>()).addAll(files);
       }
     });

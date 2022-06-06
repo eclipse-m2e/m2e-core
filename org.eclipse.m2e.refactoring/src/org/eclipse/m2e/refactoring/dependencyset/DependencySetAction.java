@@ -16,6 +16,7 @@ package org.eclipse.m2e.refactoring.dependencyset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -72,7 +73,8 @@ public class DependencySetAction implements IActionDelegate {
         } else*/if(selected instanceof org.eclipse.aether.graph.DependencyNode node) {
           file = getFileFromEditor();
           if(node.getData().get("LEVEL") == null) {
-            keys.add(new ArtifactKey(node.getDependency().getArtifact()));
+            Artifact artifact = node.getDependency().getArtifact();
+            keys.add(new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), null));
           }
 
         } /*else if (selected instanceof RequiredProjectWrapper) {

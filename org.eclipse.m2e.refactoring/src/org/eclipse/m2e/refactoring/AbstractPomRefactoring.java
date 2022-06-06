@@ -130,7 +130,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
 
       // construct properties for all models
       for(IMavenProjectFacade projectFacade : projects) {
-        RefactoringModelResources model = models.get(projectFacade.getArtifactKey().getArtifactId());
+        RefactoringModelResources model = models.get(projectFacade.getArtifactKey().artifactId());
         if(model == null) {
           continue;
         }

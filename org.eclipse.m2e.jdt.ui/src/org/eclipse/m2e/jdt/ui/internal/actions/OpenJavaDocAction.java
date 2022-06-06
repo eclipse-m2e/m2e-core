@@ -77,7 +77,7 @@ public class OpenJavaDocAction extends ActionDelegate {
 
       new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc, ak)) {
         protected IStatus run(IProgressMonitor monitor) {
-          openJavaDoc(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
+          openJavaDoc(ak.groupId(), ak.artifactId(), ak.version(), monitor);
           return Status.OK_STATUS;
         }
       }.schedule();

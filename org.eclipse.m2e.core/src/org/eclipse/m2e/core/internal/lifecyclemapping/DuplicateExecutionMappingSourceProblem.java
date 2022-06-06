@@ -36,7 +36,7 @@ public class DuplicateExecutionMappingSourceProblem extends DuplicateMappingSour
    */
   public DuplicateExecutionMappingSourceProblem(SourceLocation location, String message, MojoExecutionKey executionKey,
       DuplicatePluginExecutionMetadataException error) {
-    super(location, message, IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE_GOAL, executionKey.getGoal(), error);
+    super(location, message, IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE_GOAL, executionKey.goal(), error);
     this.executionKey = executionKey;
   }
 

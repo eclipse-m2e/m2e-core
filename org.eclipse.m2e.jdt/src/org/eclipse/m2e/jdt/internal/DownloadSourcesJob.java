@@ -211,7 +211,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     SubMonitor requestMonitor = SubMonitor.convert(monitor, 33);
     try {
       if(request.artifact != null) {
-        requestMonitor.setTaskName(getName() + ": " + request.artifact.getArtifactId());
+        requestMonitor.setTaskName(getName() + ": " + request.artifact.artifactId());
       } else if(request.project != null) {
         requestMonitor.setTaskName(getName() + ": " + request.project.getName());
       }
@@ -305,11 +305,11 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private File download(ArtifactKey artifact, List<ArtifactRepository> repositories, IProgressMonitor monitor)
       throws CoreException {
-    Artifact resolved = maven.resolve(artifact.getGroupId(), //
-        artifact.getArtifactId(), //
-        artifact.getVersion(), //
+    Artifact resolved = maven.resolve(artifact.groupId(), //
+        artifact.artifactId(), //
+        artifact.version(), //
         "jar" /*type*/, // //$NON-NLS-1$
-        artifact.getClassifier(), //
+        artifact.classifier(), //
         repositories, //
         monitor);
     return resolved.getFile();
