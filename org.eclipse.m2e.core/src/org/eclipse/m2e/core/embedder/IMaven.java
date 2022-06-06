@@ -56,7 +56,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IMaven {
+public interface IMaven extends IComponentLookup {
 
   // POM Model read/write operations
 
@@ -229,8 +229,6 @@ public interface IMaven {
    */
   ClassLoader getProjectRealm(MavenProject project);
 
-  // execution context
-
   /**
    * This is convenience method fully equivalent to
    *
@@ -241,8 +239,8 @@ public interface IMaven {
    * return context.execute(callable, monitor);
    * </pre>
    *
-   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private
-   *             util method
+   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private util
+   *             method
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
@@ -262,17 +260,6 @@ public interface IMaven {
   default <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(callable, monitor);
   }
-
-  /**
-   * Lookup a component from the embedded PlexusContainer.
-   * @param clazz the requested role
-   * @return The component instance requested.
-   * @throws CoreException if the requested component is not available
-   *
-   * @since 1.10
-   */
-  <T> T lookup(Class<T> clazz) throws CoreException;
-
 
   /**
    * Creates and returns new, possibly nested, maven execution context for this Maven embedder.

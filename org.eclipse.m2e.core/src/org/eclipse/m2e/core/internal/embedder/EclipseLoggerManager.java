@@ -13,8 +13,13 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import org.codehaus.plexus.logging.AbstractLoggerManager;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LoggerManager;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
@@ -24,12 +29,17 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
  *
  * @author igor
  */
+@Component(service = LoggerManager.class)
 public class EclipseLoggerManager extends AbstractLoggerManager {
 
-  private final EclipseLogger logger;
+  @Reference
+  IMavenConfiguration mavenConfiguration;
 
-  public EclipseLoggerManager(IMavenConfiguration mavenConfiguration) {
-    this.logger = new EclipseLogger(mavenConfiguration);
+  private EclipseLogger logger;
+
+  @Activate
+  void activate() {
+    logger = new EclipseLogger(mavenConfiguration);
   }
 
   @Override

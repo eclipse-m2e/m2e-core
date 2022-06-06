@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +36,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -60,9 +60,13 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.EnvironmentUtils;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.session.scope.internal.SessionScope;
+import org.apache.maven.settings.Settings;
 
 import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -135,21 +139,23 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       request = DefaultMavenExecutionRequest.copy(parent);
     }
     if(request == null) {
-      request = createExecutionRequest();
+      request = createExecutionRequest(maven.getMavenConfiguration(), maven, maven);
+      request.setBaseDirectory(basedir);
     }
-    request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(basedir));
+    request.setMultiModuleProjectDirectory(PlexusContainerManager.computeMultiModuleProjectDirectory(basedir));
 
     return request;
   }
 
-  private MavenExecutionRequest createExecutionRequest() throws CoreException {
+  static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration,
+      IComponentLookup lookup, IMaven maven)
+      throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
     // this causes problems with unexpected "stale project configuration" error markers
     // need to think how to manage ${maven.build.timestamp} properly inside workspace
     //request.setStartTime( new Date() );
 
-    IMavenConfiguration mavenConfiguration = maven.getMavenConfiguration();
     if(mavenConfiguration.getGlobalSettingsFile() != null) {
       request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
     }
@@ -159,13 +165,25 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
     request.setUserSettingsFile(userSettingsFile);
 
+    Settings settings = maven.getSettings(); //TODO if we could adapt IMavenConfiguration -> Settings we could save the IMaven reference here 
+    //and settings are actually derived from IMavenConfiguration
     try {
-      maven.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, maven.getSettings());
+      request = lookup.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, settings);
     } catch(MavenExecutionRequestPopulationException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_no_exec_req, ex));
     }
 
-    ArtifactRepository localRepository = maven.getLocalRepository();
+    String localRepositoryPath = settings.getLocalRepository();
+    if(localRepositoryPath == null) {
+      localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
+    }
+
+    ArtifactRepository localRepository;
+    try {
+      localRepository = lookup.lookup(RepositorySystem.class).createLocalRepository(new File(localRepositoryPath));
+    } catch(InvalidRepositoryException ex) {
+      throw new AssertionError("Should never happen!", ex);
+    }
     request.setLocalRepository(localRepository);
     request.setLocalRepositoryPath(localRepository.getBasedir());
     request.setOffline(mavenConfiguration.isOffline());
@@ -179,12 +197,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.setCacheTransferError(true);
 
     request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
-    // the right way to disable snapshot update
-    // request.setUpdateSnapshots(false);
-    if(basedir != null) {
-      request.setBaseDirectory(basedir);
-      request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(basedir));
-    }
     return request;
   }
 
@@ -459,46 +471,51 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   }
 
   @Override
-  public <Extension> Collection<Extension> lookupExtensions(Class<Extension> extensionType) {
-    MavenSession session = getSession();
-    List<MavenProject> projects = session.getProjects();
-    Collection<Extension> extensions = new LinkedHashSet<>();
-    extensions.addAll(lookupList(extensionType));
-    if(projects != null && !projects.isEmpty()) {
-      extensions.addAll(getProjectScopedExtensionComponents(projects, extensionType));
+  public IComponentLookup getComponentLookup() {
+    if(context == null) {
+      throw new IllegalStateException();
     }
-    return extensions;
-  }
-
-  private <Extension> List<Extension> lookupList(Class<Extension> extensionType) {
-    try {
-      return maven.getPlexusContainer().lookupList(extensionType);
-    } catch(CoreException | ComponentLookupException e) {
-      e.printStackTrace();
-      return List.of();
+    if(projectFacade == null) {
+      return maven;
     }
-  }
-
-  private <T> Collection<T> getProjectScopedExtensionComponents(Collection<MavenProject> projects,
-      Class<T> extensionType) {
-
-    Collection<T> result = new LinkedHashSet<>();
-    Collection<ClassLoader> realms = new HashSet<>();
-
-    Thread thread = Thread.currentThread();
-    ClassLoader ccl = thread.getContextClassLoader();
-    try {
-      for(MavenProject project : projects) {
-        ClassLoader projectRealm = project.getClassRealm();
-
-        if(projectRealm != null && realms.add(projectRealm)) {
-          thread.setContextClassLoader(projectRealm);
-          result.addAll(lookupList(extensionType));
+    MavenProject mavenProject = projectFacade.getMavenProject();
+    if(mavenProject == null) {
+      return projectFacade;
+    }
+    //project scoped lookup...
+    return new IComponentLookup() {
+      @Override
+      public <T> T lookup(Class<T> clazz) throws CoreException {
+        Thread thread = Thread.currentThread();
+        ClassLoader ccl = thread.getContextClassLoader();
+        try {
+          ClassLoader projectRealm = mavenProject.getClassRealm();
+          if(projectRealm != null) {
+            thread.setContextClassLoader(projectRealm);
+          }
+          return projectFacade.lookup(clazz);
+        } finally {
+          thread.setContextClassLoader(ccl);
         }
       }
-      return result;
-    } finally {
-      thread.setContextClassLoader(ccl);
-    }
+
+      @Override
+      public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
+        Thread thread = Thread.currentThread();
+        ClassLoader ccl = thread.getContextClassLoader();
+        try {
+          ClassRealm projectRealm = mavenProject.getClassRealm();
+          if(projectRealm != null) {
+            thread.setContextClassLoader(projectRealm);
+          }
+          return projectFacade.lookupCollection(type);
+        } finally {
+          thread.setContextClassLoader(ccl);
+        }
+      }
+
+    };
   }
+
+
 }

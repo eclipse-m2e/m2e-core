@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -41,7 +43,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
-public interface IMavenProjectFacade {
+public interface IMavenProjectFacade extends IComponentLookup {
 
   /**
    * Returns project relative paths of resource directories
@@ -163,5 +165,29 @@ public interface IMavenProjectFacade {
    * @since 2.0
    */
   IMavenExecutionContext createExecutionContext();
+
+  /**
+   * Lookup a component from the projects context. This will include potentially defined <b>core</b>-extensions, but not
+   * <b>project</b>-scoped extensions! If you need project-scoped extensions as well use
+   * {@link #createExecutionContext()} and call {@link IMavenExecutionContext#lookupExtensions(Class)}
+   * 
+   * @param clazz the requested role
+   * @return The component instance requested.
+   * @throws CoreException if the requested component is not available
+   */
+  @Override
+  <T> T lookup(Class<T> clazz) throws CoreException;
+
+  /**
+   * Lookup a list of components from the projects context. This will include potentially defined
+   * <b>core</b>-extensions, but not <b>project</b>-scoped extensions! If you need project-scoped extensions as well use
+   * {@link #createExecutionContext()} and call {@link IMavenExecutionContext#lookupExtensions(Class)}
+   * 
+   * @param clazz the requested role
+   * @return The component instance requested.
+   * @throws CoreException if the requested component is not available
+   */
+  @Override
+  <C> Collection<C> lookupCollection(Class<C> type) throws CoreException;
 
 }

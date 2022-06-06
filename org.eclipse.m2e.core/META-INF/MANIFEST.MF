@@ -55,7 +55,9 @@ Import-Package: javax.inject;version="1.0.0",
  org.slf4j;version="1.6.2"
 Automatic-Module-Name: org.eclipse.m2e.core
 Service-Component: OSGI-INF/org.eclipse.m2e.core.embedder.MavenModelManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.embedder.EclipseLoggerManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.embedder.MavenImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.embedder.PlexusContainerManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.markers.MavenMarkerManager.xml,

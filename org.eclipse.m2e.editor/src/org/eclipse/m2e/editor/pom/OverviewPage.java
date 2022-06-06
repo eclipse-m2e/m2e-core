@@ -164,8 +164,6 @@ public class OverviewPage extends MavenPomEditorPage {
   private static final int RELOAD_ALL = RELOAD_MODULES + RELOAD_BASE + RELOAD_CI + RELOAD_SCM + RELOAD_IM
       + RELOAD_PROPERTIES + RELOAD_ORG + RELOAD_PARENT;
 
-  private static final String COMPONENTS_PATH = "META-INF/plexus/components.xml";
-
   //controls
   Text artifactIdText;
 
@@ -357,8 +355,9 @@ public class OverviewPage extends MavenPomEditorPage {
     if(projectFacade != null) {
       try {
         List<String> list = projectFacade.createExecutionContext().execute((context, monitor) -> {
-          return context.lookupExtensions(ArtifactHandler.class).stream().map(ArtifactHandler::getPackaging)
-              .filter(Objects::nonNull).distinct().sorted().collect(Collectors.toList());
+          return context.getComponentLookup().lookupCollection(ArtifactHandler.class).stream()
+              .map(ArtifactHandler::getPackaging).filter(Objects::nonNull).distinct().sorted()
+              .collect(Collectors.toList());
         }, null);
         packagingTypes.addAll(list);
       } catch(CoreException ex) {
