@@ -139,12 +139,7 @@ public class SaveDirtyFilesDialog extends ListDialog {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if(newInput instanceof List) {
-        fContents = (List) newInput;
-      } else {
-        fContents = null;
-        // we use a fixed set.
-      }
+      fContents = newInput instanceof List list ? list : null; // else we use a fixed set.
     }
 
     @Override

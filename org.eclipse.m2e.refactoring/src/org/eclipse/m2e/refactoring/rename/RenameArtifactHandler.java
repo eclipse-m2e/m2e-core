@@ -41,10 +41,10 @@ public class RenameArtifactHandler extends AbstractHandler {
       return null;
     }
     Object element = ((IStructuredSelection) selection).getFirstElement();
-    if(element instanceof IFile) {
-      rename((IFile) element);
-    } else if(element instanceof IAdaptable) {
-      IProject project = ((IAdaptable) element).getAdapter(IProject.class);
+    if(element instanceof IFile file) {
+      rename(file);
+    } else if(element instanceof IAdaptable adaptable) {
+      IProject project = adaptable.getAdapter(IProject.class);
       if(project == null) {
         return null;
       }
