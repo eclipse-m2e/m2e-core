@@ -32,7 +32,7 @@ public abstract class AbstractBinaryProjectsImportJob extends Job {
 		Collection<ArtifactKey> artifacts = getArtifactKeys(monitor);
 		for (ArtifactKey a : artifacts) {
 			try {
-				BinaryProjectPlugin.create(a.getGroupId(), a.getArtifactId(), a.getVersion(), null, monitor);
+				BinaryProjectPlugin.create(a.groupId(), a.artifactId(), a.version(), null, monitor);
 			} catch (CoreException e) {
 			}
 		}

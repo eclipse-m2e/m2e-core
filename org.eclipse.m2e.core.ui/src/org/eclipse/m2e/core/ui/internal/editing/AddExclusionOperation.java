@@ -54,12 +54,12 @@ public class AddExclusionOperation implements Operation {
     if(depElement != null) {
       Element exclusionsElement = getChild(depElement, EXCLUSIONS);
 
-      if(null == PomEdits.findChild(exclusionsElement, EXCLUSION, childEquals(GROUP_ID, exclusion.getGroupId()),
-          childEquals(ARTIFACT_ID, exclusion.getArtifactId()))) {
+      if(null == PomEdits.findChild(exclusionsElement, EXCLUSION, childEquals(GROUP_ID, exclusion.groupId()),
+          childEquals(ARTIFACT_ID, exclusion.artifactId()))) {
         Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
 
-        createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
-        createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
+        createElementWithText(exclusionElement, GROUP_ID, exclusion.groupId());
+        createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.artifactId());
         format(exclusionElement);
       }
     } else {

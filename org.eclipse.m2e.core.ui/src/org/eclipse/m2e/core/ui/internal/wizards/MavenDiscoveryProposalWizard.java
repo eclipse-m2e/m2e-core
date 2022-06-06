@@ -177,10 +177,10 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         }
 
         private void ignore(MojoExecutionKey key, Collection<MavenProject> projects) {
-          String pluginGroupId = key.getGroupId();
-          String pluginArtifactId = key.getArtifactId();
-          String pluginVersion = key.getVersion();
-          String[] goals = new String[] {key.getGoal()};
+          String pluginGroupId = key.groupId();
+          String pluginArtifactId = key.artifactId();
+          String pluginVersion = key.version();
+          String[] goals = new String[] {key.goal()};
           for(MavenProject project : projects) {
             IFile pomFile = M2EUtils.getPomFile(project);
             try {
@@ -200,8 +200,8 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
         private void ignoreWorkspace(MojoExecutionKey key) {
           LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
-          LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.getGroupId(), key.getArtifactId(),
-              key.getVersion(), new String[] {key.getGoal()}, PluginExecutionAction.ignore);
+          LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.groupId(), key.artifactId(),
+              key.version(), new String[] {key.goal()}, PluginExecutionAction.ignore);
           LifecycleMappingFactory.writeWorkspaceMetadata(mapping);
         }
       };

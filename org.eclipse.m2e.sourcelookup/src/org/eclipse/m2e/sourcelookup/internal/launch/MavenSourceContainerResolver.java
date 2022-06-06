@@ -56,9 +56,9 @@ public class MavenSourceContainerResolver implements ISourceContainerResolver {
   }
 
   protected ISourceContainer resolveSourceContainer(ArtifactKey artifact, IProgressMonitor monitor) {
-    String groupId = artifact.getGroupId();
-    String artifactId = artifact.getArtifactId();
-    String version = artifact.getVersion();
+    String groupId = artifact.groupId();
+    String artifactId = artifact.artifactId();
+    String version = artifact.version();
 
     IMaven maven = MavenPlugin.getMaven();
     IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();

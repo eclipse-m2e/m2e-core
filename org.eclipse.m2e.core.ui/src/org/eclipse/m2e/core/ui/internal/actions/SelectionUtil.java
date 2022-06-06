@@ -200,12 +200,12 @@ public class SelectionUtil {
   }
 
   public static ArtifactKey getArtifactKey(Object element) {
-    if(element instanceof Artifact) {
-      return new ArtifactKey(((Artifact) element));
+    if(element instanceof Artifact artifact) {
+      return new ArtifactKey(artifact);
 
     } else if(element instanceof org.eclipse.aether.graph.DependencyNode depNode) {
       org.eclipse.aether.artifact.Artifact artifact = depNode.getDependency().getArtifact();
-      return new ArtifactKey(artifact);
+      return new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), null);
 
       //getArtifactKey() used only in a handful of actions, to my knowledge none of these are currently available on
       //model.edit.Dependency instances.

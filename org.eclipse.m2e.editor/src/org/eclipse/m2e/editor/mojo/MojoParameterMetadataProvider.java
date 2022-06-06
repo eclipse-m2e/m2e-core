@@ -193,7 +193,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
   }
 
   private MojoParameter getPredefined(ArtifactKey pluginKey) {
-    return PREDEF.get(pluginKey.getGroupId() + ":" + pluginKey.getArtifactId() + ":" + pluginKey.getVersion());
+    return PREDEF.get(pluginKey.groupId() + ":" + pluginKey.artifactId() + ":" + pluginKey.version());
   }
 
   <T> T execute(final ArtifactKey pluginKey, final ICallable<T> callable) throws CoreException {
@@ -255,9 +255,9 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     PluginDescriptor desc;
 
     Plugin plugin = new Plugin();
-    plugin.setGroupId(pluginKey.getGroupId());
-    plugin.setArtifactId(pluginKey.getArtifactId());
-    plugin.setVersion(pluginKey.getVersion());
+    plugin.setGroupId(pluginKey.groupId());
+    plugin.setArtifactId(pluginKey.artifactId());
+    plugin.setVersion(pluginKey.version());
 
     List<RemoteRepository> remoteRepos = context.getSession().getCurrentProject().getRemotePluginRepositories();
     try {

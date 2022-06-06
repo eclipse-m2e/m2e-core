@@ -228,14 +228,14 @@ public class MavenPomSelectionComponent extends Composite {
 
     if(artifacts != null) {
       for(ArtifactKey a : artifacts) {
-        artifactKeys.add(a.getGroupId() + ":" + a.getArtifactId()); //$NON-NLS-1$
-        artifactKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+        artifactKeys.add(a.groupId() + ":" + a.artifactId()); //$NON-NLS-1$
+        artifactKeys.add(a.groupId() + ":" + a.artifactId() + ":" + a.version()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
     if(managed != null) {
       for(ArtifactKey a : managed) {
-        managedKeys.add(a.getGroupId() + ":" + a.getArtifactId()); //$NON-NLS-1$
-        managedKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+        managedKeys.add(a.groupId() + ":" + a.artifactId()); //$NON-NLS-1$
+        managedKeys.add(a.groupId() + ":" + a.artifactId() + ":" + a.version()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
 

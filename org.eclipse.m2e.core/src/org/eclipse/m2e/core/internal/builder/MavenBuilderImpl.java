@@ -120,7 +120,7 @@ public class MavenBuilderImpl {
               : null;
 
           log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
-              mojoExecutionKey.toString());
+              mojoExecutionKey);
           participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
@@ -141,7 +141,8 @@ public class MavenBuilderImpl {
             log.debug("Exception in build participant {}", participant.getClass().getName(), e);
             buildErrors.put(e, mojoExecutionKey);
           } finally {
-            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", participant.getClass().getName(), mojoExecutionKey.toString(), System.currentTimeMillis() - executionStartTime);
+            log.debug("Finished executing build participant {} for plugin execution {} in {} ms",
+                participant.getClass().getName(), mojoExecutionKey, System.currentTimeMillis() - executionStartTime);
             participant.setMavenProjectFacade(null);
             participant.setGetDeltaCallback(null);
             participant.setSession(null);
@@ -187,7 +188,8 @@ public class MavenBuilderImpl {
   }
 
   private void debugBuildParticipant(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade,
-      MojoExecutionKey mojoExecutionKey, AbstractBuildParticipant participant, Set<File> files, IProgressMonitor monitor) {
+      MojoExecutionKey mojoExecutionKey, AbstractBuildParticipant participant, Set<File> files,
+      IProgressMonitor monitor) {
     for(BuildDebugHook hook : hooks) {
       hook.buildParticipant(projectFacade, mojoExecutionKey, participant, files, monitor);
     }
@@ -311,8 +313,8 @@ public class MavenBuilderImpl {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
     try {
-      markerManager.deleteMarkers(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID,
-          BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
+      markerManager.deleteMarkers(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID, BUILD_PARTICIPANT_ID_ATTR_NAME,
+          buildParticipantId);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     }

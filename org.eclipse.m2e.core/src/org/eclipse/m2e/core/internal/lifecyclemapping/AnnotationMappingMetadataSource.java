@@ -94,11 +94,11 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
 
   private Xpp3Dom getAction(MojoExecutionKey execution) {
 
-    String key = Plugin.constructKey(execution.getGroupId(), execution.getArtifactId());
+    String key = Plugin.constructKey(execution.groupId(), execution.artifactId());
     Plugin plugin = getPlugin(project.getBuild(), key);
     Plugin mplugin = getPlugin(project.getPluginManagement(), key);
 
-    String executionId = execution.getExecutionId();
+    String executionId = execution.executionId();
     if(executionId != null) {
 
       // find pi for the executionId

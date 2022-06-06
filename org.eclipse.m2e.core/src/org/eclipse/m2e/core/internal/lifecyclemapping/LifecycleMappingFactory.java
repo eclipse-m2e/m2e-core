@@ -810,7 +810,7 @@ public class LifecycleMappingFactory {
       List<IPluginExecutionMetadata> executionMetadatas = entry.getValue();
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
-        if(reportNotCoveredMojoExecutionProblems && isInterestingPhase(executionKey.getLifecyclePhase())) {
+        if(reportNotCoveredMojoExecutionProblems && isInterestingPhase(executionKey.lifecyclePhase())) {
           SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
           result.addProblem(
               new NotCoveredMojoExecution(executionKey, notCoveredMojoExecutionSeverity.getSeverity(), markerLocation));

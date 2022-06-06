@@ -83,11 +83,11 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     Map<String, String> attributes = new LinkedHashMap<>(this.attributes);
 
     if(artifactKey != null) {
-      attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.getGroupId());
-      attributes.put(IClasspathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.getArtifactId());
-      attributes.put(IClasspathManager.VERSION_ATTRIBUTE, artifactKey.getVersion());
-      if(artifactKey.getClassifier() != null) {
-        attributes.put(IClasspathManager.CLASSIFIER_ATTRIBUTE, artifactKey.getClassifier());
+      attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.groupId());
+      attributes.put(IClasspathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.artifactId());
+      attributes.put(IClasspathManager.VERSION_ATTRIBUTE, artifactKey.version());
+      if(artifactKey.classifier() != null) {
+        attributes.put(IClasspathManager.CLASSIFIER_ATTRIBUTE, artifactKey.classifier());
       }
     }
     if(scope != null) {
@@ -167,7 +167,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   @Override
   public String getGroupId() {
-    return artifactKey != null ? artifactKey.getGroupId() : null;
+    return artifactKey != null ? artifactKey.groupId() : null;
   }
 
   private void setClasspathEntry(IClasspathEntry entry) {
@@ -201,7 +201,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   @Override
   public String getArtifactId() {
-    return artifactKey != null ? artifactKey.getArtifactId() : null;
+    return artifactKey != null ? artifactKey.artifactId() : null;
   }
 
   @Override

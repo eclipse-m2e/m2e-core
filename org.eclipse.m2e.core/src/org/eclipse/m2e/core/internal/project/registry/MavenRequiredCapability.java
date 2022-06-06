@@ -49,27 +49,27 @@ public class MavenRequiredCapability extends RequiredCapability {
   }
 
   public static MavenRequiredCapability createResolvedMavenArtifact(ArtifactKey key, String scope, boolean optional) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.version(),
         scope, optional, true);
   }
 
   public static MavenRequiredCapability createMavenArtifact(ArtifactKey key, String scope, boolean optional) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.version(),
         scope, optional, false);
   }
 
   public static MavenRequiredCapability createMavenArtifactImport(ArtifactKey key) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT_IMPORT, MavenCapability.getId(key),
-        key.getVersion(), "import", false, false); //$NON-NLS-1$
+        key.version(), "import", false, false); //$NON-NLS-1$
   }
 
   public static MavenRequiredCapability createMavenParent(ArtifactKey key) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.version(),
         null, false, false);
   }
 
   public static MavenRequiredCapability createResolvedMavenParent(ArtifactKey key) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.version(),
         null, false, true);
   }
 

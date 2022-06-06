@@ -79,12 +79,12 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
 
   protected IMavenProjectFacade getMavenDistribution() {
     try {
-      VersionRange range = VersionRange.createFromVersionSpec(getDistributionArtifactKey().getVersion());
+      VersionRange range = VersionRange.createFromVersionSpec(getDistributionArtifactKey().version());
       for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
         ArtifactKey artifactKey = facade.getArtifactKey();
-        if(getDistributionArtifactKey().getGroupId().equals(artifactKey.getGroupId()) //
-            && getDistributionArtifactKey().getArtifactId().equals(artifactKey.getArtifactId())//
-            && range.containsVersion(new DefaultArtifactVersion(artifactKey.getVersion()))) {
+        if(getDistributionArtifactKey().groupId().equals(artifactKey.groupId()) //
+            && getDistributionArtifactKey().artifactId().equals(artifactKey.artifactId())//
+            && range.containsVersion(new DefaultArtifactVersion(artifactKey.version()))) {
           return facade;
         }
       }
@@ -121,8 +121,8 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
       //
       for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
         ArtifactKey artifactKey = facade.getArtifactKey();
-        if(getDistributionArtifactKey().getGroupId().equals(artifactKey.getGroupId()) //
-            && getDistributionArtifactKey().getArtifactId().equals(artifactKey.getArtifactId())) {
+        if(getDistributionArtifactKey().groupId().equals(artifactKey.groupId()) //
+            && getDistributionArtifactKey().artifactId().equals(artifactKey.artifactId())) {
           File loggingConfigurationDirectory = new File(facade.getPomFile().getParentFile(), "src/conf/logging");
           if(loggingConfigurationDirectory.exists()) {
             collector.addArchiveEntry(loggingConfigurationDirectory.getAbsolutePath());
@@ -135,8 +135,8 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
       IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
       for(Artifact artifact : artifacts) {
         if(!Artifact.SCOPE_TEST.equals(artifact.getScope())) {
-          if(PLEXUS_CLASSWORLDS.getGroupId().equals(artifact.getGroupId())
-              && PLEXUS_CLASSWORLDS.getArtifactId().equals(artifact.getArtifactId())) {
+          if(PLEXUS_CLASSWORLDS.groupId().equals(artifact.getGroupId())
+              && PLEXUS_CLASSWORLDS.artifactId().equals(artifact.getArtifactId())) {
             launcherArtifact = artifact;
           } else {
             addArtifact(collector, artifact, projectRegistry);
@@ -168,18 +168,18 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
   public String toString() {
     IMavenProjectFacade maven = getMavenDistribution();
     if(maven != null) {
-      return maven.getProject().getName() + ' ' + maven.getArtifactKey().getVersion();
+      return maven.getProject().getName() + ' ' + maven.getArtifactKey().version();
     }
-    return getDistributionArtifactKey().getVersion();
+    return getDistributionArtifactKey().version();
   }
 
   @Override
   public String getVersion() {
     IMavenProjectFacade maven = getMavenDistribution();
     if(maven != null) {
-      return maven.getArtifactKey().getVersion();
+      return maven.getArtifactKey().version();
     }
-    return getDistributionArtifactKey().getVersion();
+    return getDistributionArtifactKey().version();
   }
 
 }

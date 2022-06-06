@@ -147,7 +147,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 			MojoExecution execution, IPluginExecutionMetadata executionMetadata) {
 
 		MojoExecutionKey key = getExecutionKey();
-		if (execution.getArtifactId().equals(key.getArtifactId()) && execution.getGoal().equals(key.getGoal())) {
+		if (execution.getArtifactId().equals(key.artifactId()) && execution.getGoal().equals(key.goal())) {
 
 			return new AbstractBuildParticipant() {
 				@Override
@@ -173,7 +173,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 						IWorkspaceRoot root = project.getWorkspace().getRoot();
 						ArtifactKey mavenProject = projectFacade.getArtifactKey();
 						IPath outputPath = getOutputDir(projectFacade).append("META-INF/maven")
-								.append(mavenProject.getGroupId()).append(mavenProject.getArtifactId());
+								.append(mavenProject.groupId()).append(mavenProject.artifactId());
 
 						IFile pom = root.getFolder(outputPath).getFile(IMavenConstants.POM_FILE_NAME);
 						forcePom = !pom.exists();
@@ -790,13 +790,13 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 	private String getPluginKey() {
 		MojoExecutionKey execution = getExecutionKey();
-		return execution.getGroupId() + ":" + execution.getArtifactId();
+		return execution.groupId() + ":" + execution.artifactId();
 	}
 
 	private MojoExecution getExecution(MavenExecutionPlan executionPlan, MojoExecutionKey key) {
 		for (MojoExecution execution : executionPlan.getMojoExecutions()) {
-			if (key.getArtifactId().equals(execution.getArtifactId()) && key.getGroupId().equals(execution.getGroupId())
-					&& key.getGoal().equals(execution.getGoal())) {
+			if (key.artifactId().equals(execution.getArtifactId()) && key.groupId().equals(execution.getGroupId())
+					&& key.goal().equals(execution.getGoal())) {
 				return execution;
 			}
 		}
@@ -833,16 +833,16 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		ArtifactKey mavenProject = facade.getArtifactKey();
 		IWorkspaceRoot root = project.getWorkspace().getRoot();
 
-		IPath outputPath = getOutputDir(facade).append("META-INF/maven").append(mavenProject.getGroupId())
-				.append(mavenProject.getArtifactId());
+		IPath outputPath = getOutputDir(facade).append("META-INF/maven").append(mavenProject.groupId())
+				.append(mavenProject.artifactId());
 
 		IFolder output = root.getFolder(outputPath);
 		M2EUtils.createFolder(output, true, monitor);
 
 		Properties properties = new Properties();
-		properties.put("groupId", mavenProject.getGroupId());
-		properties.put("artifactId", mavenProject.getArtifactId());
-		properties.put("version", mavenProject.getVersion());
+		properties.put("groupId", mavenProject.groupId());
+		properties.put("artifactId", mavenProject.artifactId());
+		properties.put("version", mavenProject.version());
 		properties.put("m2e.projectName", project.getName());
 		properties.put("m2e.projectLocation", project.getLocation().toOSString());
 

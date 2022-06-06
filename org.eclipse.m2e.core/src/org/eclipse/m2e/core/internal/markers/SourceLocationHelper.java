@@ -94,7 +94,7 @@ public class SourceLocationHelper {
   }
 
   public static SourceLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
-    Plugin plugin = mavenProject.getPlugin(mojoExecutionKey.getGroupId() + ":" + mojoExecutionKey.getArtifactId());
+    Plugin plugin = mavenProject.getPlugin(mojoExecutionKey.groupId() + ":" + mojoExecutionKey.artifactId());
 
     InputLocation inputLocation = plugin != null ? plugin.getLocation(SELF) : null;
     if(inputLocation == null || inputLocation.getLineNumber() < 0) {
@@ -108,7 +108,7 @@ public class SourceLocationHelper {
     }
 
     String elementName;
-    InputLocation executionInputLocation = findExecutionLocation(plugin, mojoExecutionKey.getExecutionId());
+    InputLocation executionInputLocation = findExecutionLocation(plugin, mojoExecutionKey.executionId());
     if(executionInputLocation != null && executionInputLocation.getLineNumber() >= 0) {
       inputLocation = executionInputLocation;
       elementName = EXECUTION;

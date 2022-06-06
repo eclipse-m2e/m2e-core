@@ -48,11 +48,11 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   @Override
   public String getMavenText() {
     MojoExecutionKey execution = element.getExecution();
-    if("default".equals(execution.getExecutionId())) {
+    if("default".equals(execution.executionId())) {
       return NLS.bind("{0}", prjconf.getRelpath());
     }
     //TODO is execution id actually important or just takes up space
-    return NLS.bind("Execution {0}, in {1}", execution.getExecutionId(), prjconf.getRelpath());
+    return NLS.bind("Execution {0}, in {1}", execution.executionId(), prjconf.getRelpath());
   }
 
   /* (non-Javadoc)
@@ -61,7 +61,7 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   @Override
   public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration) {
     ILifecycleMappingRequirement requirement = element.getLifecycleMappingRequirement();
-    return LifecycleMappingFactory.isInterestingPhase(element.getMojoExecutionKey().getLifecyclePhase())
+    return LifecycleMappingFactory.isInterestingPhase(element.getMojoExecutionKey().lifecyclePhase())
         && !mappingConfiguration.isRequirementSatisfied(requirement);
   }
 

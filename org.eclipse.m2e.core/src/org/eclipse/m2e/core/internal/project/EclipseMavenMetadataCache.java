@@ -88,9 +88,9 @@ public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache impleme
     /*
      * maybe too conservative, but purge anything that matches GAbV (bV==baseVersion)
      */
-    return eq(key.getGroupId(), artifact.getGroupId()) //
-        && eq(key.getArtifactId(), artifact.getArtifactId()) //
-        && eq(key.getVersion(), artifact.getBaseVersion());
+    return eq(key.groupId(), artifact.getGroupId()) //
+        && eq(key.artifactId(), artifact.getArtifactId()) //
+        && eq(key.version(), artifact.getBaseVersion());
   }
 
   private static <T> boolean eq(T a, T b) {

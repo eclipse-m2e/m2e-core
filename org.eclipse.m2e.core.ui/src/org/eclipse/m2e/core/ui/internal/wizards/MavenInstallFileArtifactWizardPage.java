@@ -267,11 +267,11 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
 
     ArtifactKey artifactKey = SelectionUtil.getType(file, ArtifactKey.class);
     if(artifactKey != null) {
-      groupIdCombo.setText(artifactKey.getGroupId());
-      artifactIdCombo.setText(artifactKey.getArtifactId());
-      versionCombo.setText(artifactKey.getVersion());
-      if(artifactKey.getClassifier() != null) {
-        classifierCombo.setText(artifactKey.getClassifier());
+      groupIdCombo.setText(artifactKey.groupId());
+      artifactIdCombo.setText(artifactKey.artifactId());
+      versionCombo.setText(artifactKey.version());
+      if(artifactKey.classifier() != null) {
+        classifierCombo.setText(artifactKey.classifier());
       }
     }
   }

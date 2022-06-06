@@ -625,7 +625,7 @@ public class OverviewPage extends MavenPomEditorPage {
             IMavenProjectFacade projectFacade = findModuleProject(module);
             if(projectFacade != null) {
               ArtifactKey key = projectFacade.getArtifactKey();
-              OpenPomAction.openEditor(key.getGroupId(), key.getArtifactId(), key.getVersion(),
+              OpenPomAction.openEditor(key.groupId(), key.artifactId(), key.version(),
                   getPomEditor().getMavenProject(), monitor);
             } else {
               IFile modulePom = findModuleFile(module);

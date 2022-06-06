@@ -55,13 +55,13 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     } else if(element instanceof MojoExecutionMappingRequirement req) {
       MojoExecutionKey exec = req.getExecution();
       return NLS.bind("{0}:{1}:{2}",
-          new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
+          new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
     } else if(element instanceof PackagingTypeMappingRequirement req) {
       return NLS.bind("Packaging {0}", req.getPackaging());
     } else if(element instanceof ProjectConfiguratorMappingRequirement req) {
       MojoExecutionKey exec = req.getExecution();
       return NLS.bind("{0}:{1}:{2}",
-          new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
+          new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
     }
     throw new IllegalStateException();
   }

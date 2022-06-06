@@ -87,7 +87,7 @@ public class MavenPropertyTester extends PropertyTester {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade mavenProject = null;
         mavenProject = projectManager.getMavenProject( //
-            key.getGroupId(), key.getArtifactId(), key.getVersion());
+            key.groupId(), key.artifactId(), key.version());
         return mavenProject != null;
       }
     }

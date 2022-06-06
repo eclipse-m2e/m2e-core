@@ -413,8 +413,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException {
-    if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())
-        || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.getKey())) {
+    if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.key())
+        || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.key())) {
       reloadSettings();
     }
   }

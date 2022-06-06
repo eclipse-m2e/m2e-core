@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -146,15 +147,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     this.finalName = mavenProject.getBuild().getFinalName();
 
-    this.artifactRepositories = new LinkedHashSet<>();
-    for(ArtifactRepository repository : mavenProject.getRemoteArtifactRepositories()) {
-      this.artifactRepositories.add(new ArtifactRepositoryRef(repository));
-    }
-
-    this.pluginArtifactRepositories = new LinkedHashSet<>();
-    for(ArtifactRepository repository : mavenProject.getPluginArtifactRepositories()) {
-      this.pluginArtifactRepositories.add(new ArtifactRepositoryRef(repository));
-    }
+    this.artifactRepositories = toRepositoryReferences(mavenProject.getRemoteArtifactRepositories());
+    this.pluginArtifactRepositories = toRepositoryReferences(mavenProject.getPluginArtifactRepositories());
 
     timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
     IProject project = getProject();
@@ -164,6 +158,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       i++ ;
     }
     timestamp[timestamp.length - 1] = getModificationStamp(pom);
+  }
+
+  private Set<ArtifactRepositoryRef> toRepositoryReferences(List<ArtifactRepository> artifactRepositories) {
+    return artifactRepositories.stream().map(r -> {
+      String username = r.getAuthentication() != null ? r.getAuthentication().getUsername() : null;
+      return new ArtifactRepositoryRef(r.getId(), r.getUrl(), username);
+    }).collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   /**
@@ -317,7 +318,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   void setMavenProjectArtifacts(MavenProject mavenProject) {
-    this.artifacts = Collections.unmodifiableSet(ArtifactRef.fromArtifact(mavenProject.getArtifacts()));
+    Set<ArtifactRef> collect = mavenProject.getArtifacts().stream()
+        .map(a -> new ArtifactRef(new ArtifactKey(a), a.getScope()))
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+    this.artifacts = Collections.unmodifiableSet(collect);
   }
 
   @Override
@@ -453,7 +457,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     MojoExecution execution = setupMojoExecutions.get(mojoExecutionKey);
     if(execution == null) {
       for(MojoExecution _execution : getMojoExecutions(monitor)) {
-        if(mojoExecutionKey.match(_execution)) {
+        if(match(mojoExecutionKey, _execution)) {
           execution = manager.setupMojoExecution(this, _execution, monitor);
           break;
         }
@@ -461,6 +465,15 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       putSetupMojoExecution(setupMojoExecutions, mojoExecutionKey, execution);
     }
     return execution;
+  }
+
+  private boolean match(MojoExecutionKey key, MojoExecution mojoExecution) {
+    if(mojoExecution == null) {
+      return false;
+    }
+    return key.groupId().equals(mojoExecution.getGroupId()) && key.artifactId().equals(mojoExecution.getArtifactId())
+        && key.version().equals(mojoExecution.getVersion()) && key.goal().equals(mojoExecution.getGoal())
+        && key.executionId().equals(mojoExecution.getExecutionId());
   }
 
   private void putSetupMojoExecution(Map<MojoExecutionKey, MojoExecution> setupMojoExecutions,
