@@ -9,18 +9,21 @@
  *
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
+ *      Patrick Ziegler - Issue 743 - Occasionally, m2e is unable to read wrapped artifacts
  *******************************************************************************/
 package org.eclipse.m2e.pde.target;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.jar.Manifest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
@@ -126,6 +129,26 @@ public class MavenTargetBundle extends TargetBundle {
 				FilenameUtils.getBaseName(wrappedFile.getName()) + ".xml");
 		if (CacheManager.isOutdated(wrappedFile, artifactFile)
 				|| propertiesChanged(bndInstructions, instructionsFile)) {
+			// The cached file may already be locked by another process (e.g. the Target Editor) and thus can't be
+			// patched directly. So instead, we create a temporary file which is used instead. Since it also means the
+			// original file is outdated, it has to be marked for deletion as well, once the program terminates.
+			if (!wrappedFile.canWrite()) {
+				// Delete the original file, once the process has released the lock
+				wrappedFile.deleteOnExit();
+				
+				File bundleDir = wrappedFile.getParentFile();
+				
+				String baseName = FilenameUtils.getBaseName(wrappedFile.getName());
+				String extension = FilenameUtils.getExtension(wrappedFile.getName());
+				
+				FilenameFilter fileFilter = new RegexFileFilter(baseName);
+				int index = bundleDir.listFiles(fileFilter).length;
+				
+				wrappedFile = new File(wrappedFile.getParentFile(), String.format("%s-%d.%s", baseName, index, extension));
+				// Delete the temporary file as well
+				wrappedFile.deleteOnExit();
+			}
+			
 			try (Jar jar = new Jar(artifactFile)) {
 				Manifest originalManifest = jar.getManifest();
 				try (Analyzer analyzer = new Analyzer();) {
