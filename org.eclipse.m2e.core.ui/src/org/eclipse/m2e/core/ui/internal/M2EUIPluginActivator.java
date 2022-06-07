@@ -31,6 +31,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
@@ -159,5 +161,10 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   public static boolean showExperimentalFeatures() {
     return Boolean.parseBoolean(System.getProperty(PROP_SHOW_EXPERIMENTAL_FEATURES));
+  }
+
+  public ArchetypeManager getArchetypeManager() {
+    //TODO temporary redirect unless factored out of m2e core so we can already migrate all non core consumers...
+    return MavenPluginActivator.getDefault().getArchetypeManager();
   }
 }

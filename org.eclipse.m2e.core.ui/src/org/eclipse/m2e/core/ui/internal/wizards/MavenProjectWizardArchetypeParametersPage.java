@@ -50,15 +50,15 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.archetype.MavenArchetype;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;
 
@@ -428,16 +428,16 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
       try {
 
-        ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+        ArchetypeManager archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
 
-        ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
+        ArtifactRepository remoteArchetypeRepository = archetypeManager
+            .getArchetypeRepository(new MavenArchetype(archetype));
 
-        properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
+        properties = archetypeManager.getRequiredProperties(new MavenArchetype(archetype), remoteArchetypeRepository,
+            monitor);
 
-      } catch(UnknownArchetype e) {
+      } catch(CoreException e) {
         log.error(NLS.bind("Error downloading archetype {0}", archetypeName), e); //$NON-NLS-1$
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
       } finally {
         monitor.done();
       }

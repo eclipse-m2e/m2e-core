@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -59,19 +58,9 @@ public interface IProjectConfigurationManager {
    * Creates project structure using Archetype and then imports the created project(s)
    *
    * @return an unmodifiable list of created projects.
-   * @since 1.1
-   */
-  List<IProject> createArchetypeProjects(IPath location, Archetype archetype, //
-      String groupId, String artifactId, String version, String javaPackage, Properties properties, //
-      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Creates project structure using Archetype and then imports the created project(s)
-   *
-   * @return an unmodifiable list of created projects.
    * @since 1.8
    */
-  List<IProject> createArchetypeProjects(IPath location, Archetype archetype, //
+  List<IProject> createArchetypeProjects(IPath location, IArchetype archetype, //
       String groupId, String artifactId, String version, String javaPackage, Properties properties, //
       ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
           throws CoreException;
