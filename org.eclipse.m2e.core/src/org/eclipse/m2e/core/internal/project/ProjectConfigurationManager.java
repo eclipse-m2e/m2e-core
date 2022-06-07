@@ -48,6 +48,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,7 +64,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.archetype.ArchetypeGenerationResult;
-import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.ArchetypeManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
@@ -76,7 +77,6 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -85,6 +85,7 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
+import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -723,19 +724,6 @@ public class ProjectConfigurationManager
     }
   }
 
-  /**
-   * Creates project structure using Archetype and then imports created project(s)
-   *
-   * @return an unmodifiable list of created projects.
-   * @since 1.1
-   */
-  @Override
-  public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, String groupId, String artifactId,
-      String version, String javaPackage, Properties properties, ProjectImportConfiguration configuration,
-      IProgressMonitor monitor) throws CoreException {
-    return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties,
-        configuration, null, monitor);
-  }
 
   /**
    * Creates project structure using Archetype and then imports created project(s)
@@ -744,7 +732,7 @@ public class ProjectConfigurationManager
    * @since 1.8
    */
   @Override
-  public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, String groupId, String artifactId,
+  public List<IProject> createArchetypeProjects(IPath location, IArchetype archetype, String groupId, String artifactId,
       String version, String javaPackage, Properties properties, ProjectImportConfiguration configuration,
       IProjectCreationListener listener, IProgressMonitor monitor) throws CoreException {
     return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext)
@@ -753,7 +741,7 @@ public class ProjectConfigurationManager
         javaPackage, properties, configuration, listener, m), monitor);
   }
 
-  List<IProject> createArchetypeProjects0(IPath location, Archetype archetype, String groupId, String artifactId,
+  List<IProject> createArchetypeProjects0(IPath location, IArchetype archetype, String groupId, String artifactId,
       String version, String javaPackage, Properties properties, ProjectImportConfiguration configuration,
       IProjectCreationListener listener, IProgressMonitor monitor) throws CoreException {
     monitor.beginTask(NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 2);
@@ -787,7 +775,8 @@ public class ProjectConfigurationManager
           .setRemoteArtifactRepositories(maven.getArtifactRepositories(true)).setProperties(properties)
           .setOutputDirectory(location.toPortableString());
 
-      ArchetypeGenerationResult result = getArchetyper().generateProjectFromArchetype(request);
+      ArchetypeManager archetyper = Adapters.adapt(archetype, ArchetypeManager.class);
+      ArchetypeGenerationResult result = archetyper.generateProjectFromArchetype(request);
 
       Exception cause = result.getCause();
       if(cause != null) {
@@ -828,7 +817,7 @@ public class ProjectConfigurationManager
    * Apparently, Archetype#generateProjectFromArchetype 2.0-alpha-4 does not attempt to resolve archetype from
    * configured remote repositories. To compensate, we populate local repo with archetype pom/jar.
    */
-  private Artifact resolveArchetype(Archetype a, IProgressMonitor monitor) throws CoreException {
+  private Artifact resolveArchetype(IArchetype a, IProgressMonitor monitor) throws CoreException {
     List<ArtifactRepository> repos = new ArrayList<>();
     repos.addAll(maven.getArtifactRepositories()); // see org.apache.maven.archetype.downloader.DefaultDownloader#download
 
@@ -850,10 +839,6 @@ public class ProjectConfigurationManager
           + Messages.ProjectConfigurationManager_error_resolve2;
       throw new CoreException(Status.error(msg, e));
     }
-  }
-
-  private org.apache.maven.archetype.ArchetypeManager getArchetyper() {
-    return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
   @Override

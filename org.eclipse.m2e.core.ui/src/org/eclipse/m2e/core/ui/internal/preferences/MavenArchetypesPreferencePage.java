@@ -53,7 +53,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
@@ -81,7 +80,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     super(GRID);
     setTitle(Messages.MavenArchetypesPreferencePage_title);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
-    this.archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+    this.archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
   }
 
   @Override

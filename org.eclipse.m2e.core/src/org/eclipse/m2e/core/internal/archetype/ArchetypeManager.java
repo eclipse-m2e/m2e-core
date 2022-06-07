@@ -35,16 +35,15 @@ import org.eclipse.core.runtime.Status;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
-import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
+import org.eclipse.m2e.core.project.IArchetype;
 
 
 /**
@@ -124,17 +123,17 @@ public class ArchetypeManager {
   }
 
   /**
-   * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found. The repository
-   * url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
+   * Gets the remote {@link ArtifactRepository} of the given {@link IArchetype}, or null if none is found. The
+   * repository url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
    * <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
    *
    * @see <a href=
    *      "http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
    * @param archetype
-   * @return the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
+   * @return the remote {@link ArtifactRepository} of the given {@link IArchetype}, or null if none is found.
    * @throws CoreException
    */
-  public ArtifactRepository getArchetypeRepository(Archetype archetype) throws CoreException {
+  public ArtifactRepository getArchetypeRepository(IArchetype archetype) throws CoreException {
     String repoUrl = archetype.getRepository();
     if(repoUrl == null || repoUrl.trim().isEmpty()) {
       return null;
@@ -143,17 +142,16 @@ public class ArchetypeManager {
   }
 
   /**
-   * Gets the required properties of an {@link Archetype}.
+   * Gets the required properties of an {@link IArchetype}.
    *
    * @param archetype the archetype possibly declaring required properties
    * @param remoteArchetypeRepository the remote archetype repository, can be null.
    * @param monitor the progress monitor, can be null.
    * @return the required properties of the archetypes, null if none is found.
-   * @throws UnknownArchetype thrown if no archetype is can be resolved
-   * @throws CoreException
+   * @throws CoreException if no archetype can be resolved
    */
-  public List<?> getRequiredProperties(Archetype archetype, ArtifactRepository remoteArchetypeRepository,
-      IProgressMonitor monitor) throws UnknownArchetype, CoreException {
+  public List<?> getRequiredProperties(IArchetype archetype, ArtifactRepository remoteArchetypeRepository,
+      IProgressMonitor monitor) throws CoreException {
     Assert.isNotNull(archetype, "Archetype can not be null");
 
     if(monitor == null) {
@@ -171,34 +169,20 @@ public class ArchetypeManager {
       repositories.add(0, remoteArchetypeRepository);
     }
 
-    try {
-      return maven.createExecutionContext().execute((context, monitor1) -> {
-        ArtifactRepository localRepository = context.getLocalRepository();
-        if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
-          ArchetypeDescriptor descriptor;
-          try {
-            descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null, localRepository,
-                repositories);
-          } catch(UnknownArchetype ex) {
-            throw new CoreException(Status.error("UnknownArchetype", ex));
-          }
-          return descriptor.getRequiredProperties();
+    return maven.createExecutionContext().execute((context, monitor1) -> {
+      ArtifactRepository localRepository = context.getLocalRepository();
+      if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
+        ArchetypeDescriptor descriptor;
+        try {
+          descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null, localRepository,
+              repositories);
+        } catch(UnknownArchetype ex) {
+          throw new CoreException(Status.error("UnknownArchetype", ex));
         }
-        return null;
-      }, monitor);
-    } catch(CoreException e) {
-      if(e.getStatus().getException() instanceof UnknownArchetype archetypeException) {
-        throw archetypeException;
+        return descriptor.getRequiredProperties();
       }
-      throw e;
-    }
-  }
-
-  /**
-   * @since 1.5
-   */
-  public ArchetypeArtifactManager getArchetypeArtifactManager() {
-    return aaMgr;
+      return null;
+    }, monitor);
   }
 
   /**
@@ -208,14 +192,4 @@ public class ArchetypeManager {
     return archetyper;
   }
 
-  /**
-   * @since 1.5
-   */
-  public ArchetypeDataSource getArchetypeDataSource(String hint) {
-    try {
-      return container.lookup(ArchetypeDataSource.class, hint);
-    } catch(ComponentLookupException ex) {
-      throw new NoSuchComponentException(ex);
-    }
-  }
 }

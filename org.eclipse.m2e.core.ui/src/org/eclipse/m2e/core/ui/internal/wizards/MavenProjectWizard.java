@@ -51,6 +51,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.archetype.MavenArchetype;
 
 
 /**
@@ -237,7 +238,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
-              archetype, //
+              new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
               properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
           return projects;

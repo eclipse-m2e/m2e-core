@@ -56,6 +56,7 @@ import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.archetype.MavenArchetype;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
@@ -246,7 +247,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
-              archetype, //
+              new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
               properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
 
