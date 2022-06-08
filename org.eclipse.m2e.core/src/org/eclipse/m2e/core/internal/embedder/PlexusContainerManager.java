@@ -39,6 +39,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -46,6 +47,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.LoggerManager;
 
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
+import org.apache.maven.cli.internal.ExtensionResolutionException;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -152,8 +154,16 @@ public class PlexusContainerManager {
       cleanup();
       PlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
       if(plexusContainer == null) {
+        try {
         containerMap.put(canonicalDirectory,
             plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration));
+        } catch(ExtensionResolutionException e) {
+          //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
+          CoreExtension extension = e.getExtension();
+          throw new PlexusContainerException("can't create plexus container for basedir = " + basedir.getAbsolutePath()
+              + " because one the extensions " + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
+              + extension.getVersion() + " can't be loaded.", e);
+        }
       }
       return plexusContainer;
     }
