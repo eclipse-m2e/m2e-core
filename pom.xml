@@ -32,6 +32,7 @@
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
 		<jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
 		<tycho.scmUrl>scm:git:https://github.com/eclipse-m2e/m2e-core.git</tycho.scmUrl>
+		<trimStackTrace>false</trimStackTrace>
 	</properties>
 
 	<organization>

@@ -54,10 +54,10 @@ import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.ui.internal.archetype.MavenArchetype;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;

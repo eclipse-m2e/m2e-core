@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.archetype;
+package org.eclipse.m2e.core.ui.internal.archetype;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
 
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 /**
@@ -88,7 +88,7 @@ public abstract class ArchetypeCatalogFactory {
   }
 
   ArchetypeManager getArchetyper() {
-    return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
+    return M2EUIPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
   /**

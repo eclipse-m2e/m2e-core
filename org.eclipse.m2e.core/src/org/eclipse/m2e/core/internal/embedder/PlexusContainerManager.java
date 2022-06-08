@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 
@@ -107,6 +109,9 @@ public class PlexusContainerManager {
   @Reference
   private IMavenConfiguration mavenConfiguration;
 
+  @Reference
+  private IWorkspace workspace;
+
   @Deactivate
   void dispose() {
     synchronized(containerMap) {
@@ -161,8 +166,9 @@ public class PlexusContainerManager {
           //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
           CoreExtension extension = e.getExtension();
           throw new PlexusContainerException("can't create plexus container for basedir = " + basedir.getAbsolutePath()
-              + " because one the extensions " + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
-              + extension.getVersion() + " can't be loaded.", e);
+              + " because the extension " + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
+              + extension.getVersion() + " can't be loaded (defined in "
+              + new File(directory, EXTENSIONS_FILENAME).getAbsolutePath() + ").", e);
         }
       }
       return plexusContainer;
@@ -321,8 +327,11 @@ public class PlexusContainerManager {
       return null;
     }
     final File basedir = file.isDirectory() ? file : file.getParentFile();
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    File workspaceRoot = workspace.getRoot().getLocation().toFile();
     File current = basedir;
-    while(current != null) {
+    while(current != null && !current.equals(workspaceRoot)) {
+
       if(new File(current, MVN_FOLDER).isDirectory()) {
         return current;
       }
