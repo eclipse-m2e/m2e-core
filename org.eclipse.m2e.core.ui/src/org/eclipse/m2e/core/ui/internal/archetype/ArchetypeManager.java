@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.archetype;
+package org.eclipse.m2e.core.ui.internal.archetype;
 
 import java.io.File;
 import java.io.FileInputStream;
