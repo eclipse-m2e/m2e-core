@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.osgi.util.tracker.ServiceTracker;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -65,9 +67,13 @@ public class ArchetypeManager {
 
   private final PlexusContainer container;
 
-  public ArchetypeManager(PlexusContainer container, File configFile) {
+  private ServiceTracker<ArchetypeGenerator, ArchetypeGenerator> serviceTracker;
+
+  public ArchetypeManager(PlexusContainer container, File configFile,
+      ServiceTracker<ArchetypeGenerator, ArchetypeGenerator> serviceTracker) {
     this.container = container;
     this.configFile = configFile;
+    this.serviceTracker = serviceTracker;
     this.writer = new ArchetypeCatalogsWriter();
     try {
       this.aaMgr = container.lookup(ArchetypeArtifactManager.class);
@@ -75,6 +81,10 @@ public class ArchetypeManager {
     } catch(ComponentLookupException ex) {
       throw new NoSuchComponentException(ex);
     }
+  }
+
+  public ArchetypeGenerator getGenerator() {
+    return serviceTracker.getService();
   }
 
   /**

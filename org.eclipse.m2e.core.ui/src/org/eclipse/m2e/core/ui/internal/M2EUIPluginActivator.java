@@ -18,6 +18,7 @@ import java.io.File;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.ui.internal.archetype.ExtensionReader;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
@@ -225,8 +227,12 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return new DefaultPlexusContainer(cc, logginModule);
   }
 
-  private static ArchetypeManager newArchetypeManager(PlexusContainer container, File stateLocationDir) {
-    ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES));
+  private ArchetypeManager newArchetypeManager(PlexusContainer container, File stateLocationDir) {
+    ServiceTracker<ArchetypeGenerator, ArchetypeGenerator> tracker = new ServiceTracker<ArchetypeGenerator, ArchetypeGenerator>(getBundle().getBundleContext(),
+        ArchetypeGenerator.class, null);
+    tracker.open();
+    ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES),
+        tracker);
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.InternalCatalogFactory());
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory());
     for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions()) {
