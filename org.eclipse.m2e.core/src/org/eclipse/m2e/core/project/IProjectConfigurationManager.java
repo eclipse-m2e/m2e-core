@@ -15,7 +15,6 @@ package org.eclipse.m2e.core.project;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -51,17 +50,6 @@ public interface IProjectConfigurationManager {
    * @since 1.8
    */
   void createSimpleProject(IProject project, IPath location, Model model, String[] folders,
-      ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
-          throws CoreException;
-
-  /**
-   * Creates project structure using Archetype and then imports the created project(s)
-   *
-   * @return an unmodifiable list of created projects.
-   * @since 1.8
-   */
-  List<IProject> createArchetypeProjects(IPath location, IArchetype archetype, //
-      String groupId, String artifactId, String version, String javaPackage, Properties properties, //
       ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
           throws CoreException;
 

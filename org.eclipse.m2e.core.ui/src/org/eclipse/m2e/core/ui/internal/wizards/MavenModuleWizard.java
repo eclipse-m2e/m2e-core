@@ -53,6 +53,7 @@ import org.apache.maven.model.Parent;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
@@ -246,7 +247,8 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
+          List<IProject> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+              .createArchetypeProjects(location,
               new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
               properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);

@@ -46,5 +46,6 @@ Import-Package: org.eclipse.compare.rangedifferencer,
  org.eclipse.ltk.core.refactoring,
  org.slf4j;version="[1.6.2,2.0.0)"
 Service-Component: OSGI-INF/component.xml,
+ OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
  OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.MavenArchetypeAdapterFactory.xml
 Automatic-Module-Name: org.eclipse.m2e.core.ui
