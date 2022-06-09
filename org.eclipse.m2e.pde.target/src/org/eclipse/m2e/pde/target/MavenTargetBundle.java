@@ -22,7 +22,9 @@ import java.util.jar.Manifest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.pde.core.target.TargetBundle;
@@ -32,6 +34,7 @@ import aQute.bnd.osgi.Jar;
 
 public class MavenTargetBundle extends TargetBundle {
 
+	private static final ILog LOGGER = Platform.getLog(MavenTargetBundle.class);
 	private TargetBundle bundle;
 	private IStatus status;
 	private final BundleInfo bundleInfo;
@@ -90,6 +93,7 @@ public class MavenTargetBundle extends TargetBundle {
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(),
 						artifact + " is not a bundle", ex);
+				LOGGER.log(status);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
 					bundle = cacheManager.accessArtifactFile(artifact,
@@ -102,9 +106,11 @@ public class MavenTargetBundle extends TargetBundle {
 						message += " (" + e.getMessage() + ")";
 					}
 					status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(), message, e);
+					LOGGER.log(status);
 				}
 			} else {
 				status = Status.CANCEL_STATUS;
+				LOGGER.log(status);
 			}
 		}
 	}
