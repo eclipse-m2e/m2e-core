@@ -107,6 +107,15 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   @Override
+  protected boolean saveBeforeLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+      throws CoreException {
+    if(configuration.getAttribute(ATTR_SAVE_BEFORE_LAUNCH, true)) {
+      return super.saveBeforeLaunch(configuration, mode, monitor);
+    }
+    return true;
+  }
+
+  @Override
   public IVMRunner getVMRunner(final ILaunchConfiguration configuration, String mode) throws CoreException {
     return launchSupport.decorateVMRunner(super.getVMRunner(configuration, mode));
   }

@@ -16,6 +16,7 @@ package org.eclipse.m2e.tests.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -31,7 +32,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,6 +42,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -51,6 +56,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -62,6 +68,13 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -81,6 +94,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
+import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -90,6 +104,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
@@ -97,16 +112,91 @@ import org.eclipse.m2e.jdt.internal.BuildPathManager;
 @SuppressWarnings("restriction")
 public abstract class AbstractMavenProjectTestCase {
 
+  private static final boolean STOP_ON_FAILED_TEST = Boolean.getBoolean("m2e.stopOnFailedTest");
+
   public static final int DELETE_RETRY_COUNT = 10;
 
   public static final long DELETE_RETRY_DELAY = 6000L;
 
-  protected static final IProgressMonitor monitor = new NullProgressMonitor();
+  protected static final IProgressMonitor monitor = new IProgressMonitor() {
+
+    AtomicBoolean canceled = new AtomicBoolean();
+
+    public void worked(int work) {
+      driveEvents();
+    }
+
+    public void subTask(String name) {
+      driveEvents();
+
+    }
+
+    public void setTaskName(String name) {
+      driveEvents();
+
+    }
+
+    public void setCanceled(boolean value) {
+      canceled.set(value);
+    }
+
+    public boolean isCanceled() {
+      return canceled.get();
+    }
+
+    public void internalWorked(double work) {
+      driveEvents();
+
+    }
+
+    public void done() {
+      driveEvents();
+
+    }
+
+    public void beginTask(String name, int totalWork) {
+      driveEvents();
+    }
+  };
 
   protected IWorkspace workspace;
 
   @Rule
   public TestName name = new TestName();
+
+  @Rule(order = Integer.MIN_VALUE)
+  public TestWatcher watchman = new TestWatcher() {
+    @Override
+    protected void failed(Throwable e, Description description) {
+      if(STOP_ON_FAILED_TEST) {
+        AtomicBoolean wait = new AtomicBoolean(true);
+        Shell shell = new Shell(Display.getCurrent());
+        shell.setLayout(new FillLayout());
+        Button button = new Button(shell, SWT.PUSH);
+        button.setText("Shutdown test");
+        button.addSelectionListener(new SelectionListener() {
+
+          public void widgetSelected(SelectionEvent e) {
+            wait.set(false);
+          }
+
+          public void widgetDefaultSelected(SelectionEvent e) {
+
+          }
+        });
+        shell.setVisible(true);
+        shell.pack();
+        while(wait.get() && !shell.isDisposed()) {
+          driveEvents();
+          Display.getCurrent().sleep();
+        }
+      }
+    }
+
+    @Override
+    protected void succeeded(Description description) {
+    }
+  };
 
   protected File repo;
 
@@ -120,6 +210,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   @Before
   public void setUp() throws Exception {
+    monitor.setCanceled(false);
     workspace = ResourcesPlugin.getWorkspace();
     mavenConfiguration = MavenPlugin.getMavenConfiguration();
     setAutoBuilding(false);
@@ -157,12 +248,21 @@ public abstract class AbstractMavenProjectTestCase {
     WorkspaceHelpers.cleanWorkspace();
     FilexWagon.setRequestFailPattern(null);
     FilexWagon.setRequestFilterPattern(null, true);
+    driveEvents();
+  }
+
+  protected void useSettings(String settings) throws IOException, CoreException {
+    String userSettingsFile = new File(settings).getCanonicalFile().getAbsolutePath();
+    mavenConfiguration.setUserSettingsFile(userSettingsFile);
   }
 
   @After
   public void tearDown() throws Exception {
     waitForJobsToComplete();
-    WorkspaceHelpers.cleanWorkspace();
+    driveEvents();
+    if(!STOP_ON_FAILED_TEST) {
+      WorkspaceHelpers.cleanWorkspace();
+    }
 
     // Restore the user settings file location
     mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
@@ -553,6 +653,10 @@ public abstract class AbstractMavenProjectTestCase {
     WorkspaceHelpers.assertNoErrors(project);
   }
 
+  protected static void assertMavenNature(IProject project) throws CoreException {
+    assertTrue("project " + project.getName() + " has no maven nature", project.hasNature(IMavenConstants.NATURE_ID));
+  }
+
   /**
    * Returns a set of projects that were affected by specified collection of events
    *
@@ -592,6 +696,33 @@ public abstract class AbstractMavenProjectTestCase {
     }
   }
 
+  protected Collection<IProject> createProjectsFromArchetype(final String projectName, final IArchetype archetype,
+      final IPath location) throws CoreException {
+    return createProjectsFromArchetype(projectName, archetype, new Properties(), location);
+  }
+
+  protected Collection<IProject> createProjectsFromArchetype(final String projectName, final IArchetype archetype,
+      Properties properties, final IPath location) throws CoreException {
+    List<IProject> eclipseProjects = new ArrayList<IProject>();
+    workspace.run((IWorkspaceRunnable) m -> {
+      Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+          .createArchetypeProjects(location, archetype, //
+              projectName, projectName, "0.0.1-SNAPSHOT", "test", //
+              properties, monitor);
+      MavenPlugin.getProjectConfigurationManager()
+          .importProjects(projects, new ProjectImportConfiguration(), null, monitor).stream()
+          .filter(r -> r.getProject() != null && r.getProject().exists()).map(r -> r.getProject())
+          .forEach(eclipseProjects::add);
+
+    }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+    try {
+      waitForJobsToComplete();
+    } catch(InterruptedException e) {
+      fail("Interrupted");
+    }
+    return eclipseProjects;
+  }
+
   /**
    * Nullifies all transient IMavenProjectFacade fields, which should have roughly the same effect as writing it to
    * workspace state and reading it back after workspace restart.
@@ -611,4 +742,14 @@ public abstract class AbstractMavenProjectTestCase {
   public static Set<IFile> getPomFiles(IProject... projects) {
     return Stream.of(projects).map(p -> p.getFile(IMavenConstants.POM_FILE_NAME)).collect(Collectors.toSet());
   }
+
+  public static void driveEvents() {
+    Display current = Display.getCurrent();
+    if(current != null) {
+      while(current.readAndDispatch()) {
+        //process all events...
+      }
+    }
+  }
+
 }
