@@ -16,7 +16,9 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.jetty.util,
  org.eclipse.jetty.http,
  org.eclipse.jetty.security,
- org.eclipse.jetty.io
+ org.eclipse.jetty.io,
+ org.eclipse.swt;bundle-version="3.119.0",
+ org.eclipse.m2e.core.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: Eclipse.org - m2e

@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,6 +48,8 @@ import org.apache.maven.model.Model;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -238,12 +241,15 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          List<IProject> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
               .createArchetypeProjects(location,
               new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
-              properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
-          return projects;
+              properties, monitor);
+          return MavenPlugin.getProjectConfigurationManager()
+              .importProjects(projects, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor)
+              .stream().filter(r -> r.getProject() != null && r.getProject().exists())
+              .map(IMavenProjectImportResult::getProject).toList();
         }
       };
     }

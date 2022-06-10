@@ -65,7 +65,7 @@ public class MavenPluginActivator extends Plugin {
 
   private BundleContext bundleContext;
 
-  private String version = "0.0.0"; //$NON-NLS-1$
+  private static String version = "0.0.0"; //$NON-NLS-1$
 
   private final BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
 
@@ -197,7 +197,7 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public static String getVersion() {
-    return plugin.version;
+    return version;
   }
 
   public static String getUserAgent() {
