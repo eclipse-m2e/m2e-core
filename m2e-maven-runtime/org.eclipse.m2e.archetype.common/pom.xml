@@ -18,7 +18,7 @@
 		<version>1.16.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>org.eclipse.m2e.archetype.common</artifactId>
+	<artifactId>org.eclipse.m2e.archetype.common</artifactId><!-- TODO: rename to org.eclipse.m2e.archetype -->
 	<version>3.2.1-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
@@ -31,46 +31,23 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven.archetype</groupId>
-			<artifactId>archetype-common</artifactId>
+			<artifactId>archetype-catalog</artifactId>
 			<version>${archetype-common.version}</version>
 			<exclusions>
-				<!-- Excluded dependencies are fulfilled via the OSGi requirements specified below as Import-Package/Require-Bundle and
-					therefore don't have to be embedded. -->
-				<exclusion>
-					<groupId>com.ibm.icu</groupId>
-					<artifactId>icu4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-artifact</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-model</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-plugin-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven.shared</groupId>
-					<artifactId>maven-shared-utils</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.codehaus.plexus</groupId>
-					<artifactId>plexus-classworlds</artifactId>
-				</exclusion>
 				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-utils</artifactId>
 				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.archetype</groupId>
+			<artifactId>archetype-descriptor</artifactId>
+			<version>${archetype-common.version}</version>
+			<exclusions>
 				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
-					<artifactId>plexus-component-annotations</artifactId>
+					<artifactId>plexus-utils</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -84,9 +61,8 @@
 					<artifactId>bnd-maven-plugin</artifactId>
 					<configuration>
 						<bnd>
-						<![CDATA[
+							<![CDATA[
 							-exportcontents: \
-								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${archetype-common.version}";x-friends:="org.eclipse.m2e.core.ui"
 							Require-Bundle: \
 								org.eclipse.m2e.maven.runtime;bundle-version="[1.18.0,1.19.0)",\
