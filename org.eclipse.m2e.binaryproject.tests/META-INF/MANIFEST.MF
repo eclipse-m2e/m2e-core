@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.m2e.binaryproject.tests;singleton:=true
 Bundle-Version: 1.16.0.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Require-Bundle: org.eclipse.m2e.core;bundle-version="1.16.0",
- org.eclipse.m2e.maven.runtime;bundle-version="1.16.0",
+ org.eclipse.m2e.maven.runtime,
  org.eclipse.m2e.binaryproject;bundle-version="1.16.0",
  org.eclipse.m2e.tests.common;bundle-version="1.16.0",
  org.junit;bundle-version="4.0.0",
