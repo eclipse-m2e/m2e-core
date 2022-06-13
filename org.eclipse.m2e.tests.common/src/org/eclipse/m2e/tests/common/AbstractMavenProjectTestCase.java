@@ -69,7 +69,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -174,16 +173,8 @@ public abstract class AbstractMavenProjectTestCase {
         shell.setLayout(new FillLayout());
         Button button = new Button(shell, SWT.PUSH);
         button.setText("Shutdown test");
-        button.addSelectionListener(new SelectionListener() {
 
-          public void widgetSelected(SelectionEvent e) {
-            wait.set(false);
-          }
-
-          public void widgetDefaultSelected(SelectionEvent e) {
-
-          }
-        });
+        SelectionListener.widgetSelectedAdapter(ev -> wait.set(false));
         shell.setVisible(true);
         shell.pack();
         while(wait.get() && !shell.isDisposed()) {
@@ -318,9 +309,7 @@ public abstract class AbstractMavenProjectTestCase {
     for(int i = 0; i < DELETE_RETRY_COUNT; i++ ) {
       try {
         doDeleteProject(project);
-      } catch(InterruptedException e) {
-        throw e;
-      } catch(OperationCanceledException e) {
+      } catch(InterruptedException | OperationCanceledException e) {
         throw e;
       } catch(Exception e) {
         cause = e;
@@ -368,17 +357,17 @@ public abstract class AbstractMavenProjectTestCase {
   protected IProject createProject(String projectName, InputStream pomContent) throws CoreException {
     final IProject project = workspace.getRoot().getProject(projectName);
 
-    workspace.run((IWorkspaceRunnable) monitor -> {
-      project.create(monitor);
+    workspace.run(m -> {
+      project.create(m);
 
       if(!project.isOpen()) {
-        project.open(monitor);
+        project.open(m);
       }
 
       IFile pomFile = project.getFile("pom.xml");
       if(!pomFile.exists()) {
         try {
-          pomFile.create(pomContent, true, monitor);
+          pomFile.create(pomContent, true, m);
         } catch(CoreException ex) {
           throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
         }
@@ -402,19 +391,19 @@ public abstract class AbstractMavenProjectTestCase {
 
     final IProject project = workspace.getRoot().getProject(projectName);
 
-    workspace.run((IWorkspaceRunnable) monitor -> {
+    workspace.run(m -> {
       if(!project.exists()) {
         IProjectDescription projectDescription = workspace.newProjectDescription(project.getName());
         if(addNature) {
           projectDescription.setNatureIds(new String[] {IMavenConstants.NATURE_ID});
         }
         projectDescription.setLocation(null);
-        project.create(projectDescription, monitor);
-        project.open(IResource.NONE, monitor);
+        project.create(projectDescription, m);
+        project.open(IResource.NONE, m);
       } else {
-        project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        project.refreshLocal(IResource.DEPTH_INFINITE, m);
       }
-      ensureDefaultCharset(project, monitor);
+      ensureDefaultCharset(project, m);
     }, null);
 
     // emulate behavior when autobuild was not honored by ProjectRegistryRefreshJob
@@ -497,7 +486,7 @@ public abstract class AbstractMavenProjectTestCase {
     File dst = new File(root.getLocation().toFile(), src.getName());
     copyDir(src, dst);
 
-    final ArrayList<MavenProjectInfo> projectInfos = new ArrayList<>();
+    final List<MavenProjectInfo> projectInfos = new ArrayList<>();
     for(String pomName : pomNames) {
       File pomFile = new File(dst, pomName);
       Model model = mavenModelManager.readMavenModel(pomFile);
@@ -511,8 +500,8 @@ public abstract class AbstractMavenProjectTestCase {
     final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<>();
 
     workspace.run(
-        (IWorkspaceRunnable) monitor -> importResults.addAll(MavenPlugin.getProjectConfigurationManager()
-            .importProjects(projectInfos, importConfiguration, listener, monitor)),
+        m -> importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
+            importConfiguration, listener, m)),
         MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     IProject[] projects = new IProject[projectInfos.size()];
@@ -571,9 +560,9 @@ public abstract class AbstractMavenProjectTestCase {
     final MavenProjectInfo projectInfo = new MavenProjectInfo(projectName, pomFile, model, null);
     setBasedirRename(projectInfo);
 
-    workspace.run((IWorkspaceRunnable) monitor -> {
+    workspace.run(m -> {
       MavenPlugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo),
-          importConfiguration, monitor);
+          importConfiguration, m);
       IProject project = workspace.getRoot()
           .getProject(ProjectConfigurationManager.getProjectName(importConfiguration, projectInfo.getModel()));
       assertNotNull("Failed to import project " + projectInfo, project);
@@ -711,7 +700,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   protected Collection<IProject> createProjectsFromArchetype(final String projectName, final IArchetype archetype,
       Properties properties, final IPath location) throws CoreException {
-    List<IProject> eclipseProjects = new ArrayList<IProject>();
+    List<IProject> eclipseProjects = new ArrayList<>();
     workspace.run((IWorkspaceRunnable) m -> {
       Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
           .createArchetypeProjects(location, archetype, //
