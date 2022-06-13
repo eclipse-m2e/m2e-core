@@ -88,10 +88,6 @@ public class ArchetypeGenerator {
     userProperties.setProperty("archetypeGroupId", archetype.getGroupId());
     userProperties.setProperty("archetypeArtifactId", archetype.getArtifactId());
     userProperties.setProperty("archetypeVersion", archetype.getVersion());
-    String repository = archetype.getRepository();
-    if(repository != null) {
-      userProperties.setProperty("archetypeRepository", repository);
-    }
     userProperties.setProperty("groupId", groupId);
     userProperties.setProperty("artifactId", artifactId);
     userProperties.setProperty("version", version);

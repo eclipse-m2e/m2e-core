@@ -15,7 +15,6 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.eclipse.m2e.core.project.IArchetype;
 
 
-@SuppressWarnings("restriction")
 public class MavenArchetype implements IArchetype {
 
   private Archetype archetype;
@@ -37,11 +36,6 @@ public class MavenArchetype implements IArchetype {
   @Override
   public String getVersion() {
     return archetype.getVersion();
-  }
-
-  @Override
-  public String getRepository() {
-    return archetype.getRepository();
   }
 
 }

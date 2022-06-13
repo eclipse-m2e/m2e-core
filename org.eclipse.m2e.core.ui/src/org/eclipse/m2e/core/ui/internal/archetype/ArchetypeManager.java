@@ -133,25 +133,6 @@ public class ArchetypeManager {
   }
 
   /**
-   * Gets the remote {@link ArtifactRepository} of the given {@link IArchetype}, or null if none is found. The
-   * repository url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
-   * <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
-   *
-   * @see <a href=
-   *      "http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
-   * @param archetype
-   * @return the remote {@link ArtifactRepository} of the given {@link IArchetype}, or null if none is found.
-   * @throws CoreException
-   */
-  public ArtifactRepository getArchetypeRepository(IArchetype archetype) throws CoreException {
-    String repoUrl = archetype.getRepository();
-    if(repoUrl == null || repoUrl.trim().isEmpty()) {
-      return null;
-    }
-    return MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId() + "-repo", repoUrl); //$NON-NLS-1$
-  }
-
-  /**
    * Gets the required properties of an {@link IArchetype}.
    *
    * @param archetype the archetype possibly declaring required properties
@@ -160,7 +141,7 @@ public class ArchetypeManager {
    * @return the required properties of the archetypes, null if none is found.
    * @throws CoreException if no archetype can be resolved
    */
-  public List<?> getRequiredProperties(IArchetype archetype, ArtifactRepository remoteArchetypeRepository,
+  public List<?> getRequiredProperties(IArchetype archetype,
       IProgressMonitor monitor) throws CoreException {
     Assert.isNotNull(archetype, "Archetype can not be null");
 
@@ -175,9 +156,6 @@ public class ArchetypeManager {
     IMaven maven = MavenPlugin.getMaven();
 
     final List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
-    if(remoteArchetypeRepository != null) {
-      repositories.add(0, remoteArchetypeRepository);
-    }
 
     return maven.createExecutionContext().execute((context, monitor1) -> {
       ArtifactRepository localRepository = context.getLocalRepository();

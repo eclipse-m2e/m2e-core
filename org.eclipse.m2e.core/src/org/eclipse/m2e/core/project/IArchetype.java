@@ -31,9 +31,4 @@ public interface IArchetype {
    */
   String getVersion();
 
-  /**
-   * @return the repository of the archetype
-   */
-  String getRepository();
-
 }
