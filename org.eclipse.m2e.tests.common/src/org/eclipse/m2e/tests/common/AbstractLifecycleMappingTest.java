@@ -86,9 +86,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
       throws IOException, XmlPullParserException {
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
     try (InputStream in = new FileInputStream(metadataFile)) {
-      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-          .createLifecycleMappingMetadataSource(in);
-      return lifecycleMappingMetadataSource;
+      return LifecycleMappingFactory.createLifecycleMappingMetadataSource(in);
     }
   }
 
@@ -102,9 +100,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
    */
   protected MavenProjectFacade newMavenProjectFacade(IFile pom) throws CoreException {
     MavenProject mavenProject = MavenPlugin.getMaven().readProject(pom.getLocation().toFile(), monitor);
-    MavenProjectFacade facade = new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(),
-        pom, mavenProject, new ResolverConfiguration());
-    return facade;
+    return new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(), pom, mavenProject,
+        new ResolverConfiguration());
   }
 
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
@@ -113,10 +110,9 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
 
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-      if(entry.getValue() == null || entry.getValue().isEmpty()) {
-        if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
-          result.add(entry.getKey());
-        }
+      if((entry.getValue() == null || entry.getValue().isEmpty())
+          && LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
+        result.add(entry.getKey());
       }
     }
 

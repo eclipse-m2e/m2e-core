@@ -13,16 +13,14 @@
 
 package org.eclipse.m2e.tests.common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -64,17 +62,7 @@ public class FileHelpers {
   }
 
   private static void copyFile(File src, File dst) throws IOException {
-    BufferedInputStream in = new BufferedInputStream(new FileInputStream(src));
-    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dst));
-
-    byte[] buf = new byte[10240];
-    int len;
-    while((len = in.read(buf)) != -1) {
-      out.write(buf, 0, len);
-    }
-
-    out.close();
-    in.close();
+    Files.copy(src.toPath(), dst.toPath());
   }
 
   public static void filterXmlFile(File src, File dst, Map<String, String> tokens) throws IOException {
@@ -84,16 +72,13 @@ public class FileHelpers {
       text = IOUtil.toString(reader);
     }
 
-    for(String token : tokens.keySet()) {
-      text = text.replace(token, tokens.get(token));
+    for(Entry<String, String> entry : tokens.entrySet()) {
+      text = text.replace(entry.getKey(), entry.getValue());
     }
 
     dst.getParentFile().mkdirs();
-    Writer writer = WriterFactory.newXmlWriter(dst);
-    try {
+    try (Writer writer = WriterFactory.newXmlWriter(dst)) {
       writer.write(text);
-    } finally {
-      writer.close();
     }
   }
 
