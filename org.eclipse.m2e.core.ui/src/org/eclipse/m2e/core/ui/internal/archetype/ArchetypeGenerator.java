@@ -100,7 +100,7 @@ public class ArchetypeGenerator {
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
     File emptyPom = getEmptyPom(basedir);
     try {
-      String goals = "-U org.apache.maven.plugins:maven-archetype-plugin:2.4:generate";
+      String goals = "-U archetype:generate";
       if(emptyPom != null) {
         goals += " -f " + emptyPom.getAbsolutePath();
       }
