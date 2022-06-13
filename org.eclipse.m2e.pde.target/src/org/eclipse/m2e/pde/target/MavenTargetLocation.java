@@ -163,12 +163,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			TargetBundles bundles = new TargetBundles();
 			IMaven maven = MavenPlugin.getMaven();
-			List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
-			for (MavenTargetRepository extraRepository : extraRepositories) {
-				ArtifactRepository repository = maven.createArtifactRepository(extraRepository.getId(),
-						extraRepository.getUrl());
-				repositories.add(repository);
-			}
+			List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
 			SubMonitor subMonitor = SubMonitor.convert(monitor, roots.size() * 100);
 			for (MavenTargetDependency root : roots) {
 				if (subMonitor.isCanceled()) {
@@ -375,9 +370,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			targetBundles.bundles.put(artifact, bundle);
 			if (includeSource) {
 				try {
+					List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
 					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
 							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
-							maven.getArtifactRepositories(), new NullProgressMonitor()));
+							repositories, new NullProgressMonitor()));
 					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve,
 							cacheManager);
 					targetBundles.bundles.put(resolve, sourceBundle);
@@ -405,12 +401,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			IMaven maven = MavenPlugin.getMaven();
 			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
 			IMavenExecutionContext context = maven.createExecutionContext();
-			List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
-			for (MavenTargetRepository extraRepository : extraRepositories) {
-				ArtifactRepository repository = maven.createArtifactRepository(extraRepository.getId(),
-						extraRepository.getUrl());
-				repositories.add(repository);
-			}
+			List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
 			List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(repositories);
 			VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
 			VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
@@ -447,10 +438,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	}
 
+	private List<ArtifactRepository> getAvailableArtifactRepositories(IMaven maven) throws CoreException {
+		List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
+		for (MavenTargetRepository repo : extraRepositories) {
+			ArtifactRepository repository = maven.createArtifactRepository(repo.getId(), repo.getUrl());
+			repositories.add(repository);
+		}
+		return repositories;
+	}
+
 	public List<MavenTargetDependency> getRoots() {
 		return roots;
 	}
-
 
 	public IFeature getFeatureTemplate() {
 		return featureTemplate;
