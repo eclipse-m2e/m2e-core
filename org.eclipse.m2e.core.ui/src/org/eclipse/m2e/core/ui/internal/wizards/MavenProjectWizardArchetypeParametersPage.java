@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.TableItem;
 
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.metadata.RequiredProperty;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -430,11 +429,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
         ArchetypeManager archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
 
-        ArtifactRepository remoteArchetypeRepository = archetypeManager
-            .getArchetypeRepository(new MavenArchetype(archetype));
-
-        properties = archetypeManager.getRequiredProperties(new MavenArchetype(archetype), remoteArchetypeRepository,
-            monitor);
+        properties = archetypeManager.getRequiredProperties(new MavenArchetype(archetype), monitor);
 
       } catch(CoreException e) {
         log.error(NLS.bind("Error downloading archetype {0}", archetypeName), e); //$NON-NLS-1$
