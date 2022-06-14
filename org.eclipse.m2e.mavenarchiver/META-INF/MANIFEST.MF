@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: m2e connector for the mavenarchiver and pom properties
+Bundle-SymbolicName: org.eclipse.m2e.mavenarchiver;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-Vendor: Eclipse m2e
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.core.resources;bundle-version="[3.4.0,4.0.0)",
+ org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
+ org.eclipse.m2e.jdt;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[1.0.0,2.0.0)",
+ org.eclipse.jdt.core;bundle-version="[3.0.0,4.0.0)"
+Export-Package: org.eclipse.m2e.mavenarchiver.internal;x-friends="org.eclipse.m2e.mavenarchiver.tests"
+Automatic-Module-Name: org.eclipse.m2e.mavenarchiver

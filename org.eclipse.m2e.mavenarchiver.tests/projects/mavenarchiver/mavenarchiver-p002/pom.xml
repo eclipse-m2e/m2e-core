@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.m2e.mavenarchiver.tests</groupId>
+  <artifactId>mavenarchiver-p002</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+		<archive>
+			<manifest>
+				<addClasspath>true</addClasspath>
+				<addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+				<addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+			</manifest>
+		</archive>        
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.3</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
