@@ -617,9 +617,38 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       generateParameters = generateParameters || isGenerateParameters(request.getMavenProject(), execution, monitor);
       enablePreviewFeatures = enablePreviewFeatures
           || isEnablePreviewFeatures(request.getMavenProject(), execution, monitor);
+
+      // process -err:+deprecation , -warn:-serial ...
+      for(Object o : maven.getMojoParameterValue(request.getMavenProject(), execution, "compilerArgs", List.class,
+          monitor)) {
+        if(o instanceof String compilerArg) {
+          boolean err = false/*, warn = false*/;
+          String[] settings = new String[0];
+          if(compilerArg.startsWith("-warn:")) {
+            //warn = true;
+            settings = compilerArg.substring("-warn:".length()).split(",");
+          } else if(compilerArg.startsWith("-err:")) {
+            err = true;
+            settings = compilerArg.substring("-err:".length()).split(",");
+          }
+          for(String cliSetting : settings) {
+            if(cliSetting.length() >= 2) {
+              String severity = cliSetting.charAt(0) == '-' ? JavaCore.IGNORE
+                  : (err ? JavaCore.ERROR : JavaCore.WARNING);
+              cliSetting = Character.isLetter(cliSetting.charAt(0)) ? cliSetting : cliSetting.substring(1);
+              String option = toCompilerOption(cliSetting);
+              if(option != null) {
+                options.put(option, severity);
+              }
+            }
+          }
+        }
+      }
     }
 
-    if(release != null) {
+    if(release != null)
+
+    {
       source = release;
       target = release;
     } else {
@@ -658,6 +687,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
       options.put(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
     }
+
+  }
+
+  /**
+   * @param problemSettingName
+   * @return the compiler option (usually defined in {@link JavaCore}) for the given CLI problem setting. or
+   *         {@code null} if none found;
+   */
+  private String toCompilerOption(String problemSettingName) {
+    return switch(problemSettingName) {
+      case "serial" -> JavaCore.COMPILER_PB_MISSING_SERIAL_VERSION;
+      default -> null;
+    };
   }
 
   private boolean isGenerateParameters(MavenProject mavenProject, MojoExecution execution, IProgressMonitor monitor) {
