@@ -84,7 +84,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -93,7 +92,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
@@ -245,7 +244,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
       }
     });
 
-    final ArchetypeManager archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
+    final ArchetypePlugin archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
     ArrayList allCatalogs = new ArrayList(archetypeManager.getActiveArchetypeCatalogs());
     allCatalogs.add(0, ALL_CATALOGS);
     catalogsComboViewer.setInput(allCatalogs);
@@ -500,7 +499,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
 
   @SuppressWarnings("unchecked")
   private List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
-    ArchetypeManager manager = M2EUIPluginActivator.getDefault().getArchetypeManager();
+    ArchetypePlugin manager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getActiveArchetypeCatalogs();
 
     ArrayList<Archetype> list = new ArrayList<>();
@@ -552,7 +551,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
         if(IStatus.ERROR == event.getResult().getSeverity()) {
           error = event.getResult().getMessage();
         } else if((catalogArchetypes == null || catalogArchetypes.isEmpty())) {
-          ArchetypeManager archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
+          ArchetypePlugin archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
           Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getActiveArchetypeCatalogs();
           if(catalogs.isEmpty()) {
             error = Messages.MavenProjectWizardArchetypePage_error_noEnabledCatalogs;
@@ -597,7 +596,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     super.setVisible(visible);
 
     if(visible) {
-      ArchetypeManager archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
+      ArchetypePlugin archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
       String catalogId = dialogSettings.get(KEY_CATALOG);
       catalogFactory = null;
       if(catalogId != null && !catalogId.equals(ALL_CATALOGS)) {
@@ -713,7 +712,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
 
           final List<ArtifactRepository> remoteRepositories;
           if(repositoryUrl.length() == 0) {
-            remoteRepositories = maven.getArtifactRepositories(); // XXX should use ArchetypeManager.getArchetypeRepositories()
+            remoteRepositories = maven.getArtifactRepositories(); // XXX should use ArchetypePlugin.getArchetypeRepositories()
           } else {
             //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication
             //see http://maven.apache.org/archetype/maven-archetype-plugin/faq.html
@@ -759,15 +758,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
             archetype.setArtifactId(archetypeArtifactId);
             archetype.setVersion(archetypeVersion);
             archetype.setRepository(repositoryUrl);
-            org.apache.maven.archetype.ArchetypeManager archetyper = M2EUIPluginActivator.getDefault()
-                .getArchetypeManager().getArchetyper();
-            maven.createExecutionContext().execute((ctx, m) -> {
-              ProjectBuildingRequest request = ctx.newProjectBuildingRequest();
-              archetyper.updateLocalCatalog(request, archetype);
-              return null;
-            }, monitor);
-
-
+            M2EUIPluginActivator.getDefault().getArchetypePlugin().updateLocalCatalog(archetype);
 
             archetypesCache.clear();
 

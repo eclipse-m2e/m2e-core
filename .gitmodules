@@ -1,4 +1,4 @@
 [submodule "m2e-core-tests"]
 	path = m2e-core-tests
-	url = https://github.com/laeubi/m2e-core-tests.git
-	branch = archetype_3
+	url = https://github.com/tesla/m2e-core-tests.git
+	branch = master

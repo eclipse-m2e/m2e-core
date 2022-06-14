@@ -57,7 +57,7 @@ public class ExtensionReader {
 
   private static final String ATTR_DESCRIPTION = "description"; //$NON-NLS-1$
 
-  public static List<ArchetypeCatalogFactory> readArchetypeExtensions() {
+  public static List<ArchetypeCatalogFactory> readArchetypeExtensions(ArchetypePlugin archetypePlugin) {
     List<ArchetypeCatalogFactory> archetypeCatalogs = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -68,7 +68,7 @@ public class ExtensionReader {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         IContributor contributor = extension.getContributor();
         for(IConfigurationElement element : elements) {
-          ArchetypeCatalogFactory factory = readArchetypeCatalogs(element, contributor);
+          ArchetypeCatalogFactory factory = readArchetypeCatalogs(element, contributor, archetypePlugin);
           // archetypeManager.addArchetypeCatalogFactory(factory);
           archetypeCatalogs.add(factory);
         }
@@ -78,7 +78,7 @@ public class ExtensionReader {
   }
 
   private static ArchetypeCatalogFactory readArchetypeCatalogs(IConfigurationElement element,
-      IContributor contributor) {
+      IContributor contributor, ArchetypePlugin archetypePlugin) {
     if(ELEMENT_LOCAL_ARCHETYPE.equals(element.getName())) {
       String name = element.getAttribute(ATTR_NAME);
       if(name != null) {
@@ -89,7 +89,8 @@ public class ExtensionReader {
           if(catalogUrl != null) {
             String description = element.getAttribute(ATTR_DESCRIPTION);
             String url = catalogUrl.toString();
-            return new ArchetypeCatalogFactory.LocalCatalogFactory(url, description, false);
+            return archetypePlugin.newLocalCatalogFactory(url, description,
+                false, true);
           }
         }
         log.error("Unable to find Archetype catalog " + name + " in " + contributor.getName());
@@ -98,7 +99,8 @@ public class ExtensionReader {
       String url = element.getAttribute(ATTR_URL);
       if(url != null) {
         String description = element.getAttribute(ATTR_DESCRIPTION);
-        return new ArchetypeCatalogFactory.RemoteCatalogFactory(url, description, false);
+        return archetypePlugin.newRemoteCatalogFactory(url, description, false,
+            true);
       }
     }
     return null;

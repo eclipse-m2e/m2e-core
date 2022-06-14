@@ -14,12 +14,12 @@
 package org.eclipse.m2e.core.ui.internal.archetype;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,18 +28,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.archetype.ArchetypeManager;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
+import org.apache.maven.archetype.source.ArchetypeDataSource;
+import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 import org.apache.maven.archetype.source.RemoteCatalogArchetypeDataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.project.ProjectBuildingRequest;
 
-import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 /**
@@ -94,23 +95,26 @@ public abstract class ArchetypeCatalogFactory {
     return getId();
   }
 
-  ArchetypeManager getArchetyper() {
-    return M2EUIPluginActivator.getDefault().getArchetypeManager().getArchetyper();
-  }
-
   /**
    * Factory for internal ArchetypeCatalog
    */
   public static class InternalCatalogFactory extends ArchetypeCatalogFactory {
     public static final String ID = "internal"; //$NON-NLS-1$
 
-    public InternalCatalogFactory() {
+    private ArchetypeDataSource source;
+
+    InternalCatalogFactory(ArchetypeDataSource source) {
       super(ID, Messages.ArchetypeCatalogFactory_internal, false);
+      this.source = source;
     }
 
     @Override
     public ArchetypeCatalog getArchetypeCatalog() {
-      return getArchetyper().getInternalCatalog();
+      try {
+        return source.getArchetypeCatalog(null);
+      } catch(ArchetypeDataSourceException e) {
+        return new ArchetypeCatalog();
+      }
     }
   }
 
@@ -120,13 +124,26 @@ public abstract class ArchetypeCatalogFactory {
   public static class DefaultLocalCatalogFactory extends ArchetypeCatalogFactory {
     public static final String ID = "defaultLocal"; //$NON-NLS-1$
 
-    public DefaultLocalCatalogFactory() {
+    private ArchetypeDataSource source;
+
+    private IMaven maven;
+
+    DefaultLocalCatalogFactory(IMaven maven, ArchetypeDataSource source) {
       super(ID, Messages.ArchetypeCatalogFactory_default_local, false);
+      this.maven = maven;
+      this.source = source;
     }
 
     @Override
     public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
-      return executeWithRequest(getArchetyper()::getLocalCatalog);
+      return maven.createExecutionContext().execute((ctx, m) -> {
+        ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
+        try {
+          return source.getArchetypeCatalog(buildingRequest);
+        } catch(ArchetypeDataSourceException e) {
+          return new ArchetypeCatalog();
+        }
+      }, null);
     }
   }
 
@@ -135,16 +152,19 @@ public abstract class ArchetypeCatalogFactory {
    */
   public static class LocalCatalogFactory extends ArchetypeCatalogFactory {
 
-    public LocalCatalogFactory(String path, String description, boolean editable) {
-      this(path, description, editable, true);
-    }
+    private IMaven maven;
 
-    public LocalCatalogFactory(String path, String description, boolean editable, boolean enabled) {
+    private ArchetypeDataSource source;
+
+    public LocalCatalogFactory(String path, String description, boolean editable, boolean enabled, IMaven maven,
+        ArchetypeDataSource source) {
       super(path,
           description == null || description.trim().length() == 0
               ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path)
               : description,
           editable, enabled);
+      this.maven = maven;
+      this.source = source;
     }
 
     @Override
@@ -152,14 +172,24 @@ public abstract class ArchetypeCatalogFactory {
       ArchetypeCatalog catalog = getEmbeddedCatalog();
       if(catalog == null) {
         //local but not embedded catalog
-        catalog = executeWithRequest(request -> {
-          ArtifactRepository localRepository = new MavenArtifactRepository();
-          //TODO: test this
-          String path = getId();
-          localRepository.setUrl(Path.of(path).toUri().toString());
-          request.setLocalRepository(localRepository);
-          return getArchetyper().getLocalCatalog(request);
-        });
+        IMavenExecutionContext context = maven.createExecutionContext();
+        ArtifactRepository localRepository = new MavenArtifactRepository();
+        Path path = Path.of(getId());
+        File file = path.toFile().getAbsoluteFile();
+        if(file.isFile()) {
+          file = file.getParentFile();
+        }
+        localRepository.setUrl(file.toURI().toString());
+        context.getExecutionRequest().setLocalRepository(localRepository);
+        return context.execute((ctx, m) -> {
+          ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
+          buildingRequest.setLocalRepository(localRepository);
+          try {
+            return source.getArchetypeCatalog(buildingRequest);
+          } catch(ArchetypeDataSourceException e) {
+            return new ArchetypeCatalog();
+          }
+        }, null);
       }
       return catalog;
     }
@@ -199,16 +229,19 @@ public abstract class ArchetypeCatalogFactory {
 
     private String repositoryUrl = null;
 
-    public RemoteCatalogFactory(String url, String description, boolean editable) {
-      this(url, description, editable, true);
-    }
+    private IMaven maven;
 
-    public RemoteCatalogFactory(String url, String description, boolean editable, boolean enabled) {
+    private ArchetypeDataSource source;
+
+    RemoteCatalogFactory(String url, String description, boolean editable, boolean enabled, IMaven maven,
+        ArchetypeDataSource source) {
       super(url,
           description == null || description.trim().length() == 0
               ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url)
               : description,
           editable, enabled);
+      this.maven = maven;
+      this.source = source;
       repositoryUrl = parseCatalogUrl(url);
     }
 
@@ -233,13 +266,19 @@ public abstract class ArchetypeCatalogFactory {
         url = url.substring(0, idx);
       }
       final String remoteUrl = url;
-      ArchetypeCatalog catalog = executeWithRequest(request -> {
-        ArtifactRepository archeTypeRepo = new MavenArtifactRepository();
-        archeTypeRepo.setUrl(remoteUrl);
-        archeTypeRepo.setId(RemoteCatalogArchetypeDataSource.ARCHETYPE_REPOSITORY_ID);
-        request.getRemoteRepositories().add(archeTypeRepo);
-        return getArchetyper().getRemoteCatalog(request);
-      });
+
+      ArchetypeCatalog catalog = maven.createExecutionContext().execute((ctx, m) -> {
+        ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
+        try {
+          ArtifactRepository archeTypeRepo = new MavenArtifactRepository();
+          archeTypeRepo.setUrl(remoteUrl);
+          archeTypeRepo.setId(RemoteCatalogArchetypeDataSource.ARCHETYPE_REPOSITORY_ID);
+          buildingRequest.getRemoteRepositories().add(archeTypeRepo);
+          return source.getArchetypeCatalog(buildingRequest);
+        } catch(ArchetypeDataSourceException e) {
+          return new ArchetypeCatalog();
+        }
+      }, null);
 
       @SuppressWarnings("serial")
       ArchetypeCatalog catalogWrapper = new ArchetypeCatalog() {
@@ -294,13 +333,6 @@ public abstract class ArchetypeCatalogFactory {
     public String getRepositoryUrl() {
       return repositoryUrl;
     }
-  }
-
-  private static <T> T executeWithRequest(Function<ProjectBuildingRequest, T> action) throws CoreException {
-    return MavenPlugin.getMaven().createExecutionContext().execute((ctx, m) -> {
-      ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
-      return action.apply(buildingRequest);
-    }, null);
   }
 
 }
