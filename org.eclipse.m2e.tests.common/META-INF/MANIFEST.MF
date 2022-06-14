@@ -20,7 +20,7 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.swt;bundle-version="3.119.0",
  org.eclipse.m2e.core.ui
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: Eclipse.org - m2e
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.tests.common
