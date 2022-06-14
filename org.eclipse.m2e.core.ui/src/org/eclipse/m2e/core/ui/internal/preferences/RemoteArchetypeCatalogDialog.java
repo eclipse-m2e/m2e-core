@@ -168,7 +168,8 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     verifyButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
       verifyButton.setEnabled(false);
       String url = catalogUrlCombo.getText();
-      final RemoteCatalogFactory factory = new RemoteCatalogFactory(url, null, true);
+      final RemoteCatalogFactory factory = M2EUIPluginActivator.getDefault().getArchetypePlugin()
+          .newRemoteCatalogFactory(url, null, true, true);
       Job.create(Messages.RemoteArchetypeCatalogDialog_job_download, monitor -> {
         try {
           ArchetypeCatalog catalog = factory.getArchetypeCatalog();
@@ -235,7 +236,8 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogUrlCombo.getText().trim();
 
-    archetypeCatalogFactory = new RemoteCatalogFactory(location, description, true);
+    archetypeCatalogFactory = M2EUIPluginActivator.getDefault().getArchetypePlugin().newRemoteCatalogFactory(location,
+        description, true, true);
 
     saveValue(KEY_LOCATIONS, location);
 

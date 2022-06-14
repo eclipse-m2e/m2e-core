@@ -96,7 +96,7 @@ public class ArchetypeGenerator {
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
     File emptyPom = getEmptyPom(basedir);
     try {
-      String goals = "-U archetype:generate";
+      String goals = "-U " + ArchetypePlugin.ARCHETYPE_PREFIX + ":generate";
       if(emptyPom != null) {
         goals += " -f " + emptyPom.getAbsolutePath();
       }

@@ -241,7 +241,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
               .createArchetypeProjects(location,
               new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
