@@ -58,7 +58,7 @@
               class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
               enablesFor="+"
               icon="icons/exclude.gif"
-              label="%action.exclude1.label"
+              label="%action.exclude.label"
               menubarPath="additions"/>
      </objectContribution>
 
