@@ -19,13 +19,13 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
-	<version>1.18.1-SNAPSHOT</version>
+	<version>1.18.2-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E SLF4J-Simple Binding for Embedded Maven Runtime</name>
 
 	<properties>
-		<slf4j-simple.version>1.7.30</slf4j-simple.version>
+		<slf4j-simple.version>1.7.36</slf4j-simple.version>
 	</properties>
 
 	<description>
