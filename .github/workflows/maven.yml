@@ -1,7 +1,6 @@
 # This workflow will build the m2e project with Maven
 
-name: Build m2e-core
-
+name: Build M2Eclipse
 on:
   push:
     branches: 
@@ -17,16 +16,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 11
+      with:
+        fetch-depth: 0
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
         cache: 'maven'
     - name: Generated Meta data
       run: mvn generate-sources -f m2e-maven-runtime -Pgenerate-osgi-metadata -Dtycho.mode=maven
     - name: Build m2e-core
-      run: mvn clean verify -Dmaven.test.failure.ignore=true --file pom.xml
+      uses: GabrielBB/xvfb-action@v1
+      with:
+       run: mvn clean verify -Dmaven.test.failure.ignore=true --file pom.xml
     - name: Upload Test Results
       uses: actions/upload-artifact@v3
       with:
