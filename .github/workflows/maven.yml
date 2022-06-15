@@ -13,9 +13,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up JDK 17
@@ -23,7 +24,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: 'maven'
+    - name: Cache local Maven repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        # re-cache on changes in the pom and target files
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml', '**/*.target') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
     - name: Generated Meta data
       run: mvn generate-sources -f m2e-maven-runtime -Pgenerate-osgi-metadata -Dtycho.mode=maven
     - name: Build m2e-core
