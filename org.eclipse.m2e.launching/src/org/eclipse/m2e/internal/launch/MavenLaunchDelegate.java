@@ -232,7 +232,9 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private void getPreferences(StringBuilder sb, ILaunchConfiguration configuration, String goals) throws CoreException {
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
-    sb.append(" -B"); //$NON-NLS-1$
+    if(configuration.getAttribute(MavenLaunchConstants.ATTR_BATCH, true)) {
+      sb.append(" -B"); //$NON-NLS-1$
+    }
 
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_DEBUG_OUTPUT, mavenConfiguration.isDebugOutput())) {
       sb.append(" -X").append(" -e"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -69,6 +69,13 @@ public class ArchetypeGenerator {
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Properties properties, IProgressMonitor monitor)
       throws CoreException {
+    return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, false,
+        monitor);
+  }
+
+  public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
+      String artifactId, String version, String javaPackage, Properties properties, boolean interactive,
+      IProgressMonitor monitor) throws CoreException {
     SubMonitor subMonitor = SubMonitor.convert(monitor,
         NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 3);
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -100,7 +107,7 @@ public class ArchetypeGenerator {
       if(emptyPom != null) {
         goals += " -f " + emptyPom.getAbsolutePath();
       }
-      CompletableFuture<?> maven = mavenLauncher.runMaven(basedir, goals, userProperties);
+      CompletableFuture<?> maven = mavenLauncher.runMaven(basedir, goals, userProperties, interactive);
       subMonitor.worked(1);
       Display current = Display.getCurrent();
       while(!maven.isDone()) {
