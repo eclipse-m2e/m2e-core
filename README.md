@@ -1,4 +1,5 @@
 # Eclipse IDE integration for Maven (Eclipse m2e project)
+[![Build m2e-core](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml/badge.svg)](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml)
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/eclipse-m2e/m2e-core?label=Version&sort=semver)
 [![GitHub license](https://img.shields.io/github/license/eclipse-m2e/m2e-core?label=License)](https://github.com/eclipse-m2e/m2e-core/blob/master/LICENSE)
