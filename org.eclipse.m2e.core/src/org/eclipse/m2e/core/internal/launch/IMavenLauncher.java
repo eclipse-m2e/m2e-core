@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public interface IMavenLauncher {
 
-  CompletableFuture<?> runMaven(File basedir, String goals, Properties properties) throws CoreException;
+  CompletableFuture<?> runMaven(File basedir, String goals, Properties properties, boolean interactive)
+      throws CoreException;
 
 }

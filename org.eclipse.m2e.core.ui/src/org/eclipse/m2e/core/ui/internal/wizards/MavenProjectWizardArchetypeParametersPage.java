@@ -111,6 +111,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   /** shows if the package has been customized by the user */
   protected boolean packageCustomized = false;
 
+  private Button runInteractive;
+
   /** Creates a new page. */
   public MavenProjectWizardArchetypeParametersPage(ProjectImportConfiguration projectImportConfiguration) {
     super("Maven2ProjectWizardArchifactPage", projectImportConfiguration); //$NON-NLS-1$
@@ -195,6 +197,10 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       }
       validate();
     });
+    new Label(parent, SWT.NONE);
+    this.runInteractive = new Button(parent, SWT.CHECK);
+    runInteractive.setSelection(true);
+    runInteractive.setText(Messages.MavenProjectWizardArchetypeParametersPage_runInteractive);
   }
 
   private void createPropertiesGroup(Composite composite) {
@@ -636,5 +642,13 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   private boolean isVisible() {
     return getControl() != null && getControl().isVisible();
+  }
+
+  /**
+   * 
+   */
+  public boolean isInteractive() {
+    return runInteractive.getSelection();
+
   }
 }

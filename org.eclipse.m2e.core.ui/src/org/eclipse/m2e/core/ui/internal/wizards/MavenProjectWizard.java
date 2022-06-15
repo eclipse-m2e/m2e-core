@@ -237,6 +237,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       final String version = model.getVersion();
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
+      final boolean interactive = parametersPage.isInteractive();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
@@ -245,7 +246,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
               .createArchetypeProjects(location,
               new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
-              properties, monitor);
+                  properties, interactive, monitor);
           return MavenPlugin.getProjectConfigurationManager()
               .importProjects(projects, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor)
               .stream().filter(r -> r.getProject() != null && r.getProject().exists())
