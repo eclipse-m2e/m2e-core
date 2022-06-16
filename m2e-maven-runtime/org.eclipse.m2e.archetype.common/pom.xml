@@ -76,6 +76,55 @@
 					<groupId>org.apache.maven</groupId>
 					<artifactId>maven-aether-provider</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<!-- The following excluded dependencies are not accessed at runtime and therefore don't need to be embedded. -->
+				<exclusion>
+					<groupId>org.apache.ivy</groupId>
+					<artifactId>ivy</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.shared</groupId>
+					<artifactId>maven-common-artifact-filters</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.maven.shared</groupId>
+					<artifactId>maven-invoker</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.velocity</groupId>
+					<artifactId>velocity</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>groovy-all</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-velocity</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-collections</groupId>
+					<artifactId>commons-collections</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-guice</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-inject-bean</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-inject-plexus</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>
@@ -88,13 +137,15 @@
 					<artifactId>bnd-maven-plugin</artifactId>
 					<configuration>
 						<bnd>
-						<![CDATA[
+							<![CDATA[
 							-exportcontents: \
 								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${archetype-common.version}";x-friends:="org.eclipse.m2e.core.ui"
 							Require-Bundle: \
 								org.eclipse.m2e.maven.runtime;bundle-version="[3.0.0,4.0.0)",\
 								com.ibm.icu
+							Import-Package: \
+								org.slf4j;resolution:=optional;version="[1.7.0,2.0.0)"
 						]]>
 						</bnd>
 					</configuration>
