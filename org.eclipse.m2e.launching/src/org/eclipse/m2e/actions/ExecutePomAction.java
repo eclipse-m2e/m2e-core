@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -61,6 +62,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IPomFacade;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -168,6 +170,11 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   private IContainer findPomXmlBasedir(IContainer dir) {
     if(dir == null) {
       return null;
+    }
+    //first check if this is a pom facade, then we have a base directory!
+    IPomFacade pomFacade = Adapters.adapt(dir, IPomFacade.class);
+    if(pomFacade != null) {
+      return dir;
     }
 
     try {
