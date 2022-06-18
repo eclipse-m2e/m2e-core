@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -144,6 +145,34 @@ public class MavenModelManager {
       Thread.currentThread().setContextClassLoader(ccl);
     }
     return null;
+  }
+
+  public Optional<File> locatePom(File baseDir) {
+    if(baseDir == null || !baseDir.isDirectory()) {
+      return Optional.empty();
+    }
+    File file = new File(baseDir, IMavenConstants.POM_FILE_NAME);
+    if(file.isFile()) {
+      //check the obvious case first...
+      return Optional.of(file);
+    }
+    ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+    try {
+      PlexusContainer plexusContainer = containerManager.aquire(baseDir);
+      Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+      ModelProcessor modelProcessor = plexusContainer.lookup(ModelProcessor.class);
+      File pom = modelProcessor.locatePom(baseDir);
+      System.out.println(pom);
+      if(pom != null && pom.isFile()) {
+        return Optional.of(pom);
+      }
+    } catch(Exception ex) {
+      //can't locate the pom... but don't bail to the caller...
+      MavenPluginActivator.getDefault().getLog().warn("Error while locating pom for basedir " + baseDir, ex);
+    } finally {
+      Thread.currentThread().setContextClassLoader(ccl);
+    }
+    return Optional.empty();
   }
 
   public org.apache.maven.model.Model readMavenModel(IFile pomFile) throws CoreException {
