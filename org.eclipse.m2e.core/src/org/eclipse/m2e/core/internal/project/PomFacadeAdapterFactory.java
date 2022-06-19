@@ -70,7 +70,6 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
   }
 
   private IPomFacade getFacadeForPom(IFile file) {
-    System.out.println("file=" + file);
     if(file == null) {
       return null;
     }
