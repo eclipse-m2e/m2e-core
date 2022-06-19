@@ -162,7 +162,6 @@ public class MavenModelManager {
       Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
       ModelProcessor modelProcessor = plexusContainer.lookup(ModelProcessor.class);
       File pom = modelProcessor.locatePom(baseDir);
-      System.out.println(pom);
       if(pom != null && pom.isFile()) {
         return Optional.of(pom);
       }
