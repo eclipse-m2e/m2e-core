@@ -19,6 +19,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
+        submodules: true
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -37,11 +38,11 @@ jobs:
     - name: Build m2e-core
       uses: GabrielBB/xvfb-action@v1
       with:
-       run: mvn clean verify -Dmaven.test.failure.ignore=true --file pom.xml
+       run: mvn clean verify -B -Puts,its -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Dtycho.surefire.timeout=7200
     - name: Upload Test Results
       uses: actions/upload-artifact@v3
       with:
         name: test-results
         if-no-files-found: error
         path: |
-          ${{ github.workspace }}/*/target/surefire-reports/*.xml
+          ${{ github.workspace }}/**/target/surefire-reports/*.xml
