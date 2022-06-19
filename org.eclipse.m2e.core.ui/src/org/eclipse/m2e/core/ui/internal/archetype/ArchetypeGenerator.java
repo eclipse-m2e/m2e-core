@@ -15,8 +15,10 @@ package org.eclipse.m2e.core.ui.internal.archetype;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +38,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+
+import org.apache.maven.DefaultMaven;
 
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -146,9 +150,10 @@ public class ArchetypeGenerator {
       try {
         File tempFile = File.createTempFile("pom", ".xml", basedir);
         tempFile.deleteOnExit();
-        Files.writeString(tempFile.toPath(),
-            "<project><modelVersion>4.0.0</modelVersion><groupId>empty</groupId><artifactId>empty</artifactId><version>1</version><name>Generating archetype</name></project>",
-            StandardCharsets.UTF_8);
+        URL standalone = DefaultMaven.class.getResource("project/standalone.xml");
+        try (InputStream stream = standalone.openStream()) {
+          Files.copy(stream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
         return tempFile;
       } catch(IOException ex) {
       }
