@@ -13,10 +13,10 @@
 
 package org.eclipse.m2e.core.ui.internal.archetype;
 
-import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,12 +174,7 @@ public abstract class ArchetypeCatalogFactory {
         //local but not embedded catalog
         IMavenExecutionContext context = maven.createExecutionContext();
         ArtifactRepository localRepository = new MavenArtifactRepository();
-        Path path = Path.of(getId());
-        File file = path.toFile().getAbsoluteFile();
-        if(file.isFile()) {
-          file = file.getParentFile();
-        }
-        localRepository.setUrl(file.toURI().toString());
+        localRepository.setUrl(getLocalRepositoryURL());
         context.getExecutionRequest().setLocalRepository(localRepository);
         return context.execute((ctx, m) -> {
           ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
@@ -194,13 +189,31 @@ public abstract class ArchetypeCatalogFactory {
       return catalog;
     }
 
+    private String getLocalRepositoryURL() {
+      Path path;
+      try { // First try to use the id as a path, then as a URI else as it is
+        path = Path.of(getId());
+      } catch(Exception e1) {
+        try {
+          path = Path.of(new URI(getId()));
+        } catch(Exception e2) {
+          return getId();
+        }
+      }
+      path = path.toAbsolutePath();
+      if(Files.isRegularFile(path)) {
+        path = path.getParent();
+      }
+      return path.toUri().toString();
+    }
+
     private ArchetypeCatalog getEmbeddedCatalog() throws CoreException {
       URL url = getEmbeddedUrl();
       if(url == null) {
         //Not an embedded catalog, nothing else to do
         return null;
       }
-      try (InputStream is = new BufferedInputStream(url.openStream())) {
+      try (InputStream is = url.openStream()) {
         return new ArchetypeCatalogXpp3Reader().read(is);
       } catch(Exception ex) {
         String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());
