@@ -857,6 +857,8 @@ public class Messages extends NLS {
 
   public static String wizardProjectPageMaven2ValidatorRequiredProperty;
 
+  public static String wizardProjectPageMaven2ValidatorRequiredPropertyInvalidValue;
+
   public static String wizardProjectPageMaven2Description;
 
   public static String wizardProjectPageMaven2ValidatorPackaging;

@@ -55,6 +55,7 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
+import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -207,7 +208,8 @@ public class ArchetypePlugin {
    * @return the required properties of the archetypes, null if none is found.
    * @throws CoreException if no archetype can be resolved
    */
-  public List<?> getRequiredProperties(IArchetype archetype, IProgressMonitor monitor) throws CoreException {
+  public List<RequiredProperty> getRequiredProperties(IArchetype archetype, IProgressMonitor monitor)
+      throws CoreException {
     Assert.isNotNull(archetype, "Archetype can not be null");
 
     if(monitor == null) {
