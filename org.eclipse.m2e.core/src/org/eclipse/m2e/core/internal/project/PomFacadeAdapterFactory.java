@@ -25,9 +25,11 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IPomFacade;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -41,7 +43,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
   private IMavenProjectRegistry mavenProjectRegistry;
 
   @Reference
-  private MavenModelManager mavenModelManager;
+  private PlexusContainerManager containerManager;
 
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
@@ -58,7 +60,10 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
         IContainer container = (IContainer) adaptableObject;
         IPomFacade facade = Optional.of(container.getLocation())//
             .map(IPath::toFile)//
-            .flatMap(basedir -> mavenModelManager.locatePom(basedir))//
+            .flatMap(basedir -> {
+              IComponentLookup lookup = containerManager.getComponentLookup(basedir);
+              return IMavenToolbox.of(lookup).locatePom(basedir);
+            })//
             .map(pomfile -> container.getFile(Path.fromPortableString(pomfile.getName())))//
             .map(this::getFacadeForPom)//
             .orElse(null);

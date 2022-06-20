@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,8 +97,6 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.interpolation.ModelInterpolator;
-import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -419,32 +416,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())
         || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.getKey())) {
       reloadSettings();
-    }
-  }
-
-  @Override
-  public Model readModel(InputStream in) throws CoreException {
-    try {
-      return lookup(ModelReader.class).read(in, null);
-    } catch(IOException e) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
-    }
-  }
-
-  public Model readModel(File pomFile) throws CoreException {
-    try (InputStream is = new FileInputStream(pomFile)) {
-      return readModel(is);
-    } catch(IOException e) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
-    }
-  }
-
-  @Override
-  public void writeModel(Model model, OutputStream out) throws CoreException {
-    try {
-      lookup(ModelWriter.class).write(out, null, model);
-    } catch(IOException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_write_pom, ex));
     }
   }
 
