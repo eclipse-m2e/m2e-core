@@ -69,6 +69,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -748,7 +749,7 @@ public class ProjectConfigurationManager
     Model model = projectInfo.getModel();
     if(model == null) {
       try (InputStream pomStream = Files.newInputStream(pomFile.toPath())) {
-        model = maven.readModel(pomStream);
+        model = IMavenToolbox.of(maven).readModel(pomStream);
       } catch(IOException ex) {
         log.error(Messages.MavenImpl_error_read_pom, ex);
       }

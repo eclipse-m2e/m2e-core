@@ -266,6 +266,10 @@ public class Messages extends NLS {
 
   public static String ProjectConfiguratorToRunAfterNotAvailable;
 
+  public static String MavenToolbox_lookuprequired;
+
+  public static String MavenToolbox_sessionrequired;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

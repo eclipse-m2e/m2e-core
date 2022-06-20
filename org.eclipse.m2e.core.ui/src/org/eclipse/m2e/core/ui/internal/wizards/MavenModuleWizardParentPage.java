@@ -46,6 +46,7 @@ import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.WorkingSets;
@@ -221,7 +222,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       parentContainer = pom.getParent();
 
       try (InputStream pomStream = pom.getContents()) {
-        parentModel = MavenPlugin.getMavenModelManager().readMavenModel(pomStream);
+        parentModel = IMavenToolbox.of(MavenPlugin.getMaven()).readModel(pomStream);
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
       } catch(CoreException | IOException e) {

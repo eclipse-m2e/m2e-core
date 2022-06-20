@@ -42,6 +42,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -60,9 +61,17 @@ public interface IMaven extends IComponentLookup {
 
   // POM Model read/write operations
 
-  Model readModel(InputStream in) throws CoreException;
+  /**
+   * @deprecated use the {@link MavenModelManager} instead
+   */
+  @Deprecated(forRemoval = true)
+  default Model readModel(InputStream in) throws CoreException {
+    return IMavenToolbox.of(this).readModel(in);
+  }
 
-  void writeModel(Model model, OutputStream out) throws CoreException;
+  default void writeModel(Model model, OutputStream out) throws CoreException {
+    IMavenToolbox.of(this).writeModel(model, out);
+  }
 
   // artifact resolution
 

@@ -160,18 +160,35 @@ public class PlexusContainerManager {
       PlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
       if(plexusContainer == null) {
         try {
-        containerMap.put(canonicalDirectory,
-            plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration));
+          containerMap.put(canonicalDirectory,
+              plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration));
         } catch(ExtensionResolutionException e) {
           //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
           CoreExtension extension = e.getExtension();
-          throw new PlexusContainerException("can't create plexus container for basedir = " + basedir.getAbsolutePath()
-              + " because the extension " + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
-              + extension.getVersion() + " can't be loaded (defined in "
-              + new File(directory, EXTENSIONS_FILENAME).getAbsolutePath() + ").", e);
+          throw new PlexusContainerException(
+              "can't create plexus container for basedir = " + basedir.getAbsolutePath() + " because the extension "
+                  + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion()
+                  + " can't be loaded (defined in " + new File(directory, EXTENSIONS_FILENAME).getAbsolutePath() + ").",
+              e);
         }
       }
       return plexusContainer;
+    }
+  }
+
+  public IComponentLookup getComponentLookup() {
+    try {
+      return new PlexusComponentLookup(aquire());
+    } catch(Exception ex) {
+      return new ExceptionalLookup(ex);
+    }
+  }
+
+  public IComponentLookup getComponentLookup(File basedir) {
+    try {
+      return new PlexusComponentLookup(aquire(basedir));
+    } catch(Exception ex) {
+      return new ExceptionalLookup(ex);
     }
   }
 
@@ -314,6 +331,33 @@ public class PlexusContainerManager {
       } catch(ComponentLookupException ex) {
         return List.of();
       }
+    }
+
+  }
+
+  private static final class ExceptionalLookup implements IComponentLookup {
+
+    private Exception exception;
+
+    public ExceptionalLookup(Exception exception) {
+      this.exception = exception;
+    }
+
+    @Override
+    public <C> C lookup(Class<C> type) throws CoreException {
+      throw throwException();
+    }
+
+    @Override
+    public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
+      throw throwException();
+    }
+
+    private CoreException throwException() {
+      if(exception instanceof CoreException) {
+        return (CoreException) exception;
+      }
+      return new CoreException(Status.error("container creation failed", exception));
     }
 
   }

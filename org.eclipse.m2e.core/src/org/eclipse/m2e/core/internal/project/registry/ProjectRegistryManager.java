@@ -93,6 +93,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
@@ -560,7 +561,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         try (InputStream is = pom.getContents()) {
           // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
-          Model model = getMaven().readModel(is);
+          Model model = IMavenToolbox.of(getMaven()).readModel(is);
           if(model != null && model.getParent() != null) {
             Parent parent = model.getParent();
             if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
