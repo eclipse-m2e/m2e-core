@@ -13,25 +13,16 @@ package org.eclipse.m2e.core.embedder;
 
 import java.io.File;
 
-import org.eclipse.core.resources.IFile;
-
 
 /**
- * The {@link IPomFacade} is a wrapper over the maven representation of a pom that represents something that could be
- * executed as a maven execution. You can expect it to do something similar to
- * <code>mvn -f {@link IPomFacade#getPomFile()}</code> on the commandline.
+ * The {@link IMavenExecutableLocation} is a wrapper over the maven representation of a pom that represents something
+ * that could be executed as a maven execution. You can expect it to do something similar to
+ * <code>mvn -f {@link IMavenExecutableLocation#getPomFile()}</code> on the commandline.
  */
-public interface IPomFacade {
+public interface IMavenExecutableLocation {
 
   /**
-   * @return the pom file location in the current workspace
+   * @return the executable Maven file, never {@code null}.
    */
-  IFile getPom();
-
-  /**
-   * @return the underlying java file
-   */
-  default File getPomFile() {
-    return getPom().getLocation().toFile();
-  }
+  File getPomFile();
 }

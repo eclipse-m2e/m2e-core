@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
-import org.eclipse.m2e.core.embedder.IPomFacade;
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
@@ -47,7 +47,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
 
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-    if(adapterType == IPomFacade.class) {
+    if(adapterType == IMavenExecutableLocation.class) {
       if(adaptableObject instanceof IFile) {
         IFile file = (IFile) adaptableObject;
         if(file.getName().equalsIgnoreCase(IMavenConstants.POM_FILE_NAME)) {
@@ -58,7 +58,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
       }
       if(adaptableObject instanceof IContainer) {
         IContainer container = (IContainer) adaptableObject;
-        IPomFacade facade = Optional.of(container.getLocation())//
+        IMavenExecutableLocation facade = Optional.of(container.getLocation())//
             .map(IPath::toFile)//
             .flatMap(basedir -> {
               IComponentLookup lookup = containerManager.getComponentLookup(basedir);
@@ -74,7 +74,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
     return null;
   }
 
-  private IPomFacade getFacadeForPom(IFile file) {
+  private IMavenExecutableLocation getFacadeForPom(IFile file) {
     if(file == null) {
       return null;
     }
@@ -103,22 +103,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
 
   @Override
   public Class<?>[] getAdapterList() {
-    return new Class[] {IPomFacade.class};
-  }
-
-  private static final class ResourcePomFacade implements IPomFacade {
-
-    private IFile pom;
-
-    public ResourcePomFacade(IFile pom) {
-      this.pom = pom;
-    }
-
-    @Override
-    public IFile getPom() {
-      return pom;
-    }
-
+    return new Class[] {IMavenExecutableLocation.class};
   }
 
 }

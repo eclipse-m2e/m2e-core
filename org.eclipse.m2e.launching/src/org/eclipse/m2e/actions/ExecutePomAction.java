@@ -62,7 +62,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IPomFacade;
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -172,7 +172,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
       return null;
     }
     //first check if this is a pom facade, then we have a base directory!
-    IPomFacade pomFacade = Adapters.adapt(dir, IPomFacade.class);
+    IMavenExecutableLocation pomFacade = Adapters.adapt(dir, IMavenExecutableLocation.class);
     if(pomFacade != null) {
       return dir;
     }
