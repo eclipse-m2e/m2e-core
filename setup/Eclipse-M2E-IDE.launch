@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
     <setAttribute key="additional_plugins">
-        <setEntry value="org.eclipse.m2e.logback.configuration:1.16.3.qualifier:default:true:default:true"/>
+        <setEntry value="org.apache.xml.resolver:1.2.0.v20220401-1849:default:true:default:default"/>
+        <setEntry value="org.eclipse.m2e.logback.configuration:1.17.0.qualifier:default:true:default:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
     <booleanAttribute key="askclear" value="true"/>
