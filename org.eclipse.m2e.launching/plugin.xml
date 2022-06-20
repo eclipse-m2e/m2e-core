@@ -87,7 +87,7 @@
                     <adapt type="org.eclipse.core.resources.IProject">
                        <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
                     </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IPomFacade">
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
                     </adapt>
                  </or>
               </iterate>
@@ -112,7 +112,7 @@
                     <adapt type="org.eclipse.core.resources.IProject">
                        <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
                     </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IPomFacade">
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
                     </adapt>
                  </or>
               </iterate>
@@ -137,7 +137,7 @@
                     <adapt type="org.eclipse.core.resources.IProject">
                        <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
                     </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IPomFacade">
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
                     </adapt>
                  </or>
               </iterate>
@@ -162,7 +162,7 @@
                     <adapt type="org.eclipse.core.resources.IProject">
                        <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
                     </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IPomFacade">
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
                     </adapt>
                  </or>
               </iterate>
@@ -187,7 +187,7 @@
                     <adapt type="org.eclipse.core.resources.IProject">
                        <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
                     </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IPomFacade">
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
                     </adapt>
                  </or>
               </iterate>
