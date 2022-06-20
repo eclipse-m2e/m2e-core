@@ -16,11 +16,13 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -68,6 +70,11 @@ import org.eclipse.m2e.core.ui.internal.util.ArchetypeUtil;
  */
 public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWizardPage {
 
+  /**
+   * 
+   */
+  private static final String ARCHETYPE_REQUIRED_PROPERTY = "ArcheType.RequiredProperty";
+
   private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypeParametersPage.class);
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
@@ -100,7 +107,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   private boolean isUsed = true;
 
-  protected Set<String> requiredProperties;
+  protected final Map<String, RequiredProperty> requiredProperties = new LinkedHashMap<>();
 
   protected Set<String> optionalProperties;
 
@@ -121,7 +128,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     setDescription(Messages.wizardProjectPageMaven2ArchetypeParametersDescription);
     setPageComplete(false);
 
-    requiredProperties = new HashSet<>();
     optionalProperties = new HashSet<>();
   }
 
@@ -336,10 +342,19 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     if(!requiredProperties.isEmpty()) {
       Properties properties = getProperties();
-      for(String key : requiredProperties) {
-        String value = properties.getProperty(key);
+      for(var entry : requiredProperties.entrySet()) {
+        String propertyKey = entry.getKey();
+        String value = properties.getProperty(propertyKey);
         if(value == null || value.length() == 0) {
-          return NLS.bind(Messages.wizardProjectPageMaven2ValidatorRequiredProperty, key);
+          return NLS.bind(Messages.wizardProjectPageMaven2ValidatorRequiredProperty, propertyKey);
+        }
+        RequiredProperty requiredProperty = entry.getValue();
+        String regex = requiredProperty.getValidationRegex();
+        if(regex != null && !regex.isBlank()) {
+          Predicate<String> predicate = Pattern.compile(regex).asMatchPredicate();
+          if(!predicate.test(value)) {
+            return NLS.bind(Messages.wizardProjectPageMaven2ValidatorRequiredPropertyInvalidValue, propertyKey, regex);
+          }
         }
       }
     }
@@ -382,13 +397,12 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       RequiredPropertiesLoader propertiesLoader = new RequiredPropertiesLoader(archetype);
       getContainer().run(true, true, propertiesLoader);
 
-      List<?> properties = propertiesLoader.getProperties();
+      List<RequiredProperty> properties = propertiesLoader.getProperties();
       if(properties != null) {
-        for(Object o : properties) {
-          if(o instanceof RequiredProperty rp) {
-            requiredProperties.add(rp.getKey());
-            addTableItem(rp.getKey(), rp.getDefaultValue());
-          }
+        for(RequiredProperty property : properties) {
+          requiredProperties.put(property.getKey(), property);
+          TableItem tableItem = addTableItem(property.getKey(), property.getDefaultValue());
+          tableItem.setData(ARCHETYPE_REQUIRED_PROPERTY, property);
         }
       }
 
@@ -414,13 +428,13 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     private final Archetype archetype;
 
-    private List<?> properties;
+    private List<RequiredProperty> properties;
 
     RequiredPropertiesLoader(Archetype archetype) {
       this.archetype = archetype;
     }
 
-    List<?> getProperties() {
+    List<RequiredProperty> getProperties() {
       return properties;
     }
 
@@ -598,7 +612,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
       // populate the property name selection
       List<String> propertyKeys = new ArrayList<>(n);
-      propertyKeys.addAll(requiredProperties);
+      propertyKeys.addAll(requiredProperties.keySet());
       propertyKeys.addAll(optionalProperties);
       comboEditor.setItems(propertyKeys.toArray(new String[n]));
     }
