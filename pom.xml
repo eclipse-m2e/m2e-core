@@ -30,6 +30,8 @@
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
+		<tycho.surefire.useUIHarness>true</tycho.surefire.useUIHarness>
+		<tycho.surefire.useUIThread>true</tycho.surefire.useUIThread>
 		<jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
 		<tycho.scmUrl>scm:git:https://github.com/eclipse-m2e/m2e-core.git</tycho.scmUrl>
 		<trimStackTrace>false</trimStackTrace>
@@ -307,7 +309,8 @@
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho-version}</version>
 					<configuration>
-						<useUIHarness>true</useUIHarness>
+						<useUIHarness>${tycho.surefire.useUIHarness}</useUIHarness>
+						<useUIThread>${tycho.surefire.useUIThread}</useUIThread>
 						<includes>
 							<include>**/*Test.java</include>
 						</includes>
@@ -437,6 +440,42 @@
 			<modules>
 				<module>m2e-core-tests</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>modello-code-generation</id>
+			<activation>
+				<!-- Only activated for org.eclipse.m2e.core project-->
+				<file>
+					<exists>mdo/lifecycle-mapping-metadata-model.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.modello</groupId>
+						<artifactId>modello-maven-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>standard</id>
+								<goals>
+									<goal>java</goal>
+									<goal>xpp3-reader</goal>
+									<goal>xpp3-writer</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.basedir}/src-gen</outputDirectory>
+									<version>1.0.0</version>
+									<useJava5>true</useJava5>
+									<models>
+										<model>mdo/lifecycle-mapping-metadata-model.xml</model>
+									</models>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 
