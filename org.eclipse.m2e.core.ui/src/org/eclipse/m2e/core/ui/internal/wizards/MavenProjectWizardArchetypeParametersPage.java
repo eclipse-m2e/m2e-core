@@ -15,8 +15,8 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -109,7 +110,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   protected final Map<String, RequiredProperty> requiredProperties = new LinkedHashMap<>();
 
-  protected Set<String> optionalProperties;
+  protected final Set<String> optionalProperties = new LinkedHashSet<>();
 
   protected Archetype archetype;
 
@@ -128,7 +129,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     setDescription(Messages.wizardProjectPageMaven2ArchetypeParametersDescription);
     setPageComplete(false);
 
-    optionalProperties = new HashSet<>();
   }
 
   /** Creates page controls. */
@@ -207,6 +207,18 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     this.runInteractive = new Button(parent, SWT.CHECK);
     runInteractive.setSelection(true);
     runInteractive.setText(Messages.MavenProjectWizardArchetypeParametersPage_runInteractive);
+    runInteractive.addSelectionListener(new SelectionListener() {
+
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        validate();
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+        validate();
+      }
+    });
   }
 
   private void createPropertiesGroup(Composite composite) {
@@ -344,11 +356,18 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       Properties properties = getProperties();
       for(var entry : requiredProperties.entrySet()) {
         String propertyKey = entry.getKey();
+        RequiredProperty requiredProperty = entry.getValue();
         String value = properties.getProperty(propertyKey);
-        if(value == null || value.length() == 0) {
+        String defaultValue = requiredProperty.getDefaultValue();
+        if(value == null || value.isBlank()) {
+          if(defaultValue != null && !defaultValue.isEmpty()) {
+            if(requireEvaluation(defaultValue) && !isInteractive()) {
+              return Messages.wizardProjectPageMaven2ValidatorRequireInteractive;
+            }
+            continue;
+          }
           return NLS.bind(Messages.wizardProjectPageMaven2ValidatorRequiredProperty, propertyKey);
         }
-        RequiredProperty requiredProperty = entry.getValue();
         String regex = requiredProperty.getValidationRegex();
         if(regex != null && !regex.isBlank()) {
           Predicate<String> predicate = Pattern.compile(regex).asMatchPredicate();
@@ -360,6 +379,10 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     return null;
+  }
+
+  private boolean requireEvaluation(String value) {
+    return value != null && value.contains("${");
   }
 
   /** Ends the wizard flow chain. */
@@ -401,8 +424,12 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       if(properties != null) {
         for(RequiredProperty property : properties) {
           requiredProperties.put(property.getKey(), property);
-          TableItem tableItem = addTableItem(property.getKey(), property.getDefaultValue());
-          tableItem.setData(ARCHETYPE_REQUIRED_PROPERTY, property);
+          if(requireEvaluation(property.getDefaultValue())) {
+            optionalProperties.add(property.getKey());
+          } else {
+            TableItem tableItem = addTableItem(property.getKey(), property.getDefaultValue());
+            tableItem.setData(ARCHETYPE_REQUIRED_PROPERTY, property);
+          }
         }
       }
 
