@@ -15,8 +15,10 @@ package org.eclipse.m2e.core.ui.internal.archetype;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +38,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+
+import org.apache.maven.DefaultMaven;
 
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -69,6 +73,13 @@ public class ArchetypeGenerator {
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Properties properties, IProgressMonitor monitor)
       throws CoreException {
+    return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, false,
+        monitor);
+  }
+
+  public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
+      String artifactId, String version, String javaPackage, Properties properties, boolean interactive,
+      IProgressMonitor monitor) throws CoreException {
     SubMonitor subMonitor = SubMonitor.convert(monitor,
         NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 3);
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -88,10 +99,6 @@ public class ArchetypeGenerator {
     userProperties.setProperty("archetypeGroupId", archetype.getGroupId());
     userProperties.setProperty("archetypeArtifactId", archetype.getArtifactId());
     userProperties.setProperty("archetypeVersion", archetype.getVersion());
-    String repository = archetype.getRepository();
-    if(repository != null) {
-      userProperties.setProperty("archetypeRepository", repository);
-    }
     userProperties.setProperty("groupId", groupId);
     userProperties.setProperty("artifactId", artifactId);
     userProperties.setProperty("version", version);
@@ -100,11 +107,11 @@ public class ArchetypeGenerator {
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
     File emptyPom = getEmptyPom(basedir);
     try {
-      String goals = "-U org.apache.maven.plugins:maven-archetype-plugin:2.4:generate";
+      String goals = "-U " + ArchetypePlugin.ARCHETYPE_PREFIX + ":generate";
       if(emptyPom != null) {
         goals += " -f " + emptyPom.getAbsolutePath();
       }
-      CompletableFuture<?> maven = mavenLauncher.runMaven(basedir, goals, userProperties);
+      CompletableFuture<?> maven = mavenLauncher.runMaven(basedir, goals, userProperties, interactive);
       subMonitor.worked(1);
       Display current = Display.getCurrent();
       while(!maven.isDone()) {
@@ -143,9 +150,10 @@ public class ArchetypeGenerator {
       try {
         File tempFile = File.createTempFile("pom", ".xml", basedir);
         tempFile.deleteOnExit();
-        Files.writeString(tempFile.toPath(),
-            "<project><modelVersion>4.0.0</modelVersion><groupId>empty</groupId><artifactId>empty</artifactId><version>1</version><name>Generating archetype</name></project>",
-            StandardCharsets.UTF_8);
+        URL standalone = DefaultMaven.class.getResource("project/standalone.xml");
+        try (InputStream stream = standalone.openStream()) {
+          Files.copy(stream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
         return tempFile;
       } catch(IOException ex) {
       }

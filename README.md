@@ -1,4 +1,5 @@
 # Eclipse IDE integration for Maven (Eclipse m2e project)
+[![Build m2e-core](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml/badge.svg)](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml)
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/eclipse-m2e/m2e-core?label=Version&sort=semver)
 [![GitHub license](https://img.shields.io/github/license/eclipse-m2e/m2e-core?label=License)](https://github.com/eclipse-m2e/m2e-core/blob/master/LICENSE)
@@ -27,7 +28,7 @@ into your Eclipse-IDE, or use the Eclipse Marketplace Client directly from withi
 
 ⚠️ _Some other entries exist that look like m2e. They're usually outdated or incorrect. Please use the official one, linked above._
 
-Alternatively, you can install the lastest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository:<br>
+Alternatively, you can install the latest M2Eclipse release by using the _Install New Software_ dialog in Eclipse IDE, pointing it to this p2 repository:<br>
 https://download.eclipse.org/technology/m2e/releases/latest/
 
 To use the latest snapshot build, you can use this p2 repository:<br>

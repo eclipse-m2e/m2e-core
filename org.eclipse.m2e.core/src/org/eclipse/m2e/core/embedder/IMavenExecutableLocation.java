@@ -8,21 +8,21 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.launch;
+
+package org.eclipse.m2e.core.embedder;
 
 import java.io.File;
-import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
-
-import org.eclipse.core.runtime.CoreException;
 
 
 /**
- * {@link IMavenLauncher} allows to trigger a maven run
+ * The {@link IMavenExecutableLocation} is a wrapper over the maven representation of a pom that represents something
+ * that could be executed as a maven execution. You can expect it to do something similar to
+ * <code>mvn -f {@link IMavenExecutableLocation#getPomFile()}</code> on the commandline.
  */
-public interface IMavenLauncher {
+public interface IMavenExecutableLocation {
 
-  CompletableFuture<?> runMaven(File basedir, String goals, Properties properties, boolean interactive)
-      throws CoreException;
-
+  /**
+   * @return the executable Maven file, never {@code null}.
+   */
+  File getPomFile();
 }

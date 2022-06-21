@@ -52,4 +52,6 @@ public interface MavenLaunchConstants {
   String ATTR_THREADS = "M2_THREADS"; //$NON-NLS-1$
 
   String ATTR_SAVE_BEFORE_LAUNCH = "M2_SAVE_BEFORE_LAUNCH";
+
+  String ATTR_BATCH = "M2_BATCH";
 }

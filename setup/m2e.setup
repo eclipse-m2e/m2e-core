@@ -96,6 +96,7 @@
   </setupTask>
   <setupTask
       xsi:type="setup.p2:P2Task"
+      disabled="true"
       label="m2e - connectors">
     <requirement
         name="org.sonatype.tycho.m2e.feature.feature.group"/>

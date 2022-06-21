@@ -44,7 +44,8 @@ import org.eclipse.m2e.core.internal.launch.IMavenLauncher;
 @Component(service = IMavenLauncher.class)
 public class EclipseMavenLauncher implements IMavenLauncher {
 
-  public CompletableFuture<?> runMaven(File basedir, String goals, Properties mavenProperties) throws CoreException {
+  public CompletableFuture<?> runMaven(File basedir, String goals, Properties mavenProperties, boolean interactive)
+      throws CoreException {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType launchConfigurationType = launchManager
         .getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID);
@@ -53,6 +54,7 @@ public class EclipseMavenLauncher implements IMavenLauncher {
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, basedir.getAbsolutePath());
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_GOALS, goals);
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_SAVE_BEFORE_LAUNCH, false);
+    workingCopy.setAttribute(MavenLaunchConstants.ATTR_BATCH, !interactive);
     List<String> properties = new ArrayList<>();
     for(String propertyKey : mavenProperties.stringPropertyNames()) {
       String propertyValue = mavenProperties.getProperty(propertyKey);
@@ -97,7 +99,9 @@ public class EclipseMavenLauncher implements IMavenLauncher {
               return;
             }
           }
-          launchManager.removeLaunch(launch);
+          if(!interactive) {
+            launchManager.removeLaunch(launch);
+          }
           run.completeAsync(() -> launch);
         });
       }

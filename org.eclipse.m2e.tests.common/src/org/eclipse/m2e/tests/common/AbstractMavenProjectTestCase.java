@@ -702,7 +702,7 @@ public abstract class AbstractMavenProjectTestCase {
       Properties properties, final IPath location) throws CoreException {
     List<IProject> eclipseProjects = new ArrayList<>();
     workspace.run((IWorkspaceRunnable) m -> {
-      Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+      Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
           .createArchetypeProjects(location, archetype, //
               projectName, projectName, "0.0.1-SNAPSHOT", "test", //
               properties, monitor);

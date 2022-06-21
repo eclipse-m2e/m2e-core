@@ -57,7 +57,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
@@ -70,7 +70,7 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
 public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
-  ArchetypeManager archetypeManager;
+  ArchetypePlugin archetypeManager;
 
   CheckboxTableViewer archetypesViewer;
 
@@ -80,7 +80,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     super(GRID);
     setTitle(Messages.MavenArchetypesPreferencePage_title);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
-    this.archetypeManager = M2EUIPluginActivator.getDefault().getArchetypeManager();
+    this.archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
   }
 
   @Override

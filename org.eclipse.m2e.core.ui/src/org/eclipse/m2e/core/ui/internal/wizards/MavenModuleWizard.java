@@ -246,15 +246,16 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final String version = model.getVersion();
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
+      final boolean interactive = parametersPage.isInteractive();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypeManager().getGenerator()
+          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
               .createArchetypeProjects(location,
               new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
-                  properties, monitor);
+                  properties, interactive, monitor);
           setModule(moduleName);
 
           return MavenPlugin.getProjectConfigurationManager()

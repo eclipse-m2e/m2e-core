@@ -45,6 +45,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
@@ -174,13 +175,15 @@ public class ArchetypeCatalogsWriter {
           String path = attributes.getValue(ATT_CATALOG_LOCATION);
           if(path != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(new LocalCatalogFactory(path, description, true, enabled));
+            catalogs.add(M2EUIPluginActivator.getDefault().getArchetypePlugin().newLocalCatalogFactory(path,
+                description, true, enabled));
           }
         } else if(TYPE_REMOTE.equals(type)) {
           String url = attributes.getValue(ATT_CATALOG_LOCATION);
           if(url != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(new RemoteCatalogFactory(url, description, true, enabled));
+            catalogs.add(M2EUIPluginActivator.getDefault().getArchetypePlugin().newRemoteCatalogFactory(url,
+                description, true, enabled));
           }
         } else {
           String id = attributes.getValue(ATT_CATALOG_ID);

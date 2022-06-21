@@ -8,34 +8,24 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.ui.internal.archetype;
+package org.eclipse.m2e.core.internal.project;
 
-import org.apache.maven.archetype.catalog.Archetype;
+import java.io.File;
 
-import org.eclipse.m2e.core.project.IArchetype;
+import org.eclipse.core.resources.IFile;
 
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 
-public class MavenArchetype implements IArchetype {
+public class ResourcePomFacade implements IMavenExecutableLocation {
 
-  private Archetype archetype;
+  protected final IFile pom;
 
-  public MavenArchetype(Archetype archetype) {
-    this.archetype = archetype;
+  public ResourcePomFacade(IFile pom) {
+    this.pom = pom;
   }
 
   @Override
-  public String getGroupId() {
-    return archetype.getGroupId();
+  public File getPomFile() {
+    return pom.getLocation().toFile();
   }
-
-  @Override
-  public String getArtifactId() {
-    return archetype.getArtifactId();
-  }
-
-  @Override
-  public String getVersion() {
-    return archetype.getVersion();
-  }
-
 }

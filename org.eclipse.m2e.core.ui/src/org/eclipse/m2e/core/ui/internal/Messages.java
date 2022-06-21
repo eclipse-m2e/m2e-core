@@ -857,6 +857,10 @@ public class Messages extends NLS {
 
   public static String wizardProjectPageMaven2ValidatorRequiredProperty;
 
+  public static String wizardProjectPageMaven2ValidatorRequiredPropertyInvalidValue;
+
+  public static String wizardProjectPageMaven2ValidatorRequireInteractive;
+
   public static String wizardProjectPageMaven2Description;
 
   public static String wizardProjectPageMaven2ValidatorPackaging;
@@ -1002,6 +1006,8 @@ public class Messages extends NLS {
   public static String MavenInstallationWizardPage_selectProjectTitle;
 
   public static String MavenSettingsPreferencePage_globalSettingsBrowseButton_text;
+
+  public static String MavenProjectWizardArchetypeParametersPage_runInteractive;
 
   static {
     // initialize resource bundle

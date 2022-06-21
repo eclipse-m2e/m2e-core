@@ -31,6 +31,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -42,7 +43,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
-public interface IMavenProjectFacade {
+public interface IMavenProjectFacade extends IMavenExecutableLocation {
 
   /**
    * Returns project relative paths of resource directories
@@ -99,8 +100,6 @@ public interface IMavenProjectFacade {
   IProject getProject();
 
   IFile getPom();
-
-  File getPomFile();
 
   /**
    * Returns the full, absolute path of the given file relative to the workspace. Returns null if the file does not

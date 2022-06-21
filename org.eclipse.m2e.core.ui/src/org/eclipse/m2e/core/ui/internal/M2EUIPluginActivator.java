@@ -14,17 +14,11 @@
 
 package org.eclipse.m2e.core.ui.internal;
 
-import java.io.File;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -39,23 +33,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.ClassWorld;
-
-import org.apache.maven.archetype.ArchetypeGenerationRequest;
-
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.ui.internal.archetype.ExtensionReader;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
@@ -72,7 +52,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private static M2EUIPluginActivator instance;
 
-  private ArchetypeManager archetypeManager;
+  private ServiceTracker<ArchetypePlugin, ArchetypePlugin> archetypeManager;
 
   /**
    * Storage for preferences.
@@ -100,8 +80,11 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   public static final String PROP_SHOW_EXPERIMENTAL_FEATURES = "m2e.showExperimentalFeatures";
 
+  private BundleContext context;
+
   @Override
   public void start(BundleContext context) throws Exception {
+    this.context = context;
     super.start(context);
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -191,53 +174,14 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return Boolean.parseBoolean(System.getProperty(PROP_SHOW_EXPERIMENTAL_FEATURES));
   }
 
-  public ArchetypeManager getArchetypeManager() {
+  public ArchetypePlugin getArchetypePlugin() {
     synchronized(this) {
       if(this.archetypeManager == null) {
-        try {
-          PlexusContainer archetyperContainer = newPlexusContainer(ArchetypeGenerationRequest.class.getClassLoader());
-          this.archetypeManager = newArchetypeManager(archetyperContainer,
-              MavenPluginActivator.getDefault().getStateLocation().toFile());
-          try {
-            this.archetypeManager.readCatalogs();
-          } catch(Exception ex) {
-            String msg = "Can't read archetype catalog configuration";
-            log.error(msg, ex);
-          }
-        } catch(PlexusContainerException ex1) {
-          log.error("Failed to initialize the ArchetypeManager", ex1);
-        }
+        archetypeManager = new ServiceTracker<>(context, ArchetypePlugin.class, null);
+        archetypeManager.open();
       }
     }
-    return this.archetypeManager;
+    return this.archetypeManager.getService();
   }
 
-  private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
-    final Module logginModule = new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
-      }
-    };
-    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setName("plexus"); //$NON-NLS-1$
-    return new DefaultPlexusContainer(cc, logginModule);
-  }
-
-  private ArchetypeManager newArchetypeManager(PlexusContainer container, File stateLocationDir) {
-    ServiceTracker<ArchetypeGenerator, ArchetypeGenerator> tracker = new ServiceTracker<ArchetypeGenerator, ArchetypeGenerator>(getBundle().getBundleContext(),
-        ArchetypeGenerator.class, null);
-    tracker.open();
-    ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES),
-        tracker);
-    archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.InternalCatalogFactory());
-    archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory());
-    for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions()) {
-      archetypeManager.addArchetypeCatalogFactory(archetypeCatalogFactory);
-    }
-    return archetypeManager;
-  }
 }
