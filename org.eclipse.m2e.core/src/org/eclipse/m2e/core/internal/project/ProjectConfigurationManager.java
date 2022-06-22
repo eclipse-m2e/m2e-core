@@ -64,6 +64,7 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -73,6 +74,7 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
@@ -118,6 +120,9 @@ public class ProjectConfigurationManager
 
   @Reference
   IMavenConfiguration mavenConfiguration;
+
+  @Reference
+  PlexusContainerManager containerManager;
 
   @Override
   public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos,
@@ -241,7 +246,10 @@ public class ProjectConfigurationManager
     // first, resolve maven dependencies for all projects
     Set<IFile> pomFiles = new LinkedHashSet<>();
     for(IProject project : projects) {
-      pomFiles.add(project.getFile(IMavenConstants.POM_FILE_NAME));
+      File baseDir = project.getLocation().toFile();
+      IMavenToolbox.of(containerManager.getComponentLookup(baseDir)).locatePom(baseDir).ifPresent(pomFile -> {
+        pomFiles.add(project.getFile(pomFile.getName()));
+      });
     }
     progress.subTask(Messages.ProjectConfigurationManager_task_refreshing);
 

@@ -41,9 +41,8 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testCoreExtension() throws Exception {
-		boolean skipSanityCheck = true; // TODO this should also work! But not part of this change
 		IProject[] projects = importProjects("resources/projects/pomless/", new String[] { "bundle/pom.xml" },
-				new ResolverConfiguration(), skipSanityCheck);
+				new ResolverConfiguration(), false);
 		waitForJobsToComplete(monitor);
 		assertEquals(1, projects.length);
 		IProject project = projects[0];
