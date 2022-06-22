@@ -39,7 +39,6 @@ import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.m2e.pde.target.MavenTargetRepository;
 import org.eclipse.m2e.pde.target.MissingMetadataMode;
 import org.eclipse.m2e.pde.target.TemplateFeatureModel;
-import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
@@ -390,7 +389,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				featureSpecPage.update(featureModel, iscreate || targetLocation.getFeatureTemplate() == null);
 				pluginListPage.update(featureModel);
 			} catch (CoreException e) {
-				Platform.getLog(Activator.class).log(e.getStatus());
+				Platform.getLog(MavenTargetLocationWizard.class).log(e.getStatus());
 			}
 			featureModel.makeReadOnly();
 		}

@@ -16,21 +16,23 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.target.provider.DependencyNodeLabelProvider;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetTreeContentProvider;
 import org.eclipse.pde.ui.target.ITargetLocationHandler;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
+@Component(service = IAdapterFactory.class, property = {
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.aether.graph.DependencyNode",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ILabelProvider",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ITreeContentProvider",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.pde.ui.target.ITargetLocationHandler" })
 public class DependencyNodeAdapterFactory implements IAdapterFactory {
 
-	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
-	public static final ILabelProvider LABEL_PROVIDER = new DependencyNodeLabelProvider();
-	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
-	static {
-		Activator.runOnBundleStop(TREE_CONTENT_PROVIDER::dispose);
-		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
-	}
+	private final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
+	private final ILabelProvider LABEL_PROVIDER = new DependencyNodeLabelProvider();
+	private final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
 
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
@@ -49,6 +51,12 @@ public class DependencyNodeAdapterFactory implements IAdapterFactory {
 	@Override
 	public Class<?>[] getAdapterList() {
 		return new Class<?>[] { ITreeContentProvider.class, ILabelProvider.class, ITargetLocationHandler.class };
+	}
+
+	@Deactivate
+	void dispose() {
+		TREE_CONTENT_PROVIDER.dispose();
+		LABEL_PROVIDER.dispose();
 	}
 
 }

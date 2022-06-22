@@ -15,15 +15,16 @@ package org.eclipse.m2e.pde.ui.target.adapter;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.m2e.pde.target.MavenTargetBundle;
-import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetBundleLabelProvider;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
+@Component(service = IAdapterFactory.class, property = {
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.m2e.pde.target.MavenTargetBundle",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ILabelProvider" })
 public class MavenTargetBundleAdapterFactory implements IAdapterFactory {
 
-	public static final ILabelProvider LABEL_PROVIDER = new MavenTargetBundleLabelProvider();
-	static {
-		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
-	}
+	private final ILabelProvider LABEL_PROVIDER = new MavenTargetBundleLabelProvider();
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adaptableObject instanceof MavenTargetBundle) {
@@ -37,6 +38,11 @@ public class MavenTargetBundleAdapterFactory implements IAdapterFactory {
 	@Override
 	public Class<?>[] getAdapterList() {
 		return new Class<?>[] { ILabelProvider.class };
+	}
+
+	@Deactivate
+	void dispose() {
+		LABEL_PROVIDER.dispose();
 	}
 
 }
