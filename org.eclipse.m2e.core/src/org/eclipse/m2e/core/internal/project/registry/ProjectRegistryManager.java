@@ -32,6 +32,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -245,7 +246,18 @@ public class ProjectRegistryManager implements ISaveParticipant {
       // XXX sensible handling
       return null;
     }
-    return project.getFile(IMavenConstants.POM_FILE_NAME);
+    File baseDir = project.getLocation().toFile();
+    Optional<File> pom = IMavenToolbox.of(containerManager.getComponentLookup(baseDir)).locatePom(baseDir);
+    return pom.map(pomFile -> {
+      IFile file = project.getFile(pomFile.getName());
+      try {
+        //the file might be created by the locate call so make sure we refresh it here...
+        file.refreshLocal(IResource.DEPTH_ZERO, null);
+      } catch(CoreException ex) {
+        //if this does not work, there might be an error, but this is not handled here...
+      }
+      return file;
+    }).orElse(null);
   }
 
   /**

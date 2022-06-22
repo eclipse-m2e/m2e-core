@@ -110,7 +110,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IFile resource = (IFile) marker.getResource();
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
       if(domModel == null) {
-        throw new IllegalArgumentException("Document is not structured: " + resource);
+        log.debug("Document is not structured: " + resource);
+        return;
       }
       IStructuredDocument document = domModel.getStructuredDocument();
       int charStart = document.getLineOffset(lineNumber - 1) + columnStart - 1;
