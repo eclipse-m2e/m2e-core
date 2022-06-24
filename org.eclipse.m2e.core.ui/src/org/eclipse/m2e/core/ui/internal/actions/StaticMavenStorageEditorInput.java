@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 
@@ -83,24 +82,6 @@ public class StaticMavenStorageEditorInput implements IStorageEditorInput {
   }
 
 }
-
-
-class StaticMavenPathStorageEditorInput extends StaticMavenStorageEditorInput implements IPathEditorInput {
-  public StaticMavenPathStorageEditorInput(String name, String tooltip, String path, byte[] content) {
-    super(name, tooltip, path, content);
-  }
-
-  //implemented as hinted by IPathEditorInput javadoc.
-  @Override
-  public boolean equals(Object obj) {
-    IPath path = getPath();
-    if(path != null && obj instanceof StaticMavenPathStorageEditorInput other) {
-      return path.equals(other.getPath());
-    }
-    return super.equals(obj);
-  }
-}
-
 
 /**
  * Implementation of IStorage that only serve static/immutable content
