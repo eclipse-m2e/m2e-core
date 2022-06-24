@@ -84,21 +84,6 @@ public class SelectionUtil {
 
   public static final int WORKING_SET = 16;
 
-  /** Checks which type the given selection belongs to. */
-  public static int getSelectionType(IStructuredSelection selection) {
-    int type = UNSUPPORTED;
-    if(selection != null) {
-      for(Object name : selection) {
-        int elementType = getElementType(name);
-        if(elementType == UNSUPPORTED) {
-          return UNSUPPORTED;
-        }
-        type |= elementType;
-      }
-    }
-    return type;
-  }
-
   /** Checks which type the given element belongs to. */
   public static int getElementType(Object element) {
     IProject project = getType(element, IProject.class);
