@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2020 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *******************************************************************************/
 package org.eclipse.m2e.mavenarchiver.internal;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
-
 /**
  * Defines plugin-wide constants for the mavenarchiver plugin.
  * 
@@ -18,9 +16,11 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
  */
 public class MavenArchiverConstants {
 
-	public static final String MAVENARCHIVER_MARKER_ID = IMavenConstants.MARKER_ID + ".mavenarchiver"; //$NON-NLS-1$
+	@SuppressWarnings("restriction")
+	public static final String MAVENARCHIVER_MARKER_ID = org.eclipse.m2e.core.internal.IMavenConstants.MARKER_ID
+			+ ".mavenarchiver";
 
-	public static final String MAVENARCHIVER_MARKER_ERROR = MAVENARCHIVER_MARKER_ID + ".error"; //$NON-NLS-1$
+	public static final String MAVENARCHIVER_MARKER_ERROR = MAVENARCHIVER_MARKER_ID + ".error";
 
 	private MavenArchiverConstants() {
 		// prevent instantiation.
