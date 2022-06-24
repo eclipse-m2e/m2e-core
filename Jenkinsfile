@@ -27,6 +27,7 @@ pipeline {
 			post {
 				always {
 					archiveArtifacts artifacts: 'org.eclipse.*.site/target/repository/**/*,org.eclipse.*.site/target/*.zip,*/target/work/data/.metadata/.log,m2e-core-tests/*/target/work/data/.metadata/.log,m2e-maven-runtime/target/*.properties'
+					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
 			}
