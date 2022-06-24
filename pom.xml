@@ -83,6 +83,7 @@
 		<module>org.eclipse.m2e.pde.connector</module>
 		<module>org.eclipse.m2e.apt.core</module>
 		<module>org.eclipse.m2e.apt.ui</module>
+		<module>org.eclipse.m2e.mavenarchiver</module>
 
 		<!-- common test helpers -->
 		<module>org.eclipse.m2e.tests.common</module>
