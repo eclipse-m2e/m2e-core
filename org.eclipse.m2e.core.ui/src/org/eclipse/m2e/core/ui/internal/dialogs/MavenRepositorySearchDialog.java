@@ -216,6 +216,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setStatusLineAboveButtons(true);
+    setHelpAvailable(false);
     setTitle(title);
   }
 
