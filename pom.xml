@@ -26,7 +26,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<tycho-version>2.7.2</tycho-version>
+		<tycho-version>2.7.4</tycho-version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -99,7 +99,7 @@
 		<module>org.eclipse.m2e.logback.feature</module>
 		<module>org.eclipse.m2e.pde.feature</module>
 		<module>org.eclipse.m2e.repository</module>
-		
+
 		<!-- products -->
 		<module>products</module>
 
