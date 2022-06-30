@@ -57,6 +57,7 @@ import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -220,8 +221,8 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 	private void mavenProjectChanged(IMavenProjectFacade newFacade, IMavenProjectFacade oldFacade,
 			boolean forceGeneration, IProgressMonitor monitor) throws CoreException {
-		IFolder outputdir = getBuildOutputDir(newFacade);
-		IFile manifest = outputdir.getFile(JarFile.MANIFEST_NAME);
+		IContainer outputdir = getBuildOutputDir(newFacade);
+		IFile manifest = outputdir.getFile(org.eclipse.core.runtime.Path.forPosix(JarFile.MANIFEST_NAME));
 		if (forceGeneration || needsNewManifest(manifest, oldFacade, newFacade)) {
 			generateManifest(newFacade, manifest, monitor);
 			refresh(outputdir, monitor);
@@ -245,7 +246,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 * @param monitor   the progress monitor
 	 * @throws CoreException
 	 */
-	private void refresh(IFolder outputdir, IProgressMonitor monitor) throws CoreException {
+	private void refresh(IContainer outputdir, IProgressMonitor monitor) throws CoreException {
 		// refresh the target folder
 		if (outputdir.exists()) {
 			try {
@@ -803,9 +804,12 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		return Path.of(pom.getLocationURI());
 	}
 
-	private IFolder getBuildOutputDir(IMavenProjectFacade facade) {
-		IWorkspaceRoot workspaceRoot = facade.getProject().getWorkspace().getRoot();
-		return workspaceRoot.getFolder(getOutputDir(facade));
+	private IContainer getBuildOutputDir(IMavenProjectFacade facade) {
+		IWorkspaceRoot root = facade.getProject().getWorkspace().getRoot();
+		IPath outputDir = getOutputDir(facade);
+		return outputDir.segmentCount() == 1 //
+				? root.getProject(outputDir.segment(0))
+				: root.getFolder(outputDir);
 	}
 
 	private IFile getOutputPomXML(IMavenProjectFacade facade) {
