@@ -48,16 +48,16 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   /**
    * Returns project relative paths of resource directories
    */
-  IPath[] getResourceLocations();
+  List<IPath> getResourceLocations();
 
   /**
    * Returns project relative paths of test resource directories
    */
-  IPath[] getTestResourceLocations();
+  List<IPath> getTestResourceLocations();
 
-  IPath[] getCompileSourceLocations();
+  List<IPath> getCompileSourceLocations();
 
-  IPath[] getTestCompileSourceLocations();
+  List<IPath> getTestCompileSourceLocations();
 
   /**
    * Returns project resource for given file system location or null the location is outside of project.

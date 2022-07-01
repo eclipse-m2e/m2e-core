@@ -822,15 +822,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   public void notifyProjectChangeListeners(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
-    if(events.size() > 0) {
-      MavenProjectChangedEvent[] eventsArray = events.toArray(new MavenProjectChangedEvent[events.size()]);
-      ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<>();
+    if(!events.isEmpty()) {
+      List<IMavenProjectChangedListener> listeners = new ArrayList<>();
       synchronized(this.projectChangeListeners) {
         listeners.addAll(this.projectChangeListeners);
       }
       listeners.addAll(ExtensionReader.readProjectChangedEventListenerExtentions());
       for(IMavenProjectChangedListener listener : listeners) {
-        listener.mavenProjectChanged(eventsArray, monitor);
+        listener.mavenProjectChanged(events, monitor);
       }
     }
   }
@@ -887,7 +886,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  public IMavenProjectFacade[] getProjects() {
+  public List<MavenProjectFacade> getProjects() {
     return projectRegistry.getProjects();
   }
 

@@ -16,7 +16,6 @@ package org.eclipse.m2e.editor.internal.lifecycle;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -84,7 +83,7 @@ public class ConflictingLifecycleMappingResolution extends AbstractLifecycleMapp
     // must kick off an update project job since the pom isn't modified.
     // Only update the project from where this quick fix was executed.
     // Other projects can be updated manually
-    new UpdateMavenProjectJob(getProjects(markers.stream()).toArray(IProject[]::new)).schedule();
+    new UpdateMavenProjectJob(getProjects(markers.stream())).schedule();
   }
 
   /**

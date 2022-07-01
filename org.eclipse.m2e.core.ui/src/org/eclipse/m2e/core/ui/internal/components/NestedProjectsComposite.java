@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.ui.internal.components;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +82,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   Collection<IProject> projects;
 
-  IProject[] selectedProjects;
+  List<IProject> selectedProjects;
 
   private Link includeOutDateProjectslink;
 
@@ -466,17 +467,13 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     return null;
   }
 
-  public IProject[] getSelectedProjects() {
+  public List<IProject> getSelectedProjects() {
     return selectedProjects;
   }
 
-  IProject[] internalGetSelectedProjects() {
+  List<IProject> internalGetSelectedProjects() {
     Object[] obj = codebaseViewer.getCheckedElements();
-    IProject[] projects = new IProject[obj.length];
-    for(int i = 0; i < obj.length; i++ ) {
-      projects[i] = (IProject) obj[i];
-    }
-    return projects;
+    return Arrays.stream(obj).map(IProject.class::cast).toList();
   }
 
   public void refresh() {

@@ -13,8 +13,8 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -136,10 +136,10 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
   }
 
   public void assignWorkingSets() {
-    IProject[] projects = selectedProjects.getSelectedProjects();
-    if(projects != null && projects.length > 0 && workingSetName != null && !workingSetName.isEmpty()) {
+    List<IProject> projects = selectedProjects.getSelectedProjects();
+    if(projects != null && !projects.isEmpty() && workingSetName != null && !workingSetName.isEmpty()) {
       WorkingSets.addToWorkingSet(projects, workingSetName);
-      allWorkingSetProjects.addAll(Arrays.asList(projects));
+      allWorkingSetProjects.addAll(projects);
     }
   }
 }

@@ -154,8 +154,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
       boolean offline = mavenConfiguration.isOffline();
       boolean updateSnapshots = false;
-      projectManager.refresh(new MavenUpdateRequest(projects.toArray(new IProject[projects.size()]), //
-          offline, updateSnapshots));
+      projectManager.refresh(new MavenUpdateRequest(projects, offline, updateSnapshots));
 
       return status != null ? status : Status.OK_STATUS;
     }

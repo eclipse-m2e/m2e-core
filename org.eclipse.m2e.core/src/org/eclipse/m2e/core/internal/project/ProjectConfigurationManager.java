@@ -64,7 +64,6 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -629,7 +628,7 @@ public class ProjectConfigurationManager
   // project creation
 
   @Override
-  public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
+  public void createSimpleProject(IProject project, IPath location, Model model, List<String> directories,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
     createSimpleProject(project, location, model, directories, configuration, null, monitor);
   }
@@ -649,7 +648,7 @@ public class ProjectConfigurationManager
    */
   // XXX should use Maven plugin configurations instead of manually specifying folders
   @Override
-  public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
+  public void createSimpleProject(IProject project, IPath location, Model model, List<String> directories,
       ProjectImportConfiguration configuration, IProjectCreationListener listener, IProgressMonitor monitor)
       throws CoreException {
     String projectName = project.getName();
@@ -847,7 +846,7 @@ public class ProjectConfigurationManager
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
         IMavenProjectFacade facade = event.getMavenProject();
@@ -917,15 +916,11 @@ public class ProjectConfigurationManager
     if(!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
       return Collections.emptyList();
     }
-    IMavenProjectFacade[] existingFacades = projectManager.getProjects();
-    if(existingFacades == null || existingFacades.length == 0) {
+    List<MavenProjectFacade> existingFacades = projectManager.getProjects();
+    if(existingFacades == null || existingFacades.isEmpty()) {
       return Collections.emptyList();
     }
-    List<IProject> existingProjects = new ArrayList<>(existingFacades.length);
-    for(IMavenProjectFacade f : existingFacades) {
-      existingProjects.add(f.getProject());
-    }
-    return existingProjects;
+    return existingFacades.stream().map(IMavenProjectFacade::getProject).toList();
   }
 
   private static final String GROUP_ID = "[groupId]"; //$NON-NLS-1$

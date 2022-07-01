@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.jobs.Job;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
@@ -63,8 +62,7 @@ public class MavenUpdateConfigurationChangeListener implements IResourceChangeLi
   protected void updateProjectConfiguration(List<IProject> outOfDateProjects) {
     if(outOfDateProjects != null && !outOfDateProjects.isEmpty()) {
       LOG.debug("Automatic update of {}", outOfDateProjects);
-      Job updateJob = new UpdateMavenProjectJob(outOfDateProjects.toArray(new IProject[outOfDateProjects.size()]));
-      updateJob.schedule();
+      new UpdateMavenProjectJob(outOfDateProjects).schedule();
     }
   }
 }

@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.m2e.sourcelookup.internal.launch;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.eclipse.jdt.launching.sourcelookup.advanced.AdvancedSourceLookupParticipant;
@@ -37,7 +39,7 @@ public class MavenSourceLookupParticipant extends AdvancedSourceLookupParticipan
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     disposeContainers();
   }
 }

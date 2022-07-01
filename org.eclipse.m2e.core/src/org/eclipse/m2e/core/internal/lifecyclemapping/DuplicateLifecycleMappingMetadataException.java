@@ -13,10 +13,9 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 
 
 /**
@@ -26,18 +25,17 @@ public class DuplicateLifecycleMappingMetadataException extends DuplicateMapping
 
   private static final long serialVersionUID = 1L;
 
-  private final LifecycleMappingMetadata[] lifecyclemappings;
+  private final List<LifecycleMappingMetadata> lifecyclemappings;
 
-  public DuplicateLifecycleMappingMetadataException(LifecycleMappingMetadata... lifecyclemappings) {
-    super(Arrays.stream(lifecyclemappings).map(LifecycleMappingMetadata::getSource)
-        .toArray(LifecycleMappingMetadataSource[]::new));
+  public DuplicateLifecycleMappingMetadataException(List<LifecycleMappingMetadata> lifecyclemappings) {
+    super(lifecyclemappings.stream().map(LifecycleMappingMetadata::getSource).toList());
     this.lifecyclemappings = lifecyclemappings;
   }
 
   /**
    * @return Returns the lifecyclemappings.
    */
-  public LifecycleMappingMetadata[] getConflictingMappings() {
+  public List<LifecycleMappingMetadata> getConflictingMappings() {
     return this.lifecyclemappings;
   }
 

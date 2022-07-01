@@ -128,8 +128,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     Boolean[] updateProjects = new Boolean[1];
     updateProjects[0] = updateMavenDependencies;
     if(updateMavenDependencies) {
-      IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
-      if(projects != null && projects.length > 0) {
+      List<IMavenProjectFacade> projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+      if(projects != null && !projects.isEmpty()) {
         updateProjects[0] = MessageDialog.openQuestion(getShell(),
             Messages.MavenPreferencePage_updateProjectRequired_title,
             Messages.MavenProjectPreferencePage_dialog_message);
@@ -143,19 +143,19 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
         mavenConfiguration.setUserSettingsFile(userSettings);
 
         if(Boolean.TRUE.equals(updateProjects[0])) {
-          IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
-          List<IProject> allProjects = new ArrayList<>();
-          if(projects != null && projects.length > 0) {
+          List<IMavenProjectFacade> projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+          if(projects != null && !projects.isEmpty()) {
             MavenPlugin.getMaven().reloadSettings();
 
-            SubMonitor subMonitor = SubMonitor.convert(monitor, projects.length);
+            List<IProject> allProjects = new ArrayList<>();
+            SubMonitor subMonitor = SubMonitor.convert(monitor, projects.size());
             for(IMavenProjectFacade project : projects) {
               subMonitor.split(1).beginTask(
                   NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, project.getProject().getName()), 1);
               allProjects.add(project.getProject());
             }
-            MavenPlugin.getMavenProjectRegistry().refresh(
-                new MavenUpdateRequest(allProjects.toArray(IProject[]::new), mavenConfiguration.isOffline(), true));
+            MavenPlugin.getMavenProjectRegistry()
+                .refresh(new MavenUpdateRequest(allProjects, mavenConfiguration.isOffline(), true));
             subMonitor.done();
           }
         }

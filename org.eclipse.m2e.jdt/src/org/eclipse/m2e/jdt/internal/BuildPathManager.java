@@ -180,7 +180,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
     for(MavenProjectChangedEvent event : events) {
@@ -325,8 +325,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   private static final String ARTIFACT_TYPE_JAR = "jar";
 
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    return maven.isUnavailable(a.groupId(), a.artifactId(), a.version(), ARTIFACT_TYPE_JAR /*type*/,
-        a.classifier(), repositories);
+    return maven.isUnavailable(a.groupId(), a.artifactId(), a.version(), ARTIFACT_TYPE_JAR /*type*/, a.classifier(),
+        repositories);
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -848,8 +848,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     if(repositories != null) {
       ArtifactKey sourcesArtifact = new ArtifactKey(a.groupId(), a.artifactId(), a.version(),
           getSourcesClassifier(a.classifier()));
-      ArtifactKey javadocArtifact = new ArtifactKey(a.groupId(), a.artifactId(), a.version(),
-          CLASSIFIER_JAVADOC);
+      ArtifactKey javadocArtifact = new ArtifactKey(a.groupId(), a.artifactId(), a.version(), CLASSIFIER_JAVADOC);
       if(downloadSources) {
         if(isUnavailable(sourcesArtifact, repositories)) {
           // 501553: fall back to requesting JavaDoc, if requested sources are missing,

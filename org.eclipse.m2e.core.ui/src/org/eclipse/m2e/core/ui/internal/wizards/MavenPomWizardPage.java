@@ -13,6 +13,9 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -95,7 +98,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
    */
   private void initialize() {
     String packagingToUse = MavenArtifactComponent.DEFAULT_PACKAGING;
-    String[] availablePackagingTypes = MavenArtifactComponent.PACKAGING_OPTIONS;
+    List<String> availablePackagingTypes = Arrays.asList(MavenArtifactComponent.PACKAGING_OPTIONS);
     if(selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection ssel) {
       if(ssel.size() > 1) {
         return;
@@ -111,7 +114,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
           projectConversionEnabler = pcm.getConversionEnablerForProject(project);
           if(projectConversionEnabler != null) {
             availablePackagingTypes = projectConversionEnabler.getPackagingTypes(project);
-            packagingToUse = availablePackagingTypes[0];
+            packagingToUse = availablePackagingTypes.get(0);
           }
         }
       }
