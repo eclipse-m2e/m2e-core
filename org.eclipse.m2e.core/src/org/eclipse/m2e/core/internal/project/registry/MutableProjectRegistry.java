@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -160,7 +161,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
   }
 
   @Override
-  public MavenProjectFacade[] getProjects() {
+  public List<MavenProjectFacade> getProjects() {
     if(isClosed()) {
       return parent.getProjects();
     }

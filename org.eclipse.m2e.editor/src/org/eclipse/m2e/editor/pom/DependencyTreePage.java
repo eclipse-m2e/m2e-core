@@ -1113,7 +1113,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
 

@@ -16,10 +16,8 @@
 package org.eclipse.m2e.editor.internal.lifecycle;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -47,12 +45,12 @@ public class WorkspaceLifecycleMappingResolution extends AbstractLifecycleMappin
 
   @Override
   protected void fix(IDocument document, List<IMarker> markers, IProgressMonitor monitor) {
-    doFix(markers, monitor);
+    doFix(markers);
   }
 
   @Override
   protected void fix(IResource resource, List<IMarker> markers, IProgressMonitor monitor) {
-    doFix(markers, monitor);
+    doFix(markers);
   }
 
   @Override
@@ -61,7 +59,7 @@ public class WorkspaceLifecycleMappingResolution extends AbstractLifecycleMappin
     return NLS.bind(Messages.LifecycleMappingProposal_workspaceIgnore_label, goal);
   }
 
-  private void doFix(List<IMarker> markers, IProgressMonitor monitor) {
+  private void doFix(List<IMarker> markers) {
     // force reload from disk in case mapping file was modified by external process
     LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
     for(IMarker marker : markers) {
@@ -72,20 +70,15 @@ public class WorkspaceLifecycleMappingResolution extends AbstractLifecycleMappin
     // must kick off an update project job since the pom isn't modified.
     // Only update the project from where this quick fix was executed.
     // Other projects can be updated manually
-    new UpdateMavenProjectJob(toArray(getProjects(markers.stream()))).schedule();
+    new UpdateMavenProjectJob(getProjects(markers.stream())).schedule();
   }
 
   private void addMapping(LifecycleMappingMetadataSource mapping, IMarker marker) {
     String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
     String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
     String version = marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
-    String[] goals = new String[] {marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
+    List<String> goals = List.of(marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")); //$NON-NLS-1$
 
     LifecycleMappingFactory.addLifecyclePluginExecution(mapping, groupId, artifactId, version, goals, action);
   }
-
-  private static IProject[] toArray(Set<IProject> projects) {
-    return projects.toArray(new IProject[projects.size()]);
-  }
-
 }

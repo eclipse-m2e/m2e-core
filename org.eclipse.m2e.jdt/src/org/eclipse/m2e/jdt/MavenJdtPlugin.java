@@ -24,6 +24,7 @@
 package org.eclipse.m2e.jdt;
 
 import java.io.File;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 
@@ -234,7 +235,7 @@ public class MavenJdtPlugin extends Plugin {
       done = false;
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
       if(mavenConfiguration.isDownloadSources() || mavenConfiguration.isDownloadJavaDoc()) {
-        IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
+        List<IMavenProjectFacade> facades = MavenPlugin.getMavenProjectRegistry().getProjects();
         for(IMavenProjectFacade facade : facades) {
           if(monitor.isCanceled()) {
             break;

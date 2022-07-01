@@ -13,7 +13,9 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -207,15 +209,9 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
    * @return The Maven2 directories selected by the user. Neither the array nor any of its elements is <code>null</code>
    *         .
    */
-  public String[] getFolders() {
+  public List<String> getFolders() {
     ProjectFolder[] mavenDirectories = getProjectFolders();
-
-    String[] directories = new String[mavenDirectories.length];
-    for(int i = 0; i < directories.length; i++ ) {
-      directories[i] = mavenDirectories[i].getPath();
-    }
-
-    return directories;
+    return Arrays.stream(mavenDirectories).map(ProjectFolder::getPath).toList();
   }
 
   /**

@@ -14,7 +14,9 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -69,8 +71,8 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     File bundleStateLocation = result.toFile();
     this.workspaceStateFile = new File(bundleStateLocation, STATE_FILENAME);
     boolean updateProjectsOnStartup = configuration.isUpdateProjectsOnStartup();
-    if(updateProjectsOnStartup || manager.getProjects().length == 0) {
-      refresh(new MavenUpdateRequest(workspace.getRoot().getProjects(), //
+    if(updateProjectsOnStartup || manager.getProjects().isEmpty()) {
+      refresh(new MavenUpdateRequest(Arrays.asList(workspace.getRoot().getProjects()), //
           configuration.isOffline() /*offline*/, false /* updateSnapshots */));
     }
   }
@@ -109,8 +111,9 @@ public class MavenProjectManager implements IMavenProjectRegistry {
   }
 
   @Override
-  public IMavenProjectFacade[] getProjects() {
-    return manager.getProjects();
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public List<IMavenProjectFacade> getProjects() {
+    return (List) manager.getProjects();
   }
 
   //XXX mkleint: this only returns a correct facade for the project's own pom.xml, if the POM file is nested, the result is wrong.

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,11 +124,8 @@ abstract class BasicProjectRegistry implements Serializable {
     return workspacePoms.get(paths.iterator().next());
   }
 
-  /**
-   * @TODO return a List
-   */
-  public MavenProjectFacade[] getProjects() {
-    return workspacePoms.values().toArray(new MavenProjectFacade[workspacePoms.size()]);
+  public List<MavenProjectFacade> getProjects() {
+    return List.copyOf(workspacePoms.values());
   }
 
   public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {

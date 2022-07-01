@@ -161,7 +161,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
             }
           }
 
-          new UpdateMavenProjectJob(changed.toArray(new IProject[changed.size()])).schedule();
+          new UpdateMavenProjectJob(changed).schedule();
         }
 
         private Collection<IProject> getProject(Collection<MavenProject> projects) {
@@ -201,7 +201,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         private void ignoreWorkspace(MojoExecutionKey key) {
           LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
           LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.groupId(), key.artifactId(),
-              key.version(), new String[] {key.goal()}, PluginExecutionAction.ignore);
+              key.version(), List.of(key.goal()), PluginExecutionAction.ignore);
           LifecycleMappingFactory.writeWorkspaceMetadata(mapping);
         }
       };

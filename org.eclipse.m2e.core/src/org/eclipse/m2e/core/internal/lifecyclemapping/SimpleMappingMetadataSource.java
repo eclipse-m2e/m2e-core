@@ -81,11 +81,10 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     List<LifecycleMappingMetadata> matching = stream.toList();
     if(matching.isEmpty()) {
       return null;
-    }
-    if(matching.size() == 1) {
+    } else if(matching.size() == 1) {
       return matching.get(0);
     }
-    throw new DuplicateLifecycleMappingMetadataException(matching.toArray(LifecycleMappingMetadata[]::new));
+    throw new DuplicateLifecycleMappingMetadataException(matching);
   }
 
   @Override

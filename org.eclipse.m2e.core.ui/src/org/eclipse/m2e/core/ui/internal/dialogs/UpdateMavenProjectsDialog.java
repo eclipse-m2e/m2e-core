@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -39,7 +41,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
 
   private final IProject[] initialSelection;
 
-  private IProject[] selectedProjects;
+  private List<IProject> selectedProjects;
 
   private boolean offlineMode;
 
@@ -161,7 +163,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
     super.okPressed();
   }
 
-  public IProject[] getSelectedProjects() {
+  public List<IProject> getSelectedProjects() {
     return selectedProjects;
   }
 

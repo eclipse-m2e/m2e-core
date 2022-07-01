@@ -304,7 +304,7 @@ public class LifecycleMappingFactory {
   }
 
   public static void addLifecyclePluginExecution(LifecycleMappingMetadataSource mapping, String groupId,
-      String artifactId, String version, String[] goals, PluginExecutionAction action) {
+      String artifactId, String version, List<String> goals, PluginExecutionAction action) {
 
     PluginExecutionMetadata execution = getPluginExecutionMetadata(mapping, groupId, artifactId, version, action);
 
@@ -637,7 +637,7 @@ public class LifecycleMappingFactory {
               }
               if(isPrimaryMapping(executionMetadata, sorter)) {
                 if(primaryMetadata != null) {
-                  throw new DuplicatePluginExecutionMetadataException(primaryMetadata, executionMetadata);
+                  throw new DuplicatePluginExecutionMetadataException(List.of(primaryMetadata, executionMetadata));
                 }
                 primaryMetadata = executionMetadata;
               }

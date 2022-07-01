@@ -106,8 +106,8 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   @Override
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     CompositeChange res = new CompositeChange(getTitle());
-    IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
-    pm.beginTask(Messages.AbstractPomRefactoring_task, projects.length);
+    List<IMavenProjectFacade> projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+    pm.beginTask(Messages.AbstractPomRefactoring_task, projects.size());
 
     models = new HashMap<>();
 

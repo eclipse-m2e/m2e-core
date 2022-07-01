@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -216,9 +218,9 @@ public class MavenArtifactComponent extends Composite {
     versionCombo.setText(version);
   }
 
-  public void setPackagingTypes(String[] packagingTypes) {
+  public void setPackagingTypes(List<String> packagingTypes) {
     if(packagingCombo != null) {
-      packagingCombo.setItems(packagingTypes);
+      packagingCombo.setItems(packagingTypes.toArray(String[]::new));
     }
   }
 

@@ -128,7 +128,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   // IMavenProjectChangedListener
 
   @Override
-  public final void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public final void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
         mavenProjectChanged(event, monitor);

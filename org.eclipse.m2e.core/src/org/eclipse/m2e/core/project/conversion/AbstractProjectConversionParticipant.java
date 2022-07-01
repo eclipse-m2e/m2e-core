@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.project.conversion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -49,9 +50,9 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   private String id;
 
-  private String[] runsAfter;
+  private List<String> runsAfter = Collections.emptyList();
 
-  private String[] runsBefore;
+  private List<String> runsBefore = Collections.emptyList();
 
   public String getName() {
     return name;
@@ -75,9 +76,9 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
   /**
    * Split a String using the comma delimiter, ignore whitespace.
    */
-  protected String[] split(String str) {
+  protected List<String> split(String str) {
     if(str == null) {
-      return null;
+      return Collections.emptyList();
     }
     String[] split = str.split(",");
     ArrayList<String> list = new ArrayList<>(split.length);
@@ -87,10 +88,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
         list.add(s);
       }
     }
-
-    String[] result = new String[list.size()];
-    list.toArray(result);
-    return result;
+    return list;
   }
 
   /**
@@ -151,7 +149,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
    *
    * @since 1.3
    */
-  public String[] getPrecedingConverterIds() {
+  public List<String> getPrecedingConverterIds() {
     return runsAfter;
   }
 
@@ -160,7 +158,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
    *
    * @since 1.3
    */
-  public String[] getSucceedingConverterIds() {
+  public List<String> getSucceedingConverterIds() {
     return runsBefore;
   }
 }

@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -59,7 +60,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
 
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     try {
       MutableWorkspaceState state = new MutableWorkspaceState();
 

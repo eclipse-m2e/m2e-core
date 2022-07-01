@@ -14,6 +14,7 @@ package org.eclipse.m2e.apt.internal.compiler;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -72,7 +73,8 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
     }
     if(!buildContext.hasDelta(mavenProjectFacade.getPomFile())) {
 
-      IPath[] sources = "compile".equals(mojoExecution.getGoal()) ? mavenProjectFacade.getCompileSourceLocations()
+      List<IPath> sources = "compile".equals(mojoExecution.getGoal()) //
+          ? mavenProjectFacade.getCompileSourceLocations()
           : mavenProjectFacade.getTestCompileSourceLocations();
 
       boolean hasSourceChanged = false;

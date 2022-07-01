@@ -610,8 +610,7 @@ public abstract class MavenPomEditorPage extends FormPage {
       modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
     }
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    IMavenProjectFacade[] facades = projectManager.getProjects();
-    for(IMavenProjectFacade facade : facades) {
+    for(IMavenProjectFacade facade : projectManager.getProjects()) {
       if(modulePath.equals(facade.getPom().getLocation())) {
         return facade;
       }
