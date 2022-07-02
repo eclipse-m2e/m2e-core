@@ -70,7 +70,6 @@
 		<module>org.eclipse.m2e.jdt.ui</module>
 		<module>org.eclipse.m2e.refactoring</module>
 		<module>org.eclipse.m2e.editor</module>
-		<module>org.eclipse.m2e.lifecyclemapping.defaults</module>
 		<module>org.eclipse.m2e.discovery</module>
 		<module>org.eclipse.m2e.scm</module>
 		<module>org.eclipse.m2e.profiles.core</module>

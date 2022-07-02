@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
-  <lifecycleMappings>
 
+  <lifecycleMappings>
     <lifecycleMapping>
       <packagingType>jar</packagingType>
+      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
+    </lifecycleMapping>
+    <lifecycleMapping>
+      <packagingType>war</packagingType>
       <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
     </lifecycleMapping>
   </lifecycleMappings>

@@ -47,6 +47,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,8 +129,6 @@ public class LifecycleMappingFactory {
 
   private static final String LIFECYCLE_MAPPING_PLUGIN_KEY = LIFECYCLE_MAPPING_PLUGIN_GROUPID + ":" //$NON-NLS-1$
       + LIFECYCLE_MAPPING_PLUGIN_ARTIFACTID;
-
-  private static final String DEFAULT_LIFECYCLE_METADATA_BUNDLE = "org.eclipse.m2e.lifecyclemapping.defaults";
 
   public static final String LIFECYCLE_MAPPING_METADATA_SOURCE_NAME = "lifecycle-mapping-metadata.xml"; //$NON-NLS-1$
 
@@ -1204,7 +1203,7 @@ public class LifecycleMappingFactory {
       return null;
     }
     if(defaultLifecycleMappingMetadataSource == null) {
-      Bundle bundle = Platform.getBundle(DEFAULT_LIFECYCLE_METADATA_BUNDLE);
+      Bundle bundle = FrameworkUtil.getBundle(LifecycleMappingFactory.class);
       defaultLifecycleMappingMetadataSource = getMetadataSource(bundle);
       if(defaultLifecycleMappingMetadataSource == null) {
         defaultLifecycleMappingMetadataSource = new LifecycleMappingMetadataSource();
