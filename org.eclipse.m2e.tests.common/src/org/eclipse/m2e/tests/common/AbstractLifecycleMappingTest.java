@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +40,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
-import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -106,16 +104,12 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
 
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
     List<MojoExecutionKey> result = new ArrayList<>();
-
-    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
-
-    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-      if((entry.getValue() == null || entry.getValue().isEmpty())
-          && LifecycleMappingFactory.isInterestingPhase(entry.getKey().lifecyclePhase())) {
-        result.add(entry.getKey());
+    facade.getMojoExecutionMapping().forEach((key, executions) -> {
+      if((executions == null || executions.isEmpty())
+          && LifecycleMappingFactory.isInterestingPhase(key.lifecyclePhase())) {
+        result.add(key);
       }
-    }
-
+    });
     return result;
   }
 

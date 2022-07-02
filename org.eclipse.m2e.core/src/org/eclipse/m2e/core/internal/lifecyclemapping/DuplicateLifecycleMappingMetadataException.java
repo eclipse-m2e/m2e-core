@@ -21,12 +21,12 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMeta
 
 /**
  * DuplicateLifecycleMappingMetadataException
- *
  */
 public class DuplicateLifecycleMappingMetadataException extends DuplicateMappingException {
 
   private static final long serialVersionUID = 1L;
-  private LifecycleMappingMetadata[] lifecyclemappings;
+
+  private final LifecycleMappingMetadata[] lifecyclemappings;
 
   public DuplicateLifecycleMappingMetadataException(LifecycleMappingMetadata... lifecyclemappings) {
     super(Arrays.stream(lifecyclemappings).map(LifecycleMappingMetadata::getSource)

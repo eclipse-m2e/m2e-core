@@ -10,6 +10,7 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.util.Arrays;
@@ -20,17 +21,16 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetad
 
 /**
  * DuplicatePluginExecutionMetadataException
- *
  */
-public class DuplicatePluginExecutionMetadataException extends DuplicateMappingException{
+public class DuplicatePluginExecutionMetadataException extends DuplicateMappingException {
 
   private static final long serialVersionUID = 1L;
-  private PluginExecutionMetadata[] pluginExecutionMetadatas;
+
+  private final PluginExecutionMetadata[] pluginExecutionMetadatas;
 
   public DuplicatePluginExecutionMetadataException(PluginExecutionMetadata... pluginExecutionMetadatas) {
-    super(
-        Arrays.stream(pluginExecutionMetadatas).map(PluginExecutionMetadata::getSource)
-            .toArray(LifecycleMappingMetadataSource[]::new));
+    super(Arrays.stream(pluginExecutionMetadatas).map(PluginExecutionMetadata::getSource)
+        .toArray(LifecycleMappingMetadataSource[]::new));
     this.pluginExecutionMetadatas = pluginExecutionMetadatas;
   }
 

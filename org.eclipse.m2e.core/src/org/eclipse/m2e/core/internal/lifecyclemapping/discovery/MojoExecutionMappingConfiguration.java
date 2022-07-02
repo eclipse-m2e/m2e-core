@@ -14,14 +14,8 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
-import java.util.Objects;
-
 import org.eclipse.core.runtime.Assert;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
-import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -29,7 +23,9 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * Represents Maven plugin execution bound to project lifecycle and corresponding lifecycle mapping metadata. Only
  * considers primary mapping, secondary project configurators are ignored.
  */
-public class MojoExecutionMappingConfiguration implements ILifecycleMappingElement {
+public class MojoExecutionMappingConfiguration {
+  private MojoExecutionMappingConfiguration() {
+  } // static use only
 
   public static class MojoExecutionMappingRequirement implements ILifecycleMappingRequirement {
     private final MojoExecutionKey execution;
@@ -92,141 +88,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
 
   }
 
-  public static class ProjectConfiguratorMappingRequirement implements ILifecycleMappingRequirement {
-    private final MojoExecutionKey execution;
-
-    private final String configuratorId;
-
-    public ProjectConfiguratorMappingRequirement(MojoExecutionKey execution, String configuratorId) {
-      this.execution = execution;
-      this.configuratorId = configuratorId;
-    }
-
-    @Override
-    public int hashCode() {
-      return configuratorId.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-
-      return obj instanceof ProjectConfiguratorMappingRequirement other && configuratorId.equals(other.configuratorId)
-          && execution.equals(other.execution);
-    }
-
-    public MojoExecutionKey getExecution() {
-      return execution;
-    }
-
-    public String getProjectConfiguratorId() {
-      return configuratorId;
-    }
-  }
-
-  private final MojoExecutionKey execution;
-
-  private final PluginExecutionMetadata mapping;
-
-  private final ILifecycleMappingRequirement requirement;
-
-  public MojoExecutionMappingConfiguration(MojoExecutionKey execution, IPluginExecutionMetadata mapping) {
-    this.execution = execution;
-    this.mapping = (PluginExecutionMetadata) mapping;
-
-    if(mapping == null) {
-      requirement = new MojoExecutionMappingRequirement(execution);
-    } else if(mapping.getAction() == PluginExecutionAction.configurator) {
-      requirement = new ProjectConfiguratorMappingRequirement(execution,
-          LifecycleMappingFactory.getProjectConfiguratorId(mapping));
-    } else {
-      requirement = null; // this execution is fully mapped with <execute/>, <ignore/> or <error/> action
-    }
-  }
-
-  public String getArtifactId() {
-    return execution.artifactId();
-  }
-
-  public String getGoal() {
-    return execution.goal();
-  }
-
-  public boolean isMapped() {
-    return false;
-  }
-
-  public boolean isExtensionAvailable() {
-    return false;
-  }
-
-  public MojoExecutionKey getMojoExecutionKey() {
-    return execution;
-  }
-
-  public MojoExecutionKey getExecution() {
-    return this.execution;
-  }
-
-  public PluginExecutionMetadata getMapping() {
-    return this.mapping;
-  }
-
-  /**
-   * Mapping requirement key. Null if this mojo execution configuration is complete, i.e. mapped to ignore, execute or
-   * error actions.
-   */
-  @Override
-  public ILifecycleMappingRequirement getLifecycleMappingRequirement() {
-    return requirement;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = execution.hashCode();
-
-    if(mapping != null) {
-      hash = 17 * hash + mapping.getAction().hashCode();
-      if(mapping.getAction() == PluginExecutionAction.configurator) {
-        hash += LifecycleMappingFactory.getProjectConfiguratorId(mapping).hashCode();
-      }
-    }
-
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj instanceof MojoExecutionMappingConfiguration other) {
-      if(!execution.equals(other.execution)) {
-        return false;
-      }
-
-      if(mapping == null) {
-        return other.mapping == null;
-      }
-
-      if(other.mapping == null) {
-        return false;
-      }
-
-      if(mapping.getAction() != other.mapping.getAction()) {
-        return false;
-      }
-
-      if(mapping.getAction() == PluginExecutionAction.configurator) {
-        String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(mapping);
-        String otherConfiguratorId = LifecycleMappingFactory.getProjectConfiguratorId(other.mapping);
-        if(!Objects.equals(configuratorId, otherConfiguratorId)) {
-          return false;
-        }
-      }
-    }
-    return false;
+  public static record ProjectConfiguratorMappingRequirement(MojoExecutionKey execution, String configuratorId)
+      implements ILifecycleMappingRequirement {
   }
 }

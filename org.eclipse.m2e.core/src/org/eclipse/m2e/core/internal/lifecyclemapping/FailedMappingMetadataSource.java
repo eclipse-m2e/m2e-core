@@ -10,6 +10,7 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.util.Collections;
@@ -24,34 +25,24 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * FailedMappingMetadataSource
- *
  */
 public class FailedMappingMetadataSource implements MappingMetadataSource {
 
-  private DuplicateMappingException failure;
+  private final DuplicateMappingException failure;
 
-  private MappingMetadataSource source;
+  private final MappingMetadataSource source;
 
-  /**
-   * @param source
-   * @param failure
-   */
   public FailedMappingMetadataSource(MappingMetadataSource source, DuplicateMappingException e) {
     this.source = source;
     this.failure = e;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getLifecycleMappingMetadata(java.lang.String)
-   */
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType,
+      Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
     throw failure;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getPluginExecutionMetadata(org.eclipse.m2e.core.project.configurator.MojoExecutionKey)
-   */
   @Override
   public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution) {
     return source.getPluginExecutionMetadata(execution);
@@ -71,9 +62,6 @@ public class FailedMappingMetadataSource implements MappingMetadataSource {
     return this.source;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
-   */
   @Override
   public List<LifecycleMappingFilter> getFilters() {
     return Collections.emptyList();

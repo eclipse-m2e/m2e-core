@@ -16,7 +16,6 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -119,8 +118,7 @@ public class LifecycleMappingDiscoveryHelper {
   }
 
   private static IMarker[] getLifecycleMappingMarkers(IProject p) throws CoreException {
-    IMarker[] markers = p.findMarkers(IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, true, IResource.DEPTH_ONE);
-    return markers;
+    return p.findMarkers(IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, true, IResource.DEPTH_ONE);
   }
 
   /**
@@ -142,9 +140,8 @@ public class LifecycleMappingDiscoveryHelper {
       monitor = new NullProgressMonitor();
     }
     monitor.beginTask(Messages.MavenImportWizard_searchingTaskTitle, requirements.size());
-    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allProposals = discoveryService.discover(
-        requirements, discoveryRequest.getSelectedProposals(), monitor);
-    discoveryRequest.setProposals(allProposals);
+    List<IMavenDiscoveryProposal> selected = discoveryRequest.getSelectedProposals();
+    discoveryRequest.setProposals(discoveryService.discover(requirements, selected, monitor));
     monitor.worked(1);
   }
 
