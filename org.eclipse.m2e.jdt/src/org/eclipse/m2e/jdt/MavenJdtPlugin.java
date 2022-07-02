@@ -87,12 +87,6 @@ public class MavenJdtPlugin extends Plugin {
    * @noreference see class javadoc
    */
   public MavenJdtPlugin() {
-    instance = this;
-
-    if(Boolean.parseBoolean(Platform.getDebugOption(PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing constructor " + PLUGIN_ID); //$NON-NLS-1$
-      new Throwable().printStackTrace();
-    }
     preferencesService = Platform.getPreferencesService();
     preferencesLookup[0] = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
     preferencesLookup[1] = DefaultScope.INSTANCE.getNode(PLUGIN_ID);
@@ -105,11 +99,7 @@ public class MavenJdtPlugin extends Plugin {
   @SuppressWarnings("static-access")
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
-
-    if(Boolean.parseBoolean(Platform.getDebugOption(PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing start() " + PLUGIN_ID); //$NON-NLS-1$
-      new Throwable().printStackTrace();
-    }
+    instance = this;
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
@@ -192,6 +182,8 @@ public class MavenJdtPlugin extends Plugin {
     this.buildpathManager = null;
     this.launchConfigurationListener = null;
     this.mavenClassifierManager = null;
+
+    instance = null;
   }
 
   public static MavenJdtPlugin getDefault() {
