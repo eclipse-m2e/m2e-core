@@ -73,15 +73,6 @@ public class MavenPluginActivator extends Plugin {
 
   private Map<Class<?>, ServiceTracker<?, ?>> trackers = new ConcurrentHashMap<>();
 
-  public MavenPluginActivator() {
-    plugin = this;
-
-    if(Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing constructor " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
-      new Throwable().printStackTrace();
-    }
-  }
-
   public IMaven getMaven() {
     return getService(IMaven.class);
   }
@@ -108,13 +99,11 @@ public class MavenPluginActivator extends Plugin {
   @Override
   public void start(final BundleContext context) throws Exception {
     super.start(context);
-    if(Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing start() " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
-      Thread.dumpStack();
-    }
+    plugin = this;
+
     try {
       Version bundleVersion = getBundle().getVersion();
-      this.version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
+      version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
     } catch(IllegalArgumentException e) {
       // ignored
     }
