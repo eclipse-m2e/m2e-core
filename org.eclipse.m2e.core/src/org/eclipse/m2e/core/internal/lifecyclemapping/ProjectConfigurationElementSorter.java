@@ -39,11 +39,11 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 public class ProjectConfigurationElementSorter {
 
-  private List<String> sortedConfigurators;
+  private final List<String> sortedConfigurators;
 
-  private Map<String, String> incompleteConfigurators;
+  private final Map<String, String> incompleteConfigurators;
 
-  private Set<String> missingRequiredConfigurators;
+  private final Set<String> missingRequiredConfigurators;
 
   private final Set<String> allSecondaryConfigurators = new HashSet<>();
 
@@ -67,8 +67,8 @@ public class ProjectConfigurationElementSorter {
     //DAG including required configurators only
     DAG requirementsDag = new DAG();
 
-    Map<String, String> _incompletes = new HashMap<>();
-    Set<String> _missingIds = new HashSet<>();
+    Map<String, String> incompletes = new HashMap<>();
+    Set<String> missingIds = new HashSet<>();
 
     //Create a vertex for each configurator.
     for(String key : configuratorIds) {
@@ -77,24 +77,25 @@ public class ProjectConfigurationElementSorter {
 
       IConfigurationElement configurator = configurators.get(key);
       if(configurator == null) {
-        _missingIds.add(key);
+        missingIds.add(key);
         continue;
       }
       //Add edge for configurators this configurator should run after
-      String[] runsAfter = safeSplit(configurator.getAttribute("runsAfter"));
-
-      //fallback to legacy secondaryTo attribute
-      if(runsAfter == null) {
+      String runsAfterIds = configurator.getAttribute("runsAfter");
+      String[] runsAfter = null;
+      if(runsAfterIds != null) {
+        runsAfter = runsAfterIds.split(",");
+      } else { //fallback to legacy secondaryTo attribute
         String secondaryTo = configurator.getAttribute("secondaryTo");
         if(secondaryTo != null) {
           runsAfter = new String[] {secondaryTo};
         }
       }
 
-      if(runsAfter != null && runsAfter.length > 0) {
+      if(runsAfter != null) {
         allSecondaryConfigurators.add(key);
         for(String id : runsAfter) {
-          id = id.trim();
+          id = id.strip();
           if(id.isEmpty()) {
             continue;
           }
@@ -107,8 +108,8 @@ public class ProjectConfigurationElementSorter {
           IConfigurationElement predecessor = configurators.get(predecessorId);
           if(predecessor == null) {
             if(isRequired) {
-              _missingIds.add(predecessorId);
-              _incompletes.put(key, NLS.bind(Messages.ProjectConfiguratorToRunAfterNotAvailable, key, predecessorId));
+              missingIds.add(predecessorId);
+              incompletes.put(key, NLS.bind(Messages.ProjectConfiguratorToRunAfterNotAvailable, key, predecessorId));
             }
           } else {
             fullDag.addEdge(key, predecessorId);
@@ -118,9 +119,9 @@ public class ProjectConfigurationElementSorter {
 
       //Add edges for configurators this configurator should run before
 
-      String[] runsBefore = safeSplit(configurator.getAttribute("runsBefore"));
+      String runsBefore = configurator.getAttribute("runsBefore");
       if(runsBefore != null) {
-        for(String id : runsBefore) {
+        for(String id : runsBefore.split(",")) {
           id = id.trim();
           if(id.isEmpty()) {
             continue;
@@ -134,8 +135,8 @@ public class ProjectConfigurationElementSorter {
           if(successor == null) {
             if(isRequired) {
               //missing required matching configElement
-              _missingIds.add(successorId);
-              _incompletes.put(key, NLS.bind(Messages.ProjectConfiguratorToRunBeforeNotAvailable, key, successorId));
+              missingIds.add(successorId);
+              incompletes.put(key, NLS.bind(Messages.ProjectConfiguratorToRunBeforeNotAvailable, key, successorId));
             }
           } else {
             fullDag.addEdge(successorId, key);
@@ -149,13 +150,13 @@ public class ProjectConfigurationElementSorter {
     List<String> sortedExecutions = TopologicalSorter.sort(requirementsDag);
 
     for(String id : sortedExecutions) {
-      boolean isIncompleteOrMissing = _missingIds.contains(id) || _incompletes.containsKey(id);
+      boolean isIncompleteOrMissing = missingIds.contains(id) || incompletes.containsKey(id);
       if(isIncompleteOrMissing) {
         Set<String> dependents = new HashSet<>();
         getDependents(id, requirementsDag, dependents);
         for(String next : dependents) {
-          if(configuratorIds.contains(next) && (_missingIds.contains(next) || !_incompletes.containsKey(next))) {
-            _incompletes.put(next, NLS.bind(Messages.ProjectConfiguratorNotAvailable, id, next));
+          if(configuratorIds.contains(next) && (missingIds.contains(next) || !incompletes.containsKey(next))) {
+            incompletes.put(next, NLS.bind(Messages.ProjectConfiguratorNotAvailable, id, next));
           }
         }
       }
@@ -164,25 +165,17 @@ public class ProjectConfigurationElementSorter {
     //2nd sort, including optional dependencies
     sortedExecutions = TopologicalSorter.sort(fullDag);
 
-    List<String> _sortedConfigurators = new ArrayList<>(sortedExecutions.size());
+    List<String> sortedConfiguratorsList = new ArrayList<>(sortedExecutions.size());
 
     for(String id : sortedExecutions) {
       //Remove incomplete metadata
-      if(!configuratorIds.contains(id) || _incompletes.containsKey(id) || _missingIds.contains(id)) {
+      if(!configuratorIds.contains(id) || incompletes.containsKey(id) || missingIds.contains(id)) {
         continue;
       }
 
       List<String> predecessors = fullDag.getChildLabels(id);
-
-      boolean addAsPrimary = true;
-      if(predecessors != null && !predecessors.isEmpty()) {
-        for(String p : predecessors) {
-          if(configuratorIds.contains(p)) {
-            addAsPrimary = false;
-            break;
-          }
-        }
-      }
+      boolean addAsPrimary = predecessors == null || predecessors.isEmpty()
+          || predecessors.stream().noneMatch(configuratorIds::contains);
       if(addAsPrimary) {
         Set<String> secondaries = new LinkedHashSet<>();
         getDependents(id, fullDag, secondaries);
@@ -191,12 +184,12 @@ public class ProjectConfigurationElementSorter {
       }
 
       //add to resulting list
-      _sortedConfigurators.add(id);
+      sortedConfiguratorsList.add(id);
     }
 
-    sortedConfigurators = Collections.unmodifiableList(_sortedConfigurators);
-    incompleteConfigurators = Collections.unmodifiableMap(_incompletes);
-    missingRequiredConfigurators = Collections.unmodifiableSet(_missingIds);
+    sortedConfigurators = Collections.unmodifiableList(sortedConfiguratorsList);
+    incompleteConfigurators = Collections.unmodifiableMap(incompletes);
+    missingRequiredConfigurators = Collections.unmodifiableSet(missingIds);
   }
 
   public ProjectConfigurationElementSorter(Map<String, IConfigurationElement> configurators)
@@ -220,17 +213,10 @@ public class ProjectConfigurationElementSorter {
     return (id.endsWith("?") || id.endsWith("*")) ? id.substring(0, id.length() - 1) : id;
   }
 
-  private static String[] safeSplit(String value) {
-    return value == null ? null : value.split(",");
-  }
-
   /**
    * @return a sorted, unmodifiable list of configurator ids
    */
   public List<String> getSortedConfigurators() {
-    if(sortedConfigurators == null) {
-      sortedConfigurators = Collections.emptyList();
-    }
     return sortedConfigurators;
   }
 
@@ -239,9 +225,6 @@ public class ProjectConfigurationElementSorter {
    *         found to be incomplete)
    */
   public Map<String, String> getIncompleteConfigurators() {
-    if(incompleteConfigurators == null) {
-      incompleteConfigurators = Collections.emptyMap();
-    }
     return incompleteConfigurators;
   }
 
@@ -249,9 +232,6 @@ public class ProjectConfigurationElementSorter {
    * @return an unmodifiable set of missing configurator ids.
    */
   public Set<String> getMissingConfigurators() {
-    if(missingRequiredConfigurators == null) {
-      missingRequiredConfigurators = Collections.emptySet();
-    }
     return missingRequiredConfigurators;
   }
 
@@ -259,11 +239,7 @@ public class ProjectConfigurationElementSorter {
    * @return an ordered list of secondary configurator ids to this primaryConfigurator.
    */
   public List<String> getSecondaryConfigurators(String primaryConfigurator) {
-    List<String> secondaries = primaryConfigurators.get(primaryConfigurator);
-    if(secondaries == null) {
-      secondaries = Collections.emptyList();
-    }
-    return secondaries;
+    return primaryConfigurators.getOrDefault(primaryConfigurator, Collections.emptyList());
   }
 
   /**
@@ -275,8 +251,7 @@ public class ProjectConfigurationElementSorter {
     }
     boolean isPrimary = primaryConfigurators.containsKey(configuratorId);
     boolean isSecondary = allSecondaryConfigurators.contains(configuratorId);
-    boolean isRoot = (isPrimary && (primaryConfigurators.size() == 1 || !isSecondary)) || (!isPrimary && !isSecondary);
-    return isRoot;
+    return isPrimary && (primaryConfigurators.size() == 1 || !isSecondary) || (!isPrimary && !isSecondary);
   }
 
   @Override

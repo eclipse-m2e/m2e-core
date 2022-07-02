@@ -10,12 +10,11 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -31,35 +30,26 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * the filters.
  */
 public class MojoExecutionFilter implements Predicate<PluginExecutionMetadata> {
-  private List<LifecycleMappingFilter> filters;
-
+  private final List<LifecycleMappingFilter> filters;
 
   public MojoExecutionFilter(List<MappingMetadataSource> metadataSources, MojoExecutionKey executionKey) {
     filters = metadataSources.stream().flatMap(s -> s.getFilters().stream())
-        .filter(filter -> filter.getPluginExecutions().stream()
-            .anyMatch(pluginFilter -> pluginFilter.match(executionKey)))
-        .collect(Collectors.toList());
+        .filter(filter -> filter.getPluginExecutions().stream().anyMatch(f -> f.match(executionKey))).toList();
   }
 
-  /* (non-Javadoc)
-   * @see java.util.function.Predicate#test(java.lang.Object)
-   */
   @Override
   public boolean test(PluginExecutionMetadata metadata) {
-    return Optional.ofNullable(metadata.getSource())//
-        .map(LifecycleMappingMetadataSource::getSource)//
-        .filter(Bundle.class::isInstance)//
-        .map(Bundle.class::cast)//
-        .filter(bundle -> {
-          return filters.stream().anyMatch(filter -> {
-            if(filter.getSymbolicName().equals(bundle.getSymbolicName())) {
-              Version version = bundle.getVersion();
-              if(filter.matches(version.getMajor() + "." + version.getMinor() + "." + version.getMicro())) {
-                return true;
-              }
-            }
-            return false;
-          });
-        }).isPresent();
+    return anyMatch(metadata.getSource(), filters);
+  }
+
+  static boolean anyMatch(LifecycleMappingMetadataSource source, List<LifecycleMappingFilter> filters) {
+    return source != null && source.getSource() instanceof Bundle bundle && anyFilterMatches(bundle, filters);
+  }
+
+  private static boolean anyFilterMatches(Bundle bundle, List<LifecycleMappingFilter> filters) {
+    Version version = bundle.getVersion();
+    return filters.stream() //
+        .filter(f -> f.getSymbolicName().equals(bundle.getSymbolicName()))
+        .anyMatch(filter -> filter.matches(version.getMajor() + "." + version.getMinor() + "." + version.getMicro()));
   }
 }

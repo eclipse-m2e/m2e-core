@@ -37,7 +37,7 @@ public class NotCoveredMojoExecution extends MojoExecutionProblemInfo {
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
 
-    marker
-        .setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
+        IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
   }
 }

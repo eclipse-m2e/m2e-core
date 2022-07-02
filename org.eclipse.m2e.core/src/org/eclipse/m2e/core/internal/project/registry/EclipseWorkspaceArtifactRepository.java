@@ -159,8 +159,15 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return false; // XXX
   }
 
-  public static void setDisabled(boolean disable) {
-    disabled.set(disable ? Boolean.TRUE : null);
+  public interface Disabled extends AutoCloseable {
+    @Override
+    void close();
+  }
+
+  public static Disabled setDisabled() {
+    boolean isDisabled = isDisabled();
+    disabled.set(true);
+    return () -> disabled.set(isDisabled);
   }
 
   public static boolean isDisabled() {

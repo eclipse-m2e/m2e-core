@@ -55,7 +55,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
@@ -414,7 +413,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
             matchFound = true;
           }
         } else if(requirement instanceof PackagingTypeMappingRequirement) {
-          String packaging = ((PackagingTypeMappingRequirement) requirement).getPackaging();
+          String packaging = ((PackagingTypeMappingRequirement) requirement).packaging();
           if(hasPackaging(src, packaging)) {
             matchFound = true;
           }
@@ -425,7 +424,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
           }
 
         } else if(requirement instanceof ProjectConfiguratorMappingRequirement) {
-          String configuratorId = ((ProjectConfiguratorMappingRequirement) requirement).getProjectConfiguratorId();
+          String configuratorId = ((ProjectConfiguratorMappingRequirement) requirement).configuratorId();
           if(itemEntry.getProjectConfigurators().contains(configuratorId)) {
             matchFound = true;
           }

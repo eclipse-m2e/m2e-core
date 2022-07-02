@@ -36,11 +36,11 @@ import org.eclipse.m2e.core.internal.markers.SourceLocation;
  */
 public class DuplicateMappingSourceProblem extends MavenProblemInfo {
 
-  private LifecycleMappingMetadataSource[] conflictingSources;
+  private final LifecycleMappingMetadataSource[] conflictingSources;
 
-  private String type;
+  private final String type;
 
-  private String value;
+  private final String value;
 
   /**
    * @param location
@@ -55,9 +55,6 @@ public class DuplicateMappingSourceProblem extends MavenProblemInfo {
     this.conflictingSources = error.getConflictingSources();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.markers.MavenProblemInfo#processMarker(org.eclipse.core.resources.IMarker)
-   */
   @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);

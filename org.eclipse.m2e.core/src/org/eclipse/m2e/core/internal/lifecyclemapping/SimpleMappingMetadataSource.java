@@ -9,7 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
- *      Christoph Läubrich - #549 - Improve conflict handling of lifecycle mappings 
+ *      Christoph Läubrich - #549 - Improve conflict handling of lifecycle mappings
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
@@ -17,7 +17,6 @@ package org.eclipse.m2e.core.internal.lifecyclemapping;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingFilter;
@@ -68,8 +67,8 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
   }
 
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter)
-      throws DuplicateLifecycleMappingMetadataException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType,
+      Predicate<LifecycleMappingMetadata> filter) throws DuplicateLifecycleMappingMetadataException {
     if(packagingType == null) {
       return null;
     }
@@ -79,7 +78,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     if(filter != null) {
       stream = stream.filter(Predicate.not(filter));
     }
-    List<LifecycleMappingMetadata> matching = stream.collect(Collectors.toList());
+    List<LifecycleMappingMetadata> matching = stream.toList();
     if(matching.isEmpty()) {
       return null;
     }
@@ -102,9 +101,6 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
     return mappings;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
-   */
   @Override
   public List<LifecycleMappingFilter> getFilters() {
     return mappingFilters;
