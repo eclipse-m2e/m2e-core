@@ -1,13 +1,13 @@
 Manifest-Version: 1.0
-Fragment-Host: org.eclipse.m2e.core;bundle-version="1.16.0"
+Fragment-Host: org.eclipse.m2e.core
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E Maven Integration for Eclipse Core Tests
 Bundle-SymbolicName: org.eclipse.m2e.core.tests
-Bundle-Version: 1.16.1.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: Eclipse.org - m2e
-Require-Bundle: org.eclipse.m2e.tests.common;bundle-version="1.16.0",
- org.junit;bundle-version="4.12.0",
+Require-Bundle: org.eclipse.m2e.tests.common,
+ org.junit,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.m2e.maven.runtime
