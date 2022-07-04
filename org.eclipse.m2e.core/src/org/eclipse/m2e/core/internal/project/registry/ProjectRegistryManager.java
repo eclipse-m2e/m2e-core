@@ -516,6 +516,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
               newFacade = new MavenProjectFacade(newFacade);
               putMavenProject(newFacade, mavenProject);
             }
+            mavenProjectCache.put(newFacade, mavenProject);
           }
 
           if(newFacade != null) {
