@@ -53,6 +53,7 @@ import org.apache.maven.cli.internal.ExtensionResolutionException;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
@@ -297,6 +298,7 @@ public class PlexusContainerManager {
       thread.setContextClassLoader(container.getContainerRealm());
       MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
           new PlexusComponentLookup(container), MavenPluginActivator.getDefault().getMaven());
+      container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);

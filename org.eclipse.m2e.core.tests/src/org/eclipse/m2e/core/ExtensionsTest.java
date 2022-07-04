@@ -27,7 +27,7 @@ import org.junit.Test;
 public class ExtensionsTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void testProjectExtensions() throws Exception {
-		IProject project = createExisting("buildStartTime", "resources/projects/projectExtension/", false);
+		IProject project = createExisting("projectExtension", "resources/projects/projectExtension/", false);
 		waitForJobsToComplete(monitor);
 		IMavenProjectFacade facade = Adapters.adapt(project, IMavenProjectFacade.class);
 		Assert.assertNotNull(facade);
