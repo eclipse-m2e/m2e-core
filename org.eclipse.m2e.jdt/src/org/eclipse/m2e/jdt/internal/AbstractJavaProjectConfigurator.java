@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +174,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     String executionEnvironmentId = getExecutionEnvironmentId(options);
     String buildEnvironmentId = getMinimumJavaBuildEnvironmentId(request, monitor);
-    addJREClasspathContainer(classpath, buildEnvironmentId != null ? buildEnvironmentId : executionEnvironmentId);
+    // use the higher environment id as JREs are backwards compatible
+    addJREClasspathContainer(classpath, getHighestEnvironmentId(buildEnvironmentId, executionEnvironmentId));
 
     addMavenClasspathContainer(classpath);
 
@@ -196,6 +199,24 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
 
     MavenJdtPlugin.getDefault().getBuildpathManager().updateClasspath(project, monitor);
+  }
+
+  static String getHighestEnvironmentId(String... environmentIds) {
+    List<String> environmentIdList = Arrays.stream(environmentIds).filter(Objects::nonNull)
+        .collect(Collectors.toList());
+    if(environmentIdList.size() == 1) {
+      return environmentIdList.get(0);
+    }
+    // ENVIRONMENTS map is sorted from lowest first to highest last
+    List<String> sortedExecutionEnvironmentIds = new ArrayList<>(ENVIRONMENTS.values());
+    Collections.reverse(sortedExecutionEnvironmentIds); // reverse order to see highest id first
+    for(String executionEnvironmentId : sortedExecutionEnvironmentIds) {
+      if(environmentIdList.contains(executionEnvironmentId)) {
+        return executionEnvironmentId;
+      }
+    }
+    throw new IllegalArgumentException(
+        "None of the environment ids from '" + String.join(",", environmentIds) + "' found in ENVIRONMENTS");
   }
 
   protected IContainer getOutputLocation(ProjectConfigurationRequest request, IProject project) {
