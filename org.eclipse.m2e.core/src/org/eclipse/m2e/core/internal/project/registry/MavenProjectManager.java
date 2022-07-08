@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -62,6 +63,8 @@ public class MavenProjectManager implements IMavenProjectRegistry {
   private IWorkspace workspace;
 
   private File workspaceStateFile;
+
+  private IMavenExecutionContextInitializer initializer;
 
   @Activate
   void init(BundleContext bundleContext) {
@@ -128,6 +131,16 @@ public class MavenProjectManager implements IMavenProjectRegistry {
   public File getWorkspaceStateFile() {
     //FIXME this is more a property of the WorkspaceStateWriter!
     return workspaceStateFile;
+  }
+
+  @Override
+  public void setExecutionContextInitializer(IMavenExecutionContextInitializer initializer) {
+    this.initializer = initializer;
+  }
+
+  @Override
+  public IMavenExecutionContextInitializer getExecutionContextInitializer() {
+    return initializer;
   }
 
   @Override

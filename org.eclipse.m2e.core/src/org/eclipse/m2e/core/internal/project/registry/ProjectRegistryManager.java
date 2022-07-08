@@ -92,9 +92,11 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
@@ -928,6 +930,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
         p = new Properties();
       }
       p.putAll(addProperties);
+    }
+
+    IMavenExecutionContextInitializer initializer = MavenPluginActivator.getDefault().getMavenProjectManager()
+        .getExecutionContextInitializer();
+    if(initializer != null) {
+      IMavenProjectFacade facade = state.getProjectFacade(pom);
+      if(facade != null)
+        initializer.populateSystemProperties(facade, request.getSystemProperties());
     }
 
     // eclipse workspace repository implements both workspace dependency resolution

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 
 
 /**
@@ -83,4 +84,8 @@ public interface IMavenProjectRegistry {
   void addMavenProjectChangedListener(IMavenProjectChangedListener listener);
 
   void removeMavenProjectChangedListener(IMavenProjectChangedListener listener);
+
+  void setExecutionContextInitializer(IMavenExecutionContextInitializer initializer);
+
+  IMavenExecutionContextInitializer getExecutionContextInitializer();
 }

@@ -24,6 +24,8 @@
 package org.eclipse.m2e.jdt;
 
 import java.io.File;
+import java.util.List;
+import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 
@@ -34,8 +36,10 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -45,13 +49,20 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
+
+import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.jdt.internal.AbstractJavaProjectConfigurator;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClassifierManager;
 import org.eclipse.m2e.jdt.internal.Messages;
@@ -113,6 +124,44 @@ public class MavenJdtPlugin extends Plugin {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
     IMavenProjectRegistry projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
+    IMavenExecutionContextInitializer initializer = new IMavenExecutionContextInitializer() {
+      @Override
+      public void populateSystemProperties(IMavenProjectFacade facade, Properties systemProperties) {
+        try {
+          // clear to prevent circular recursion
+          projectManager.setExecutionContextInitializer(null);
+          try {
+            List<MojoExecution> executions = AbstractJavaProjectConfigurator.getCompilerMojoExecutions(facade,
+                new NullProgressMonitor());
+            if(executions != null) {
+              String compilerLevel = null;
+              for(MojoExecution execution : executions) {
+                // this creates an execution context to resolve the dependencies
+                // but currently the initializer is cleared so will not be invoked circularly
+                compilerLevel = AbstractJavaProjectConfigurator.getCompilerLevel(MavenPlugin.getMaven(),
+                    facade.getMavenProject(), execution, "source", compilerLevel);
+              }
+              String envId = AbstractJavaProjectConfigurator.getExecutionEnvironmentId(compilerLevel);
+              IExecutionEnvironment env = AbstractJavaProjectConfigurator.getExecutionEnvironment(envId);
+              if(env != null) {
+                IPath jreContainerPath = JavaRuntime.newJREContainerPath(env);
+                IVMInstall vm = JavaRuntime.getVMInstall(jreContainerPath);
+                if(vm != null) {
+                  File location = vm.getInstallLocation();
+                  systemProperties.put("java.home", location.getPath() + File.separator + "bin");
+                }
+              }
+            }
+          } catch(CoreException ex) {
+          }
+        } finally {
+          // restore for use in future non-recursive executions...
+          projectManager.setExecutionContextInitializer(this);
+        }
+      }
+    };
+    projectManager.setExecutionContextInitializer(initializer);
+
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     File stateLocationDir = getStateLocation().toFile();
