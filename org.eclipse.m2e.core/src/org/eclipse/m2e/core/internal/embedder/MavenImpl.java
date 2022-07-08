@@ -147,6 +147,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -169,6 +170,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private final List<ISettingsChangeListener> settingsListeners = new CopyOnWriteArrayList<>();
 
   private final List<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<>();
+
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+  private final List<IMavenExecutionContextInitializer> executionContextInitializers = new CopyOnWriteArrayList<>();
 
   @Reference
   private PlexusContainerManager containerManager;

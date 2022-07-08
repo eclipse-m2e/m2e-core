@@ -24,8 +24,13 @@
 package org.eclipse.m2e.jdt;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Component;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -34,8 +39,10 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -45,13 +52,22 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
+
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.jdt.internal.AbstractJavaProjectConfigurator;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClassifierManager;
 import org.eclipse.m2e.jdt.internal.Messages;
@@ -62,7 +78,8 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
  * Only {@link #getDefault()} and {@link #getBuildpathManager()} are part of public API. All other methods, includes
  * methods inherited from AbstractUIPlugin should not be referenced by the client and can be removed without notice.
  */
-public class MavenJdtPlugin extends Plugin {
+@Component(service = {IMavenExecutionContextInitializer.class})
+public class MavenJdtPlugin extends Plugin implements IMavenExecutionContextInitializer {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 
@@ -81,6 +98,8 @@ public class MavenJdtPlugin extends Plugin {
   private final IPreferencesService preferencesService;
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
+
+  private final AtomicBoolean jreDetectionActive = new AtomicBoolean(false);
 
   /**
    * @noreference see class javadoc
@@ -113,6 +132,7 @@ public class MavenJdtPlugin extends Plugin {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
     IMavenProjectRegistry projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
+
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     File stateLocationDir = getStateLocation().toFile();
@@ -249,4 +269,69 @@ public class MavenJdtPlugin extends Plugin {
     }
 
   }
+
+  @Override
+  public void initializeExecutionRequest(IMavenExecutionContext context, MavenExecutionRequest request) {
+    try {
+      jreDetectionActive.set(true);
+      try {
+        // request.getSystemProperties();
+        IMavenProjectFacade facade = null;
+        try {
+          facade = findMavenProjectFacade(request.getPom());
+        } catch(IOException ex) {
+        }
+        if(facade == null)
+          return;
+
+        Properties systemProperties = request.getSystemProperties();
+        List<MojoExecution> executions = AbstractJavaProjectConfigurator.getCompilerMojoExecutions(facade,
+            new NullProgressMonitor());
+        if(executions != null) {
+          String compilerLevel = null;
+          for(MojoExecution execution : executions) {
+            // this creates an execution context to resolve the dependencies
+            // but currently the initializer is cleared so will not be invoked circularly
+            compilerLevel = AbstractJavaProjectConfigurator.getCompilerLevel(MavenPlugin.getMaven(),
+                facade.getMavenProject(), execution, "source", compilerLevel);
+          }
+          IVMInstall vm = findVM(compilerLevel);
+          if(vm != null) {
+            File location = vm.getInstallLocation();
+            systemProperties.put("java.home", location.getPath() + File.separator + "bin");
+          }
+        }
+      } catch(CoreException ex) {
+      }
+    } finally {
+      jreDetectionActive.set(false);
+    }
+  }
+
+  private static IVMInstall findVM(String compilerLevel) {
+    String envId = AbstractJavaProjectConfigurator.getExecutionEnvironmentId(compilerLevel);
+    IExecutionEnvironment env = AbstractJavaProjectConfigurator.getExecutionEnvironment(envId);
+    if(env != null) {
+      IPath jreContainerPath = JavaRuntime.newJREContainerPath(env);
+      IVMInstall vm = JavaRuntime.getVMInstall(jreContainerPath);
+      if(vm != null) {
+        return vm;
+      }
+    }
+    return null;
+  }
+
+  private static IMavenProjectFacade findMavenProjectFacade(File pom) throws IOException {
+    pom = pom.getCanonicalFile();
+    try {
+      IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+      for(IMavenProjectFacade project : projects) {
+        if(project.getPomFile().getCanonicalFile().equals(pom))
+          return project;
+      }
+    } catch(IOException ex) {
+    }
+    return null;
+  }
+
 }

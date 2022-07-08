@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
@@ -55,6 +56,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -207,6 +209,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return ENVIRONMENTS.get(options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM));
   }
 
+  public static String getExecutionEnvironmentId(String compilerLevel) {
+    return ENVIRONMENTS.get(compilerLevel);
+  }
+
   protected void addJavaNature(IProject project, IProgressMonitor monitor) throws CoreException {
     addNature(project, JavaCore.NATURE_ID, monitor);
   }
@@ -248,7 +254,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
+  public static IExecutionEnvironment getExecutionEnvironment(String environmentId) {
     if(environmentId == null
         || JreSystemVersion.WORKSPACE_DEFAULT == MavenJdtPlugin.getDefault().getJreSystemVersion()) {
       return null;
@@ -610,10 +616,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     boolean enablePreviewFeatures = false;
 
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
-      release = getCompilerLevel(request.mavenProject(), execution, "release", release, RELEASES, monitor);
+      release = getCompilerLevel(maven, request.mavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
-      source = getCompilerLevel(request.mavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
-      target = getCompilerLevel(request.mavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
+      source = getCompilerLevel(maven, request.mavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
+      target = getCompilerLevel(maven, request.mavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
       generateParameters = generateParameters || isGenerateParameters(request.mavenProject(), execution, monitor);
       enablePreviewFeatures = enablePreviewFeatures
           || isEnablePreviewFeatures(request.mavenProject(), execution, monitor);
@@ -764,7 +770,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return false;
   }
 
-  private String sanitizeJavaVersion(String version) {
+  private static String sanitizeJavaVersion(String version) {
     return switch(version) {
       case "5", "6", "7", "8" -> "1." + version;
       default -> {
@@ -787,10 +793,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return DEFAULT_COMPILER_LEVEL;
   }
 
+  public static List<MojoExecution> getCompilerMojoExecutions(IMavenProjectFacade facade, IProgressMonitor monitor)
+      throws CoreException {
+    return facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE,
+        GOAL_TESTCOMPILE);
+  }
+
   protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    return request.mavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
-        monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
+    return getCompilerMojoExecutions(request.mavenProjectFacade(), monitor);
   }
 
   protected List<MojoExecution> getEnforcerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
@@ -799,8 +810,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         monitor, GOAL_ENFORCE);
   }
 
-  private String getCompilerLevel(MavenProject mavenProject, MojoExecution execution, String parameter, String source,
-      List<String> levels, IProgressMonitor monitor) {
+  public static String getCompilerLevel(IMaven maven, MavenProject mavenProject, MojoExecution execution,
+      String parameter, String source) {
+    return getCompilerLevel(maven, mavenProject, execution, parameter, source, SOURCES, new NullProgressMonitor());
+  }
+
+  private static String getCompilerLevel(IMaven maven, MavenProject mavenProject, MojoExecution execution,
+      String parameter, String source, List<String> levels, IProgressMonitor monitor) {
     int levelIdx = getLevelIndex(source, levels);
 
     try {
@@ -822,7 +838,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return levels.get(levelIdx);
   }
 
-  private int getLevelIndex(String level, List<String> levels) {
+  private static int getLevelIndex(String level, List<String> levels) {
     int idx = -1;
     if(level != null) {
       idx = levels.indexOf(level);
@@ -896,7 +912,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return null;
   }
 
-  private double asDouble(String level) {
+  private static double asDouble(String level) {
     if(level == null || level.isEmpty()) {
       return -1;
     }
