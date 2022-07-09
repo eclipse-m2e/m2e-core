@@ -97,7 +97,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
-import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
@@ -171,11 +170,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
   private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<>();
 
   private volatile Thread syncRefreshThread;
-
-  /**
-   * Backwards compatibility with clients that request setup MojoExecution outside of {@link MavenBuilder} execution.
-   */
-  private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<>();
 
   private final Map<MavenProjectFacade, MavenProject> mavenProjectCache;
 
@@ -1003,22 +997,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    MavenProject mavenProject = null;
-    if(MavenExecutionContext.getThreadContext() == null) {
-      // the intent of this code is to provide backwards compatibility for clients that request setup MojoExecution
-      // outside of MavenBuilder context. Setup MojoExecutions are specific to MavenProject instances, so keep
-      // MavenProject until the facade is discarded
-      synchronized(legacyMavenProjects) {
-        mavenProject = legacyMavenProjects.get(projectFacade);
-        if(mavenProject == null) {
-          mavenProject = getMavenProject(projectFacade, monitor);
-          legacyMavenProjects.put(projectFacade, mavenProject);
-        }
-      }
-    }
-    if(mavenProject == null) {
-      mavenProject = getMavenProject(projectFacade, monitor);
-    }
+    MavenProject mavenProject = getMavenProject(projectFacade, monitor);
     return maven.setupMojoExecution(mavenProject, mojoExecution, monitor);
   }
 
@@ -1047,20 +1026,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * maven execution scope is guaranteed to return the same MavenProject instance.</li>
    * <li>Global "project cache", that is meant to improve performance during incremental workspace builds. The project
    * cache is small and cached values are discarded and reloaded as needed.</li>
-   * <li>Global "legacy support project map" provides support for legacy, i.e. pre m2e 1.4, extensions that setup
-   * MojoExecution instances outside of maven execution scope. Legacy support project map entries are not discarded
-   * until their corresponding facade instances are discarded.</li>
    * </ul>
    */
 
   MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-    MavenProject mavenProject;
-    synchronized(legacyMavenProjects) {
-      mavenProject = legacyMavenProjects.get(facade);
-    }
-    if(mavenProject != null) {
-      return mavenProject;
-    }
     Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
     try {
       return mavenProjects.computeIfAbsent(facade, fac -> mavenProjectCache.computeIfAbsent(fac,
@@ -1075,17 +1044,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   MavenProject getMavenProject(MavenProjectFacade facade) {
-    MavenProject mavenProject;
-    synchronized(legacyMavenProjects) {
-      mavenProject = legacyMavenProjects.get(facade);
-    }
-    if(mavenProject == null) {
-      mavenProject = mavenProjectCache.get(facade);
-      if(mavenProject != null) {
-        putMavenProject(facade, mavenProject);
-      }
-    }
-    if(mavenProject == null) {
+    MavenProject mavenProject = mavenProjectCache.get(facade);
+    if(mavenProject != null) {
+      putMavenProject(facade, mavenProject);
+    } else {
       mavenProject = getContextProjects().get(facade);
     }
     return mavenProject;
@@ -1103,9 +1065,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
     } else {
       mavenProjects.remove(facade);
-      synchronized(legacyMavenProjects) {
-        legacyMavenProjects.remove(facade);
-      }
     }
   }
 
