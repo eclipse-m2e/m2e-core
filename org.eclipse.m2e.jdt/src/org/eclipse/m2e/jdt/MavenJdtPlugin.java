@@ -27,6 +27,9 @@ import java.io.File;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import org.eclipse.core.resources.IProject;
@@ -64,6 +67,7 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
  * Only {@link #getDefault()} and {@link #getBuildpathManager()} are part of public API. All other methods, includes
  * methods inherited from AbstractUIPlugin should not be referenced by the client and can be removed without notice.
  */
+@Component
 public class MavenJdtPlugin extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
@@ -77,6 +81,9 @@ public class MavenJdtPlugin extends Plugin {
   BuildPathManager buildpathManager;
 
   IMavenClassifierManager mavenClassifierManager;
+
+  @Reference
+  private IWorkspace workspace;
 
   @Reference
   IMavenProjectRegistry projectManager;
@@ -99,16 +106,9 @@ public class MavenJdtPlugin extends Plugin {
     preferencesLookup[1] = DefaultScope.INSTANCE.getNode(PLUGIN_ID);
   }
 
-  /**
-   * @noreference see class javadoc
-   */
-  @Override
-  @SuppressWarnings("static-access")
-  public void start(BundleContext bundleContext) throws Exception {
-    super.start(bundleContext);
+  @Activate
+  public void init(BundleContext bundleContext) throws Exception {
     instance = this;
-
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
     File stateLocationDir = getStateLocation().toFile();
 
@@ -161,11 +161,8 @@ public class MavenJdtPlugin extends Plugin {
     this.mavenClassifierManager = new MavenClassifierManager();
   }
 
-  /**
-   * @noreference see class javadoc
-   */
-  @Override
-  public void stop(BundleContext context) throws Exception {
+  @Deactivate
+  public void cleanup(BundleContext context) throws Exception {
     super.stop(context);
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
