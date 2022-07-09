@@ -22,4 +22,4 @@ Bundle-Vendor: %Bundle-Vendor
 Import-Package: org.osgi.service.component.annotations;version="1.2.0",
  org.slf4j;version="[1.6.2,2.0.0)"
 Automatic-Module-Name: org.eclipse.m2e.jdt
-Service-Component: OSGI-INF/org.eclipse.m2e.jdt.MavenJdtPlugin.xml
+Service-Component: OSGI-INF/org.eclipse.m2e.jdt.internal.JdtMavenExecutionContextInitializer.xml
