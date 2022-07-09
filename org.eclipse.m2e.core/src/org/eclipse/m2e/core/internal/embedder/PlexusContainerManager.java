@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Christoph Läubrich and others
+ * Copyright (c) 2022, 2023 Christoph Läubrich and others
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -178,12 +178,10 @@ public class PlexusContainerManager {
         } catch(ExtensionResolutionException e) {
           //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
           CoreExtension extension = e.getExtension();
-          throw new PlexusContainerException(
-              "can't create plexus container for basedir = " + basedir.getAbsolutePath() + " because the extension "
-                  + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion()
-                  + " can't be loaded (defined in "
-                  + new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME).getAbsolutePath() + ").",
-              e);
+          throw new PlexusContainerException("can't create plexus container for basedir = " + basedir.getAbsolutePath()
+              + " because the extension " + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
+              + extension.getVersion() + " can't be loaded (defined in "
+              + new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME).getAbsolutePath() + ").", e);
         }
       }
       return plexusContainer;
@@ -341,11 +339,10 @@ public class PlexusContainerManager {
       container.setLookupRealm(null);
       container.setLoggerManager(loggerManager);
       thread.setContextClassLoader(container.getContainerRealm());
-      MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
-          wrap(container), MavenPluginActivator.getDefault().getMaven().getSettings());
+      MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration, wrap(container),
+          MavenPluginActivator.getDefault().getMaven().getSettings(), multiModuleProjectDirectory);
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
-      request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
       return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
     } finally {
@@ -356,7 +353,7 @@ public class PlexusContainerManager {
 
   private static final class M2EClassWorld extends ClassWorld {
 
-    private File multiModuleProjectDirectory;
+    private final File multiModuleProjectDirectory;
 
     M2EClassWorld(String plexusCoreRealm, ClassLoader classLoader, File multiModuleProjectDirectory) {
       super(plexusCoreRealm, classLoader);
@@ -449,6 +446,5 @@ public class PlexusContainerManager {
   public static IComponentLookup wrap(PlexusContainer container, ClassRealm realm) {
     return new PlexusComponentLookup(container, realm);
   }
-
 
 }

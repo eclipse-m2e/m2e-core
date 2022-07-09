@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2022 Igor Fedorenko
+ * Copyright (c) 2013, 2023 Igor Fedorenko and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,10 @@
  * Contributors:
  *      Igor Fedorenko - initial API and implementation
  *      Christoph Läubrich - move creation MavenExecutionRequest from MavenImpl->MavenExecutionContext
+ *      Hannes Wellmann - Add support for properties and profile-activations from .mvn/maven.config
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.embedder;
-
-import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
 import java.io.File;
 import java.util.ArrayDeque;
@@ -44,6 +43,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.cli.MavenCLIParser;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -62,7 +62,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.Settings;
@@ -147,19 +146,23 @@ public class MavenExecutionContext implements IMavenExecutionContext {
         throw new IllegalStateException(); //
       }
       request = DefaultMavenExecutionRequest.copy(parent);
+      request.setMultiModuleProjectDirectory(parent.getMultiModuleProjectDirectory());
     }
-    if(request == null) {
-      request = createExecutionRequest(IMavenConfiguration.getWorkspaceConfiguration(),
-          containerLookup, MavenPlugin.getMaven().getSettings());
+    File multiModuleRoot = MavenProperties.computeMultiModuleProjectDirectory(basedir);
+    if(multiModuleRoot == null) {
+      multiModuleRoot = multiModuleProjectDirectory;
+    }
+    if(request == null
+        || (multiModuleRoot != null && !multiModuleRoot.equals(request.getMultiModuleProjectDirectory()))) {
+      request = createExecutionRequest(IMavenConfiguration.getWorkspaceConfiguration(), containerLookup,
+          MavenPlugin.getMaven().getSettings(), multiModuleRoot);
       request.setBaseDirectory(basedir);
     }
-    request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
-
     return request;
   }
 
   static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration, IComponentLookup lookup,
-      Settings settings) throws CoreException {
+      Settings settings, File multiModuleProjectDirectory) throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
     // this causes problems with unexpected "stale project configuration" error markers
@@ -197,10 +200,11 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.setLocalRepositoryPath(localRepository.getBasedir());
     request.setOffline(mavenConfiguration.isOffline());
 
-    request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
-    request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
-
-    MavenExecutionContext.populateSystemProperties(request);
+    request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
+    Properties userProperties = request.getUserProperties();
+    userProperties.put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
+    userProperties.put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
+    MavenCLIParser.populateCLIOptions(request);
 
     request.setCacheNotFound(true);
     request.setCacheTransferError(true);
@@ -246,7 +250,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       } catch(MavenExecutionRequestPopulationException ex) {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_config, ex));
       }
-      populateSystemProperties(request);
       setValue(CTX_LOCALREPOSITORY, request.getLocalRepository());
       final FilterRepositorySystemSession repositorySession = createRepositorySession(request,
           MavenPlugin.getMavenConfiguration(), lookup);
@@ -417,18 +420,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   public static MavenExecutionContext getThreadContext(boolean innermost) {
     final Deque<MavenExecutionContext> stack = threadLocal.get();
     return stack != null ? (innermost ? stack.peekFirst() : stack.peekLast()) : null;
-  }
-
-  public static void populateSystemProperties(MavenExecutionRequest request) {
-    // temporary solution for https://issues.sonatype.org/browse/MNGECLIPSE-1607
-    // oddly, there are no unit tests that fail if this is commented out
-    if(request.getSystemProperties() == null || request.getSystemProperties().isEmpty()) {
-      Properties systemProperties = new Properties();
-      EnvironmentUtils.addEnvVars(systemProperties);
-      copyProperties(systemProperties, System.getProperties());
-      MavenProperties.setProperties(systemProperties);
-      request.setSystemProperties(systemProperties);
-    }
   }
 
   /*
