@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>forge-parent</artifactId>
+		<groupId>org.sonatype.forge</groupId>
+		<version>6</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.eclipse.m2e.tests</groupId>
+  <artifactId>child</artifactId>
+  <version>1.0.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>test</groupId>
+      <artifactId>a</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+
+</project>

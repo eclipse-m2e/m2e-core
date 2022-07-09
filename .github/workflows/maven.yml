@@ -38,7 +38,7 @@ jobs:
     - name: Build m2e-core
       uses: GabrielBB/xvfb-action@v1
       with:
-       run: mvn clean verify -B -Puts,its -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Dtycho.surefire.timeout=7200
+       run: mvn clean verify -B -Pits -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Dtycho.surefire.timeout=7200
     - name: Upload Test Results
       uses: actions/upload-artifact@v3
       with:
