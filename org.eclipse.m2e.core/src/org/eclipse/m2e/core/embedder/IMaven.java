@@ -283,4 +283,5 @@ public interface IMaven extends IComponentLookup {
    */
   IMavenExecutionContext createExecutionContext();
 
+  List<IMavenExecutionContextInitializer> getExecutionContextInitializers();
 }

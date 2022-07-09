@@ -1102,4 +1102,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return new MavenExecutionContext(this, (IMavenProjectFacade) null);
   }
 
+  /**
+   * @return Returns the executionContextInitializers.
+   */
+  public List<IMavenExecutionContextInitializer> getExecutionContextInitializers() {
+    return this.executionContextInitializers;
+  }
 }

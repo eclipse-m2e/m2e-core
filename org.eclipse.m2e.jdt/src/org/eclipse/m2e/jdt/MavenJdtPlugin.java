@@ -67,7 +67,7 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
  * Only {@link #getDefault()} and {@link #getBuildpathManager()} are part of public API. All other methods, includes
  * methods inherited from AbstractUIPlugin should not be referenced by the client and can be removed without notice.
  */
-@Component
+@Component(service = {})
 public class MavenJdtPlugin extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$

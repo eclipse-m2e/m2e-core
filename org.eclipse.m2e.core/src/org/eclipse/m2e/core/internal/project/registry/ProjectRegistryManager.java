@@ -92,6 +92,7 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
@@ -937,6 +938,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     if(pom != null && pom.getLocation() != null) {
       request.setMultiModuleProjectDirectory(
           PlexusContainerManager.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
+    }
+
+    // this at least has a POM file and the initializer gets to set java.home properly
+    // but it seems that this is not the execution that maps resolved dependencies to local file locations
+    // so things still don't work after this one
+    List<IMavenExecutionContextInitializer> initializers = maven.getExecutionContextInitializers();
+    for(IMavenExecutionContextInitializer initializer : initializers) {
+      initializer.initializeExecutionRequest(null, request);
     }
 
     return request;

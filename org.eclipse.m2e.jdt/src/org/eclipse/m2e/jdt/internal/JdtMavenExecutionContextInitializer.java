@@ -50,6 +50,8 @@ public class JdtMavenExecutionContextInitializer implements IMavenExecutionConte
    */
   @Override
   public void initializeExecutionRequest(IMavenExecutionContext context, MavenExecutionRequest request) {
+    if(jreDetectionActive.get())
+      return; // hackk to prevent endless recursion; maybe a thread-local would be better?
     try {
       jreDetectionActive.set(true);
       try {
@@ -100,6 +102,8 @@ public class JdtMavenExecutionContextInitializer implements IMavenExecutionConte
   }
 
   private static IMavenProjectFacade findMavenProjectFacade(File pom) throws IOException {
+    if(pom == null)
+      return null;
     pom = pom.getCanonicalFile();
     try {
       List<IMavenProjectFacade> projects = MavenPlugin.getMavenProjectRegistry().getProjects();

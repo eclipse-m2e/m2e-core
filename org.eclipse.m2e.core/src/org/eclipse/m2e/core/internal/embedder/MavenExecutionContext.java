@@ -69,7 +69,6 @@ import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContextInitializer;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -193,11 +192,11 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
 
     MavenExecutionContext.populateSystemProperties(request);
-    Collection<IMavenExecutionContextInitializer> initializers = lookup
-        .lookupCollection(IMavenExecutionContextInitializer.class);
-    for(IMavenExecutionContextInitializer initializer : initializers) {
-      initializer.initializeExecutionRequest(getThreadContext(), request);
-    }
+    // I have noticed that the request pom is always null here; too early to configure here?
+//    List<IMavenExecutionContextInitializer> initializers = maven.getExecutionContextInitializers();
+//    for(IMavenExecutionContextInitializer initializer : initializers) {
+//      initializer.initializeExecutionRequest(getThreadContext(), request);
+//    }
 
     request.setCacheNotFound(true);
     request.setCacheTransferError(true);
