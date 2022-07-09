@@ -17,13 +17,14 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -76,7 +77,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -284,18 +284,14 @@ public class LifecycleMappingPage extends WizardPage {
         if(inputElement instanceof LifecycleMappingDiscoveryRequest request) {
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<>();
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<>();
-          Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> projects = request.getProjects();
-          for(final Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : projects.entrySet()) {
-            final String relPath = entry.getKey().getProject().getFile(IMavenConstants.POM_FILE_NAME).getFullPath()
+
+          request.getProjects().forEach((facade, requirements) -> {
+            String relPath = facade.getProject().getFile(IMavenConstants.POM_FILE_NAME).getFullPath()
                 .toPortableString();
-            for(final ILifecycleMappingRequirement requirement : entry.getValue()) {
+            for(ILifecycleMappingRequirement requirement : requirements) {
               // include mojo execution if it has available proposals or interesting phase not mapped locally
               if(requirement != null) {
-                List<ILifecycleMappingLabelProvider> val = mojos.get(requirement);
-                if(val == null) {
-                  val = new ArrayList<>();
-                  mojos.put(requirement, val);
-                }
+                List<ILifecycleMappingLabelProvider> val = mojos.computeIfAbsent(requirement, r -> new ArrayList<>());
                 val.add(new ILifecycleMappingLabelProvider() {
 
                   @Override
@@ -304,7 +300,7 @@ public class LifecycleMappingPage extends WizardPage {
                     if(requirement instanceof MojoExecutionMappingRequirement mojo) {
                       executionId = mojo.getExecutionId();
                     } else if(requirement instanceof ProjectConfiguratorMappingRequirement conf) {
-                      executionId = conf.getExecution().executionId();
+                      executionId = conf.execution().executionId();
                     }
 
                     if(executionId != null) {
@@ -331,7 +327,7 @@ public class LifecycleMappingPage extends WizardPage {
                   public Collection<MavenProject> getProjects() {
                     MavenProject mavenProject;
                     try {
-                      mavenProject = entry.getKey().getMavenProject(new NullProgressMonitor());
+                      mavenProject = facade.getMavenProject(new NullProgressMonitor());
                       return Collections.singleton(mavenProject);
                     } catch(CoreException e) {
                       LOG.error(e.getMessage(), e);
@@ -342,15 +338,10 @@ public class LifecycleMappingPage extends WizardPage {
                 });
               }
             }
-          }
+          });
           List<ILifecycleMappingLabelProvider> toRet = new ArrayList<>();
-          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : packagings
-              .entrySet()) {
-            toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
-          }
-          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
-            toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
-          }
+          packagings.forEach((req, providers) -> toRet.add(new AggregateMappingLabelProvider(req, providers)));
+          mojos.forEach((req, providers) -> toRet.add(new AggregateMappingLabelProvider(req, providers)));
           return toRet.toArray();
         }
         return null;
@@ -431,10 +422,8 @@ public class LifecycleMappingPage extends WizardPage {
           return null;
         }
         if(element instanceof AggregateMappingLabelProvider prov) {
-          if(prov.isError(mappingConfiguration)) {
-            if(!isHandled(prov)) {
-              return MavenImages.IMG_ERROR;
-            }
+          if(prov.isError(mappingConfiguration) && !isHandled(prov)) {
+            return MavenImages.IMG_ERROR;
           }
           return MavenImages.IMG_PASSED;
         }
@@ -468,19 +457,14 @@ public class LifecycleMappingPage extends WizardPage {
     });
 
     treeViewer.setComparator(new ViewerComparator() {
+      Comparator<ILifecycleMappingLabelProvider> providerComparator = Comparator
+          .comparing(ILifecycleMappingLabelProvider::getMavenText);
       @Override
       public int compare(Viewer viewer, Object e1, Object e2) {
-        if(!(e1 instanceof ILifecycleMappingLabelProvider && e2 instanceof ILifecycleMappingLabelProvider)) {
-          return super.compare(viewer, e1, e2);
+        if(e1 instanceof ILifecycleMappingLabelProvider p1 && e2 instanceof ILifecycleMappingLabelProvider p2) {
+          return providerComparator.compare(p1, p2);
         }
-        int cat1 = category(e1);
-        int cat2 = category(e2);
-
-        if(cat1 != cat2) {
-          return cat1 - cat2;
-        }
-        return ((ILifecycleMappingLabelProvider) e1).getMavenText()
-            .compareTo(((ILifecycleMappingLabelProvider) e2).getMavenText());
+        return super.compare(viewer, e1, e2);
       }
     });
 
@@ -549,16 +533,9 @@ public class LifecycleMappingPage extends WizardPage {
   protected boolean shouldDeslectProposal(ILifecycleMappingLabelProvider prov) {
     IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
     if(proposal != null) {
-      TreeItem[] items = treeViewer.getTree().getItems();
-      for(TreeItem item : items) {
-        if(item.getData() instanceof ILifecycleMappingLabelProvider lifecycleMappingProvider
-            && item.getData() != prov) {
-          if(proposal.equals(
-              mappingConfiguration.getSelectedProposal(lifecycleMappingProvider.getKey()))) {
-            return false;
-          }
-        }
-      }
+      return Arrays.stream(treeViewer.getTree().getItems()).noneMatch(
+          item -> item.getData() instanceof ILifecycleMappingLabelProvider itemProvider && item.getData() != prov
+              && proposal.equals(mappingConfiguration.getSelectedProposal(itemProvider.getKey())));
     }
     return true;
   }

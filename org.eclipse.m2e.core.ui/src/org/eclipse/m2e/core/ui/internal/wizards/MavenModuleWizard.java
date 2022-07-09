@@ -215,7 +215,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         }
       }
 
-      final String[] folders = artifactPage.getFolders();
+      final List<String> folders = artifactPage.getFolders();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName)) {
         @Override

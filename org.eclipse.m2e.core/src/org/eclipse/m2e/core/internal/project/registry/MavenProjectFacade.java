@@ -88,13 +88,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final String packaging;
 
-  private final IPath[] resourceLocations;
+  private final List<IPath> resourceLocations;
 
-  private final IPath[] testResourceLocations;
+  private final List<IPath> testResourceLocations;
 
-  private final IPath[] compileSourceLocations;
+  private final List<IPath> compileSourceLocations;
 
-  private final IPath[] testCompileSourceLocations;
+  private final List<IPath> testCompileSourceLocations;
 
   private final IPath outputLocation;
 
@@ -180,10 +180,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.packaging = other.packaging;
     this.modules = new ArrayList<>(other.modules);
 
-    this.resourceLocations = arrayCopy(other.resourceLocations);
-    this.testResourceLocations = arrayCopy(other.testResourceLocations);
-    this.compileSourceLocations = arrayCopy(other.compileSourceLocations);
-    this.testCompileSourceLocations = arrayCopy(other.testCompileSourceLocations);
+    this.resourceLocations = List.copyOf(other.resourceLocations);
+    this.testResourceLocations = List.copyOf(other.testResourceLocations);
+    this.compileSourceLocations = List.copyOf(other.compileSourceLocations);
+    this.testCompileSourceLocations = List.copyOf(other.testCompileSourceLocations);
 
     this.outputLocation = other.outputLocation;
     this.testOutputLocation = other.testOutputLocation;
@@ -196,15 +196,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
   }
 
-  private static <T> T[] arrayCopy(T[] a) {
-    return Arrays.copyOf(a, a.length);
-  }
-
   /**
    * Returns project relative paths of resource directories
    */
   @Override
-  public IPath[] getResourceLocations() {
+  public List<IPath> getResourceLocations() {
     return resourceLocations;
   }
 
@@ -212,17 +208,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * Returns project relative paths of test resource directories
    */
   @Override
-  public IPath[] getTestResourceLocations() {
+  public List<IPath> getTestResourceLocations() {
     return testResourceLocations;
   }
 
   @Override
-  public IPath[] getCompileSourceLocations() {
+  public List<IPath> getCompileSourceLocations() {
     return compileSourceLocations;
   }
 
   @Override
-  public IPath[] getTestCompileSourceLocations() {
+  public List<IPath> getTestCompileSourceLocations() {
     return testCompileSourceLocations;
   }
 

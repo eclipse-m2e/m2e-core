@@ -13,37 +13,15 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
-import java.util.Objects;
-
 /**
  * Represents project packaging type and corresponding lifecycle mapping metadata.
  */
-public class PackagingTypeMappingConfiguration implements ILifecycleMappingElement {
+public class PackagingTypeMappingConfiguration {
+  private PackagingTypeMappingConfiguration() {
+  } // static use only
 
-  public static class PackagingTypeMappingRequirement implements ILifecycleMappingRequirement {
-    private final String packaging;
+  public static record PackagingTypeMappingRequirement(String packaging) implements ILifecycleMappingRequirement {
 
-    public PackagingTypeMappingRequirement(String packaging) {
-      this.packaging = packaging;
-    }
-
-    @Override
-    public int hashCode() {
-      return packaging.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if(this == obj) {
-        return true;
-      }
-
-      return obj instanceof PackagingTypeMappingRequirement other && packaging.equals(other.packaging);
-    }
-
-    public String getPackaging() {
-      return packaging;
-    }
   }
 
   public static class LifecycleStrategyMappingRequirement implements ILifecycleMappingRequirement {
@@ -79,52 +57,4 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
       return packaging;
     }
   }
-
-  private final String packaging;
-
-  private final String lifecycleMappingId;
-
-  private final ILifecycleMappingRequirement requirement;
-
-  public PackagingTypeMappingConfiguration(String packaging, String lifecycleMappingId) {
-    this.packaging = packaging;
-    this.lifecycleMappingId = lifecycleMappingId;
-
-    if(lifecycleMappingId == null) {
-      requirement = new PackagingTypeMappingRequirement(packaging);
-    } else {
-      requirement = new LifecycleStrategyMappingRequirement(packaging, lifecycleMappingId);
-    }
-  }
-
-  public String getPackaging() {
-    return packaging;
-  }
-
-  public String getLifecycleMappingId() {
-    return lifecycleMappingId;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = packaging.hashCode();
-    hash = 17 * hash + (lifecycleMappingId != null ? lifecycleMappingId.hashCode() : 0);
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-
-    return obj instanceof PackagingTypeMappingConfiguration other && //
-        packaging.equals(other.packaging) && Objects.equals(lifecycleMappingId, other.lifecycleMappingId);
-  }
-
-  @Override
-  public ILifecycleMappingRequirement getLifecycleMappingRequirement() {
-    return requirement;
-  }
-
 }

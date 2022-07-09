@@ -7,8 +7,6 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-data @noDefault
-      </programArgs>
       <vmArgs>--add-modules=ALL-SYSTEM
 --illegal-access=permit 
 --add-opens java.base/java.lang=ALL-UNNAMED
@@ -45,6 +43,7 @@
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <property name="osgi.instance.area" value="@noDefault" />
    </configurations>
 
 </product>

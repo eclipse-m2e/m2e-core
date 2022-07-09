@@ -165,8 +165,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                     CumulativeMappingDiscoveryJob.getInstance().addProjects(toProcessNow);
                     ProjectConfigurationManager configurationManager = (ProjectConfigurationManager) MavenPlugin
                             .getProjectConfigurationManager();
-                    MavenUpdateRequest request = new MavenUpdateRequest(
-                            toProcessNow.toArray(new IProject[toProcessNow.size()]), false, false);
+                    MavenUpdateRequest request = new MavenUpdateRequest(toProcessNow, false, false);
                     configurationManager.updateProjectConfiguration(request, true,
                             false, false, monitor);
                 }

@@ -13,7 +13,7 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.osgi.framework.Bundle;
@@ -36,17 +36,12 @@ import org.eclipse.m2e.core.internal.markers.SourceLocation;
  */
 public class DuplicateMappingSourceProblem extends MavenProblemInfo {
 
-  private LifecycleMappingMetadataSource[] conflictingSources;
+  private final List<LifecycleMappingMetadataSource> conflictingSources;
 
-  private String type;
+  private final String type;
 
-  private String value;
+  private final String value;
 
-  /**
-   * @param location
-   * @param message
-   * @param error
-   */
   public DuplicateMappingSourceProblem(SourceLocation location, String message, String type, String value,
       DuplicateMappingException error) {
     super(location, message, error);
@@ -55,16 +50,13 @@ public class DuplicateMappingSourceProblem extends MavenProblemInfo {
     this.conflictingSources = error.getConflictingSources();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.markers.MavenProblemInfo#processMarker(org.eclipse.core.resources.IMarker)
-   */
   @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
     marker.setAttribute(IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE, type);
     marker.setAttribute(IMavenConstants.MARKER_DUPLICATEMAPPING_VALUE, value);
 
-    Bundle[] bundles = Arrays.stream(conflictingSources).map(LifecycleMappingMetadataSource::getSource)
+    Bundle[] bundles = conflictingSources.stream().map(LifecycleMappingMetadataSource::getSource)
         .filter(Bundle.class::isInstance).map(Bundle.class::cast).toArray(Bundle[]::new);
     marker.setAttribute(IMavenConstants.MARKER_DUPLICATEMAPPING_SOURCES, bundles.length);
     for(int i = 0; i < bundles.length; i++ ) {

@@ -14,7 +14,7 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -31,16 +31,16 @@ public abstract class DuplicateMappingException extends RuntimeException {
 
   private static final long serialVersionUID = -7303637464019592307L;
 
-  private final LifecycleMappingMetadataSource[] sources;
+  private final List<LifecycleMappingMetadataSource> sources;
 
-  protected DuplicateMappingException(LifecycleMappingMetadataSource... sources) {
+  protected DuplicateMappingException(List<LifecycleMappingMetadataSource> sources) {
     this.sources = sources;
   }
 
   @Override
   public String getMessage() {
     // sources might be either bundle, artifact or "default", "workspace" or MavenProject (all should provide proper toString() implementations)
-    return "Mapping defined in " + Arrays.stream(sources).map(LifecycleMappingMetadataSource::getSource)
+    return "Mapping defined in " + sources.stream().map(LifecycleMappingMetadataSource::getSource)
         .map(s -> s == null ? DESCRIPTION_UNKNOWN_SOURCE : s.toString())
         .collect(Collectors.joining("' and '", "'", "'"));
   }
@@ -48,7 +48,7 @@ public abstract class DuplicateMappingException extends RuntimeException {
   /**
    * @return Returns the sources.
    */
-  public LifecycleMappingMetadataSource[] getConflictingSources() {
+  public List<LifecycleMappingMetadataSource> getConflictingSources() {
     return this.sources;
   }
 

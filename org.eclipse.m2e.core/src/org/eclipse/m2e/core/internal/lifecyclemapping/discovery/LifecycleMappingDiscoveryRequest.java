@@ -21,8 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -57,9 +57,6 @@ public class LifecycleMappingDiscoveryRequest {
 
   private final Map<IMavenProjectFacade, Throwable> errors = new LinkedHashMap<>();
 
-  public LifecycleMappingDiscoveryRequest() {
-  }
-
   public void setProposals(Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals) {
     this.allproposals = proposals;
   }
@@ -71,11 +68,7 @@ public class LifecycleMappingDiscoveryRequest {
     if(allproposals == null || requirement == null) {
       return Collections.emptyList();
     }
-    List<IMavenDiscoveryProposal> result = allproposals.get(requirement);
-    if(result == null) {
-      return Collections.emptyList();
-    }
-    return result;
+    return allproposals.getOrDefault(requirement, Collections.emptyList());
   }
 
   public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> getAllProposals() {
@@ -101,30 +94,15 @@ public class LifecycleMappingDiscoveryRequest {
     if(allproposals == null || allproposals.isEmpty()) {
       return false;
     }
-
-    List<IMavenDiscoveryProposal> proposals = allproposals.get(requirement);
-    if(proposals != null) {
-      for(IMavenDiscoveryProposal proposal : proposals) {
-        if(selectedProposals.contains(proposal)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    List<IMavenDiscoveryProposal> proposals = allproposals.getOrDefault(requirement, Collections.emptyList());
+    return proposals.stream().anyMatch(selectedProposals::contains);
   }
 
   /**
    * Returns true if mapping configuration is complete after applying selected proposals.
    */
   public boolean isMappingComplete() {
-    for(ILifecycleMappingRequirement packagingRequirement : getRequirements()) {
-      if(!isRequirementSatisfied(packagingRequirement)) {
-        return false;
-      }
-    }
-
-    return true;
+    return getRequirements().stream().noneMatch(r -> !isRequirementSatisfied(r));
   }
 
   /**
@@ -132,10 +110,7 @@ public class LifecycleMappingDiscoveryRequest {
    */
 
   public void autoCompleteMapping() {
-
-    for(Entry<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> entry : getAllProposals().entrySet()) {
-
-      List<IMavenDiscoveryProposal> proposals = entry.getValue();
+    for(List<IMavenDiscoveryProposal> proposals : getAllProposals().values()) {
       if(proposals != null && proposals.size() == 1) {
         addSelectedProposal(proposals.get(0));
       }
@@ -168,12 +143,8 @@ public class LifecycleMappingDiscoveryRequest {
 
   public void addProject(IMavenProjectFacade facade, ILifecycleMappingRequirement requirement) {
     if(facade != null && requirement != null) {
-      List<ILifecycleMappingRequirement> requirements = allProjects.get(facade);
-      if(requirements == null) {
-        requirements = new ArrayList<>();
-      }
+      List<ILifecycleMappingRequirement> requirements = allProjects.computeIfAbsent(facade, f -> new ArrayList<>());
       requirements.add(requirement);
-      allProjects.put(facade, requirements);
     }
   }
 
@@ -186,14 +157,10 @@ public class LifecycleMappingDiscoveryRequest {
   }
 
   public Collection<ILifecycleMappingRequirement> getRequirements() {
-    if(allProjects == null || allProjects.isEmpty()) {
+    if(allProjects.isEmpty()) {
       return Collections.emptyList();
     }
-    Set<ILifecycleMappingRequirement> requirements = new LinkedHashSet<>();
-    for(Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : allProjects.entrySet()) {
-      requirements.addAll(entry.getValue());
-    }
-    return requirements;
+    return allProjects.values().stream().flatMap(List::stream).collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
 }

@@ -114,7 +114,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     /*
      * This method is called while holding workspace lock. Avoid long-running operations if possible.
      */

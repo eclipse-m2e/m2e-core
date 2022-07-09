@@ -33,16 +33,6 @@
 		</markerResolutionGenerator>
 	</extension>
  <extension
-       point="org.eclipse.core.runtime.adapters">
-    <factory
-          adaptableType="org.eclipse.m2e.internal.discovery.InstallCatalogItemMavenDiscoveryProposal"
-          class="org.eclipse.m2e.internal.discovery.InstallCatalogItemMappingLabelProvider">
-       <adapter
-             type="org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider">
-       </adapter>
-    </factory>
- </extension>
- <extension
        point="org.eclipse.m2e.core.ui.discoveryLaunch">
     <launcher
           class="org.eclipse.m2e.internal.discovery.MavenDiscoveryLauncher">

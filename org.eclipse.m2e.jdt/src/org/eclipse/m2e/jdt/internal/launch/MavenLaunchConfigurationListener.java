@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.jdt.internal.launch;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +124,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
         switch(event.getKind()) {

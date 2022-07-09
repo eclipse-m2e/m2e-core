@@ -218,7 +218,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     final AbstractCreateMavenProjectJob job;
 
     if(simpleProject.getSelection()) {
-      final String[] folders = artifactPage.getFolders();
+      final List<String> folders = artifactPage.getFolders();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName)) {
         @Override

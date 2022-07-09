@@ -73,7 +73,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
     @Override
     public void fix(IMarker[] markers, IDocument doc, IProgressMonitor monitor) {
       final Set<IProject> projects = getProjects(Stream.of(markers));
-      new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
+      new UpdateMavenProjectJob(projects).schedule();
     }
 
     @Override

@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -63,6 +62,6 @@ public abstract class AbstractMavenDependencyResolver {
   }
 
   protected List<MavenProjectFacade> getProjects() {
-    return Arrays.asList(contextRegistry.getProjects());
+    return contextRegistry.getProjects();
   }
 }

@@ -43,13 +43,13 @@ public interface IProjectConfigurationManager {
       ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
           throws CoreException;
 
-  void createSimpleProject(IProject project, IPath location, Model model, String[] folders,
+  void createSimpleProject(IProject project, IPath location, Model model, List<String> folders,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.8
    */
-  void createSimpleProject(IProject project, IPath location, Model model, String[] folders,
+  void createSimpleProject(IProject project, IPath location, Model model, List<String> folders,
       ProjectImportConfiguration configuration, IProjectCreationListener importListener, IProgressMonitor monitor)
           throws CoreException;
 

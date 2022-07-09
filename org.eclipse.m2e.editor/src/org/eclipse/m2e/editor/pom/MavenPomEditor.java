@@ -1055,7 +1055,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    */
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     IEditorInput input = getEditorInput();
     if(input instanceof IFileEditorInput fileinput) {
       for(MavenProjectChangedEvent event : events) {

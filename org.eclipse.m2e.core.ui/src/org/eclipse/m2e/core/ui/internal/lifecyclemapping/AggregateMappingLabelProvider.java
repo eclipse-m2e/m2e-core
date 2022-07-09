@@ -57,9 +57,9 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
       return NLS.bind("{0}:{1}:{2}",
           new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
     } else if(element instanceof PackagingTypeMappingRequirement req) {
-      return NLS.bind("Packaging {0}", req.getPackaging());
+      return NLS.bind("Packaging {0}", req.packaging());
     } else if(element instanceof ProjectConfiguratorMappingRequirement req) {
-      MojoExecutionKey exec = req.getExecution();
+      MojoExecutionKey exec = req.execution();
       return NLS.bind("{0}:{1}:{2}",
           new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
     }

@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -32,7 +33,7 @@ public interface IProjectRegistry {
 
   MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version);
 
-  MavenProjectFacade[] getProjects();
+  List<MavenProjectFacade> getProjects();
 
   Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId);
 

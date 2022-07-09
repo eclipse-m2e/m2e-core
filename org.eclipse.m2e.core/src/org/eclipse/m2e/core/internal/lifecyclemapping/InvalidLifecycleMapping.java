@@ -54,7 +54,8 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
   }
 
   @Override
-  public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project, IProgressMonitor monitor) {
+  public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project,
+      IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
