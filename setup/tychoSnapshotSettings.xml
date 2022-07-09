@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0	https://maven.apache.org/xsd/settings-1.0.0.xsd">
 	<!-- This Maven-settings file allows to test Tycho snapshots without the need to install them into the local Maven repository 
 		and thus makes it possible to test snapshots of Tycho's extension in the CI.
-		To use it, add the following arguments to the Maven command: -s setup/tychoSnapshotSettings.xml -U -->
+		To use it, add the following line of arguments to the '.mvn/maven.config' file: -s setup/tychoSnapshotSettings.xml -U -->
 	<profiles>
 		<profile>
 			<id>tycho-snapshots</id>
