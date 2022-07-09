@@ -87,7 +87,7 @@ In order to build m2e on the command line, run the following commands subsequent
 2. `mvn clean verify`
 
 Within the Eclipse-IDE both builds can be run using the Maven Launch-Configurations *m2e-maven-runtime--generate-OSGi-metadata* respectively *m2e-core--build*. The Launch-Configuration *m2e-core--build-all* runs both builds subsequently.
-The (long-running) integration tests are skipped by default, add `-Pits,uts` to your command in order to run them; adding `-DskipTests` will skip all tests, within Eclipse one can run *m2e-core--build-with-integration-tests*.
+The (long-running) integration tests are skipped by default, add `-Pits` to your command in order to run them; adding `-DskipTests` will skip all tests, within Eclipse one can run *m2e-core--build-with-integration-tests*.
 
 If you have unresolved errors or are going to modify the Maven runtime components in _m2e-maven-runtime_ folder (typically to change version of Maven runtime, indexer, archetypes... that are shipped by default with m2e), you may want to launch the `m2e-maven-runtime--generate-OSGi-metadata` Run-configuration or trigger the Oomph-setup manually. See `m2e-maven-runtime/README.md` for details.
 

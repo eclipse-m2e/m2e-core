@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>multi-parent</artifactId>
+		<groupId>org.eclipse.m2e.tests</groupId>
+		<version>1.0.0</version>
+		<relativePath>../parent</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.eclipse.m2e.tests</groupId>
+  <artifactId>multi-child</artifactId>
+  <version>1.0.0</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>test</groupId>
+      <artifactId>to-move</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>test2</groupId>
+    	<artifactId>to-move</artifactId>
+    	<version>0.242</version>
+    </dependency>
+    <dependency>
+    	<groupId>test</groupId>
+    	<artifactId>dont-move</artifactId>
+    	<version>1.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>test</groupId>
+    	<artifactId>move-but-exists</artifactId>
+    	<version>0.9</version>
+    </dependency>
+  </dependencies>
+
+</project>
