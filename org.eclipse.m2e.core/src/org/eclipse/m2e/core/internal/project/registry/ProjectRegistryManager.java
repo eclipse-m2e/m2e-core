@@ -1128,7 +1128,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Map<MavenProjectFacade, MavenProject> createProjectCache() {
-    int maxCacheSize = 5;
+    int maxCacheSize = Integer.getInteger("m2e.project.cache.size", 20);
     return Collections.synchronizedMap(new LinkedHashMap<>(maxCacheSize * 4 / 3 + 1, 0.75f, true) {
       private static final long serialVersionUID = 8022606648487974598L;
 
