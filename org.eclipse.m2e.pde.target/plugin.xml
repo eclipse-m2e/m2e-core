@@ -9,4 +9,11 @@
              type="Maven">
        </targetLocation>
     </extension>
+    <extension
+          point="org.eclipse.pde.core.dynamicSource">
+       <locator
+             class="org.eclipse.m2e.pde.target.MavenPluginSourcePathLocator"
+             complexity="high">
+       </locator>
+    </extension>
 </plugin>

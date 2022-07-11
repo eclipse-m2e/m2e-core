@@ -153,7 +153,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	@Override
 	protected TargetBundle[] resolveBundles(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
-		return resolveArtifacts(definition, monitor).stream().flatMap(tb -> tb.bundles.entrySet().stream())
+		return resolveArtifacts(definition, monitor).stream().flatMap(tb -> tb.bundles())
 				.filter(e -> !isExcluded(e.getKey())).map(Entry::getValue).toArray(TargetBundle[]::new);
 	}
 
@@ -213,7 +213,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		} else {
 			bundleFilter = Predicate.not(bundleFilter);
 		}
-		Iterator<TargetBundle> featurePlugins = bundles.bundles.entrySet().stream() //
+		Iterator<TargetBundle> featurePlugins = bundles.bundles() //
 				.filter(e -> !isExcluded(e.getKey()) && !isIgnored(e.getKey()))//
 				.map(Entry::getValue)//
 				.filter(bundleFilter)//
@@ -367,7 +367,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		MavenTargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
-			targetBundles.bundles.put(artifact, bundle);
+			targetBundles.addBundle(artifact, bundle);
 			if (includeSource) {
 				try {
 					List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
@@ -376,8 +376,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 							repositories, new NullProgressMonitor()));
 					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve,
 							cacheManager);
-					targetBundles.bundles.put(resolve, sourceBundle);
-					targetBundles.sourceBundles.put(artifact, sourceBundle);
+					targetBundles.addBundle(resolve, sourceBundle);
+					targetBundles.addSourceBundle(artifact, sourceBundle);
 				} catch (Exception e) {
 					// Source not available / usable
 				}
@@ -387,7 +387,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		} else {
 			failedArtifacts.add(artifact);
 			// failed ones must be added to the target as well to fail resolution of the TP
-			targetBundles.bundles.put(artifact, bundle);
+			targetBundles.addBundle(artifact, bundle);
 		}
 	}
 
@@ -473,13 +473,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 		key += ":" + artifact.getBaseVersion();
 		return key;
-	}
-
-	public int getDependencyCount() {
-		if (targetBundles == null) {
-			return -1;
-		}
-		return targetBundles.bundles.size() - 1;
 	}
 
 	List<DependencyNode> getDependencyNodes(MavenTargetDependency dependency) {
@@ -676,6 +669,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return null;
 	}
 
+	public Artifact lookupArtifact(File file) {
+		TargetBundles bundles = targetBundles;
+		if (bundles != null) {
+			return bundles.getArtifact(file).orElse(null);
+		}
+		return null;
+	}
 	public Collection<String> getExcludes() {
 		return Collections.unmodifiableCollection(excludedArtifacts);
 	}
@@ -696,5 +696,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				metadataMode, dependencyDepth, dependencyScopes, includeSource, instructionsMap.values(),
 				excludedArtifacts, featureTemplate);
 	}
+
 
 }

@@ -12,13 +12,16 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.target;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -32,11 +35,12 @@ import aQute.bnd.version.Version;
  * represents a resolved set of {@link Artifact} -> {@link TargetBundle}
  */
 class TargetBundles {
-	final Map<Artifact, TargetBundle> bundles = new HashMap<>();
+	private final Map<Artifact, TargetBundle> bundles = new HashMap<>();
+	private final Map<File, Artifact> artifacts = new HashMap<>();
+	private final Map<Artifact, MavenSourceBundle> sourceBundles = new HashMap<>();
 	final Set<Artifact> ignoredArtifacts = new HashSet<>();
 	final List<TargetFeature> features = new ArrayList<>();
 	final Map<MavenTargetDependency, List<DependencyNode>> dependencyNodes = new HashMap<>();
-	final Map<Artifact, MavenSourceBundle> sourceBundles = new HashMap<>();
 
 	Optional<DependencyNode> getDependencyNode(Artifact artifact) {
 		return dependencyNodes.values().stream().flatMap(l -> l.stream())
@@ -91,5 +95,26 @@ class TargetBundles {
 		} catch (IllegalArgumentException e) {
 			return new Version(0, 0, 1, version);
 		}
+	}
+
+
+	public void addBundle(Artifact artifact, TargetBundle bundle) {
+		bundles.put(artifact, bundle);
+		File file = artifact.getFile();
+		if (file != null) {
+			artifacts.put(file, artifact);
+		}
+	}
+
+	public void addSourceBundle(Artifact artifact, MavenSourceBundle sourceBundle) {
+		sourceBundles.put(artifact, sourceBundle);
+	}
+
+	public Stream<Entry<Artifact, TargetBundle>> bundles() {
+		return bundles.entrySet().stream();
+	}
+
+	public Optional<Artifact> getArtifact(File file) {
+		return Optional.ofNullable(artifacts.get(file));
 	}
 }
