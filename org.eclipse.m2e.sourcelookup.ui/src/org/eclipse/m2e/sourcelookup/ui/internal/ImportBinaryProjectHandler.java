@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.binaryproject.internal.AbstractBinaryProjectsImportJob;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
+import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ImportBinaryProjectHandler extends AbstractHandler {

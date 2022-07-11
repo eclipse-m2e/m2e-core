@@ -31,6 +31,13 @@ public record ArtifactKey(String groupId, String artifactId, String version, Str
     this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), null);
   }
 
+  /**
+   * @param lookupArtifact
+   */
+  public ArtifactKey(org.eclipse.aether.artifact.Artifact a) {
+    this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier());
+  }
+
   @Override
   public String toString() {
     return groupId + ':' + artifactId + ':' + version + toString(classifier);

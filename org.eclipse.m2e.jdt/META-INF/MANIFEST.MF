@@ -6,8 +6,7 @@ Bundle-Version: 2.0.5.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.m2e.jdt,
  org.eclipse.m2e.jdt.internal;x-friends:="org.eclipse.m2e.jdt.ui",
- org.eclipse.m2e.jdt.internal.launch;x-friends:="org.eclipse.m2e.jdt.ui",
- org.eclipse.m2e.sourcelookup.internal;x-friends:="org.eclipse.m2e.sourcelookup,org.eclipse.m2e.sourcelookup.ui"
+ org.eclipse.m2e.jdt.internal.launch;x-friends:="org.eclipse.m2e.jdt.ui"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.jdt.core;bundle-version="3.18.0",

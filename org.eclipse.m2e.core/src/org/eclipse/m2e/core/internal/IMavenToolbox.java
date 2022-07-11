@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +88,14 @@ public interface IMavenToolbox {
       ProjectBuildingResult projectBuildingResult = componentLookup.lookup(ProjectBuilder.class).build(pomFile,
           configuration);
       MavenProject project = projectBuildingResult.getProject();
-      clearProjectBuildingRequest(project, new HashSet<>());
+      clearProjectBuildingRequest(project);
       result.setProject(project);
       result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
     } catch(ProjectBuildingException ex) {
       if(ex.getResults() != null && ex.getResults().size() == 1) {
         ProjectBuildingResult projectBuildingResult = ex.getResults().get(0);
         MavenProject project = projectBuildingResult.getProject();
-        clearProjectBuildingRequest(project, new HashSet<>());
+        clearProjectBuildingRequest(project);
         result.setProject(project);
         result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
       }
@@ -123,7 +123,7 @@ public interface IMavenToolbox {
     for(ProjectBuildingResult projectBuildingResult : projectBuildingResults) {
       MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
       MavenProject project = projectBuildingResult.getProject();
-      clearProjectBuildingRequest(project, new HashSet<>());
+      clearProjectBuildingRequest(project);
       mavenExecutionResult.setProject(project);
       mavenExecutionResult.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
       if(!projectBuildingResult.getProblems().isEmpty()) {
@@ -140,6 +140,10 @@ public interface IMavenToolbox {
    * 
    * @param project
    */
+  private static void clearProjectBuildingRequest(MavenProject project) {
+    clearProjectBuildingRequest(project, Collections.newSetFromMap(new IdentityHashMap<>()));
+  }
+
   private static void clearProjectBuildingRequest(MavenProject project, Set<MavenProject> seen) {
     if(project != null && seen.add(project)) {
       project.setProjectBuildingRequest(null);

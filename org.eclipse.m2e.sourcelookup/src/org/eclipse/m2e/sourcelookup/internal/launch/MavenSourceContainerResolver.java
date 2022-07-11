@@ -26,9 +26,9 @@ import org.eclipse.jdt.launching.sourcelookup.advanced.ISourceContainerResolver;
 import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
 
 
 public class MavenSourceContainerResolver implements ISourceContainerResolver {

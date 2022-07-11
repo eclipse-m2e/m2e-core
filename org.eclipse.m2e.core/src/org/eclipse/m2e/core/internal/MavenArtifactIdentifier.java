@@ -12,7 +12,7 @@
  *      Hannes Wellmann - Generalize and improve artifact identification and source locating
  *******************************************************************************/
 
-package org.eclipse.m2e.sourcelookup.internal;
+package org.eclipse.m2e.core.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,13 +26,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -61,41 +57,17 @@ public class MavenArtifactIdentifier {
 
   private static final ILog LOG = Platform.getLog(MavenArtifactIdentifier.class);
 
-  // reads META-INF/maven/**/pom.properties
-  private static final MetaInfMavenScanner<ArtifactKey> SCANNER = new MetaInfMavenScanner<>() {
-    @Override
-    protected ArtifactKey visitFile(Path file) throws IOException {
-      try (InputStream is = Files.newInputStream(file)) {
-        return loadPomProperties(is, file);
-      }
-    }
-
-    @Override
-    protected ArtifactKey visitJarEntry(JarFile jar, JarEntry entry) throws IOException {
-      try (InputStream is = jar.getInputStream(entry)) {
-        return loadPomProperties(is, Path.of(entry.getName()));
-      }
-    }
-
-    private ArtifactKey loadPomProperties(InputStream is, Path path) throws IOException {
-      Properties properties = new Properties();
-      properties.load(is);
-      ArtifactKey key = readArtifactKey(properties);
-      // validate properties and path match
-      if(key != null && path.endsWith(Path.of(key.groupId(), key.artifactId(), "pom.properties"))) {
-        return key;
-      }
-      return null;
-    }
-  };
-
   public static Collection<ArtifactKey> identify(File classesLocation) {
     // GAV extracted from pom.properties
-    // checksum-based lookup in central
     Path location = classesLocation.toPath();
-    Set<ArtifactKey> classesArtifacts = scanPomProperties(location);
+    Set<ArtifactKey> classesArtifacts = MetaInfMavenScanner.scanForPomProperties(location);
     if(classesArtifacts.isEmpty()) {
-      classesArtifacts = identifyCentralSearch(location);
+      // GAV extracted from pom.xml
+      classesArtifacts = MetaInfMavenScanner.scanForPomXml(location);
+      if(classesArtifacts.isEmpty()) {
+        // checksum-based lookup in central
+        classesArtifacts = identifyCentralSearch(location);
+      }
     }
     return classesArtifacts;
   }
@@ -129,21 +101,10 @@ public class MavenArtifactIdentifier {
     }
   }
 
-  private static Set<ArtifactKey> scanPomProperties(Path classesLocation) {
-    return new HashSet<>(SCANNER.scan(classesLocation, "pom.properties"));
-  }
-
-  private static ArtifactKey readArtifactKey(Properties pomProperties) {
-    String groupId = pomProperties.getProperty("groupId");
-    String artifactId = pomProperties.getProperty("artifactId");
-    String version = pomProperties.getProperty("version");
-    if(groupId != null && artifactId != null && version != null) {
-      return new ArtifactKey(groupId, artifactId, version, /* classifier= */null);
-    }
-    return null;
-  }
-
   public static Path resolveSourceLocation(ArtifactKey artifact, IProgressMonitor monitor) {
+    if(artifact == null) {
+      return null;
+    }
     String groupId = artifact.groupId();
     String artifactId = artifact.artifactId();
     String version = artifact.version();
