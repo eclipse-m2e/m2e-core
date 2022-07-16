@@ -1,3 +1,0 @@
-requires.1.namespace = osgi.bundle
-requires.1.name = ch.qos.logback.slf4j
-requires.1.range = 0.9.24
