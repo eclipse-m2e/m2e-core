@@ -5,7 +5,7 @@ Bundle-Version: 2.1.0.qualifier
 Bundle-Name: M2E Logback Appender
 Bundle-Vendor: Eclipse.org - m2e
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Fragment-Host: ch.qos.logback.classic
+Fragment-Host: ch.qos.logback.classic;bundle-version="1.2.0"
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.console,

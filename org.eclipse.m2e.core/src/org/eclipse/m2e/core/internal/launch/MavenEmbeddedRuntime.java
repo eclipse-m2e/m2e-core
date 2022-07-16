@@ -120,7 +120,9 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
       allEntries.add(getEmbeddedSLF4JBinding(mavenRuntimeBundle));
 
-      Set<Bundle> bundles = getRequiredBundles(mavenRuntimeBundle);
+      Set<String> noDependencyBundles = Set.of("org.slf4j.api", "slf4j.api");
+      // Don't include dependencies of slf4j bundle to ensure no other than the slf4j-binding embedded into m2e.maven.runtime is available.
+      Set<Bundle> bundles = getRequiredBundles(mavenRuntimeBundle, noDependencyBundles);
 
       for(Bundle bundle : bundles) {
         addBundleClasspathEntries(allEntries, bundle, false);
@@ -159,13 +161,16 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   private static final List<String> CLASSPATH_CONSIDERED_REQUIREMENT_NAMESPACES = List
       .of(BundleNamespace.BUNDLE_NAMESPACE, PackageNamespace.PACKAGE_NAMESPACE);
 
-  private Set<Bundle> getRequiredBundles(Bundle root) {
+  private Set<Bundle> getRequiredBundles(Bundle root, Set<String> noDependencyBundles) {
     // find and add required bundles and bundles providing imported packages
     Set<Bundle> bundles = new LinkedHashSet<>();
     Queue<Bundle> pending = new ArrayDeque<>();
     pending.add(root);
     while(!pending.isEmpty()) { // breath-first search to collect all (transitively) required bundles
       Bundle bundle = pending.remove();
+      if(noDependencyBundles.contains(bundle.getSymbolicName())) {
+        continue;
+      }
       BundleWiring wiring = bundle.adapt(BundleWiring.class);
       for(String namespace : CLASSPATH_CONSIDERED_REQUIREMENT_NAMESPACES) {
         for(BundleWire wire : wiring.getRequiredWires(namespace)) {

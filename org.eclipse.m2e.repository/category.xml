@@ -18,6 +18,12 @@
    <feature id="org.eclipse.m2e.sdk.feature">
       <category name="m2e"/>
    </feature>
+   <bundle id="slf4j.api"/>
+   <bundle id="slf4j.api.source"/>
+   <bundle id="ch.qos.logback.core"/>
+   <bundle id="ch.qos.logback.core.source"/>
+   <bundle id="ch.qos.logback.classic"/>
+   <bundle id="ch.qos.logback.classic.source"/>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
    <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/0.15.0/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.20.7/" enabled="true" />

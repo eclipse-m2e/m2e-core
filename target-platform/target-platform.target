@@ -5,6 +5,7 @@
 	<locations>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/eclipse/updates/4.25/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
+			<repository location="https://download.eclipse.org/tools/orbit/downloads/2022-09/"/>
 			<unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
@@ -27,13 +28,6 @@
 			<unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/tools/orbit/downloads/2022-09/"/>
-			<unit id="com.google.gson" version="0.0.0"/>
-			<unit id="ch.qos.logback.core" version="0.0.0"/>
-			<unit id="ch.qos.logback.classic" version="0.0.0"/>
-			<unit id="ch.qos.logback.slf4j" version="0.0.0"/>
-		</location>
-		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/0.15.0/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
 			<unit id="org.eclipse.wildwebdeveloper.xml.feature.feature.group" version="0.0.0"/>
 		</location>
@@ -45,7 +39,7 @@
 			<repository location="https://download.eclipse.org/cbi/updates/license/"/>
 			<unit id="org.eclipse.license.feature.group" version="0.0.0"/>
 		</location>
-		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" missingManifest="error" type="Maven">
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="OSGi" missingManifest="error" type="Maven">
 			<dependencies>
 				<dependency>
 					<groupId>biz.aQute.bnd</groupId>
@@ -57,6 +51,38 @@
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>biz.aQute.bndlib</artifactId>
 					<version>6.3.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.osgi</groupId>
+					<artifactId>org.osgi.service.repository</artifactId>
+					<version>1.1.0</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
+		<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="true" label="Logging" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+					<version>1.2.11</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+					<version>1.7.36</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Misc" missingManifest="error" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>com.google.code.gson</groupId>
+					<artifactId>gson</artifactId>
+					<version>2.9.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -75,12 +101,6 @@
 					<groupId>io.takari.m2e.workspace</groupId>
 					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
 					<version>0.3.1</version>
-					<type>jar</type>
-				</dependency>
-				<dependency>
-					<groupId>org.osgi</groupId>
-					<artifactId>org.osgi.service.repository</artifactId>
-					<version>1.1.0</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
