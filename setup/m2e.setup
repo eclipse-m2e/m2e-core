@@ -45,8 +45,8 @@
   </setupTask>
   <setupTask
       xsi:type="jdt:JRETask"
-      version="JavaSE-11"
-      location="${jre.location-11}"
+      version="JavaSE-17"
+      location="${jre.location-17}"
       name="JRE for JavaSE-11">
     <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
   </setupTask>
@@ -96,15 +96,12 @@
   </setupTask>
   <setupTask
       xsi:type="setup.p2:P2Task"
+      disabled="true"
       label="m2e - connectors">
-    <requirement
-        name="org.sonatype.tycho.m2e.feature.feature.group"/>
     <requirement
         name="org.sonatype.m2e.modello.feature.feature.group"/>
     <requirement
         name="com.ianbrandt.tools.m2e.mdp.feature.feature.group"/>
-    <repository
-        url="https://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-tycho/0.9.0/N/LATEST/"/>
     <repository
         url="https://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-modello/0.16.0/N/LATEST/"/>
     <repository

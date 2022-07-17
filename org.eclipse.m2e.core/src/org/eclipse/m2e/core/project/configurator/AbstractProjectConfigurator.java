@@ -128,7 +128,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   // IMavenProjectChangedListener
 
   @Override
-  public final void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public final void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
         mavenProjectChanged(event, monitor);
@@ -241,7 +241,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   protected List<MojoExecution> getMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+    IMavenProjectFacade projectFacade = request.mavenProjectFacade();
 
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = getConfiguratorExecutions(projectFacade);
 

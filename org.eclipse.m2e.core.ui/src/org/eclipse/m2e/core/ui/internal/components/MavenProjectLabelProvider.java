@@ -37,7 +37,7 @@ public class MavenProjectLabelProvider extends LabelProvider {
       return null;
     }
     ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
-    if(element instanceof IProject && !((IProject) element).isAccessible()) {
+    if(element instanceof IProject project && !project.isAccessible()) {
       return sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
     }
 
@@ -49,7 +49,7 @@ public class MavenProjectLabelProvider extends LabelProvider {
 
   @Override
   public String getText(Object element) {
-    return element instanceof IProject ? ((IProject) element).getName() : ""; //$NON-NLS-1$
+    return element instanceof IProject project ? project.getName() : ""; //$NON-NLS-1$
   }
 
 }

@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.core.internal;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,12 +28,6 @@ import org.osgi.framework.Version;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.ILoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.runtime.CoreException;
@@ -42,23 +35,14 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.util.FileUtils;
 
-import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.project.DefaultProjectBuilder;
 
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -73,9 +57,6 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 
 public class MavenPluginActivator extends Plugin {
-  private final Logger log = LoggerFactory.getLogger(MavenPluginActivator.class);
-
-  public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
   // The shared instance
   private static MavenPluginActivator plugin;
@@ -84,24 +65,13 @@ public class MavenPluginActivator extends Plugin {
 
   private BundleContext bundleContext;
 
-  private ArchetypeManager archetypeManager;
-
-  private String version = "0.0.0"; //$NON-NLS-1$
+  private static String version = "0.0.0"; //$NON-NLS-1$
 
   private final BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
 
   private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
 
   private Map<Class<?>, ServiceTracker<?, ?>> trackers = new ConcurrentHashMap<>();
-
-  public MavenPluginActivator() {
-    plugin = this;
-
-    if(Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing constructor " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
-      new Throwable().printStackTrace();
-    }
-  }
 
   public IMaven getMaven() {
     return getService(IMaven.class);
@@ -129,13 +99,11 @@ public class MavenPluginActivator extends Plugin {
   @Override
   public void start(final BundleContext context) throws Exception {
     super.start(context);
-    if(Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
-      System.err.println("### executing start() " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
-      Thread.dumpStack();
-    }
+    plugin = this;
+
     try {
       Version bundleVersion = getBundle().getVersion();
-      this.version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
+      version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
     } catch(IllegalArgumentException e) {
       // ignored
     }
@@ -153,31 +121,6 @@ public class MavenPluginActivator extends Plugin {
     // Automatically delete now obsolete nexus cache (can be removed again if some time has passed and it is unlikely an old workspace that need to be cleaned up is used).
     IPath nexusCache = Platform.getStateLocation(context.getBundle()).append("nexus");
     FileUtils.deleteDirectory(nexusCache.toFile());
-  }
-
-  private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
-    final Module logginModule = new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
-      }
-    };
-    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setName("plexus"); //$NON-NLS-1$
-    return new DefaultPlexusContainer(cc, logginModule);
-  }
-
-  private static ArchetypeManager newArchetypeManager(PlexusContainer container, File stateLocationDir) {
-    ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES));
-    archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.InternalCatalogFactory());
-    archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory());
-    for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions()) {
-      archetypeManager.addArchetypeCatalogFactory(archetypeCatalogFactory);
-    }
-    return archetypeManager;
   }
 
   /**
@@ -221,27 +164,6 @@ public class MavenPluginActivator extends Plugin {
     return getService(MavenRuntimeManagerImpl.class);
   }
 
-  public ArchetypeManager getArchetypeManager() {
-    synchronized(this) {
-      if(this.archetypeManager == null) {
-        try {
-          PlexusContainer archetyperContainer = newPlexusContainer(ArchetypeGenerationRequest.class.getClassLoader());
-          // TODO this is broken, need to make it lazy, otherwise we'll deadlock or timeout... or both
-          this.archetypeManager = newArchetypeManager(archetyperContainer, getStateLocation().toFile());
-          try {
-            this.archetypeManager.readCatalogs();
-          } catch(Exception ex) {
-            String msg = "Can't read archetype catalog configuration";
-            log.error(msg, ex);
-          }
-        } catch(PlexusContainerException ex1) {
-          log.error("Failed to initialize the ArchetypeManager", ex1);
-        }
-      }
-    }
-    return this.archetypeManager;
-  }
-
   public IMavenMarkerManager getMavenMarkerManager() {
     return getService(IMavenMarkerManager.class);
   }
@@ -264,7 +186,7 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public static String getVersion() {
-    return plugin.version;
+    return version;
   }
 
   public static String getUserAgent() {

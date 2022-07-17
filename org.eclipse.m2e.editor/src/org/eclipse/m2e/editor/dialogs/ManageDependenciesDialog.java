@@ -443,10 +443,10 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     @Override
     public String getText(Object element) {
       MavenProject project = null;
-      if(element instanceof MavenProject) {
-        project = (MavenProject) element;
-      } else if(element instanceof Object[]) {
-        project = (MavenProject) ((Object[]) element)[0];
+      if(element instanceof MavenProject mavenProject) {
+        project = mavenProject;
+      } else if(element instanceof Object[] array) {
+        project = (MavenProject) array[0];
       } else {
         return ""; //$NON-NLS-1$
       }
@@ -459,8 +459,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof MavenProject) {
-        MavenProject project = (MavenProject) element;
+      if(element instanceof MavenProject project) {
         IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
             project.getArtifactId(), project.getVersion());
         if(search == null) {
@@ -495,8 +494,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     @Override
     public Object getParent(Object element) {
-      if(element instanceof MavenProject) {
-        MavenProject project = (MavenProject) element;
+      if(element instanceof MavenProject project) {
         return project.getParent();
       }
       return null;
@@ -523,19 +521,17 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     @Override
     public Object[] getChildren(Object parentElement) {
-      if(parentElement instanceof MavenProject) {
+      if(parentElement instanceof MavenProject parent) {
         /*
          * Walk the hierarchy list until we find the parentElement and
          * return the previous element, which is the child.
          */
-        MavenProject parent = (MavenProject) parentElement;
-
         if(getProjectHierarchy().size() == 1) {
           //No parent exists, only one element in the tree
           return new Object[0];
         }
 
-        if(getProjectHierarchy().get(0).equals(parent)) {
+        if(getProjectHierarchy().get(0).getProject().equals(parent)) {
           //We are the final child
           return new Object[0];
         }
@@ -543,7 +539,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
         ListIterator<ParentHierarchyEntry> iter = getProjectHierarchy().listIterator();
         while(iter.hasNext()) {
           ParentHierarchyEntry next = iter.next();
-          if(next.equals(parent)) {
+          if(next.getProject().equals(parent)) {
             iter.previous();
             ParentHierarchyEntry previous = iter.previous();
             return new Object[] {previous};

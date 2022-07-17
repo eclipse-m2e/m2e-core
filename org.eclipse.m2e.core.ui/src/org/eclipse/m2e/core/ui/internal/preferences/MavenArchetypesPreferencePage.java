@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -53,14 +53,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
 /**
@@ -71,7 +70,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
-  ArchetypeManager archetypeManager;
+  ArchetypePlugin archetypeManager;
 
   CheckboxTableViewer archetypesViewer;
 
@@ -81,7 +80,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     super(GRID);
     setTitle(Messages.MavenArchetypesPreferencePage_title);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
-    this.archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+    this.archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
   }
 
   @Override
@@ -157,17 +156,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     archetypesViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
 
     archetypesViewer.setLabelProvider(new CatalogsLabelProvider());
-
-    archetypesViewer.setContentProvider(new IStructuredContentProvider() {
-
-      @Override
-      public Object[] getElements(Object input) {
-        if(input instanceof Collection) {
-          return ((Collection<?>) input).toArray();
-        }
-        return new Object[0];
-      }
-    });
+    archetypesViewer.setContentProvider(new ArrayContentProvider());
 
     Table table = archetypesViewer.getTable();
     table.setLinesVisible(false);

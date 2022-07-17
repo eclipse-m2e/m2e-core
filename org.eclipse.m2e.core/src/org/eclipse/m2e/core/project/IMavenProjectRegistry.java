@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -57,7 +58,7 @@ public interface IMavenProjectRegistry {
   /**
    * Returns IMavenProjectFacade for all opened Maven workspace projects.
    */
-  IMavenProjectFacade[] getProjects();
+  List<IMavenProjectFacade> getProjects();
 
   /**
    * You can also use <code>Adapters.adapt(resource, IMavenProjectFacade.class)</code>.

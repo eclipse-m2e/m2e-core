@@ -180,7 +180,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
     for(MavenProjectChangedEvent event : events) {
@@ -260,10 +260,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private IClasspathManagerDelegate getDelegate(IMavenProjectFacade projectFacade, IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(projectFacade);
-    if(lifecycleMapping instanceof IClasspathManagerDelegate) {
-      return (IClasspathManagerDelegate) lifecycleMapping;
-    }
-    return defaultDelegate;
+    return lifecycleMapping instanceof IClasspathManagerDelegate classpathManager ? classpathManager : defaultDelegate;
   }
 
   private void configureAttachedSourcesAndJavadoc(IMavenProjectFacade facade, Properties sourceAttachment,
@@ -305,7 +302,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
         ArtifactKey aKey = desc.getArtifactKey();
         if(aKey != null) { // maybe we should try to find artifactKey little harder here?
-          boolean isSnapshot = aKey.getVersion().endsWith("-SNAPSHOT");
+          boolean isSnapshot = aKey.version().endsWith("-SNAPSHOT");
           // We should update a sources/javadoc jar for a snapshot in case they're already downloaded.
           File mainFile = desc.getPath() != null ? desc.getPath().toFile() : null;
           File srcFile = srcPath != null ? srcPath.toFile() : null;
@@ -328,8 +325,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   private static final String ARTIFACT_TYPE_JAR = "jar";
 
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(), ARTIFACT_TYPE_JAR /*type*/,
-        a.getClassifier(), repositories);
+    return maven.isUnavailable(a.groupId(), a.artifactId(), a.version(), ARTIFACT_TYPE_JAR /*type*/, a.classifier(),
+        repositories);
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -683,7 +680,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   private IPath getSourcePath(ArtifactKey a) {
-    File file = getAttachedArtifactFile(a, getSourcesClassifier(a.getClassifier()));
+    File file = getAttachedArtifactFile(a, getSourcesClassifier(a.classifier()));
 
     if(file != null) {
       return Path.fromOSString(file.getAbsolutePath());
@@ -699,7 +696,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     // can't use Maven resolve methods since they mark artifacts as not-found even if they could be resolved remotely
     try {
       ArtifactRepository localRepository = maven.getLocalRepository();
-      String relPath = maven.getArtifactPath(localRepository, a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar", //$NON-NLS-1$
+      String relPath = maven.getArtifactPath(localRepository, a.groupId(), a.artifactId(), a.version(), "jar", //$NON-NLS-1$
           classifier);
       File file = new File(localRepository.getBasedir(), relPath).getCanonicalFile();
       if(file.canRead()) {
@@ -849,10 +846,9 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
     ArtifactKey[] result = new ArtifactKey[2];
     if(repositories != null) {
-      ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
-          getSourcesClassifier(a.getClassifier()));
-      ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
-          CLASSIFIER_JAVADOC);
+      ArtifactKey sourcesArtifact = new ArtifactKey(a.groupId(), a.artifactId(), a.version(),
+          getSourcesClassifier(a.classifier()));
+      ArtifactKey javadocArtifact = new ArtifactKey(a.groupId(), a.artifactId(), a.version(), CLASSIFIER_JAVADOC);
       if(downloadSources) {
         if(isUnavailable(sourcesArtifact, repositories)) {
           // 501553: fall back to requesting JavaDoc, if requested sources are missing,
@@ -916,8 +912,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     @Override
     public boolean visit(IResourceDelta delta) {
-      if(delta.getResource() instanceof IFile) {
-        IFile file = (IFile) delta.getResource();
+      if(delta.getResource() instanceof IFile file) {
         if(ModuleSupport.MODULE_INFO_JAVA.equals(file.getName())) {
           affectedProjects.add(file.getProject());
         }

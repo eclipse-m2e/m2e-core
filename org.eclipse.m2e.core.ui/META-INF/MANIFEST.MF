@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.core.ui;singleton:=true
 Bundle-Version: 2.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
@@ -12,6 +12,7 @@ Export-Package: org.eclipse.m2e.core.ui.internal;x-friends:="org.eclipse.m2e.edi
    org.eclipse.m2e.editor.xml,
    org.eclipse.m2e.scm,
    org.eclipse.m2e.jdt.ui",
+ org.eclipse.m2e.core.ui.internal.archetype;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.components;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.core.ui.internal.console;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.dialogs;x-friends:="org.eclipse.m2e.editor",
@@ -27,12 +28,12 @@ Export-Package: org.eclipse.m2e.core.ui.internal;x-friends:="org.eclipse.m2e.edi
  org.eclipse.m2e.core.ui.internal.wizards;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.scm"
 Bundle-Activator: org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.m2e.core;bundle-version="1.16.0",
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.core.resources;bundle-version="3.5.2",
  org.eclipse.core.runtime;bundle-version="3.5.0",
- org.eclipse.m2e.model.edit;bundle-version="1.16.0";visibility:=reexport,
- org.eclipse.m2e.maven.runtime;bundle-version="1.16.0",
- org.eclipse.m2e.archetype.common;bundle-version="1.16.0",
+ org.eclipse.m2e.model.edit;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
+ org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
+ org.eclipse.m2e.archetype.common;bundle-version="[3.2.1,4.0.0)",
  org.eclipse.ui.console;bundle-version="3.4.0",
  org.eclipse.ui.ide;bundle-version="3.18.0",
  org.eclipse.core.filesystem;bundle-version="1.2.1",
@@ -44,5 +45,7 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="1.16.0",
 Import-Package: org.eclipse.compare.rangedifferencer,
  org.eclipse.ltk.core.refactoring,
  org.slf4j;version="[1.6.2,2.0.0)"
-Service-Component: OSGI-INF/component.xml
+Service-Component: OSGI-INF/component.xml,
+ OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
+ OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
 Automatic-Module-Name: org.eclipse.m2e.core.ui

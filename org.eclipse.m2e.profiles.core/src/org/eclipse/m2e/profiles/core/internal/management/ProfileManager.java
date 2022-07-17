@@ -14,7 +14,10 @@
 package org.eclipse.m2e.profiles.core.internal.management;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +33,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -51,6 +54,8 @@ import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -70,7 +75,8 @@ import org.eclipse.m2e.profiles.core.internal.ProfileState;
 @Component(service = IProfileManager.class)
 public class ProfileManager implements IProfileManager {
 
-  private static final ILog log = Platform.getLog(ProfileManager.class);
+  @Reference
+  private ILog log;
 
   @Reference
   IProjectConfigurationManager configurationManager;
@@ -377,8 +383,11 @@ public class ProfileManager implements IProfileManager {
     return readModel(maven, file);
   }
 
-  @SuppressWarnings("restriction")
   private Model readModel(IMaven maven, File file) throws CoreException {
-    return ((org.eclipse.m2e.core.internal.embedder.MavenImpl) maven).readModel(file);
+    try (InputStream is = new FileInputStream(file)) {
+      return IMavenToolbox.of(maven).readModel(new FileInputStream(file));
+    } catch(IOException e) {
+      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
+    }
   }
 }

@@ -87,27 +87,24 @@ public class MavenPropertyTester extends PropertyTester {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade mavenProject = null;
         mavenProject = projectManager.getMavenProject( //
-            key.getGroupId(), key.getArtifactId(), key.getVersion());
+            key.groupId(), key.artifactId(), key.version());
         return mavenProject != null;
       }
     }
 
     if(IS_TRANSITIVE_DEPENDENCY_TREE_NODE.equals(property)) {
-      if(receiver instanceof DependencyNode) {
-        DependencyNode nd = (DependencyNode) receiver;
+      if(receiver instanceof DependencyNode nd) {
         return nd.getData().get("LEVEL") == null;
       }
     }
     if(IS_DIRECT_DEPENDENCY_TREE_NODE.equals(property)) {
-      if(receiver instanceof DependencyNode) {
-        DependencyNode nd = (DependencyNode) receiver;
+      if(receiver instanceof DependencyNode nd) {
         return "DIRECT".equals(nd.getData().get("LEVEL"));
       }
     }
 
     if(IS_BUILD_DIRECTORY.equals(property)) {
-      if(receiver instanceof IFolder) {
-        IFolder folder = (IFolder) receiver;
+      if(receiver instanceof IFolder folder) {
         IProject project = folder.getProject();
         if(project != null) {
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
@@ -130,12 +127,11 @@ public class MavenPropertyTester extends PropertyTester {
     }
 
     if(HAS_MAVEN_NATURE.equals(property)) {
-      if(receiver instanceof IFileEditorInput) {
-        var editor = (IFileEditorInput) receiver;
+      if(receiver instanceof IFileEditorInput editor) {
         return checkProjectNature(editor.getFile().getProject(), expectedValue);
       }
-      if(receiver instanceof IResource) {
-        IProject project = ((IResource) receiver).getProject();
+      if(receiver instanceof IResource resource) {
+        IProject project = resource.getProject();
         return checkProjectNature(project, expectedValue);
       }
     }
@@ -145,7 +141,7 @@ public class MavenPropertyTester extends PropertyTester {
   }
 
   private boolean checkProjectNature(IProject project, Object expectedValue) {
-    boolean expectedBoolean = expectedValue instanceof Boolean ? (Boolean) expectedValue : true;
+    boolean expectedBoolean = expectedValue instanceof Boolean b ? b : true;
     try {
       return project.hasNature(IMavenConstants.NATURE_ID) == expectedBoolean;
     } catch(CoreException ex) {

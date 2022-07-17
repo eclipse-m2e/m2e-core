@@ -139,29 +139,29 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
           List<IProject> changed = new LinkedList<>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignore(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+              ignore(mojo.getExecution(), prov.getProjects());
             }
           }
 
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreParent()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+              ignoreAtDefinition(mojo.getExecution(), prov.getProjects());
             }
           }
 
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreWorkspace()) {
             ILifecycleMappingRequirement req = prov.getKey();
-            if(req instanceof MojoExecutionMappingRequirement) {
+            if(req instanceof MojoExecutionMappingRequirement mojo) {
               changed.addAll(getProject(prov.getProjects()));
-              ignoreWorkspace(((MojoExecutionMappingRequirement) req).getExecution());
+              ignoreWorkspace(mojo.getExecution());
             }
           }
 
-          new UpdateMavenProjectJob(changed.toArray(new IProject[changed.size()])).schedule();
+          new UpdateMavenProjectJob(changed).schedule();
         }
 
         private Collection<IProject> getProject(Collection<MavenProject> projects) {
@@ -177,10 +177,10 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         }
 
         private void ignore(MojoExecutionKey key, Collection<MavenProject> projects) {
-          String pluginGroupId = key.getGroupId();
-          String pluginArtifactId = key.getArtifactId();
-          String pluginVersion = key.getVersion();
-          String[] goals = new String[] {key.getGoal()};
+          String pluginGroupId = key.groupId();
+          String pluginArtifactId = key.artifactId();
+          String pluginVersion = key.version();
+          String[] goals = new String[] {key.goal()};
           for(MavenProject project : projects) {
             IFile pomFile = M2EUtils.getPomFile(project);
             try {
@@ -200,8 +200,8 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
         private void ignoreWorkspace(MojoExecutionKey key) {
           LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
-          LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.getGroupId(), key.getArtifactId(),
-              key.getVersion(), new String[] {key.getGoal()}, PluginExecutionAction.ignore);
+          LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.groupId(), key.artifactId(),
+              key.version(), List.of(key.goal()), PluginExecutionAction.ignore);
           LifecycleMappingFactory.writeWorkspaceMetadata(mapping);
         }
       };

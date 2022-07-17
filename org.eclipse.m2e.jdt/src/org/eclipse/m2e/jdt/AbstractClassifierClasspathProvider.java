@@ -82,8 +82,8 @@ public abstract class AbstractClassifierClasspathProvider
       int classpathProperty) {
     for(IPath folder : folders) {
       IResource member = project.findMember(folder); // only returns existing members
-      if(member instanceof IFolder) { // must exist and be a folder
-        runtimeClasspath.add(ModuleSupport.createRuntimeClasspathEntry((IFolder) member, classpathProperty, project));
+      if(member instanceof IFolder folderMember) { // must exist and be a folder
+        runtimeClasspath.add(ModuleSupport.createRuntimeClasspathEntry(folderMember, classpathProperty, project));
       }
     }
   }

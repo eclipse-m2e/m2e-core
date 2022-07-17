@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.project.conversion;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -27,7 +29,8 @@ import org.eclipse.core.runtime.Status;
 public abstract class AbstractProjectConversionEnabler implements IProjectConversionEnabler {
 
   private static final String JAR = "jar"; //$NON-NLS-1$
-  private static final String[] PACKAGING_OPTIONS = {JAR};
+
+  private static final List<String> PACKAGING_OPTIONS = List.of(JAR);
 
 
   @Override
@@ -41,7 +44,7 @@ public abstract class AbstractProjectConversionEnabler implements IProjectConver
   }
 
   @Override
-  public String[] getPackagingTypes(IProject project) {
+  public List<String> getPackagingTypes(IProject project) {
     return PACKAGING_OPTIONS;
   }
 

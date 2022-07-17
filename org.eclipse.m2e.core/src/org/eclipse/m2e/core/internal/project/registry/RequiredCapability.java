@@ -49,7 +49,4 @@ public abstract class RequiredCapability implements Serializable {
    */
   public abstract boolean isPotentialMatch(Capability capability, boolean versionMatch);
 
-  protected static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
-  }
 }

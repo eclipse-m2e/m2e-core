@@ -7,17 +7,15 @@ Bundle-Activator: org.eclipse.m2e.core.internal.MavenPluginActivator
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.osgi;bundle-version="3.10.0",
- org.eclipse.m2e.maven.runtime;bundle-version="1.16.0",
- org.eclipse.m2e.archetype.common;bundle-version="1.16.0",
+ org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
  org.eclipse.m2e.workspace.cli;bundle-version="0.1.0",
  org.eclipse.core.runtime;bundle-version="3.12.0",
  org.eclipse.core.resources;bundle-version="3.9.0",
  org.eclipse.core.filesystem;bundle-version="1.7.700",
  org.apache.commons.codec;bundle-version="1.14.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Export-Package: org.eclipse.m2e.core,
- org.eclipse.m2e.core.archetype;x-friends:="org.eclipse.m2e.core.ui",
  org.eclipse.m2e.core.embedder,
  org.eclipse.m2e.core.internal;
   x-friends:="org.eclipse.m2e.core.ui,
@@ -26,7 +24,6 @@ Export-Package: org.eclipse.m2e.core,
    org.eclipse.m2e.launching,
    org.eclipse.m2e.scm,
    org.eclipse.m2e.profiles.core",
- org.eclipse.m2e.core.internal.archetype;x-friends:="org.eclipse.m2e.core.ui",
  org.eclipse.m2e.core.internal.builder;x-internal:=true,
  org.eclipse.m2e.core.internal.builder.plexusbuildapi;x-internal:=true,
  org.eclipse.m2e.core.internal.content;x-internal:=true,
@@ -56,11 +53,14 @@ Import-Package: javax.inject;version="1.0.0",
  org.slf4j;version="1.6.2"
 Automatic-Module-Name: org.eclipse.m2e.core
 Service-Component: OSGI-INF/org.eclipse.m2e.core.embedder.MavenModelManager.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.embedder.EclipseLoggerManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.embedder.MavenImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.embedder.PlexusContainerManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.markers.MavenMarkerManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl.xml,
+ OSGI-INF/org.eclipse.m2e.core.internal.project.PomFacadeAdapterFactory.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.project.ProjectConfigurationManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.project.WorkspaceStateWriter.xml,

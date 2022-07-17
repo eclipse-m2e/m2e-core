@@ -108,11 +108,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
-      if(t instanceof CoreException) {
-        throw (CoreException) t;
+      if(t instanceof CoreException coreEx) {
+        throw coreEx;
       }
-      if(t instanceof RuntimeException) {
-        throw (RuntimeException) t;
+      if(t instanceof RuntimeException runtimeEx) {
+        throw runtimeEx;
       }
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
     }
@@ -162,11 +162,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
-      if(t instanceof CoreException) {
-        throw (CoreException) t;
+      if(t instanceof CoreException coreEx) {
+        throw coreEx;
       }
-      if(t instanceof RuntimeException) {
-        throw (RuntimeException) t;
+      if(t instanceof RuntimeException runtimeEx) {
+        throw runtimeEx;
       }
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
     }
@@ -193,7 +193,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
   }
 
   private MojoParameter getPredefined(ArtifactKey pluginKey) {
-    return PREDEF.get(pluginKey.getGroupId() + ":" + pluginKey.getArtifactId() + ":" + pluginKey.getVersion());
+    return PREDEF.get(pluginKey.groupId() + ":" + pluginKey.artifactId() + ":" + pluginKey.version());
   }
 
   <T> T execute(final ArtifactKey pluginKey, final ICallable<T> callable) throws CoreException {
@@ -255,9 +255,9 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     PluginDescriptor desc;
 
     Plugin plugin = new Plugin();
-    plugin.setGroupId(pluginKey.getGroupId());
-    plugin.setArtifactId(pluginKey.getArtifactId());
-    plugin.setVersion(pluginKey.getVersion());
+    plugin.setGroupId(pluginKey.groupId());
+    plugin.setArtifactId(pluginKey.artifactId());
+    plugin.setVersion(pluginKey.version());
 
     List<RemoteRepository> remoteRepos = context.getSession().getCurrentProject().getRemotePluginRepositories();
     try {

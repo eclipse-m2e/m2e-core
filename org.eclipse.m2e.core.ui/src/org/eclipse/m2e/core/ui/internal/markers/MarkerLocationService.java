@@ -110,7 +110,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IFile resource = (IFile) marker.getResource();
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
       if(domModel == null) {
-        throw new IllegalArgumentException("Document is not structured: " + resource);
+        log.debug("Document is not structured: " + resource);
+        return;
       }
       IStructuredDocument document = domModel.getStructuredDocument();
       int charStart = document.getLineOffset(lineNumber - 1) + columnStart - 1;
@@ -228,8 +229,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private void annotateMarker(final IMarker marker, IStructuredDocument structuredDocument,
       Element ourMarkerPlacement) {
-    if(ourMarkerPlacement instanceof IndexedRegion) {
-      IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
+    if(ourMarkerPlacement instanceof IndexedRegion region) {
       try {
         marker.setAttribute(IMarker.CHAR_START, region.getStartOffset());
         //as end, mark just the end of line where the region starts to prevent marking the entire <build> section.
@@ -383,8 +383,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         if(managed.containsKey(id)) {
           Dependency managedDep = managed.get(id);
           String managedVersion = managedDep == null ? null : managedDep.getVersion();
-          if(version instanceof IndexedRegion) {
-            IndexedRegion off = (IndexedRegion) version;
+          if(version instanceof IndexedRegion off) {
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
@@ -521,8 +520,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         if(managed.containsKey(id)) {
           Plugin managedPlugin = managed.get(id);
           String managedVersion = managedPlugin == null ? null : managedPlugin.getVersion();
-          if(version instanceof IndexedRegion) {
-            IndexedRegion off = (IndexedRegion) version;
+          if(version instanceof IndexedRegion off) {
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
@@ -562,8 +560,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       String childString = getTextValue(groupId);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset
-        if(groupId instanceof IndexedRegion) {
-          IndexedRegion off = (IndexedRegion) groupId;
+        if(groupId instanceof IndexedRegion off) {
           IMarker mark = mavenMarkerManager.addMarker(pomFile, type,
               org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_groupid,
               document.getLineOfOffset(off.getStartOffset()) + 1, matchingParentGroupIdSeverity.getSeverity());
@@ -582,8 +579,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       String childString = getTextValue(version);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset
-        if(version instanceof IndexedRegion) {
-          IndexedRegion off = (IndexedRegion) version;
+        if(version instanceof IndexedRegion off) {
           IMarker mark = mavenMarkerManager.addMarker(pomFile, type,
               org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_version,
               document.getLineOfOffset(off.getStartOffset()) + 1, matchingParentVersionSeverity.getSeverity());
@@ -653,8 +649,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       int start = off.getStartOffset();
       while(reg != null && start < lineend) {
         reg = reg.getNextSibling();
-        if(reg instanceof Comment) {
-          Comment comm = (Comment) reg;
+        if(reg instanceof Comment comm) {
           String data = comm.getData();
           if(data != null && data.contains(ignoreString)) {
             return true;

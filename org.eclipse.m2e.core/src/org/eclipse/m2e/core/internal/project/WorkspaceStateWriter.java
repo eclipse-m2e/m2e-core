@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -59,7 +60,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
 
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     try {
       MutableWorkspaceState state = new MutableWorkspaceState();
 
@@ -78,7 +79,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
           if(location != null) {
             File pom = location.toFile();
             if(pom.canRead()) {
-              state.putPom(pom, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+              state.putPom(pom, artifact.groupId(), artifact.artifactId(), artifact.version());
             }
           }
           IResource outputLocation = root.findMember(projectFacade.getOutputLocation());
@@ -99,12 +100,12 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
               extension = getAndPersistArtifactExtension(project, projectFacade.getMavenProject(monitor));
             }
             if(extension != null) {
-              String classifier = artifact.getClassifier();
+              String classifier = artifact.classifier();
               if(classifier == null) {
                 classifier = "";
               }
-              state.putArtifact(outputLocation.getLocation().toFile(), artifact.getGroupId(), artifact.getArtifactId(),
-                  extension, classifier, artifact.getVersion());
+              state.putArtifact(outputLocation.getLocation().toFile(), artifact.groupId(), artifact.artifactId(),
+                  extension, classifier, artifact.version());
             } else {
               log.warn("Could not determine project {} main artifact extension.", project);
             }
@@ -112,8 +113,8 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
           // assume test output location gets attached as classified=tests
           IResource testOutputLocation = root.findMember(projectFacade.getTestOutputLocation());
           if(!"pom".equals(projectFacade.getPackaging()) && testOutputLocation != null && testOutputLocation.exists()) {
-            state.putArtifact(testOutputLocation.getLocation().toFile(), artifact.getGroupId(),
-                artifact.getArtifactId(), "jar", "tests", artifact.getVersion());
+            state.putArtifact(testOutputLocation.getLocation().toFile(), artifact.groupId(),
+                artifact.artifactId(), "jar", "tests", artifact.version());
           }
         } catch(CoreException ex) {
           log.error("Error writing workspace state file", ex);

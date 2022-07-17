@@ -83,11 +83,11 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     Map<String, String> attributes = new LinkedHashMap<>(this.attributes);
 
     if(artifactKey != null) {
-      attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.getGroupId());
-      attributes.put(IClasspathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.getArtifactId());
-      attributes.put(IClasspathManager.VERSION_ATTRIBUTE, artifactKey.getVersion());
-      if(artifactKey.getClassifier() != null) {
-        attributes.put(IClasspathManager.CLASSIFIER_ATTRIBUTE, artifactKey.getClassifier());
+      attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.groupId());
+      attributes.put(IClasspathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.artifactId());
+      attributes.put(IClasspathManager.VERSION_ATTRIBUTE, artifactKey.version());
+      if(artifactKey.classifier() != null) {
+        attributes.put(IClasspathManager.CLASSIFIER_ATTRIBUTE, artifactKey.classifier());
       }
     }
     if(scope != null) {
@@ -104,48 +104,35 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
 
     IAccessRule[] accessRulesArray = accessRules.toArray(new IAccessRule[accessRules.size()]);
-    IClasspathEntry entry;
-    switch(entryKind) {
-      case IClasspathEntry.CPE_CONTAINER:
-        entry = JavaCore.newContainerEntry(path, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_LIBRARY:
-        entry = JavaCore.newLibraryEntry(path, //
-            sourceAttachmentPath, //
-            sourceAttachmentRootPath, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_SOURCE:
-        entry = JavaCore.newSourceEntry(path, //
-            getInclusionPatterns(), //
-            getExclusionPatterns(), //
-            outputLocation, //
-            attributesArray);
-        break;
-      case IClasspathEntry.CPE_PROJECT:
-        entry = JavaCore.newProjectEntry(path, //
-            accessRulesArray, //
-            combineAccessRules, //
-            attributesArray, //
-            exported);
-        break;
-      case IClasspathEntry.CPE_VARIABLE:
-        entry = JavaCore.newVariableEntry(path, //
-            sourceAttachmentPath, //
-            sourceAttachmentRootPath, //
-            accessRulesArray, //
-            attributesArray, //
-            exported);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported IClasspathEntry kind=" + entryKind); //$NON-NLS-1$
-    }
-    return entry;
+    return switch(entryKind) {
+      case IClasspathEntry.CPE_CONTAINER -> JavaCore.newContainerEntry(path, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_LIBRARY -> JavaCore.newLibraryEntry(path, //
+          sourceAttachmentPath, //
+          sourceAttachmentRootPath, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_SOURCE -> JavaCore.newSourceEntry(path, //
+          getInclusionPatterns(), //
+          getExclusionPatterns(), //
+          outputLocation, //
+          attributesArray);
+      case IClasspathEntry.CPE_PROJECT -> JavaCore.newProjectEntry(path, //
+          accessRulesArray, //
+          combineAccessRules, //
+          attributesArray, //
+          exported);
+      case IClasspathEntry.CPE_VARIABLE -> JavaCore.newVariableEntry(path, //
+          sourceAttachmentPath, //
+          sourceAttachmentRootPath, //
+          accessRulesArray, //
+          attributesArray, //
+          exported);
+      default -> throw new IllegalArgumentException("Unsupported IClasspathEntry kind=" + entryKind); //$NON-NLS-1$
+    };
   }
 
   @Override
@@ -180,7 +167,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   @Override
   public String getGroupId() {
-    return artifactKey != null ? artifactKey.getGroupId() : null;
+    return artifactKey != null ? artifactKey.groupId() : null;
   }
 
   private void setClasspathEntry(IClasspathEntry entry) {
@@ -214,7 +201,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   @Override
   public String getArtifactId() {
-    return artifactKey != null ? artifactKey.getArtifactId() : null;
+    return artifactKey != null ? artifactKey.artifactId() : null;
   }
 
   @Override

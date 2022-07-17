@@ -114,8 +114,8 @@ public class M2EUtils {
     }
     while(path.segmentCount() > 1) {
       IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-      if(ires instanceof IFile) {
-        stack.push((IFile) ires);
+      if(ires instanceof IFile f) {
+        stack.push(f);
       }
       path = path.removeFirstSegments(1);
     }
@@ -145,7 +145,7 @@ public class M2EUtils {
       return false;
     }
     for(Plugin p : project.getOriginalModel().getBuild().getPlugins()) {
-      if(p.getGroupId().equals(key.getGroupId()) && p.getArtifactId().equals(key.getArtifactId())) {
+      if(p.getGroupId().equals(key.groupId()) && p.getArtifactId().equals(key.artifactId())) {
         return true;
       }
     }

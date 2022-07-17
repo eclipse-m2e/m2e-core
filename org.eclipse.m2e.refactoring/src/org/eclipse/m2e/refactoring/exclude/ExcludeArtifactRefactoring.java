@@ -239,7 +239,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private static boolean matches(Dependency d, ArtifactKey a) {
-    return d.getArtifactId().equals(a.getArtifactId()) && d.getGroupId().equals(a.getGroupId());
+    return d.getArtifactId().equals(a.artifactId()) && d.getGroupId().equals(a.groupId());
   }
 
   private static boolean contains(Set<ArtifactKey> keys, Dependency d) {
@@ -319,7 +319,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       return false;
     }
     for(Exclusion ex : dependency.getExclusions()) {
-      if(ex.getArtifactId().equals(exclusion.getArtifactId()) && ex.getGroupId().equals(exclusion.getGroupId())) {
+      if(ex.getArtifactId().equals(exclusion.artifactId()) && ex.getGroupId().equals(exclusion.groupId())) {
         return true;
       }
     }
@@ -363,7 +363,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       if(node.getDependency() != null) {
         Artifact a = node.getDependency().getArtifact();
         for(ArtifactKey exclude : excludes) {
-          if(a.getGroupId().equals(exclude.getGroupId()) && a.getArtifactId().equals(exclude.getArtifactId())) {
+          if(a.getGroupId().equals(exclude.groupId()) && a.getArtifactId().equals(exclude.artifactId())) {
             if(topLevel != null) {
               // need to add exclusion to top-level dependency
               Dependency dependency = findDependency(topLevel);

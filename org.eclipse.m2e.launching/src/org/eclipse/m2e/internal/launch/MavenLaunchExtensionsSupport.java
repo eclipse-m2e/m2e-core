@@ -47,8 +47,7 @@ public class MavenLaunchExtensionsSupport {
   }
 
   public void configureSourceLookup(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor) {
-    if(launch.getSourceLocator() instanceof MavenSourceLocator) {
-      final MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
+    if(launch.getSourceLocator() instanceof MavenSourceLocator sourceLocator) {
       for(IMavenLaunchParticipant participant : participants) {
         List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(configuration,
             launch, monitor);

@@ -228,14 +228,14 @@ public class MavenPomSelectionComponent extends Composite {
 
     if(artifacts != null) {
       for(ArtifactKey a : artifacts) {
-        artifactKeys.add(a.getGroupId() + ":" + a.getArtifactId()); //$NON-NLS-1$
-        artifactKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+        artifactKeys.add(a.groupId() + ":" + a.artifactId()); //$NON-NLS-1$
+        artifactKeys.add(a.groupId() + ":" + a.artifactId() + ":" + a.version()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
     if(managed != null) {
       for(ArtifactKey a : managed) {
-        managedKeys.add(a.getGroupId() + ":" + a.getArtifactId()); //$NON-NLS-1$
-        managedKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
+        managedKeys.add(a.groupId() + ":" + a.artifactId()); //$NON-NLS-1$
+        managedKeys.add(a.groupId() + ":" + a.artifactId() + ":" + a.version()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
 
@@ -312,8 +312,8 @@ public class MavenPomSelectionComponent extends Composite {
   public IndexedArtifact getIndexedArtifact() {
     IStructuredSelection selection = (IStructuredSelection) searchResultViewer.getSelection();
     Object element = selection.getFirstElement();
-    if(element instanceof IndexedArtifact) {
-      return (IndexedArtifact) element;
+    if(element instanceof IndexedArtifact indexedArtifact) {
+      return indexedArtifact;
     }
     TreeItem[] treeItems = searchResultViewer.getTree().getSelection();
     if(treeItems.length == 0) {
@@ -331,10 +331,9 @@ public class MavenPomSelectionComponent extends Composite {
   List<IndexedArtifactFile> getSelectedIndexedArtifactFiles(IStructuredSelection selection) {
     ArrayList<IndexedArtifactFile> result = new ArrayList<>();
     for(Object element : selection.toList()) {
-      if(element instanceof IndexedArtifact) {
+      if(element instanceof IndexedArtifact ia) {
         //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
         //represent that value..
-        IndexedArtifact ia = (IndexedArtifact) element;
         if(managedKeys.contains(getKey(ia))) {
           for(IndexedArtifactFile file : ia.getFiles()) {
             if(managedKeys.contains(getKey(file))) {
@@ -356,8 +355,8 @@ public class MavenPomSelectionComponent extends Composite {
             result.add(ia.getFiles().iterator().next());
           }
         }
-      } else if(element instanceof IndexedArtifactFile) {
-        result.add((IndexedArtifactFile) element);
+      } else if(element instanceof IndexedArtifactFile indexedArtifactFile) {
+        result.add(indexedArtifactFile);
       }
     }
 
@@ -481,13 +480,11 @@ public class MavenPomSelectionComponent extends Composite {
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+      if(element instanceof IndexedArtifactFile f) {
         if(artifactKeys.contains(getKey(f))) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
-      } else if(element instanceof IndexedArtifact) {
-        IndexedArtifact i = (IndexedArtifact) element;
+      } else if(element instanceof IndexedArtifact i) {
         if(artifactKeys.contains(getKey(i))) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
@@ -513,8 +510,7 @@ public class MavenPomSelectionComponent extends Composite {
 //          return MavenImages.IMG_VERSION_SRC;
 //        }
         return MavenImages.IMG_VERSION;
-      } else if(element instanceof IndexedArtifact) {
-        IndexedArtifact i = (IndexedArtifact) element;
+      } else if(element instanceof IndexedArtifact i) {
         if(managedKeys.contains(getKey(i))) {
           return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
         }
@@ -528,8 +524,7 @@ public class MavenPomSelectionComponent extends Composite {
      */
     @Override
     public StyledString getStyledText(Object element) {
-      if(element instanceof IndexedArtifact) {
-        IndexedArtifact a = (IndexedArtifact) element;
+      if(element instanceof IndexedArtifact a) {
         String name = (a.getClassname() == null ? "" : a.getClassname() + "   " + a.getPackageName() + "   ") + a.getGroupId() + "   " + a.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         StyledString ss = new StyledString();
         ss.append(name);
@@ -537,8 +532,7 @@ public class MavenPomSelectionComponent extends Composite {
           ss.append(Messages.MavenPomSelectionComponent_managed_decoration, StyledString.DECORATIONS_STYLER);
         }
         return ss;
-      } else if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+      } else if(element instanceof IndexedArtifactFile f) {
         StyledString ss = new StyledString();
         String name = f.version
             + " [" + (f.type == null ? "jar" : f.type) + (f.classifier != null ? ", " + f.classifier : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -562,16 +556,15 @@ public class MavenPomSelectionComponent extends Composite {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      if(inputElement instanceof Map) {
-        return ((Map<?, ?>) inputElement).values().toArray();
+      if(inputElement instanceof Map<?, ?> map) {
+        return map.values().toArray();
       }
       return EMPTY;
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-      if(parentElement instanceof IndexedArtifact) {
-        IndexedArtifact a = (IndexedArtifact) parentElement;
+      if(parentElement instanceof IndexedArtifact a) {
         return a.getFiles().toArray();
       }
       return EMPTY;

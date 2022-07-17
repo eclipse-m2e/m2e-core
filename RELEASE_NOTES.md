@@ -5,6 +5,10 @@
 * 📅 Release Date: ? 2022
 * All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.0...2.0.0
 
+### Require Java 17 or above
+
+Running m2e now requires a Java-17 (or higher) compliant JRE.
+
 #### Removed legacy WTP-SSE based editor
 
 The legacy textual editor is removed as it doesn't receive enough update/maintenance. The editor based on Generic Editor and LemMinX-Maven is now the only one distributed by m2e.
@@ -12,6 +16,11 @@ The legacy textual editor is removed as it doesn't receive enough update/mainten
 #### Inclusion of m2e-apt plugins for annotation processors
 
 m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e and are shipped by default with m2e installations. So annotation processing should be better supported out of the box.
+
+### Stop caching of Maven-projects for legacy clients
+
+For for clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is not longer cached any more.
+In general MojoExecutions should be set up within the scope of `MavenExecutionContext`.
 
 ## 1.20.1
 

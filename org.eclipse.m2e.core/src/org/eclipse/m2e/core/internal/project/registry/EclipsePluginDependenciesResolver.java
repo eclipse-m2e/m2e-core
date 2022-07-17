@@ -43,24 +43,16 @@ public class EclipsePluginDependenciesResolver extends DefaultPluginDependencies
   @Override
   public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
       throws PluginResolutionException {
-    boolean disabled = EclipseWorkspaceArtifactRepository.isDisabled();
-    EclipseWorkspaceArtifactRepository.setDisabled(true);
-    try {
+    try (var d = EclipseWorkspaceArtifactRepository.setDisabled()) {
       return super.resolve(plugin, repositories, session);
-    } finally {
-      EclipseWorkspaceArtifactRepository.setDisabled(disabled);
     }
   }
 
   @Override
   public DependencyNode resolve(Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
       List<RemoteRepository> repositories, RepositorySystemSession session) throws PluginResolutionException {
-    boolean disabled = EclipseWorkspaceArtifactRepository.isDisabled();
-    EclipseWorkspaceArtifactRepository.setDisabled(true);
-    try {
+    try (var d = EclipseWorkspaceArtifactRepository.setDisabled()) {
       return super.resolve(plugin, pluginArtifact, dependencyFilter, repositories, session);
-    } finally {
-      EclipseWorkspaceArtifactRepository.setDisabled(disabled);
     }
   }
 

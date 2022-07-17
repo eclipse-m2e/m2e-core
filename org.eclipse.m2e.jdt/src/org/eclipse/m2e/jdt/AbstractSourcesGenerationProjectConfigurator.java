@@ -57,9 +57,9 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
   @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
-    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IMavenProjectFacade facade = request.mavenProjectFacade();
 
-    assertHasNature(request.getProject(), JavaCore.NATURE_ID);
+    assertHasNature(request.mavenProjectFacade().getProject(), JavaCore.NATURE_ID);
 
     for(MojoExecution mojoExecution : getMojoExecutions(request, monitor)) {
       File[] sources = getSourceFolders(request, mojoExecution, monitor);
@@ -83,8 +83,8 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
 
   protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    return new File[] {getParameterValue(request.getMavenProject(), getOutputFolderParameterName(), File.class,
-        mojoExecution, monitor)};
+    return new File[] {
+        getParameterValue(request.mavenProject(), getOutputFolderParameterName(), File.class, mojoExecution, monitor)};
   }
 
   protected String getOutputFolderParameterName() {

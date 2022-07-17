@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,12 +96,12 @@ abstract class BasicProjectRegistry implements Serializable {
   private static void copy(Map from, Map to) {
     for(Map.Entry entry : (Set<Map.Entry>) from.entrySet()) {
       Object value = entry.getValue();
-      if(value instanceof Map) {
+      if(value instanceof Map mapValue) {
         Map map = new LinkedHashMap();
-        copy((Map) value, map);
+        copy(mapValue, map);
         value = map;
-      } else if(value instanceof Set) {
-        Set set = new LinkedHashSet((Set) value);
+      } else if(value instanceof Set setValue) {
+        Set set = new LinkedHashSet(setValue);
         value = set;
       }
       to.put(entry.getKey(), value);
@@ -123,17 +124,14 @@ abstract class BasicProjectRegistry implements Serializable {
     return workspacePoms.get(paths.iterator().next());
   }
 
-  /**
-   * @TODO return a List
-   */
-  public MavenProjectFacade[] getProjects() {
-    return workspacePoms.values().toArray(new MavenProjectFacade[workspacePoms.size()]);
+  public List<MavenProjectFacade> getProjects() {
+    return List.copyOf(workspacePoms.values());
   }
 
   public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
     Map<ArtifactKey, Collection<IFile>> artifacts = new HashMap<>();
     workspaceArtifacts.forEach((wsKey, files) -> {
-      if(!files.isEmpty() && groupId.equals(wsKey.getGroupId()) && artifactId.equals(wsKey.getArtifactId())) {
+      if(!files.isEmpty() && groupId.equals(wsKey.groupId()) && artifactId.equals(wsKey.artifactId())) {
         artifacts.computeIfAbsent(wsKey, k -> new HashSet<>()).addAll(files);
       }
     });

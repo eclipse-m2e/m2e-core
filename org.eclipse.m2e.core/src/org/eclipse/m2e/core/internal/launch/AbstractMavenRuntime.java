@@ -91,8 +91,8 @@ public abstract class AbstractMavenRuntime {
     if(extensions != null) {
       IMavenProjectRegistry registry = MavenPlugin.getMavenProjectRegistry();
       for(ClasspathEntry entry : extensions) {
-        if(entry instanceof ProjectClasspathEntry) {
-          collectProject(collector, (ProjectClasspathEntry) entry, registry, monitor);
+        if(entry instanceof ProjectClasspathEntry projectClasspathEntry) {
+          collectProject(collector, projectClasspathEntry, registry, monitor);
         }
       }
     }

@@ -49,7 +49,7 @@ public class ProjectRegistry extends BasicProjectRegistry implements IProjectReg
   }
 
   @Override
-  public synchronized MavenProjectFacade[] getProjects() {
+  public synchronized List<MavenProjectFacade> getProjects() {
     return super.getProjects();
   }
 

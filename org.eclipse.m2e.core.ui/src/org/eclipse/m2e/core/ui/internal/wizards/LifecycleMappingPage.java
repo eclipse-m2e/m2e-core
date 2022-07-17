@@ -17,13 +17,14 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -76,7 +77,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -175,8 +175,7 @@ public class LifecycleMappingPage extends WizardPage {
       @SuppressWarnings("synthetic-access")
       @Override
       protected void setValue(Object element, Object value) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           int intVal = ((Integer) value).intValue();
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
 
@@ -217,8 +216,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected Object getValue(Object element) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           if(ignore.contains(element)) {
@@ -237,8 +235,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected CellEditor getCellEditor(Object element) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           List<String> values = new ArrayList<>();
           for(IMavenDiscoveryProposal prop : all) {
@@ -254,8 +251,7 @@ public class LifecycleMappingPage extends WizardPage {
 
           Control cont = edit.getControl();
           //this attempts to disable text edits in the combo..
-          if(cont instanceof CCombo) {
-            CCombo combo = (CCombo) cont;
+          if(cont instanceof CCombo combo) {
             combo.setEditable(false);
           }
           return edit;
@@ -265,8 +261,7 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       protected boolean canEdit(Object element) {
-        if(element instanceof AggregateMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof AggregateMappingLabelProvider prov) {
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           return all != null && !all.isEmpty() || prov.getKey() instanceof MojoExecutionMappingRequirement;
         }
@@ -286,32 +281,26 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public Object[] getElements(Object inputElement) {
-        if(inputElement instanceof LifecycleMappingDiscoveryRequest) {
+        if(inputElement instanceof LifecycleMappingDiscoveryRequest request) {
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<>();
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<>();
-          Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> projects = ((LifecycleMappingDiscoveryRequest) inputElement)
-              .getProjects();
-          for(final Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : projects.entrySet()) {
-            final String relPath = entry.getKey().getProject().getFile(IMavenConstants.POM_FILE_NAME).getFullPath()
+
+          request.getProjects().forEach((facade, requirements) -> {
+            String relPath = facade.getProject().getFile(IMavenConstants.POM_FILE_NAME).getFullPath()
                 .toPortableString();
-            for(final ILifecycleMappingRequirement requirement : entry.getValue()) {
+            for(ILifecycleMappingRequirement requirement : requirements) {
               // include mojo execution if it has available proposals or interesting phase not mapped locally
               if(requirement != null) {
-                List<ILifecycleMappingLabelProvider> val = mojos.get(requirement);
-                if(val == null) {
-                  val = new ArrayList<>();
-                  mojos.put(requirement, val);
-                }
+                List<ILifecycleMappingLabelProvider> val = mojos.computeIfAbsent(requirement, r -> new ArrayList<>());
                 val.add(new ILifecycleMappingLabelProvider() {
 
                   @Override
                   public String getMavenText() {
                     String executionId = null;
-                    if(requirement instanceof MojoExecutionMappingRequirement) {
-                      executionId = ((MojoExecutionMappingRequirement) requirement).getExecutionId();
-                    } else if(requirement instanceof ProjectConfiguratorMappingRequirement) {
-                      executionId = ((ProjectConfiguratorMappingRequirement) requirement).getExecution()
-                          .getExecutionId();
+                    if(requirement instanceof MojoExecutionMappingRequirement mojo) {
+                      executionId = mojo.getExecutionId();
+                    } else if(requirement instanceof ProjectConfiguratorMappingRequirement conf) {
+                      executionId = conf.execution().executionId();
                     }
 
                     if(executionId != null) {
@@ -338,7 +327,7 @@ public class LifecycleMappingPage extends WizardPage {
                   public Collection<MavenProject> getProjects() {
                     MavenProject mavenProject;
                     try {
-                      mavenProject = entry.getKey().getMavenProject(new NullProgressMonitor());
+                      mavenProject = facade.getMavenProject(new NullProgressMonitor());
                       return Collections.singleton(mavenProject);
                     } catch(CoreException e) {
                       LOG.error(e.getMessage(), e);
@@ -349,15 +338,10 @@ public class LifecycleMappingPage extends WizardPage {
                 });
               }
             }
-          }
+          });
           List<ILifecycleMappingLabelProvider> toRet = new ArrayList<>();
-          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : packagings
-              .entrySet()) {
-            toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
-          }
-          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
-            toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
-          }
+          packagings.forEach((req, providers) -> toRet.add(new AggregateMappingLabelProvider(req, providers)));
+          mojos.forEach((req, providers) -> toRet.add(new AggregateMappingLabelProvider(req, providers)));
           return toRet.toArray();
         }
         return null;
@@ -365,8 +349,8 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public Object[] getChildren(Object parentElement) {
-        if(parentElement instanceof AggregateMappingLabelProvider) {
-          return ((AggregateMappingLabelProvider) parentElement).getChildren();
+        if(parentElement instanceof AggregateMappingLabelProvider prov) {
+          return prov.getChildren();
         }
         return new Object[0];
       }
@@ -404,13 +388,12 @@ public class LifecycleMappingPage extends WizardPage {
 
       @Override
       public String getColumnText(Object element, int columnIndex) {
-        if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+        if(element instanceof ILifecycleMappingLabelProvider prov) {
           if(columnIndex == MAVEN_INFO_IDX) {
             String text = prov.getMavenText();
-            if(prov instanceof AggregateMappingLabelProvider && !isHandled(prov)) {
+            if(prov instanceof AggregateMappingLabelProvider aggProv && !isHandled(prov)) {
               text = NLS.bind(Messages.LifecycleMappingPage_errorMavenBuild,
-                  new String[] {text, String.valueOf(((AggregateMappingLabelProvider) prov).getChildren().length)});
+                  new String[] {text, String.valueOf(aggProv.getChildren().length)});
             }
             return text;
           } else if(columnIndex == ACTION_INFO_IDX && element instanceof AggregateMappingLabelProvider) {
@@ -438,12 +421,9 @@ public class LifecycleMappingPage extends WizardPage {
         if(columnIndex != 0) {
           return null;
         }
-        if(element instanceof AggregateMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
-          if(prov.isError(mappingConfiguration)) {
-            if(!isHandled(prov)) {
-              return MavenImages.IMG_ERROR;
-            }
+        if(element instanceof AggregateMappingLabelProvider prov) {
+          if(prov.isError(mappingConfiguration) && !isHandled(prov)) {
+            return MavenImages.IMG_ERROR;
           }
           return MavenImages.IMG_PASSED;
         }
@@ -452,10 +432,8 @@ public class LifecycleMappingPage extends WizardPage {
     });
 
     treeViewer.addSelectionChangedListener(event -> {
-      if(event.getSelection() instanceof IStructuredSelection
-          && ((IStructuredSelection) event.getSelection()).size() == 1) {
-        ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
-            .getSelection()).getFirstElement();
+      if(event.getSelection() instanceof IStructuredSelection structuredSelection && structuredSelection.size() == 1) {
+        ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) structuredSelection.getFirstElement();
         if(ignore.contains(prov)) {
           details.setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
           license.setText(EMPTY_STRING);
@@ -479,19 +457,14 @@ public class LifecycleMappingPage extends WizardPage {
     });
 
     treeViewer.setComparator(new ViewerComparator() {
+      Comparator<ILifecycleMappingLabelProvider> providerComparator = Comparator
+          .comparing(ILifecycleMappingLabelProvider::getMavenText);
       @Override
       public int compare(Viewer viewer, Object e1, Object e2) {
-        if(!(e1 instanceof ILifecycleMappingLabelProvider && e2 instanceof ILifecycleMappingLabelProvider)) {
-          return super.compare(viewer, e1, e2);
+        if(e1 instanceof ILifecycleMappingLabelProvider p1 && e2 instanceof ILifecycleMappingLabelProvider p2) {
+          return providerComparator.compare(p1, p2);
         }
-        int cat1 = category(e1);
-        int cat2 = category(e2);
-
-        if(cat1 != cat2) {
-          return cat1 - cat2;
-        }
-        return ((ILifecycleMappingLabelProvider) e1).getMavenText()
-            .compareTo(((ILifecycleMappingLabelProvider) e2).getMavenText());
+        return super.compare(viewer, e1, e2);
       }
     });
 
@@ -560,15 +533,9 @@ public class LifecycleMappingPage extends WizardPage {
   protected boolean shouldDeslectProposal(ILifecycleMappingLabelProvider prov) {
     IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
     if(proposal != null) {
-      TreeItem[] items = treeViewer.getTree().getItems();
-      for(TreeItem item : items) {
-        if(item.getData() instanceof ILifecycleMappingLabelProvider && item.getData() != prov) {
-          if(proposal.equals(
-              mappingConfiguration.getSelectedProposal(((ILifecycleMappingLabelProvider) item.getData()).getKey()))) {
-            return false;
-          }
-        }
-      }
+      return Arrays.stream(treeViewer.getTree().getItems()).noneMatch(
+          item -> item.getData() instanceof ILifecycleMappingLabelProvider itemProvider && item.getData() != prov
+              && proposal.equals(mappingConfiguration.getSelectedProposal(itemProvider.getKey())));
     }
     return true;
   }
@@ -677,8 +644,8 @@ public class LifecycleMappingPage extends WizardPage {
     for(TreeItem item : treeViewer.getTree().getItems()) {
       ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) item.getData();
       if(!isHandled(prov)) {
-        if(prov instanceof AggregateMappingLabelProvider) {
-          count += ((AggregateMappingLabelProvider) prov).getChildren().length;
+        if(prov instanceof AggregateMappingLabelProvider aggProv) {
+          count += aggProv.getChildren().length;
         } else {
           ++count;
         }

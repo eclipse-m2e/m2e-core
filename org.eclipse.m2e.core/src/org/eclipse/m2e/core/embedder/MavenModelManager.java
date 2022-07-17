@@ -16,12 +16,15 @@ package org.eclipse.m2e.core.embedder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -69,11 +72,15 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -91,25 +98,47 @@ public class MavenModelManager {
   private IMavenProjectRegistry projectManager;
 
   @Reference
+  private PlexusContainerManager containerManager;
+
+  @Reference
   private IMaven maven;
 
   public org.apache.maven.model.Model readMavenModel(InputStream reader) throws CoreException {
-    return maven.readModel(reader);
+    return IMavenToolbox.of(maven).readModel(reader);
   }
 
+  /**
+   * Read the model from the provided pom file (might not exits) pointer
+   * 
+   * @param pomFile the file pointer
+   * @return a maven model, or <code>null</code> if the pointer do not point to any valid maven directory
+   * @throws CoreException if the file points to a valid maven directory but the pom could not be read
+   */
   public org.apache.maven.model.Model readMavenModel(File pomFile) throws CoreException {
-    try (FileInputStream stream = new FileInputStream(pomFile)) {
-      Model model = readMavenModel(stream);
-      model.setPomFile(pomFile);
-      return model;
-    } catch(IOException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, ex.getMessage(), ex));
+    File baseDir = pomFile.isDirectory() ? pomFile : pomFile.getParentFile();
+    Objects.requireNonNull(baseDir, "not a directory and not a parent, invalid file?");
+    IComponentLookup lookup = containerManager.getComponentLookup(baseDir);
+    IMavenToolbox toolbox = IMavenToolbox.of(lookup);
+    Optional<File> locatePom = toolbox.locatePom(baseDir);
+    if(locatePom.isEmpty()) {
+      return null;
     }
+    ModelProcessor modelProcessor = lookup.lookup(ModelProcessor.class);
+
+    File pom = locatePom.get();
+    Model model;
+    try {
+      model = modelProcessor.read(pom, new HashMap<>(Map.of(ModelProcessor.SOURCE, new FileModelSource(pom))));
+    } catch(IOException ex) {
+      throw new CoreException(Status.error(ex.getMessage(), ex));
+    }
+    model.setPomFile(pom);
+    return model;
   }
 
   public org.apache.maven.model.Model readMavenModel(IFile pomFile) throws CoreException {
     try (InputStream is = pomFile.getContents()) {
-      Model model = maven.readModel(is);
+      Model model = IMavenToolbox.of(maven).readModel(is);
       IPath location = pomFile.getLocation();
       if(location != null) {
         model.setPomFile(location.toFile());
@@ -130,7 +159,7 @@ public class MavenModelManager {
     try {
       ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
-      maven.writeModel(model, buf);
+      IMavenToolbox.of(maven).writeModel(model, buf);
 
       // XXX MNGECLIPSE-495
       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

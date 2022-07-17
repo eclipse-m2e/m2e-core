@@ -24,8 +24,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +80,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
   private IProfileManager profileManager;
 
   public ProfileSelectionHandler() {
-    BundleContext context = FrameworkUtil.getBundle(ProfileSelectionHandler.class).getBundleContext();
-    IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(context);
+    IEclipseContext serviceContext = EclipseContextFactory.getServiceContext(ProfileSelectionHandler.class);
     ContextInjectionFactory.inject(this, serviceContext);
   }
 

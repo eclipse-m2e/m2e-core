@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -61,6 +62,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -93,21 +95,20 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
   public void launch(IEditorPart editor, String mode) {
     IEditorInput editorInput = editor.getEditorInput();
-    if(editorInput instanceof IFileEditorInput) {
-      launch(((IFileEditorInput) editorInput).getFile().getParent(), mode);
+    if(editorInput instanceof IFileEditorInput fileInput) {
+      launch(fileInput.getFile().getParent(), mode);
     }
   }
 
   public void launch(ISelection selection, String mode) {
-    if(selection instanceof IStructuredSelection) {
-      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
       Object object = structuredSelection.getFirstElement();
 
       IContainer basedir = null;
-      if(object instanceof IProject || object instanceof IFolder) {
-        basedir = (IContainer) object;
-      } else if(object instanceof IFile) {
-        basedir = ((IFile) object).getParent();
+      if(object instanceof IContainer container) {
+        basedir = container;
+      } else if(object instanceof IFile file) {
+        basedir = file.getParent();
       } else if(object instanceof IAdaptable) {
         IAdaptable adaptable = (IAdaptable) object;
         Object adapter = adaptable.getAdapter(IProject.class);
@@ -169,6 +170,11 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   private IContainer findPomXmlBasedir(IContainer dir) {
     if(dir == null) {
       return null;
+    }
+    //first check if this is a pom facade, then we have a base directory!
+    IMavenExecutableLocation pomFacade = Adapters.adapt(dir, IMavenExecutableLocation.class);
+    if(pomFacade != null) {
+      return dir;
     }
 
     try {
@@ -314,8 +320,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
                 }
 
                 public String getText(Object element) {
-                  if(element instanceof ILaunchConfiguration) {
-                    ILaunchConfiguration configuration = (ILaunchConfiguration) element;
+                  if(element instanceof ILaunchConfiguration configuration) {
                     try {
                       return labelProvider.getText(element) + " : "
                           + configuration.getAttribute(MavenLaunchConstants.ATTR_GOALS, "");

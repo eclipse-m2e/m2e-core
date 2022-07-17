@@ -57,7 +57,7 @@ public class ClasspathConfigurator extends AbstractJavaProjectConfigurator {
       IProgressMonitor monitor) throws CoreException {
     // TODO need repository information
 
-    IProject project = request.getProject();
+    IProject project = request.mavenProjectFacade().getProject();
 
     IMaven maven = MavenPlugin.getMaven();
 

@@ -164,7 +164,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     IMavenProjectFacade projectFacade = Adapters.adapt(javaProject.getProject(), IMavenProjectFacade.class);
     IMavenExecutionContext context;
     if(projectFacade == null) {
-      context = IMavenExecutionContext.join(MavenPlugin.getMaven());
+      context = IMavenExecutionContext.getThreadContext().orElseGet(MavenPlugin.getMaven()::createExecutionContext);
     } else {
       context = projectFacade.createExecutionContext();
     }
@@ -391,8 +391,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   }
 
   public static void enable(ILaunchConfiguration config) throws CoreException {
-    if(config instanceof ILaunchConfigurationWorkingCopy) {
-      enable((ILaunchConfigurationWorkingCopy) config);
+    if(config instanceof ILaunchConfigurationWorkingCopy wc) {
+      enable(wc);
     } else {
       ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
       enable(wc);

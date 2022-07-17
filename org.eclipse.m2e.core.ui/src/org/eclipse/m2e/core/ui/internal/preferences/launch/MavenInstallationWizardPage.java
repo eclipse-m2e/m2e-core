@@ -142,8 +142,8 @@ public class MavenInstallationWizardPage extends WizardPage {
 
     @Override
     public String getText(Object element) {
-      if(element instanceof ProjectClasspathEntry) {
-        return ((ProjectClasspathEntry) element).getProject();
+      if(element instanceof ProjectClasspathEntry entry) {
+        return entry.getProject();
       }
       return element.toString();
     }
@@ -328,8 +328,7 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   protected boolean contains(List<ClasspathEntry> entries, IProject project) {
     for(ClasspathEntry entry : entries) {
-      if(entry instanceof ProjectClasspathEntry
-          && ((ProjectClasspathEntry) entry).getProject().equals(project.getName())) {
+      if(entry instanceof ProjectClasspathEntry projectEntry && projectEntry.getProject().equals(project.getName())) {
         return true;
       }
     }

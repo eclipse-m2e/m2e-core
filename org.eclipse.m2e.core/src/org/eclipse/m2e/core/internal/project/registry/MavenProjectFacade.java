@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,12 +25,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
+
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -39,8 +46,10 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -79,13 +88,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final String packaging;
 
-  private final IPath[] resourceLocations;
+  private final List<IPath> resourceLocations;
 
-  private final IPath[] testResourceLocations;
+  private final List<IPath> testResourceLocations;
 
-  private final IPath[] compileSourceLocations;
+  private final List<IPath> compileSourceLocations;
 
-  private final IPath[] testCompileSourceLocations;
+  private final List<IPath> testCompileSourceLocations;
 
   private final IPath outputLocation;
 
@@ -138,15 +147,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     this.finalName = mavenProject.getBuild().getFinalName();
 
-    this.artifactRepositories = new LinkedHashSet<>();
-    for(ArtifactRepository repository : mavenProject.getRemoteArtifactRepositories()) {
-      this.artifactRepositories.add(new ArtifactRepositoryRef(repository));
-    }
-
-    this.pluginArtifactRepositories = new LinkedHashSet<>();
-    for(ArtifactRepository repository : mavenProject.getPluginArtifactRepositories()) {
-      this.pluginArtifactRepositories.add(new ArtifactRepositoryRef(repository));
-    }
+    this.artifactRepositories = toRepositoryReferences(mavenProject.getRemoteArtifactRepositories());
+    this.pluginArtifactRepositories = toRepositoryReferences(mavenProject.getPluginArtifactRepositories());
 
     timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
     IProject project = getProject();
@@ -156,6 +158,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       i++ ;
     }
     timestamp[timestamp.length - 1] = getModificationStamp(pom);
+  }
+
+  private Set<ArtifactRepositoryRef> toRepositoryReferences(List<ArtifactRepository> artifactRepositories) {
+    return artifactRepositories.stream().map(r -> {
+      String username = r.getAuthentication() != null ? r.getAuthentication().getUsername() : null;
+      return new ArtifactRepositoryRef(r.getId(), r.getUrl(), username);
+    }).collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   /**
@@ -171,10 +180,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.packaging = other.packaging;
     this.modules = new ArrayList<>(other.modules);
 
-    this.resourceLocations = arrayCopy(other.resourceLocations);
-    this.testResourceLocations = arrayCopy(other.testResourceLocations);
-    this.compileSourceLocations = arrayCopy(other.compileSourceLocations);
-    this.testCompileSourceLocations = arrayCopy(other.testCompileSourceLocations);
+    this.resourceLocations = List.copyOf(other.resourceLocations);
+    this.testResourceLocations = List.copyOf(other.testResourceLocations);
+    this.compileSourceLocations = List.copyOf(other.compileSourceLocations);
+    this.testCompileSourceLocations = List.copyOf(other.testCompileSourceLocations);
 
     this.outputLocation = other.outputLocation;
     this.testOutputLocation = other.testOutputLocation;
@@ -187,15 +196,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
   }
 
-  private static <T> T[] arrayCopy(T[] a) {
-    return Arrays.copyOf(a, a.length);
-  }
-
   /**
    * Returns project relative paths of resource directories
    */
   @Override
-  public IPath[] getResourceLocations() {
+  public List<IPath> getResourceLocations() {
     return resourceLocations;
   }
 
@@ -203,17 +208,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    * Returns project relative paths of test resource directories
    */
   @Override
-  public IPath[] getTestResourceLocations() {
+  public List<IPath> getTestResourceLocations() {
     return testResourceLocations;
   }
 
   @Override
-  public IPath[] getCompileSourceLocations() {
+  public List<IPath> getCompileSourceLocations() {
     return compileSourceLocations;
   }
 
   @Override
-  public IPath[] getTestCompileSourceLocations() {
+  public List<IPath> getTestCompileSourceLocations() {
     return testCompileSourceLocations;
   }
 
@@ -309,7 +314,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   void setMavenProjectArtifacts(MavenProject mavenProject) {
-    this.artifacts = Collections.unmodifiableSet(ArtifactRef.fromArtifact(mavenProject.getArtifacts()));
+    Set<ArtifactRef> collect = mavenProject.getArtifacts().stream()
+        .map(a -> new ArtifactRef(new ArtifactKey(a), a.getScope()))
+        .collect(Collectors.toCollection(LinkedHashSet::new));
+    this.artifacts = Collections.unmodifiableSet(collect);
   }
 
   @Override
@@ -445,7 +453,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     MojoExecution execution = setupMojoExecutions.get(mojoExecutionKey);
     if(execution == null) {
       for(MojoExecution _execution : getMojoExecutions(monitor)) {
-        if(mojoExecutionKey.match(_execution)) {
+        if(match(mojoExecutionKey, _execution)) {
           execution = manager.setupMojoExecution(this, _execution, monitor);
           break;
         }
@@ -453,6 +461,15 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       putSetupMojoExecution(setupMojoExecutions, mojoExecutionKey, execution);
     }
     return execution;
+  }
+
+  private boolean match(MojoExecutionKey key, MojoExecution mojoExecution) {
+    if(mojoExecution == null) {
+      return false;
+    }
+    return key.groupId().equals(mojoExecution.getGroupId()) && key.artifactId().equals(mojoExecution.getArtifactId())
+        && key.version().equals(mojoExecution.getVersion()) && key.goal().equals(mojoExecution.getGoal())
+        && key.executionId().equals(mojoExecution.getExecutionId());
   }
 
   private void putSetupMojoExecution(Map<MojoExecutionKey, MojoExecution> setupMojoExecutions,
@@ -538,7 +555,58 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   @Override
-  public IMaven getMaven() {
+  public IComponentLookup getComponentLookup() {
+    return new IComponentLookup() {
+
+      @Override
+      public <T> T lookup(Class<T> clazz) throws CoreException {
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        try {
+          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
+          if(ccl instanceof ClassRealm) {
+            //do not change here as a specific class realm is already set!
+          } else {
+            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          }
+          return plexusContainer.lookup(clazz);
+        } catch(Exception ex) {
+          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
+        } finally {
+          Thread.currentThread().setContextClassLoader(ccl);
+        }
+      }
+
+      @Override
+      public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        try {
+          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
+          if(ccl instanceof ClassRealm) {
+            //do not change here as a specific class realm is already set!
+          } else {
+            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          }
+          Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+          return plexusContainer.lookupList(type);
+        } catch(ComponentLookupException ex) {
+          return List.of();
+        } catch(Exception ex) {
+          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
+        } finally {
+          Thread.currentThread().setContextClassLoader(ccl);
+        }
+      }
+    };
+  }
+
+
+  /**
+   * Gets an access to a (possibly project specific) {@link IMaven} instance, this is the same instance that is used to
+   * create new {@link IMavenExecutionContext}s see {@link #createExecutionContext()}
+   * 
+   * @return a Maven instance, configured according to this project
+   */
+  private IMaven getMaven() {
     return manager.getMaven();
   }
 }

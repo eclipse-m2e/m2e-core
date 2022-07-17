@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.ui.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
 public class UpdateMavenProjectJob extends WorkspaceJob {
 
-  private final IProject[] projects;
+  private final Collection<IProject> projects;
 
   private final boolean offline;
 
@@ -48,12 +49,12 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
 
   private final boolean refreshFromLocal;
 
-  public UpdateMavenProjectJob(IProject[] projects) {
+  public UpdateMavenProjectJob(Collection<IProject> projects) {
     this(projects, MavenPlugin.getMavenConfiguration().isOffline(), false /*forceUpdateDependencies*/,
         true /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/);
   }
 
-  public UpdateMavenProjectJob(IProject[] projects, boolean offline, boolean forceUpdateDependencies,
+  public UpdateMavenProjectJob(Collection<IProject> projects, boolean offline, boolean forceUpdateDependencies,
       boolean updateConfiguration, boolean cleanProjects, boolean refreshFromLocal) {
 
     super(Messages.UpdateSourcesAction_job_update_conf);

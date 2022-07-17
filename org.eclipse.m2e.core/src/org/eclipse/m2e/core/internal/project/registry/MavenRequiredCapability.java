@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.util.Objects;
+
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -47,34 +49,35 @@ public class MavenRequiredCapability extends RequiredCapability {
   }
 
   public static MavenRequiredCapability createResolvedMavenArtifact(ArtifactKey key, String scope, boolean optional) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.version(),
         scope, optional, true);
   }
 
   public static MavenRequiredCapability createMavenArtifact(ArtifactKey key, String scope, boolean optional) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.version(),
         scope, optional, false);
   }
 
   public static MavenRequiredCapability createMavenArtifactImport(ArtifactKey key) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT_IMPORT, MavenCapability.getId(key),
-        key.getVersion(), "import", false, false); //$NON-NLS-1$
+        key.version(), "import", false, false); //$NON-NLS-1$
   }
 
   public static MavenRequiredCapability createMavenParent(ArtifactKey key) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.version(),
         null, false, false);
   }
 
   public static MavenRequiredCapability createResolvedMavenParent(ArtifactKey key) {
-    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.version(),
         null, false, true);
   }
 
   @Override
   public boolean isPotentialMatch(Capability capability, boolean narrowMatch) {
-    if(capability instanceof MavenCapability && getVersionlessKey().equals(capability.getVersionlessKey())) {
-      String version = ((MavenCapability) capability).getVersion();
+    if(capability instanceof MavenCapability mavenCapability
+        && getVersionlessKey().equals(capability.getVersionlessKey())) {
+      String version = mavenCapability.getVersion();
 
       // not interested in any version, but just in the resolved one
       if(resolved && narrowMatch) {
@@ -120,12 +123,9 @@ public class MavenRequiredCapability extends RequiredCapability {
     if(this == obj) {
       return true;
     }
-    if(!(obj instanceof MavenRequiredCapability)) {
-      return false;
-    }
-    MavenRequiredCapability other = (MavenRequiredCapability) obj;
-    return getVersionlessKey().equals(other.getVersionlessKey()) && versionRange.equals(other.versionRange)
-        && eq(scope, other.scope) && optional == other.optional;
+    return obj instanceof MavenRequiredCapability other && //
+        getVersionlessKey().equals(other.getVersionlessKey()) && versionRange.equals(other.versionRange)
+        && Objects.equals(scope, other.scope) && optional == other.optional;
   }
 
 }

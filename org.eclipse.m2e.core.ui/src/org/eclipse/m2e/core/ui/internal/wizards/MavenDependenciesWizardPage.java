@@ -130,15 +130,15 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
           org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, null, null, false);
       if(dialog.open() == Window.OK) {
         Object result = dialog.getFirstResult();
-        if(result instanceof IndexedArtifactFile) {
-          Dependency dependency = ((IndexedArtifactFile) result).getDependency();
+        if(result instanceof IndexedArtifactFile indexArtifactFile) {
+          Dependency dependency = indexArtifactFile.getDependency();
           dependency.setScope(dialog.getSelectedScope());
           dependencyViewer.add(dependency);
           notifyListeners();
-        } else if(result instanceof IndexedArtifact) {
+        } else if(result instanceof IndexedArtifact indexArtifact) {
           // If we have an ArtifactInfo, we add the first FileInfo it contains
           // which corresponds to the latest version of the artifact.
-          Set<IndexedArtifactFile> files = ((IndexedArtifact) result).getFiles();
+          Set<IndexedArtifactFile> files = indexArtifact.getFiles();
           if(files != null && !files.isEmpty()) {
             dependencyViewer.add(files.iterator().next().getDependency());
             notifyListeners();
@@ -233,8 +233,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
      */
     @Override
     public String getText(Object element) {
-      if(element instanceof Dependency) {
-        Dependency d = (Dependency) element;
+      if(element instanceof Dependency d) {
         return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion() //$NON-NLS-1$//$NON-NLS-2$
             + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$
       }

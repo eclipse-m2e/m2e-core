@@ -46,6 +46,7 @@ import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.WorkingSets;
@@ -212,8 +213,8 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 
       workingSetGroup.selectWorkingSets(WorkingSets.getAssignedWorkingSets(project));
-    } else if(parentObject instanceof IContainer) {
-      pom = ((IContainer) parentObject).getFile(new Path(IMavenConstants.POM_FILE_NAME));
+    } else if(parentObject instanceof IContainer container) {
+      pom = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     }
 
     if(pom != null && pom.exists()) {
@@ -221,7 +222,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       parentContainer = pom.getParent();
 
       try (InputStream pomStream = pom.getContents()) {
-        parentModel = MavenPlugin.getMavenModelManager().readMavenModel(pomStream);
+        parentModel = IMavenToolbox.of(MavenPlugin.getMaven()).readModel(pomStream);
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
       } catch(CoreException | IOException e) {

@@ -348,7 +348,7 @@ public class ModuleSupport {
   public static void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor, List<String> compilerArgs) {
 
-    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IMavenProjectFacade facade = request.mavenProjectFacade();
 
     IJavaProject javaProject = JavaCore.create(facade.getProject());
     if(javaProject == null || !javaProject.exists() || classpath == null) {

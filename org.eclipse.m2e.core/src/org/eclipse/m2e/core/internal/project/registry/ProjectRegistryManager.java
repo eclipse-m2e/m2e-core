@@ -32,6 +32,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -93,11 +94,12 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
-import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -160,16 +162,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
   private IMavenConfiguration configuration;
 
   @Reference
+  private PlexusContainerManager containerManager;
+
+  @Reference
   private ProjectRegistryReader stateReader;
 
   private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<>();
 
   private volatile Thread syncRefreshThread;
-
-  /**
-   * Backwards compatibility with clients that request setup MojoExecution outside of {@link MavenBuilder} execution.
-   */
-  private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<>();
 
   private final Map<MavenProjectFacade, MavenProject> mavenProjectCache;
 
@@ -240,7 +240,18 @@ public class ProjectRegistryManager implements ISaveParticipant {
       // XXX sensible handling
       return null;
     }
-    return project.getFile(IMavenConstants.POM_FILE_NAME);
+    File baseDir = project.getLocation().toFile();
+    Optional<File> pom = IMavenToolbox.of(containerManager.getComponentLookup(baseDir)).locatePom(baseDir);
+    return pom.map(pomFile -> {
+      IFile file = project.getFile(pomFile.getName());
+      try {
+        //the file might be created by the locate call so make sure we refresh it here...
+        file.refreshLocal(IResource.DEPTH_ZERO, null);
+      } catch(CoreException ex) {
+        //if this does not work, there might be an error, but this is not handled here...
+      }
+      return file;
+    }).orElse(null);
   }
 
   /**
@@ -499,6 +510,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
               newFacade = new MavenProjectFacade(newFacade);
               putMavenProject(newFacade, mavenProject);
             }
+            mavenProjectCache.put(newFacade, mavenProject);
           }
 
           if(newFacade != null) {
@@ -556,7 +568,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         try (InputStream is = pom.getContents()) {
           // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
-          Model model = getMaven().readModel(is);
+          Model model = IMavenToolbox.of(getMaven()).readModel(is);
           if(model != null && model.getParent() != null) {
             Parent parent = model.getParent();
             if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
@@ -697,8 +709,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(newFacade);
 
-    if(lifecycleMapping instanceof ILifecycleMapping2) {
-      AbstractMavenDependencyResolver resolver = ((ILifecycleMapping2) lifecycleMapping).getDependencyResolver(monitor);
+    if(lifecycleMapping instanceof ILifecycleMapping2 lifecycleMapping2) {
+      AbstractMavenDependencyResolver resolver = lifecycleMapping2.getDependencyResolver(monitor);
       resolver.setManager(this);
       return resolver;
     }
@@ -805,15 +817,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   public void notifyProjectChangeListeners(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
-    if(events.size() > 0) {
-      MavenProjectChangedEvent[] eventsArray = events.toArray(new MavenProjectChangedEvent[events.size()]);
-      ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<>();
+    if(!events.isEmpty()) {
+      List<IMavenProjectChangedListener> listeners = new ArrayList<>();
       synchronized(this.projectChangeListeners) {
         listeners.addAll(this.projectChangeListeners);
       }
       listeners.addAll(ExtensionReader.readProjectChangedEventListenerExtentions());
       for(IMavenProjectChangedListener listener : listeners) {
-        listener.mavenProjectChanged(eventsArray, monitor);
+        listener.mavenProjectChanged(events, monitor);
       }
     }
   }
@@ -870,7 +881,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  public IMavenProjectFacade[] getProjects() {
+  public List<MavenProjectFacade> getProjects() {
     return projectRegistry.getProjects();
   }
 
@@ -919,7 +930,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     request.setLocalRepository(getMaven().getLocalRepository());
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
     if(pom != null && pom.getLocation() != null) {
-      request.setMultiModuleProjectDirectory(MavenImpl.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
+      request.setMultiModuleProjectDirectory(
+          PlexusContainerManager.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
     }
 
     return request;
@@ -980,24 +992,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return maven;
   }
 
+  PlexusContainerManager getContainerManager() {
+    return this.containerManager;
+  }
+
   /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    MavenProject mavenProject = null;
-    if(MavenExecutionContext.getThreadContext() == null) {
-      // the intent of this code is to provide backwards compatibility for clients that request setup MojoExecution
-      // outside of MavenBuilder context. Setup MojoExecutions are specific to MavenProject instances, so keep
-      // MavenProject until the facade is discarded
-      synchronized(legacyMavenProjects) {
-        mavenProject = legacyMavenProjects.get(projectFacade);
-        if(mavenProject == null) {
-          mavenProject = getMavenProject(projectFacade, monitor);
-          legacyMavenProjects.put(projectFacade, mavenProject);
-        }
-      }
-    }
-    if(mavenProject == null) {
-      mavenProject = getMavenProject(projectFacade, monitor);
-    }
+    MavenProject mavenProject = getMavenProject(projectFacade, monitor);
     return maven.setupMojoExecution(mavenProject, mojoExecution, monitor);
   }
 
@@ -1026,45 +1027,28 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * maven execution scope is guaranteed to return the same MavenProject instance.</li>
    * <li>Global "project cache", that is meant to improve performance during incremental workspace builds. The project
    * cache is small and cached values are discarded and reloaded as needed.</li>
-   * <li>Global "legacy support project map" provides support for legacy, i.e. pre m2e 1.4, extensions that setup
-   * MojoExecution instances outside of maven execution scope. Legacy support project map entries are not discarded
-   * until their corresponding facade instances are discarded.</li>
    * </ul>
    */
 
   MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-    MavenProject mavenProject;
-    synchronized(legacyMavenProjects) {
-      mavenProject = legacyMavenProjects.get(facade);
-    }
-    if(mavenProject != null) {
-      return mavenProject;
-    }
     Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
     try {
       return mavenProjects.computeIfAbsent(facade, fac -> mavenProjectCache.computeIfAbsent(fac,
           f -> readProjectWithDependencies(f.getPom(), f.getResolverConfiguration(), monitor)));
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();
-      if(cause instanceof CoreException) {
-        throw (CoreException) cause;
+      if(cause instanceof CoreException coreException) {
+        throw coreException;
       }
       throw new CoreException(Status.error("Unexpected internal Error occured", ex)); // this really should never happen
     }
   }
 
   MavenProject getMavenProject(MavenProjectFacade facade) {
-    MavenProject mavenProject;
-    synchronized(legacyMavenProjects) {
-      mavenProject = legacyMavenProjects.get(facade);
-    }
-    if(mavenProject == null) {
-      mavenProject = mavenProjectCache.get(facade);
-      if(mavenProject != null) {
-        putMavenProject(facade, mavenProject);
-      }
-    }
-    if(mavenProject == null) {
+    MavenProject mavenProject = mavenProjectCache.get(facade);
+    if(mavenProject != null) {
+      putMavenProject(facade, mavenProject);
+    } else {
       mavenProject = getContextProjects().get(facade);
     }
     return mavenProject;
@@ -1082,9 +1066,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
     } else {
       mavenProjects.remove(facade);
-      synchronized(legacyMavenProjects) {
-        legacyMavenProjects.remove(facade);
-      }
     }
   }
 
@@ -1107,7 +1088,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Map<MavenProjectFacade, MavenProject> createProjectCache() {
-    int maxCacheSize = 5;
+    int maxCacheSize = Integer.getInteger("m2e.project.cache.size", 20);
     return Collections.synchronizedMap(new LinkedHashMap<>(maxCacheSize * 4 / 3 + 1, 0.75f, true) {
       private static final long serialVersionUID = 8022606648487974598L;
 

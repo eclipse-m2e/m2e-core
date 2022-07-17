@@ -28,7 +28,6 @@ import org.eclipse.m2e.pde.target.MavenTargetBundle;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.m2e.pde.target.MissingMetadataMode;
-import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationHandler;
@@ -140,7 +139,8 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public IStatus update(ITargetDefinition target, TreePath[] treePaths, IProgressMonitor monitor) {
 		ITargetLocation[] targetLocations = target.getTargetLocations();
-		IStatus status = new Status(IStatus.OK, Activator.ID, ITargetLocationHandler.STATUS_CODE_NO_CHANGE, "", null);
+		IStatus status = new Status(IStatus.OK, "org.eclipse.m2e.pde.ui", ITargetLocationHandler.STATUS_CODE_NO_CHANGE,
+				"", null);
 		for (TreePath treePath : treePaths) {
 			Object segment = treePath.getFirstSegment();
 			if (segment instanceof MavenTargetLocation) {
@@ -256,7 +256,7 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 				}
 			}
 		}
-		return toggled > 0 ? new Status(IStatus.OK, Activator.class.getPackageName(), STATUS_FORCE_RELOAD, "", null)
+		return toggled > 0 ? new Status(IStatus.OK, "org.eclipse.m2e.pde.ui", STATUS_FORCE_RELOAD, "", null)
 				: Status.CANCEL_STATUS;
 	}
 

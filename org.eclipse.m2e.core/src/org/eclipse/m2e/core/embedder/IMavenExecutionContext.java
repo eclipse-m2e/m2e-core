@@ -13,12 +13,11 @@
 
 package org.eclipse.m2e.core.embedder;
 
-import java.util.Collection;
+import java.util.Optional;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -36,20 +35,20 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 /**
  * Maven execution context. Encapsulates maven execution request, maven session and related maven session state objects.
  * Instances can be either in configuration or execution states. In configuration state, {@link #getExecutionRequest()}
- * can be used to customize maven execution configuration parameters. Context enters execution state during {@link
- * #execute(..., IProgressMonitor)} invocation. During transition from configuration state to execution state, maven
- * session is created and the the context is associated with the current thread. Maven session instance and related
- * objects can be accessed through their corresponding context getXXX methods.
+ * can be used to customize maven execution configuration parameters. Context enters execution state during
+ * {@link #execute(..., IProgressMonitor)} invocation. During transition from configuration state to execution state,
+ * maven session is created and the the context is associated with the current thread. Maven session instance and
+ * related objects can be accessed through their corresponding context getXXX methods.
  * <p>
  * Maven execution contexts can be nested, i.e. new context can be created and entered from a thread that already has
  * associated maven execution context. By default nested contexts inherit all configuration from immediate outer
- * context, but can be customised via {@link #getExecutionRequest()}. Outer context is suspended during execution of
+ * context, but can be customized via {@link #getExecutionRequest()}. Outer context is suspended during execution of
  * nested context's {@link #execute(ICallable, IProgressMonitor)} method.
  * <p>
  * Typical usage
  *
  * <pre>
- * IMavenExecutionContext context = maven.createExecutionContext();
+ * IMavenExecutionContext context = mavenProjectFacade.createExecutionContext();
  *
  * MavenProject project = context.execute(new ICallable&lt;MavenProject&gt;() {
  *   public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) {
@@ -62,7 +61,6 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  *
  * @see ICallable
  * @see IMaven#createExecutionContext()
- * @see IMaven#execute(ICallable, IProgressMonitor)
  * @see IMavenProjectRegistry#execute(org.eclipse.m2e.core.project.IMavenProjectFacade, ICallable, IProgressMonitor)
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
@@ -105,16 +103,6 @@ public interface IMavenExecutionContext {
   MavenExecutionResult execute(MavenExecutionRequest request);
 
   /**
-   * Look up the given extension type, this requires an active execution
-   * 
-   * @param <Extension>
-   * @param extensionType
-   * @throws IllegalStateException if called outside of any execute call
-   * @return
-   */
-  <Extension> Collection<Extension> lookupExtensions(Class<Extension> extensionType) throws CoreException;
-
-  /**
    * @throws IllegalStateException if called outside of {@link #execute(MavenProject,ICallable, IProgressMonitor)}
    * @since 1.4
    */
@@ -138,23 +126,25 @@ public interface IMavenExecutionContext {
   ProjectBuildingRequest newProjectBuildingRequest();
 
   /**
-   * Either join the currents thread {@link IMavenExecutionContext} or creates a fresh one from the supplied factory if
-   * this thread is currently not executing anything. Be aware that because of this might return an already executing
-   * context, this context should not be configured in any way, use {@link IMaven#createExecutionContext()} or
-   * {@link IMavenProjectFacade#createExecutionContext()} to create a specific context that could be configured.
-   * 
-   * @return a {@link IMavenExecutionContext} that could be used for execution
-   * @throws CoreException
+   * @return the {@link IComponentLookup} to use for this context
+   * @throws IllegalStateException if called outside of any execute call
    */
-  static IMavenExecutionContext join(IMavenExecutionContextFactory factory) throws CoreException {
-    IMavenExecutionContext context = MavenExecutionContext.getThreadContext();
-    if(context == null) {
-      if(factory == null) {
-        throw new CoreException(Status.error("Nothing to join and no factory given!"));
-      }
-      return factory.createExecutionContext();
-    }
-    return context;
+  IComponentLookup getComponentLookup();
+
+  /**
+   * Get the current thread context.
+   * <p>
+   * To trigger a new execution, it's often better to create a new project-specific context with
+   * {@link IMavenProjectFacade#createExecutionContext()} than to blindly reuse current thread context, as we do not
+   * know whether the current thread context maps the current project propertly.
+   * </p>
+   * 
+   * @return the IMavenExecutionContext already in use for current thread, or {@link Optional#empty()} if absent.
+   * @since 2.0
+   */
+  static Optional<IMavenExecutionContext> getThreadContext() {
+    return Optional.ofNullable(MavenExecutionContext.getThreadContext());
   }
+
 
 }

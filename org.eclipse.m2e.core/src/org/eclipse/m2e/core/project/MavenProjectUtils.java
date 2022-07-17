@@ -53,15 +53,16 @@ public class MavenProjectUtils {
     return directory.removeFirstSegments(projectLocation.segmentCount()).makeRelative().setDevice(null);
   }
 
-  public static IPath[] getResourceLocations(IProject project, List<Resource> resources) {
+  public static List<IPath> getResourceLocations(IProject project, List<Resource> resources) {
     LinkedHashSet<IPath> locations = new LinkedHashSet<>();
     for(Resource resource : resources) {
       locations.add(getProjectRelativePath(project, resource.getDirectory()));
     }
-    return locations.toArray(new IPath[locations.size()]);
+    locations.remove(null);
+    return List.copyOf(locations);
   }
 
-  public static IPath[] getSourceLocations(IProject project, List<String> roots) {
+  public static List<IPath> getSourceLocations(IProject project, List<String> roots) {
     LinkedHashSet<IPath> locations = new LinkedHashSet<>();
     for(String root : roots) {
       IPath path = getProjectRelativePath(project, root);
@@ -69,7 +70,7 @@ public class MavenProjectUtils {
         locations.add(path);
       }
     }
-    return locations.toArray(new IPath[locations.size()]);
+    return List.copyOf(locations);
   }
 
   /**
@@ -92,3 +93,4 @@ public class MavenProjectUtils {
     return resource != null ? resource.getFullPath() : null;
   }
 }
+

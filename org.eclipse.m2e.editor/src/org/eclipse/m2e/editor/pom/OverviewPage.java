@@ -164,8 +164,6 @@ public class OverviewPage extends MavenPomEditorPage {
   private static final int RELOAD_ALL = RELOAD_MODULES + RELOAD_BASE + RELOAD_CI + RELOAD_SCM + RELOAD_IM
       + RELOAD_PROPERTIES + RELOAD_ORG + RELOAD_PARENT;
 
-  private static final String COMPONENTS_PATH = "META-INF/plexus/components.xml";
-
   //controls
   Text artifactIdText;
 
@@ -357,8 +355,9 @@ public class OverviewPage extends MavenPomEditorPage {
     if(projectFacade != null) {
       try {
         List<String> list = projectFacade.createExecutionContext().execute((context, monitor) -> {
-          return context.lookupExtensions(ArtifactHandler.class).stream().map(ArtifactHandler::getPackaging)
-              .filter(Objects::nonNull).distinct().sorted().collect(Collectors.toList());
+          return context.getComponentLookup().lookupCollection(ArtifactHandler.class).stream()
+              .map(ArtifactHandler::getPackaging).filter(Objects::nonNull).distinct().sorted()
+              .collect(Collectors.toList());
         }, null);
         packagingTypes.addAll(list);
       } catch(CoreException ex) {
@@ -626,7 +625,7 @@ public class OverviewPage extends MavenPomEditorPage {
             IMavenProjectFacade projectFacade = findModuleProject(module);
             if(projectFacade != null) {
               ArtifactKey key = projectFacade.getArtifactKey();
-              OpenPomAction.openEditor(key.getGroupId(), key.getArtifactId(), key.getVersion(),
+              OpenPomAction.openEditor(key.groupId(), key.artifactId(), key.version(),
                   getPomEditor().getMavenProject(), monitor);
             } else {
               IFile modulePom = findModuleFile(module);
@@ -678,9 +677,9 @@ public class OverviewPage extends MavenPomEditorPage {
 
     modulesEditor.setCreateButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
       IEditorInput editorInput = OverviewPage.this.pomEditor.getEditorInput();
-      if(editorInput instanceof FileEditorInput) {
+      if(editorInput instanceof FileEditorInput fileInput) {
         MavenModuleWizard wizard = new MavenModuleWizard(true);
-        wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(((FileEditorInput) editorInput).getFile()));
+        wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(fileInput.getFile()));
         WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
         int res = dialog.open();
         if(res == Window.OK) {
@@ -752,8 +751,8 @@ public class OverviewPage extends MavenPomEditorPage {
 
           @Override
           public void drop(DropTargetEvent event) {
-            if(event.data instanceof Object[]) {
-              addSelectedModules((Object[]) event.data, true);
+            if(event.data instanceof Object[] array) {
+              addSelectedModules(array, true);
             }
           }
         });
@@ -1347,14 +1346,14 @@ public class OverviewPage extends MavenPomEditorPage {
       IContainer container = null;
       IFile pomFile = null;
 
-      if(selection instanceof IFile) {
-        pomFile = (IFile) selection;
+      if(selection instanceof IFile file) {
+        pomFile = file;
         if(!IMavenConstants.POM_FILE_NAME.equals(pomFile.getName())) {
           continue;
         }
         container = pomFile.getParent();
-      } else if(selection instanceof IContainer && !selection.equals(getProject())) {
-        container = (IContainer) selection;
+      } else if(selection instanceof IContainer c && !selection.equals(getProject())) {
+        container = c;
         pomFile = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
       }
 
@@ -1405,8 +1404,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
     @Override
     public Image getImage(Object element) {
-      if(element instanceof String) {
-        String moduleName = (String) element;
+      if(element instanceof String moduleName) {
         IMavenProjectFacade projectFacade = editorPage.findModuleProject(moduleName);
         if(projectFacade != null) {
           return MavenEditorImages.IMG_PROJECT;

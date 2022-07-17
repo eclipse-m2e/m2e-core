@@ -20,7 +20,6 @@
 
 package org.eclipse.m2e.core.internal.project.conversion;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -108,38 +107,25 @@ public class ProjectConversionParticipantSorter {
       AbstractProjectConversionParticipant converter = converterMap.get(converterId);
 
       //Add edges for all the converters this converter should run after
-      String[] predecessors = converter.getPrecedingConverterIds();
-      if(predecessors != null) {
-        for(String id : predecessors) {
-          Vertex predecessor = dag.getVertex(id);
-          if(predecessor != null) {
-            dag.addEdge(converterVx, predecessor);
-          }
+      List<String> predecessors = converter.getPrecedingConverterIds();
+      for(String id : predecessors) {
+        Vertex predecessor = dag.getVertex(id);
+        if(predecessor != null) {
+          dag.addEdge(converterVx, predecessor);
         }
       }
 
       //Add edges for all the converters this converter should run before
-      String[] successors = converter.getSucceedingConverterIds();
-      if(successors != null) {
-        for(String id : successors) {
-          Vertex successor = dag.getVertex(id);
-          if(successor != null) {
-            dag.addEdge(successor, converterVx);
-          }
+      List<String> successors = converter.getSucceedingConverterIds();
+      for(String id : successors) {
+        Vertex successor = dag.getVertex(id);
+        if(successor != null) {
+          dag.addEdge(successor, converterVx);
         }
       }
-
     }
-
     List<String> sortedConverterIds = TopologicalSorter.sort(dag);
-
-    List<AbstractProjectConversionParticipant> sortedConverters = new ArrayList<>(
-        converters.size());
-
-    for(String id : sortedConverterIds) {
-      sortedConverters.add(converterMap.get(id));
-    }
-    this.sortedConverters = Collections.unmodifiableList(sortedConverters);
+    this.sortedConverters = sortedConverterIds.stream().map(converterMap::get).toList();
   }
 
   /**

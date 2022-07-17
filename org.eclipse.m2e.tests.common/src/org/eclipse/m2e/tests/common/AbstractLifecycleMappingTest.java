@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,7 +40,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
-import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -86,9 +84,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
       throws IOException, XmlPullParserException {
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
     try (InputStream in = new FileInputStream(metadataFile)) {
-      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-          .createLifecycleMappingMetadataSource(in);
-      return lifecycleMappingMetadataSource;
+      return LifecycleMappingFactory.createLifecycleMappingMetadataSource(in);
     }
   }
 
@@ -102,24 +98,18 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
    */
   protected MavenProjectFacade newMavenProjectFacade(IFile pom) throws CoreException {
     MavenProject mavenProject = MavenPlugin.getMaven().readProject(pom.getLocation().toFile(), monitor);
-    MavenProjectFacade facade = new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(),
-        pom, mavenProject, new ResolverConfiguration());
-    return facade;
+    return new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(), pom, mavenProject,
+        new ResolverConfiguration());
   }
 
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
     List<MojoExecutionKey> result = new ArrayList<>();
-
-    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
-
-    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-      if(entry.getValue() == null || entry.getValue().isEmpty()) {
-        if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
-          result.add(entry.getKey());
-        }
+    facade.getMojoExecutionMapping().forEach((key, executions) -> {
+      if((executions == null || executions.isEmpty())
+          && LifecycleMappingFactory.isInterestingPhase(key.lifecyclePhase())) {
+        result.add(key);
       }
-    }
-
+    });
     return result;
   }
 

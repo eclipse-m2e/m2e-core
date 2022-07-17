@@ -116,7 +116,7 @@ public class LifecycleMappingsViewer {
           expand = !isIgnoreMapping(entry.getKey(), entry.getValue());
         }
         if(expand) {
-          mappingsTreeViewer.expandToLevel(entry.getKey().getLifecyclePhase(), AbstractTreeViewer.ALL_LEVELS);
+          mappingsTreeViewer.expandToLevel(entry.getKey().lifecyclePhase(), AbstractTreeViewer.ALL_LEVELS);
         }
       }
     }
@@ -294,16 +294,15 @@ public class LifecycleMappingsViewer {
 
       @Override
       public Image getColumnImage(Object element, int columnIndex) {
-        if(columnIndex == 0 && element instanceof MojoExecutionKey) {
-          return isErrorMapping((MojoExecutionKey) element) ? MavenImages.IMG_ERROR : MavenImages.IMG_PASSED;
+        if(columnIndex == 0 && element instanceof MojoExecutionKey key) {
+          return isErrorMapping(key) ? MavenImages.IMG_ERROR : MavenImages.IMG_PASSED;
         }
         return null;
       }
 
       @Override
       public String getColumnText(Object element, int columnIndex) {
-        if(element instanceof MojoExecutionKey) {
-          MojoExecutionKey execution = (MojoExecutionKey) element;
+        if(element instanceof MojoExecutionKey execution) {
           switch(columnIndex) {
             case 0:
               return LifecycleMappingsViewer.this.toString(execution);
@@ -329,8 +328,7 @@ public class LifecycleMappingsViewer {
     mappingsTreeViewer.setInput(phases);
     mappingsTreeViewer.addSelectionChangedListener(e -> {
       Object element = e.getStructuredSelection().getFirstElement();
-      if(element instanceof MojoExecutionKey) {
-        MojoExecutionKey execution = (MojoExecutionKey) element;
+      if(element instanceof MojoExecutionKey execution) {
         infoLabel.setText(getSourcelabel(execution, mappings.get().get(execution), true));
       } else {
         infoLabel.setText("");
@@ -359,14 +357,14 @@ public class LifecycleMappingsViewer {
           meta.addPluginExecution(clone);
         }
       } else {
-        PluginExecutionFilter filter = new PluginExecutionFilter(execution.getGroupId(), execution.getArtifactId(),
-            execution.getVersion(), execution.getGoal());
+        PluginExecutionFilter filter = new PluginExecutionFilter(execution.groupId(), execution.artifactId(),
+            execution.version(), execution.goal());
 
         PluginExecutionMetadata mapping = new PluginExecutionMetadata();
         mapping.setFilter(filter);
 
         Xpp3Dom actionDom;
-        if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
+        if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().lifecyclePhase())) {
           actionDom = new Xpp3Dom(PluginExecutionAction.error.toString());
         } else {
           actionDom = new Xpp3Dom(PluginExecutionAction.ignore.toString());
@@ -407,7 +405,7 @@ public class LifecycleMappingsViewer {
   boolean isErrorMapping(MojoExecutionKey execution) {
     List<IPluginExecutionMetadata> mappings = this.mappings.get().get(execution);
     if(mappings == null || mappings.isEmpty()) {
-      return LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase());
+      return LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase());
     }
     for(IPluginExecutionMetadata mapping : mappings) {
       if(PluginExecutionAction.error == mapping.getAction()) {
@@ -419,7 +417,7 @@ public class LifecycleMappingsViewer {
 
   boolean isIgnoreMapping(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
     if(mappings == null || mappings.isEmpty()) {
-      return !LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase());
+      return !LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase());
     }
     for(IPluginExecutionMetadata mapping : mappings) {
       if(PluginExecutionAction.ignore != mapping.getAction()) {
@@ -439,7 +437,7 @@ public class LifecycleMappingsViewer {
         sb.append(mapping.getAction().toString());
       }
     } else {
-      if(LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase())) {
+      if(LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
         sb.append(PluginExecutionAction.error.toString());
       } else {
         sb.append(PluginExecutionAction.ignore.toString());
@@ -455,21 +453,21 @@ public class LifecycleMappingsViewer {
         LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
         if(metadata != null) {
           Object source = metadata.getSource();
-          if(source instanceof String) {
-            sources.add((String) source);
-          } else if(source instanceof Artifact) {
-            sources.add(getSourceLabel((Artifact) source, detailed));
-          } else if(source instanceof MavenProject) {
-            sources.add(getSourceLabel((MavenProject) source, detailed));
-          } else if(source instanceof Bundle) {
-            sources.add(getSourceLabel((Bundle) source, detailed));
+          if(source instanceof String s) {
+            sources.add(s);
+          } else if(source instanceof Artifact artifact) {
+            sources.add(getSourceLabel(artifact, detailed));
+          } else if(source instanceof MavenProject mavenProject) {
+            sources.add(getSourceLabel(mavenProject, detailed));
+          } else if(source instanceof Bundle bundle) {
+            sources.add(getSourceLabel(bundle, detailed));
           } else {
             sources.add("unknown"); //$NON-NLS-1$
           }
         }
       }
     } else {
-      if(!LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase())) {
+      if(!LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
         sources.add("uninteresting"); //$NON-NLS-1$
       }
     }
@@ -515,25 +513,25 @@ public class LifecycleMappingsViewer {
     // TODO show groupId, but only if not a known plugin groupId
 
     // shorten artifactId
-    String artifactId = execution.getArtifactId();
+    String artifactId = execution.artifactId();
     if(artifactId.endsWith("-maven-plugin")) { //$NON-NLS-1$
       artifactId = artifactId.substring(0, artifactId.length() - "-maven-plugin".length()); //$NON-NLS-1$
     } else if(artifactId.startsWith("maven-") && artifactId.endsWith("-plugin")) { //$NON-NLS-1$ //$NON-NLS-2$
       artifactId = artifactId.substring("maven-".length(), artifactId.length() - "-plugin".length()); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    sb.append(artifactId).append(':').append(execution.getGoal());
+    sb.append(artifactId).append(':').append(execution.goal());
 
     // only show execution id if necessary
     int count = 0;
     for(MojoExecutionKey other : mappings.get().keySet()) {
-      if(eq(execution.getGroupId(), other.getGroupId()) && eq(execution.getArtifactId(), other.getArtifactId())
-          && eq(execution.getGoal(), other.getGoal())) {
+      if(eq(execution.groupId(), other.groupId()) && eq(execution.artifactId(), other.artifactId())
+          && eq(execution.goal(), other.goal())) {
         count++ ;
       }
     }
     if(count > 1) {
-      sb.append(" (").append(execution.getExecutionId()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(" (").append(execution.executionId()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     return sb.toString();
   }
@@ -567,10 +565,10 @@ public class LifecycleMappingsViewer {
           Map<String, List<MojoExecutionKey>> phases = new LinkedHashMap<>();
           if(result != null) {
             for(MojoExecutionKey execution : result.keySet()) {
-              List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
+              List<MojoExecutionKey> executions = phases.get(execution.lifecyclePhase());
               if(executions == null) {
                 executions = new ArrayList<>();
-                phases.put(execution.getLifecyclePhase(), executions);
+                phases.put(execution.lifecyclePhase(), executions);
               }
               executions.add(execution);
             }

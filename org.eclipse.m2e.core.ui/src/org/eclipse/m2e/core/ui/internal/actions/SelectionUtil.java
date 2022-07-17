@@ -84,21 +84,6 @@ public class SelectionUtil {
 
   public static final int WORKING_SET = 16;
 
-  /** Checks which type the given selection belongs to. */
-  public static int getSelectionType(IStructuredSelection selection) {
-    int type = UNSUPPORTED;
-    if(selection != null) {
-      for(Object name : selection) {
-        int elementType = getElementType(name);
-        if(elementType == UNSUPPORTED) {
-          return UNSUPPORTED;
-        }
-        type |= elementType;
-      }
-    }
-    return type;
-  }
-
   /** Checks which type the given element belongs to. */
   public static int getElementType(Object element) {
     IProject project = getType(element, IProject.class);
@@ -143,8 +128,8 @@ public class SelectionUtil {
     if(type.isInstance(element)) {
       return type.cast(element);
     }
-    if(element instanceof IAdaptable) {
-      T adapter = ((IAdaptable) element).getAdapter(type);
+    if(element instanceof IAdaptable adaptable) {
+      T adapter = adaptable.getAdapter(type);
       if(adapter != null) {
         return adapter;
       }
@@ -215,13 +200,12 @@ public class SelectionUtil {
   }
 
   public static ArtifactKey getArtifactKey(Object element) {
-    if(element instanceof Artifact) {
-      return new ArtifactKey(((Artifact) element));
-
-    } else if(element instanceof org.eclipse.aether.graph.DependencyNode) {
-      org.eclipse.aether.artifact.Artifact artifact = ((org.eclipse.aether.graph.DependencyNode) element)
-          .getDependency().getArtifact();
+    if(element instanceof Artifact artifact) {
       return new ArtifactKey(artifact);
+
+    } else if(element instanceof org.eclipse.aether.graph.DependencyNode depNode) {
+      org.eclipse.aether.artifact.Artifact artifact = depNode.getDependency().getArtifact();
+      return new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), null);
 
       //getArtifactKey() used only in a handful of actions, to my knowledge none of these are currently available on
       //model.edit.Dependency instances.
@@ -249,16 +233,15 @@ public class SelectionUtil {
   }
 
   public static MavenProject getMavenProject(IEditorInput editorInput, IProgressMonitor monitor) throws CoreException {
-    if(editorInput instanceof IFileEditorInput) {
-      IFile pomFile = ((IFileEditorInput) editorInput).getFile();
+    if(editorInput instanceof IFileEditorInput fileInput) {
+      IFile pomFile = fileInput.getFile();
       IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       IMavenProjectFacade facade = projectManager.create(pomFile, true, monitor);
       if(facade != null) {
         return facade.getMavenProject(monitor);
       }
 
-    } else if(editorInput instanceof IStorageEditorInput) {
-      IStorageEditorInput storageInput = (IStorageEditorInput) editorInput;
+    } else if(editorInput instanceof IStorageEditorInput storageInput) {
       IStorage storage = storageInput.getStorage();
       IPath path = storage.getFullPath();
       if(path == null || !new File(path.toOSString()).exists()) {
@@ -335,13 +318,13 @@ public class SelectionUtil {
     //350136 we need to process the selection first! that's what is relevant for any popup menu action we have.
     //the processing of active editor first might have been only relevant when we had the actions in main menu, but even
     // then the popups were wrong..
-    if(selection instanceof IStructuredSelection) {
-      Object o = ((IStructuredSelection) selection).iterator().next();
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      Object o = structuredSelection.iterator().next();
 
-      if(o instanceof IProject) {
-        file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
-      } else if(o instanceof IFile) {
-        file = (IFile) o;
+      if(o instanceof IProject project) {
+        file = project.getFile(IMavenConstants.POM_FILE_NAME);
+      } else if(o instanceof IFile f) {
+        file = f;
       }
       if(file != null) {
         return file;
@@ -358,8 +341,7 @@ public class SelectionUtil {
         IEditorPart editor = page.getActiveEditor();
         if(editor != null) {
           IEditorInput input = editor.getEditorInput();
-          if(input instanceof IFileEditorInput) {
-            IFileEditorInput fileInput = (IFileEditorInput) input;
+          if(input instanceof IFileEditorInput fileInput) {
             file = fileInput.getFile();
             if(IMavenConstants.POM_FILE_NAME.equals(file.getName())) {
               return file;
@@ -383,20 +365,18 @@ public class SelectionUtil {
    */
   public static IProject[] getProjects(ISelection selection, boolean includeAll) {
     ArrayList<IProject> projectList = new ArrayList<>();
-    if(selection instanceof IStructuredSelection) {
-      for(Object o : ((IStructuredSelection) selection)) {
-        if(o instanceof IProject) {
-          safeAdd((IProject) o, projectList);
-        } else if(o instanceof IWorkingSet) {
-          IWorkingSet workingSet = (IWorkingSet) o;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      for(Object o : structuredSelection) {
+        if(o instanceof IProject project) {
+          safeAdd(project, projectList);
+        } else if(o instanceof IWorkingSet workingSet) {
           for(IAdaptable adaptable : workingSet.getElements()) {
             IProject project = adaptable.getAdapter(IProject.class);
             safeAdd(project, projectList);
           }
-        } else if(o instanceof IResource) {
-          safeAdd(((IResource) o).getProject(), projectList);
-        } else if(o instanceof IAdaptable) {
-          IAdaptable adaptable = (IAdaptable) o;
+        } else if(o instanceof IResource resource) {
+          safeAdd(resource.getProject(), projectList);
+        } else if(o instanceof IAdaptable adaptable) {
           IProject project = adaptable.getAdapter(IProject.class);
           safeAdd(project, projectList);
         }

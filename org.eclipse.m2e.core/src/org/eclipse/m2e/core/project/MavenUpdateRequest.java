@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.core.project;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -55,7 +56,7 @@ public class MavenUpdateRequest {
     addPomFile(project);
   }
 
-  public MavenUpdateRequest(IProject[] projects, boolean offline, boolean updateSnapshots) {
+  public MavenUpdateRequest(Collection<IProject> projects, boolean offline, boolean updateSnapshots) {
     this(offline, updateSnapshots);
 
     for(IProject project : projects) {
@@ -127,13 +128,8 @@ public class MavenUpdateRequest {
       return true;
     }
 
-    if(!(object instanceof MavenUpdateRequest)) {
-      return false;
-    }
-
-    MavenUpdateRequest request = (MavenUpdateRequest) object;
-
-    return this.offline == request.offline //
+    return object instanceof MavenUpdateRequest request && //
+        this.offline == request.offline //
         && this.forceDependencyUpdate == request.forceDependencyUpdate //
         && this.pomFiles.equals(request.pomFiles);
   }

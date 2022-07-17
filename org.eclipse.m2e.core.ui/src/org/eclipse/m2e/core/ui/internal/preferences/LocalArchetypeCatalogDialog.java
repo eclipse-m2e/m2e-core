@@ -42,10 +42,10 @@ import org.eclipse.swt.widgets.Text;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 
 
 /**
@@ -171,7 +171,8 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogLocationCombo.getText().trim();
 
-    archetypeCatalogFactory = new LocalCatalogFactory(location, description, true);
+    archetypeCatalogFactory = M2EUIPluginActivator.getDefault().getArchetypePlugin().newLocalCatalogFactory(location,
+        description, true, true);
 
     saveValue(KEY_LOCATIONS, location);
 
@@ -217,7 +218,8 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
       return false;
     }
 
-    LocalCatalogFactory factory = new LocalCatalogFactory(location, null, true);
+    LocalCatalogFactory factory = M2EUIPluginActivator.getDefault().getArchetypePlugin()
+        .newLocalCatalogFactory(location, null, true, true);
     ArchetypeCatalog archetypeCatalog;
     try {
       archetypeCatalog = factory.getArchetypeCatalog();

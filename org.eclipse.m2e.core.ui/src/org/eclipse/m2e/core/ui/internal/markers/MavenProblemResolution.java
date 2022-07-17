@@ -208,8 +208,7 @@ public abstract class MavenProblemResolution extends WorkbenchMarkerResolution
   }
 
   public static int getOrder(IMarkerResolution res) {
-    if(res instanceof MavenProblemResolution) {
-      MavenProblemResolution mr = (MavenProblemResolution) res;
+    if(res instanceof MavenProblemResolution mr) {
       return mr.getOrder();
     }
     return Integer.MAX_VALUE;

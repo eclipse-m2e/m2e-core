@@ -90,9 +90,7 @@ public class IdPartRemovalResolution extends AbstractPomProblemResolution {
     //now check parent version and groupid against the current project's ones..
     if(PROJECT_NODE.equals(root.getNodeName())) {
       Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE);
-      if(value instanceof IndexedRegion) {
-        IndexedRegion off = (IndexedRegion) value;
-
+      if(value instanceof IndexedRegion off) {
         int offset = off.getStartOffset();
         if(offset <= 0) {
           return;

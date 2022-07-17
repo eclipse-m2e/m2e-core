@@ -16,21 +16,23 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
-import org.eclipse.m2e.pde.ui.Activator;
 import org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetDependencyLabelProvider;
 import org.eclipse.m2e.pde.ui.target.provider.MavenTargetTreeContentProvider;
 import org.eclipse.pde.ui.target.ITargetLocationHandler;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
+@Component(service = IAdapterFactory.class, property = {
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTABLE_CLASS + "=org.eclipse.m2e.pde.target.MavenTargetDependency",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ILabelProvider",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.jface.viewers.ITreeContentProvider",
+		IAdapterFactory.SERVICE_PROPERTY_ADAPTER_NAMES + "=org.eclipse.pde.ui.target.ITargetLocationHandler" })
 public class MavenTargetDependencyAdapterFactory implements IAdapterFactory {
 
-	public static final ILabelProvider LABEL_PROVIDER = new MavenTargetDependencyLabelProvider();
-	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
-	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
-	static {
-		Activator.runOnBundleStop(LABEL_PROVIDER::dispose);
-		Activator.runOnBundleStop(TREE_CONTENT_PROVIDER::dispose);
-	}
+	private final ILabelProvider LABEL_PROVIDER = new MavenTargetDependencyLabelProvider();
+	private final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
+	private final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
 	@Override
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adaptableObject instanceof MavenTargetDependency) {
@@ -48,6 +50,12 @@ public class MavenTargetDependencyAdapterFactory implements IAdapterFactory {
 	@Override
 	public Class<?>[] getAdapterList() {
 		return new Class[] { ILabelProvider.class, ITreeContentProvider.class, ITargetLocationHandler.class };
+	}
+
+	@Deactivate
+	void dispose() {
+		LABEL_PROVIDER.dispose();
+		TREE_CONTENT_PROVIDER.dispose();
 	}
 
 }

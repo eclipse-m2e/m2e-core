@@ -120,7 +120,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     // in vast majority of cases there will be single workspace artifact with matching groupId and artifactId
     for(ArtifactKey workspaceArtifact : workspaceArtifacts.keySet()) {
       try {
-        Version workspaceVersion = versionScheme.parseVersion(workspaceArtifact.getVersion());
+        Version workspaceVersion = versionScheme.parseVersion(workspaceArtifact.version());
         if(constraint.containsVersion(workspaceVersion)) {
           matchingArtifacts.put(workspaceVersion, workspaceArtifact);
         }
@@ -159,8 +159,15 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     return false; // XXX
   }
 
-  public static void setDisabled(boolean disable) {
-    disabled.set(disable ? Boolean.TRUE : null);
+  public interface Disabled extends AutoCloseable {
+    @Override
+    void close();
+  }
+
+  public static Disabled setDisabled() {
+    boolean isDisabled = isDisabled();
+    disabled.set(true);
+    return () -> disabled.set(isDisabled);
   }
 
   public static boolean isDisabled() {
@@ -200,8 +207,8 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
 
     for(MavenProjectFacade facade : context.state.getProjects()) {
       ArtifactKey artifactKey = facade.getArtifactKey();
-      if(groupId.equals(artifactKey.getGroupId()) && artifactId.equals(artifactKey.getArtifactId())) {
-        versions.add(artifactKey.getVersion());
+      if(groupId.equals(artifactKey.groupId()) && artifactId.equals(artifactKey.artifactId())) {
+        versions.add(artifactKey.version());
       }
     }
 

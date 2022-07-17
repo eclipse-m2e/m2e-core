@@ -13,6 +13,9 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -95,29 +98,23 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
    */
   private void initialize() {
     String packagingToUse = MavenArtifactComponent.DEFAULT_PACKAGING;
-    String[] availablePackagingTypes = MavenArtifactComponent.PACKAGING_OPTIONS;
-    if(selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
-      IStructuredSelection ssel = (IStructuredSelection) selection;
+    List<String> availablePackagingTypes = Arrays.asList(MavenArtifactComponent.PACKAGING_OPTIONS);
+    if(selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection ssel) {
       if(ssel.size() > 1) {
         return;
       }
       Object obj = ssel.getFirstElement();
-      if(obj instanceof IResource) {
-        IContainer container;
-        if(obj instanceof IContainer) {
-          container = (IContainer) obj;
-        } else {
-          container = ((IResource) obj).getParent();
-        }
+      if(obj instanceof IResource resource) {
+        IContainer container = obj instanceof IContainer c ? c : resource.getParent();
         projectText.setText(container.getFullPath().toString());
         pomComponent.setArtifactId(container.getName());
         pomComponent.setGroupId(container.getName());
-        if(container instanceof IProject) {
+        if(container instanceof IProject project) {
           IProjectConversionManager pcm = MavenPlugin.getProjectConversionManager();
-          projectConversionEnabler = pcm.getConversionEnablerForProject((IProject) container);
+          projectConversionEnabler = pcm.getConversionEnablerForProject(project);
           if(projectConversionEnabler != null) {
-            availablePackagingTypes = projectConversionEnabler.getPackagingTypes((IProject) container);
-            packagingToUse = availablePackagingTypes[0];
+            availablePackagingTypes = projectConversionEnabler.getPackagingTypes(project);
+            packagingToUse = availablePackagingTypes.get(0);
           }
         }
       }
@@ -213,8 +210,8 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
       return;
     }
 
-    if(container instanceof IProject && projectConversionEnabler != null) {
-      IStatus status = projectConversionEnabler.canBeConverted((IProject) container);
+    if(container instanceof IProject project && projectConversionEnabler != null) {
+      IStatus status = projectConversionEnabler.canBeConverted(project);
       if(status.getSeverity() == IStatus.ERROR) {
         updateStatus(status.getMessage());
         return;

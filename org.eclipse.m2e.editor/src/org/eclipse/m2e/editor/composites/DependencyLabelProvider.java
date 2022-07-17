@@ -28,7 +28,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.project.MavenProject;
@@ -142,9 +141,8 @@ public class DependencyLabelProvider extends LabelProvider
 
   @Override
   public StyledString getStyledText(Object element) {
-    if(element instanceof DependenciesComposite.Dependency) {
+    if(element instanceof DependenciesComposite.Dependency dep) {
       StyledString ss = new StyledString(getText(element));
-      DependenciesComposite.Dependency dep = (DependenciesComposite.Dependency) element;
       String[] managed = findManaged(dep);
       if(managed != null && managed[0] != null) {
         String man = managed[0];
@@ -162,19 +160,15 @@ public class DependencyLabelProvider extends LabelProvider
 
   @Override
   public String getText(Object element) {
-    if(element instanceof DependenciesComposite.Dependency) {
-      DependenciesComposite.Dependency dependency = (DependenciesComposite.Dependency) element;
+    if(element instanceof DependenciesComposite.Dependency dependency) {
       return getText(dependency.groupId, dependency.artifactId, dependency.version, //
           dependency.classifier, dependency.type, dependency.scope);
-    } else if(element instanceof org.apache.maven.model.Dependency) {
-      org.apache.maven.model.Dependency dependency = (org.apache.maven.model.Dependency) element;
+    } else if(element instanceof org.apache.maven.model.Dependency dependency) {
       return getText(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
           dependency.getClassifier(), dependency.getType(), dependency.getScope());
-//    } else if(element instanceof Exclusion) {
-//      Exclusion exclusion = (Exclusion) element;
+//    } else if(element instanceof Exclusion exclusion) {
 //      return getText(exclusion.getGroupId(), exclusion.getArtifactId(), null, null, null, null);
-//    } else if(element instanceof Extension) {
-//      Extension extension = (Extension) element;
+//    } else if(element instanceof Extension extension) {
 //      return getText(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), null, null, null);
     }
     return super.getText(element);
@@ -182,25 +176,21 @@ public class DependencyLabelProvider extends LabelProvider
 
   @Override
   public Image getImage(Object element) {
-    if(element instanceof DependenciesComposite.Dependency) {
-      DependenciesComposite.Dependency dependency = (DependenciesComposite.Dependency) element;
+    if(element instanceof DependenciesComposite.Dependency dependency) {
       boolean isManaged = showManagedOverlay && findManaged(dependency) != null;
       return getImage(dependency.groupId, dependency.artifactId, dependency.version, isManaged);
-    } else if(element instanceof org.apache.maven.model.Dependency) {
+    } else if(element instanceof org.apache.maven.model.Dependency dependency) {
 
       if(!showManagedOverlay) {
-        org.apache.maven.model.Dependency dependency = (Dependency) element;
         //a workaround to handle display in ManagedDependenciesDialog
         //TODO shall have a switch of it's own.. the curse of blind code reuse
         return getImage(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), false);
       }
       //mkleint: all MavenDependency instances are inherited but only in *dependenciesComposite*
       return MavenEditorImages.IMG_INHERITED;
-//    }else if(element instanceof Exclusion) {
-//      Exclusion exclusion = (Exclusion) element;
+//    }else if(element instanceof Exclusion exclusion) {
 //      return getImage(exclusion.getGroupId(), exclusion.getArtifactId(), null, false);
-//    } else if(element instanceof Extension) {
-//      Extension extension = (Extension) element;
+//    } else if(element instanceof Extension extension) {
 //      return getImage(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), false);
     }
 

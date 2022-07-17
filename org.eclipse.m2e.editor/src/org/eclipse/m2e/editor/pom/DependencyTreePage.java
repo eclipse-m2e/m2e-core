@@ -306,8 +306,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     treeViewer.addOpenListener(event -> {
       IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
       for(Object o : selection) {
-        if(o instanceof DependencyNode) {
-          org.eclipse.aether.artifact.Artifact a = ((DependencyNode) o).getDependency().getArtifact();
+        if(o instanceof DependencyNode dep) {
+          org.eclipse.aether.artifact.Artifact a = dep.getDependency().getArtifact();
           OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
         }
       }
@@ -449,8 +449,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     listViewer.addOpenListener(event -> {
       IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
       for(Object o : selection) {
-        if(o instanceof Artifact) {
-          Artifact a = (Artifact) o;
+        if(o instanceof Artifact a) {
           OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
         }
       }
@@ -682,12 +681,10 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public boolean select(Viewer viewer, Object parentElement, Object element) {
       if(matcher != null && !matcher.isEmpty()) {
         // matcher = new TextMatcher(searchControl.getSearchText().getText());
-        if(element instanceof Artifact) {
-          Artifact a = (Artifact) element;
+        if(element instanceof Artifact a) {
           return matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId());
 
-        } else if(element instanceof DependencyNode) {
-          DependencyNode node = (DependencyNode) element;
+        } else if(element instanceof DependencyNode node) {
           org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
           if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
             return true;
@@ -768,12 +765,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Object[] getChildren(Object element) {
-      if(element instanceof DependencyNode) {
-        DependencyNode node = (DependencyNode) element;
-        List<DependencyNode> children = node.getChildren();
-        return children.toArray(new DependencyNode[children.size()]);
-      }
-      return new Object[0];
+      return element instanceof DependencyNode node ? node.getChildren().toArray(DependencyNode[]::new) : new Object[0];
     }
 
     @Override
@@ -783,11 +775,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public boolean hasChildren(Object element) {
-      if(element instanceof DependencyNode) {
-        DependencyNode node = (DependencyNode) element;
-        return !node.getChildren().isEmpty();
-      }
-      return false;
+      return element instanceof DependencyNode node && !node.getChildren().isEmpty();
     }
 
     @Override
@@ -818,8 +806,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof DependencyNode) {
-        DependencyNode node = (DependencyNode) element;
+      if(element instanceof DependencyNode node) {
         String scope = node.getDependency().getScope();
         if(scope != null && !"compile".equals(scope) && !isMatching(node)) { //$NON-NLS-1$
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -837,10 +824,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
 
     private boolean isMatching(Object element) {
-      if(element instanceof DependencyNode) {
-        return isMatching(((DependencyNode) element));
-      }
-      return false;
+      return element instanceof DependencyNode node && isMatching(node);
     }
 
     private boolean isMatching(DependencyNode node) {
@@ -855,9 +839,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public String getText(Object element) {
-      if(element instanceof DependencyNode) {
-        DependencyNode node = (DependencyNode) element;
-
+      if(element instanceof DependencyNode node) {
         org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
 
         StringBuilder label = new StringBuilder(128);
@@ -904,8 +886,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Image getImage(Object element) {
-      if(element instanceof DependencyNode) {
-        DependencyNode node = (DependencyNode) element;
+      if(element instanceof DependencyNode node) {
         org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
@@ -935,8 +916,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Color getForeground(Object element) {
-      if(element instanceof Artifact) {
-        Artifact a = (Artifact) element;
+      if(element instanceof Artifact a) {
         String scope = a.getScope();
         if(scope != null && !"compile".equals(scope) && !isMatching(a)) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -947,10 +927,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Color getBackground(Object element) {
-      if(element instanceof Artifact && isMatching((Artifact) element)) {
-        return highlighter.getBackgroundColor();
-      }
-      return null;
+      return element instanceof Artifact artifact && isMatching(artifact) ? highlighter.getBackgroundColor() : null;
     }
 
     private boolean isMatching(Artifact a) {
@@ -963,8 +940,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public String getText(Object element) {
-      if(element instanceof Artifact) {
-        Artifact a = (Artifact) element;
+      if(element instanceof Artifact a) {
         StringBuilder label = new StringBuilder(64);
 
         if(showGroupId) {
@@ -988,8 +964,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Image getImage(Object element) {
-      if(element instanceof Artifact) {
-        Artifact a = (Artifact) element;
+      if(element instanceof Artifact a) {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
             a.getArtifactId(), //
@@ -1005,8 +980,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     public Object[] getElements(Object input) {
-      if(input instanceof MavenProject) {
-        MavenProject project = (MavenProject) input;
+      if(input instanceof MavenProject project) {
         List<Artifact> artifacts = new ArrayList<>();
         ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(currentClasspath);
         for(Artifact artifact : project.getArtifacts()) {
@@ -1050,8 +1024,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
 
     protected void addArtifactKey(Object o) {
-      if(o instanceof Artifact) {
-        Artifact a = (Artifact) o;
+      if(o instanceof Artifact a) {
         artifactKeys.add(getKey(a.getGroupId(), a.getArtifactId()));
       }
     }
@@ -1070,8 +1043,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     @Override
     protected void addArtifactKey(Object o) {
-      if(o instanceof DependencyNode) {
-        org.eclipse.aether.artifact.Artifact a = ((DependencyNode) o).getDependency().getArtifact();
+      if(o instanceof DependencyNode node) {
+        org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
         artifactKeys.add(getKey(a.getGroupId(), a.getArtifactId()));
       }
     }
@@ -1140,7 +1113,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   }
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
 

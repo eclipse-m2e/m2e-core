@@ -143,8 +143,8 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
     File configFile = getConfigurationFile(facade.getProject());
     try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(configFile))) {
       Object obj = ois.readObject();
-      if(obj instanceof LifecycleMappingConfiguration) {
-        return (LifecycleMappingConfiguration) obj;
+      if(obj instanceof LifecycleMappingConfiguration lifecycleMappingConfiguration) {
+        return lifecycleMappingConfiguration;
       }
     } catch(ClassNotFoundException ex) {
       log.warn("Could not read persistent build lifecycle mapping configuration for {}.", facade.toString(), ex);

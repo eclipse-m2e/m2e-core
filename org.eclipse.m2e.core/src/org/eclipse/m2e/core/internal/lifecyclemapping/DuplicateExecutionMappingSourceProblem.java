@@ -10,6 +10,7 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import org.eclipse.core.resources.IMarker;
@@ -22,27 +23,17 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * DuplicateExecutionMappingSourceProblem
- *
  */
 public class DuplicateExecutionMappingSourceProblem extends DuplicateMappingSourceProblem {
 
-  private MojoExecutionKey executionKey;
+  private final MojoExecutionKey executionKey;
 
-  /**
-   * @param location
-   * @param message
-   * @param executionKey
-   * @param error
-   */
   public DuplicateExecutionMappingSourceProblem(SourceLocation location, String message, MojoExecutionKey executionKey,
       DuplicatePluginExecutionMetadataException error) {
-    super(location, message, IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE_GOAL, executionKey.getGoal(), error);
+    super(location, message, IMavenConstants.MARKER_DUPLICATEMAPPING_TYPE_GOAL, executionKey.goal(), error);
     this.executionKey = executionKey;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.DuplicateMappingSourceProblem#processMarker(org.eclipse.core.resources.IMarker)
-   */
   @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);

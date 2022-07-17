@@ -21,6 +21,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocu
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.textEquals;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -53,9 +54,13 @@ import org.apache.maven.model.Parent;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.archetype.MavenArchetype;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
@@ -210,7 +215,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         }
       }
 
-      final String[] folders = artifactPage.getFolders();
+      final List<String> folders = artifactPage.getFolders();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName)) {
         @Override
@@ -241,18 +246,22 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final String version = model.getVersion();
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
+      final boolean interactive = parametersPage.isInteractive();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
-              archetype, //
+          Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
+              .createArchetypeProjects(location,
+              new MavenArchetype(archetype), //
               groupId, artifactId, version, javaPackage, //
-              properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
-
+                  properties, interactive, monitor);
           setModule(moduleName);
 
-          return projects;
+          return MavenPlugin.getProjectConfigurationManager()
+              .importProjects(projects, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor)
+              .stream().filter(r -> r.getProject() != null && r.getProject().exists())
+              .map(IMavenProjectImportResult::getProject).toList();
         }
       };
     }

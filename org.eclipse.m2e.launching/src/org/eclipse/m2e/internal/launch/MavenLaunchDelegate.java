@@ -107,6 +107,15 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   @Override
+  protected boolean saveBeforeLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor)
+      throws CoreException {
+    if(configuration.getAttribute(ATTR_SAVE_BEFORE_LAUNCH, true)) {
+      return super.saveBeforeLaunch(configuration, mode, monitor);
+    }
+    return true;
+  }
+
+  @Override
   public IVMRunner getVMRunner(final ILaunchConfiguration configuration, String mode) throws CoreException {
     return launchSupport.decorateVMRunner(super.getVMRunner(configuration, mode));
   }
@@ -175,28 +184,35 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
    */
   private void getProperties(StringBuilder sb, ILaunchConfiguration configuration) throws CoreException {
 
+    List<String> properties;
     try {
-      List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.emptyList());
-      for(String property : properties) {
-        int n = property.indexOf('=');
-        String name = property;
-        String value = null;
-
-        if(n > -1) {
-          name = property.substring(0, n);
-          if(n > 1) {
-            value = LaunchingUtils.substituteVar(property.substring(n + 1));
-          }
-        }
-
-        sb.append(" -D").append(name); //$NON-NLS-1$
-        if(value != null) {
-          sb.append('=').append(quote(value));
-        }
-      }
+      properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.emptyList());
     } catch(CoreException e) {
       log.error("Exception while getting configuration attribute " + ATTR_PROPERTIES, e);
       throw e;
+    }
+    for(String property : properties) {
+      int n = property.indexOf('=');
+      String name = property;
+      String value = null;
+
+      if(n > -1) {
+        name = property.substring(0, n);
+        if(n > 1) {
+          String substring = property.substring(n + 1);
+          try {
+            value = LaunchingUtils.substituteVar(substring);
+          } catch(CoreException e) {
+            log.debug("Exception while substitute variables in substring " + substring + " using raw value.", e);
+            value = substring;
+          }
+        }
+      }
+
+      sb.append(" -D").append(name); //$NON-NLS-1$
+      if(value != null) {
+        sb.append('=').append(quote(value));
+      }
     }
 
     try {
@@ -216,7 +232,9 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private void getPreferences(StringBuilder sb, ILaunchConfiguration configuration, String goals) throws CoreException {
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
-    sb.append(" -B"); //$NON-NLS-1$
+    if(configuration.getAttribute(MavenLaunchConstants.ATTR_BATCH, true)) {
+      sb.append(" -B"); //$NON-NLS-1$
+    }
 
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_DEBUG_OUTPUT, mavenConfiguration.isDebugOutput())) {
       sb.append(" -X").append(" -e"); //$NON-NLS-1$ //$NON-NLS-2$

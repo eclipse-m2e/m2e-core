@@ -154,8 +154,8 @@ public class MavenRepositoryView extends ViewPart {
     ArrayList<IMavenRepositoryNode> list = new ArrayList<>();
     if(elements != null) {
       for(Object elem : elements) {
-        if(elem instanceof IMavenRepositoryNode) {
-          list.add((IMavenRepositoryNode) elem);
+        if(elem instanceof IMavenRepositoryNode repoNode) {
+          list.add(repoNode);
         }
       }
     }
@@ -168,8 +168,7 @@ public class MavenRepositoryView extends ViewPart {
     }
     ArrayList<IArtifactNode> list = new ArrayList<>();
     for(Object elem : elements) {
-      if(elem instanceof IArtifactNode) {
-        IArtifactNode node = (IArtifactNode) elem;
+      if(elem instanceof IArtifactNode node) {
         list.add(node);
       }
     }
@@ -238,8 +237,8 @@ public class MavenRepositoryView extends ViewPart {
       public void run() {
         ISelection selection = viewer.getSelection();
         Object element = ((IStructuredSelection) selection).getFirstElement();
-        if(element instanceof IArtifactNode) {
-          Artifact f = ((IArtifactNode) element).getArtifact();
+        if(element instanceof IArtifactNode node) {
+          Artifact f = node.getArtifact();
           OpenPomAction.openEditor(f.getGroupId(), f.getArtifactId(), f.getVersion(), null);
         }
       }
@@ -257,8 +256,8 @@ public class MavenRepositoryView extends ViewPart {
       public void run() {
         Object element = getStructuredSelection().getFirstElement();
         String url = null;
-        if(element instanceof RepositoryNode) {
-          url = ((RepositoryNode) element).getRepositoryUrl();
+        if(element instanceof RepositoryNode repoNode) {
+          url = repoNode.getRepositoryUrl();
         } else if(element instanceof IndexedArtifact) {
           //
         } else if(element instanceof IndexedArtifactFile) {
@@ -308,8 +307,7 @@ public class MavenRepositoryView extends ViewPart {
     if(elements.size() != 1) {
       return null;
     }
-    Object element = elements.get(0);
-    return element instanceof RepositoryNode ? (RepositoryNode) element : null;
+    return elements.get(0) instanceof RepositoryNode repoNode ? repoNode : null;
   }
 
   @Override

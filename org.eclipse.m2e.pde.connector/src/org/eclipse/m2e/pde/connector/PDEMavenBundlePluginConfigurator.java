@@ -62,7 +62,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			if (isFelix(plugin)) {
 				if (isFelixManifestGoal(execution)) {
 					IMaven maven = MavenPlugin.getMaven();
-					Boolean supportIncremental = maven.getMojoParameterValue(request.getMavenProject(), execution,
+					Boolean supportIncremental = maven.getMojoParameterValue(request.mavenProject(), execution,
 							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
 					if (supportIncremental == null || !supportIncremental.booleanValue()) {
 						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
@@ -82,7 +82,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 							+ (isFelix(execution.getPlugin()) ? FELIX_MANIFEST_GOAL : BND_MANIFEST_GOALS) + ".");
 		}
 
-		IMavenProjectFacade facade = request.getMavenProjectFacade();
+		IMavenProjectFacade facade = request.mavenProjectFacade();
 		IPath metainfPath = getMetainfPath(facade, executions, monitor);
 		PDEProjectHelper.addPDENature(facade.getProject(), metainfPath, monitor);
 	}
@@ -96,8 +96,8 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 		if (facade == null) {
 			// attribute specifying project (probably parent) is not in the workspace.
 			// The following code returns the location of the project's parent-element.
-			location = SourceLocationHelper.findLocation(request.getMavenProject(), new MojoExecutionKey(execution));
-			facade = request.getMavenProjectFacade();
+			location = SourceLocationHelper.findLocation(request.mavenProject(), new MojoExecutionKey(execution));
+			facade = request.mavenProjectFacade();
 		}
 		MavenProblemInfo problem = new MavenProblemInfo(message, IMarker.SEVERITY_WARNING, location);
 		markerManager.addErrorMarker(facade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, problem);

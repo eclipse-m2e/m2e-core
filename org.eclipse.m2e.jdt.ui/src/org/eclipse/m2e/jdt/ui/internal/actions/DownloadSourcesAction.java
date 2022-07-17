@@ -62,14 +62,11 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
     if(selection != null) {
       IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
       for(Object element : selection) {
-        if(element instanceof IProject) {
-          IProject project = (IProject) element;
+        if(element instanceof IProject project) {
           buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
-        } else if(element instanceof IPackageFragmentRoot) {
-          IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
+        } else if(element instanceof IPackageFragmentRoot fragment) {
           buildpathManager.scheduleDownload(fragment, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
-        } else if(element instanceof IWorkingSet) {
-          IWorkingSet workingSet = (IWorkingSet) element;
+        } else if(element instanceof IWorkingSet workingSet) {
           for(IAdaptable adaptable : workingSet.getElements()) {
             IProject project = adaptable.getAdapter(IProject.class);
             buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
@@ -80,8 +77,8 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
   }
 
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      this.selection = structuredSelection;
     } else {
       this.selection = null;
     }

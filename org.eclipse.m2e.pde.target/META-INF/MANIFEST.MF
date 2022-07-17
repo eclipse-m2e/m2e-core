@@ -4,18 +4,19 @@ Bundle-Name: M2E PDE Integration
 Bundle-SymbolicName: org.eclipse.m2e.pde.target;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde.target
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.19.0",
  org.eclipse.pde.ui;bundle-version="3.12.0",
  org.eclipse.equinox.frameworkadmin;bundle-version="2.1.400",
- biz.aQute.bndlib;bundle-version="5.1.2",
- org.eclipse.m2e.maven.runtime,
- org.eclipse.m2e.core,
+ org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
+ org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.core.resources
 Export-Package: org.eclipse.m2e.pde.target;x-friends:="org.eclipse.m2e.pde.ui"
 Bundle-Activator: org.eclipse.m2e.pde.target.Activator
 Bundle-ActivationPolicy: lazy
-Import-Package: org.apache.commons.codec.digest;version="1.14.0",
+Import-Package: aQute.bnd.osgi;version="[5.5.0,6.0.0)",
+ aQute.bnd.version;version="[2.2.0,3.0.0)",
+ org.apache.commons.codec.digest;version="1.14.0",
  org.apache.commons.io;version="2.6.0",
  org.apache.commons.io.output;version="2.8.0",
  org.slf4j

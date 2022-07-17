@@ -16,6 +16,9 @@ package org.eclipse.m2e.core.ui.internal;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -32,6 +35,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
@@ -40,9 +44,15 @@ import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 
 public class M2EUIPluginActivator extends AbstractUIPlugin {
 
+  private final Logger log = LoggerFactory.getLogger(M2EUIPluginActivator.class);
+
+  public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
+
   public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$
 
   private static M2EUIPluginActivator instance;
+
+  private ServiceTracker<ArchetypePlugin, ArchetypePlugin> archetypeManager;
 
   /**
    * Storage for preferences.
@@ -70,8 +80,11 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   public static final String PROP_SHOW_EXPERIMENTAL_FEATURES = "m2e.showExperimentalFeatures";
 
+  private BundleContext context;
+
   @Override
   public void start(BundleContext context) throws Exception {
+    this.context = context;
     super.start(context);
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -160,4 +173,15 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   public static boolean showExperimentalFeatures() {
     return Boolean.parseBoolean(System.getProperty(PROP_SHOW_EXPERIMENTAL_FEATURES));
   }
+
+  public ArchetypePlugin getArchetypePlugin() {
+    synchronized(this) {
+      if(this.archetypeManager == null) {
+        archetypeManager = new ServiceTracker<>(context, ArchetypePlugin.class, null);
+        archetypeManager.open();
+      }
+    }
+    return this.archetypeManager.getService();
+  }
+
 }

@@ -44,8 +44,8 @@ public class UpdateConfigurationStartup implements IStartup {
   private static final String PROJECT_PREF = DiscoveryActivator.PLUGIN_ID + ".pref.projects"; //$NON-NLS-1$
 
   public void earlyStartup() {
-    IProject[] projects = getSavedProjects();
-    if(projects != null && projects.length > 0) {
+    List<IProject> projects = getSavedProjects();
+    if(!projects.isEmpty()) {
       updateConfiguration(projects);
     }
     disableStartup();
@@ -88,10 +88,10 @@ public class UpdateConfigurationStartup implements IStartup {
    */
   public static void updateConfiguration() {
     Collection<IProject> projects = getMarkedProjects();
-    new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
+    updateConfiguration(projects);
   }
 
-  private static void updateConfiguration(IProject[] projects) {
+  private static void updateConfiguration(Collection<IProject> projects) {
     new UpdateMavenProjectJob(projects).schedule();
   }
 
@@ -138,7 +138,7 @@ public class UpdateConfigurationStartup implements IStartup {
   }
 
   private static void setEarlyActivationPreference(String[] disabledPlugins) {// Add ourself to disabled
-	StringBuilder preference = new StringBuilder();
+    StringBuilder preference = new StringBuilder();
     for(String item : disabledPlugins) {
       preference.append(item).append(IPreferenceConstants.SEPARATOR);
     }
@@ -151,7 +151,7 @@ public class UpdateConfigurationStartup implements IStartup {
   /*
    * Get projects we saved previously
    */
-  public static IProject[] getSavedProjects() {
+  public static List<IProject> getSavedProjects() {
     String[] projectNames = DiscoveryActivator.getDefault().getPreferenceStore().getString(PROJECT_PREF)
         .split(String.valueOf(IPreferenceConstants.SEPARATOR));
     List<IProject> projects = new ArrayList<>(projectNames.length);
@@ -164,7 +164,7 @@ public class UpdateConfigurationStartup implements IStartup {
         }
       }
     }
-    return projects.toArray(new IProject[projects.size()]);
+    return projects;
   }
 
   /*

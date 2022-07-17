@@ -45,12 +45,12 @@ public abstract class MojoExecutionProblemInfo extends MavenProblemInfo {
 
   static void setExecutionInfo(MojoExecutionKey mojoExecutionKey, IMarker marker) throws CoreException {
     //TODO what parameters are important here for the hints?
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecutionKey.getGroupId());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecutionKey.getArtifactId());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecutionKey.getExecutionId());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecutionKey.getGoal());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecutionKey.getVersion());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecutionKey.getLifecyclePhase());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecutionKey.groupId());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecutionKey.artifactId());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecutionKey.executionId());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecutionKey.goal());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecutionKey.version());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecutionKey.lifecyclePhase());
   }
 
 }

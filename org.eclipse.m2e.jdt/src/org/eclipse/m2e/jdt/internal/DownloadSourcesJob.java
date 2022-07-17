@@ -93,11 +93,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       if(this == o) {
         return true;
       }
-      if(!(o instanceof DownloadRequest)) {
-        return false;
-      }
-      DownloadRequest other = (DownloadRequest) o;
-      return project.equals(other.project) && Objects.equals(fragment, other.fragment)
+      return o instanceof DownloadRequest other && //
+          project.equals(other.project) && Objects.equals(fragment, other.fragment)
           && Objects.equals(artifact, other.artifact) && downloadSources == other.downloadSources
           && downloadJavaDoc == other.downloadJavaDoc;
     }
@@ -214,7 +211,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     SubMonitor requestMonitor = SubMonitor.convert(monitor, 33);
     try {
       if(request.artifact != null) {
-        requestMonitor.setTaskName(getName() + ": " + request.artifact.getArtifactId());
+        requestMonitor.setTaskName(getName() + ": " + request.artifact.artifactId());
       } else if(request.project != null) {
         requestMonitor.setTaskName(getName() + ": " + request.project.getName());
       }
@@ -308,11 +305,11 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private File download(ArtifactKey artifact, List<ArtifactRepository> repositories, IProgressMonitor monitor)
       throws CoreException {
-    Artifact resolved = maven.resolve(artifact.getGroupId(), //
-        artifact.getArtifactId(), //
-        artifact.getVersion(), //
+    Artifact resolved = maven.resolve(artifact.groupId(), //
+        artifact.artifactId(), //
+        artifact.version(), //
         "jar" /*type*/, // //$NON-NLS-1$
-        artifact.getClassifier(), //
+        artifact.classifier(), //
         repositories, //
         monitor);
     return resolved.getFile();

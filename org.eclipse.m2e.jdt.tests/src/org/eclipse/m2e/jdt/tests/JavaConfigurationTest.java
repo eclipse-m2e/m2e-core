@@ -10,6 +10,7 @@
 
 package org.eclipse.m2e.jdt.tests;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.core.IJavaProject;
@@ -52,4 +56,19 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
     waitForJobsToComplete();
     assertEquals("11", javaProject.getOption(JavaCore.COMPILER_SOURCE, false));
   }
+
+	@Test
+	public void testJDTWarnings() throws CoreException, IOException, InterruptedException {
+		((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
+		setAutoBuilding(true);
+		File pomFileFS = new File(
+				FileLocator.toFileURL(getClass().getResource("/projects/compilerWarnings/pom.xml")).getFile());
+		waitForJobsToComplete();
+		IProject project = importProject(pomFileFS.getAbsolutePath());
+		IFile file = project.getFile("src/main/java/A.java");
+		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+		waitForJobsToComplete();
+		IMarker[] findMarkers = file.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
+		assertArrayEquals(new IMarker[0], findMarkers);
+	}
 }

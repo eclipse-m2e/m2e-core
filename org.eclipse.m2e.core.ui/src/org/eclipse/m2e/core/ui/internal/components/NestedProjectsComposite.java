@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.ui.internal.components;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +82,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   Collection<IProject> projects;
 
-  IProject[] selectedProjects;
+  List<IProject> selectedProjects;
 
   private Link includeOutDateProjectslink;
 
@@ -114,8 +115,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
         @Override
         public Object[] getElements(Object element) {
-        if(element instanceof Collection) {
-          return ((Collection<?>) element).toArray();
+        if(element instanceof Collection<?> collection) {
+          return collection.toArray();
         }
         return null;
       }
@@ -135,8 +136,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
             }
           }
           return children.toArray();
-        } else if(parentElement instanceof Collection) {
-          return ((Collection<?>) parentElement).toArray();
+        } else if(parentElement instanceof Collection<?> collection) {
+          return collection.toArray();
         }
         return null;
       }
@@ -163,8 +164,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
               return true;
             }
           }
-        } else if(element instanceof Collection) {
-          return !((Collection<?>) element).isEmpty();
+        } else if(element instanceof Collection<?> collection) {
+          return !collection.isEmpty();
         }
         return false;
       }
@@ -351,8 +352,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   String getElePath(Object element) {
-    if(element instanceof IProject) {
-      IProject project = (IProject) element;
+    if(element instanceof IProject project) {
       URI locationURI = project.getLocationURI();
 
       try {
@@ -416,8 +416,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   private static void addProject(Collection<IProject> projects, String location) {
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     for(IContainer container : root.findContainersForLocationURI(new File(location).toURI())) {
-      if(container instanceof IProject) {
-        projects.add((IProject) container);
+      if(container instanceof IProject project) {
+        projects.add(project);
         break;
       }
     }
@@ -461,23 +461,19 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   public IProject getSelection() {
     ISelection selection = codebaseViewer.getSelection();
-    if(selection instanceof IStructuredSelection) {
-      return (IProject) ((IStructuredSelection) selection).getFirstElement();
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      return (IProject) structuredSelection.getFirstElement();
     }
     return null;
   }
 
-  public IProject[] getSelectedProjects() {
+  public List<IProject> getSelectedProjects() {
     return selectedProjects;
   }
 
-  IProject[] internalGetSelectedProjects() {
+  List<IProject> internalGetSelectedProjects() {
     Object[] obj = codebaseViewer.getCheckedElements();
-    IProject[] projects = new IProject[obj.length];
-    for(int i = 0; i < obj.length; i++ ) {
-      projects[i] = (IProject) obj[i];
-    }
-    return projects;
+    return Arrays.stream(obj).map(IProject.class::cast).toList();
   }
 
   public void refresh() {

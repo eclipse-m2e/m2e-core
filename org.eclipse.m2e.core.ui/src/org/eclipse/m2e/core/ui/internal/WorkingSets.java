@@ -75,7 +75,7 @@ public class WorkingSets {
    *
    * @since 1.5
    */
-  public static void addToWorkingSet(IProject[] projects, String workingSetName) {
+  public static void addToWorkingSet(List<IProject> projects, String workingSetName) {
     IWorkingSet[] workingSets = new IWorkingSet[] {getOrCreateWorkingSet(workingSetName)};
     IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
     for(IProject project : projects) {

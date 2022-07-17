@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,21 +33,17 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
@@ -64,15 +59,8 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.converters.ConfigurationConverter;
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
@@ -98,8 +86,6 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.extension.internal.CoreExports;
-import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -111,8 +97,6 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.interpolation.ModelInterpolator;
-import org.apache.maven.model.io.ModelReader;
-import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -173,14 +157,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
 public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
+
   private static final Logger log = LoggerFactory.getLogger(MavenImpl.class);
-
-  /**
-   * Id of maven core class realm
-   */
-  public static final String MAVEN_CORE_REALM_ID = "plexus.core"; //$NON-NLS-1$
-
-  private DefaultPlexusContainer plexus;
 
   @Reference
   private IMavenConfiguration mavenConfiguration;
@@ -191,6 +169,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private final List<ISettingsChangeListener> settingsListeners = new CopyOnWriteArrayList<>();
 
   private final List<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<>();
+
+  @Reference
+  private PlexusContainerManager containerManager;
 
   /**
    * Cached parsed settings.xml instance
@@ -228,7 +209,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     try {
       DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup(Maven.class))
           .newRepositorySession(request);
-      String updatePolicy = mavenConfiguration.getGlobalUpdatePolicy();
+      String updatePolicy = getMavenConfiguration().getGlobalUpdatePolicy();
       return new FilterRepositorySystemSession(session, request.isUpdateSnapshots() ? null : updatePolicy);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
@@ -266,7 +247,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
         monitor);
   }
@@ -291,7 +272,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
         monitor);
   }
@@ -432,41 +413,15 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException {
-    if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())
-        || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.getKey())) {
+    if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.key())
+        || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.key())) {
       reloadSettings();
     }
   }
 
   @Override
-  public Model readModel(InputStream in) throws CoreException {
-    try {
-      return lookup(ModelReader.class).read(in, null);
-    } catch(IOException e) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
-    }
-  }
-
-  public Model readModel(File pomFile) throws CoreException {
-    try (InputStream is = new FileInputStream(pomFile)) {
-      return readModel(is);
-    } catch(IOException e) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
-    }
-  }
-
-  @Override
-  public void writeModel(Model model, OutputStream out) throws CoreException {
-    try {
-      lookup(ModelWriter.class).write(out, null, model);
-    } catch(IOException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_write_pom, ex));
-    }
-  }
-
-  @Override
   public MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute((context, pm) -> {
+    return getExecutionContext().execute((context, pm) -> {
       MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
       try {
         lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -478,6 +433,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_project, ex));
       }
     }, monitor);
+  }
+
+  private IMavenExecutionContext getExecutionContext() {
+    return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext);
   }
 
   @Override
@@ -589,7 +548,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(child,
+    return getExecutionContext().execute(child,
         (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
         context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
@@ -615,7 +574,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
     List<ArtifactRepository> repositories = remoteRepositories;
 
-    return IMavenExecutionContext.join(this).execute((context, pm) -> {
+    return getExecutionContext().execute((context, pm) -> {
       org.eclipse.aether.RepositorySystem repoSystem = lookup(org.eclipse.aether.RepositorySystem.class);
 
       ArtifactRequest request = new ArtifactRequest();
@@ -801,7 +760,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
@@ -843,7 +802,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       ConfigurationConverter typeConverter = converterLookup.lookupConverterForType(type);
 
       Object value = typeConverter.fromConfiguration(converterLookup, paramConfig, type, Object.class,
-          plexus.getContainerRealm(), expressionEvaluator, null);
+          getPlexusContainer().getContainerRealm(), expressionEvaluator, null);
       return type.cast(value);
     } catch(ComponentConfigurationException | ClassCastException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_param, ex));
@@ -853,7 +812,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(project,
+    return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal),
         monitor);
   }
@@ -983,13 +942,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public Mirror getMirror(ArtifactRepository repo) throws CoreException {
-    return IMavenExecutionContext.join(this)
+    return getExecutionContext()
         .execute((c, m) -> lookup(RepositorySystem.class).getMirror(repo, c.getExecutionRequest().getMirrors()), null);
   }
 
   @Override
   public List<Mirror> getMirrors() throws CoreException {
-    return IMavenExecutionContext.join(this).execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
+    return getExecutionContext().execute((c, m) -> c.getExecutionRequest().getMirrors(), null);
   }
 
   @Override
@@ -1016,18 +975,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public PlexusContainer getPlexusContainer() throws CoreException {
     try {
-      return getPlexusContainer0();
-    } catch(PlexusContainerException ex) {
+      return containerManager.aquire();
+    } catch(Exception ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_init_maven, ex));
     }
-  }
-
-  private synchronized PlexusContainer getPlexusContainer0() throws PlexusContainerException {
-    if(plexus == null) {
-      plexus = newPlexusContainer();
-      plexus.setLoggerManager(new EclipseLoggerManager(mavenConfiguration));
-    }
-    return plexus;
   }
 
   @Override
@@ -1073,58 +1024,43 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public <T> T lookup(Class<T> clazz) throws CoreException {
+    ClassLoader ccl = Thread.currentThread().getContextClassLoader();
     try {
-      return getPlexusContainer().lookup(clazz);
+      PlexusContainer plexusContainer = getPlexusContainer();
+      Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+      return plexusContainer.lookup(clazz);
     } catch(ComponentLookupException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
-    }
-  }
-
-  private static DefaultPlexusContainer newPlexusContainer() throws PlexusContainerException {
-    ClassWorld classWorld = new ClassWorld(MAVEN_CORE_REALM_ID, ClassWorld.class.getClassLoader());
-    ClassRealm realm;
-    try {
-      realm = classWorld.getRealm(MAVEN_CORE_REALM_ID);
-    } catch(NoSuchRealmException e) {
-      throw new PlexusContainerException("Could not lookup required class realm", e);
-    }
-    ContainerConfiguration mavenCoreCC = new DefaultContainerConfiguration() //
-        .setClassWorld(classWorld) //
-        .setRealm(realm) //
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setName("mavenCore"); //$NON-NLS-1$
-
-    Module logginModule = new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
-      }
-    };
-    Module coreExportsModule = new AbstractModule() {
-      @Override
-      protected void configure() {
-        ClassRealm realm = mavenCoreCC.getRealm();
-        CoreExtensionEntry entry = CoreExtensionEntry.discoverFrom(realm);
-        CoreExports exports = new CoreExports(entry);
-        bind(CoreExports.class).toInstance(exports);
-      }
-    };
-    return new DefaultPlexusContainer(mavenCoreCC, logginModule, new ExtensionModule(), coreExportsModule);
-  }
-
-  @Deactivate
-  public synchronized void disposeContainer() {
-    if(plexus != null) {
-      plexus.dispose();
+    } finally {
+      Thread.currentThread().setContextClassLoader(ccl);
     }
   }
 
   @Override
+  public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
+    ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+    try {
+      PlexusContainer plexusContainer = getPlexusContainer();
+      Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
+      return plexusContainer.lookupList(type);
+    } catch(ComponentLookupException ex) {
+      return List.of();
+    } finally {
+      Thread.currentThread().setContextClassLoader(ccl);
+    }
+  }
+
+
+  @Override
   public ClassLoader getProjectRealm(MavenProject project) {
+    Objects.requireNonNull(project);
     ClassLoader classLoader = project.getClassRealm();
     if(classLoader == null) {
-      classLoader = plexus.getContainerRealm();
+      try {
+        return containerManager.aquire(project.getBasedir()).getContainerRealm();
+      } catch(Exception ex) {
+        throw new RuntimeException(ex);
+      }
     }
     return classLoader;
   }
@@ -1160,25 +1096,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public MavenExecutionContext createExecutionContext() {
     return new MavenExecutionContext(this, (IMavenProjectFacade) null);
-  }
-
-  /**
-   * @param file a base file or directory, may be <code>null</code>
-   * @return the value for `maven.multiModuleProjectDirectory` as defined in Maven launcher
-   */
-  public static File computeMultiModuleProjectDirectory(File file) {
-    if(file == null) {
-      return null;
-    }
-    final File basedir = file.isDirectory() ? file : file.getParentFile();
-    File current = basedir;
-    while(current != null) {
-      if(new File(current, ".mvn").isDirectory()) {
-        return current;
-      }
-      current = current.getParentFile();
-    }
-    return basedir;
   }
 
 }

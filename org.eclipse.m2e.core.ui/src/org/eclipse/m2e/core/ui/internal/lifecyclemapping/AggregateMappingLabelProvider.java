@@ -50,18 +50,18 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
 
   @Override
   public String getMavenText() {
-    if(element instanceof LifecycleStrategyMappingRequirement) {
-      return NLS.bind("Connector {0}", ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId());
-    } else if(element instanceof MojoExecutionMappingRequirement) {
-      MojoExecutionKey exec = ((MojoExecutionMappingRequirement) element).getExecution();
+    if(element instanceof LifecycleStrategyMappingRequirement lifecycleStrategyMappingRequirement) {
+      return NLS.bind("Connector {0}", lifecycleStrategyMappingRequirement.getLifecycleMappingId());
+    } else if(element instanceof MojoExecutionMappingRequirement req) {
+      MojoExecutionKey exec = req.getExecution();
       return NLS.bind("{0}:{1}:{2}",
-          new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
-    } else if(element instanceof PackagingTypeMappingRequirement) {
-      return NLS.bind("Packaging {0}", ((PackagingTypeMappingRequirement) element).getPackaging());
-    } else if(element instanceof ProjectConfiguratorMappingRequirement) {
-      MojoExecutionKey exec = ((ProjectConfiguratorMappingRequirement) element).getExecution();
+          new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
+    } else if(element instanceof PackagingTypeMappingRequirement req) {
+      return NLS.bind("Packaging {0}", req.packaging());
+    } else if(element instanceof ProjectConfiguratorMappingRequirement req) {
+      MojoExecutionKey exec = req.execution();
       return NLS.bind("{0}:{1}:{2}",
-          new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
+          new String[] {exec.artifactId(), exec.version(), exec.goal(), String.valueOf(content.size())});
     }
     throw new IllegalStateException();
   }
@@ -101,9 +101,6 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
 
   @Override
   public boolean equals(Object other) {
-    if(other instanceof AggregateMappingLabelProvider) {
-      return other.hashCode() == hashCode();
-    }
-    return false;
+    return other instanceof AggregateMappingLabelProvider && other.hashCode() == hashCode();
   }
 }

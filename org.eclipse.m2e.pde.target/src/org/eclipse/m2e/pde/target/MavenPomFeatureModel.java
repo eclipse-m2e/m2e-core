@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.internal.core.NLResourceHelper;
 import org.eclipse.pde.internal.core.feature.AbstractFeatureModel;
@@ -75,7 +76,7 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 	public void load() throws CoreException {
 		editable = true;
 		try (FileInputStream stream = new FileInputStream(artifact.getFile())) {
-			Model model = MavenPlugin.getMaven().readModel(stream);
+			Model model = IMavenToolbox.of(MavenPlugin.getMaven()).readModel(stream);
 
 			IFeature f = getFeature();
 			String id = model.getGroupId() + "." + model.getArtifactId() + "." + model.getPackaging();

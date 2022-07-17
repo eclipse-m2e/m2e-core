@@ -16,6 +16,7 @@
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -137,18 +138,17 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     String newChecksumPolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
     boolean updateRequired = !originalChecksumPolicy.equals(newChecksumPolicy);
     if(updateRequired) {
-      IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
-      if(facades != null && facades.length > 0) {
+      List<IMavenProjectFacade> facades = MavenPlugin.getMavenProjectRegistry().getProjects();
+      if(facades != null && !facades.isEmpty()) {
         boolean proceed = MessageDialog.openQuestion(getShell(),
             Messages.MavenPreferencePage_updateProjectRequired_title,
             Messages.MavenPreferencePage_changingPreferencesRequiresProjectUpdate);
         if(proceed) {
-          ArrayList<IProject> allProjects = new ArrayList<>(facades.length);
+          ArrayList<IProject> allProjects = new ArrayList<>(facades.size());
           for(IMavenProjectFacade facade : facades) {
             allProjects.add(facade.getProject());
           }
-          new UpdateMavenProjectJob(
-              allProjects.toArray(new IProject[allProjects.size()]), //
+          new UpdateMavenProjectJob(allProjects, //
               MavenPlugin.getMavenConfiguration().isOffline(), true /*forceUpdateDependencies*/,
               false /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/).schedule();
         }

@@ -57,8 +57,8 @@ public class MavenLifecycleMappingsView extends ViewPart {
       @Override
       public void selectionChanged(IWorkbenchPart part, ISelection selection) {
         Object element;
-        if(selection instanceof IStructuredSelection) {
-          element = ((IStructuredSelection) selection).getFirstElement();
+        if(selection instanceof IStructuredSelection structuredSelection) {
+          element = structuredSelection.getFirstElement();
         } else {
           element = null;
         }

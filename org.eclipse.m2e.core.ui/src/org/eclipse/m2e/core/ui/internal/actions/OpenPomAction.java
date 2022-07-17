@@ -92,11 +92,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
   @Override
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
-    } else {
-      this.selection = null;
-    }
+    this.selection = selection instanceof IStructuredSelection sel ? sel : null;
   }
 
   @Override
@@ -120,7 +116,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
           new Job(Messages.OpenPomAction_job_opening) {
               @Override
               protected IStatus run(IProgressMonitor monitor) {
-              openEditor(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), getMavenProject(), monitor);
+              openEditor(ak.groupId(), ak.artifactId(), ak.version(), getMavenProject(), monitor);
               return Status.OK_STATUS;
             }
           }.schedule();

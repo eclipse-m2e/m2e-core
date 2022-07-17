@@ -92,9 +92,9 @@ public class DependencySetRefactoring extends Refactoring {
     private final String version;
 
     public OneDependency(ArtifactKey key) {
-      this.groupId = key.getGroupId();
-      this.artifactId = key.getArtifactId();
-      this.version = key.getVersion();
+      this.groupId = key.groupId();
+      this.artifactId = key.artifactId();
+      this.version = key.version();
     }
 
     @Override

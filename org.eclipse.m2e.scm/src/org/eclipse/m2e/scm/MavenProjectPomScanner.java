@@ -14,7 +14,9 @@
 package org.eclipse.m2e.scm;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -41,6 +44,7 @@ import org.apache.maven.model.Scm;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 
@@ -219,8 +223,11 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
     return readModel(file);
   }
 
-  @SuppressWarnings("restriction")
   private Model readModel(File file) throws CoreException {
-    return ((org.eclipse.m2e.core.internal.embedder.MavenImpl) maven).readModel(file);
+    try (InputStream is = new FileInputStream(file)) {
+      return IMavenToolbox.of(maven).readModel(new FileInputStream(file));
+    } catch(IOException e) {
+      throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
+    }
   }
 }

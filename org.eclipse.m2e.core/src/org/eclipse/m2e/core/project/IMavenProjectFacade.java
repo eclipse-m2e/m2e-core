@@ -30,9 +30,9 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
+import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContextFactory;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -43,21 +43,21 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
-public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
+public interface IMavenProjectFacade extends IMavenExecutableLocation {
 
   /**
    * Returns project relative paths of resource directories
    */
-  IPath[] getResourceLocations();
+  List<IPath> getResourceLocations();
 
   /**
    * Returns project relative paths of test resource directories
    */
-  IPath[] getTestResourceLocations();
+  List<IPath> getTestResourceLocations();
 
-  IPath[] getCompileSourceLocations();
+  List<IPath> getCompileSourceLocations();
 
-  IPath[] getTestCompileSourceLocations();
+  List<IPath> getTestCompileSourceLocations();
 
   /**
    * Returns project resource for given file system location or null the location is outside of project.
@@ -101,8 +101,6 @@ public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
 
   IFile getPom();
 
-  File getPomFile();
-
   /**
    * Returns the full, absolute path of the given file relative to the workspace. Returns null if the file does not
    * exist or is not a member of this project.
@@ -141,23 +139,6 @@ public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
   Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
   /**
-   * Creates a new execution context that is one suitable to execute in the context of this facade, that is it might
-   * include project specific extensions.
-   * 
-   * @return a new execution context for this facade
-   */
-  IMavenExecutionContext createExecutionContext();
-
-  /**
-   * Gets an access to a (possibly project specific) {@link IMaven} instance,
-   * this is the same instance that is used to create new {@link IMavenExecutionContext}s
-   * see {@link #createExecutionContext()}
-   * 
-   * @return a Maven instance, configured according to this project
-   */
-  IMaven getMaven();
-
-  /**
    * Returns fully setup MojoExecution instance bound to project build lifecycle that matches provided mojoExecutionKey.
    * Returns null if no such mojo execution.
    */
@@ -176,5 +157,18 @@ public interface IMavenProjectFacade extends IMavenExecutionContextFactory {
   String getLifecycleMappingId();
 
   Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
+
+  /**
+   * @return a project-specific Maven execution context.
+   * @since 2.0
+   */
+  IMavenExecutionContext createExecutionContext();
+
+  /**
+   * Returns the component lookup for this projects context. This will include potentially defined
+   * <b>core</b>-extensions, but not <b>project</b>-scoped extensions! If you need project-scoped extensions as well use
+   * {@link #createExecutionContext()};
+   */
+  IComponentLookup getComponentLookup();
 
 }

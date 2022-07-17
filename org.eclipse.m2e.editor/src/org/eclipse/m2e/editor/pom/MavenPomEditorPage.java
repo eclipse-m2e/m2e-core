@@ -335,24 +335,12 @@ public abstract class MavenPomEditorPage extends FormPage {
               head = NLS.bind(Messages.FormUtils_click_for_details, head.substring(0, FormUtils.MAX_MSG_LENGTH));
             }
           }
-          int severity;
-          switch(max.getAttribute(IMarker.SEVERITY, -1)) {
-            case IMarker.SEVERITY_ERROR: {
-              severity = IMessageProvider.ERROR;
-              break;
-            }
-            case IMarker.SEVERITY_WARNING: {
-              severity = IMessageProvider.WARNING;
-              break;
-            }
-            case IMarker.SEVERITY_INFO: {
-              severity = IMessageProvider.INFORMATION;
-              break;
-            }
-            default: {
-              severity = IMessageProvider.NONE;
-            }
-          }
+          int severity = switch(max.getAttribute(IMarker.SEVERITY, -1)) {
+            case IMarker.SEVERITY_ERROR -> IMessageProvider.ERROR;
+            case IMarker.SEVERITY_WARNING -> IMessageProvider.WARNING;
+            case IMarker.SEVERITY_INFO -> IMessageProvider.INFORMATION;
+            default -> IMessageProvider.NONE;
+          };
           setErrorMessageForMarkers(head, text, severity, markers);
         } else {
           setErrorMessageForMarkers(null, null, IMessageProvider.NONE, new IMarker[0]);
@@ -445,7 +433,7 @@ public abstract class MavenPomEditorPage extends FormPage {
         MavenProject mp = getPomEditor().getMavenProject();
         if(mp != null) {
           return FormUtils.simpleInterpolate(mp,
-              control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText());
+              control instanceof Text text ? text.getText() : ((CCombo) control).getText());
         }
         return "Cannot interpolate expressions, not resolvable file.";
       }
@@ -458,15 +446,15 @@ public abstract class MavenPomEditorPage extends FormPage {
     decoration.addSelectionListener(
         SelectionListener.widgetSelectedAdapter(e -> decoration.showHoverText(decoration.getDescriptionText())));
     ModifyListener listener = e -> {
-      String text = control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText();
+      String text = control instanceof Text textWidget ? textWidget.getText() : ((CCombo) control).getText();
       if(text.indexOf("${") != -1 && text.indexOf("}") != -1) {
         decoration.show();
       } else {
         decoration.hide();
       }
     };
-    if(control instanceof Text) {
-      ((Text) control).addModifyListener(listener);
+    if(control instanceof Text text) {
+      text.addModifyListener(listener);
     } else {
       ((CCombo) control).addModifyListener(listener);
     }
@@ -509,14 +497,14 @@ public abstract class MavenPomEditorPage extends FormPage {
 
     ModifyListener ml = new ModifyListener() {
       String getText(Control control) {
-        if(control instanceof Text) {
-          return ((Text) control).getText();
+        if(control instanceof Text text) {
+          return text.getText();
         }
-        if(control instanceof Combo) {
-          return ((Combo) control).getText();
+        if(control instanceof Combo combo) {
+          return combo.getText();
         }
-        if(control instanceof CCombo) {
-          return ((CCombo) control).getText();
+        if(control instanceof CCombo ccombo) {
+          return ccombo.getText();
         }
         throw new IllegalStateException();
       }
@@ -534,9 +522,9 @@ public abstract class MavenPomEditorPage extends FormPage {
             Element el1 = provider.find(document);
             if(el1 != null) {
               Node parent = el1.getParentNode();
-              if(parent instanceof Element) {
-                removeChild((Element) parent, el1);
-                removeIfNoChildElement((Element) parent);
+              if(parent instanceof Element element) {
+                removeChild(element, el1);
+                removeIfNoChildElement(element);
               }
             }
           } else {
@@ -622,8 +610,7 @@ public abstract class MavenPomEditorPage extends FormPage {
       modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
     }
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    IMavenProjectFacade[] facades = projectManager.getProjects();
-    for(IMavenProjectFacade facade : facades) {
+    for(IMavenProjectFacade facade : projectManager.getProjects()) {
       if(modulePath.equals(facade.getPom().getLocation())) {
         return facade;
       }

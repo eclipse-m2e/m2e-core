@@ -42,6 +42,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -56,13 +57,21 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IMaven extends IMavenExecutionContextFactory {
+public interface IMaven extends IComponentLookup {
 
   // POM Model read/write operations
 
-  Model readModel(InputStream in) throws CoreException;
+  /**
+   * @deprecated use the {@link MavenModelManager} instead
+   */
+  @Deprecated(forRemoval = true)
+  default Model readModel(InputStream in) throws CoreException {
+    return IMavenToolbox.of(this).readModel(in);
+  }
 
-  void writeModel(Model model, OutputStream out) throws CoreException;
+  default void writeModel(Model model, OutputStream out) throws CoreException {
+    IMavenToolbox.of(this).writeModel(model, out);
+  }
 
   // artifact resolution
 
@@ -118,13 +127,13 @@ public interface IMaven extends IMavenExecutionContextFactory {
   // execution
 
   /**
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
-   *             {@link IMavenExecutionContext#join()}
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
   default void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
-    IMavenExecutionContext.join(this).execute(project, execution, monitor);
+    IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(project, execution,
+        monitor);
   }
 
   /**
@@ -229,8 +238,6 @@ public interface IMaven extends IMavenExecutionContextFactory {
    */
   ClassLoader getProjectRealm(MavenProject project);
 
-  // execution context
-
   /**
    * This is convenience method fully equivalent to
    *
@@ -241,8 +248,8 @@ public interface IMaven extends IMavenExecutionContextFactory {
    * return context.execute(callable, monitor);
    * </pre>
    *
-   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private
-   *             util method
+   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private util
+   *             method
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
@@ -255,33 +262,25 @@ public interface IMaven extends IMavenExecutionContextFactory {
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.
    *
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext} see for example
-   *             {@link IMavenExecutionContext#join()}
+   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
    * @since 1.4
    */
   @Deprecated(forRemoval = true)
   default <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.join(this).execute(callable, monitor);
+    return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(callable, monitor);
   }
 
   /**
-   * Creates and returns new global maven execution context. such a context is suitable if one likes to perform some
-   * action without a project, this is similar to calling maven but without a pom.xml If you want to execute in the
-   * context of a project (e.g. to support project scoped extensions) you should use
-   * {@link IMavenProjectFacade#createExecutionContext()} instead.
+   * Creates and returns new, possibly nested, maven execution context for this Maven embedder.
+   * <p>
+   * <b>IMPORTANT:</b> When in the context of a particular project, it's usually better to use
+   * {@link IMavenProjectFacade#createExecutionContext()} which will include more project-specific configuration and
+   * will lead to more accurate and consistent results compared to Maven CLI commands.
+   * </p>
    *
    * @since 1.4
+   * @see IMavenProjectFacade#createExecutionContext()
    */
-  IMavenExecutionContext createExecutionContext() throws CoreException;
-
-  /**
-   * Lookup a component from the embedded PlexusContainer.
-   * @param clazz the requested role
-   * @return The component instance requested.
-   * @throws CoreException if the requested component is not available
-   *
-   * @since 1.10
-   */
-  <T> T lookup(Class<T> clazz) throws CoreException;
+  IMavenExecutionContext createExecutionContext();
 
 }

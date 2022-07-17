@@ -120,18 +120,17 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
   private void updateProjects() {
     //Update projects if problem severities changed
     if(isDirty()) {
-      IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
-      if(facades != null && facades.length > 0) {
+      List<IMavenProjectFacade> facades = MavenPlugin.getMavenProjectRegistry().getProjects();
+      if(facades != null && !facades.isEmpty()) {
         boolean proceed = MessageDialog.openQuestion(getShell(),
             Messages.MavenPreferencePage_updateProjectRequired_title,
             Messages.MavenWarningsPreferencePage_changingProblemSeveritiesRequiresProjectUpdate);
         if(proceed) {
-          ArrayList<IProject> allProjects = new ArrayList<>(facades.length);
+          ArrayList<IProject> allProjects = new ArrayList<>(facades.size());
           for(IMavenProjectFacade facade : facades) {
             allProjects.add(facade.getProject());
           }
-          new UpdateMavenProjectJob(
-              allProjects.toArray(new IProject[allProjects.size()]), //
+          new UpdateMavenProjectJob(allProjects, //
               MavenPlugin.getMavenConfiguration().isOffline(), true /*forceUpdateDependencies*/,
               false /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/).schedule();
           initOriginalValues();

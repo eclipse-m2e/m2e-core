@@ -40,8 +40,7 @@ public class MavenModuleFilter extends ViewerFilter {
 
   @SuppressWarnings("restriction")
   public boolean select(Viewer viewer, Object parentElement, Object element) {
-    if(element instanceof IFolder) {
-      IFolder folder = (IFolder) element;
+    if(element instanceof IFolder folder) {
       IProject project = folder.getProject();
       try {
         if(project.hasNature(org.eclipse.m2e.core.internal.IMavenConstants.NATURE_ID)) {

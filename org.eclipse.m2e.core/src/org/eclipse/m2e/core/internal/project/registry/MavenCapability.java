@@ -68,31 +68,28 @@ public class MavenCapability extends Capability {
     if(this == obj) {
       return true;
     }
-    if(!(obj instanceof MavenCapability)) {
-      return false;
-    }
-    MavenCapability other = (MavenCapability) obj;
-    return getVersionlessKey().equals(other.getVersionlessKey()) && version.equals(other.version);
+    return obj instanceof MavenCapability other && //
+        getVersionlessKey().equals(other.getVersionlessKey()) && version.equals(other.version);
   }
 
   public static MavenCapability createMavenArtifact(ArtifactKey key) {
-    return new MavenCapability(NS_MAVEN_ARTIFACT, getId(key), key.getVersion());
+    return new MavenCapability(NS_MAVEN_ARTIFACT, getId(key), key.version());
   }
 
   public static MavenCapability createMavenArtifactImport(ArtifactKey key) {
-    return new MavenCapability(NS_MAVEN_ARTIFACT_IMPORT, getId(key), key.getVersion());
+    return new MavenCapability(NS_MAVEN_ARTIFACT_IMPORT, getId(key), key.version());
   }
 
   public static MavenCapability createMavenParent(ArtifactKey key) {
-    return new MavenCapability(NS_MAVEN_PARENT, getId(key), key.getVersion());
+    return new MavenCapability(NS_MAVEN_PARENT, getId(key), key.version());
   }
 
   static String getId(ArtifactKey key) {
     StringBuilder sb = new StringBuilder();
-    sb.append(key.getGroupId());
-    sb.append(':').append(key.getArtifactId());
-    if(key.getClassifier() != null) {
-      sb.append(':').append(key.getClassifier());
+    sb.append(key.groupId());
+    sb.append(':').append(key.artifactId());
+    if(key.classifier() != null) {
+      sb.append(':').append(key.classifier());
     }
     return sb.toString();
   }

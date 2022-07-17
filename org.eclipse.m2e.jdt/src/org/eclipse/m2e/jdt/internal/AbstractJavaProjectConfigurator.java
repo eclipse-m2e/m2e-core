@@ -154,7 +154,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    IProject project = request.getProject();
+    IProject project = request.mavenProjectFacade().getProject();
 
     monitor.setTaskName(Messages.AbstractJavaProjectConfigurator_task_name + project.getName());
 
@@ -199,7 +199,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected IContainer getOutputLocation(ProjectConfigurationRequest request, IProject project) {
-    MavenProject mavenProject = request.getMavenProject();
+    MavenProject mavenProject = request.mavenProject();
     return getFolder(project, mavenProject.getBuild().getOutputDirectory());
   }
 
@@ -216,15 +216,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       final IProgressMonitor monitor) throws CoreException {
-    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IMavenProjectFacade facade = request.mavenProjectFacade();
     IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
     ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(facade);
     if(lifecycleMapping == null) {
       return;
     }
     for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
-      if(configurator instanceof IJavaProjectConfigurator) {
-        ((IJavaProjectConfigurator) configurator).configureRawClasspath(request, classpath, monitor);
+      if(configurator instanceof IJavaProjectConfigurator javaConfigurator) {
+        javaConfigurator.configureRawClasspath(request, classpath, monitor);
       }
     }
   }
@@ -295,9 +295,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     SubMonitor mon = SubMonitor.convert(monitor, 6);
     try {
-      IProject project = request.getProject();
-      MavenProject mavenProject = request.getMavenProject();
-      IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+      IProject project = request.mavenProjectFacade().getProject();
+      MavenProject mavenProject = request.mavenProject();
+      IMavenProjectFacade projectFacade = request.mavenProjectFacade();
 
       IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
       IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
@@ -610,16 +610,45 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     boolean enablePreviewFeatures = false;
 
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
-      release = getCompilerLevel(request.getMavenProject(), execution, "release", release, RELEASES, monitor);
+      release = getCompilerLevel(request.mavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
-      source = getCompilerLevel(request.getMavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
-      target = getCompilerLevel(request.getMavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
-      generateParameters = generateParameters || isGenerateParameters(request.getMavenProject(), execution, monitor);
+      source = getCompilerLevel(request.mavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
+      target = getCompilerLevel(request.mavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
+      generateParameters = generateParameters || isGenerateParameters(request.mavenProject(), execution, monitor);
       enablePreviewFeatures = enablePreviewFeatures
-          || isEnablePreviewFeatures(request.getMavenProject(), execution, monitor);
+          || isEnablePreviewFeatures(request.mavenProject(), execution, monitor);
+
+      // process -err:+deprecation , -warn:-serial ...
+      for(Object o : maven.getMojoParameterValue(request.mavenProject(), execution, "compilerArgs", List.class,
+          monitor)) {
+        if(o instanceof String compilerArg) {
+          boolean err = false/*, warn = false*/;
+          String[] settings = new String[0];
+          if(compilerArg.startsWith("-warn:")) {
+            //warn = true;
+            settings = compilerArg.substring("-warn:".length()).split(",");
+          } else if(compilerArg.startsWith("-err:")) {
+            err = true;
+            settings = compilerArg.substring("-err:".length()).split(",");
+          }
+          for(String cliSetting : settings) {
+            if(cliSetting.length() >= 2) {
+              String severity = cliSetting.charAt(0) == '-' ? JavaCore.IGNORE
+                  : (err ? JavaCore.ERROR : JavaCore.WARNING);
+              cliSetting = Character.isLetter(cliSetting.charAt(0)) ? cliSetting : cliSetting.substring(1);
+              String option = toCompilerOption(cliSetting);
+              if(option != null) {
+                options.put(option, severity);
+              }
+            }
+          }
+        }
+      }
     }
 
-    if(release != null) {
+    if(release != null)
+
+    {
       source = release;
       target = release;
     } else {
@@ -648,7 +677,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, JavaCore.GENERATE);
     }
     // 360962 keep forbidden_reference severity set by the user
-    IJavaProject jp = JavaCore.create(request.getProject());
+    IJavaProject jp = JavaCore.create(request.mavenProjectFacade().getProject());
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
       options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.WARNING);
     }
@@ -658,6 +687,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
       options.put(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
     }
+
+  }
+
+  /**
+   * @param problemSettingName
+   * @return the compiler option (usually defined in {@link JavaCore}) for the given CLI problem setting. or
+   *         {@code null} if none found;
+   */
+  private String toCompilerOption(String problemSettingName) {
+    return switch(problemSettingName) {
+      case "serial" -> JavaCore.COMPILER_PB_MISSING_SERIAL_VERSION;
+      default -> null;
+    };
   }
 
   private boolean isGenerateParameters(MavenProject mavenProject, MojoExecution execution, IProgressMonitor monitor) {
@@ -723,23 +765,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private String sanitizeJavaVersion(String version) {
-    switch(version) {
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-        version = "1." + version;
-        break;
-      default:
+    return switch(version) {
+      case "5", "6", "7", "8" -> "1." + version;
+      default -> {
         if(version.startsWith("1.")) {
           String subVersion = version.substring(2);
           if(Integer.parseInt(subVersion) > 8) {
-            version = subVersion;
+            yield subVersion;
           }
         }
-        break;
-    }
-    return version;
+        yield version;
+      }
+    };
   }
 
   protected String getDefaultTargetLevel(String source) {
@@ -752,13 +789,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    return request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+    return request.mavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
   protected List<MojoExecution> getEnforcerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    return request.getMavenProjectFacade().getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID, ENFORCER_PLUGIN_ARTIFACT_ID,
+    return request.mavenProjectFacade().getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID, ENFORCER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_ENFORCE);
   }
 
@@ -869,7 +906,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     super.unconfigure(request, monitor);
-    removeMavenClasspathContainer(request.getProject());
+    removeMavenClasspathContainer(request.mavenProjectFacade().getProject());
   }
 
   private void removeMavenClasspathContainer(IProject project) throws JavaModelException {
@@ -979,7 +1016,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
 
-    IMavenProjectFacade facade = request.getMavenProjectFacade();
+    IMavenProjectFacade facade = request.mavenProjectFacade();
     IJavaProject javaProject = JavaCore.create(facade.getProject());
     if(javaProject == null || !javaProject.exists() || classpath == null) {
       return;

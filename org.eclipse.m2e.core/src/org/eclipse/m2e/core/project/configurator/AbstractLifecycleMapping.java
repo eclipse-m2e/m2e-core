@@ -73,11 +73,11 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public void configure(ProjectConfigurationRequest request, IProgressMonitor mon) throws CoreException {
     final SubMonitor monitor = SubMonitor.convert(mon, 5);
     try {
-      MavenPlugin.getProjectConfigurationManager().addMavenBuilder(request.getProject(), null /*description*/,
-          monitor.newChild(1));
+      MavenPlugin.getProjectConfigurationManager().addMavenBuilder(request.mavenProjectFacade().getProject(),
+          null /*description*/, monitor.newChild(1));
 
-      IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
-      MavenProject mavenProject = request.getMavenProject();
+      IMavenProjectFacade projectFacade = request.mavenProjectFacade();
+      MavenProject mavenProject = request.mavenProject();
 
       Build build = mavenProject.getBuild();
       if(build != null) {
@@ -85,8 +85,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
         if(directory != null) {
           IContainer container = projectFacade.getProject().getFolder(projectFacade.getProjectRelativePath(directory));
           if(container != null) {
-            if(!container.exists() && container instanceof IFolder) {
-              M2EUtils.createFolder((IFolder) container, true, monitor.newChild(1));
+            if(!container.exists() && container instanceof IFolder folder) {
+              M2EUtils.createFolder(folder, true, monitor.newChild(1));
             } else {
               container.setDerived(true, monitor.newChild(1));
             }
@@ -141,7 +141,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   @Override
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+    IMavenProjectFacade projectFacade = request.mavenProjectFacade();
 
     for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor)) {
       if(monitor.isCanceled()) {

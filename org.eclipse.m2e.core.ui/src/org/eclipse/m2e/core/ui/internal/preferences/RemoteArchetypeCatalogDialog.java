@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -44,10 +42,10 @@ import org.eclipse.swt.widgets.Text;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
 /**
@@ -170,41 +168,17 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     verifyButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
       verifyButton.setEnabled(false);
       String url = catalogUrlCombo.getText();
-      final RemoteCatalogFactory factory = new RemoteCatalogFactory(url, null, true);
-
-      new Job(Messages.RemoteArchetypeCatalogDialog_job_download) {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          IStatus status = Status.OK_STATUS;
-          ArchetypeCatalog catalog = null;
-          try {
-            catalog = factory.getArchetypeCatalog();
-          } finally {
-            final IStatus s = status;
-            final List<Archetype> archetypes = ((catalog == null) ? Collections.emptyList() : catalog.getArchetypes());
-            Shell shell = getShell();
-            if(shell == null) {
-              return status;
-            }
-            shell.getDisplay().asyncExec(() -> {
-              if(verifyButton.isDisposed()) {
-                return;
-              }
-              verifyButton.setEnabled(true);
-              if(!s.isOK()) {
-                setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
-                getButton(IDialogConstants.OK_ID).setEnabled(false);
-              } else if(archetypes.isEmpty()) {
-                setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
-              } else {
-                setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
-                    IStatus.INFO);
-              }
-            });
-          }
-          return Status.OK_STATUS;
+      final RemoteCatalogFactory factory = M2EUIPluginActivator.getDefault().getArchetypePlugin()
+          .newRemoteCatalogFactory(url, null, true, true);
+      Job.create(Messages.RemoteArchetypeCatalogDialog_job_download, monitor -> {
+        try {
+          ArchetypeCatalog catalog = factory.getArchetypeCatalog();
+          List<Archetype> archetypes = catalog == null ? Collections.emptyList() : catalog.getArchetypes();
+          reportResult(archetypes, null);
+        } catch(Exception ex) {
+          reportResult(Collections.emptyList(), ex);
         }
-      }.schedule();
+      }).schedule();
     }));
 
     Label filler = new Label(composite, SWT.NONE);
@@ -214,6 +188,25 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     super.createButtonsForButtonBar(composite); // cancel button
 
     return composite;
+  }
+
+  private void reportResult(List<Archetype> archetypes, Exception exception) {
+    Shell shell = getShell();
+    if(shell != null) {
+      shell.getDisplay().asyncExec(() -> {
+        if(!verifyButton.isDisposed()) {
+          verifyButton.setEnabled(true);
+          if(exception != null) {
+            setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, exception.getMessage()));
+            getButton(IDialogConstants.OK_ID).setEnabled(false);
+          } else if(archetypes.isEmpty()) {
+            setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
+          } else {
+            setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()), IStatus.INFO);
+          }
+        }
+      });
+    }
   }
 
   @Override
@@ -243,7 +236,8 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogUrlCombo.getText().trim();
 
-    archetypeCatalogFactory = new RemoteCatalogFactory(location, description, true);
+    archetypeCatalogFactory = M2EUIPluginActivator.getDefault().getArchetypePlugin().newRemoteCatalogFactory(location,
+        description, true, true);
 
     saveValue(KEY_LOCATIONS, location);
 

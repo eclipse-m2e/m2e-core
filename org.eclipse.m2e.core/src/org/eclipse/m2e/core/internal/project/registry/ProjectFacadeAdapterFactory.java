@@ -31,8 +31,7 @@ public class ProjectFacadeAdapterFactory implements IAdapterFactory {
 
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
-    if(adaptableObject instanceof IResource) {
-      IResource resource = (IResource) adaptableObject;
+    if(adaptableObject instanceof IResource resource) {
       if(adapterType == IMavenProjectFacade.class) {
         return adapterType.cast(mavenProjectRegistry.getProject(resource.getProject()));
       }

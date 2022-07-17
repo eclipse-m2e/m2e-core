@@ -15,11 +15,14 @@ package org.eclipse.m2e.tests.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 
@@ -57,9 +60,7 @@ public class WorkspaceHelpers {
       try {
         System.gc();
         doCleanWorkspace();
-      } catch(InterruptedException e) {
-        throw e;
-      } catch(OperationCanceledException e) {
+      } catch(InterruptedException | OperationCanceledException e) {
         throw e;
       } catch(Exception e) {
         cause = e;
@@ -97,9 +98,7 @@ public class WorkspaceHelpers {
           if(file.isDirectory()) {
             FileUtils.deleteDirectory(file);
           } else {
-            if(!file.delete()) {
-              throw new IOException("Could not delete file " + file.getCanonicalPath());
-            }
+            Files.delete(file.toPath());
           }
         }
       }
@@ -114,24 +113,16 @@ public class WorkspaceHelpers {
   }
 
   public static String toString(List<IMarker> markers) {
-    String sep = "";
-    StringBuilder sb = new StringBuilder();
-    if(markers != null) {
-      for(IMarker marker : markers) {
-        try {
-          sb.append(sep).append(toString(marker));
-        } catch(CoreException ex) {
-          // ignore
-        }
-        sep = ", ";
-      }
-    }
-    return sb.toString();
+    return markers.stream().map(WorkspaceHelpers::toString).collect(Collectors.joining(","));
   }
 
-  protected static String toString(IMarker marker) throws CoreException {
-    return "Type=" + marker.getType() + ":Message=" + marker.getAttribute(IMarker.MESSAGE) + ":LineNumber="
-        + marker.getAttribute(IMarker.LINE_NUMBER);
+  protected static String toString(IMarker marker) {
+    try {
+      return "Type=" + marker.getType() + ":Message=" + marker.getAttribute(IMarker.MESSAGE) + ":LineNumber="
+          + marker.getAttribute(IMarker.LINE_NUMBER);
+    } catch(CoreException ex) {
+      throw new IllegalStateException(ex);
+    }
   }
 
   public static List<IMarker> findMarkers(IProject project, int targetSeverity) throws CoreException {
@@ -140,20 +131,8 @@ public class WorkspaceHelpers {
 
   public static List<IMarker> findMarkers(IProject project, int targetSeverity, String withAttribute)
       throws CoreException {
-    SortedMap<IMarker, IMarker> errors = new TreeMap<>((o1, o2) -> {
-      int lineNumber1 = o1.getAttribute(IMarker.LINE_NUMBER, -1);
-      int lineNumber2 = o2.getAttribute(IMarker.LINE_NUMBER, -1);
-      if(lineNumber1 < lineNumber2) {
-        return -1;
-      }
-      if(lineNumber1 > lineNumber2) {
-        return 1;
-      }
-      // Markers on the same line
-      String message1 = o1.getAttribute(IMarker.MESSAGE, "");
-      String message2 = o2.getAttribute(IMarker.MESSAGE, "");
-      return message1.compareTo(message2);
-    });
+    Set<IMarker> errors = new TreeSet<>(Comparator.<IMarker> comparingInt(o -> o.getAttribute(IMarker.LINE_NUMBER, -1))
+        .thenComparing(o -> o.getAttribute(IMarker.MESSAGE, "")));
     for(IMarker marker : project.findMarkers(null /* all markers */, true /* subtypes */, IResource.DEPTH_INFINITE)) {
       int severity = marker.getAttribute(IMarker.SEVERITY, 0);
       if(targetSeverity >= 0 && severity != targetSeverity) {
@@ -165,10 +144,10 @@ public class WorkspaceHelpers {
           continue;
         }
       }
-      errors.put(marker, marker);
+      errors.add(marker);
     }
     List<IMarker> result = new ArrayList<>();
-    result.addAll(errors.keySet());
+    result.addAll(errors);
     return result;
   }
 
@@ -283,17 +262,17 @@ public class WorkspaceHelpers {
     Assert.assertEquals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION,
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
     //TODO what parameters are important here for the hints?
-    Assert.assertEquals("Marker's groupID", mojoExecution.getGroupId(),
+    Assert.assertEquals("Marker's groupID", mojoExecution.groupId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null));
-    Assert.assertEquals("Marker's artifactId", mojoExecution.getArtifactId(),
+    Assert.assertEquals("Marker's artifactId", mojoExecution.artifactId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null));
-    Assert.assertEquals("Marker's executionId", mojoExecution.getExecutionId(),
+    Assert.assertEquals("Marker's executionId", mojoExecution.executionId(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, null));
-    Assert.assertEquals("Marker's goal", mojoExecution.getGoal(),
+    Assert.assertEquals("Marker's goal", mojoExecution.goal(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null));
-    Assert.assertEquals("Marker's version", mojoExecution.getVersion(),
+    Assert.assertEquals("Marker's version", mojoExecution.version(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null));
-    Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.getLifecyclePhase(),
+    Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.lifecyclePhase(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
   }
 

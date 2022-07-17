@@ -184,11 +184,11 @@
    */
   public boolean match(org.eclipse.m2e.core.project.configurator.MojoExecutionKey mojoExecution) {
     checkAllFieldsSet();
-    if(!getGroupId().equals(mojoExecution.getGroupId()) || !getArtifactId().equals(mojoExecution.getArtifactId())) {
+    if(!getGroupId().equals(mojoExecution.groupId()) || !getArtifactId().equals(mojoExecution.artifactId())) {
       return false;
     }
 
-    org.apache.maven.artifact.versioning.DefaultArtifactVersion version = new org.apache.maven.artifact.versioning.DefaultArtifactVersion(mojoExecution.getVersion());
+    org.apache.maven.artifact.versioning.DefaultArtifactVersion version = new org.apache.maven.artifact.versioning.DefaultArtifactVersion(mojoExecution.version());
 
     if(parsedVersionRange==null) {
       try {
@@ -202,7 +202,7 @@
       return false;
     }
 
-    return getGoals().contains(mojoExecution.getGoal());
+    return getGoals().contains(mojoExecution.goal());
   }
             ]]>
           </code>

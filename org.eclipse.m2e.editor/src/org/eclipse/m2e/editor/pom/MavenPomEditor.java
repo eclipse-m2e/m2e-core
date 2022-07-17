@@ -371,8 +371,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(sourceDocument == null) {
       initializeSourceDocument();
     }
-    if(sourceDocument instanceof IStructuredDocument) {
-      this.structuredModel = this.modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
+    if(sourceDocument instanceof IStructuredDocument structuredSelection) {
+      this.structuredModel = this.modelManager.getModelForEdit(structuredSelection);
     } else {
       // create a read-only copy of the document
       try (InputStream docStream = new DocumentInputStream(sourceDocument)) {
@@ -390,13 +390,13 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       return;
     }
     sourceDocument = documentProvider.getDocument(this.getEditorInput());
-    if(documentProvider instanceof TextFileDocumentProvider) {
+    if(documentProvider instanceof TextFileDocumentProvider textDocumentProvider) {
       try {
         // not clear why, but some documents are sometimes not synchronized at this stage
         // and this causes some strange dirtiness behavior or non-working refactorings.
         // It's most probably some disposal issue but no better solution was found yet.
         // so let's force synchronization...
-        ((TextFileDocumentProvider) documentProvider).synchronize(getEditorInput());
+        textDocumentProvider.synchronize(getEditorInput());
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }
@@ -457,9 +457,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
     // a workaround for editor pages not returned
     IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
-    if(contributor instanceof MultiPageEditorActionBarContributor) {
+    if(contributor instanceof MultiPageEditorActionBarContributor multiPageContributor) {
       IEditorPart activeEditor = getActivePageInstance();
-      ((MultiPageEditorActionBarContributor) contributor).setActivePage(activeEditor);
+      multiPageContributor.setActivePage(activeEditor);
     }
   }
 
@@ -525,8 +525,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         public IEditorActionBarContributor getActionBarContributor() {
           IEditorActionBarContributor contributor = super.getActionBarContributor();
           IEditorActionBarContributor multiContributor = MavenPomEditor.this.getEditorSite().getActionBarContributor();
-          if(multiContributor instanceof MavenPomEditorContributor) {
-            contributor = ((MavenPomEditorContributor) multiContributor).sourceViewerActionContributor;
+          if(multiContributor instanceof MavenPomEditorContributor pomEditorContributor) {
+            contributor = pomEditorContributor.sourceViewerActionContributor;
           }
           return contributor;
         }
@@ -633,11 +633,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private int addPomPage(IFormPage page) {
     try {
-      if(page instanceof MavenPomEditorPage) {
-        mavenpomEditorPages.add((MavenPomEditorPage) page);
+      if(page instanceof MavenPomEditorPage pomPage) {
+        mavenpomEditorPages.add(pomPage);
       }
-      if(page instanceof IPomFileChangedListener) {
-        fileChangeListeners.add((IPomFileChangedListener) page);
+      if(page instanceof IPomFileChangedListener listener) {
+        fileChangeListeners.add(listener);
       }
       return addPage(page);
     } catch(PartInitException ex) {
@@ -700,8 +700,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
       IEditorInput input = getEditorInput();
 
-      if(input instanceof IFileEditorInput) {
-        IFileEditorInput fileInput = (IFileEditorInput) input;
+      if(input instanceof IFileEditorInput fileInput) {
         pomFile = fileInput.getFile();
         pomFile.refreshLocal(1, null);
       }
@@ -802,10 +801,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   public IDOMElement getElement(EObject o) {
     for(Adapter adapter : o.eAdapters()) {
-      if(adapter instanceof EMF2DOMSSEAdapter) {
-        EMF2DOMSSEAdapter a = (EMF2DOMSSEAdapter) adapter;
-        if(a.getNode() instanceof IDOMElement) {
-          return (IDOMElement) a.getNode();
+      if(adapter instanceof EMF2DOMSSEAdapter a) {
+        if(a.getNode() instanceof IDOMElement element) {
+          return element;
         }
         break;
       }
@@ -1057,10 +1055,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    */
 
   @Override
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     IEditorInput input = getEditorInput();
-    if(input instanceof IFileEditorInput) {
-      IFileEditorInput fileinput = (IFileEditorInput) input;
+    if(input instanceof IFileEditorInput fileinput) {
       for(MavenProjectChangedEvent event : events) {
         if(fileinput.getFile().equals(event.getSource())) {
           IMavenProjectFacade facade = event.getMavenProject();

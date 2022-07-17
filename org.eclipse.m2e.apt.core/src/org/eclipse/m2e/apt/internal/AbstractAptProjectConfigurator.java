@@ -78,7 +78,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     }
 
     // Get the objects needed for APT configuration
-    IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
+    IMavenProjectFacade mavenProjectFacade = request.mavenProjectFacade();
 
     AnnotationProcessingMode mode = getAnnotationProcessorMode(mavenProjectFacade);
 
@@ -139,14 +139,14 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
      * JavaProjectConfigurator runs.
      */
     // Get the various project references we'll need
-    IProject eclipseProject = request.getProject();
+    IProject eclipseProject = request.mavenProjectFacade().getProject();
     if(!eclipseProject.hasNature(JavaCore.NATURE_ID)) {
       return;
     }
 
-    request.getMavenProjectFacade().createExecutionContext().execute((c, m) -> {
-      AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
-      delegate.setFacade(request.getMavenProjectFacade());
+    request.mavenProjectFacade().createExecutionContext().execute((c, m) -> {
+      AptConfiguratorDelegate delegate = getDelegate(request.mavenProjectFacade());
+      delegate.setFacade(request.mavenProjectFacade());
       delegate.setSession(c.getSession());
       // If this isn't a Java project, we have nothing to do
       if(!delegate.isIgnored(monitor)) {

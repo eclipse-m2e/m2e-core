@@ -108,8 +108,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final int offset = region.getOffset();
 
     XmlUtils.performOnCurrentElement(document, offset, (node, structured) -> {
-      if(textViewer instanceof ISourceViewer) {
-        IHyperlink[] links = openExternalMarkerDefinition((ISourceViewer) textViewer, offset);
+      if(textViewer instanceof ISourceViewer sourceViwer) {
+        IHyperlink[] links = openExternalMarkerDefinition(sourceViwer, offset);
         if(links.length > 0) {
           hyperlinks.addAll(Arrays.asList(links));
         }
@@ -180,8 +180,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       NodeList childs = root.getChildNodes();
       for(int i = 0; i < childs.getLength(); i++ ) {
         Node child = childs.item(i);
-        if(child instanceof Element) {
-          Element el = (Element) child;
+        if(child instanceof Element el) {
           if(VERSION.equals(el.getNodeName())) {
             return null;
           }
@@ -307,12 +306,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   }
 
   static ExpressionRegion findExpressionRegion(Node current, ITextViewer viewer, int offset) {
-    if(current instanceof Text) {
-      Text node = (Text) current;
+    if(current instanceof Text node) {
       String value = node.getNodeValue();
-      if(value != null) {
-        assert node instanceof IndexedRegion;
-        IndexedRegion reg = (IndexedRegion) node;
+      if(value != null && node instanceof IndexedRegion reg) {
         int index = offset - reg.getStartOffset();
         String before = value.substring(0, Math.min(index + 1, value.length()));
         String after = value.substring(Math.min(index + 1, value.length()));
@@ -424,10 +420,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       Iterator<Annotation> it = model.getAnnotationIterator();
       while(it.hasNext()) {
         Annotation ann = it.next();
-        if(ann instanceof MarkerAnnotation) {
+        if(ann instanceof MarkerAnnotation marker) {
           Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
           if(pos.includes(offset)) {
-            toRet.add(new MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation) ann));
+            toRet.add(new MarkerRegion(pos.getOffset(), pos.getLength(), marker));
           }
         }
       }

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -94,11 +93,11 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
 
   private Xpp3Dom getAction(MojoExecutionKey execution) {
 
-    String key = Plugin.constructKey(execution.getGroupId(), execution.getArtifactId());
+    String key = Plugin.constructKey(execution.groupId(), execution.artifactId());
     Plugin plugin = getPlugin(project.getBuild(), key);
     Plugin mplugin = getPlugin(project.getPluginManagement(), key);
 
-    String executionId = execution.getExecutionId();
+    String executionId = execution.executionId();
     if(executionId != null) {
 
       // find pi for the executionId
@@ -106,29 +105,33 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
         PluginExecution pluginExecution = plugin.getExecutionsAsMap().get(executionId);
         if(pluginExecution != null) {
           Xpp3Dom action = getAction(pluginExecution);
-          if(action != null)
+          if(action != null) {
             return action;
+          }
         }
       }
       if(mplugin != null) {
         PluginExecution pluginExecution = mplugin.getExecutionsAsMap().get(executionId);
         if(pluginExecution != null) {
           Xpp3Dom action = getAction(pluginExecution);
-          if(action != null)
+          if(action != null) {
             return action;
+          }
         }
       }
 
       // find pi for the whole plugin
       if(plugin != null) {
         Xpp3Dom action = getAction(plugin);
-        if(action != null)
+        if(action != null) {
           return action;
+        }
       }
       if(mplugin != null) {
         Xpp3Dom action = getAction(mplugin);
-        if(action != null)
+        if(action != null) {
           return action;
+        }
       }
     }
     return null;
@@ -139,21 +142,17 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
   }
 
   @Override
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType, Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
+  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType,
+      Predicate<LifecycleMappingMetadata> filter) throws DuplicateMappingException {
     return null;
   }
 
   private Xpp3Dom getAction(InputLocationTracker tracker) {
     InputLocation location = tracker.getLocation(SELF);
-
     if(location != null && location.getSource() != null && projectId.equals(location.getSource().getModelId())) {
       int l = location.getLineNumber();
       int c = location.getColumnNumber();
-      for(PI pi : pis) {
-        if(pi.l == l && pi.c == c) {
-          return pi.action;
-        }
-      }
+      return pis.stream().filter(pi -> pi.line == l && pi.column == c).map(PI::action).findFirst().orElse(null);
     }
     return null;
   }
@@ -203,7 +202,6 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
 
         } else if(eventType == XmlPullParser.PROCESSING_INSTRUCTION && !stack.isEmpty()) {
 
-
           String text = parser.getText();
           if(text.startsWith("m2e ")) { //$NON-NLS-1$
             // found it
@@ -211,11 +209,11 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
             if(dom == null) {
               SourceLocation location = new SourceLocation(source.getLocation(), source.getModelId(),
                   parser.getLineNumber(), parser.getColumnNumber(), text.length() + 4);
-              throw new LifecycleMappingConfigurationException(Messages.AnnotationMappingMetadataSource_UnsupportedInstructionFormat, location);
+              throw new LifecycleMappingConfigurationException(
+                  Messages.AnnotationMappingMetadataSource_UnsupportedInstructionFormat, location);
             }
             State s = stack.peek();
-            PI pi = new PI(s.l, s.c, dom);
-            pis.add(pi);
+            pis.add(new PI(s.line, s.column, dom));
           }
         }
 
@@ -225,7 +223,8 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     } catch(XmlPullParserException | IOException ex) {
       SourceLocation location = new SourceLocation(source.getLocation(), source.getModelId(), parser.getLineNumber(),
           parser.getColumnNumber(), 1);
-      throw new LifecycleMappingConfigurationException(Messages.AnnotationMappingMetadataSource_ErrorParsingInstruction, location);
+      throw new LifecycleMappingConfigurationException(Messages.AnnotationMappingMetadataSource_ErrorParsingInstruction,
+          location);
     }
 
     return pis;
@@ -241,27 +240,25 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
 
   private static Xpp3Dom parse(String pi) {
 
-    List<String> split = Arrays.stream(PI_SPLITTER.split(pi, 2)).map(String::strip).collect(Collectors.toList());
+    List<String> split = Arrays.stream(PI_SPLITTER.split(pi, 2)).map(String::strip).toList();
 
     PluginExecutionAction a = getAction(split.get(0));
     if(a == null) {
       return null;
     }
-    switch(a) {
-      case ignore:
-        return new Xpp3Dom("ignore"); //$NON-NLS-1$
-
-      case configurator:
+    return switch(a) {
+      case ignore -> new Xpp3Dom("ignore"); //$NON-NLS-1$
+      case configurator -> {
         if(split.size() != 2) {
-          return null;
+          yield null;
         }
         Xpp3Dom conf = new Xpp3Dom("configurator"); //$NON-NLS-1$
         Xpp3Dom id = new Xpp3Dom("id"); //$NON-NLS-1$
         id.setValue(split.get(1));
         conf.addChild(id);
-        return conf;
-
-      case execute:
+        yield conf;
+      }
+      case execute -> {
         Xpp3Dom exec = new Xpp3Dom("execute"); //$NON-NLS-1$
         if(split.size() > 1) {
           EXECUTE_SPLITTER.splitAsStream(split.get(1)).map(String::strip).map(EXECUTE_OPTIONS::get)
@@ -271,50 +268,24 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
                 exec.addChild(opt);
               });
         }
-        return exec;
-
-      default:
-        return null;
-    }
+        yield exec;
+      }
+      default -> null;
+    };
   }
 
   private static PluginExecutionAction getAction(String value) {
-    for(PluginExecutionAction a : PluginExecutionAction.values()) {
-      if(value.toLowerCase().equals(a.name())) {
-        return a;
-      }
-    }
-    return null;
+    return Arrays.stream(PluginExecutionAction.values()) //
+        .filter(a -> value.toLowerCase().equals(a.name())) //
+        .findFirst().orElse(null);
   }
 
-  private static class State {
-    final int l;
-
-    final int c;
-
-    State(int l, int c) {
-      this.l = l;
-      this.c = c;
-    }
+  private static record State(int line, int column) {
   }
 
-  private static class PI {
-    final int l;
-
-    final int c;
-
-    final Xpp3Dom action;
-
-    PI(int l, int c, Xpp3Dom action) {
-      this.l = l;
-      this.c = c;
-      this.action = action;
-    }
+  private static record PI(int line, int column, Xpp3Dom action) {
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource#getFilters()
-   */
   @Override
   public List<LifecycleMappingFilter> getFilters() {
     return Collections.emptyList();

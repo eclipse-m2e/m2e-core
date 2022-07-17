@@ -60,8 +60,8 @@ public class OpenJavaDocAction extends ActionDelegate {
   private IStructuredSelection selection;
 
   public void selectionChanged(IAction action, ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      this.selection = (IStructuredSelection) selection;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      this.selection = structuredSelection;
     } else {
       this.selection = null;
     }
@@ -77,7 +77,7 @@ public class OpenJavaDocAction extends ActionDelegate {
 
       new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc, ak)) {
         protected IStatus run(IProgressMonitor monitor) {
-          openJavaDoc(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
+          openJavaDoc(ak.groupId(), ak.artifactId(), ak.version(), monitor);
           return Status.OK_STATUS;
         }
       }.schedule();

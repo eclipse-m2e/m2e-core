@@ -103,12 +103,12 @@ public class WorkingSetGroup {
     workingsetComboViewer.setContentProvider(new IStructuredContentProvider() {
       @Override
       public Object[] getElements(Object input) {
-        if(input instanceof IWorkingSet[]) {
-          return (IWorkingSet[]) input;
+        if(input instanceof IWorkingSet[] workingSets) {
+          return workingSets;
         } else if(input instanceof List<?>) {
           return new Object[] {input};
-        } else if(input instanceof Set<?>) {
-          return ((Set<?>) input).toArray();
+        } else if(input instanceof Set<?> set) {
+          return set.toArray();
         }
         return new IWorkingSet[0];
       }
@@ -126,9 +126,9 @@ public class WorkingSetGroup {
 
       @Override
       public Image getImage(Object element) {
-        if(element instanceof IWorkingSet) {
+        if(element instanceof IWorkingSet workingSet) {
 
-          ImageDescriptor imageDescriptor = ((IWorkingSet) element).getImageDescriptor();
+          ImageDescriptor imageDescriptor = workingSet.getImageDescriptor();
           if(imageDescriptor != null) {
             try {
               return (Image) images.create(imageDescriptor);
@@ -142,16 +142,16 @@ public class WorkingSetGroup {
 
       @Override
       public String getText(Object element) {
-        if(element instanceof IWorkingSet) {
-          return ((IWorkingSet) element).getLabel();
-        } else if(element instanceof List<?>) {
+        if(element instanceof IWorkingSet workingSet) {
+          return workingSet.getLabel();
+        } else if(element instanceof List<?> list) {
           StringBuilder sb = new StringBuilder();
-          for(Object o : (List<?>) element) {
-            if(o instanceof IWorkingSet) {
+          for(Object o : list) {
+            if(o instanceof IWorkingSet workingSet) {
               if(sb.length() > 0) {
                 sb.append(", "); //$NON-NLS-1$
               }
-              sb.append(((IWorkingSet) o).getLabel());
+              sb.append(workingSet.getLabel());
             }
           }
           return sb.toString();
@@ -211,8 +211,8 @@ public class WorkingSetGroup {
       Object o = selection.getFirstElement();
       if(o != null) {
         workingSets.clear();
-        if(o instanceof IWorkingSet) {
-          workingSets.add((IWorkingSet) o);
+        if(o instanceof IWorkingSet workingSet) {
+          workingSets.add(workingSet);
         } else if(o instanceof List<?>) {
           @SuppressWarnings("unchecked")
           List<IWorkingSet> l = (List<IWorkingSet>) o;

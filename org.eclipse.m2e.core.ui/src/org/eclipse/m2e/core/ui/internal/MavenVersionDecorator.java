@@ -48,8 +48,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
 
   @Override
   public String decorateText(String text, Object element) {
-    if(element instanceof IResource) {
-      IResource resource = (IResource) element;
+    if(element instanceof IResource resource) {
       IProject project = resource.getProject();
       if(project != null) {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
@@ -62,10 +61,10 @@ public class MavenVersionDecorator implements ILabelDecorator {
             if(start > -1) {
               int n = text.indexOf(' ', start + name.length());
               if(n > -1) {
-                return text.substring(0, n) + "  " + mavenProject.getVersion() + text.substring(n); //$NON-NLS-1$
+                return text.substring(0, n) + "  " + mavenProject.version() + text.substring(n); //$NON-NLS-1$
               }
             }
-            return text + "  " + mavenProject.getVersion(); //$NON-NLS-1$
+            return text + "  " + mavenProject.version(); //$NON-NLS-1$
           }
         }
       }
