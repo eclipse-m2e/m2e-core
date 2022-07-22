@@ -365,7 +365,7 @@ public class OverviewPage extends MavenPomEditorPage {
     }
 
     if(packagingTypes.isEmpty()) {
-      //something went wrong, add at laest some basic items....
+      //something went wrong, add at least some basic items....
       packagingTypes.add("jar"); //$NON-NLS-1$
       packagingTypes.add("war"); //$NON-NLS-1$
       packagingTypes.add("ejb"); //MNGECLIPSE-688 : add EAR & EJB Support //$NON-NLS-1$
@@ -625,8 +625,8 @@ public class OverviewPage extends MavenPomEditorPage {
             IMavenProjectFacade projectFacade = findModuleProject(module);
             if(projectFacade != null) {
               ArtifactKey key = projectFacade.getArtifactKey();
-              OpenPomAction.openEditor(key.groupId(), key.artifactId(), key.version(),
-                  getPomEditor().getMavenProject(), monitor);
+              OpenPomAction.openEditor(key.groupId(), key.artifactId(), key.version(), getPomEditor().getMavenProject(),
+                  monitor);
             } else {
               IFile modulePom = findModuleFile(module);
               if(modulePom != null && modulePom.isAccessible()) {

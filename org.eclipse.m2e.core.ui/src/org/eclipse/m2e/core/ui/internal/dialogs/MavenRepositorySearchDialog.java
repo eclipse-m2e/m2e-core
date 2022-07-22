@@ -74,7 +74,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   public static MavenRepositorySearchDialog createOpenPomDialog(Shell parent, String title) {
     return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey> emptySet(),
-        Collections.<ArtifactKey, String> emptyMap(), false, null, null, false);
+        Collections.<ArtifactKey, String> emptyMap(), false, null, null, false, false);
   }
 
   /**
@@ -108,7 +108,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
         }
       }
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, artifacts, managed, true, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, artifacts, managed, true, mp, p, true,
+        inManagedSection);
   }
 
   /**
@@ -126,7 +127,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       Parent par = mp.getModel().getParent();
       artifacts.add(new ArtifactKey(par.getGroupId(), par.getArtifactId(), par.getVersion(), null));
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PARENTS, artifacts, managed, false, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PARENTS, artifacts, managed, false, mp, p, true,
+        false);
   }
 
   /**
@@ -160,7 +162,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       }
 
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PLUGIN, artifacts, managed, false, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PLUGIN, artifacts, managed, false, mp, p, true,
+        inManagedSection);
   }
 
   private final boolean showScope;
@@ -203,8 +206,11 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
   private final boolean showCoords;
 
+  private final boolean inManagedSection;
+
   private MavenRepositorySearchDialog(Shell parent, String title, String queryType, Set<ArtifactKey> artifacts,
-      Map<ArtifactKey, String> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates) {
+      Map<ArtifactKey, String> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates,
+      boolean inManagedSection) {
     super(parent, DIALOG_SETTINGS);
     this.artifacts = artifacts;
     this.managed = managed;
@@ -213,6 +219,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     this.project = p;
     this.mavenproject = mp;
     this.showCoords = showCoordinates;
+    this.inManagedSection = inManagedSection;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setStatusLineAboveButtons(true);
@@ -301,10 +308,16 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       scopeLabel.setText(Messages.AddDependencyDialog_scope_label);
 
       comScope = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-      comScope.setItems(SCOPES);
       GridData scopeListData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
       comScope.setLayoutData(scopeListData);
-      comScope.setText(SCOPES[0]);
+
+      if(inManagedSection) {
+        comScope.setItems(DEP_MANAGEMENT_SCOPES);
+        comScope.setText(DEP_MANAGEMENT_SCOPES[0]);
+      } else {
+        comScope.setItems(SCOPES);
+        comScope.setText(SCOPES[0]);
+      }
     }
 
     if(showScope) {
@@ -418,7 +431,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
         txtGroupId.setText(selectedIndexedArtifactFile.group);
         txtArtifactId.setText(selectedIndexedArtifactFile.artifact);
 
-        String type = managed.get(new ArtifactKey(selectedIndexedArtifactFile.group, selectedIndexedArtifactFile.artifact,
+        String type = managed
+            .get(new ArtifactKey(selectedIndexedArtifactFile.group, selectedIndexedArtifactFile.artifact,
                 selectedIndexedArtifactFile.version, selectedIndexedArtifactFile.classifier));
         if(type != null) {
           txtVersion.setText(""); //$NON-NLS-1$
@@ -451,8 +465,9 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     if(old == null) {
       return new IndexedArtifact(groupId, artifactId, null, null, null);
     }
-    return new IndexedArtifact(groupId != null ? groupId : old.getGroupId(), artifactId != null ? artifactId
-        : old.getArtifactId(), old.getPackageName(), old.getClassname(), old.getPackaging());
+    return new IndexedArtifact(groupId != null ? groupId : old.getGroupId(),
+        artifactId != null ? artifactId : old.getArtifactId(), old.getPackageName(), old.getClassname(),
+        old.getPackaging());
   }
 
   private IndexedArtifactFile cloneIndexedArtifactFile(IndexedArtifactFile old, String groupId, String artifactId,

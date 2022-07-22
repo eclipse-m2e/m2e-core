@@ -155,14 +155,15 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     gd_classifierText.horizontalIndent = 4;
     gd_classifierText.widthHint = 200;
     classifierText.setLayoutData(gd_classifierText);
-    ProposalUtil
-        .addClassifierProposal(project, groupIdText, artifactIdText, versionText, classifierText, Packaging.ALL);
+    ProposalUtil.addClassifierProposal(project, groupIdText, artifactIdText, versionText, classifierText,
+        Packaging.ALL);
 
     Label typeLabel = new Label(composite, SWT.NONE);
     typeLabel.setText(Messages.EditDependencyDialog_type_label);
 
     typeCombo = new Combo(composite, SWT.NONE);
     typeCombo.setItems(TYPES);
+
     GridData gd_typeText = new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1);
     gd_typeText.horizontalIndent = 4;
     gd_typeText.widthHint = 120;
@@ -198,8 +199,8 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     gd_optionalButton.horizontalIndent = 4;
     optionalButton.setLayoutData(gd_optionalButton);
 
-    composite.setTabList(new Control[] {groupIdText, artifactIdText, versionText, classifierText, typeCombo,
-        scopeCombo, systemPathText, /*selectSystemPathButton,*/optionalButton});
+    composite.setTabList(new Control[] {groupIdText, artifactIdText, versionText, classifierText, typeCombo, scopeCombo,
+        systemPathText, /*selectSystemPathButton,*/optionalButton});
 
     setDependency(dependency);
 
@@ -223,8 +224,9 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     final String system = valueOrNull(systemPathText.getText());
     final boolean optional = optionalButton.getSelection();
     resultOperation = document -> {
-      Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT,
-          DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
+      Element depsEl = dependencyManagement
+          ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES)
+          : getChild(document.getDocumentElement(), DEPENDENCIES);
       Element dep = findChild(depsEl, DEPENDENCY, childEquals(GROUP_ID, oldGroupId),
           childEquals(ARTIFACT_ID, oldArtifactId));
       if(dep != null) {
