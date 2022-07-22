@@ -38,13 +38,13 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyTreeWrapper;
 import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 
 
 public class LifecycleMappingDialog extends Dialog implements ISelectionChangedListener {
 
-  private PomHierarchyComposite pomComposite;
+  private PomHierarchyTreeWrapper pomComposite;
 
   private CLabel status;
 
@@ -80,8 +80,8 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     Composite container = (Composite) super.createDialogArea(parent);
     Label label = new Label(container, SWT.NONE);
     label.setText("Select location to place ignore");
-    pomComposite = new PomHierarchyComposite(container, SWT.BORDER);
-    pomComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    pomComposite = new PomHierarchyTreeWrapper(container, SWT.BORDER);
+    pomComposite.getTreeComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     pomComposite.addSelectionChangedListener(this);
     pomComposite.computeHeirarchy(facade, null);
     status = new CLabel(container, SWT.WRAP);

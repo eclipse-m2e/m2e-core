@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -51,29 +50,25 @@ import org.eclipse.m2e.core.ui.internal.util.ParentGatherer;
 import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 
 
-public class PomHierarchyComposite extends Composite implements IInputSelectionProvider {
-  private static final Logger LOG = LoggerFactory.getLogger(PomHierarchyComposite.class);
+public class PomHierarchyTreeWrapper implements IInputSelectionProvider {
+  private static final Logger LOG = LoggerFactory.getLogger(PomHierarchyTreeWrapper.class);
 
   private TreeViewer pomsViewer;
 
   private List<ParentHierarchyEntry> hierarchy;
 
-  public PomHierarchyComposite(Composite parent, int style) {
-    super(parent, style);
-    build();
-  }
-
-  private void build() {
-    setLayout(new FillLayout(SWT.HORIZONTAL));
-    pomsViewer = new TreeViewer(this, SWT.NULL);
+  public PomHierarchyTreeWrapper(Composite parent, int style) {
+    pomsViewer = new TreeViewer(parent);
     pomsViewer.setLabelProvider(new DepLabelProvider());
     pomsViewer.setContentProvider(new PomHeirarchyContentProvider());
   }
 
-  @Override
+  public Composite getTreeComposite() {
+    return (Composite) pomsViewer.getControl();
+  }
+
   public void setEnabled(boolean bool) {
     pomsViewer.getTree().setEnabled(bool);
-    super.setEnabled(bool);
   }
 
   public void computeHeirarchy(final IMavenProjectFacade project, IRunnableContext context) {

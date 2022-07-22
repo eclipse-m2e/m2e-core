@@ -69,7 +69,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyTreeWrapper;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
@@ -97,7 +97,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   private final List<ParentHierarchyEntry> projectHierarchy;
 
-  private PomHierarchyComposite pomHierarchy;
+  private PomHierarchyTreeWrapper pomHierarchy;
 
   private IStatus status;
 
@@ -160,7 +160,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     Label selectPomLabel = new Label(pomComposite, SWT.NONE);
     selectPomLabel.setText(Messages.ManageDependenciesDialog_selectPOMLabel);
 
-    pomHierarchy = new PomHierarchyComposite(pomComposite, SWT.BORDER);
+    pomHierarchy = new PomHierarchyTreeWrapper(pomComposite, SWT.BORDER);
     pomHierarchy.setHierarchy(getProjectHierarchy());
     // pomsViewer = new TreeViewer(pomComposite, SWT.BORDER);
 
@@ -203,7 +203,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     selectPomLabel.setLayoutData(gridData);
 
     gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    pomHierarchy.setLayoutData(gridData);
+    pomHierarchy.getTreeComposite().setLayoutData(gridData);
     //pomsViewer.getTree().setLayoutData(gridData);
 
     /*

@@ -33,7 +33,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyTreeWrapper;
 import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 import org.eclipse.m2e.refactoring.Messages;
 
@@ -41,7 +41,7 @@ import org.eclipse.m2e.refactoring.Messages;
 @SuppressWarnings("restriction")
 public class ExcludeWizardPage extends UserInputWizardPage implements SelectionListener, ISelectionChangedListener {
 
-  private PomHierarchyComposite pomHierarchy;
+  private PomHierarchyTreeWrapper pomHierarchy;
 
   private Button currentPom;
 
@@ -81,10 +81,10 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     hierarchy.setText(Messages.ExcludeWizardPage_selectFromHierarchy);
     hierarchy.addSelectionListener(this);
 
-    pomHierarchy = new PomHierarchyComposite(composite, SWT.BORDER);
+    pomHierarchy = new PomHierarchyTreeWrapper(composite, SWT.BORDER);
     GridData gd_pomHierarchy = new GridData(SWT.FILL, SWT.FILL, true, true);
     gd_pomHierarchy.horizontalIndent = 35;
-    pomHierarchy.setLayoutData(gd_pomHierarchy);
+    pomHierarchy.getTreeComposite().setLayoutData(gd_pomHierarchy);
     pomHierarchy.setEnabled(false);
     pomHierarchy.addSelectionChangedListener(this);
 
