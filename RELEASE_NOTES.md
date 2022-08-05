@@ -17,6 +17,10 @@ The legacy textual editor is removed as it doesn't receive enough update/mainten
 
 m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e and are shipped by default with m2e installations. So annotation processing should be better supported out of the box.
 
+#### Inclusion of maven archiver connector
+
+m2e mavenarchiver connector so far part of some external repository were migrated into m2e and are shipped by default with m2e installations.
+
 ### Stop caching of Maven-projects for legacy clients
 
 For for clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is not longer cached any more.
