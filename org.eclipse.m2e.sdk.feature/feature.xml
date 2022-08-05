@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.m2e.sdk.feature"
-      version="2.0.0.qualifier"
+      version="2.0.1.qualifier"
       label="%featureName"
       provider-name="%providerName"
       license-feature="org.eclipse.license"

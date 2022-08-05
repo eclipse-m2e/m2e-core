@@ -219,7 +219,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		mavenProjectChanged(newFacade, oldFacade, false, monitor);
 	}
 
-	private void mavenProjectChanged(IMavenProjectFacade newFacade, IMavenProjectFacade oldFacade,
+	protected void mavenProjectChanged(IMavenProjectFacade newFacade, IMavenProjectFacade oldFacade,
 			boolean forceGeneration, IProgressMonitor monitor) throws CoreException {
 		IContainer outputdir = getBuildOutputDir(newFacade);
 		IFile manifest = outputdir.getFile(org.eclipse.core.runtime.Path.forPosix(JarFile.MANIFEST_NAME));
@@ -276,7 +276,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 * @param monitor   the progress monitor
 	 * @return true if the MANIFEST.MF needs to be regenerated
 	 */
-	private boolean needsNewManifest(IFile manifest, IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade) {
+	protected boolean needsNewManifest(IFile manifest, IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade) {
 
 		if (!manifest.exists()) {
 			return true;
