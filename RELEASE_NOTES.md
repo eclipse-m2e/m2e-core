@@ -2,8 +2,8 @@
 
 ## 2.0.0
 
-* 📅 Release Date: ? 2022
-* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.0...2.0.0
+* 📅 Release Date: August 5th 2022
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.1...2.0.0
 
 ### Require Java 17 or above
 
@@ -21,6 +21,10 @@ m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e 
 
 For for clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is not longer cached any more.
 In general MojoExecutions should be set up within the scope of `MavenExecutionContext`.
+
+### Multiple API breakage
+
+This major release improve (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement to removed APIs.
 
 ## 1.20.1
 
