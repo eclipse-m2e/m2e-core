@@ -1,9 +1,9 @@
 # Eclipse m2e - Release notes
 
-## 2.0.0
+## 2.0.1
 
 * 📅 Release Date: August 5th 2022
-* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.1...2.0.0
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.20.1...2.0.1
 
 ### Require Java 17 or above
 
