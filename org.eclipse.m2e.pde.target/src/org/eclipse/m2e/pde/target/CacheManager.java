@@ -161,7 +161,7 @@ class CacheManager {
 			if (bundle == null) {
 				throw new IllegalStateException(CacheManager.class.getSimpleName() + " not loaded from a bundle");
 			}
-			baseDir = bundle.getDataFile("").toPath();
+			baseDir = Platform.getStateLocation(bundle).toFile().toPath();
 			// clear all locations older than 14 days, this can be improved by
 			// 1) watch for changes in the workspace -> if target is deleted/removed from
 			// workspace we can clear the cache
