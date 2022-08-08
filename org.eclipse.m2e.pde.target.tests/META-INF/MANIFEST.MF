@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: org.eclipse.m2e.pde.target.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse.org
+Fragment-Host: org.eclipse.m2e.pde.target;bundle-version="2.0.300"
+Require-Bundle: org.junit;bundle-version="4.13.2"
+Automatic-Module-Name: org.eclipse.m2e.pde.target.tests
+Bundle-RequiredExecutionEnvironment: JavaSE-17
