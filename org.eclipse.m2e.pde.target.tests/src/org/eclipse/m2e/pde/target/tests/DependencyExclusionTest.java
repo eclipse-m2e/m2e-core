@@ -1,0 +1,153 @@
+/*******************************************************************************
+ * Copyright (c) 2023, 2023 Hannes Wellmann and others
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * https://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Hannes Wellmann - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.m2e.pde.target.tests;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+import org.eclipse.pde.core.target.ITargetDefinition;
+import org.junit.Test;
+
+public class DependencyExclusionTest extends AbstractMavenTargetTest {
+
+	@Test
+	public void testExclusionOfDirectRequirement() throws Exception {
+		ITargetDefinition target = resolveMavenTarget(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>1.9.3</version>
+									<type>jar</type>
+								</dependency>
+							</dependencies>
+							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
+						</location>
+						""");
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(junitPlatformCommons("1.9.3"));
+		assertTargetBundles(target, expectedBundles);
+	}
+
+	@Test
+	public void testExclusionOfDirectAndTransitivRequirement() throws Exception {
+		ITargetDefinition target = resolveMavenTarget(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-api</artifactId>
+									<version>5.9.3</version>
+									<type>jar</type>
+								</dependency>
+							</dependencies>
+							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
+						</location>
+						""");
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(//
+				junitJupiterAPI(), //
+				junitPlatformCommons("1.9.3"), //
+				opentest4j());
+		assertTargetBundles(target, expectedBundles);
+
+	}
+
+	@Test
+	public void testExclusionOfMultipleVersions() throws Exception {
+		ITargetDefinition target = resolveMavenTarget(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-api</artifactId>
+									<version>5.9.3</version>
+									<type>jar</type>
+								</dependency>
+								<dependency>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>1.7.2</version>
+									<type>jar</type>
+								</dependency>
+							</dependencies>
+							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
+							<exclude>org.apiguardian:apiguardian-api:1.1.0</exclude>
+						</location>
+						""");
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(//
+				junitJupiterAPI(), //
+				junitPlatformCommons("1.9.3"), //
+				junitPlatformCommons("1.7.2"), //
+				opentest4j());
+		assertTargetBundles(target, expectedBundles);
+	}
+
+	@Test
+	public void testExclusionOfDifferentVersions() throws Exception {
+		ITargetDefinition target = resolveMavenTarget(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-api</artifactId>
+									<version>5.9.3</version>
+									<type>jar</type>
+								</dependency>
+								<dependency>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>1.7.2</version>
+									<type>jar</type>
+								</dependency>
+							</dependencies>
+							<exclude>org.apiguardian:apiguardian-api:1.1.0</exclude>
+						</location>
+						""");
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(//
+				junitJupiterAPI(), //
+				junitPlatformCommons("1.9.3"), //
+				junitPlatformCommons("1.7.2"), //
+				apiGuardian("1.1.2"), opentest4j());
+		assertTargetBundles(target, expectedBundles);
+	}
+
+	private static ExpectedBundle junitPlatformCommons(String version) {
+		return originalOSGiBundle("junit-platform-commons", version, "org.junit.platform:junit-platform-commons");
+	}
+
+	private static ExpectedBundle junitJupiterAPI() {
+		return originalOSGiBundle("junit-jupiter-api", "5.9.3", "org.junit.jupiter:junit-jupiter-api");
+	}
+
+	private static ExpectedBundle apiGuardian(String version) {
+		return originalOSGiBundle("org.apiguardian.api", version, "org.apiguardian:apiguardian-api");
+	}
+
+	private static ExpectedBundle opentest4j() {
+		return originalOSGiBundle("org.opentest4j", "1.2.0", "org.opentest4j:opentest4j");
+	}
+}

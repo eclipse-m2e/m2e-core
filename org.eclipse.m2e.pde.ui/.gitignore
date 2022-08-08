@@ -1,0 +1,3 @@
+# Only ignore Maven target folder in this Plug-in but not the 'target' folder in the src-folder
+!target/
+/target/
