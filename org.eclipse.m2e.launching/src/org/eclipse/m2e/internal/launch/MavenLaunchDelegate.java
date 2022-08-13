@@ -19,16 +19,23 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.launching.IVMRunner;
@@ -55,6 +62,10 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   //classworlds 2.0
   private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; //$NON-NLS-1$
 
+  private static final String ANSI_SUPPORT_QUALIFIER = "org.eclipse.ui.console"; //$NON-NLS-1$
+
+  private static final String ANSI_SUPPORT_KEY = "ANSI_support_enabled"; //$NON-NLS-1$
+
   private static final VersionRange MAVEN_33PLUS_RUNTIMES;
 
   static {
@@ -77,6 +88,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private MavenLaunchExtensionsSupport extensionsSupport;
 
+  private IPreferencesService preferencesService;
+
   public MavenLaunchDelegate() {
     allowAdvancedSourcelookup();
   }
@@ -91,6 +104,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     try {
       this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, monitor);
       this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
+      this.preferencesService = Platform.getPreferencesService();
 
       log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
       log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
@@ -103,6 +117,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       this.monitor = null;
       this.launchSupport = null;
       this.extensionsSupport = null;
+      this.preferencesService = null;
     }
   }
 
@@ -263,6 +278,23 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       sb.append(" --threads ").append(threads);
     }
 
+    int colors = configuration.getAttribute(MavenLaunchConstants.ATTR_COLOR,
+        MavenLaunchConstants.ATTR_COLOR_VALUE_AUTO);
+    if(colors == MavenLaunchConstants.ATTR_COLOR_VALUE_AUTO) {
+      // In reality we don't want to pass -Dstyle.color=auto to Maven.
+      // It tries to detect if the current stdout is a terminal (using something like `isatty`)
+      // and for Eclipse that test fails.
+      colors = isAnsiProcessingEnabled() ? MavenLaunchConstants.ATTR_COLOR_VALUE_ALWAYS
+          : MavenLaunchConstants.ATTR_COLOR_VALUE_NEVER;
+    }
+    String enableColor = switch(colors) {
+      case MavenLaunchConstants.ATTR_COLOR_VALUE_ALWAYS -> "always";
+      case MavenLaunchConstants.ATTR_COLOR_VALUE_NEVER -> "never";
+      default -> throw new IllegalArgumentException(
+          "Unexpected value for" + MavenLaunchConstants.ATTR_COLOR + ": " + colors);
+    };
+    sb.append(" -Dstyle.color=" + enableColor);
+
     if(!goals.contains("-gs ")) { //$NON-NLS-1$
       String globalSettings = launchSupport.getSettings();
       if(globalSettings != null && !globalSettings.trim().isEmpty() && !new File(globalSettings.trim()).exists()) {
@@ -295,6 +327,39 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // if(s != null && s.trim().length() > 0) {
     //   sb.append(" -D").append(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY).append("=").append(s);
     // }
+  }
+
+  /**
+   * Gets the current status of the ANSI processing.
+   *
+   * @return true if enabled, false if not.
+   */
+  private boolean isAnsiProcessingEnabled() {
+    if(!isAnsiSupportInstalled()) {
+      return false;
+    }
+    return preferencesService.getBoolean(ANSI_SUPPORT_QUALIFIER, ANSI_SUPPORT_KEY, true, null);
+  }
+
+  // We can completely remove this test if / when this module will require
+  // a version of org.eclipse.ui.console newer than 3.11.300
+  private boolean isAnsiSupportInstalled() {
+    Bundle consoleBundle = Platform.getBundle("org.eclipse.ui.console");
+    if(consoleBundle == null) {
+      return false;
+    }
+
+    Version currentVer = consoleBundle.getVersion();
+    if("qualifier".equals(currentVer.getQualifier())) {
+      // In the rare case when someone is running with a dev version of
+      // `org.eclipse.ui.console` we "fake" a qualifier with the current time.
+      SimpleDateFormat df = new SimpleDateFormat("'v'yyyyMMdd-HHmm", Locale.US);
+      String qualifier = df.format(new Date());
+      currentVer = new Version(currentVer.getMajor(), currentVer.getMinor(), currentVer.getMicro(), qualifier);
+    }
+
+    Version ansiVer = new Version(3, 11, 300, "v20220804-1122");
+    return currentVer.compareTo(ansiVer) >= 0;
   }
 
   /**

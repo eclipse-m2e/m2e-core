@@ -118,6 +118,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private Combo threadsCombo;
 
+  private Combo colorOutputCombo;
+
   private MavenRuntimeSelector runtimeSelector;
 
   private Text userSettings;
@@ -297,19 +299,39 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       gridLayout.marginWidth = 0;
       gridLayout.marginHeight = 0;
       composite.setLayout(gridLayout);
+
+      Label threadsLabel = new Label(composite, SWT.NONE);
+      threadsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblThreads);
+      threadsLabel.setToolTipText("--threads"); //$NON-NLS-1$
+
       threadsCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
       for(int i = 1; i <= processors; i++ ) {
         threadsCombo.add(Integer.toString(i));
       }
       threadsCombo.setEnabled(processors > 1);
       threadsCombo.addSelectionListener(modyfyingListener);
-
-      Label threadsLabel = new Label(composite, SWT.NONE);
-      threadsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblThreads);
-      threadsLabel.setToolTipText("--threads"); //$NON-NLS-1$
     }
-    new Label(mainComposite, SWT.NONE);
-    new Label(mainComposite, SWT.NONE);
+
+    {
+      Composite composite = new Composite(mainComposite, SWT.NONE);
+      composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+      GridLayout gridLayout = new GridLayout(2, false);
+      gridLayout.marginWidth = 0;
+      gridLayout.marginHeight = 0;
+      composite.setLayout(gridLayout);
+
+      Label enableColorOutputLabel = new Label(composite, SWT.NONE);
+      enableColorOutputLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblEnableColorOutput);
+      enableColorOutputLabel.setToolTipText("-Dstyle.color=auto|always|never"); //$NON-NLS-1$
+
+      colorOutputCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
+      // Warning: changing the order here would conflict with the constants in ColorOutput.
+      // The current assumption is that the index in the combo is the same as the constant.
+      colorOutputCombo.add(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblEnableColorOutput_Auto);
+      colorOutputCombo.add(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblEnableColorOutput_Always);
+      colorOutputCombo.add(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblEnableColorOutput_Never);
+      colorOutputCombo.addSelectionListener(modyfyingListener);
+    }
 
     TableViewer tableViewer = new TableViewer(mainComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
     tableViewer.addDoubleClickListener(event -> {
@@ -460,6 +482,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
       this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1) - 1);
+      this.colorOutputCombo.select(getAttribute(configuration, ATTR_COLOR, MavenLaunchConstants.ATTR_COLOR_VALUE_AUTO));
 
       this.runtimeSelector.initializeFrom(configuration);
 
@@ -542,6 +565,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     runtimeSelector.performApply(configuration);
 
     configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex() + 1);
+    configuration.setAttribute(ATTR_COLOR, colorOutputCombo.getSelectionIndex());
 
     // store as String in "param=value" format
     List<String> properties = new ArrayList<>();

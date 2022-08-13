@@ -226,6 +226,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		var wc = configType.newInstance(null, configName);
 		wc.setAttribute(MavenLaunchConstants.ATTR_GOALS, "clean verify");
 		wc.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, pomDir);
+		// The ANSI codes produced when color is enabled break the detection of certain significant lines
+		wc.setAttribute(MavenLaunchConstants.ATTR_COLOR, MavenLaunchConstants.ATTR_COLOR_VALUE_NEVER);
 		wc.setAttribute(MavenLaunchConstants.ATTR_PROPERTIES,
 				Arrays.stream(properties).map(e -> e.getKey() + "=" + e.getValue()).collect(toList()));
 		wc.launch(mode, new NullProgressMonitor());
