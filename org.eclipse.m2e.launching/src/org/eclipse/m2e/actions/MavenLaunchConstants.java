@@ -51,7 +51,25 @@ public interface MavenLaunchConstants {
 
   String ATTR_THREADS = "M2_THREADS"; //$NON-NLS-1$
 
+  String ATTR_COLOR = "M2_COLORS"; //$NON-NLS-1$
+
   String ATTR_SAVE_BEFORE_LAUNCH = "M2_SAVE_BEFORE_LAUNCH";
 
   String ATTR_BATCH = "M2_BATCH";
+
+  /**
+   * Not passed directly to Maven.
+   * <p>
+   * The auto as handled by Maven tries to detect if {@code stdout} is a terminal by invoking {@code isatty}, which
+   * returns `false` for the Eclipse console. <br />
+   * So we will solve the detection part and will pass {@code always} / {@code never} to Maven.
+   * </p>
+   */
+  int ATTR_COLOR_VALUE_AUTO = 0;
+
+  /** Instruct Maven to always output colors. */
+  int ATTR_COLOR_VALUE_ALWAYS = 1;
+
+  /** Instruct Maven to never output colors. */
+  int ATTR_COLOR_VALUE_NEVER = 2;
 }

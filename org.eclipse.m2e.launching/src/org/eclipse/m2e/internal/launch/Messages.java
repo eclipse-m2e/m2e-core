@@ -57,6 +57,14 @@ public class Messages extends NLS {
 
   public static String MavenLaunchMainTab_lblThreads;
 
+  public static String MavenLaunchMainTab_lblEnableColorOutput;
+
+  public static String MavenLaunchMainTab_lblEnableColorOutput_Auto;
+
+  public static String MavenLaunchMainTab_lblEnableColorOutput_Always;
+
+  public static String MavenLaunchMainTab_lblEnableColorOutput_Never;
+
   public static String MavenLaunchMainTab_btnUpdateSnapshots;
 
   public static String MavenLaunchMainTab_lblAfterClean;
