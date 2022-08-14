@@ -19,14 +19,17 @@ pipeline {
 		}
 		stage('Build') {
 			steps {
-				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata '
+				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata'
 				wrap([$class: 'Xvnc', useXauthority: true]) {
 					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200'
 				}
 			}
 			post {
 				always {
-					archiveArtifacts artifacts: 'org.eclipse.*.site/target/repository/**/*,org.eclipse.*.site/target/*.zip,*/target/work/data/.metadata/.log,m2e-core-tests/*/target/work/data/.metadata/.log,m2e-maven-runtime/target/*.properties'
+					archiveArtifacts artifacts: 'org.eclipse.m2e.repository/target/*.zip,\
+						*/target/work/data/.metadata/.log,\
+						m2e-core-tests/*/target/work/data/.metadata/.log,\
+						m2e-maven-runtime/target/*.properties'
 					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
@@ -48,17 +51,14 @@ pipeline {
 							scp -r org.eclipse.m2e.repository/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						# Read M2E branding version
-						regex='<feature id="org\\.eclipse\\.m2e\\.sdk\\.feature" label="%featureName" version="([0-9]\\.[0-9]\\.[0-9])\\.qualifier" '
-						content=$(echo $(<"org.eclipse.m2e.sdk.feature/feature.xml")) # replaces consecutive newline and tabs by single space
-						if [[ $content  =~ $regex ]]
+						version=$(xmllint --xpath 'string(/feature/@version)' org.eclipse.m2e.sdk.feature/feature.xml)
+						if [[ $version =~ ([0-9]\\.[0-9]\\.[0-9])\\.qualifier ]] # backslash itself has to be escaped in Jenkinsfile
 						then
 							M2E_VERSION="${BASH_REMATCH[1]}"
-							echo M2E_VERSION=$M2E_VERSION
 						else
 							echo Failed to read M2E_VERSION. Abort deployment.
 							exit 1
 						fi
-
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 					'''
