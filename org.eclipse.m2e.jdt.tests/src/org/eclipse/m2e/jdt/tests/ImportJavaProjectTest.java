@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -34,6 +33,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.project.MavenProjectConfigurator;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.FileHelpers;
 import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 import org.junit.After;
@@ -69,7 +69,7 @@ public class ImportJavaProjectTest extends AbstractMavenProjectTestCase {
   @Override
 @After
   public void tearDown() throws IOException {
-    FileUtils.deleteDirectory(this.parentproject.getParentFile());
+    FileHelpers.deleteDirectory(this.parentproject.getParentFile());
   }
  
   @Test

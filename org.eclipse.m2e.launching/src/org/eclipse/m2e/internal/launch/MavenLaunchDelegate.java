@@ -19,14 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -335,31 +330,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
    * @return true if enabled, false if not.
    */
   private boolean isAnsiProcessingEnabled() {
-    if(!isAnsiSupportInstalled()) {
-      return false;
-    }
     return preferencesService.getBoolean(ANSI_SUPPORT_QUALIFIER, ANSI_SUPPORT_KEY, true, null);
-  }
-
-  // We can completely remove this test if / when this module will require
-  // a version of org.eclipse.ui.console newer than 3.11.300
-  private boolean isAnsiSupportInstalled() {
-    Bundle consoleBundle = Platform.getBundle("org.eclipse.ui.console");
-    if(consoleBundle == null) {
-      return false;
-    }
-
-    Version currentVer = consoleBundle.getVersion();
-    if("qualifier".equals(currentVer.getQualifier())) {
-      // In the rare case when someone is running with a dev version of
-      // `org.eclipse.ui.console` we "fake" a qualifier with the current time.
-      SimpleDateFormat df = new SimpleDateFormat("'v'yyyyMMdd-HHmm", Locale.US);
-      String qualifier = df.format(new Date());
-      currentVer = new Version(currentVer.getMajor(), currentVer.getMinor(), currentVer.getMicro(), qualifier);
-    }
-
-    Version ansiVer = new Version(3, 11, 300, "v20220804-1122");
-    return currentVer.compareTo(ansiVer) >= 0;
   }
 
   /**
