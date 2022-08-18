@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -59,6 +60,8 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   private static final String MAVEN_EXECUTOR_CLASS = org.apache.maven.cli.MavenCli.class.getName();
 
   public static final String PLEXUS_CLASSWORLD_NAME = "plexus.core"; //$NON-NLS-1$
+
+  private static final String M2E_SL4J_BINDING_HEADER = "M2E-SLF4JBinding"; // header defined in org.eclipse.m2e.maven.runtime/pom.xml
 
   private static List<String> LAUNCHER_CLASSPATH;
 
@@ -113,6 +116,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       Set<String> allEntries = new LinkedHashSet<>();
 
       addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
+      allEntries.add(getEmbeddedSLF4JBinding(mavenRuntimeBundle));
 
       Set<Bundle> bundles = new LinkedHashSet<>();
       // find and add required bundles and bundles providing imported packages
@@ -146,6 +150,14 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
         entries.addAll(Bundles.getClasspathEntries(fragment));
       }
     }
+  }
+
+  private static String getEmbeddedSLF4JBinding(Bundle mavenBundle) {
+    String bindingPath = mavenBundle.getHeaders().get(M2E_SL4J_BINDING_HEADER);
+    Objects.requireNonNull(bindingPath,
+        () -> "Missing '" + M2E_SL4J_BINDING_HEADER + "' header in embedded Maven-runtime bundle");
+    String bindingJarPath = Bundles.getClasspathEntryPath(mavenBundle, bindingPath);
+    return Objects.requireNonNull(bindingJarPath, () -> M2E_SL4J_BINDING_HEADER + " '" + bindingPath + "' not found");
   }
 
   private static Bundle findMavenEmbedderBundle() {

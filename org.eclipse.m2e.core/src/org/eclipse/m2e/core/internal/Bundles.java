@@ -50,9 +50,8 @@ public class Bundles {
     cp.addAll(parseBundleClasspath(bundle));
     List<String> entries = new ArrayList<>();
     for(String cpe : cp) {
-      String entry = getNestedJarOrDir(bundle, ".".equals(cpe) ? "/" : cpe);
+      String entry = getClasspathEntryPath(bundle, ".".equals(cpe) ? "/" : cpe);
       if(entry != null) {
-        entry = new Path(entry).toOSString();
         log.debug("\tEntry:{}", entry);
         entries.add(entry);
       }
@@ -73,12 +72,13 @@ public class Bundles {
     return List.of(".");
   }
 
-  private static String getNestedJarOrDir(Bundle bundle, String cp) {
+  public static String getClasspathEntryPath(Bundle bundle, String cp) {
     // try embedded entries first
     URL url = bundle.getEntry(cp);
     if(url != null) {
       try {
-        return FileLocator.toFileURL(url).getFile();
+        String path = FileLocator.toFileURL(url).getFile();
+        return new Path(path).toOSString();
       } catch(IOException ex) {
         log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
       }

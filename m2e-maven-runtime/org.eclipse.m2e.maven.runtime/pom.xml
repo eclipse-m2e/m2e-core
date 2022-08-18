@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.8.6-SNAPSHOT</version>
+	<version>3.8.601-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -35,6 +35,7 @@
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
+		<slf4j-simple.version>1.7.36</slf4j-simple.version>
 	</properties>
 
 	<dependencies>
@@ -106,6 +107,13 @@
 			<groupId>org.fusesource.jansi</groupId>
 			<artifactId>jansi</artifactId>
 		</dependency>
+		<dependency>
+			<!-- SLF4J-binding only used by a launched Maven-runtime.
+				Keep the BND-instructions below in sync with this jar's name. -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j-simple.version}</version>
+		</dependency>
 		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -139,6 +147,15 @@
 					<configuration>
 						<bnd>
 							<![CDATA[
+							# When launching a Maven build using this embedded runtime, we want the embedded SLF4J logger binding to be used.
+							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding 
+							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible 
+							# for OSGi, by simply NOT placing the binding's jar on the Bundle-ClassPath.
+							slf4jBinding=slf4j-simple-${slf4j-simple.version}.jar
+							M2E-SLF4JBinding=jars/${slf4jBinding}
+							-includeresource: \
+								jars/=jars/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
+								jars/=jars/${slf4jBinding};lib:=false
 							-exportcontents: \
 								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								META-INF.sisu;-noimport:=true;x-internal:=true,\
@@ -154,7 +171,6 @@
 								org.slf4j.helpers;resolution:=optional;version="[1.6.2,2.0.0)",\
 								javax.inject;version="1.0.0"
 							Require-Bundle: \
-								org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.18.0,1.19.0)",\
 								com.google.guava
 						]]>
 							<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched 
