@@ -35,7 +35,6 @@
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
-		<slf4j-simple.version>1.7.36</slf4j-simple.version>
 	</properties>
 
 	<dependencies>
@@ -110,9 +109,8 @@
 		<dependency>
 			<!-- SLF4J-binding only used by a launched Maven-runtime.
 				Keep the BND-instructions below in sync with this jar's name. -->
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j-simple.version}</version>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-slf4j-provider</artifactId>
 		</dependency>
 		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
 		<dependency>
@@ -151,7 +149,7 @@
 							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding 
 							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible 
 							# for OSGi, by simply NOT placing the binding's jar on the Bundle-ClassPath.
-							slf4jBinding=slf4j-simple-${slf4j-simple.version}.jar
+							slf4jBinding=maven-slf4j-provider-${maven-core.version}.jar
 							M2E-SLF4JBinding=jars/${slf4jBinding}
 							-includeresource: \
 								jars/=jars/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
