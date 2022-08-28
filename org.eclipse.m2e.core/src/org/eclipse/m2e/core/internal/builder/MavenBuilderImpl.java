@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -113,12 +112,10 @@ public class MavenBuilderImpl {
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<>();
     MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
     try {
-      for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
-        MojoExecutionKey mojoExecutionKey = entry.getKey();
-        for(InternalBuildParticipant participant : entry.getValue()) {
+      participants.forEach((mojoExecutionKey, buildParticipants) -> {
+        for(InternalBuildParticipant participant : buildParticipants) {
           Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<>(participantResults.getFiles())
               : null;
-
           log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
               mojoExecutionKey);
           participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
@@ -157,7 +154,7 @@ public class MavenBuilderImpl {
           debugBuildParticipant(debugHooks, projectFacade, mojoExecutionKey, (AbstractBuildParticipant) participant,
               diff(debugRefreshFiles, participantResults.getFiles()), monitor);
         }
-      }
+      });
     } catch(Exception e) {
       log.debug("Unexpected build exception", e);
       buildErrors.put(e, null);
@@ -268,28 +265,25 @@ public class MavenBuilderImpl {
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
 
     // Remove obsolete markers for problems reported by build participants
-    for(Entry<String, List<File>> entry : results.getRemoveMessages().entrySet()) {
-      String buildParticipantId = entry.getKey();
-      for(File file : entry.getValue()) {
+    results.getRemoveMessages().forEach((buildParticipantId, files) -> {
+      for(File file : files) {
         deleteBuildParticipantMarkers(project, markerManager, file, buildParticipantId);
       }
-    }
+    });
 
     // Create new markers for problems reported by build participants
-    for(Entry<String, List<Message>> messageEntry : results.getMessages().entrySet()) {
-      String buildParticipantId = messageEntry.getKey();
-      for(Message buildMessage : messageEntry.getValue()) {
+    results.getMessages().forEach((buildParticipantId, messages) -> {
+      for(Message buildMessage : messages) {
         addBuildParticipantMarker(project, markerManager, buildMessage, buildParticipantId);
 
-        if(buildMessage.cause != null && buildErrors.containsKey(buildMessage.cause)) {
-          buildErrors.remove(buildMessage.cause);
+        if(buildMessage.cause() != null) {
+          buildErrors.remove(buildMessage.cause());
         }
       }
-    }
+    });
 
     // Create markers for the build errors linked to mojo/plugin executions
-    for(Throwable error : buildErrors.keySet()) {
-      MojoExecutionKey mojoExecutionKey = buildErrors.get(error);
+    buildErrors.forEach((error, mojoExecutionKey) -> {
       SourceLocation markerLocation;
       if(mojoExecutionKey != null) {
         markerLocation = SourceLocationHelper.findLocation(mavenProject, mojoExecutionKey);
@@ -299,7 +293,7 @@ public class MavenBuilderImpl {
       BuildProblemInfo problem = new BuildProblemInfo(error, mojoExecutionKey, markerLocation);
       markerManager.addErrorMarker(project.getFile(IMavenConstants.POM_FILE_NAME), IMavenConstants.MARKER_BUILD_ID,
           problem);
-    }
+    });
 
     if(result.hasExceptions()) {
       markerManager.addMarkers(project.getFile(IMavenConstants.POM_FILE_NAME), IMavenConstants.MARKER_BUILD_ID, result);
@@ -323,15 +317,15 @@ public class MavenBuilderImpl {
   private void addBuildParticipantMarker(IProject project, IMavenMarkerManager markerManager, Message buildMessage,
       String buildParticipantId) {
 
-    IResource resource = MavenProjectUtils.getProjectResource(project, buildMessage.file);
+    IResource resource = MavenProjectUtils.getProjectResource(project, buildMessage.file());
     if(resource == null) {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
     int at = buildParticipantId.lastIndexOf('-');
     String pluginExecutionKey = buildParticipantId.substring(0, at);
-    String message = buildMessage.message + " (" + pluginExecutionKey + ')'; //$NON-NLS-1$
+    String message = buildMessage.message() + " (" + pluginExecutionKey + ')'; //$NON-NLS-1$
     IMarker marker = markerManager.addMarker(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID, message,
-        buildMessage.line, buildMessage.severity);
+        buildMessage.line(), buildMessage.severity());
     try {
       marker.setAttribute(BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
     } catch(CoreException ex) {
@@ -353,9 +347,8 @@ public class MavenBuilderImpl {
 
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<>();
     try {
-      for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
-        MojoExecutionKey mojoExecutionKey = entry.getKey();
-        for(InternalBuildParticipant participant : entry.getValue()) {
+      participants.forEach((mojoExecutionKey, buildParticipants) -> {
+        for(InternalBuildParticipant participant : buildParticipants) {
           participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
@@ -375,7 +368,7 @@ public class MavenBuilderImpl {
             processMavenSessionErrors(session, mojoExecutionKey, buildErrors);
           }
         }
-      }
+      });
     } catch(Exception e) {
       buildErrors.put(e, null);
     } finally {
