@@ -119,6 +119,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.inject</groupId>
 			<artifactId>javax.inject</artifactId>
 			<scope>provided</scope>
@@ -167,7 +172,10 @@
 								org.slf4j;resolution:=optional;version="[1.7.0,3.0.0)",\
 								org.slf4j.spi;resolution:=optional;version="[1.7.0,3.0.0)",\
 								org.slf4j.helpers;resolution:=optional;version="[1.7.0,3.0.0)",\
-								javax.inject;version="1.0.0"
+								javax.inject;version="1.0.0",\
+								javax.annotation;version="[1.2.0,2.0.0)",\
+								javax.annotation.sql;version="[1.2.0,2.0.0)",\
+								javax.annotation.security;version="[1.2.0,2.0.0)"
 							Require-Bundle: \
 								com.google.guava
 						]]>
