@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -51,8 +53,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mapping = projectFacade.getMojoExecutionMapping();
     Map<String, AbstractProjectConfigurator> configurators = getProjectConfigurators(projectFacade);
 
-    List<MojoExecution> mojoExecutions = ((MavenProjectFacade) projectFacade).getExecutionPlan(
-        ProjectRegistryManager.LIFECYCLE_DEFAULT, monitor);
+    List<MojoExecution> mojoExecutions = ((MavenProjectFacade) projectFacade)
+        .getExecutionPlan(ProjectRegistryManager.LIFECYCLE_DEFAULT, monitor);
 
     if(mojoExecutions != null) { // null if execution plan could not be calculated
       for(MojoExecution mojoExecution : mojoExecutions) {
@@ -79,15 +81,13 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                     projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata);
                 if(buildParticipant != null) {
                   log.debug("\tAction: {}", executionMetadata.getAction());
-                  log.debug("\t\tProject configurator : id={} class={}", configuratorId, configurator.getClass()
-                      .getName());
+                  log.debug("\t\tProject configurator : id={} class={}", configuratorId,
+                      configurator.getClass().getName());
                   log.debug("\t\tBuild participant: {}", buildParticipant.getClass().getName());
                   executionMappings.add(buildParticipant);
                 }
                 break;
-              case ignore:
-              case warn:
-              case error:
+              case ignore, warn, error:
                 log.debug("\tAction: {}", executionMetadata.getAction());
                 break;
               default:
@@ -138,10 +138,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         }
         continue; // mapping is null/empty and did not change
       }
-      if(oldMetadatas == null || oldMetadatas.isEmpty()) {
-        return true;
-      }
-      if(metadatas.size() != oldMetadatas.size()) {
+      if(oldMetadatas == null || oldMetadatas.isEmpty() || metadatas.size() != oldMetadatas.size()) {
         return true;
       }
       for(int i = 0; i < metadatas.size(); i++ ) {
@@ -153,43 +150,28 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
           }
           continue;
         }
-        if(oldMetadata == null) {
+        if(oldMetadata == null || metadata.getAction() != oldMetadata.getAction()) {
           return true;
         }
-        if(metadata.getAction() != oldMetadata.getAction()) {
-          return true;
-        }
-        switch(metadata.getAction()) {
-          case ignore:
-          case execute:
-            continue;
-          case error:
-            // TODO verify error message did not change...
-            continue;
-          case configurator:
-            String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
-            String oldConfiguratorId = LifecycleMappingFactory.getProjectConfiguratorId(oldMetadata);
-            if(!eq(configuratorId, oldConfiguratorId)) {
+        if(metadata.getAction() == PluginExecutionAction.configurator) {
+          String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
+          String oldConfiguratorId = LifecycleMappingFactory.getProjectConfiguratorId(oldMetadata);
+          if(!Objects.equals(configuratorId, oldConfiguratorId)) {
+            return true;
+          }
+          try {
+            AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfigurator(metadata);
+            if(configurator.hasConfigurationChanged(newFacade, oldConfiguration, entry.getKey(), monitor)) {
               return true;
             }
-            try {
-              AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfigurator(metadata);
-              if(configurator.hasConfigurationChanged(newFacade, oldConfiguration, entry.getKey(), monitor)) {
-                return true;
-              }
-            } catch(LifecycleMappingConfigurationException e) {
-              // installation problem/misconfiguration
-            }
-            continue;
+          } catch(LifecycleMappingConfigurationException e) {
+            // installation problem/misconfiguration
+          }
         }
+        // TODO verify error message did not change in case metadata.getAction() == error ...
       }
     }
-
     return false;
-  }
-
-  private static <T> boolean eq(T a, T b) {
-    return a != null ? a.equals(b) : b == null;
   }
 
 }

@@ -27,33 +27,15 @@ import java.util.Set;
  */
 class BuildResultCollector implements IIncrementalBuildFramework.BuildResultCollector {
 
-  private String currentParticipantId;
-
-  public static class Message {
-    public final File file;
-
-    public final int line;
-
-    public final int column;
-
-    public final String message;
-
-    public final int severity;
-
-    public final Throwable cause;
-
-    Message(File file, int line, int column, String message, int severity, Throwable cause) {
-      this.file = file;
-      this.line = line;
-      this.column = column;
+  public static record Message(File file, int line, int column, String message, int severity, Throwable cause) {
+    public Message {
       if(message == null && cause != null) {
         message = cause.getMessage();
       }
-      this.message = message;
-      this.severity = severity;
-      this.cause = cause;
     }
   }
+
+  private String currentParticipantId;
 
   /** Added, changed or removed resources */
   private final Set<File> refresh = new HashSet<>();
@@ -79,11 +61,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
     if(currentParticipantId == null) {
       throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
     }
-    List<Message> messageList = messages.get(currentParticipantId);
-    if(messageList == null) {
-      messageList = new ArrayList<>();
-      messages.put(currentParticipantId, messageList);
-    }
+    List<Message> messageList = messages.computeIfAbsent(currentParticipantId, i -> new ArrayList<>());
     messageList.add(new Message(file, line, column, message, severity, cause));
   }
 
@@ -92,11 +70,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
     if(currentParticipantId == null) {
       throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
     }
-    List<File> files = removeMessages.get(currentParticipantId);
-    if(files == null) {
-      files = new ArrayList<>();
-      removeMessages.put(currentParticipantId, files);
-    }
+    List<File> files = removeMessages.computeIfAbsent(currentParticipantId, i -> new ArrayList<>());
     files.add(file);
   }
 

@@ -50,26 +50,23 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProvider {
-  static final Logger log = LoggerFactory.getLogger(MavenBuilder.class);
+  private static final Logger log = LoggerFactory.getLogger(MavenBuilder.class);
 
   final MavenBuilderImpl builder = new MavenBuilderImpl(this);
 
+  private final ProjectRegistryManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+
+  private final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+
+  private final IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
+
   private abstract class BuildMethod<T> {
-    final ProjectRegistryManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
 
-    final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-
-    final IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
-
-    public BuildMethod() {
-
-    }
-
-    public final T execute(final int kind, final Map<String, String> args, IProgressMonitor monitor)
-        throws CoreException {
-      final IProject project = getProject();
-      markerManager.deleteMarkers(project, kind == FULL_BUILD || kind == CLEAN_BUILD, IMavenConstants.MARKER_BUILD_ID);
-      final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    public final T execute(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
+      IProject project = getProject();
+      boolean includeSubtypes = kind == FULL_BUILD || kind == CLEAN_BUILD;
+      markerManager.deleteMarkers(project, includeSubtypes, IMavenConstants.MARKER_BUILD_ID);
+      IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
       if(pomResource == null) {
         return null;
       }
@@ -81,10 +78,10 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
         return null;
       }
 
-      final IMavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
+      IMavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
 
       return context.execute((context2, monitor2) -> {
-        final IMavenProjectFacade projectFacade = getProjectFacade(project, monitor2);
+        IMavenProjectFacade projectFacade = getProjectFacade(project, monitor2);
 
         if(projectFacade == null) {
           return null;
@@ -128,8 +125,8 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
       markerManager.addMarker(project, IMavenConstants.MARKER_BUILD_ID, msg, 1, IMarker.SEVERITY_ERROR);
     }
 
-    IMavenProjectFacade getProjectFacade(final IProject project, final IProgressMonitor monitor) throws CoreException {
-      final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    IMavenProjectFacade getProjectFacade(IProject project, IProgressMonitor monitor) throws CoreException {
+      IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
 
       // facade refresh should be forced whenever pom.xml has changed
       // there is no delta info for full builds
@@ -188,10 +185,9 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
   };
 
   @Override
-  protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor)
-      throws CoreException {
+  protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
     log.debug("Building project {}", getProject().getName()); //$NON-NLS-1$
-    final long start = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
     try {
       return methodBuild.execute(kind, args, monitor);
     } finally {
@@ -200,9 +196,9 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
   }
 
   @Override
-  protected void clean(final IProgressMonitor monitor) throws CoreException {
+  protected void clean(IProgressMonitor monitor) throws CoreException {
     log.debug("Cleaning project {}", getProject().getName()); //$NON-NLS-1$
-    final long start = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
 
     try {
       methodClean.execute(CLEAN_BUILD, Collections.emptyMap(), monitor);
