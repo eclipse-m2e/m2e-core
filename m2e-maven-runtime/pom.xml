@@ -52,7 +52,7 @@
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
-					<version>6.2.0</version>
+					<version>6.3.1</version>
 					<configuration>
 						<packagingTypes>eclipse-plugin</packagingTypes>
 						<!-- PDE does not honor custom manifest location -->
@@ -90,7 +90,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.3.0</version>
 					<configuration>
 						<overWriteReleases>true</overWriteReleases>
 						<overWriteSnapshots>true</overWriteSnapshots>
