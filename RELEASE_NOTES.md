@@ -1,5 +1,17 @@
 # Eclipse m2e - Release notes
 
+## 2.0.2
+
+* 📅 Release Date: August 30th 2022
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/2.0.1...2.0.2
+
+### Support for colored Maven console printouts
+
+M2E now supports colored console printouts for Maven builds launched in the IDE out of the box.
+
+This is built on top of the new support for colored Console content, which is added to Eclipse-Platform in the 2022-09/4.25 release (which is therefore required).
+In the Run/Debug-configuration of a `Maven Build` launch it can be controlled if the printout is colored or not (i.e. the value of Maven's `style.color` property). The default is `Auto`, which enables colored print-outs if colored Console printout is generally enabled in the workspace.
+
 ## 2.0.1
 
 * 📅 Release Date: August 5th 2022
@@ -28,7 +40,7 @@ In general MojoExecutions should be set up within the scope of `MavenExecutionCo
 
 ### Multiple API breakage
 
-This major release improve (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement to removed APIs.
+This major release improves (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement to removed APIs.
 
 ## 1.20.1
 
