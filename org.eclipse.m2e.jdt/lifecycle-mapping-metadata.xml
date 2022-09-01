@@ -6,10 +6,6 @@
       <packagingType>jar</packagingType>
       <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
     </lifecycleMapping>
-    <lifecycleMapping>
-      <packagingType>war</packagingType>
-      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
-    </lifecycleMapping>
   </lifecycleMappings>
 
   <pluginExecutions>

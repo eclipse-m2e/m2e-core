@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
 
+	<!-- Although it would make more sense to have it part of
+	     org.eclipse.m2e.jdt, we move the lifecycle mapping definition
+	     here so it is marked as "default" and can be overriden, eg by
+	     m2e-wtp. Otherwise: https://github.com/eclipse-m2e/m2e-core/issues/867 -->
+	<lifecycleMappings>
+		<lifecycleMapping>
+			<packagingType>war</packagingType>
+			<lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
+		</lifecycleMapping>
+	</lifecycleMappings>
+
   <pluginExecutions>
     <!-- M2E's default lifecycle mappings for standard maven plugins -->
     <pluginExecution>
