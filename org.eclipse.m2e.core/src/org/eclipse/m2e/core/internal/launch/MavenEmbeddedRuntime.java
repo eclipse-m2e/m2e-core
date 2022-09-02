@@ -16,20 +16,22 @@ package org.eclipse.m2e.core.internal.launch;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
-import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
@@ -118,13 +120,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
       allEntries.add(getEmbeddedSLF4JBinding(mavenRuntimeBundle));
 
-      Set<Bundle> bundles = new LinkedHashSet<>();
-      // find and add required bundles and bundles providing imported packages
-      List<BundleWire> requiredWires = new ArrayList<>();
-      BundleWiring wiring = mavenRuntimeBundle.adapt(BundleWiring.class);
-      requiredWires.addAll(wiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
-      requiredWires.addAll(wiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
-      requiredWires.stream().map(BundleWire::getProvider).map(BundleRevision::getBundle).forEach(bundles::add);
+      Set<Bundle> bundles = getRequiredBundles(mavenRuntimeBundle);
 
       for(Bundle bundle : bundles) {
         addBundleClasspathEntries(allEntries, bundle, false);
@@ -158,6 +154,30 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
         () -> "Missing '" + M2E_SL4J_BINDING_HEADER + "' header in embedded Maven-runtime bundle");
     String bindingJarPath = Bundles.getClasspathEntryPath(mavenBundle, bindingPath);
     return Objects.requireNonNull(bindingJarPath, () -> M2E_SL4J_BINDING_HEADER + " '" + bindingPath + "' not found");
+  }
+
+  private static final List<String> CLASSPATH_CONSIDERED_REQUIREMENT_NAMESPACES = List
+      .of(BundleNamespace.BUNDLE_NAMESPACE, PackageNamespace.PACKAGE_NAMESPACE);
+
+  private Set<Bundle> getRequiredBundles(Bundle root) {
+    // find and add required bundles and bundles providing imported packages
+    Set<Bundle> bundles = new LinkedHashSet<>();
+    Queue<Bundle> pending = new ArrayDeque<>();
+    pending.add(root);
+    while(!pending.isEmpty()) { // breath-first search to collect all (transitively) required bundles
+      Bundle bundle = pending.remove();
+      BundleWiring wiring = bundle.adapt(BundleWiring.class);
+      for(String namespace : CLASSPATH_CONSIDERED_REQUIREMENT_NAMESPACES) {
+        for(BundleWire wire : wiring.getRequiredWires(namespace)) {
+          Bundle requiredBundle = wire.getProvider().getBundle();
+          if(requiredBundle.getBundleId() != Constants.SYSTEM_BUNDLE_ID && bundles.add(requiredBundle)) {
+            // Don't add OSGi System-Bundle, which is wired if a bundle imports java.* or sun.* packages
+            pending.add(requiredBundle);
+          }
+        }
+      }
+    }
+    return bundles;
   }
 
   private static Bundle findMavenEmbedderBundle() {
