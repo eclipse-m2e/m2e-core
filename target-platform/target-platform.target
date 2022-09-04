@@ -33,7 +33,6 @@
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/tools/orbit/downloads/2022-06/"/>
 			<unit id="com.google.gson" version="0.0.0"/>
-			<unit id="com.google.guava" version="0.0.0"/>
 			<unit id="ch.qos.logback.core" version="0.0.0"/>
 			<unit id="ch.qos.logback.classic" version="0.0.0"/>
 			<unit id="ch.qos.logback.slf4j" version="0.0.0"/>
@@ -62,6 +61,18 @@
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>biz.aQute.bndlib</artifactId>
 					<version>6.3.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>com.google.guava</groupId>
+					<artifactId>failureaccess</artifactId>
+					<version>1.0.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+					<version>31.1-jre</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
