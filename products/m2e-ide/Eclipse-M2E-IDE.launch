@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
     <setAttribute key="additional_plugins">
-        <setEntry value="org.apache.felix.scr:2.1.24.v20200924-1939:default:true:2:true"/>
-        <setEntry value="org.eclipse.core.runtime:3.25.0.v20220506-1157:default:true:default:true"/>
-        <setEntry value="org.eclipse.equinox.common:3.16.100.v20220315-2327:default:true:2:true"/>
+        <setEntry value="org.apache.felix.scr:2.2.2:default:true:2:true"/>
+        <setEntry value="org.apache.xml.resolver:1.2.0.v20220715-1206:default:true:default:default"/>
+        <setEntry value="org.eclipse.core.runtime:3.26.0.v20220813-0916:default:true:default:true"/>
+        <setEntry value="org.eclipse.equinox.common:3.16.200.v20220817-1601:default:true:2:true"/>
         <setEntry value="org.eclipse.equinox.event:1.6.100.v20211021-1418:default:true:2:true"/>
-        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.0.v20210315-2228:default:true:1:true"/>
-        <setEntry value="org.apache.xml.resolver:1.2.0.v20220401-1849:default:true:default:default"/>
-        <setEntry value="org.eclipse.m2e.logback.configuration:1.17.0.qualifier:default:true:default:true"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.100.v20220620-1617:default:true:1:true"/>
+        <setEntry value="org.eclipse.m2e.logback.configuration:2.0.0.qualifier:default:true:default:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
     <booleanAttribute key="askclear" value="true"/>
@@ -25,6 +25,7 @@
     <stringAttribute key="featurePluginResolution" value="workspace"/>
     <booleanAttribute key="includeOptional" value="false"/>
     <stringAttribute key="location" value="${workspace_loc}/../runtime-m2e-ide.product"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>

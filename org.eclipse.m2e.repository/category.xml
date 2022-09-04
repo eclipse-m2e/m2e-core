@@ -20,6 +20,6 @@
    </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
    <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/0.15.0/" enabled="true" />
-   <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.20.6/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.20.7/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/eclipse/updates/4.25/" enabled="true" />
 </site>
