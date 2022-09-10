@@ -1,0 +1,2 @@
+# To force a version qualifier update add the bug here
+Enforce recompilation to pick up return-type change from Array to List: https://github.com/eclipse-m2e/m2e-core/issues/896
