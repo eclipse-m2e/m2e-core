@@ -3,6 +3,7 @@ pipeline {
 		timeout(time: 45, unit: 'MINUTES')
 		buildDiscarder(logRotator(numToKeepStr:'10'))
 		disableConcurrentBuilds(abortPrevious: true)
+		timestamps()
 	}
 	agent {
 		label "centos-latest"
@@ -21,7 +22,7 @@ pipeline {
 			steps {
 				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata'
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200'
+					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200 -Dtycho.debug.artifactcomparator=true'
 				}
 			}
 			post {
@@ -29,7 +30,8 @@ pipeline {
 					archiveArtifacts artifacts: 'org.eclipse.m2e.repository/target/*.zip,\
 						*/target/work/data/.metadata/.log,\
 						m2e-core-tests/*/target/work/data/.metadata/.log,\
-						m2e-maven-runtime/target/*.properties'
+						m2e-maven-runtime/target/*.properties,\
+						**/target/artifactcomparison/*'
 					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
