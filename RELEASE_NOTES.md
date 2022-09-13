@@ -38,6 +38,16 @@ m2e mavenarchiver connector so far part of some external repository were migrate
 For for clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is not longer cached any more.
 In general MojoExecutions should be set up within the scope of `MavenExecutionContext`.
 
+### Improved support for Maven archetypes
+
+Maven archetypes can use Groovy scripts for processing of input parameters since Maven 3, which is now also supported via m2e. In addition, validation of parameters with regular expressions is now also supported:
+![archetype parameter validation](https://user-images.githubusercontent.com/17798/189828315-2deb2fd4-c310-4e75-a83b-9603acfb4198.png)
+
+Any additional inputs required by the Groovy script are handled in the Eclipse console:
+![archetype in Eclipse console](https://user-images.githubusercontent.com/17798/189828638-2bb545b8-bbaf-4d72-a8fb-ba798df9894f.png)
+
+This feature was sponsored by [Faktor Zehn](https://faktorzehn.org)
+
 ### Multiple API breakage
 
 This major release improves (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement to removed APIs.
