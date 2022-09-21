@@ -52,6 +52,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
@@ -64,6 +65,8 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IArchetype;
+import org.eclipse.m2e.core.ui.archetype.ArchetypeGenerator;
+import org.eclipse.m2e.core.ui.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
@@ -74,8 +77,8 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
  *
  * @author Eugene Kuleshov
  */
-@Component(service = ArchetypePlugin.class)
-public class ArchetypePlugin {
+@Component(service = {ArchetypeManager.class, ArchetypePlugin.class})
+public class ArchetypePlugin implements ArchetypeManager {
 
   public static final String ARCHETYPE_PREFIX = "archetype";
 
@@ -157,15 +160,34 @@ public class ArchetypePlugin {
   /**
    * @return Collection of ArchetypeCatalogFactory
    */
-  public Collection<ArchetypeCatalogFactory> getArchetypeCatalogs() {
+  public Collection<ArchetypeCatalogFactory> getArchetypeCatalogFactories() {
     return new ArrayList<>(catalogs.values());
   }
 
   /**
    * @return all active ArchetypeCatalogFactory
    */
-  public Collection<ArchetypeCatalogFactory> getActiveArchetypeCatalogs() {
+  public Collection<ArchetypeCatalogFactory> getActiveArchetypeCatalogFactories() {
     return catalogs.values().stream().filter(ArchetypeCatalogFactory::isEnabled).collect(Collectors.toList());
+  }
+
+  @Override
+  public Map<String, ArchetypeCatalog> getActiveArchetypeCatalogs() throws CoreException {
+    try {
+      return getActiveArchetypeCatalogFactories().stream()
+        .collect(Collectors.toMap(ArchetypeCatalogFactory::getId, t -> {
+          try {
+            return t.getArchetypeCatalog();
+          } catch(CoreException ex) {
+            throw new RuntimeException(ex);
+          }
+        }));
+    } catch(RuntimeException e) {
+      if(e.getCause() instanceof CoreException ce) {
+        throw ce;
+      }
+      throw e;
+    }
   }
 
   public void addArchetypeCatalogFactory(ArchetypeCatalogFactory factory) {
@@ -195,7 +217,7 @@ public class ArchetypePlugin {
 
   public void saveCatalogs() throws IOException {
     try (OutputStream os = new FileOutputStream(configFile)) {
-      writer.writeArchetypeCatalogs(getArchetypeCatalogs(), os);
+      writer.writeArchetypeCatalogs(getArchetypeCatalogFactories(), os);
     }
   }
 
@@ -208,6 +230,7 @@ public class ArchetypePlugin {
    * @return the required properties of the archetypes, null if none is found.
    * @throws CoreException if no archetype can be resolved
    */
+  @Override
   public List<RequiredProperty> getRequiredProperties(IArchetype archetype, IProgressMonitor monitor)
       throws CoreException {
     Assert.isNotNull(archetype, "Archetype can not be null");
@@ -240,6 +263,7 @@ public class ArchetypePlugin {
     }, monitor);
   }
 
+  @Override
   public void updateLocalCatalog(Archetype archetype) throws CoreException {
     maven.createExecutionContext().execute((ctx, m) -> {
       ProjectBuildingRequest request = ctx.newProjectBuildingRequest();

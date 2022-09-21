@@ -100,7 +100,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
 
   @Override
   public boolean performOk() {
-    Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getArchetypeCatalogs();
+    Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getArchetypeCatalogFactories();
     for(ArchetypeCatalogFactory factory : catalogs) {
       if(factory.isEditable()) {
         archetypeManager.removeArchetypeCatalogFactory(factory.getId());
@@ -249,7 +249,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       archetypesViewer.refresh(event.getElement(), true);
     });
 
-    archetypeCatalogs = new ArrayList<>(archetypeManager.getArchetypeCatalogs());
+    archetypeCatalogs = new ArrayList<>(archetypeManager.getArchetypeCatalogFactories());
     archetypesViewer.setInput(archetypeCatalogs);
     archetypeCatalogs.forEach(a -> archetypesViewer.setChecked(a, a.isEnabled()));
     archetypesViewer.refresh(); // should listen on property changes instead?

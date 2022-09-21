@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ import org.eclipse.m2e.core.internal.Messages;
 /**
  * Abstract ArchetypeCatalog factory
  */
+@ProviderType
 public abstract class ArchetypeCatalogFactory {
   private static final Logger log = LoggerFactory.getLogger(ArchetypeCatalogFactory.class);
 

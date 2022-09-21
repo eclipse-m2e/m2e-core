@@ -11,16 +11,21 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.ui.internal.archetype;
+package org.eclipse.m2e.core.ui.archetype;
 
 import org.apache.maven.archetype.catalog.Archetype;
 
 import org.eclipse.m2e.core.project.IArchetype;
 
 
-public class MavenArchetype implements IArchetype {
+/**
+ * Implementation of {@link IArchetype} based on {@link Archetype}
+ * 
+ * @since 2.1.0 (package version 1.0.0)
+ */
+public final class MavenArchetype implements IArchetype {
 
-  private Archetype archetype;
+  private final Archetype archetype;
 
   public MavenArchetype(Archetype archetype) {
     this.archetype = archetype;

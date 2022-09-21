@@ -245,7 +245,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     });
 
     final ArchetypePlugin archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
-    ArrayList allCatalogs = new ArrayList(archetypeManager.getActiveArchetypeCatalogs());
+    ArrayList allCatalogs = new ArrayList(archetypeManager.getActiveArchetypeCatalogFactories());
     allCatalogs.add(0, ALL_CATALOGS);
     catalogsComboViewer.setInput(allCatalogs);
 
@@ -254,12 +254,12 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     configureButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnConfigure);
     configureButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
 
-      Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getActiveArchetypeCatalogs();
+      Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getActiveArchetypeCatalogFactories();
 
       PreferencesUtil.createPreferenceDialogOn(getShell(),
           "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
 
-      Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getActiveArchetypeCatalogs();
+      Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getActiveArchetypeCatalogFactories();
 
       //Deselect removed catalog if needed
       if(catalogFactory != null && !newCatalogs.contains(catalogFactory)) {
@@ -500,7 +500,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
   @SuppressWarnings("unchecked")
   private List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
     ArchetypePlugin manager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
-    Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getActiveArchetypeCatalogs();
+    Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getActiveArchetypeCatalogFactories();
 
     ArrayList<Archetype> list = new ArrayList<>();
 
@@ -552,7 +552,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
           error = event.getResult().getMessage();
         } else if((catalogArchetypes == null || catalogArchetypes.isEmpty())) {
           ArchetypePlugin archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
-          Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getActiveArchetypeCatalogs();
+          Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getActiveArchetypeCatalogFactories();
           if(catalogs.isEmpty()) {
             error = Messages.MavenProjectWizardArchetypePage_error_noEnabledCatalogs;
           } else {

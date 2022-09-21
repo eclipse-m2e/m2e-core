@@ -48,11 +48,12 @@ import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.ui.archetype.ArchetypeGenerator;
 
 
-@Component(service = {ArchetypeGenerator.class})
+@Component(service = {ArchetypeGeneratorImpl.class})
 @SuppressWarnings("restriction")
-public class ArchetypeGenerator {
+public class ArchetypeGeneratorImpl implements ArchetypeGenerator {
 
   @Reference
   IProjectConfigurationManager projectConfigurationManager;
@@ -63,19 +64,7 @@ public class ArchetypeGenerator {
   @Reference
   IMavenLauncher mavenLauncher;
 
-  /**
-   * Creates project structure using Archetype and then imports created project(s)
-   *
-   * @return a list of created projects.
-   * @since 1.8
-   */
-  public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
-      String artifactId, String version, String javaPackage, Map<String, String> properties, IProgressMonitor monitor)
-      throws CoreException {
-    return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, false,
-        monitor);
-  }
-
+  @Override
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Map<String, String> properties, boolean interactive,
       IProgressMonitor monitor) throws CoreException {
