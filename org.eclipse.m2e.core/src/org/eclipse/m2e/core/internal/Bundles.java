@@ -18,10 +18,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
@@ -38,6 +39,8 @@ import org.eclipse.osgi.util.ManifestElement;
  * @since 1.5
  */
 public class Bundles {
+  private Bundles() {
+  }
 
   private static final Logger log = LoggerFactory.getLogger(Bundles.class);
 
@@ -45,12 +48,18 @@ public class Bundles {
     log.debug("getClasspathEntries(Bundle={})", bundle);
     Set<String> cp = new LinkedHashSet<>();
     if(inDevelopmentMode()) {
-      cp.addAll(getDevClassPath(bundle.getSymbolicName()));
+      Collections.addAll(cp, getDevClassPath(bundle.getSymbolicName()));
     }
     cp.addAll(parseBundleClasspath(bundle));
     List<String> entries = new ArrayList<>();
     for(String cpe : cp) {
-      String entry = getClasspathEntryPath(bundle, ".".equals(cpe) ? "/" : cpe);
+      String entry;
+      if(".".equals(cpe)) {
+        entry = FileLocator.getBundleFileLocation(bundle)
+            .orElseThrow(() -> new NoSuchElementException("Unable to locate bundle:" + bundle)).toString();
+      } else {
+        entry = getClasspathEntryPath(bundle, cpe);
+      }
       if(entry != null) {
         log.debug("\tEntry:{}", entry);
         entries.add(entry);
@@ -64,7 +73,7 @@ public class Bundles {
     try {
       ManifestElement[] cpEntries = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, header);
       if(cpEntries != null) {
-        return Arrays.stream(cpEntries).map(ManifestElement::getValue).collect(Collectors.toList());
+        return Arrays.stream(cpEntries).map(ManifestElement::getValue).toList();
       }
     } catch(BundleException ex) {
       log.warn("Could not parse bundle classpath of {}", bundle, ex);
@@ -97,12 +106,12 @@ public class Bundles {
   }
 
   @SuppressWarnings("restriction")
-  public static List<String> getDevClassPath(String bundleSymbolicName) {
-    return Arrays.asList(org.eclipse.core.internal.runtime.DevClassPathHelper.getDevClassPath(bundleSymbolicName));
+  private static String[] getDevClassPath(String bundleSymbolicName) {
+    return org.eclipse.core.internal.runtime.DevClassPathHelper.getDevClassPath(bundleSymbolicName);
   }
 
   @SuppressWarnings("restriction")
-  public static boolean inDevelopmentMode() {
+  private static boolean inDevelopmentMode() {
     return org.eclipse.core.internal.runtime.DevClassPathHelper.inDevelopmentMode();
   }
 }

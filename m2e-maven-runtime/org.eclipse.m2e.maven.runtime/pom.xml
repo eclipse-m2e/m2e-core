@@ -169,9 +169,9 @@
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								io.takari.*;provider=m2e;mandatory:=provider
 							Import-Package: \
-								org.slf4j;resolution:=optional;version="[1.7.0,3.0.0)",\
-								org.slf4j.spi;resolution:=optional;version="[1.7.0,3.0.0)",\
-								org.slf4j.helpers;resolution:=optional;version="[1.7.0,3.0.0)",\
+								org.slf4j;version="[1.7.31,3.0.0)",\
+								org.slf4j.spi;version="[1.7.31,3.0.0)",\
+								org.slf4j.helpers;version="[1.7.31,3.0.0)",\
 								javax.inject;version="1.0.0",\
 								javax.annotation;version="[1.2.0,2.0.0)",\
 								javax.annotation.sql;version="[1.2.0,2.0.0)",\
