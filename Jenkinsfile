@@ -22,7 +22,7 @@ pipeline {
 			steps {
 				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata'
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200 -Dtycho.debug.artifactcomparator=true'
+					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200'
 				}
 			}
 			post {

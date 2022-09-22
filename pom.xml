@@ -26,7 +26,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<tycho-version>2.7.5</tycho-version>
+		<tycho-version>3.0.0</tycho-version>
 
 		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
 		<tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -239,6 +239,7 @@
 					</baselineRepositories>
 					<baselineReplace>common</baselineReplace>
 					<baselineMode>${tycho.p2.baselineMode}</baselineMode>
+					<writeComparatorDelta>true</writeComparatorDelta>
 					<ignoredPatterns>
 						<pattern>META-INF/ECLIPSE_.RSA</pattern>
 						<pattern>META-INF/ECLIPSE_.SF</pattern>
@@ -311,7 +312,7 @@
 							<version>${tycho-version}</version>
 						</dependency>
 						<dependency>
-							<groupId>org.eclipse.tycho.extras</groupId>
+							<groupId>org.eclipse.tycho</groupId>
 							<artifactId>tycho-buildtimestamp-jgit</artifactId>
 							<version>${tycho-version}</version>
 						</dependency>
@@ -367,11 +368,6 @@
 		<pluginRepository>
 			<id>cbi-releases</id>
 			<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>tycho-snapshots</id>
-			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
-      <snapshots><enabled>true</enabled></snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 
