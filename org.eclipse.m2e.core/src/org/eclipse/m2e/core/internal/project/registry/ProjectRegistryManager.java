@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,10 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalNotification;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
@@ -171,7 +176,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private volatile Thread syncRefreshThread;
 
-  private final Map<MavenProjectFacade, MavenProject> mavenProjectCache;
+  private final Cache<MavenProjectFacade, MavenProject> mavenProjectCache;
 
   /**
    * @noreference For tests only
@@ -1033,8 +1038,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
   MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
     Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
     try {
-      return mavenProjects.computeIfAbsent(facade, fac -> mavenProjectCache.computeIfAbsent(fac,
-          f -> readProjectWithDependencies(f.getPom(), f.getResolverConfiguration(), monitor)));
+      return mavenProjects.computeIfAbsent(facade, fac -> {
+        try {
+          return mavenProjectCache.get(fac,
+              () -> readProjectWithDependencies(fac.getPom(), fac.getResolverConfiguration(), monitor));
+        } catch(ExecutionException ex) {
+          throw new RuntimeException(ex);
+        }
+      });
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();
       if(cause instanceof CoreException coreException) {
@@ -1045,7 +1056,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   MavenProject getMavenProject(MavenProjectFacade facade) {
-    MavenProject mavenProject = mavenProjectCache.get(facade);
+    MavenProject mavenProject = mavenProjectCache.getIfPresent(facade);
     if(mavenProject != null) {
       putMavenProject(facade, mavenProject);
     } else {
@@ -1087,33 +1098,24 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return new IdentityHashMap<>();
   }
 
-  private Map<MavenProjectFacade, MavenProject> createProjectCache() {
+  private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
     int maxCacheSize = Integer.getInteger("m2e.project.cache.size", 20);
-    return Collections.synchronizedMap(new LinkedHashMap<>(maxCacheSize * 4 / 3 + 1, 0.75f, true) {
-      private static final long serialVersionUID = 8022606648487974598L;
-
-      @Override
-      protected boolean removeEldestEntry(java.util.Map.Entry<MavenProjectFacade, MavenProject> eldest) {
-        if(size() > maxCacheSize) {
-          // there is currently no good way to determine if MavenProject instance is still being used or not
-          // for now assume that cache entries removed from project cache can only be referenced by context map
-          MavenProjectFacade facade = eldest.getKey();
-          Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
-          if(!contextProjects.containsKey(facade)) {
-            flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), false);
-          }
-          return true;
-        }
-        return false;
-      }
-    });
+    return CacheBuilder.newBuilder() //
+        .maximumSize(maxCacheSize) //
+        .removalListener((RemovalNotification<MavenProjectFacade, MavenProject> removed) -> {
+            Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
+            MavenProjectFacade facade = removed.getKey();
+            if(!contextProjects.containsKey(facade)) {
+              flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), false);
+            }
+        }).build();
   }
 
   private Set<IFile> flushCaches(MutableProjectRegistry newState, IFile pom, MavenProjectFacade facade,
       boolean forceDependencyUpdate) {
     if(facade != null) {
       ArtifactKey key = facade.getArtifactKey();
-      mavenProjectCache.remove(facade);
+      mavenProjectCache.invalidate(facade);
       Set<IFile> ifiles = new HashSet<>();
       for(File file : flushMavenCaches(facade.getPomFile(), key, forceDependencyUpdate)) {
         MavenProjectFacade affected = projectRegistry.getProjectFacade(file);
