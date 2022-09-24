@@ -81,6 +81,8 @@ import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * This configurator is used to generate files as per the org.apache.maven
@@ -761,13 +763,24 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	 * @throws IOException if the file could not be created
 	 */
 	private File fakeFile(ArtifactRepository localRepo, Artifact artifact) throws IOException {
-		Path fakeRepo = Files.createTempDirectory("fakerepo");
+		Path fakeRepo = getFakeDir();
 		Path fakeFile = fakeRepo.resolve(localRepo.pathOf(artifact));
 		Files.createDirectories(fakeFile.getParent());
 		if (!Files.exists(fakeFile)) {
 			Files.createFile(fakeFile);
 		}
 		return fakeFile.toFile();
+	}
+
+	private Path getFakeDir() throws IOException {
+		Bundle bundle = FrameworkUtil.getBundle(AbstractMavenArchiverConfigurator.class);
+		if (bundle != null) {
+			File dataFile = bundle.getDataFile("fakerepo");
+			if (dataFile != null) {
+				return dataFile.toPath();
+			}
+		}
+		return Files.createTempDirectory("fakerepo");
 	}
 
 	@SuppressWarnings("restriction")
