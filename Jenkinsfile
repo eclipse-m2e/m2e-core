@@ -9,8 +9,8 @@ pipeline {
 		label "centos-latest"
 	}
 	tools {
-		maven 'apache-maven-latest'
-		jdk 'openjdk-latest'
+		maven 'apache-maven-3.8.6'
+		jdk 'openjdk-jdk17-latest'
 	}
 	stages {
 		stage('get m2e-core-tests') {
