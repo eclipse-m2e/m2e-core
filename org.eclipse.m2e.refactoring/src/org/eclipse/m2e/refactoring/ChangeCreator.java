@@ -16,13 +16,12 @@ package org.eclipse.m2e.refactoring;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.compare.rangedifferencer.IRangeComparator;
 import org.eclipse.compare.rangedifferencer.RangeDifference;
 import org.eclipse.compare.rangedifferencer.RangeDifferencer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -41,7 +40,7 @@ import org.eclipse.text.edits.TextEditGroup;
  * @author Anton Kraev
  */
 public class ChangeCreator {
-  private static final Logger log = LoggerFactory.getLogger(ChangeCreator.class);
+  private static final ILog log = Platform.getLog(ChangeCreator.class);
 
   private final String label;
 

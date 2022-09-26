@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.lsp4e.LanguageServersRegistry;
 import org.eclipse.lsp4e.LanguageServersRegistry.LanguageServerDefinition;
@@ -33,12 +35,10 @@ import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.wildwebdeveloper.xml.LemminxClasspathExtensionProvider;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
 public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionProvider {
-	private static final Logger LOG = LoggerFactory.getLogger(MavenRuntimeClasspathProvider.class);
+	private static final ILog LOG = Platform.getLog(MavenRuntimeClasspathProvider.class);
 
 	private static IMavenConfigurationChangeListener mavenConfigurationlistener;
 	private static final String LANGUAGE_SERVER = "org.eclipse.wildwebdeveloper.xml";

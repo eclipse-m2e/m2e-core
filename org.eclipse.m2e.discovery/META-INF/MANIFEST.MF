@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.discovery;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
@@ -39,7 +39,7 @@ Import-Package: org.apache.maven.plugin;provider=m2e,
  org.eclipse.equinox.p2.metadata,
  org.eclipse.equinox.p2.repository.metadata,
  org.eclipse.equinox.p2.ui,
- org.slf4j;version="[1.6.2,2.0.0)"
+ org.slf4j;version="[1.7.0,3.0.0)"
 Bundle-Activator: org.eclipse.m2e.internal.discovery.DiscoveryActivator
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/component.xml

@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.8.601-SNAPSHOT</version>
+	<version>3.8.602-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -164,9 +164,9 @@
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								io.takari.*;provider=m2e;mandatory:=provider
 							Import-Package: \
-								org.slf4j;resolution:=optional;version="[1.6.2,2.0.0)",\
-								org.slf4j.spi;resolution:=optional;version="[1.6.2,2.0.0)",\
-								org.slf4j.helpers;resolution:=optional;version="[1.6.2,2.0.0)",\
+								org.slf4j;resolution:=optional;version="[1.7.0,3.0.0)",\
+								org.slf4j.spi;resolution:=optional;version="[1.7.0,3.0.0)",\
+								org.slf4j.helpers;resolution:=optional;version="[1.7.0,3.0.0)",\
 								javax.inject;version="1.0.0"
 							Require-Bundle: \
 								com.google.guava

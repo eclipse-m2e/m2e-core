@@ -17,9 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
@@ -28,6 +25,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -45,7 +44,7 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
  * @author Anton Kraev
  */
 public class RefactoringModelResources {
-  private static final Logger log = LoggerFactory.getLogger(RefactoringModelResources.class);
+  private static final ILog log = Platform.getLog(RefactoringModelResources.class);
 
   private static final String TMP_PROJECT_NAME = ".m2eclipse_refactoring"; //$NON-NLS-1$
 

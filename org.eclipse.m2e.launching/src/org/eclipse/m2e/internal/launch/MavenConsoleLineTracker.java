@@ -29,15 +29,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -67,7 +66,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * @author Eugene Kuleshov
  */
 public class MavenConsoleLineTracker implements IConsoleLineTracker {
-  private static final Logger log = LoggerFactory.getLogger(MavenConsoleLineTracker.class);
+  private static final ILog log = Platform.getLog(MavenConsoleLineTracker.class);
 
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 

@@ -13,14 +13,13 @@
 
 package org.eclipse.m2e.refactoring.rename;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
@@ -32,7 +31,7 @@ import org.eclipse.m2e.refactoring.internal.SaveDirtyFilesDialog;
 
 
 public class RenameArtifactHandler extends AbstractHandler {
-  private static final Logger log = LoggerFactory.getLogger(RenameArtifactHandler.class);
+  private static final ILog log = Platform.getLog(RenameArtifactHandler.class);
 
   @Override
   public Object execute(ExecutionEvent event) {
