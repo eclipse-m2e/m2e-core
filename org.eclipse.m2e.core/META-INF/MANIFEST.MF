@@ -51,7 +51,7 @@ MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
 Import-Package: com.google.common.cache,
  javax.inject;version="1.0.0",
- org.slf4j;version="1.6.2"
+ org.slf4j;version="[1.7.0,3.0.0)"
 Automatic-Module-Name: org.eclipse.m2e.core
 Service-Component: OSGI-INF/org.eclipse.m2e.core.embedder.MavenModelManager.xml,
  OSGI-INF/org.eclipse.m2e.core.internal.embedder.EclipseLoggerManager.xml,

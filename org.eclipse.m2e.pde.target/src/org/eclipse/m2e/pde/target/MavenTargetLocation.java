@@ -53,9 +53,11 @@ import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
@@ -74,13 +76,11 @@ import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MavenTargetLocation.class);
+	private static final ILog LOGGER = Platform.getLog(MavenTargetLocation.class);
 	private static final String SOURCE_SUFFIX = ".source";
 	private static final String NOT_A_FEATURE = "not_a_feature";
 	public static final String ELEMENT_CLASSIFIER = "classifier";

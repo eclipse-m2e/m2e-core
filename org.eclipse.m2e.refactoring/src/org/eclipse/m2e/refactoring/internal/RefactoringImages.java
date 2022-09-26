@@ -13,9 +13,8 @@
 
 package org.eclipse.m2e.refactoring.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.ResourceLocator;
@@ -25,7 +24,7 @@ import org.eclipse.jface.resource.ResourceLocator;
  * @author Eugene Kuleshov
  */
 public class RefactoringImages {
-  private static final Logger log = LoggerFactory.getLogger(RefactoringImages.class);
+  private static final ILog log = Platform.getLog(RefactoringImages.class);
 
   // images
 

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.jdt.ui;singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.m2e.jdt.ui.internal;x-internal:=true,
  org.eclipse.m2e.jdt.ui.internal.actions;x-internal:=true,
@@ -25,5 +25,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.jdt.ui.internal.MavenJdtUiPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
-Import-Package: org.slf4j;version="[1.6.2,2.0.0)"
+Import-Package: org.slf4j;version="[1.7.0,3.0.0)"
 Automatic-Module-Name: org.eclipse.m2e.jdt.ui

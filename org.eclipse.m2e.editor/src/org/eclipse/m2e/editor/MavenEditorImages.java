@@ -16,9 +16,8 @@ package org.eclipse.m2e.editor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.ResourceLocator;
@@ -29,7 +28,7 @@ import org.eclipse.swt.graphics.Image;
  * @author Eugene Kuleshov
  */
 public class MavenEditorImages {
-  private static final Logger log = LoggerFactory.getLogger(MavenEditorImages.class);
+  private static final ILog log = Platform.getLog(MavenEditorImages.class);
 
   // image descriptors
 

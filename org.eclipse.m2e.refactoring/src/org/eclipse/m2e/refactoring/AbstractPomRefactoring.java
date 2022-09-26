@@ -20,14 +20,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.CompoundCommand;
@@ -70,7 +69,7 @@ import org.eclipse.m2e.refactoring.internal.Activator;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractPomRefactoring extends Refactoring {
-  private static final Logger log = LoggerFactory.getLogger(AbstractPomRefactoring.class);
+  private static final ILog log = Platform.getLog(AbstractPomRefactoring.class);
 
   protected static final String PROBLEMS_DURING_REFACTORING = Messages.AbstractPomRefactoring_error;
 
