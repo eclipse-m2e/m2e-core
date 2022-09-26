@@ -2,9 +2,9 @@
 <feature
       id="org.eclipse.m2e.logback.feature"
       label="%featureName"
-      version="2.0.0.qualifier"
+      version="2.1.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.m2e.logback.configuration"
+      plugin="org.eclipse.m2e.core"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
 
@@ -17,14 +17,7 @@
    </copyright>
 
    <plugin
-         id="org.eclipse.m2e.logback.configuration"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.logback.appender"
+         id="org.eclipse.m2e.logback"
          download-size="0"
          install-size="0"
          version="0.0.0"
