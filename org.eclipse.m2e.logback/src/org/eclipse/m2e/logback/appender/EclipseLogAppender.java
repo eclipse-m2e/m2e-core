@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2021 Sonatype, Inc.
+ * Copyright (c) 2010, 2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -31,32 +31,23 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 
   @Override
   protected void append(ILoggingEvent logEvent) {
-    int severity;
-    switch(logEvent.getLevel().levelInt) {
-      case Level.ERROR_INT:
-        severity = IStatus.ERROR;
-        break;
-      case Level.WARN_INT:
-        severity = IStatus.WARNING;
-        break;
-      case Level.INFO_INT:
-        severity = IStatus.INFO;
-        break;
-      default:
-        return;
+    int severity = switch(logEvent.getLevel().levelInt) {
+      case Level.ERROR_INT -> IStatus.ERROR;
+      case Level.WARN_INT -> IStatus.WARNING;
+      case Level.INFO_INT -> IStatus.INFO;
+      default -> -1;
+    };
+    if(severity != -1) {
+      IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
+      ECLIPSE_LOG.log(status);
     }
-    IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
-    ECLIPSE_LOG.log(status);
   }
 
   private static Throwable getThrowable(ILoggingEvent logEvent) {
-    if(logEvent.getThrowableProxy() instanceof ThrowableProxy) {
-      return ((ThrowableProxy) logEvent.getThrowableProxy()).getThrowable();
+    if(logEvent.getThrowableProxy() instanceof ThrowableProxy proxy) {
+      return proxy.getThrowable();
     }
     Object[] args = logEvent.getArgumentArray();
-    if(args != null && args.length > 0 && args[args.length - 1] instanceof Throwable) {
-      return (Throwable) args[args.length - 1];
-    }
-    return null;
+    return args != null && args.length > 0 && args[args.length - 1] instanceof Throwable throwable ? throwable : null;
   }
 }

@@ -7,7 +7,6 @@
         <setEntry value="org.eclipse.equinox.common:3.16.200.v20220817-1601:default:true:2:true"/>
         <setEntry value="org.eclipse.equinox.event:1.6.100.v20211021-1418:default:true:2:true"/>
         <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.100.v20220620-1617:default:true:1:true"/>
-        <setEntry value="org.eclipse.m2e.logback.configuration:2.0.0.qualifier:default:true:default:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
     <booleanAttribute key="askclear" value="true"/>
