@@ -74,8 +74,9 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 			assertTrue(DisplayHelper.waitForCondition(Display.getDefault(), 3000, () -> done[0]));
 			assertEquals(List.of(), allStatus);
 			IDocument document = effectivePomEditor.getDocumentProvider().getDocument(effectivePomEditor.getEditorInput());
-			assertTrue(document.get().contains("my-app"));
-			assertFalse(document.get().contains("Loading"));
+			String docText = document.get();
+			assertTrue(docText.contains("my-app"));
+			assertFalse(docText.contains("Loading"));
 		}
 	}
 	

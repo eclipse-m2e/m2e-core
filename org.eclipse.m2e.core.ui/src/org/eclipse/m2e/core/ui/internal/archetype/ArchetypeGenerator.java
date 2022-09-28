@@ -13,12 +13,11 @@
 
 package org.eclipse.m2e.core.ui.internal.archetype;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,10 +39,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
-import org.apache.maven.DefaultMaven;
+import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.launch.IMavenLauncher;
 import org.eclipse.m2e.core.project.IArchetype;
@@ -106,13 +104,11 @@ public class ArchetypeGenerator {
     userProperties.put("package", javaPackage);
     userProperties.put("outputDirectory", basedir.getAbsolutePath());
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
-    File emptyPom = getEmptyPom(basedir);
-    try {
+
+    File[] workingDir = new File[1];
+    try (var workingDirCleaner = createEmptyWorkingDirectory(workingDir)) {
       String goals = "-U " + ArchetypePlugin.ARCHETYPE_PREFIX + ":generate";
-      if(emptyPom != null) {
-        goals += " -f " + emptyPom.getAbsolutePath();
-      }
-      CompletableFuture<?> maven = mavenLauncher.runMaven(basedir, goals, userProperties, interactive);
+      CompletableFuture<?> maven = mavenLauncher.runMaven(workingDir[0], goals, userProperties, interactive);
       subMonitor.worked(1);
       Display current = Display.getCurrent();
       while(!maven.isDone()) {
@@ -134,32 +130,19 @@ public class ArchetypeGenerator {
       return projectConfigurationManager.collectProjects(scanner.getProjects());
     } catch(InterruptedException | CancellationException ex) {
       throw new CoreException(Status.CANCEL_STATUS);
-    } catch(ExecutionException ex) {
+    } catch(ExecutionException | IOException ex) {
       if(ex.getCause() instanceof CoreException coreException) {
         throw coreException;
       }
       throw new CoreException(Status.error(Messages.ProjectConfigurationManager_error_failed, ex)); //$NON-NLS-1$
-    } finally {
-      if(emptyPom != null) {
-        emptyPom.delete();
-      }
     }
   }
 
-  private File getEmptyPom(File basedir) {
-    if(new File(basedir, IMavenConstants.POM_FILE_NAME).isFile()) {
-      try {
-        File tempFile = File.createTempFile("pom", ".xml", basedir);
-        tempFile.deleteOnExit();
-        URL standalone = DefaultMaven.class.getResource("project/standalone.xml");
-        try (InputStream stream = standalone.openStream()) {
-          Files.copy(stream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        }
-        return tempFile;
-      } catch(IOException ex) {
-      }
-    }
-    return null;
+  private static Closeable createEmptyWorkingDirectory(File[] workingDir) throws IOException {
+    Path tempWorkingDir = Files.createTempDirectory("m2e-archetypeGenerator");
+    Files.createDirectories(tempWorkingDir.resolve(".mvn")); // Ensure tempWorkingDir is used as maven.multiModuleProjectDirectory
+    workingDir[0] = tempWorkingDir.toFile();
+    return () -> FileUtils.deleteDirectory(workingDir[0]);
   }
 
 }
