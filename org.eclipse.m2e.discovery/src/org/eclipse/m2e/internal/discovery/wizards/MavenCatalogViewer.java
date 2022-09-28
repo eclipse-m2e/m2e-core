@@ -40,7 +40,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMeta
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
 
@@ -71,7 +70,7 @@ public class MavenCatalogViewer extends CatalogViewer {
       }
 
       if(getCatalog().getItems().size() == installedFeatures.size()) {
-        handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, Messages.MavenCatalogViewer_allInstalled));
+        handleStatus(Status.error(Messages.MavenCatalogViewer_allInstalled));
       } else {
         final MavenCatalogConfiguration config = (MavenCatalogConfiguration) getConfiguration();
         final Collection<String> selectedPackagingTypes = config.getSelectedPackagingTypes();
@@ -134,8 +133,7 @@ public class MavenCatalogViewer extends CatalogViewer {
               }
             }
             if(noneApplicable) {
-              handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID,
-                  Messages.MavenCatalogViewer_noApplicableCatalogItems));
+              handleStatus(Status.error(Messages.MavenCatalogViewer_noApplicableCatalogItems));
             }
           });
         }

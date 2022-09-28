@@ -58,7 +58,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
@@ -322,7 +321,7 @@ public abstract class AbstractMavenProjectTestCase {
     }
 
     // must be a timeout
-    throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, "Could not delete project", cause));
+    throw new CoreException(Status.error("Could not delete project", cause));
   }
 
   private void doDeleteProject(final IProject project) throws CoreException, InterruptedException {
@@ -350,7 +349,7 @@ public abstract class AbstractMavenProjectTestCase {
     try (InputStream is = new FileInputStream(pomResource)) {
       return createProject(projectName, is);
     } catch(IOException ex1) {
-      throw new CoreException(new Status(IStatus.ERROR, "", 0, ex1.toString(), ex1));
+      throw new CoreException(Status.error(ex1.toString(), ex1));
     }
   }
 
@@ -369,7 +368,7 @@ public abstract class AbstractMavenProjectTestCase {
         try {
           pomFile.create(pomContent, true, m);
         } catch(CoreException ex) {
-          throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
+          throw new CoreException(Status.error(ex.toString(), ex));
         }
       }
     }, null);

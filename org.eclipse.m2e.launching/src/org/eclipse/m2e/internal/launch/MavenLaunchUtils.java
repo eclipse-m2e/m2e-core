@@ -20,7 +20,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
@@ -48,8 +47,7 @@ public class MavenLaunchUtils {
     String name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
     AbstractMavenRuntime runtime = runtimeManager.getRuntime(name);
     if(runtime == null) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, //
-          NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, name), null));
+      throw new CoreException(Status.error(NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, name)));
     }
     return runtime;
   }

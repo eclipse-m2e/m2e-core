@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -59,7 +58,6 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
-import org.eclipse.m2e.refactoring.internal.Activator;
 
 
 /**
@@ -266,7 +264,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
         }
       };
     } catch(Exception ex) {
-      throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, PROBLEMS_DURING_REFACTORING, ex));
+      throw new CoreException(Status.error(PROBLEMS_DURING_REFACTORING, ex));
     } finally {
       for(String artifact : models.keySet()) {
         models.get(artifact).releaseAllResources();
@@ -341,7 +339,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     } catch(Exception ex) {
       String msg = NLS.bind("Can't load model {0}", pomFile);
       log.error(msg, ex);
-      throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, msg, ex));
+      throw new CoreException(Status.error(msg, ex));
     }
   }
 }

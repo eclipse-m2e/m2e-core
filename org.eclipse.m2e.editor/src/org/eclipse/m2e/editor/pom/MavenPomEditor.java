@@ -452,7 +452,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     try {
       super.pageChange(newPageIndex);
     } catch(NullPointerException e) {
-      MavenEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
+      MavenEditorPlugin.getDefault().getLog().log(Status.error("", e)); //$NON-NLS-1$
       this.close(false);
     }
     // a workaround for editor pages not returned
@@ -587,11 +587,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         getSite().getShell().getDisplay().syncExec(() -> doc.set(content)); // run in UI Thread as some listeners require it
         return Status.OK_STATUS;
       } catch(CoreException ce) {
-        return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, -1,
-            Messages.MavenPomEditor_error_failed_effective, ce);
+        return Status.error(Messages.MavenPomEditor_error_failed_effective, ce);
       } catch(IOException ie) {
-        return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, -1,
-            Messages.MavenPomEditor_error_failed_effective, ie);
+        return Status.error(Messages.MavenPomEditor_error_failed_effective, ie);
       }
     }
   }

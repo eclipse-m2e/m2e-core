@@ -243,12 +243,8 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.setManageButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
       try {
         openManageDependenciesDialog();
-      } catch(InvocationTargetException e1) {
-        MavenEditorPlugin.getDefault().getLog()
-            .log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "Error: ", e1)); //$NON-NLS-1$
-      } catch(InterruptedException e1) {
-        MavenEditorPlugin.getDefault().getLog()
-            .log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "Error: ", e1)); //$NON-NLS-1$
+      } catch(InvocationTargetException | InterruptedException e1) {
+        MavenEditorPlugin.getDefault().getLog().log(Status.error("Error: ", e1)); //$NON-NLS-1$
       }
     }));
 

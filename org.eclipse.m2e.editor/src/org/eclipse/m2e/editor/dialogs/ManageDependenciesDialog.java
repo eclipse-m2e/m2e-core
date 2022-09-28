@@ -76,7 +76,6 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
-import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.pom.ValueProvider;
@@ -271,7 +270,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           }
         } catch(Exception e) {
           LOG.error("Error updating managed dependencies", e);
-          return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "Error updating managed dependencies", e);
+          return Status.error("Error updating managed dependencies", e);
         }
         return Status.OK_STATUS;
       }
@@ -384,7 +383,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           Object[] arguments = {selectedDep.getArtifactId() + "-" + selectedDep.getVersion(), //$NON-NLS-1$
               targetDep.getVersion(), modelID};
           String message = NLS.bind(Messages.ManageDependenciesDialog_dependencyExistsWarning, arguments);
-          updateStatus(new Status(IStatus.WARNING, MavenEditorPlugin.PLUGIN_ID, message));
+          updateStatus(Status.warning(message));
           return true;
         }
       }
@@ -394,15 +393,13 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   protected void checkStatus(ParentHierarchyEntry targetProject, LinkedList<Dependency> selectedDependencies) {
     if(targetProject == null || selectedDependencies.isEmpty()) {
-      updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
-          Messages.ManageDependenciesDialog_emptySelectionError));
+      updateStatus(Status.error(Messages.ManageDependenciesDialog_emptySelectionError));
       return;
     }
     boolean error = false;
     if(targetProject.getFacade() == null) {
       error = true;
-      updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
-          Messages.ManageDependenciesDialog_projectNotPresentError));
+      updateStatus(Status.error(Messages.ManageDependenciesDialog_projectNotPresentError));
     } else {
       error = checkDependencies(targetProject.getProject().getModel(), getDependenciesList());
     }
@@ -413,7 +410,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   protected void clearStatus() {
-    updateStatus(new Status(IStatus.OK, MavenEditorPlugin.PLUGIN_ID, "")); //$NON-NLS-1$
+    updateStatus(Status.OK_STATUS); //$NON-NLS-1$
   }
 
   protected class DependenciesViewerSelectionListener implements ISelectionChangedListener {

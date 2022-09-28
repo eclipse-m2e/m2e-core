@@ -413,9 +413,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					try {
 						return repoSystem.resolveVersionRange(session, request);
 					} catch (VersionRangeResolutionException e) {
-						throw new CoreException(
-								new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
-										"Resolving latest version failed", e));
+						throw new CoreException(Status.error("Resolving latest version failed", e));
 					}
 				}
 			}, monitor);

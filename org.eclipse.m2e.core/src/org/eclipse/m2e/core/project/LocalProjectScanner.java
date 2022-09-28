@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -129,8 +128,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       }
       String pomName = modulePath + "/" + model.getPomFile().getName(); //$NON-NLS-1$
       if(model.getArtifactId() == null) {
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID,
-            NLS.bind(Messages.LocalProjectScanner_missingArtifactId, pomName)));
+        throw new CoreException(Status.error(NLS.bind(Messages.LocalProjectScanner_missingArtifactId, pomName)));
       }
 
       MavenProjectInfo projectInfo = newMavenProjectInfo(pomName, model.getPomFile(), model, parentInfo);

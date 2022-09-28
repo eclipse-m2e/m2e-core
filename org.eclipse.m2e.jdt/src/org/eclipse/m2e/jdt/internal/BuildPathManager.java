@@ -91,7 +91,6 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IClasspathManagerDelegate;
-import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
 /**
@@ -229,8 +228,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       ;
       return new MavenClasspathContainerSaveHelper().readContainer(is);
     } catch(IOException | ClassNotFoundException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
-          "Can't read classpath container state for " + project.getName(), ex));
+      throw new CoreException(Status.error("Can't read classpath container state for " + project.getName(), ex));
     }
   }
 
@@ -362,8 +360,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       }
       return getClasspath(facade, scope, props, uniquePaths, monitor);
     } catch(IOException e) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, //
-          "Can't save classpath container changes", e));
+      throw new CoreException(Status.error("Can't save classpath container changes", e));
     }
   }
 
@@ -517,8 +514,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
       props.store(os, null);
     } catch(IOException e) {
-      throw new CoreException(
-          new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, "Can't save classpath container changes", e));
+      throw new CoreException(Status.error("Can't save classpath container changes", e));
     }
 
     // update classpath container. suboptimal as this will re-calculate classpath

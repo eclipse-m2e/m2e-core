@@ -27,7 +27,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -37,7 +36,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.builder.InternalBuildParticipant;
@@ -128,7 +126,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
                 projectFacade.getProject().getName());
             // oddly, CoreException stack trace is not shown in UI nor logged anywhere.
             log.warn(message, e);
-            throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, message, e));
+            throw new CoreException(Status.error(message, e));
           }
         }
       } finally {

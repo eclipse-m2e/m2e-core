@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -34,7 +33,6 @@ import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
 import org.codehaus.plexus.util.dag.Vertex;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 
@@ -92,9 +90,8 @@ public class ProjectConversionParticipantSorter {
       AbstractProjectConversionParticipant conflictingConverter = converterMap.put(converterId, converter);
 
       if(conflictingConverter != null) {
-        IStatus error = new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
-            Messages.ProjectConversion_error_duplicate_conversion_participant, converterId));
-        throw new DuplicateConversionParticipantException(error);
+        throw new DuplicateConversionParticipantException(
+            Status.error(NLS.bind(Messages.ProjectConversion_error_duplicate_conversion_participant, converterId)));
       }
 
       dag.addVertex(converterId);

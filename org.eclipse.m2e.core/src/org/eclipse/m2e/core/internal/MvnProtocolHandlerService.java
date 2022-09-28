@@ -34,7 +34,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
@@ -108,8 +107,7 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
             try {
               return repoSystem.resolveArtifact(session, artifactRequest);
             } catch(ArtifactResolutionException e) {
-              throw new CoreException(new Status(IStatus.ERROR, MvnProtocolHandlerService.class.getPackage().getName(),
-                  "Resolving artifact failed", e));
+              throw new CoreException(Status.error("Resolving artifact failed", e));
             }
           }
         }, new NullProgressMonitor());
