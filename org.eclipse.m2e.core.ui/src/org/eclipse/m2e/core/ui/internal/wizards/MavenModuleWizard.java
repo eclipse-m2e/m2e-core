@@ -23,7 +23,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.textEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,7 +245,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final String artifactId = model.getArtifactId();
       final String version = model.getVersion();
       final String javaPackage = parametersPage.getJavaPackage();
-      final Properties properties = parametersPage.getProperties();
+      final Map<String, String> properties = parametersPage.getProperties();
       final boolean interactive = parametersPage.isInteractive();
 
       job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {

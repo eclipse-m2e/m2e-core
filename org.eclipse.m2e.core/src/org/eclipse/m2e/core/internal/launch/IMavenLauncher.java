@@ -11,10 +11,11 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.launch;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.core.runtime.CoreException;
@@ -25,7 +26,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public interface IMavenLauncher {
 
-  CompletableFuture<?> runMaven(File basedir, String goals, Properties properties, boolean interactive)
+  CompletableFuture<?> runMaven(File basedir, String goals, Map<String, String> properties, boolean interactive)
       throws CoreException;
 
 }

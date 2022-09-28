@@ -340,10 +340,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     //TODO: check validity of version?
 
     String packageName = packageCombo.getText();
-    if(packageName.trim().length() != 0) {
-      if(!Pattern.matches("[A-Za-z_$][A-Za-z_$\\d]*(?:\\.[A-Za-z_$][A-Za-z_$\\d]*)*", packageName)) { //$NON-NLS-1$
-        return org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_package;
-      }
+    if(packageName.trim().length() != 0
+        && !Pattern.matches("[A-Za-z_$][A-Za-z_$\\d]*(?:\\.[A-Za-z_$][A-Za-z_$\\d]*)*", packageName)) { //$NON-NLS-1$
+      return org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_package;
     }
 
     // validate project name
@@ -353,11 +352,11 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     if(!requiredProperties.isEmpty()) {
-      Properties properties = getProperties();
+      Map<String, String> properties = getProperties();
       for(var entry : requiredProperties.entrySet()) {
         String propertyKey = entry.getKey();
         RequiredProperty requiredProperty = entry.getValue();
-        String value = properties.getProperty(propertyKey);
+        String value = properties.get(propertyKey);
         String defaultValue = requiredProperty.getDefaultValue();
         if(value == null || value.isBlank()) {
           if(defaultValue != null && !defaultValue.isEmpty()) {
@@ -598,11 +597,11 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
   }
 
-  public Properties getProperties() {
+  public Map<String, String> getProperties() {
     if(propertiesViewer.isCellEditorActive()) {
       propertiesTable.setFocus();
     }
-    Properties properties = new Properties();
+    Map<String, String> properties = new LinkedHashMap<>();
     for(int i = 0; i < propertiesTable.getItemCount(); i++ ) {
       TableItem item = propertiesTable.getItem(i);
       properties.put(item.getText(KEY_INDEX), item.getText(VALUE_INDEX));

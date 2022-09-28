@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -695,11 +695,11 @@ public abstract class AbstractMavenProjectTestCase {
 
   protected Collection<IProject> createProjectsFromArchetype(final String projectName, final IArchetype archetype,
       final IPath location) throws CoreException {
-    return createProjectsFromArchetype(projectName, archetype, new Properties(), location);
+    return createProjectsFromArchetype(projectName, archetype, Map.of(), location);
   }
 
   protected Collection<IProject> createProjectsFromArchetype(final String projectName, final IArchetype archetype,
-      Properties properties, final IPath location) throws CoreException {
+      Map<String, String> properties, final IPath location) throws CoreException {
     List<IProject> eclipseProjects = new ArrayList<>();
     workspace.run((IWorkspaceRunnable) m -> {
       Collection<MavenProjectInfo> projects = M2EUIPluginActivator.getDefault().getArchetypePlugin().getGenerator()
