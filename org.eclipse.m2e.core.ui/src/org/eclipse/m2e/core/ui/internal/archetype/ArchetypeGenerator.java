@@ -20,8 +20,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -71,14 +72,14 @@ public class ArchetypeGenerator {
    * @since 1.8
    */
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
-      String artifactId, String version, String javaPackage, Properties properties, IProgressMonitor monitor)
+      String artifactId, String version, String javaPackage, Map<String, String> properties, IProgressMonitor monitor)
       throws CoreException {
     return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, false,
         monitor);
   }
 
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
-      String artifactId, String version, String javaPackage, Properties properties, boolean interactive,
+      String artifactId, String version, String javaPackage, Map<String, String> properties, boolean interactive,
       IProgressMonitor monitor) throws CoreException {
     SubMonitor subMonitor = SubMonitor.convert(monitor,
         NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 3);
@@ -95,15 +96,15 @@ public class ArchetypeGenerator {
       throw new CoreException(Status.error(Messages.ProjectConfigurationManager_error_failed));
     }
     //See https://maven.apache.org/archetype/maven-archetype-plugin/generate-mojo.html
-    Properties userProperties = new Properties(properties);
-    userProperties.setProperty("archetypeGroupId", archetype.getGroupId());
-    userProperties.setProperty("archetypeArtifactId", archetype.getArtifactId());
-    userProperties.setProperty("archetypeVersion", archetype.getVersion());
-    userProperties.setProperty("groupId", groupId);
-    userProperties.setProperty("artifactId", artifactId);
-    userProperties.setProperty("version", version);
-    userProperties.setProperty("package", javaPackage);
-    userProperties.setProperty("outputDirectory", basedir.getAbsolutePath());
+    Map<String, String> userProperties = new LinkedHashMap<>(properties);
+    userProperties.put("archetypeGroupId", archetype.getGroupId());
+    userProperties.put("archetypeArtifactId", archetype.getArtifactId());
+    userProperties.put("archetypeVersion", archetype.getVersion());
+    userProperties.put("groupId", groupId);
+    userProperties.put("artifactId", artifactId);
+    userProperties.put("version", version);
+    userProperties.put("package", javaPackage);
+    userProperties.put("outputDirectory", basedir.getAbsolutePath());
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
     File emptyPom = getEmptyPom(basedir);
     try {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) Christoph Läubrich
+ * Copyright (c) 2022, 2022 Christoph Läubrich
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -16,9 +16,10 @@ package org.eclipse.m2e.internal.launch;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -47,8 +48,8 @@ import org.eclipse.m2e.core.internal.launch.IMavenLauncher;
 @Component(service = IMavenLauncher.class)
 public class EclipseMavenLauncher implements IMavenLauncher {
 
-  public CompletableFuture<?> runMaven(File basedir, String goals, Properties mavenProperties, boolean interactive)
-      throws CoreException {
+  public CompletableFuture<?> runMaven(File basedir, String goals, Map<String, String> mavenProperties,
+      boolean interactive) throws CoreException {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType launchConfigurationType = launchManager
         .getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID);
@@ -59,13 +60,12 @@ public class EclipseMavenLauncher implements IMavenLauncher {
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_SAVE_BEFORE_LAUNCH, false);
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_BATCH, !interactive);
     List<String> properties = new ArrayList<>();
-    for(String propertyKey : mavenProperties.stringPropertyNames()) {
-      String propertyValue = mavenProperties.getProperty(propertyKey);
-      if(propertyKey != null && propertyKey.trim().length() > 0) {
-        String prop = propertyKey.trim() + (propertyValue == null ? "" : "=" + propertyValue);
+    mavenProperties.forEach((propertyKey, propertyValue) -> {
+      if(propertyKey != null && !propertyKey.isBlank()) {
+        String prop = propertyKey.strip() + (propertyValue == null ? "" : "=" + propertyValue);
         properties.add(prop);
       }
-    }
+    });
     workingCopy.setAttribute(MavenLaunchConstants.ATTR_PROPERTIES, properties);
     workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
     CompletableFuture<ILaunch> run = new CompletableFuture<>();
@@ -110,12 +110,7 @@ public class EclipseMavenLauncher implements IMavenLauncher {
       }
 
       private Optional<ILaunch> getMavenLaunch(ILaunch[] launches) {
-        for(ILaunch launch : launches) {
-          if(launch.getLaunchConfiguration() == configuration) {
-            return Optional.of(launch);
-          }
-        }
-        return Optional.empty();
+        return Arrays.stream(launches).filter(l -> l.getLaunchConfiguration() == configuration).findFirst();
       }
     });
     DebugUITools.launch(configuration, ILaunchManager.RUN_MODE);
