@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
@@ -74,8 +73,7 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
           getBuildPathManager().persistAttachedSourcesAndJavadoc(project, containerSuggestion, monitor);
         } catch(CoreException ex) {
           log.error(ex.getMessage(), ex);
-          return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
-              Messages.MavenClasspathContainerInitializer_error_cannot_persist, ex);
+          return Status.error(Messages.MavenClasspathContainerInitializer_error_cannot_persist, ex);
         }
         return Status.OK_STATUS;
       }

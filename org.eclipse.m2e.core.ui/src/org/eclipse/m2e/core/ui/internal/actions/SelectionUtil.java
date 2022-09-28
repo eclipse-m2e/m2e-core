@@ -293,15 +293,13 @@ public class SelectionUtil {
       List<IStatus> statuses = new ArrayList<>();
       List<Throwable> exceptions = result.getExceptions();
       for(Throwable e : exceptions) {
-        statuses.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
+        statuses.add(Status.error(e.getMessage(), e));
       }
 
       throw new CoreException(new MultiStatus(IMavenConstants.PLUGIN_ID, IStatus.ERROR, //
           statuses.toArray(new IStatus[statuses.size()]), Messages.SelectionUtil_error_cannot_read, null));
     }
-
-    throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, //
-        Messages.SelectionUtil_error_cannot_read, null));
+    throw new CoreException(Status.error(Messages.SelectionUtil_error_cannot_read));
   }
 
   /**

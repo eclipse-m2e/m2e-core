@@ -43,7 +43,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
@@ -372,13 +371,12 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   }
 
   IStatus validateArtifactEntries() {
-    if(!txtArtifactId.isDisposed() && txtArtifactId.getText().isEmpty())
-      return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, Messages.AddDependencyDialog_artifactId_error);
-
-    if(!txtGroupId.isDisposed() && txtGroupId.getText().isEmpty())
-      return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, Messages.AddDependencyDialog_groupId_error);
-
-    return new Status(IStatus.OK, M2EUIPluginActivator.PLUGIN_ID, "");//$NON-NLS-1$;
+    if(!txtArtifactId.isDisposed() && txtArtifactId.getText().isEmpty()) {
+      return Status.error(Messages.AddDependencyDialog_artifactId_error);
+    } else if(!txtGroupId.isDisposed() && txtGroupId.getText().isEmpty()) {
+      return Status.error(Messages.AddDependencyDialog_groupId_error);
+    }
+    return Status.OK_STATUS;
   }
 
   void okPressedDelegate() {

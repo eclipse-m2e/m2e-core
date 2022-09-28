@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -42,7 +41,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -191,8 +189,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   protected void assertHasNature(IProject project, String natureId) throws CoreException {
     if(project.getNature(natureId) == null) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.AbstractProjectConfigurator_error_missing_nature + natureId, null));
+      throw new CoreException(Status.error(Messages.AbstractProjectConfigurator_error_missing_nature + natureId));
     }
   }
 

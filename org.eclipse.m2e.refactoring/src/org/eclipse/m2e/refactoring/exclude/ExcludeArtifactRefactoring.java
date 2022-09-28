@@ -59,7 +59,6 @@ import org.eclipse.m2e.refactoring.Messages;
 
 @SuppressWarnings("restriction")
 public class ExcludeArtifactRefactoring extends Refactoring {
-  private static final String PLUGIN_ID = "org.eclipse.m2e.refactoring"; //$NON-NLS-1$
 
   /**
    * Dependencies to exclude
@@ -170,8 +169,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         if(contains(entry.getValue(), dependency)) {
           IFile pom = project.getResource();
           if(pom != null) {
-            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind(
-                Messages.ExcludeArtifactRefactoring_removeDependencyFrom, toString(dependency), pom.getFullPath())));
+            statuses.add(Status.info(NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependencyFrom,
+                toString(dependency), pom.getFullPath())));
             changes.add(PomHelper.createChange(pom, new RemoveDependencyOperation(dependency), getName(pom)));
           }
         } else {
@@ -193,8 +192,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     if(statuses.size() == 1) {
       return RefactoringStatus.create(statuses.get(0));
     } else if(statuses.size() > 1) {
-      return RefactoringStatus.create(new MultiStatus(PLUGIN_ID, 0, statuses.toArray(new IStatus[statuses.size()]),
-          Messages.ExcludeArtifactRefactoring_errorCreatingRefactoring, null));
+      return RefactoringStatus.create(new MultiStatus(ExcludeArtifactRefactoring.class, 0,
+          statuses.toArray(IStatus[]::new), Messages.ExcludeArtifactRefactoring_errorCreatingRefactoring, null));
     } else if(locatedKeys.isEmpty()) {
       return RefactoringStatus.createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_noTargets);
     } else if(locatedKeys.size() != excludes.length) {

@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
@@ -60,7 +59,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -114,7 +112,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
       if(t instanceof RuntimeException runtimeEx) {
         throw runtimeEx;
       }
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
+      throw new CoreException(Status.error(e.getMessage(), e));
     }
   }
 
@@ -168,7 +166,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
       if(t instanceof RuntimeException runtimeEx) {
         throw runtimeEx;
       }
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
+      throw new CoreException(Status.error(e.getMessage(), e));
     }
   }
 
@@ -228,7 +226,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
       });
     } catch(InvocationTargetException | InterruptedException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, ex.getMessage(), ex));
+      throw new CoreException(Status.error(ex.getMessage(), ex));
     }
     if(innerException[0] != null) {
       throw innerException[0];
@@ -275,8 +273,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     try {
       return maven.getPlexusContainer().lookup(clazz);
     } catch(ComponentLookupException ex) {
-      throw new CoreException(
-          new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, Messages.MavenImpl_error_lookup, ex));
+      throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
     }
   }
 

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobFunction;
@@ -53,7 +52,7 @@ public class RunTest extends AbstractMavenProjectTestCase {
 				assertEquals("ok", process.getStreamsProxy().getOutputStreamMonitor().getContents());
 				return Status.OK_STATUS;
 			} catch (Exception e) {
-				return new Status(IStatus.ERROR, "org.eclipse.m2e.jdt.tests", e.getMessage(), e);
+				return Status.error(e.getMessage(), e);
 			}
 		};
 		assertSuccessfulRun.run(null);

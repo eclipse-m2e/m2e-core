@@ -40,7 +40,6 @@ import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ltk.core.refactoring.TextChange;
@@ -56,7 +55,6 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.apache.maven.model.Dependency;
 
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
@@ -129,8 +127,7 @@ public final class PomHelper {
       return change;
     } catch(Exception exc) {
       LOG.error(Messages.PomHelper_errorCreatingChange, exc);
-      throw new CoreException(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID,
-          Messages.PomHelper_errorCreatingChange, exc));
+      throw new CoreException(Status.error(Messages.PomHelper_errorCreatingChange, exc));
     } finally {
       if(model != null) {
         model.releaseFromRead();

@@ -24,7 +24,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetLocationFactory;
@@ -140,8 +139,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
 					instructions, excludes, templateFeature);
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
-					e.getMessage(), e));
+			throw new CoreException(Status.error(e.getMessage(), e));
 		}
 
 	}

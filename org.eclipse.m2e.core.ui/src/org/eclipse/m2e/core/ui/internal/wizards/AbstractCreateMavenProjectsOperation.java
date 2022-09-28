@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 public abstract class AbstractCreateMavenProjectsOperation implements IRunnableWithProgress {
@@ -68,7 +67,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     if(t instanceof CoreException ex) {
       return ex.getStatus();
     }
-    return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, t.getMessage(), t);
+    return Status.error(t.getMessage(), t);
   }
 
   /**

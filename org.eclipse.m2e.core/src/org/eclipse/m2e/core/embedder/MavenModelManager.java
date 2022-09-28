@@ -63,7 +63,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
@@ -76,7 +75,6 @@ import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -145,7 +143,7 @@ public class MavenModelManager {
       }
       return model;
     } catch(IOException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, null, ex));
+      throw new CoreException(Status.error(null, ex));
     }
   }
 
@@ -153,7 +151,7 @@ public class MavenModelManager {
     String pomFileName = pomFile.getLocation().toString();
     if(pomFile.exists()) {
       String msg = NLS.bind(Messages.MavenModelManager_error_pom_exists, pomFileName);
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, null));
+      throw new CoreException(Status.error(msg));
     }
 
     try {
@@ -200,7 +198,7 @@ public class MavenModelManager {
 
     } catch(Exception ex) {
       String msg = NLS.bind(Messages.MavenModelManager_error_create, pomFileName, ex.toString());
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
+      throw new CoreException(Status.error(msg, ex));
     }
   }
 
@@ -253,7 +251,7 @@ public class MavenModelManager {
       } catch(DependencyCollectionException ex) {
         String msg = Messages.MavenModelManager_error_read;
         log.error(msg, ex);
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
+        throw new CoreException(Status.error(msg, ex));
       }
 
       Collection<String> scopes = new HashSet<>();

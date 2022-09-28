@@ -45,7 +45,6 @@ import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
 
@@ -92,8 +91,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
     try {
-      SubMonitor monitor = SubMonitor
-          .convert(progressMonitor, Messages.MavenDiscoveryInstallOperation_Configuring, 100);
+      SubMonitor monitor = SubMonitor.convert(progressMonitor, Messages.MavenDiscoveryInstallOperation_Configuring,
+          100);
       try {
         final IInstallableUnit[] ius = computeInstallableUnits(monitor.newChild(50));
 
@@ -131,8 +130,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
       final Collection<IInstallableUnit> installableUnits = queryInstallableUnits(monitor.newChild(50), repositories);
 
       if(!statuses.isEmpty()) {
-        throw new CoreException(new MultiStatus(DiscoveryActivator.PLUGIN_ID, 0, statuses.toArray(new IStatus[statuses
-            .size()]), Messages.MavenDiscoveryInstallOperation_ErrorMessage, null));
+        throw new CoreException(new MultiStatus(MavenDiscoveryInstallOperation.class, 0,
+            statuses.toArray(IStatus[]::new), Messages.MavenDiscoveryInstallOperation_ErrorMessage, null));
       }
       return installableUnits.toArray(new IInstallableUnit[installableUnits.size()]);
     } finally {
@@ -162,8 +161,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
           }
         }
         if(repository == null) {
-          statuses.add(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
-              Messages.MavenDiscoveryInstallOperation_missingRepository, item.getName(), item.getSiteUrl())));
+          statuses.add(Status.error(
+              NLS.bind(Messages.MavenDiscoveryInstallOperation_missingRepository, item.getName(), item.getSiteUrl())));
           // Continue so we gather all the problems before telling the user
           continue;
         }
@@ -177,9 +176,9 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
           Set<IInstallableUnit> matches = result.toSet();
           if(matches.size() == 1) {
             installableUnits.addAll(matches);
-          } else if(matches.size() == 0) {
-            statuses.add(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
-                Messages.MavenDiscoveryInstallOperation_missingIU, item.getName(), versionedId.toString())));
+          } else if(matches.isEmpty()) {
+            statuses.add(Status.error(
+                NLS.bind(Messages.MavenDiscoveryInstallOperation_missingIU, item.getName(), versionedId.toString())));
           } else {
             // Choose the highest available version
             IInstallableUnit match = null;
@@ -236,8 +235,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     // fetch meta-data for these repositories
     ArrayList<IMetadataRepository> repositories = new ArrayList<>();
     monitor.setWorkRemaining(repositories.size());
-    IMetadataRepositoryManager manager = (IMetadataRepositoryManager) session.getProvisioningAgent().getService(
-        IMetadataRepositoryManager.SERVICE_NAME);
+    IMetadataRepositoryManager manager = (IMetadataRepositoryManager) session.getProvisioningAgent()
+        .getService(IMetadataRepositoryManager.SERVICE_NAME);
     for(URI uri : repositoryLocations) {
       checkCancelled(monitor);
       try {

@@ -32,7 +32,6 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
@@ -132,7 +131,7 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 				}
 			}
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, getClass(), "failed to load pom file"));
+			throw new CoreException(Status.error("failed to load pom file"));
 		} finally {
 			editable = false;
 

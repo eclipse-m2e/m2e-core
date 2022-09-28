@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -123,16 +122,14 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     IResource resource = root.findMember(new Path(projectName));
     if(!resource.exists() || (resource.getType() & IResource.FOLDER | IResource.PROJECT) == 0) {
       // TODO show warning popup
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
-          Messages.MavenPomWizard_status_not_exists, projectName), null));
+      throw new CoreException(Status.error(NLS.bind(Messages.MavenPomWizard_status_not_exists, projectName)));
     }
 
     IContainer container = (IContainer) resource;
     final IFile file = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     if(file.exists()) {
       // TODO show warning popup
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenPomWizard_error_exists, null));
+      throw new CoreException(Status.error(Messages.MavenPomWizard_error_exists));
     }
 
     final File pom = file.getLocation().toFile();

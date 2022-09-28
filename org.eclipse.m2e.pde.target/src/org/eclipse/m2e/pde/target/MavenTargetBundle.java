@@ -91,8 +91,7 @@ public class MavenTargetBundle extends TargetBundle {
 			bundle = new TargetBundle(file);
 		} catch (Exception ex) {
 			if (metadataMode == MissingMetadataMode.ERROR) {
-				status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(),
-						artifact + " is not a bundle", ex);
+				status = Status.error(artifact + " is not a bundle", ex);
 				LOGGER.log(status);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
@@ -105,7 +104,7 @@ public class MavenTargetBundle extends TargetBundle {
 					if (e.getMessage() != null) {
 						message += " (" + e.getMessage() + ")";
 					}
-					status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(), message, e);
+					status = Status.error(message, e);
 					LOGGER.log(status);
 				}
 			} else {

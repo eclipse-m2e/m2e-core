@@ -35,7 +35,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
 import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
@@ -69,10 +68,11 @@ public abstract class MavenDiscoveryUi {
       context.run(true, true, runner);
       openInstallWizard(runner.getOperation(), true, context);
     } catch(InvocationTargetException e) {
-      if(e.getCause() instanceof CoreException)
-        throw (CoreException) e.getCause();
-      IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
-          Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
+      if(e.getCause() instanceof CoreException ex) {
+        throw ex;
+      }
+      String msg = NLS.bind(Messages.ConnectorDiscoveryWizard_installProblems, e.getCause().getMessage());
+      IStatus status = Status.error(msg, e.getCause());
       StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
       return false;
     } catch(InterruptedException e) {
@@ -82,13 +82,14 @@ public abstract class MavenDiscoveryUi {
     return true;
   }
 
-  public static int openInstallWizard(RestartInstallOperation operation, boolean blockOnOpen, IRunnableContext context) {
+  public static int openInstallWizard(RestartInstallOperation operation, boolean blockOnOpen,
+      IRunnableContext context) {
     OpenInstallWizardRunner runner = new OpenInstallWizardRunner(operation, blockOnOpen);
     try {
       context.run(false, false, runner);
     } catch(InvocationTargetException e) {
-      IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
-          Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
+      String msg = NLS.bind(Messages.ConnectorDiscoveryWizard_installProblems, e.getCause().getMessage());
+      IStatus status = Status.error(msg, e.getCause());
       StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
       return Window.CANCEL;
     } catch(InterruptedException ex) {

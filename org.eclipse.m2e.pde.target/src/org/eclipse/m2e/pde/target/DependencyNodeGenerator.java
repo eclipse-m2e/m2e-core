@@ -27,7 +27,6 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -76,12 +75,9 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 				node.accept(nlg);
 				return nlg;
 			} catch (RepositoryException e) {
-				throw new CoreException(
-						new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
-								"Resolving dependencies failed", e));
+				throw new CoreException(Status.error("Resolving dependencies failed", e));
 			} catch (RuntimeException e) {
-				throw new CoreException(new Status(IStatus.ERROR,
-						MavenTargetLocation.class.getPackage().getName(), "Internal error", e));
+				throw new CoreException(Status.error("Internal error", e));
 			}
 		}
 	}
