@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -78,10 +79,12 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
     return "" + dependencies.size() + " projects"; //$NON-NLS-1$
   }
 
+  @SuppressWarnings("unused") // InterruptedException XXX unfortunately remains for API compatibility; not intentionally thrown or expected 
   public void run(IProgressMonitor monitor) throws InterruptedException {
+    monitor = IProgressMonitor.nullSafe(monitor);
     for(Dependency d : dependencies) {
-      if(monitor.isCanceled()) {
-        throw new InterruptedException();
+      if(monitor.isCanceled()) { // intentionally not an InterruptedException, to follow progress monitor expectations 
+        throw new OperationCanceledException();
       }
 
       try {

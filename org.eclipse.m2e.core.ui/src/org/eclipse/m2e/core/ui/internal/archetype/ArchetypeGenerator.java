@@ -34,6 +34,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -64,9 +65,22 @@ public class ArchetypeGenerator {
   IMavenLauncher mavenLauncher;
 
   /**
-   * Creates project structure using Archetype and then imports created project(s)
-   *
+   * Creates project structure using Archetype and then imports created project(s). May block during execution. Pumps
+   * the UI event loop if called from the UI thread. Cancellation from progress monitor is honored and signaled in the
+   * return value. Equivalent to
+   * {@link #createArchetypeProjects(IPath, IArchetype, String, String, String, String, Map, boolean, IProgressMonitor)}
+   * with <code>interactive = false</code>
+   * 
+   * @param location where to place them. may be null for the workspace root
+   * @param archetype archetype
+   * @param groupId groupid
+   * @param artifactId artifactid
+   * @param version version
+   * @param javaPackage java package
+   * @param properties initial properties (some properties will be set/overriden by this call)
+   * @param monitor monitor for progress and cancellation, may be null
    * @return a list of created projects.
+   * @throws CoreException to signal an error, or a cancellation (if the contained status is CANCEL)
    * @since 1.8
    */
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
@@ -76,6 +90,23 @@ public class ArchetypeGenerator {
         monitor);
   }
 
+  /**
+   * Creates project structure using Archetype and then imports created project(s). May block during execution. Pumps
+   * the UI event loop if called from the UI thread. Cancellation from progress monitor is honored and signaled in the
+   * return value.
+   * 
+   * @param location where to place them. may be null for the workspace root
+   * @param archetype archetype
+   * @param groupId groupid
+   * @param artifactId artifactid
+   * @param version version
+   * @param javaPackage java package
+   * @param properties initial properties (some properties will be set/overriden by this call)
+   * @param interactive see {@link IMavenLauncher#runMaven(File, String, Map, boolean)}
+   * @param monitor monitor for progress and cancellation, may be null
+   * @return a list of created projects.
+   * @throws CoreException to signal an error, or a cancellation (if the contained status is CANCEL)
+   */
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Map<String, String> properties, boolean interactive,
       IProgressMonitor monitor) throws CoreException {
@@ -105,21 +136,23 @@ public class ArchetypeGenerator {
     userProperties.put("outputDirectory", basedir.getAbsolutePath());
     String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
 
+    CompletableFuture<?> mavenRun = null;
     File[] workingDir = new File[1];
     try (var workingDirCleaner = createEmptyWorkingDirectory(workingDir)) {
       String goals = "-U " + ArchetypePlugin.ARCHETYPE_PREFIX + ":generate";
-      CompletableFuture<?> maven = mavenLauncher.runMaven(workingDir[0], goals, userProperties, interactive);
+      mavenRun = mavenLauncher.runMaven(workingDir[0], goals, userProperties, interactive);
       subMonitor.worked(1);
       Display current = Display.getCurrent();
-      while(!maven.isDone()) {
+      while(!mavenRun.isDone()) {
         if(current != null) {
           while(!current.isDisposed() && current.readAndDispatch()) {
             //loop to process events
           }
         }
         Thread.onSpinWait();
+        subMonitor.checkCanceled(); // check for cancellation when UI thread is idle only (if on UI thread)
       }
-      maven.get(); //wait for maven build to complete...
+      mavenRun.get(); //wait for maven build to complete...
       subMonitor.worked(1);
       LocalProjectScanner scanner = new LocalProjectScanner(List.of(projectFolder), true, mavenModelManager);
       try {
@@ -128,7 +161,12 @@ public class ArchetypeGenerator {
         return List.of();
       }
       return projectConfigurationManager.collectProjects(scanner.getProjects());
-    } catch(InterruptedException | CancellationException ex) {
+    } catch(InterruptedException | CancellationException | OperationCanceledException ex) {
+      // ensure cancellations that might not have originated from the Future itself, request it to cancel  
+      if(mavenRun != null) {
+        mavenRun.cancel(true);
+      }
+      // in all cases, for API compatibility, do not throw OCE, and instead throw a CoreException with CANCEL status
       throw new CoreException(Status.CANCEL_STATUS);
     } catch(ExecutionException | IOException ex) {
       if(ex.getCause() instanceof CoreException coreException) {

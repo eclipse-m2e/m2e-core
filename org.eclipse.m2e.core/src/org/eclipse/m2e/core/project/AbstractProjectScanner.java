@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 
 /**
@@ -54,5 +55,12 @@ public abstract class AbstractProjectScanner<T extends MavenProjectInfo> {
 
   public abstract String getDescription();
 
+  /**
+   * Execute. Monitor cancellation will propagate as a thrown {@link OperationCanceledException}, InterruptedException
+   * is not an expected exception and remains for compatibility reasons and to handle unexpected thread interruptions.
+   * 
+   * @param monitor a progress monitor for progress and cancellation, may be null
+   * @throws InterruptedException an unexpected thread interruption occurred
+   */
   public abstract void run(IProgressMonitor monitor) throws InterruptedException;
 }
