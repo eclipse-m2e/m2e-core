@@ -38,6 +38,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.workspace.MutableWorkspaceState;
 
@@ -46,14 +47,14 @@ import org.eclipse.m2e.workspace.MutableWorkspaceState;
  * Maintains map file of maven artifacts present in workspace.
  */
 
-@Component(service = {IMavenProjectChangedListener.class})
+@Component(service = {IMavenProjectChangedListener.class}, immediate = true)
 public class WorkspaceStateWriter implements IMavenProjectChangedListener {
   private static QualifiedName PPROP_EXTENSION = new QualifiedName(WorkspaceStateWriter.class.getName(), "extension"); //$NON-NLS-1$
 
   private static final Logger log = LoggerFactory.getLogger(WorkspaceStateWriter.class);
 
   @Reference
-  private MavenProjectManager projectManager;
+  private IMavenProjectRegistry projectManager;
 
   @Reference
   private IWorkspace workspace;
@@ -121,7 +122,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
         }
       }
 
-      state.store(projectManager.getWorkspaceStateFile());
+      state.store(((MavenProjectManager) projectManager).getWorkspaceStateFile());
     } catch(IOException ex) {
       log.error("Error writing workspace state file", ex);
     }
