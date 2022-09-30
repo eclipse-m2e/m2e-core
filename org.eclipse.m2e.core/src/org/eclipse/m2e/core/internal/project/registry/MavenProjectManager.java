@@ -47,7 +47,7 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
  * dependency between ProjectRegistryRefreshJob and ProjectRegistryManager. Otherwise, all requests are forwarded to
  * ProjectRegistryManager as is.
  */
-@Component(service = {MavenProjectManager.class, IMavenProjectRegistry.class})
+@Component(service = {IMavenProjectRegistry.class})
 public class MavenProjectManager implements IMavenProjectRegistry {
   public static final String STATE_FILENAME = "workspacestate.properties"; //$NON-NLS-1$
 
