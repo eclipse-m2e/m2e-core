@@ -46,7 +46,7 @@ import org.eclipse.m2e.workspace.MutableWorkspaceState;
  * Maintains map file of maven artifacts present in workspace.
  */
 
-@Component(service = {IMavenProjectChangedListener.class})
+@Component(service = {IMavenProjectChangedListener.class}, immediate = true)
 public class WorkspaceStateWriter implements IMavenProjectChangedListener {
   private static QualifiedName PPROP_EXTENSION = new QualifiedName(WorkspaceStateWriter.class.getName(), "extension"); //$NON-NLS-1$
 
