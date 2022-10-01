@@ -55,7 +55,7 @@ public class MavenLaunchUtils {
   public static List<String> getCliResolver(AbstractMavenRuntime runtime) {
     if(runtime.getVersion().startsWith("3.")) { //$NON-NLS-1$
       Bundle m2eWorkspaceCLIBundle = FrameworkUtil.getBundle(WorkspaceState.class);
-      return Bundles.getClasspathEntries(m2eWorkspaceCLIBundle);
+      return Bundles.getClasspathEntries(m2eWorkspaceCLIBundle, false);
     }
     return Collections.emptyList(); // unsupported version of maven
   }

@@ -44,7 +44,7 @@ public class Bundles {
 
   private static final Logger log = LoggerFactory.getLogger(Bundles.class);
 
-  public static List<String> getClasspathEntries(Bundle bundle) {
+  public static List<String> getClasspathEntries(Bundle bundle, boolean extractJar) {
     log.debug("getClasspathEntries(Bundle={})", bundle);
     Set<String> cp = new LinkedHashSet<>();
     if(inDevelopmentMode()) {
@@ -53,13 +53,7 @@ public class Bundles {
     cp.addAll(parseBundleClasspath(bundle));
     List<String> entries = new ArrayList<>();
     for(String cpe : cp) {
-      String entry;
-      if(".".equals(cpe)) {
-        entry = FileLocator.getBundleFileLocation(bundle)
-            .orElseThrow(() -> new NoSuchElementException("Unable to locate bundle:" + bundle)).toString();
-      } else {
-        entry = getClasspathEntryPath(bundle, cpe);
-      }
+      String entry = getClasspathEntryPath(bundle, cpe, extractJar);
       if(entry != null) {
         log.debug("\tEntry:{}", entry);
         entries.add(entry);
@@ -81,16 +75,23 @@ public class Bundles {
     return List.of(".");
   }
 
-  public static String getClasspathEntryPath(Bundle bundle, String cp) {
+  public static String getClasspathEntryPath(Bundle bundle, String cp, boolean extractJar) {
     // try embedded entries first
-    URL url = bundle.getEntry(cp);
-    if(url != null) {
-      try {
+    try {
+      if(".".equals(cp)) {
+        if(!extractJar) {
+          return FileLocator.getBundleFileLocation(bundle)
+              .orElseThrow(() -> new NoSuchElementException("Unable to locate bundle:" + bundle)).getCanonicalPath();
+        }
+        cp = "/"; // get bundle's root entry below, which extracts the bundle's jar, if it not of shape 'dir' already
+      }
+      URL url = bundle.getEntry(cp);
+      if(url != null) {
         String path = FileLocator.toFileURL(url).getFile();
         return new Path(path).toOSString();
-      } catch(IOException ex) {
-        log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
       }
+    } catch(IOException ex) {
+      log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
     }
 
     // in development mode entries can be absolute paths outside of bundle basedir
