@@ -17,8 +17,6 @@ package org.eclipse.m2e.core.ui.internal;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -43,8 +41,6 @@ import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 
 
 public class M2EUIPluginActivator extends AbstractUIPlugin {
-
-  private final Logger log = LoggerFactory.getLogger(M2EUIPluginActivator.class);
 
   public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
