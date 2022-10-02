@@ -99,8 +99,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
       this.preferencesService = Platform.getPreferencesService();
 
-      log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
-      log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
+      log.info("Run build in \"{}\":", getWorkingDirectory(configuration)); //$NON-NLS-1$
+      log.info(" mvn {}", getProgramArguments(configuration)); //$NON-NLS-1$
 
       extensionsSupport.configureSourceLookup(configuration, launch, monitor);
 

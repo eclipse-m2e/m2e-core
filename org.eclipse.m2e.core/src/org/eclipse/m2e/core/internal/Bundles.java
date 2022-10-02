@@ -45,7 +45,7 @@ public class Bundles {
   private static final Logger log = LoggerFactory.getLogger(Bundles.class);
 
   public static List<String> getClasspathEntries(Bundle bundle) {
-    log.debug("getClasspathEntries(Bundle={})", bundle);
+    log.info("getClasspathEntries(Bundle={})", bundle);
     Set<String> cp = new LinkedHashSet<>();
     if(inDevelopmentMode()) {
       Collections.addAll(cp, getDevClassPath(bundle.getSymbolicName()));
@@ -53,15 +53,9 @@ public class Bundles {
     cp.addAll(parseBundleClasspath(bundle));
     List<String> entries = new ArrayList<>();
     for(String cpe : cp) {
-      String entry;
-      if(".".equals(cpe)) {
-        entry = FileLocator.getBundleFileLocation(bundle)
-            .orElseThrow(() -> new NoSuchElementException("Unable to locate bundle:" + bundle)).toString();
-      } else {
-        entry = getClasspathEntryPath(bundle, cpe);
-      }
+      String entry = getClasspathEntryPath(bundle, cpe);
       if(entry != null) {
-        log.debug("\tEntry:{}", entry);
+        log.info("\tEntry: {}", entry);
         entries.add(entry);
       }
     }
@@ -83,14 +77,17 @@ public class Bundles {
 
   public static String getClasspathEntryPath(Bundle bundle, String cp) {
     // try embedded entries first
-    URL url = bundle.getEntry(cp);
-    if(url != null) {
-      try {
+    try {
+      if(".".equals(cp)) {
+        return FileLocator.getBundleFileLocation(bundle).orElseThrow().getCanonicalPath();
+      }
+      URL url = bundle.getEntry(cp);
+      if(url != null) {
         String path = FileLocator.toFileURL(url).getFile();
         return new Path(path).toOSString();
-      } catch(IOException ex) {
-        log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
       }
+    } catch(IOException | NoSuchElementException ex) {
+      log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
     }
 
     // in development mode entries can be absolute paths outside of bundle basedir
