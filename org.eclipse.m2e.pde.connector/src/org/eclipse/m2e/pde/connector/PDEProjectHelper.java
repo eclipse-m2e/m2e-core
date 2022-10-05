@@ -86,7 +86,7 @@ public class PDEProjectHelper {
 	}
 
 	@SuppressWarnings("restriction")
-	public void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
+	public static void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
 			throws CoreException {
 		// see org.eclipse.pde.internal.ui.wizards.plugin.NewProjectCreationOperation
 
@@ -118,7 +118,7 @@ public class PDEProjectHelper {
 	}
 
 	@SuppressWarnings("restriction")
-	private void addProjectForUpdateClasspath(IProject project) {
+	private static void addProjectForUpdateClasspath(IProject project) {
 		synchronized (PROJECTS_FOR_UPDATE_CLASSPATH) {
 			PROJECTS_FOR_UPDATE_CLASSPATH.add(project);
 			if (!isListeningForPluginModelChanges) {
@@ -129,7 +129,7 @@ public class PDEProjectHelper {
 		}
 	}
 
-	private IPath getOutputLocation(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
+	private static IPath getOutputLocation(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
 			throws CoreException {
 		File outputDirectory = new File(mavenProject.getBuild().getOutputDirectory());
 		outputDirectory.mkdirs();
