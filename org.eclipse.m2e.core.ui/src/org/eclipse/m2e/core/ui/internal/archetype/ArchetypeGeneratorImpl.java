@@ -51,7 +51,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.ui.archetype.ArchetypeGenerator;
 
 
-@Component(service = {ArchetypeGeneratorImpl.class})
+@Component(service = {ArchetypeGenerator.class})
 @SuppressWarnings("restriction")
 public class ArchetypeGeneratorImpl implements ArchetypeGenerator {
 

@@ -34,4 +34,29 @@ public interface IArchetype {
    */
   String getVersion();
 
+  /**
+   * @param groupId
+   * @param artifactId
+   * @param version
+   * @return an IArchetype implementation based on the given coordinates
+   */
+  static IArchetype of(String groupId, String artifactId, String version) {
+    return new IArchetype() {
+
+      @Override
+      public String getGroupId() {
+        return groupId;
+      }
+
+      @Override
+      public String getArtifactId() {
+        return artifactId;
+      }
+
+      @Override
+      public String getVersion() {
+        return version;
+      }
+    };
+  }
 }
