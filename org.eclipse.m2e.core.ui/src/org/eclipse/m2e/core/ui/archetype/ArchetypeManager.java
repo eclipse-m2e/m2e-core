@@ -22,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 
@@ -47,14 +46,6 @@ public interface ArchetypeManager {
    * @throws CoreException if no archetype can be resolved
    */
   List<RequiredProperty> getRequiredProperties(IArchetype archetype, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Updates the local catalog to either add or refresh the given archetype.
-   * 
-   * @param archetype the archetype to add or refresh in the local catalog
-   * @throws CoreException
-   */
-  void updateLocalCatalog(Archetype archetype) throws CoreException;
 
   /**
    * Returns all archetypes catalogs from the active underlying factories configured in the workspace properties.

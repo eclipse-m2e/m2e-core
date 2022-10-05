@@ -263,7 +263,6 @@ public class ArchetypePlugin implements ArchetypeManager {
     }, monitor);
   }
 
-  @Override
   public void updateLocalCatalog(Archetype archetype) throws CoreException {
     maven.createExecutionContext().execute((ctx, m) -> {
       ProjectBuildingRequest request = ctx.newProjectBuildingRequest();
