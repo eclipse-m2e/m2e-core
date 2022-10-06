@@ -33,6 +33,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
+import org.eclipse.m2e.core.ui.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
@@ -48,7 +49,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private static M2EUIPluginActivator instance;
 
-  private ServiceTracker<ArchetypePlugin, ArchetypePlugin> archetypeManager;
+  private ServiceTracker<ArchetypeManager, ArchetypeManager> archetypeManager;
 
   /**
    * Storage for preferences.
@@ -173,11 +174,18 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   public ArchetypePlugin getArchetypePlugin() {
     synchronized(this) {
       if(this.archetypeManager == null) {
-        archetypeManager = new ServiceTracker<>(context, ArchetypePlugin.class, null);
+        archetypeManager = new ServiceTracker<>(context, ArchetypeManager.class, null);
         archetypeManager.open();
       }
     }
-    return this.archetypeManager.getService();
+    ArchetypeManager archetypeManager = this.archetypeManager.getService();
+    // try to cast to internal API
+    if(archetypeManager instanceof ArchetypePlugin plugin) {
+      return plugin;
+    }
+    throw new IllegalStateException(
+        "The service implementation for ArchetypeManager must implement the internal API ArchetypePlugin as well` but the retrieved implementation "
+              + archetypeManager.getClass().getName() + " doesn't");
   }
 
 }

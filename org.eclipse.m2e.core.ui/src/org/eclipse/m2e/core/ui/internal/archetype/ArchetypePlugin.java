@@ -77,7 +77,7 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
  *
  * @author Eugene Kuleshov
  */
-@Component(service = {ArchetypeManager.class, ArchetypePlugin.class})
+@Component(service = {ArchetypeManager.class})
 public class ArchetypePlugin implements ArchetypeManager {
 
   public static final String ARCHETYPE_PREFIX = "archetype";
