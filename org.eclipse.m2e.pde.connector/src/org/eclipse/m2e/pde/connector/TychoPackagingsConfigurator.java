@@ -54,15 +54,17 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 		}
 	}
 
-	void applyDsConfiguration(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+	private void applyDsConfiguration(ProjectConfigurationRequest request, IProgressMonitor monitor)
+			throws CoreException {
 		List<MojoExecution> mojoExecutions = getTychoDsPluginMojoExecutions(request, monitor);
 		if (mojoExecutions.isEmpty()) {
 			return;
 		}
 		if (mojoExecutions.size() > 1) {
-			String message = String.format("Found more than one execution for plugin %s:%s and goal %s, only consider configuration of first one",
+			String message = String.format(
+					"Found more than one execution for plugin %s:%s and goal %s, only consider configuration of this one",
 					TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, GOAL_DECLARATIVE_SERVICES);
-			createWarningMarker(request, mojoExecutions.get(1), "executions", message);
+			createWarningMarker(request, mojoExecutions.get(0), "executions", message);
 		}
 		// first mojo execution is relevant
 		Xpp3Dom dom = mojoExecutions.get(0).getConfiguration();
@@ -78,11 +80,12 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 		if (isDsEnabled) {
 			Xpp3Dom dsVersion = dom.getChild("dsVersion");
 			if (containsExplicitConfigurationValue(dsVersion)) {
-				DSAnnotationVersion version = parseVersion(dsVersion.getValue());
+				String versionValue = dsVersion.getValue();
+				DSAnnotationVersion version = parseVersion(versionValue);
 				if (version != null) {
 					prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
 				} else {
-					String message = "Unsupported DS spec version " + dsVersion.getValue() + " found, using default instead";
+					String message = "Unsupported DS spec version " + versionValue + " found, using default instead";
 					createWarningMarker(request, mojoExecutions.get(0), SourceLocationHelper.CONFIGURATION, message);
 				}
 			}
@@ -94,36 +97,37 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 	}
 
 	private boolean containsExplicitConfigurationValue(Xpp3Dom config) {
-		if (config == null) {
-			return false;
-		}
 		// check if value is a property name
 		return config != null && !config.getValue().startsWith("${");
 	}
 
-	DSAnnotationVersion parseVersion(String version) {
+	private DSAnnotationVersion parseVersion(String version) {
 		if (version.startsWith("V")) {
 			version = version.substring(1).replace('_', '.');
 		}
-		Version osgiCompliantVersion = Version.parseVersion(version);
-		if (osgiCompliantVersion.getMajor() == 1 && osgiCompliantVersion.getMinor() == 1) {
-			return DSAnnotationVersion.V1_1;
-		} else if (osgiCompliantVersion.getMajor() == 1 && osgiCompliantVersion.getMinor() == 2) {
-			return DSAnnotationVersion.V1_2;
-		} else if (osgiCompliantVersion.getMajor() == 1 && osgiCompliantVersion.getMinor() == 3) {
-			return DSAnnotationVersion.V1_3;
+		try {
+			Version osgiVersion = Version.parseVersion(version);
+			if (osgiVersion.getMajor() == 1 && osgiVersion.getMinor() == 1) {
+				return DSAnnotationVersion.V1_1;
+			} else if (osgiVersion.getMajor() == 1 && osgiVersion.getMinor() == 2) {
+				return DSAnnotationVersion.V1_2;
+			} else if (osgiVersion.getMajor() == 1 && osgiVersion.getMinor() == 3) {
+				return DSAnnotationVersion.V1_3;
+			}
+		} catch (IllegalArgumentException e) { // assume no match
 		}
 		return null;
 	}
 
-	protected List<MojoExecution> getTychoDsPluginMojoExecutions(ProjectConfigurationRequest request,
+	private List<MojoExecution> getTychoDsPluginMojoExecutions(ProjectConfigurationRequest request,
 			IProgressMonitor monitor) throws CoreException {
 		return request.mavenProjectFacade().getMojoExecutions(TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, monitor,
 				GOAL_DECLARATIVE_SERVICES);
 	}
-	
+
 	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
 			String message) {
-		PDEMavenBundlePluginConfigurator.createWarningMarker(projectManager, markerManager, request, execution, attribute, message);
+		PDEMavenBundlePluginConfigurator.createWarningMarker(projectManager, markerManager, request, execution,
+				attribute, message);
 	}
 }
