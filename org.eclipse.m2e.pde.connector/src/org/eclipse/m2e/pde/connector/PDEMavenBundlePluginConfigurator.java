@@ -23,11 +23,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
@@ -92,6 +94,11 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 
 	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
 			String message) {
+		createWarningMarker(projectManager, markerManager, request, execution, attribute, message);
+	}
+
+	static void createWarningMarker(IMavenProjectRegistry projectManager, IMavenMarkerManager markerManager,
+			ProjectConfigurationRequest request, MojoExecution execution, String attribute, String message) {
 		SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(), attribute);
 
 		String[] gav = location.getResourceId().split(":");
