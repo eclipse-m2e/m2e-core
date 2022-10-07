@@ -27,7 +27,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +39,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import org.apache.maven.project.DefaultProjectBuilder;
 
+import org.eclipse.m2e.core.ExtendedServiceTracker;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -71,7 +71,7 @@ public class MavenPluginActivator extends Plugin {
 
   private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
 
-  private Map<Class<?>, ServiceTracker<?, ?>> trackers = new ConcurrentHashMap<>();
+  private Map<Class<?>, ExtendedServiceTracker<?>> trackers = new ConcurrentHashMap<>();
 
   public IMaven getMaven() {
     return getService(IMaven.class);
@@ -79,7 +79,8 @@ public class MavenPluginActivator extends Plugin {
 
   /**
    * @param class1
-   * @return
+   * @return the service
+   * @throws IllegalStateException in case the service could no be retrieved together with a meaningful message
    */
   private <T> T getService(Class<T> service) {
     BundleContext context = getBundleContext();
@@ -87,10 +88,9 @@ public class MavenPluginActivator extends Plugin {
       return null;
     }
     return service.cast(trackers.computeIfAbsent(service, key -> {
-      ServiceTracker<?, ?> tracker = new ServiceTracker<>(context, key, null);
-      tracker.open();
+      ExtendedServiceTracker<?> tracker = new ExtendedServiceTracker(context, key);
       return tracker;
-    }).getService());
+    }).getNotNull());
   }
 
   /**
