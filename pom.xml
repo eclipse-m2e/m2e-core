@@ -113,6 +113,7 @@
 		<module>org.eclipse.m2e.jdt.tests</module>
 		<module>org.eclipse.m2e.profiles.core.tests</module>
 		<module>org.eclipse.m2e.apt.tests</module>
+		<module>org.eclipse.m2e.pde.connector.tests</module>
 	</modules>
 
 	<build>

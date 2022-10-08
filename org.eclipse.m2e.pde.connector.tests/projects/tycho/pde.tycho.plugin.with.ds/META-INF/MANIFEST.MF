@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: pde.tycho.plugin.with.ds
+Bundle-Version: 0.0.1.qualifier
+Service-Component: OSGI-INF/pde.tycho.plugin.with.ds.AComponent.xml
+Automatic-Module-Name: pde.tycho.plugin.with.ds
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-17
