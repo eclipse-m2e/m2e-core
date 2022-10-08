@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -14,15 +14,19 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -41,9 +45,13 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
@@ -167,13 +175,41 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       throws CoreException {
     if(!project.hasNature(natureId)) {
       IProjectDescription description = project.getDescription();
-      String[] prevNatures = description.getNatureIds();
-      String[] newNatures = new String[prevNatures.length + 1];
-      System.arraycopy(prevNatures, 0, newNatures, 1, prevNatures.length);
-      newNatures[0] = natureId;
-      description.setNatureIds(newNatures);
+      var natures = Stream.concat(Stream.of(natureId), Arrays.stream(description.getNatureIds()));
+      description.setNatureIds(natures.toArray(String[]::new));
       project.setDescription(description, updateFlags, monitor);
     }
+  }
+
+  /**
+   * Creates a problem marker in the pom.xml file at the specified element of the given Plugin-execution with the passed
+   * message and severity.
+   * <p>
+   * If the attribute of the execution is specified in a parent pom.xml outside of the workspace the marker is created
+   * at the parent-element of the request's project.
+   * </p>
+   * 
+   * @param execution the execution
+   * @param element the XML-element to mark
+   * @param request the request of the project being build
+   * @param problemSeverity the problems severity, one of {@link IMarker#SEVERITY_INFO SEVERITY_INFO},
+   *          {@link IMarker#SEVERITY_WARNING SEVERITY_WARNING} or {@link IMarker#SEVERITY_ERROR SEVERITY_ERROR}
+   * @param problemMessage the message of the created problem marker
+   */
+  protected void createProblemMarker(MojoExecution execution, String element, ProjectConfigurationRequest request,
+      int problemSeverity, String problemMessage) {
+    SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(), element);
+
+    String[] gav = location.getResourceId().split(":");
+    IMavenProjectFacade facade = projectManager.getMavenProject(gav[0], gav[1], gav[2]);
+    if(facade == null) {
+      // attribute specifying project (probably parent) is not in the workspace.
+      // The following code returns the location of the project's parent-element.
+      location = SourceLocationHelper.findLocation(request.mavenProject(), new MojoExecutionKey(execution));
+      facade = request.mavenProjectFacade();
+    }
+    MavenProblemInfo problem = new MavenProblemInfo(problemMessage, problemSeverity, location);
+    markerManager.addErrorMarker(facade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, problem);
   }
 
   /**
@@ -216,21 +252,11 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
     AbstractProjectConfigurator other = (AbstractProjectConfigurator) obj;
-    if(getId() == null) {
-      if(other.getId() != null) {
-        return false;
-      }
-    } else if(!getId().equals(other.getId())) {
-      return false;
-    }
-    return true;
+    return Objects.equals(getId(), other.getId());
   }
 
   /**
@@ -242,7 +268,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = getConfiguratorExecutions(projectFacade);
 
-    ArrayList<MojoExecution> executions = new ArrayList<>();
+    List<MojoExecution> executions = new ArrayList<>();
 
     Set<MojoExecutionKey> executionKeys = configuratorExecutions.get(id);
     if(executionKeys != null) {
@@ -259,25 +285,19 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   public static Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<>();
-    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
-    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-      List<IPluginExecutionMetadata> metadatas = entry.getValue();
+    projectFacade.getMojoExecutionMapping().forEach((key, metadatas) -> {
       if(metadatas != null) {
         for(IPluginExecutionMetadata metadata : metadatas) {
           if(metadata.getAction() == PluginExecutionAction.configurator) {
-            String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
-            if(configuratorId != null) {
-              Set<MojoExecutionKey> executions = configuratorExecutions.get(configuratorId);
-              if(executions == null) {
-                executions = new LinkedHashSet<>();
-                configuratorExecutions.put(configuratorId, executions);
-              }
-              executions.add(entry.getKey());
+            String id = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
+            if(id != null) {
+              Set<MojoExecutionKey> executions = configuratorExecutions.computeIfAbsent(id, i -> new LinkedHashSet<>());
+              executions.add(key);
             }
           }
         }
       }
-    }
+    });
     return configuratorExecutions;
   }
 

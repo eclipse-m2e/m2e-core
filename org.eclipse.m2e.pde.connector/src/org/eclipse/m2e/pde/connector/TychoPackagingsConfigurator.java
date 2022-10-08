@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *      Konrad Windszus
+ *      Konrad Windszus - initial API and implementation
  *******************************************************************************/
 package org.eclipse.m2e.pde.connector;
 
@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
@@ -61,10 +62,9 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 			return;
 		}
 		if (mojoExecutions.size() > 1) {
-			String message = String.format(
-					"Found more than one execution for plugin %s:%s and goal %s, only consider configuration of this one",
-					TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, GOAL_DECLARATIVE_SERVICES);
-			createWarningMarker(request, mojoExecutions.get(0), "executions", message);
+			createProblemMarker(mojoExecutions.get(0), "executions", request, IMarker.SEVERITY_WARNING,
+					"Found more than one execution for plugin " + TYCHO_GROUP_ID + ":" + TYCHO_DS_PLUGIN_ARTIFACT_ID
+							+ " and goal " + GOAL_DECLARATIVE_SERVICES + ", only consider configuration of this one");
 		}
 		// first mojo execution is relevant
 		Xpp3Dom dom = mojoExecutions.get(0).getConfiguration();
@@ -85,8 +85,9 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 				if (version != null) {
 					prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
 				} else {
-					String message = "Unsupported DS spec version " + versionValue + " found, using default instead";
-					createWarningMarker(request, mojoExecutions.get(0), SourceLocationHelper.CONFIGURATION, message);
+					createProblemMarker(mojoExecutions.get(0), SourceLocationHelper.CONFIGURATION, request,
+							IMarker.SEVERITY_WARNING,
+							"Unsupported DS spec version " + versionValue + " found, using default instead");
 				}
 			}
 			Xpp3Dom path = dom.getChild("path");
@@ -123,11 +124,5 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 			IProgressMonitor monitor) throws CoreException {
 		return request.mavenProjectFacade().getMojoExecutions(TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, monitor,
 				GOAL_DECLARATIVE_SERVICES);
-	}
-
-	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
-			String message) {
-		PDEMavenBundlePluginConfigurator.createWarningMarker(projectManager, markerManager, request, execution,
-				attribute, message);
 	}
 }

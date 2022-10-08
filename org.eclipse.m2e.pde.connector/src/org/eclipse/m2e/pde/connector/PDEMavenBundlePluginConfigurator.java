@@ -22,14 +22,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
-import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
@@ -70,7 +65,8 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 					Boolean supportIncremental = maven.getMojoParameterValue(request.mavenProject(), execution,
 							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
 					if (supportIncremental == null || !supportIncremental.booleanValue()) {
-						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
+						createProblemMarker(execution, SourceLocationHelper.CONFIGURATION, request,
+								IMarker.SEVERITY_WARNING,
 								"Incremental updates are currently disabled, set supportIncrementalBuild=true to support automatic manifest updates for this project.");
 					}
 
@@ -82,7 +78,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 		}
 		if (!hasManifestExecution && !executions.isEmpty()) {
 			MojoExecution execution = executions.get(0);
-			createWarningMarker(request, execution, "executions",
+			createProblemMarker(execution, "executions", request, IMarker.SEVERITY_WARNING,
 					"There is currently no execution that generates a manifest, consider adding an execution for one of the following goal: "
 							+ (isFelix(execution.getPlugin()) ? FELIX_MANIFEST_GOAL : BND_MANIFEST_GOALS) + ".");
 		}
@@ -90,27 +86,6 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 		IMavenProjectFacade facade = request.mavenProjectFacade();
 		IPath metainfPath = getMetainfPath(facade, executions, monitor);
 		PDEProjectHelper.addPDENature(facade.getProject(), metainfPath, monitor);
-	}
-
-	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
-			String message) {
-		createWarningMarker(projectManager, markerManager, request, execution, attribute, message);
-	}
-
-	static void createWarningMarker(IMavenProjectRegistry projectManager, IMavenMarkerManager markerManager,
-			ProjectConfigurationRequest request, MojoExecution execution, String attribute, String message) {
-		SourceLocation location = SourceLocationHelper.findLocation(execution.getPlugin(), attribute);
-
-		String[] gav = location.getResourceId().split(":");
-		IMavenProjectFacade facade = projectManager.getMavenProject(gav[0], gav[1], gav[2]);
-		if (facade == null) {
-			// attribute specifying project (probably parent) is not in the workspace.
-			// The following code returns the location of the project's parent-element.
-			location = SourceLocationHelper.findLocation(request.mavenProject(), new MojoExecutionKey(execution));
-			facade = request.mavenProjectFacade();
-		}
-		MavenProblemInfo problem = new MavenProblemInfo(message, IMarker.SEVERITY_WARNING, location);
-		markerManager.addErrorMarker(facade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, problem);
 	}
 
 	private boolean isFelixManifestGoal(MojoExecution execution) {
