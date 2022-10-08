@@ -6,9 +6,15 @@
       <configurator
             class="org.eclipse.m2e.pde.connector.PDEMavenBundlePluginConfigurator"
             id="org.eclipse.m2e.pde.connector.configurator.bundle"
-            name="PDE integration for maven plugin projects">
+            name="PDE integration for Maven bundle plugin projects">
+      </configurator>
+      <configurator
+            class="org.eclipse.m2e.pde.connector.TychoPackagingsConfigurator"
+            id="org.apache.m2e.pde.connector.configurator.tycho"
+            name="PDE integration for Maven Tycho project packagings">
       </configurator>
    </extension>
+   
    <extension
          point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
    </extension>
