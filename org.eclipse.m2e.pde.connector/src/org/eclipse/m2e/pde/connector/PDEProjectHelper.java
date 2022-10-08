@@ -86,7 +86,7 @@ public class PDEProjectHelper {
 	}
 
 	@SuppressWarnings("restriction")
-	public static void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
+	public static IJavaProject configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
 			throws CoreException {
 		// see org.eclipse.pde.internal.ui.wizards.plugin.NewProjectCreationOperation
 
@@ -115,6 +115,7 @@ public class PDEProjectHelper {
 		} else {
 			addProjectForUpdateClasspath(project);
 		}
+		return javaProject;
 	}
 
 	@SuppressWarnings("restriction")

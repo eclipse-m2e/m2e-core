@@ -409,7 +409,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return true;
   }
 
-  private IPath[] toPaths(String[] values) {
+  public static IPath[] toPaths(String[] values) {
     if(values == null) {
       return new IPath[0];
     }
@@ -422,7 +422,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return paths;
   }
 
-  private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
+  public static void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
       IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
       boolean addTestFlag) throws CoreException {
 
@@ -466,7 +466,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   }
 
-  private IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+  private static IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().isPrefixOf(fullPath)) {
         return cped;
@@ -475,7 +475,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return null;
   }
 
-  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+  private static IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().equals(fullPath)) {
         return cped;
@@ -923,14 +923,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  protected IFolder getFolder(IProject project, String absolutePath) {
+  public static IFolder getFolder(IProject project, String absolutePath) {
     if(project.getLocation().makeAbsolute().equals(Path.fromOSString(absolutePath))) {
       return project.getFolder(project.getLocation());
     }
     return project.getFolder(getProjectRelativePath(project, absolutePath));
   }
 
-  protected IPath getProjectRelativePath(IProject project, String absolutePath) {
+  protected static IPath getProjectRelativePath(IProject project, String absolutePath) {
     File basedir = project.getLocation().toFile();
     String relative;
     if(absolutePath.equals(basedir.getAbsolutePath())) {
