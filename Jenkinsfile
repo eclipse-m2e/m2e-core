@@ -20,9 +20,11 @@ pipeline {
 		}
 		stage('Build') {
 			steps {
-				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -Dtycho.mode=maven -Pgenerate-osgi-metadata'
+				sh 'mvn clean generate-sources -f m2e-maven-runtime/pom.xml -B -V -Dtycho.mode=maven -Pgenerate-osgi-metadata'
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -f pom.xml -B -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Peclipse-sign,its -Dtycho.surefire.timeout=7200'
+					sh 'mvn clean verify -B -V \
+						-Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true \
+						-Peclipse-sign,its'
 				}
 			}
 			post {
@@ -48,7 +50,7 @@ pipeline {
 						{
 							echo Deploy m2e repo to ${1}
 							ssh genie.m2e@projects-storage.eclipse.org "\
-								rm -rf  ${1}/* && \
+								rm -rf ${1}/* && \
 								mkdir -p ${1}"
 							scp -r org.eclipse.m2e.repository/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
