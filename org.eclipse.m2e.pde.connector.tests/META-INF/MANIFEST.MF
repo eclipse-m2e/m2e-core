@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: M2E PDE Connector Tests
+Bundle-SymbolicName: org.eclipse.m2e.pde.connector.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse.org - m2e
+Fragment-Host: org.eclipse.m2e.pde.connector
+Require-Bundle: org.eclipse.m2e.tests.common,
+ org.junit,
+ org.eclipse.pde.ds.core;bundle-version="1.2.500",
+ org.osgi.service.component.annotations
+Automatic-Module-Name: org.eclipse.m2e.pde.connector.tests
+Bundle-RequiredExecutionEnvironment: JavaSE-17

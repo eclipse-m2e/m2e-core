@@ -1,0 +1,6 @@
+# Ignore all Eclipse-IDE specfic setup/metadata files
+
+.settings/
+.project
+.classpath
+OSGI-INF/

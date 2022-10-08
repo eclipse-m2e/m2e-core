@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="pde.tycho.pomless.feature"
+      version="0.0.1.qualifier">
+
+   <plugin
+         id="pde.tycho.plugin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

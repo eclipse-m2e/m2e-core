@@ -1,0 +1,1 @@
+the .mvn folder ensures that the containing folder is used a Maven's multi-module root directory instead of the git-repo root (which contains the next .mvn directory in the parent hierarchy).
