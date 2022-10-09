@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -29,9 +30,12 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.ds.internal.annotations.DSAnnotationVersion;
 import org.eclipse.pde.internal.core.natures.PDE;
 import org.osgi.framework.Version;
+import org.osgi.service.prefs.BackingStoreException;
 
 @SuppressWarnings("restriction")
 public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
+
+	private static final ILog LOG = Platform.getLog(TychoPackagingsConfigurator.class);
 
 	private static final String TYCHO_GROUP_ID = "org.eclipse.tycho";
 	private static final String TYCHO_DS_PLUGIN_ARTIFACT_ID = "tycho-ds-plugin";
@@ -60,45 +64,38 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 		if (mojoExecutions.isEmpty()) {
 			return;
 		}
+		MojoExecution mojoExecution = mojoExecutions.get(0); // first mojo execution is relevant
 		if (mojoExecutions.size() > 1) {
 			String message = String.format(
 					"Found more than one execution for plugin %s:%s and goal %s, only consider configuration of this one",
 					TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, GOAL_DECLARATIVE_SERVICES);
-			createWarningMarker(request, mojoExecutions.get(0), "executions", message);
+			createWarningMarker(request, mojoExecution, "executions", message);
 		}
-		// first mojo execution is relevant
-		Xpp3Dom dom = mojoExecutions.get(0).getConfiguration();
 		// apply PDE configuration for DS
-		IEclipsePreferences prefs = new ProjectScope(request.mavenProjectFacade().getProject())
-				.getNode(org.eclipse.pde.ds.internal.annotations.Activator.PLUGIN_ID);
-		Xpp3Dom dsEnabled = dom.getChild("enabled");
-		boolean isDsEnabled = false;
-		if (dsEnabled != null && !dsEnabled.getValue().isEmpty()) {
-			isDsEnabled = Boolean.valueOf(dsEnabled.getValue());
-			prefs.putBoolean(org.eclipse.pde.ds.internal.annotations.Activator.PREF_ENABLED, isDsEnabled);
-		}
+		MavenProject project = request.mavenProject();
+		boolean isDsEnabled = maven.getMojoParameterValue(project, mojoExecution, "enabled", Boolean.class, monitor);
 		if (isDsEnabled) {
-			Xpp3Dom dsVersion = dom.getChild("dsVersion");
-			if (containsExplicitConfigurationValue(dsVersion)) {
-				String versionValue = dsVersion.getValue();
-				DSAnnotationVersion version = parseVersion(versionValue);
-				if (version != null) {
-					prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
-				} else {
-					String message = "Unsupported DS spec version " + versionValue + " found, using default instead";
-					createWarningMarker(request, mojoExecutions.get(0), SourceLocationHelper.CONFIGURATION, message);
-				}
+			IEclipsePreferences prefs = new ProjectScope(request.mavenProjectFacade().getProject())
+					.getNode(org.eclipse.pde.ds.internal.annotations.Activator.PLUGIN_ID);
+
+			prefs.putBoolean(org.eclipse.pde.ds.internal.annotations.Activator.PREF_ENABLED, isDsEnabled);
+
+			String dsVersion = maven.getMojoParameterValue(project, mojoExecution, "dsVersion", String.class, monitor);
+			DSAnnotationVersion version = parseVersion(dsVersion);
+			if (version != null) {
+				prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
+			} else {
+				String message = "Unsupported DS spec version " + dsVersion + " found, using default instead";
+				createWarningMarker(request, mojoExecution, SourceLocationHelper.CONFIGURATION, message);
 			}
-			Xpp3Dom path = dom.getChild("path");
-			if (containsExplicitConfigurationValue(path)) {
-				prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_PATH, path.getValue());
+			String path = maven.getMojoParameterValue(project, mojoExecution, "path", String.class, monitor);
+			prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_PATH, path);
+			try {
+				prefs.flush();
+			} catch (BackingStoreException e) {
+				LOG.error("Failed to save PDE-DS preferences", e);
 			}
 		}
-	}
-
-	private boolean containsExplicitConfigurationValue(Xpp3Dom config) {
-		// check if value is a property name
-		return config != null && !config.getValue().startsWith("${");
 	}
 
 	private DSAnnotationVersion parseVersion(String version) {
