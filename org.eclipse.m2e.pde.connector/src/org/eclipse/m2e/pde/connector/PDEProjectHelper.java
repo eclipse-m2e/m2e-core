@@ -11,9 +11,10 @@
 package org.eclipse.m2e.pde.connector;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import org.apache.maven.project.MavenProject;
@@ -29,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -45,57 +45,41 @@ public class PDEProjectHelper {
 	@SuppressWarnings("restriction")
 	private static final String PDE_PLUGIN_NATURE = org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE;
 
-	private static boolean isListeningForPluginModelChanges = false;
+	private static AtomicBoolean isListeningForPluginModelChanges = new AtomicBoolean(false);
 
-	private static final List<IProject> PROJECTS_FOR_UPDATE_CLASSPATH = new ArrayList<>();
+	private static final Set<IProject> PROJECTS_FOR_UPDATE_CLASSPATH = ConcurrentHashMap.newKeySet();
 
 	private PDEProjectHelper() {
 	}
 
 	@SuppressWarnings("restriction")
 	private static final org.eclipse.pde.internal.core.IPluginModelListener CLASSPATH_UPDATER = delta -> {
-		synchronized (PROJECTS_FOR_UPDATE_CLASSPATH) {
-			PROJECTS_FOR_UPDATE_CLASSPATH.removeIf(project -> {
-				IPluginModelBase model = PluginRegistry.findModel(project);
-				if (model != null) {
-					UpdateClasspathWorkspaceJob job = new UpdateClasspathWorkspaceJob(project, model);
-					job.schedule();
-					return true;
-				}
-				return false;
-			});
-		}
+		PROJECTS_FOR_UPDATE_CLASSPATH.removeIf(project -> {
+			IPluginModelBase model = PluginRegistry.findModel(project);
+			if (model != null) {
+				new WorkspaceJob("Updating classpath") {
+					@Override
+					public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+						setClasspath(project, model, monitor);
+						return Status.OK_STATUS;
+					}
+				}.schedule();
+				return true;
+			}
+			return false;
+		});
 	};
 
-	private static class UpdateClasspathWorkspaceJob extends WorkspaceJob {
-		private final IProject project;
-
-		private final IPluginModelBase model;
-
-		public UpdateClasspathWorkspaceJob(IProject project, IPluginModelBase model) {
-			super("Updating classpath");
-			this.project = project;
-			this.model = model;
-		}
-
-		@Override
-		public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-			setClasspath(project, model, monitor);
-			return Status.OK_STATUS;
-		}
-	}
-
-	@SuppressWarnings("restriction")
-	public static void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
+	static void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
 			throws CoreException {
 		// see org.eclipse.pde.internal.ui.wizards.plugin.NewProjectCreationOperation
 
 		if (!project.hasNature(PDE_PLUGIN_NATURE)) {
-			org.eclipse.pde.internal.core.util.CoreUtility.addNatureToProject(project, PDE_PLUGIN_NATURE, null);
+			AbstractProjectConfigurator.addNature(project, PDE_PLUGIN_NATURE, null);
 		}
 
 		if (!project.hasNature(JavaCore.NATURE_ID)) {
-			org.eclipse.pde.internal.core.util.CoreUtility.addNatureToProject(project, JavaCore.NATURE_ID, null);
+			AbstractProjectConfigurator.addNature(project, JavaCore.NATURE_ID, null);
 		}
 
 		// PDE can't handle default JDT classpath
@@ -119,13 +103,10 @@ public class PDEProjectHelper {
 
 	@SuppressWarnings("restriction")
 	private static void addProjectForUpdateClasspath(IProject project) {
-		synchronized (PROJECTS_FOR_UPDATE_CLASSPATH) {
-			PROJECTS_FOR_UPDATE_CLASSPATH.add(project);
-			if (!isListeningForPluginModelChanges) {
-				org.eclipse.pde.internal.core.PDECore pdeCore = org.eclipse.pde.internal.core.PDECore.getDefault();
-				pdeCore.getModelManager().addPluginModelListener(CLASSPATH_UPDATER);
-				isListeningForPluginModelChanges = true;
-			}
+		PROJECTS_FOR_UPDATE_CLASSPATH.add(project);
+		if (isListeningForPluginModelChanges.compareAndSet(false, true)) {
+			org.eclipse.pde.internal.core.PDECore pdeCore = org.eclipse.pde.internal.core.PDECore.getDefault();
+			pdeCore.getModelManager().addPluginModelListener(CLASSPATH_UPDATER);
 		}
 	}
 
@@ -139,8 +120,7 @@ public class PDEProjectHelper {
 		return folder.getFullPath();
 	}
 
-	public static void addPDENature(IProject project, IPath manifestPath, IProgressMonitor monitor)
-			throws CoreException {
+	static void addPDENature(IProject project, IPath manifestPath, IProgressMonitor monitor) throws CoreException {
 		AbstractProjectConfigurator.addNature(project, PDE_PLUGIN_NATURE, monitor);
 		IProjectDescription description = project.getDescription();
 		Stream<ICommand> builders = Arrays.stream(description.getBuildSpec())
@@ -151,7 +131,7 @@ public class PDEProjectHelper {
 		setManifestLocaton(project, manifestPath, monitor);
 	}
 
-	protected static void setManifestLocaton(IProject project, IPath manifestPath, IProgressMonitor monitor)
+	private static void setManifestLocaton(IProject project, IPath manifestPath, IProgressMonitor monitor)
 			throws CoreException {
 		IBundleProjectService projectService = Activator.getBundleProjectService().get();
 		if (manifestPath != null && manifestPath.segmentCount() > 1) {
@@ -168,16 +148,12 @@ public class PDEProjectHelper {
 	 * Returns bundle manifest as known to PDE project metadata. Returned file may
 	 * not exist in the workspace or on the filesystem. Never returns null.
 	 */
-	public static IFile getBundleManifest(IProject project) {
+	@SuppressWarnings("restriction")
+	private static IFile getBundleManifest(IProject project) {
 		// PDE API is very inconvenient, lets use internal classes instead
-		@SuppressWarnings("restriction")
-		IContainer metainf = org.eclipse.pde.internal.core.project.PDEProject.getBundleRoot(project);
-		if (metainf == null || metainf instanceof IProject) {
-			metainf = project.getFolder("META-INF");
-		} else {
-			metainf = metainf.getFolder(new Path("META-INF"));
-		}
-		return metainf.getFile(new Path("MANIFEST.MF"));
+		IContainer metaInf = org.eclipse.pde.internal.core.project.PDEProject.getBundleRoot(project);
+		return (metaInf == null || metaInf instanceof IProject ? project : metaInf)
+				.getFile(org.eclipse.pde.internal.core.ICoreConstants.MANIFEST_PATH);
 	}
 
 	private static void setClasspath(IProject project, IPluginModelBase model, IProgressMonitor monitor)
@@ -208,7 +184,7 @@ public class PDEProjectHelper {
 		// model, re-resolve dependencies
 		// and recalculate PDE classpath
 
-		IFile manifest = PDEProjectHelper.getBundleManifest(project);
+		IFile manifest = getBundleManifest(project);
 		if (manifest.isAccessible()) {
 			manifest.touch(monitor);
 		}

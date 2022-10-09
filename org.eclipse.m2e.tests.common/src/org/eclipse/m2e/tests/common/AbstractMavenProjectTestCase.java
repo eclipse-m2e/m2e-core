@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.tests.common;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -52,7 +51,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -96,6 +94,7 @@ import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -478,11 +477,10 @@ public abstract class AbstractMavenProjectTestCase {
 
   protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration,
       boolean skipSanityCheck, IProjectCreationListener listener) throws IOException, CoreException {
-    MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
-    IWorkspaceRoot root = workspace.getRoot();
 
+    MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
     File src = new File(basedir);
-    File dst = new File(root.getLocation().toFile(), src.getName());
+    File dst = new File(workspace.getRoot().getLocation().toFile(), src.getName());
     copyDir(src, dst);
 
     final List<MavenProjectInfo> projectInfos = new ArrayList<>();
@@ -494,14 +492,12 @@ public abstract class AbstractMavenProjectTestCase {
       projectInfos.add(projectInfo);
     }
 
-    final ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(configuration);
-
-    final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<>();
-
-    workspace.run(
-        m -> importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
-            importConfiguration, listener, m)),
-        MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+    ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(configuration);
+    List<IMavenProjectImportResult> importResults = new ArrayList<>();
+    IProjectConfigurationManager configManager = MavenPlugin.getProjectConfigurationManager();
+    workspace.run(m -> {
+      importResults.addAll(configManager.importProjects(projectInfos, importConfiguration, listener, m));
+    }, configManager.getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     IProject[] projects = new IProject[projectInfos.size()];
     for(int i = 0; i < projectInfos.size(); i++ ) {
@@ -665,18 +661,6 @@ public abstract class AbstractMavenProjectTestCase {
       projects.add(event.getSource().getProject());
     }
     return projects;
-  }
-
-  /**
-   * Assert that provided list <b>only</b> contains specified expected items.
-   *
-   * @since 1.6.0
-   */
-  @SafeVarargs
-  protected static <T> void assertContainsOnly(Set<? extends T> actual, T... expected) {
-    Set<T> expectedSet = new HashSet<>();
-    Collections.addAll(expectedSet, expected);
-    assertEquals(expectedSet, actual);
   }
 
   protected void injectFilexWagon() throws Exception {
