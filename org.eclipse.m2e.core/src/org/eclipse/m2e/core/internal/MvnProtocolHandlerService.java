@@ -129,6 +129,19 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       String urlSpec = "jar:" + location.toURI() + "!" + subPath;
       return new URL(urlSpec).openStream();
     }
+
+    @Override
+    public long getLastModified() {
+      try {
+        connect();
+      } catch (IOException e) {
+        return 0;
+      }
+      if(artifactResult == null || artifactResult.isMissing()) {
+        return 0;
+      }
+      return artifactResult.getArtifact().getFile().lastModified();
+    }
   }
 
 }
