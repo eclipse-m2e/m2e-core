@@ -44,11 +44,10 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.Restriction;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecution;
@@ -56,6 +55,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -254,11 +254,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       return null;
     }
     IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
-    for(IExecutionEnvironment environment : manager.getExecutionEnvironments()) {
-      if(environment.getId().equals(environmentId)) {
-        return environment;
-      }
+    IExecutionEnvironment environment = manager.getEnvironment(environmentId);
+    if(environment != null && environment.getCompatibleVMs().length > 0) {
+      return environment;
     }
+    log.error("Failed to find a compatible VM for environment id '{}', falling back to workspace default",
+        environmentId);
     return null;
   }
 
@@ -845,45 +846,41 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     try {
       List<MojoExecution> mojoExecutions = getEnforcerMojoExecutions(request, monitor);
       for(MojoExecution mojoExecution : mojoExecutions) {
-        String version = getMinimumJavaBuildEnvironmentId(mojoExecution);
+        String version = getMinimumJavaBuildEnvironmentId(request.mavenProject(), mojoExecution, monitor);
         if(version != null) {
           return version;
         }
       }
     } catch(CoreException | InvalidVersionSpecificationException ex) {
-      log.error("Failed to determine minimum build version, assuming default", ex);
+      log.error("Failed to determine minimum build Java version, assuming default", ex);
     }
     return null;
   }
 
-  private String getMinimumJavaBuildEnvironmentId(MojoExecution mojoExecution)
-      throws InvalidVersionSpecificationException {
+  private String getMinimumJavaBuildEnvironmentId(MavenProject mavenProject, MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws InvalidVersionSpecificationException, CoreException {
     // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
-    Xpp3Dom dom = mojoExecution.getConfiguration();
-    Xpp3Dom rules = dom.getChild("rules");
-    if(rules == null) {
-      return null;
-    }
-    Xpp3Dom requireJavaVersion = rules.getChild("requireJavaVersion");
-    if(requireJavaVersion == null) {
-      return null;
-    }
-    Xpp3Dom version = requireJavaVersion.getChild("version");
-    if(version == null) {
-      return null;
-    }
-    return getMinimumJavaBuildEnvironmentId(version.getValue());
+    String version = ((MavenImpl) maven).getMojoParameterValue(mavenProject, mojoExecution,
+        List.of("rules", "requireJavaVersion", "version"), String.class, monitor);
+    return getMinimumJavaBuildEnvironmentId(version);
   }
 
   private String getMinimumJavaBuildEnvironmentId(String versionSpec) throws InvalidVersionSpecificationException {
     VersionRange vr = VersionRange.createFromVersionSpec(versionSpec);
     ArtifactVersion recommendedVersion = vr.getRecommendedVersion();
+    List<Restriction> versionRestrictions = List.of();
+    if(recommendedVersion == null) {
+      versionRestrictions = getVersionRangeRestrictionsIgnoringMicroAndQualifier(vr);
+    } else {
+      // only consider major and minor version here, micro and qualifier not relevant inside IDE (probably)
+      recommendedVersion = getMajorMinorOnlyVersion(recommendedVersion);
+    }
     // find lowest matching environment id
     for(Entry<String, String> entry : ENVIRONMENTS.entrySet()) {
       ArtifactVersion environmentVersion = new DefaultArtifactVersion(entry.getKey());
-      boolean foundMatchingVersion = false;
+      boolean foundMatchingVersion;
       if(recommendedVersion == null) {
-        foundMatchingVersion = vr.containsVersion(environmentVersion);
+        foundMatchingVersion = versionRestrictions.stream().anyMatch(r -> r.containsVersion(environmentVersion));
       } else {
         // only singular versions ever have a recommendedVersion
         int compareTo = recommendedVersion.compareTo(environmentVersion);
@@ -894,6 +891,20 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
     return null;
+  }
+
+  private static List<Restriction> getVersionRangeRestrictionsIgnoringMicroAndQualifier(VersionRange versionRange) {
+    return versionRange.getRestrictions().stream().map(restriction -> {
+      ArtifactVersion lowerBound = restriction.getLowerBound();
+      ArtifactVersion upperBound = restriction.getUpperBound();
+      return new Restriction(// 
+          lowerBound != null ? getMajorMinorOnlyVersion(lowerBound) : null, restriction.isLowerBoundInclusive(),
+          upperBound != null ? getMajorMinorOnlyVersion(upperBound) : null, restriction.isUpperBoundInclusive());
+    }).toList();
+  }
+
+  private static ArtifactVersion getMajorMinorOnlyVersion(ArtifactVersion lower) {
+    return new DefaultArtifactVersion(lower.getMajorVersion() + "." + lower.getMinorVersion());
   }
 
   private double asDouble(String level) {

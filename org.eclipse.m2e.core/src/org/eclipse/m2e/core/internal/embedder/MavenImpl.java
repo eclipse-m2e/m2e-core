@@ -709,8 +709,24 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return directory.replace(GROUP_SEPARATOR, PATH_SEPARATOR);
   }
 
-  private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
+  private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, List<String> parameterPath,
       Class<T> asType) throws CoreException {
+    Xpp3Dom dom = mojoExecution.getConfiguration();
+    if(dom == null) {
+      return null;
+    }
+    PlexusConfiguration configuration = new XmlPlexusConfiguration(dom);
+    for(String parameter : parameterPath) {
+      configuration = configuration.getChild(parameter);
+      if(configuration == null) {
+        return null;
+      }
+    }
+    return getMojoParameterValue(session, mojoExecution, configuration, asType, String.join("/", parameterPath));
+  }
+
+  private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution,
+      PlexusConfiguration configuration, Class<T> asType, String parameterLabel) throws CoreException {
     try {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -719,20 +735,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
       ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
       ConfigurationConverter typeConverter = converterLookup.lookupConverterForType(asType);
-      Xpp3Dom dom = mojoExecution.getConfiguration();
-      if(dom == null) {
-        return null;
-      }
-      PlexusConfiguration configuration = new XmlPlexusConfiguration(dom).getChild(parameter);
-      if(configuration == null) {
-        return null;
-      }
+
       Object value = typeConverter.fromConfiguration(converterLookup, configuration, asType,
           mojoDescriptor.getImplementationClass(), pluginRealm, expressionEvaluator, null);
       return asType.cast(value);
     } catch(Exception e) {
-      throw new CoreException(Status
-          .error(NLS.bind(Messages.MavenImpl_error_param_for_execution, parameter, mojoExecution.getExecutionId()), e));
+      throw new CoreException(Status.error(
+          NLS.bind(Messages.MavenImpl_error_param_for_execution, parameterLabel, mojoExecution.getExecutionId()), e));
     }
   }
 
@@ -740,7 +749,30 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
     return getExecutionContext().execute(project,
-        (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
+        (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, List.of(parameter), asType),
+        monitor);
+  }
+
+  /**
+   * Resolves a nested configuration parameter from the given {@code mojoExecution}. It coerces from String to the given
+   * type and considers expressions and default values. Deliberately no public API yet as probably refactored in the
+   * near future.
+   * 
+   * @param <T>
+   * @param project the Maven project
+   * @param mojoExecution the mojo execution from which to retrieve the configuration value
+   * @param parameterPath the path of the parameter to look up, the first item is the name of the element directly below
+   *          {@code <configuration>} and the last one is the element containing the actual value
+   * @param asType the type to coerce to
+   * @param monitor the progress monitor
+   * @return the parameter value or {@code null} if the parameter with the given name was not found
+   * @throws CoreException
+   * @see IMaven#getMojoParameterValue(MavenProject, MojoExecution, String, Class, IProgressMonitor)
+   */
+  public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, List<String> parameterPath,
+      Class<T> asType, IProgressMonitor monitor) throws CoreException {
+    return getExecutionContext().execute(project,
+        (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameterPath, asType), monitor);
   }
 
   private <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
