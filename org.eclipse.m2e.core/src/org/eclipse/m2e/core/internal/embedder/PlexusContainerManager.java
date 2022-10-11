@@ -17,6 +17,7 @@ package org.eclipse.m2e.core.internal.embedder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -37,6 +37,8 @@ import com.google.inject.AbstractModule;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.ContainerConfiguration;
@@ -47,6 +49,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -75,6 +78,7 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 @Component(service = PlexusContainerManager.class)
 public class PlexusContainerManager {
+  private static final ILog LOG = Platform.getLog(PlexusContainerManager.class);
 
   static final String MVN_FOLDER = ".mvn";
 
@@ -85,23 +89,6 @@ public class PlexusContainerManager {
   private static final String MAVEN_EXTENSION_REALM_PREFIX = "maven.ext.";
 
   private static final String PLEXUS_CORE_REALM = "plexus.core";
-
-  private static final ClassWorld CLASS_WORLD = new ClassWorld(PLEXUS_CORE_REALM, ClassWorld.class.getClassLoader());
-
-  private static final ClassRealm CORE_REALM;
-
-  private static final CoreExtensionEntry CORE_ENTRY;
-
-  private static final AtomicLong REALM_ID_SEQUENCE = new AtomicLong();
-
-  static {
-    try {
-      CORE_REALM = CLASS_WORLD.getRealm(PLEXUS_CORE_REALM);
-      CORE_ENTRY = CoreExtensionEntry.discoverFrom(CORE_REALM);
-    } catch(NoSuchRealmException ex) {
-      throw new AssertionError("Should never happen", ex);
-    }
-  }
 
   private PlexusContainer nonRootedContainer;
 
@@ -119,10 +106,10 @@ public class PlexusContainerManager {
   @Deactivate
   void dispose() {
     synchronized(containerMap) {
-      containerMap.values().forEach(PlexusContainer::dispose);
+      containerMap.values().forEach(PlexusContainerManager::disposeContainer);
       containerMap.clear();
       if(nonRootedContainer != null) {
-        nonRootedContainer.dispose();
+        disposeContainer(nonRootedContainer);
         nonRootedContainer = null;
       }
     }
@@ -135,12 +122,24 @@ public class PlexusContainerManager {
     synchronized(containerMap) {
       containerMap.entrySet().removeIf(entry -> {
         if(!new File(entry.getKey(), MVN_FOLDER).isDirectory()) {
-          entry.getValue().dispose();
+          disposeContainer(entry.getValue());
           return true;
         }
         return false;
       });
     }
+  }
+
+  private static void disposeContainer(PlexusContainer container) {
+    ClassWorld classWorld = container.getContainerRealm().getWorld();
+    for(ClassRealm realm : classWorld.getRealms()) {
+      try {
+        classWorld.disposeRealm(realm.getId());
+      } catch(NoSuchRealmException e) {
+        LOG.error("Failed to dispose ClassRealm", e);
+      }
+    }
+    container.dispose();
   }
 
   public PlexusContainer aquire() throws Exception {
@@ -164,8 +163,8 @@ public class PlexusContainerManager {
       PlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
       if(plexusContainer == null) {
         try {
-          containerMap.put(canonicalDirectory,
-              plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration));
+          plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration);
+          containerMap.put(canonicalDirectory, plexusContainer);
         } catch(ExtensionResolutionException e) {
           //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
           CoreExtension extension = e.getExtension();
@@ -196,19 +195,28 @@ public class PlexusContainerManager {
     }
   }
 
-  private static DefaultPlexusContainer newPlexusContainer(File multiModuleProjectDirectory,
-      LoggerManager loggerManager, IMavenConfiguration mavenConfiguration) throws Exception {
-    List<CoreExtensionEntry> extensions = loadCoreExtensions(multiModuleProjectDirectory, loggerManager,
-        mavenConfiguration);
-    List<File> extClassPath = List.of(); //TODO should we allow to set an ext-class path for m2e?
-    ClassRealm containerRealm = setupContainerRealm(extClassPath, extensions);
+  private static PlexusContainer newPlexusContainer(File multiModuleProjectDirectory, LoggerManager loggerManager,
+      IMavenConfiguration mavenConfiguration) throws Exception {
 
-    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(CLASS_WORLD).setRealm(containerRealm)
+    // In M2E it can happen that the same extension (with same GAV) is referenced/loaded from multiple locations ('.mvn'-folders).
+    // In contrast to a standalone Maven-build, which only has one multi-module-root ('.mvn'-folder), M2E can import multiple 
+    // projects with different '.mvn'-folder. Because the id of an extension's realm is only based on the GAV, attempts to load 
+    // the same extension from different locations result in a DuplicateRealmException. Therefore each container needs its own ClassWorld.
+    ClassWorld classWorld = new ClassWorld(PLEXUS_CORE_REALM, ClassWorld.class.getClassLoader());
+    ClassRealm coreRealm = classWorld.getRealm(PLEXUS_CORE_REALM);
+    CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
+
+    List<CoreExtensionEntry> extensions = loadCoreExtensions(coreRealm, coreEntry, multiModuleProjectDirectory,
+        loggerManager, mavenConfiguration);
+    List<File> extClassPath = List.of(); //TODO should we allow to set an ext-class path for m2e?
+    ClassRealm containerRealm = setupContainerRealm(coreRealm, extClassPath, extensions);
+
+    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(classWorld).setRealm(containerRealm)
         .setClassPathScanning(PlexusConstants.SCANNING_INDEX).setAutoWiring(true).setJSR250Lifecycle(true)
         .setName(CONTAINER_CONFIGURATION_NAME);
 
-    Set<String> exportedArtifacts = new HashSet<>(CORE_ENTRY.getExportedArtifacts());
-    Set<String> exportedPackages = new HashSet<>(CORE_ENTRY.getExportedPackages());
+    Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
+    Set<String> exportedPackages = new HashSet<>(coreEntry.getExportedPackages());
     for(CoreExtensionEntry extension : extensions) {
       exportedArtifacts.addAll(extension.getExportedArtifacts());
       exportedPackages.addAll(extension.getExportedPackages());
@@ -239,14 +247,13 @@ public class PlexusContainerManager {
     return container;
   }
 
-  private static ClassRealm setupContainerRealm(List<File> extClassPath, List<CoreExtensionEntry> extensions)
-      throws Exception {
+  private static ClassRealm setupContainerRealm(ClassRealm coreRealm, List<File> extClassPath,
+      List<CoreExtensionEntry> extensions) throws DuplicateRealmException, MalformedURLException {
     if(extClassPath.isEmpty() && extensions.isEmpty()) {
-      return CORE_REALM;
+      return coreRealm;
     }
-    ClassRealm extRealm = CLASS_WORLD.newRealm(MAVEN_EXTENSION_REALM_PREFIX + REALM_ID_SEQUENCE.getAndIncrement(),
-        null);
-    extRealm.setParentRealm(CORE_REALM);
+    ClassRealm extRealm = coreRealm.getWorld().newRealm(MAVEN_EXTENSION_REALM_PREFIX, null);
+    extRealm.setParentRealm(coreRealm);
     for(File file : extClassPath) {
       extRealm.addURL(file.toURI().toURL());
     }
@@ -265,8 +272,9 @@ public class PlexusContainerManager {
     return extRealm;
   }
 
-  private static List<CoreExtensionEntry> loadCoreExtensions(File multiModuleProjectDirectory,
-      LoggerManager loggerManager, IMavenConfiguration mavenConfiguration) throws Exception {
+  private static List<CoreExtensionEntry> loadCoreExtensions(ClassRealm coreRealm, CoreExtensionEntry coreEntry,
+      File multiModuleProjectDirectory, LoggerManager loggerManager, IMavenConfiguration mavenConfiguration)
+      throws Exception {
     if(multiModuleProjectDirectory == null) {
       return Collections.emptyList();
     }
@@ -282,9 +290,9 @@ public class PlexusContainerManager {
       return Collections.emptyList();
     }
 
-    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(CLASS_WORLD).setRealm(CORE_REALM)
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX).setAutoWiring(true).setJSR250Lifecycle(true)
-        .setName(CONTAINER_CONFIGURATION_NAME);
+    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(coreRealm.getWorld())
+        .setRealm(coreRealm).setClassPathScanning(PlexusConstants.SCANNING_INDEX).setAutoWiring(true)
+        .setJSR250Lifecycle(true).setName(CONTAINER_CONFIGURATION_NAME);
 
     DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
       @Override
@@ -305,7 +313,7 @@ public class PlexusContainerManager {
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
-      return resolver.loadCoreExtensions(request, CORE_ENTRY.getExportedArtifacts(), extensions);
+      return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
     } finally {
       thread.setContextClassLoader(ccl);
       container.dispose();
@@ -359,10 +367,8 @@ public class PlexusContainerManager {
     }
 
     private CoreException throwException() {
-      if(exception instanceof CoreException) {
-        return (CoreException) exception;
-      }
-      return new CoreException(Status.error("container creation failed", exception));
+      return exception instanceof CoreException coreException ? coreException
+          : new CoreException(Status.error("container creation failed", exception));
     }
 
   }
@@ -378,13 +384,11 @@ public class PlexusContainerManager {
     final File basedir = file.isDirectory() ? file : file.getParentFile();
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     File workspaceRoot = workspace.getRoot().getLocation().toFile();
-    File current = basedir;
-    while(current != null && !current.equals(workspaceRoot)) {
 
-      if(new File(current, MVN_FOLDER).isDirectory()) {
-        return current;
+    for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
+      if(new File(root, MVN_FOLDER).isDirectory()) {
+        return root;
       }
-      current = current.getParentFile();
     }
     return null;
   }

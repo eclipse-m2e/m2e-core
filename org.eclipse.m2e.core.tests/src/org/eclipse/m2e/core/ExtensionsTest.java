@@ -13,14 +13,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,12 +44,40 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testCoreExtension() throws Exception {
-		IProject[] projects = importProjects("resources/projects/pomless/", new String[] { "bundle/pom.xml" },
-				new ResolverConfiguration(), false);
+		IProject project = importPomlessProject("pomless", "bundle/pom.xml");
 		waitForJobsToComplete(monitor);
-		assertEquals(1, projects.length);
-		IProject project = projects[0];
 		assertEquals("my.bundle", project.getName());
 		assertNotNull(project.getNature("org.eclipse.m2e.core.maven2Nature"));
+	}
+
+	@Test
+	public void testLoadSameExtensionFromMultipleLocations() throws Exception {
+		IProject project1 = importPomlessProject("pomless", "bundle/pom.xml");
+		waitForJobsToComplete(monitor);
+		assertEquals("my.bundle", project1.getName());
+
+		IProject project2 = importPomlessProject("pomless2", "bundle2/pom.xml");
+		waitForJobsToComplete(monitor);
+		assertEquals("my.bundle2", project2.getName());
+	}
+
+	@Test
+	public void testReloadExtensionAfterDeletion() throws Exception {
+		IProject project1 = importPomlessProject("pomless", "bundle/pom.xml");
+		waitForJobsToComplete(monitor);
+		assertEquals("my.bundle", project1.getName());
+
+		WorkspaceHelpers.cleanWorkspace();
+
+		project1 = importPomlessProject("pomless", "bundle/pom.xml");
+		waitForJobsToComplete(monitor);
+		assertEquals("my.bundle", project1.getName());
+	}
+
+	private IProject importPomlessProject(String rootProject, String... poms) throws IOException, CoreException {
+		IProject[] projects = importProjects("resources/projects/" + rootProject + "/", poms,
+				new ResolverConfiguration(), false);
+		assertEquals(1, projects.length);
+		return projects[0];
 	}
 }
