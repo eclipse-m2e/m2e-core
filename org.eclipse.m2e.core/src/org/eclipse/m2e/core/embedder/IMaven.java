@@ -158,6 +158,17 @@ public interface IMaven extends IComponentLookup {
       throws CoreException;
 
   /**
+   * Resolves a configuration parameter from the given {@code mojoExecution}. It coerces from String to the given type
+   * and considers expressions and default values.
+   * 
+   * @param <T>
+   * @param project the Maven project
+   * @param mojoExecution the mojo execution from which to retrieve the configuration value
+   * @param parameter the name of the parameter (may be nested with separating {@code .})
+   * @param asType the type to coerce to
+   * @param monitor the progress monitor
+   * @return the parameter value or {@code null} if the parameter with the given name was not found
+   * @throws CoreException
    * @since 1.4
    */
   <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
