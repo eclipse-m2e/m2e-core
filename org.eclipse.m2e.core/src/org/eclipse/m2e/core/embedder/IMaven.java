@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -148,10 +150,45 @@ public interface IMaven extends IComponentLookup {
       throws CoreException;
 
   /**
-   * @since 1.4
+   * Instances should not be cached
+   *
+   * @since 2.1
    */
-  <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter, Class<T> asType,
+  public interface IConfigurationElement {
+    // TODO  or firstChild() ? That's what it is actually but it does not look so nice when chained
+    IConfigurationParameter get(String name) throws NoSuchElementException;
+
+    // TODO: or all(String) or similar.
+    Stream<IConfigurationParameter> children(String name) throws NoSuchElementException;
+
+    // TODO: or all() or similar.
+    Stream<IConfigurationParameter> children() throws NoSuchElementException;
+  }
+
+  public interface IConfigurationParameter extends IConfigurationElement {
+
+    boolean exists();
+
+    <T> T as(Class<T> clazz) throws NoSuchElementException, IllegalStateException;
+  }
+
+  /**
+   * @since 2.1
+   */
+  IConfigurationElement getMojoConfiguration(MavenProject project, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * @since 1.4
+   * @deprecated use {@link #getMojoConfiguration(MavenProject, MojoExecution, IProgressMonitor)} instead and query the
+   *             returned {@link IConfigurationElement}.
+   */
+  @Deprecated(forRemoval = true, since = "2.1")
+  default <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
+      Class<T> asType, IProgressMonitor monitor) throws CoreException {
+    IConfigurationParameter configParameter = getMojoConfiguration(project, mojoExecution, monitor).get(parameter);
+    return configParameter.exists() ? configParameter.as(asType) : null;
+  }
 
   /**
    * @since 1.4
