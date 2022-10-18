@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationParameter;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
@@ -67,9 +68,10 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			if (isFelix(plugin)) {
 				if (isFelixManifestGoal(execution)) {
 					IMaven maven = MavenPlugin.getMaven();
-					Boolean supportIncremental = maven.getMojoParameterValue(request.mavenProject(), execution,
-							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
-					if (supportIncremental == null || !supportIncremental.booleanValue()) {
+					IConfigurationParameter incrementalBuildConfig = maven
+							.getMojoConfiguration(request.mavenProject(), execution, monitor)
+							.get(FELIX_PARAM_SUPPORTINCREMENTALBUILD);
+					if (!incrementalBuildConfig.exists() || !incrementalBuildConfig.as(Boolean.class).booleanValue()) {
 						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
 								"Incremental updates are currently disabled, set supportIncrementalBuild=true to support automatic manifest updates for this project.");
 					}
@@ -138,7 +140,8 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			Plugin plugin = execution.getPlugin();
 			MavenProject project = facade.getMavenProject(monitor);
 			String manifestParameter = isBND(plugin) ? BND_PARAM_MANIFESTLOCATION : FELIX_PARAM_MANIFESTLOCATION;
-			File location = maven.getMojoParameterValue(project, execution, manifestParameter, File.class, monitor);
+			File location = maven.getMojoConfiguration(project, execution, monitor).get(manifestParameter)
+					.as(File.class);
 			if (location != null) {
 				return facade.getProjectRelativePath(location.getAbsolutePath());
 			}

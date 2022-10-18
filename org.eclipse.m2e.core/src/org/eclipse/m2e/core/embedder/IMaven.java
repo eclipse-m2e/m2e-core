@@ -193,6 +193,7 @@ public interface IMaven extends IComponentLookup {
   /**
    * @since 1.4
    */
+  //TODO: deprecate that as well? Without 1:1 replacement? M2E code base does not use it anymore
   <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException;
 

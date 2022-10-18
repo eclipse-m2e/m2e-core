@@ -38,7 +38,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarFile;
@@ -83,6 +82,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationParameter;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -705,14 +705,14 @@ public class LifecycleMappingFactory {
   private static boolean hasMatchingParameterValue(MavenProject mavenProject, MojoExecution execution,
       PluginExecutionMetadata metadata, IMaven maven, IProgressMonitor monitor) throws CoreException {
     Map<String, Object> parameters = metadata.getFilter().getParameters();
-    for(Entry<String, Object> entry : parameters.entrySet()) {
-      MojoExecution setupExecution = maven.setupMojoExecution(mavenProject, execution, monitor);
-      String value = maven.getMojoParameterValue(mavenProject, setupExecution, entry.getKey(), String.class, monitor);
-      if(!Objects.equals(entry.getValue(), value)) {
-        return false;
-      }
-    }
-    return true;
+    MojoExecution setupExecution = maven.setupMojoExecution(mavenProject, execution, monitor);
+    org.eclipse.m2e.core.embedder.IMaven.IConfigurationElement mojoConfig = maven.getMojoConfiguration(mavenProject,
+        setupExecution, monitor);
+
+    return parameters.entrySet().stream().allMatch(e -> {
+      IConfigurationParameter parameter = mojoConfig.get(e.getKey());
+      return parameter.exists() && Objects.equals(parameter.as(String.class), e.getValue());
+    });
   }
 
   private static boolean isValidPluginExecutionMetadata(PluginExecutionMetadata metadata) {

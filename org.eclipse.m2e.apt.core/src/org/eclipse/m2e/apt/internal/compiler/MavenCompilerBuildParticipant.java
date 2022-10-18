@@ -35,6 +35,8 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationElement;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationParameter;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 
@@ -64,12 +66,13 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
     //TODO check delta / scan source for *.java
     IMavenProjectFacade mavenProjectFacade = getMavenProjectFacade();
     MavenProject project = mavenProjectFacade.getMavenProject();
-    String compilerArgument = maven.getMojoParameterValue(project, mojoExecution, "compilerArgument", String.class,
-        null);
-    boolean isAnnotationProcessingEnabled = (compilerArgument == null) || !compilerArgument.contains("-proc:none");
+    IConfigurationElement config = maven.getMojoConfiguration(project, mojoExecution, null);
+    IConfigurationParameter compilerArgumentConfig = config.get("compilerArgument");
+    boolean isAnnotationProcessingEnabled = !compilerArgumentConfig.exists()
+        || !compilerArgumentConfig.as(String.class).contains("-proc:none");
     if(isAnnotationProcessingEnabled) {
-      String proc = maven.getMojoParameterValue(project, mojoExecution, PROC, String.class, null);
-      isAnnotationProcessingEnabled = !"none".equals(proc);
+      IConfigurationParameter procConfig = config.get(PROC);
+      isAnnotationProcessingEnabled = !procConfig.exists() || !"none".equals(procConfig.as(String.class));
     }
     if(!isAnnotationProcessingEnabled) {
       return Collections.emptySet();
@@ -112,8 +115,7 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
     }
 
     // tell m2e builder to refresh generated files
-    File generated = maven.getMojoParameterValue(project, getMojoExecution(),
-        MavenCompilerJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, File.class, null);
+    File generated = maven.getMojoConfiguration(project, getMojoExecution(), null).get(MavenCompilerJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER).as(File.class);
     if(generated != null) {
       buildContext.refresh(generated);
     }
