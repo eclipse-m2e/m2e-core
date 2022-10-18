@@ -17,14 +17,14 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -248,8 +248,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException {
     return getExecutionContext().execute(project,
-        (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup),
-        monitor);
+        (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup), monitor);
   }
 
   private MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
@@ -273,8 +272,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException {
     return getExecutionContext().execute(project,
-        (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
-        monitor);
+        (context, pm) -> setupMojoExecution(context.getSession(), project, execution), monitor);
   }
 
   @Override
@@ -548,9 +546,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {
-    return getExecutionContext().execute(child,
-        (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
-        context.getExecutionRequest().getProjectBuildingRequest()), monitor);
+    return getExecutionContext().execute(child, (context, pm) -> resolveParentProject(context.getRepositorySession(),
+        child, context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
 
   @Override
@@ -639,7 +636,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
     File lastUpdatedFile = getLastUpdatedFile(localRepository, artifact);
     lastUpdatedFile.getParentFile().mkdirs();
-    try (BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(lastUpdatedFile))) {
+    try (OutputStream os = new FileOutputStream(lastUpdatedFile)) {
       lastUpdated.store(os, null);
     } catch(IOException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_write_lastUpdated, ex));
@@ -703,7 +700,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private Properties loadLastUpdated(ArtifactRepository localRepository, Artifact artifact) throws CoreException {
     Properties lastUpdated = new Properties();
     File lastUpdatedFile = getLastUpdatedFile(localRepository, artifact);
-    try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(lastUpdatedFile))) {
+    try (InputStream is = new FileInputStream(lastUpdatedFile)) {
       lastUpdated.load(is);
     } catch(FileNotFoundException ex) {
       // that's okay
@@ -714,20 +711,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private File getLastUpdatedFile(ArtifactRepository localRepository, Artifact artifact) {
-    return new File(localRepository.getBasedir(), basePathOf(artifact) + "/m2e-lastUpdated.properties");
-  }
-
-  private static final char PATH_SEPARATOR = '/';
-
-  private static final char GROUP_SEPARATOR = '.';
-
-  private String basePathOf(Artifact artifact) {
-    return formatAsDirectory(artifact.getGroupId()) + PATH_SEPARATOR + artifact.getArtifactId() + PATH_SEPARATOR
-        + artifact.getBaseVersion() + PATH_SEPARATOR;
-  }
-
-  private String formatAsDirectory(String directory) {
-    return directory.replace(GROUP_SEPARATOR, PATH_SEPARATOR);
+    return Path.of(localRepository.getBasedir(), //
+        artifact.getGroupId().replace('.', '/'), artifact.getArtifactId(), artifact.getBaseVersion(),
+        "m2e-lastUpdated.properties").toFile();
   }
 
   private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
@@ -1050,7 +1036,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-
   @Override
   public ClassLoader getProjectRealm(MavenProject project) {
     Objects.requireNonNull(project);
@@ -1085,8 +1070,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    * @since 1.4
    */
   public static <V> V execute(IMaven maven, boolean offline, boolean forceDependencyUpdate, ICallable<V> callable,
-      IProgressMonitor monitor)
-      throws CoreException {
+      IProgressMonitor monitor) throws CoreException {
     IMavenExecutionContext context = maven.createExecutionContext();
     context.getExecutionRequest().setOffline(offline);
     context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
