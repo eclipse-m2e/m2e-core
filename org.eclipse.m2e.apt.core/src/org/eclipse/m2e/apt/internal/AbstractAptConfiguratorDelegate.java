@@ -165,6 +165,9 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
       String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
 
+      if (File.separatorChar != '/') {
+        generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
+      }
       AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
     }
     if(generatedTestSourcesDirectory != null && setGenTestSrcDirMethod != null) {
@@ -172,6 +175,9 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
           generatedTestSourcesDirectory);
       String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
+      if (File.separatorChar != '/') {
+        generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
+      }
       try {
         setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
       } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
