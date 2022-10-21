@@ -43,7 +43,7 @@
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
 									<!-- Don't release m2e if this points to SNAPSHOT -->
-									<version>0.6.0</version>
+									<version>0.7.0</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
