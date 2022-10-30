@@ -34,6 +34,9 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 		waitForJobsToComplete(monitor);
 		IMavenProjectFacade facade = Adapters.adapt(project, IMavenProjectFacade.class);
 		Assert.assertNotNull(facade);
+		Collection<AbstractMavenLifecycleParticipant> participantList = facade.getComponentLookup()
+				.lookupCollection(AbstractMavenLifecycleParticipant.class);
+		assertTrue("Should not return a project scoped extension", participantList.isEmpty());
 		Collection<AbstractMavenLifecycleParticipant> buildParticipants = facade.createExecutionContext()
 				.execute((context, monitor) -> {
 					assertNotNull("context has no project!", context.getSession().getCurrentProject());
