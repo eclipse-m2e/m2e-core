@@ -7,7 +7,7 @@
 ![Jenkins tests](https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmaster%2F&label=Tests)
 
 M2Eclipse provides tight integration for Apache Maven into the Eclipse IDE with the following features:
-* Rich editor for pom.xml files
+* Rich editor for pom.xml files leveraging [LemMinX-Maven](https://github.com/eclipse/lemminx-maven)
 * Launching Maven builds from within Eclipse
 * Dependency management for Eclipse build path based on Maven's pom.xml
 * Resolving Maven dependencies from the Eclipse workspace without installing to local Maven repository
