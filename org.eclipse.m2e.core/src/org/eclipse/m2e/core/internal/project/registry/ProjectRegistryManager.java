@@ -103,7 +103,6 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
@@ -1014,7 +1013,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
       ResolverConfiguration resolverConfiguration) throws CoreException {
-    IMavenExecutionContext context = new MavenExecutionContext((MavenImpl) maven, projectRegistry.getProjectFacade(pom));
+
+    IMavenExecutionContext context;
+    try {
+      context = new MavenExecutionContext(containerManager.aquire(pom), projectRegistry.getProjectFacade(pom));
+    } catch(Exception ex) {
+      throw new CoreException(Status.error("aquire container failed", ex));
+    }
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;
   }

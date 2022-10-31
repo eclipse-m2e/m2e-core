@@ -27,8 +27,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
  */
 public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAdapter implements TransferListener {
 
-  ArtifactTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
-    super(maven, monitor);
+  ArtifactTransferListenerAdapter(IProgressMonitor monitor) {
+    super(monitor);
   }
 
   @Override

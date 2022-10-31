@@ -28,9 +28,11 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
+@Ignore("This test is temorrily disabled because it requires project extensions that currently not behave consitent!")
 public class FelixConnectorTest extends AbstractMavenProjectTestCase {
 
 	@Before

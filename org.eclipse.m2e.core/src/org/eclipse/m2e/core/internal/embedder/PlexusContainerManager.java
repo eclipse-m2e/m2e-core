@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -152,6 +153,17 @@ public class PlexusContainerManager {
     }
   }
 
+  public PlexusContainer aquire(IFile pom) throws Exception {
+    if(pom == null) {
+      return aquire();
+    }
+    File file = pom.getLocation().toFile();
+    if(file == null) {
+      return aquire();
+    }
+    return aquire(file);
+  }
+
   public PlexusContainer aquire(File basedir) throws Exception {
     File directory = computeMultiModuleProjectDirectory(basedir);
     if(directory == null) {
@@ -181,7 +193,7 @@ public class PlexusContainerManager {
 
   public IComponentLookup getComponentLookup() {
     try {
-      return new PlexusComponentLookup(aquire());
+      return wrap(aquire());
     } catch(Exception ex) {
       return new ExceptionalLookup(ex);
     }
@@ -189,7 +201,7 @@ public class PlexusContainerManager {
 
   public IComponentLookup getComponentLookup(File basedir) {
     try {
-      return new PlexusComponentLookup(aquire(basedir));
+      return wrap(aquire(basedir));
     } catch(Exception ex) {
       return new ExceptionalLookup(ex);
     }
@@ -308,7 +320,7 @@ public class PlexusContainerManager {
       container.setLoggerManager(loggerManager);
       thread.setContextClassLoader(container.getContainerRealm());
       MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
-          new PlexusComponentLookup(container), MavenPluginActivator.getDefault().getMaven());
+          wrap(container), MavenPluginActivator.getDefault().getMaven().getSettings());
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
@@ -392,5 +404,14 @@ public class PlexusContainerManager {
     }
     return null;
   }
+
+  /**
+   * @param container
+   * @return
+   */
+  public static IComponentLookup wrap(PlexusContainer container) {
+    return new PlexusComponentLookup(container);
+  }
+
 
 }
