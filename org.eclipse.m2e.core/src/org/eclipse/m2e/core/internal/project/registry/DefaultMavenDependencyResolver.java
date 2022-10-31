@@ -33,6 +33,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -62,11 +63,15 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
     ProjectBuildingRequest configuration = MavenExecutionContext.getThreadContext().newProjectBuildingRequest();
-    configuration.setProject(facade.getMavenProject()); // TODO do we need this?
+    configuration.setProject(facade.getMavenProject());
     configuration.setResolveDependencies(true);
-    MavenExecutionResult mavenResult = getMaven().readMavenProject(facade.getPomFile(), configuration);
 
-    markerManager.addMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID, mavenResult);
+    MavenExecutionResult projectResult = facade.createExecutionContext().execute((ctx, mon) -> {
+      IMavenToolbox toolbox = IMavenToolbox.of(ctx);
+      return toolbox.readMavenProject(facade.getPomFile(), configuration);
+    }, monitor);
+
+    markerManager.addMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID, projectResult);
 
     if(!facade.getResolverConfiguration().shouldResolveWorkspaceProjects()) {
       return;
@@ -79,7 +84,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
     // missing dependencies
     // should be added before dependencies from MavenProject#getArtifacts() since those
     // will be added with resolved flag set to true
-    DependencyResolutionResult resolutionResult = mavenResult.getDependencyResolutionResult();
+    DependencyResolutionResult resolutionResult = projectResult.getDependencyResolutionResult();
     if(resolutionResult != null && resolutionResult.getUnresolvedDependencies() != null) {
       for(Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
         org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();

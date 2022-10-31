@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -25,15 +26,20 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.DefaultMaven;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -62,6 +68,38 @@ public interface IMavenToolbox {
    *         lookup could be acquired
    */
   Optional<MavenSession> getSession();
+
+  /**
+   * Read the supplied pomfile as a project wi
+   * 
+   * @param pomFile the pom file, never <code>null</code>
+   * @param buildingRequest the building request
+   * @return the {@link ProjectBuildingResult}
+   * @throws CoreException
+   */
+  default MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest buildingRequest)
+      throws CoreException {
+    Objects.requireNonNull(pomFile);
+    IComponentLookup componentLookup = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP);
+    MavenExecutionResult result = new DefaultMavenExecutionResult();
+    try {
+      buildingRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      ProjectBuildingResult projectBuildingResult = componentLookup.lookup(ProjectBuilder.class).build(pomFile,
+          buildingRequest);
+      result.setProject(projectBuildingResult.getProject());
+      result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+    } catch(ProjectBuildingException ex) {
+      if(ex.getResults() != null && ex.getResults().size() == 1) {
+        ProjectBuildingResult projectBuildingResult = ex.getResults().get(0);
+        result.setProject(projectBuildingResult.getProject());
+        result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+      }
+      result.addException(ex);
+    } catch(RuntimeException e) {
+      result.addException(e);
+    }
+    return result;
+  }
 
   /**
    * Loads the maven standalone project, the default implementation of this requires a session and a lookup.
