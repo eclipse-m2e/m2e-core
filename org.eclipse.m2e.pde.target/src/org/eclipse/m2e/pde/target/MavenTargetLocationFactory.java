@@ -65,8 +65,8 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			} else {
 				for (int i = 0; i < dependencyLength; i++) {
 					Node item = dependencyNodeList.item(i);
-					if (item instanceof Element) {
-						dependencies.add(parseDependency((Element) item));
+					if (item instanceof Element element) {
+						dependencies.add(parseDependency(element));
 					}
 				}
 			}
@@ -74,8 +74,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			int repositoryLength = repositoryNodeList.getLength();
 			for (int i = 0; i < repositoryLength; i++) {
 				Node item = repositoryNodeList.item(i);
-				if (item instanceof Element) {
-					Element element = (Element) item;
+				if (item instanceof Element element) {
 					repositories
 							.add(new MavenTargetRepository(getText(MavenTargetLocation.ELEMENT_REPOSITORY_ID, element),
 									getText(MavenTargetLocation.ELEMENT_REPOSITORY_URL, element)));
@@ -89,8 +88,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			int instructionsLength = instructionsNodeList.getLength();
 			for (int i = 0; i < instructionsLength; i++) {
 				Node item = instructionsNodeList.item(i);
-				if (item instanceof Element) {
-					Element instructionElement = (Element) item;
+				if (item instanceof Element instructionElement) {
 					instructions.add(new BNDInstructions(
 							instructionElement.getAttribute(MavenTargetLocation.ATTRIBUTE_INSTRUCTIONS_REFERENCE),
 							instructionElement.getTextContent()));
@@ -99,14 +97,14 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			int excludesLength = excludesNodeList.getLength();
 			for (int i = 0; i < excludesLength; i++) {
 				Node item = excludesNodeList.item(i);
-				if (item instanceof Element) {
-					excludes.add(((Element) item).getTextContent());
+				if (item instanceof Element element) {
+					excludes.add(element.getTextContent());
 				}
 			}
 			NodeList featuresNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_FEATURE);
 
 			IFeature templateFeature = IntStream.range(0, featuresNodeList.getLength())
-					.mapToObj(index -> featuresNodeList.item(index)).map(DomXmlFeature::new).findFirst().orElse(null);
+					.mapToObj(featuresNodeList::item).map(DomXmlFeature::new).findFirst().orElse(null);
 
 			DependencyDepth dependencyDepth;
 			if (location.hasAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_DEPTH)) {

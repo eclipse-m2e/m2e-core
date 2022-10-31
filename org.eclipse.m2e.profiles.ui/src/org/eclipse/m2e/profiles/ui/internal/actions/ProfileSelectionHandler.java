@@ -100,8 +100,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     IProject[] projects = org.eclipse.m2e.core.ui.internal.actions.SelectionUtil.getProjects(selection, false);
     if(projects.length == 0) {
       IEditorInput input = HandlerUtil.getActiveEditorInput(event);
-      if(input instanceof IFileEditorInput) {
-        IFileEditorInput fileInput = (IFileEditorInput) input;
+      if(input instanceof IFileEditorInput fileInput) {
         projects = new IProject[] {fileInput.getFile().getProject()};
       }
     }

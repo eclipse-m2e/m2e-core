@@ -37,9 +37,6 @@ import org.eclipse.wst.sse.core.internal.provisional.INodeNotifier;
  */
 @SuppressWarnings("restriction")
 class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
-  /**
-     *
-     */
   private final EObject modelObject;
 
   private final EStructuralFeature feature;
@@ -62,9 +59,9 @@ class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
     if(resource.isProcessEvents()) {
       try {
         resource.setProcessEvents(false);
-        if(newValue instanceof Text) {
+        if(newValue instanceof Text text) {
           changedFeature = newValue;
-          newValue = ((Text) newValue).getData();
+          newValue = text.getData();
         }
         if(changedFeature instanceof Text) {
           if(null == newValue) {
@@ -84,8 +81,7 @@ class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
   @Override
   public void load() {
     Object value = getElementText(node);
-    if(feature instanceof EAttribute) {
-      EAttribute ea = (EAttribute) feature;
+    if(feature instanceof EAttribute ea) {
       value = EcoreUtil.createFromString(ea.getEAttributeType(), value.toString());
     }
 
@@ -120,8 +116,8 @@ class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
       int nChildren = children.getLength();
       for(int i = 0; i < nChildren; i++ ) {
         Node child = children.item(i);
-        if(child instanceof Text) {
-          String value = ((Text) child).getData();
+        if(child instanceof Text text) {
+          String value = text.getData();
           int oldIdx = value.indexOf(oldValue.toString());
           if(oldIdx > -1) {
             String replacement = value.substring(0, oldIdx) + newValue.toString()

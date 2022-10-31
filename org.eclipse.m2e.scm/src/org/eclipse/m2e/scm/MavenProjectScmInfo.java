@@ -71,18 +71,17 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
     return repositoryUrl;
   }
 
+  @Override
   public boolean equals(Object obj) {
-    if(obj instanceof MavenProjectScmInfo) {
-      MavenProjectScmInfo info = (MavenProjectScmInfo) obj;
-      return folderUrl.equals(info.getFolderUrl());
-    }
-    return false;
+    return obj instanceof MavenProjectScmInfo info && folderUrl.equals(info.getFolderUrl());
   }
 
+  @Override
   public int hashCode() {
     return folderUrl.hashCode();
   }
 
+  @Override
   public String toString() {
     return getLabel() + " " + folderUrl; //$NON-NLS-1$
   }

@@ -37,8 +37,7 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public boolean canEdit(ITargetDefinition target, TreePath treePath) {
 		Object root = treePath.getFirstSegment();
-		if (root instanceof MavenTargetLocation) {
-			MavenTargetLocation location = (MavenTargetLocation) root;
+		if (root instanceof MavenTargetLocation location) {
 			if (treePath.getSegmentCount() == 1) {
 				return true;
 			}
@@ -49,14 +48,12 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			// it must use generate mode
 			if (location.getMetadataMode() == MissingMetadataMode.GENERATE) {
 				// and the selected child must be a dependency node
-				if (lastSegment instanceof DependencyNode) {
-					DependencyNode node = (DependencyNode) lastSegment;
+				if (lastSegment instanceof DependencyNode node) {
 					MavenTargetBundle bundle = location.getMavenTargetBundle(node.getArtifact());
 					return bundle != null && bundle.isWrapped();
 				}
 				// or a target dependency
-				if (lastSegment instanceof MavenTargetDependency) {
-					MavenTargetDependency dependency = (MavenTargetDependency) lastSegment;
+				if (lastSegment instanceof MavenTargetDependency dependency) {
 					MavenTargetBundle bundle = location.getMavenTargetBundle(dependency);
 					return bundle != null && bundle.isWrapped();
 				}
@@ -68,27 +65,24 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public IWizard getEditWizard(ITargetDefinition target, TreePath treePath) {
 		Object root = treePath.getFirstSegment();
-		if (root instanceof MavenTargetLocation) {
-			MavenTargetLocation location = (MavenTargetLocation) root;
+		if (root instanceof MavenTargetLocation location) {
 			if (treePath.getSegmentCount() == 1) {
 				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location);
 				wizard.setTarget(target);
 				return wizard;
 			}
 			Object lastSegment = treePath.getLastSegment();
-			if (lastSegment instanceof MavenTargetDependency) {
-				MavenTargetDependency selectedRoot = (MavenTargetDependency) lastSegment;
+			if (lastSegment instanceof MavenTargetDependency selectedRoot) {
 				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location);
 				wizard.setTarget(target);
 				wizard.setSelectedRoot(selectedRoot);
 				return wizard;
 			}
-			if (lastSegment instanceof DependencyNode) {
-				DependencyNode node = (DependencyNode) lastSegment;
+			if (lastSegment instanceof DependencyNode node) {
 				return edit(target, location, node.getArtifact());
 			}
-			if (lastSegment instanceof MavenTargetDependency) {
-				MavenTargetBundle bundle = location.getMavenTargetBundle((MavenTargetDependency) lastSegment);
+			if (lastSegment instanceof MavenTargetDependency dependency) {
+				MavenTargetBundle bundle = location.getMavenTargetBundle(dependency);
 				if (bundle != null) {
 					return edit(target, location, bundle.getArtifact());
 				}
@@ -143,8 +137,7 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 				"", null);
 		for (TreePath treePath : treePaths) {
 			Object segment = treePath.getFirstSegment();
-			if (segment instanceof MavenTargetLocation) {
-				MavenTargetLocation targetLocation = (MavenTargetLocation) segment;
+			if (segment instanceof MavenTargetLocation targetLocation) {
 				try {
 					MavenTargetLocation update = targetLocation.update(monitor);
 					if (update == null) {
@@ -169,8 +162,8 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public IStatus reload(ITargetDefinition target, ITargetLocation[] targetLocations, IProgressMonitor monitor) {
 		for (ITargetLocation location : targetLocations) {
-			if (location instanceof MavenTargetLocation) {
-				((MavenTargetLocation) location).refresh();
+			if (location instanceof MavenTargetLocation mavenLocation) {
+				mavenLocation.refresh();
 			}
 
 		}
@@ -180,11 +173,9 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public boolean canDisable(ITargetDefinition target, TreePath treePath) {
 		Object segment = treePath.getFirstSegment();
-		if (segment instanceof MavenTargetLocation) {
-			MavenTargetLocation location = (MavenTargetLocation) segment;
+		if (segment instanceof MavenTargetLocation location) {
 			Object lastSegment = treePath.getLastSegment();
-			if (lastSegment instanceof DependencyNode) {
-				DependencyNode node = (DependencyNode) lastSegment;
+			if (lastSegment instanceof DependencyNode node) {
 				return !location.isExcluded(node.getArtifact());
 			}
 		}
@@ -194,11 +185,9 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 	@Override
 	public boolean canEnable(ITargetDefinition target, TreePath treePath) {
 		Object segment = treePath.getFirstSegment();
-		if (segment instanceof MavenTargetLocation) {
-			MavenTargetLocation location = (MavenTargetLocation) segment;
+		if (segment instanceof MavenTargetLocation location) {
 			Object lastSegment = treePath.getLastSegment();
-			if (lastSegment instanceof DependencyNode) {
-				DependencyNode node = (DependencyNode) lastSegment;
+			if (lastSegment instanceof DependencyNode node) {
 				return location.isExcluded(node.getArtifact());
 			}
 		}
@@ -222,11 +211,9 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 		ITargetLocation[] targetLocations = target.getTargetLocations();
 		for (TreePath treePath : treePaths) {
 			Object segment = treePath.getFirstSegment();
-			if (segment instanceof MavenTargetLocation) {
-				MavenTargetLocation mavenTargetLocation = (MavenTargetLocation) segment;
+			if (segment instanceof MavenTargetLocation mavenTargetLocation) {
 				Object lastSegment = treePath.getLastSegment();
-				if (lastSegment instanceof MavenTargetDependency) {
-					MavenTargetDependency mavenTargetDependency = (MavenTargetDependency) lastSegment;
+				if (lastSegment instanceof MavenTargetDependency mavenTargetDependency) {
 					for (int i = 0; i < targetLocations.length; i++) {
 						ITargetLocation location = targetLocations[i];
 						if (location == mavenTargetLocation) {
@@ -245,11 +232,9 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 		int toggled = 0;
 		for (TreePath treePath : treePaths) {
 			Object segment = treePath.getFirstSegment();
-			if (segment instanceof MavenTargetLocation) {
-				MavenTargetLocation location = (MavenTargetLocation) segment;
+			if (segment instanceof MavenTargetLocation location) {
 				Object lastSegment = treePath.getLastSegment();
-				if (lastSegment instanceof DependencyNode) {
-					DependencyNode node = (DependencyNode) lastSegment;
+				if (lastSegment instanceof DependencyNode node) {
 					location.setExcluded(node.getArtifact(), !location.isExcluded(node.getArtifact()));
 					target.setTargetLocations(target.getTargetLocations());
 					toggled++;

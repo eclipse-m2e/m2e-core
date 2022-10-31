@@ -31,8 +31,7 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof MavenTargetLocation) {
-			MavenTargetLocation location = (MavenTargetLocation) element;
+		if (element instanceof MavenTargetLocation location) {
 			String name = location.getLabel();
 			if (name != null && !name.isBlank()) {
 				return name;

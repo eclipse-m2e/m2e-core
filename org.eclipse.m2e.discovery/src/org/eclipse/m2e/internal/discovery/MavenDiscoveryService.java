@@ -153,7 +153,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
         IStatus status = catalog.performDiscovery(monitor);
 
         if(!status.isOK()) {
-          log.error(status.toString());
+          log.error("{}", status);
           return;
         }
 
@@ -240,8 +240,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
             .entrySet()) {
           if(entry.getValue() != null) {
             for(IPluginExecutionMetadata executionMapping : entry.getValue()) {
-              log.debug("mapping proposal {} => {}", entry.getKey().toString(), //$NON-NLS-1$
-                  executionMapping.getAction().toString());
+              log.debug("mapping proposal {} => {}", entry.getKey(), executionMapping.getAction());
               IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata) executionMapping).getSource());
               if(proposal != null) {
                 // assumes installation of mapping proposal installs all required project configurators
@@ -303,8 +302,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     if(src == null) {
       return null;
     }
-    if(src.getSource() instanceof CatalogItem) {
-      return new InstallCatalogItemMavenDiscoveryProposal((CatalogItem) src.getSource());
+    if(src.getSource() instanceof CatalogItem item) {
+      return new InstallCatalogItemMavenDiscoveryProposal(item);
     }
     return null;
   }
@@ -312,8 +311,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   private List<LifecycleMappingMetadataSource> toMetadataSources(List<IMavenDiscoveryProposal> proposals) {
     List<LifecycleMappingMetadataSource> sources = new ArrayList<>();
     for(IMavenDiscoveryProposal proposal : proposals) {
-      if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
-        CatalogItem catalogItem = ((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem();
+      if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal installProposal) {
+        CatalogItem catalogItem = installProposal.getCatalogItem();
         LifecycleMappingMetadataSource source = MavenDiscovery.getLifecycleMappingMetadataSource(catalogItem);
         source.setSource(catalogItem);
         sources.add(source);
@@ -325,12 +324,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   private void put(Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allproposals,
       ILifecycleMappingRequirement requirement, IMavenDiscoveryProposal proposal) {
 
-    List<IMavenDiscoveryProposal> proposals = allproposals.get(requirement);
-    if(proposals == null) {
-      proposals = new ArrayList<>();
-      allproposals.put(requirement, proposals);
-    }
-
+    List<IMavenDiscoveryProposal> proposals = allproposals.computeIfAbsent(requirement, r -> new ArrayList<>());
     if(!proposals.contains(proposal)) {
       proposals.add(proposal);
     }
@@ -361,8 +355,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     }
     Set<CatalogItem> items = new HashSet<>(proposals.size());
     for(IMavenDiscoveryProposal proposal : proposals) {
-      if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
-        items.add(((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem());
+      if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal installProposal) {
+        items.add(installProposal.getCatalogItem());
       }
     }
     return items;
@@ -372,6 +366,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     return new MavenDiscoveryService(false); // not a factory instance
   }
 
+  @Override
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
   }
 
@@ -405,25 +400,24 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       log.debug("Considering catalog item '{}'", item.getName()); //$NON-NLS-1$
       for(ILifecycleMappingRequirement requirement : requirements) {
         boolean matchFound = false;
-        if(requirement instanceof MojoExecutionMappingRequirement) {
-          MojoExecutionMappingRequirement meReq = ((MojoExecutionMappingRequirement) requirement);
+        if(requirement instanceof MojoExecutionMappingRequirement meReq) {
           MojoExecutionKey mek = meReq.getExecution();
           if(matchesFilter(src, mek, meReq.getPackaging())) {
             matchFound = true;
           }
-        } else if(requirement instanceof PackagingTypeMappingRequirement) {
-          String packaging = ((PackagingTypeMappingRequirement) requirement).packaging();
+        } else if(requirement instanceof PackagingTypeMappingRequirement packagingRequirement) {
+          String packaging = packagingRequirement.packaging();
           if(hasPackaging(src, packaging)) {
             matchFound = true;
           }
-        } else if(requirement instanceof LifecycleStrategyMappingRequirement) {
-          String mappingId = ((LifecycleStrategyMappingRequirement) requirement).getLifecycleMappingId();
+        } else if(requirement instanceof LifecycleStrategyMappingRequirement lifecycleRequirement) {
+          String mappingId = lifecycleRequirement.getLifecycleMappingId();
           if(itemEntry.getMappingStrategies().contains(mappingId)) {
             matchFound = true;
           }
 
-        } else if(requirement instanceof ProjectConfiguratorMappingRequirement) {
-          String configuratorId = ((ProjectConfiguratorMappingRequirement) requirement).configuratorId();
+        } else if(requirement instanceof ProjectConfiguratorMappingRequirement projectRequirement) {
+          String configuratorId = projectRequirement.configuratorId();
           if(itemEntry.getProjectConfigurators().contains(configuratorId)) {
             matchFound = true;
           }

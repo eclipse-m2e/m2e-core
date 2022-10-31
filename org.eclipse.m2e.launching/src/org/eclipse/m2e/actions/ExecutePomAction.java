@@ -109,8 +109,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         basedir = container;
       } else if(object instanceof IFile file) {
         basedir = file.getParent();
-      } else if(object instanceof IAdaptable) {
-        IAdaptable adaptable = (IAdaptable) object;
+      } else if(object instanceof IAdaptable adaptable) {
         Object adapter = adaptable.getAdapter(IProject.class);
         if(adapter != null) {
           basedir = (IContainer) adapter;

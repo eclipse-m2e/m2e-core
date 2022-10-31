@@ -196,11 +196,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof MavenTargetBundle) {
-			MavenTargetBundle other = (MavenTargetBundle) obj;
-			return getBundleInfo().equals(other.getBundleInfo());
-		}
-		return false;
+		return obj instanceof MavenTargetBundle other && getBundleInfo().equals(other.getBundleInfo());
 	}
 
 }

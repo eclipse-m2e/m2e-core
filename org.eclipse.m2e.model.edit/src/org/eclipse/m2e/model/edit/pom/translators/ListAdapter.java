@@ -63,10 +63,10 @@ public class ListAdapter extends TranslatorAdapter {
               idx = 0;
             list.add(idx, getObject(addedElement, true));
           }
-        } else if(INodeNotifier.REMOVE == eventType && oldValue instanceof Element) {
+        } else if(INodeNotifier.REMOVE == eventType && oldValue instanceof Element oldElement) {
           if(notifier == node) {
             // Remove the corresponding object from the model.
-            Object o = getObject((Element) oldValue, false);
+            Object o = getObject(oldElement, false);
             if(o instanceof String && o.toString().length() == 0) {
               // the removed oldValue has unfortunately no text value in it, so no way to identify the
               // remove entry.
@@ -76,8 +76,8 @@ public class ListAdapter extends TranslatorAdapter {
               list.clear();
               for(int i = 0; i < lst.getLength(); i++ ) {
                 Node nd = lst.item(i);
-                if(nd instanceof Element) {
-                  list.add(getElementText((Element) nd));
+                if(nd instanceof Element element) {
+                  list.add(getElementText(element));
                 }
               }
             } else if(o != null) {
@@ -88,8 +88,7 @@ public class ListAdapter extends TranslatorAdapter {
             // to remove. I don't think this can happen. -MDP
           }
         } else if(changedFeature instanceof Text && elementType == null) {
-          if(notifier != node && notifier instanceof Element) {
-            Element e = (Element) notifier;
+          if(notifier != node && notifier instanceof Element e) {
             int idx = absoluteIndexOf(node, e);
             if(idx < 0)
               idx = 0;
@@ -105,8 +104,7 @@ public class ListAdapter extends TranslatorAdapter {
 
   public void add(Object newValue, int position) {
     Object value = getElementValue(newValue);
-    if(value instanceof EObject) {
-      EObject eo = (EObject) value;
+    if(value instanceof EObject eo) {
       if(EcoreUtil.getAdapter(eo.eAdapters(), ModelObjectAdapter.class) == null) {
         String tagName = getElementName(newValue);
         Element newElement = node.getOwnerDocument().createElement(tagName);
@@ -206,8 +204,8 @@ public class ListAdapter extends TranslatorAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        list.add(getObject((Element) child, true));
+      if(child instanceof Element element) {
+        list.add(getObject(element, true));
       }
     }
   }

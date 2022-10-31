@@ -142,8 +142,8 @@ public class SSESyncResource extends ResourceImpl {
       }
     } catch(CoreException e) {
       // IOException can't wrap another exception before Java 6
-      if(e.getCause() != null && e.getCause() instanceof IOException) {
-        throw (IOException) e.getCause();
+      if(e.getCause() != null && e.getCause() instanceof IOException ioException) {
+        throw ioException;
       }
       throw new IOException(e.getMessage());
     }
@@ -220,8 +220,7 @@ public class SSESyncResource extends ResourceImpl {
         setProcessEvents(false);
         try {
           if(INodeNotifier.ADD == eventType) {
-            if(newValue instanceof Element) {
-              Element e = (Element) newValue;
+            if(newValue instanceof Element e) {
               if(doc.getDocumentElement().equals(e)) {
                 DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil.getExistingAdapter(pomModel,
                     DocumentAdapter.class);

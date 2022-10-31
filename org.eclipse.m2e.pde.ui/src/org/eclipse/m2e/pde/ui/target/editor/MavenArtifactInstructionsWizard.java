@@ -26,9 +26,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.pde.target.BNDInstructions;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -69,45 +66,19 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 				layoutData.heightHint = 100;
 				Link link = new Link(composite, SWT.NONE);
 				link.setText(String.format(Messages.MavenArtifactInstructionsWizard_4, BND_PAGE));
-				link.addSelectionListener(new SelectionListener() {
-
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						Program.launch(e.text);
-					}
-
-					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
-
-					}
-				});
+				link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> Program.launch(e.text)));
 				if (usedefaults) {
 					textField.setText(BNDInstructions.getDefaultInstructions().getInstructions());
 				} else {
 					textField.setText(instructions);
 				}
-				buttonInherit.addSelectionListener(new SelectionListener() {
-
-					@Override
-					public void widgetSelected(SelectionEvent e) {
+				buttonInherit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
 						boolean selection = buttonInherit.getSelection();
 						usedefaults = selection;
 						textField.setEnabled(!selection);
 						link.setEnabled(!selection);
-					}
-
-					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
-
-					}
-				});
-				textField.addModifyListener(new ModifyListener() {
-
-					@Override
-					public void modifyText(ModifyEvent e) {
-						instructions = textField.getText();
-					}
-				});
+				}));
+				textField.addModifyListener(e -> instructions = textField.getText());
 				buttonInherit.setSelection(usedefaults);
 				textField.setEnabled(!buttonInherit.getSelection());
 				link.setEnabled(!buttonInherit.getSelection());
@@ -117,8 +88,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 			@Override
 			public void performHelp() {
 				IWizardContainer container = getContainer();
-				if (container instanceof TrayDialog) {
-					TrayDialog dialog = (TrayDialog) container;
+				if (container instanceof TrayDialog dialog) {
 					DialogTray tray = dialog.getTray();
 					if (tray != null) {
 						dialog.closeTray();

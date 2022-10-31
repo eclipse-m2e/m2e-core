@@ -50,14 +50,17 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testEffectivePomRendersWithoutException() throws CoreException, IOException {
-		try (InputStream in = new ByteArrayInputStream(("<project>\n"
-				+ "  <modelVersion>4.0.0</modelVersion>\n"
-				+ "  <groupId>com.mycompany.app</groupId>\n"
-				+ "  <artifactId>my-app</artifactId>\n"
-				+ "  <version>1</version>\n"
-				+ "</project>").getBytes())) {
+		try (InputStream in = new ByteArrayInputStream("""
+				<project>
+				  <modelVersion>4.0.0</modelVersion>
+				  <groupId>com.mycompany.app</groupId>
+				  <artifactId>my-app</artifactId>
+				  <version>1</version>
+				</project>""".getBytes())) {
 			IProject project = createProject("basic", in);
-			MavenPomEditor editor = (MavenPomEditor) IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), new FileEditorInput(project.getFile("pom.xml")), MavenPomEditor.EDITOR_ID);
+			MavenPomEditor editor = (MavenPomEditor) IDE.openEditor(
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(),
+					new FileEditorInput(project.getFile("pom.xml")), MavenPomEditor.EDITOR_ID);
 			boolean[] done = { false };
 			Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
 				@Override
@@ -68,18 +71,20 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 				}
 			});
 			List<IStatus> allStatus = new ArrayList<>();
-			Platform.getLog(Platform.getBundle("org.eclipse.text")).addLogListener((status, plugin) -> allStatus.add(status));
+			Platform.getLog(Platform.getBundle("org.eclipse.text"))
+					.addLogListener((status, plugin) -> allStatus.add(status));
 			editor.loadEffectivePOM();
 			ITextEditor effectivePomEditor = editor.getEffectivePomSourcePage();
 			assertTrue(DisplayHelper.waitForCondition(Display.getDefault(), 3000, () -> done[0]));
 			assertEquals(List.of(), allStatus);
-			IDocument document = effectivePomEditor.getDocumentProvider().getDocument(effectivePomEditor.getEditorInput());
+			IDocument document = effectivePomEditor.getDocumentProvider()
+					.getDocument(effectivePomEditor.getEditorInput());
 			String docText = document.get();
 			assertTrue(docText.contains("my-app"));
 			assertFalse(docText.contains("Loading"));
 		}
 	}
-	
+
 	@Test
 	public void testOpenPomEditor() throws Exception {
 		IProject project = null;
@@ -91,9 +96,10 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 			refreshMavenProject(project);
 		}
 		waitForJobsToComplete();
-		MavenPomEditor editor = (MavenPomEditor) new OpenPomAction().openPomEditor("org.apache.commons", "commons-math3", "3.2", MavenPlugin.getMavenProjectRegistry().getProject(project).getMavenProject(),
+		MavenPomEditor editor = (MavenPomEditor) new OpenPomAction().openPomEditor("org.apache.commons",
+				"commons-math3", "3.2", MavenPlugin.getMavenProjectRegistry().getProject(project).getMavenProject(),
 				new NullProgressMonitor());
- 		assertNotEquals(-1, editor.getActivePage());
+		assertNotEquals(-1, editor.getActivePage());
 	}
 
 	@Test
@@ -108,7 +114,8 @@ public class M2EEditorTest extends AbstractMavenProjectTestCase {
 		IEditorPart editor = IDE.openEditor(page, project.getFile("pom.xml"));
 		assertTrue(editor instanceof MavenPomEditor);
 		assertEquals(1, page.getEditorReferences().length);
- 		project.getFile("pom.xml").delete(true, null);
- 		assertTrue(DisplayHelper.waitForCondition(Display.getDefault(), 5000, () -> page.getEditorReferences().length == 0));
+		project.getFile("pom.xml").delete(true, null);
+		assertTrue(DisplayHelper.waitForCondition(Display.getDefault(), 5000,
+				() -> page.getEditorReferences().length == 0));
 	}
 }
