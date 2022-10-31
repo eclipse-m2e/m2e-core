@@ -138,13 +138,18 @@ public interface IMaven extends IComponentLookup {
 
   /**
    * @since 1.4
+   * @Deprecated use {@link IMavenProjectFacade#calculateExecutionPlan(Collection, IProgressMonitor)} or
+   *             {@link IMavenProjectFacade#setupExecutionPlan(Collection, IProgressMonitor)} instead
    */
+  @Deprecated(forRemoval = true)
   MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.4
+   * @deprecated only used internally
    */
+  @Deprecated(forRemoval = true)
   MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException;
 

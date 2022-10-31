@@ -378,8 +378,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 					if (projectRealm != null && projectRealm != originalTCL) {
 						Thread.currentThread().setContextClassLoader(projectRealm);
 					}
-					MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProject, List.of("package"),
-							true, monitor);
+					MavenExecutionPlan executionPlan = mavenFacade.setupExecutionPlan(List.of("package"), monitor);
 					MojoExecution mojoExecution = getExecution(executionPlan, getExecutionKey());
 					if (mojoExecution == null) {
 						return null;

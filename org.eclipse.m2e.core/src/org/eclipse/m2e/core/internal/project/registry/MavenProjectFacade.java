@@ -33,13 +33,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.DefaultLifecycles;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -49,6 +54,8 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -419,10 +426,55 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     MavenProject mavenProject = getMavenProject(monitor);
     Map<String, List<MojoExecution>> executionPlans = getContextValue(mavenProject, CTX_EXECUTION_PLANS);
     if(executionPlans == null) {
-      executionPlans = manager.calculateExecutionPlans(pom, mavenProject, monitor);
+      executionPlans = calculateExecutionPlans(mavenProject, monitor);
       mavenProject.setContextValue(CTX_EXECUTION_PLANS, executionPlans);
     }
     return executionPlans;
+  }
+
+  /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProject mavenProject,
+      IProgressMonitor monitor) {
+    //TODO is there a way to lookup them instead of hardocde them here?
+    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<>();
+    executionPlans.put(ProjectRegistryManager.LIFECYCLE_CLEAN,
+        calculateExecutionPlan(mavenProject, List.of(ProjectRegistryManager.LIFECYCLE_CLEAN), false, monitor)
+            .getMojoExecutions());
+    executionPlans.put(ProjectRegistryManager.LIFECYCLE_DEFAULT,
+        calculateExecutionPlan(mavenProject, List.of(ProjectRegistryManager.LIFECYCLE_DEFAULT), false, monitor)
+            .getMojoExecutions());
+    executionPlans.put(ProjectRegistryManager.LIFECYCLE_SITE,
+        calculateExecutionPlan(mavenProject, List.of(ProjectRegistryManager.LIFECYCLE_SITE), false, monitor)
+            .getMojoExecutions());
+    return executionPlans;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#calculateExecutionPlan(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  @Override
+  public MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, IProgressMonitor monitor) {
+    return calculateExecutionPlan(getMavenProject(), tasks, false, monitor);
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#setupExecutionPlan(java.util.Collection, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  @Override
+  public MavenExecutionPlan setupExecutionPlan(Collection<String> tasks, IProgressMonitor monitor) {
+    return calculateExecutionPlan(getMavenProject(), tasks, true, monitor);
+  }
+
+  private MavenExecutionPlan calculateExecutionPlan(MavenProject mavenProject, Collection<String> tasks, boolean setup,
+      IProgressMonitor monitor) {
+    try {
+      return createExecutionContext().execute(mavenProject, (ctx, mon) -> {
+        IMavenToolbox toolbox = IMavenToolbox.of(ctx);
+        return toolbox.calculateExecutionPlan(tasks, setup);
+      }, monitor);
+    } catch(CoreException e) {
+      manager.getMarkerManager().addErrorMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, e);
+    }
+    return new MavenExecutionPlan(List.of(), new DefaultLifecycles());
   }
 
   @SuppressWarnings("unchecked")
@@ -453,13 +505,37 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     if(execution == null) {
       for(MojoExecution _execution : getMojoExecutions(monitor)) {
         if(match(mojoExecutionKey, _execution)) {
-          execution = manager.setupMojoExecution(this, _execution, monitor);
+          execution = setupMojoExecution(this, _execution, monitor);
           break;
         }
       }
       putSetupMojoExecution(setupMojoExecutions, mojoExecutionKey, execution);
     }
     return execution;
+  }
+
+  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
+
+    MavenProject mavenProject = getMavenProject(monitor);
+    MojoExecution clone = new MojoExecution(mojoExecution.getPlugin(), mojoExecution.getGoal(),
+        mojoExecution.getExecutionId());
+    clone.setMojoDescriptor(mojoExecution.getMojoDescriptor());
+    if(mojoExecution.getConfiguration() != null) {
+      clone.setConfiguration(new Xpp3Dom(mojoExecution.getConfiguration()));
+    }
+    clone.setLifecyclePhase(mojoExecution.getLifecyclePhase());
+    createExecutionContext().execute(mavenProject, (ctx, mon) -> {
+      LifecycleExecutionPlanCalculator executionPlanCalculator = ctx.getComponentLookup()
+          .lookup(LifecycleExecutionPlanCalculator.class);
+      try {
+        executionPlanCalculator.setupMojoExecution(ctx.getSession(), mavenProject, clone);
+      } catch(Exception ex) {
+        throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
+      }
+      return null;
+    }, monitor);
+    return clone;
   }
 
   private boolean match(MojoExecutionKey key, MojoExecution mojoExecution) {
@@ -491,7 +567,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
           Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
           MojoExecution execution = setupMojoExecutions.get(_key);
           if(execution == null) {
-            execution = manager.setupMojoExecution(this, _execution, monitor);
+            execution = setupMojoExecution(this, _execution, monitor);
             putSetupMojoExecution(setupMojoExecutions, _key, execution);
           }
           result.add(execution);

@@ -18,15 +18,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.io.ModelReader;
@@ -62,6 +66,17 @@ public interface IMavenToolbox {
    *         lookup could be acquired
    */
   Optional<MavenSession> getSession();
+
+  default MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, boolean setup) throws CoreException {
+    MavenSession session = getSession().orElseThrow(ERROR_NO_SESSION);
+    IComponentLookup componentLookup = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP);
+    LifecycleExecutor lifecycleExecutor = componentLookup.lookup(LifecycleExecutor.class);
+    try {
+      return lifecycleExecutor.calculateExecutionPlan(session, setup, tasks.toArray(String[]::new));
+    } catch(Exception e) {
+      throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_calc_build_plan, e.getMessage()), e));
+    }
+  }
 
   /**
    * Loads the maven standalone project, the default implementation of this requires a session and a lookup.
