@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,13 +74,11 @@ import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.plugin.ExtensionRealmCache;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
@@ -770,26 +767,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return result;
   }
 
-  /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
-      IProgressMonitor monitor) {
-    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<>();
-    executionPlans.put(LIFECYCLE_CLEAN, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_CLEAN, monitor));
-    executionPlans.put(LIFECYCLE_DEFAULT, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_DEFAULT, monitor));
-    executionPlans.put(LIFECYCLE_SITE, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_SITE, monitor));
-    return executionPlans;
-  }
-
-  private List<MojoExecution> calculateExecutionPlan(IFile pom, MavenProject mavenProject, String lifecycle,
-      IProgressMonitor monitor) {
-    List<MojoExecution> mojoExecutions = null;
-    try {
-      MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProject, Arrays.asList(lifecycle), false,
-          monitor);
-      return executionPlan.getMojoExecutions();
-    } catch(CoreException e) {
-      markerManager.addErrorMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, e);
-    }
-    return mojoExecutions;
+  /**
+   * @return Returns the markerManager.
+   */
+  IMavenMarkerManager getMarkerManager() {
+    return this.markerManager;
   }
 
   public IFile getModulePom(IFile pom, String moduleName) {
@@ -998,12 +980,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   PlexusContainerManager getContainerManager() {
     return this.containerManager;
-  }
-
-  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws CoreException {
-    MavenProject mavenProject = getMavenProject(projectFacade, monitor);
-    return maven.setupMojoExecution(mavenProject, mojoExecution, monitor);
   }
 
   private <V> V execute(IProjectRegistry state, IFile pom, ResolverConfiguration resolverConfiguration,

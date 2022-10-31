@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -144,6 +146,10 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
    */
   MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException;
+
+  MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, IProgressMonitor monitor);
+
+  MavenExecutionPlan setupExecutionPlan(Collection<String> tasks, IProgressMonitor monitor);
 
   /**
    * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided groupId,
