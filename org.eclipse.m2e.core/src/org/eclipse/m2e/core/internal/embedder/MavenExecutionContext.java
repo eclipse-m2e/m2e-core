@@ -29,6 +29,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -36,8 +37,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
+import org.apache.maven.DefaultMaven;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -64,9 +67,9 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.Settings;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -89,7 +92,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private static final ThreadLocal<Deque<MavenExecutionContext>> threadLocal = new ThreadLocal<>();
 
-  private final MavenImpl maven;
+  private final PlexusContainer container;
 
   private MavenExecutionRequest request;
 
@@ -100,8 +103,11 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private IMavenProjectFacade projectFacade;
 
-  public MavenExecutionContext(MavenImpl maven, IMavenProjectFacade projectFacade) {
-    this.maven = maven;
+  private IComponentLookup containerLookup;
+
+  public MavenExecutionContext(PlexusContainer container, IMavenProjectFacade projectFacade) {
+    this.container = container;
+    this.containerLookup = PlexusContainerManager.wrap(container);
     this.projectFacade = projectFacade;
     if(projectFacade != null) {
       File basedir;
@@ -139,7 +145,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       request = DefaultMavenExecutionRequest.copy(parent);
     }
     if(request == null) {
-      request = createExecutionRequest(maven.getMavenConfiguration(), maven, maven);
+      request = createExecutionRequest(IMavenConfiguration.getWorkspaceConfiguration(),
+          PlexusContainerManager.wrap(container), MavenPlugin.getMaven().getSettings());
       request.setBaseDirectory(basedir);
     }
     request.setMultiModuleProjectDirectory(PlexusContainerManager.computeMultiModuleProjectDirectory(basedir));
@@ -147,9 +154,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     return request;
   }
 
-  static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration,
-      IComponentLookup lookup, IMaven maven)
-      throws CoreException {
+  static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration, IComponentLookup lookup,
+      Settings settings) throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
     // this causes problems with unexpected "stale project configuration" error markers
@@ -165,7 +171,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
     request.setUserSettingsFile(userSettingsFile);
 
-    Settings settings = maven.getSettings(); //TODO if we could adapt IMavenConfiguration -> Settings we could save the IMaven reference here 
     //and settings are actually derived from IMavenConfiguration
     try {
       request = lookup.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, settings);
@@ -231,30 +236,32 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       if(request == null) {
         request = newExecutionRequest();
       }
+
       try {
-        maven.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
+        containerLookup.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       } catch(MavenExecutionRequestPopulationException ex) {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_config, ex));
       }
       populateSystemProperties(request);
       setValue(CTX_LOCALREPOSITORY, request.getLocalRepository());
-      final FilterRepositorySystemSession repositorySession = maven.createRepositorySession(request);
+      final FilterRepositorySystemSession repositorySession = createRepositorySession(request,
+          MavenPlugin.getMavenConfiguration(), containerLookup);
       setValue(CTX_REPOSITORYSESSION, repositorySession);
       if(parent != null) {
         repositorySession.setData(parent.getRepositorySession().getData());
       }
       final MavenExecutionResult result = new DefaultMavenExecutionResult();
-      setValue(CTX_MAVENSESSION, new MavenSession(maven.getPlexusContainer(), repositorySession, request, result));
+      setValue(CTX_MAVENSESSION, new MavenSession(container, repositorySession, request, result));
     }
 
-    final LegacySupport legacySupport = maven.lookup(LegacySupport.class);
+    final LegacySupport legacySupport = containerLookup.lookup(LegacySupport.class);
     final MavenSession origLegacySession = legacySupport.getSession(); // TODO validate == origSession
 
     stack.push(this);
 
     final MavenSession session = getSession();
     legacySupport.setSession(session);
-    final SessionScope sessionScope = maven.lookup(SessionScope.class);
+    final SessionScope sessionScope = containerLookup.lookup(SessionScope.class);
     sessionScope.enter();
     sessionScope.seed(MavenSession.class, session);
 
@@ -275,7 +282,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   @Override
   public void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
     execute(project, (context, pm) -> {
-      executeMojo(context.getSession(), execution);
+      executeMojo(context.getSession(), execution, context.getComponentLookup());
       return null;
     }, monitor);
   }
@@ -285,12 +292,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     try {
       return execute((innerContext, monitor) -> {
 
-        EventSpyDispatcher eventSpyDispatcher = maven.lookup(EventSpyDispatcher.class);
+        IComponentLookup componentLookup = innerContext.getComponentLookup();
+        EventSpyDispatcher eventSpyDispatcher = componentLookup.lookup(EventSpyDispatcher.class);
         try {
           //notify about the start of the request ...
           eventSpyDispatcher.onEvent(request);
           //execute the request
-          MavenExecutionResult result = maven.lookup(Maven.class).execute(request);
+          MavenExecutionResult result = componentLookup.lookup(Maven.class).execute(request);
           // notify about the results
           eventSpyDispatcher.onEvent(result);
           return result;
@@ -304,7 +312,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
   }
 
-  private void executeMojo(MavenSession session, MojoExecution execution) {
+  private static void executeMojo(MavenSession session, MojoExecution execution, IComponentLookup lookup) {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
     Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
     for(MavenProject project : session.getProjects()) {
@@ -312,10 +320,10 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
     }
     try {
-      MojoExecutor mojoExecutor = maven.lookup(MojoExecutor.class);
+      MojoExecutor mojoExecutor = lookup.lookup(MojoExecutor.class);
       DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(execution));
       mojoExecutor.ensureDependenciesAreResolved(execution.getMojoDescriptor(), session, dependencyContext);
-      maven.lookup(BuildPluginManager.class).executeMojo(session, execution);
+      lookup.lookup(BuildPluginManager.class).executeMojo(session, execution);
     } catch(Exception ex) {
       session.getResult().addException(ex);
     } finally {
@@ -331,11 +339,12 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
   }
 
-  private <V> V executeBare(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
+  private <V> V executeBare(MavenProject project, ICallable<V> callable, IProgressMonitor monitor)
+      throws CoreException {
     final MavenSession mavenSession = getSession();
     final FilterRepositorySystemSession repositorySession = getRepositorySession();
-    final TransferListener origTransferListener = repositorySession.setTransferListener(maven
-        .createArtifactTransferListener(monitor));
+    final TransferListener origTransferListener = repositorySession
+        .setTransferListener(new ArtifactTransferListenerAdapter(monitor));
     final MavenProject origProject = mavenSession.getCurrentProject();
     final List<MavenProject> origProjects = mavenSession.getProjects();
     final ClassLoader origTCCL = Thread.currentThread().getContextClassLoader();
@@ -476,7 +485,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       throw new IllegalStateException();
     }
     if(projectFacade == null) {
-      return maven;
+      return containerLookup;
     }
     IComponentLookup projectComponentLookup = projectFacade.getComponentLookup();
     MavenProject mavenProject = projectFacade.getMavenProject();
@@ -518,5 +527,12 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     };
   }
 
+  static FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request,
+      IMavenConfiguration configuration, IComponentLookup lookup) throws CoreException {
+    DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup
+        .lookup(Maven.class)).newRepositorySession(request);
+    String updatePolicy = configuration.getGlobalUpdatePolicy();
+    return new FilterRepositorySystemSession(session, request.isUpdateSnapshots() ? null : updatePolicy);
+  }
 
 }

@@ -51,7 +51,6 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -551,7 +550,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IMavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext((MavenImpl) getMaven(), this);
+    try {
+      return new MavenExecutionContext(manager.getContainerManager().aquire(getPomFile()), this);
+    } catch(Exception ex) {
+      throw new RuntimeException("Aquire container failed!", ex);
+    }
   }
 
   @Override
@@ -599,14 +602,4 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     };
   }
 
-
-  /**
-   * Gets an access to a (possibly project specific) {@link IMaven} instance, this is the same instance that is used to
-   * create new {@link IMavenExecutionContext}s see {@link #createExecutionContext()}
-   * 
-   * @return a Maven instance, configured according to this project
-   */
-  private IMaven getMaven() {
-    return manager.getMaven();
-  }
 }

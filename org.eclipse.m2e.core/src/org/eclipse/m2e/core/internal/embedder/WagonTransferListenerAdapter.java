@@ -26,8 +26,8 @@ import org.apache.maven.wagon.repository.Repository;
  */
 final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter implements TransferListener {
 
-  WagonTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
-    super(maven, monitor);
+  WagonTransferListenerAdapter(IProgressMonitor monitor) {
+    super(monitor);
   }
 
   @Override

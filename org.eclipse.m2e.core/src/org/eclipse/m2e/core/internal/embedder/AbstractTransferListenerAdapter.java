@@ -36,8 +36,6 @@ import org.eclipse.m2e.core.internal.Messages;
 abstract class AbstractTransferListenerAdapter {
   private static final Logger log = LoggerFactory.getLogger(AbstractTransferListenerAdapter.class);
 
-  protected final MavenImpl maven;
-
   protected final IProgressMonitor monitor;
 
   //The same TransferListener monitors parallel downloads
@@ -46,8 +44,7 @@ abstract class AbstractTransferListenerAdapter {
   private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte,
       Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};
 
-  protected AbstractTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
-    this.maven = maven;
+  protected AbstractTransferListenerAdapter(IProgressMonitor monitor) {
     this.monitor = IProgressMonitor.nullSafe(monitor);
   }
 

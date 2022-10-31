@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.execution.MavenExecutionRequest;
 
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+
 
 /**
  * IMavenConfiguration
@@ -126,5 +128,9 @@ public interface IMavenConfiguration {
    * @return whether to use null as scheduling rule for builder.
    */
   boolean buildWithNullSchedulingRule();
+
+  static IMavenConfiguration getWorkspaceConfiguration() {
+    return MavenPluginActivator.getDefault().getMavenConfiguration();
+  }
 
 }

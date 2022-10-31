@@ -45,13 +45,11 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
-import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -72,8 +70,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import org.apache.maven.DefaultMaven;
-import org.apache.maven.Maven;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -203,18 +199,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    */
   IMavenConfiguration getMavenConfiguration() {
     return this.mavenConfiguration;
-  }
-
-  FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
-    try {
-      DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup(Maven.class))
-          .newRepositorySession(request);
-      String updatePolicy = getMavenConfiguration().getGlobalUpdatePolicy();
-      return new FilterRepositorySystemSession(session, request.isUpdateSnapshots() ? null : updatePolicy);
-    } catch(CoreException ex) {
-      log.error(ex.getMessage(), ex);
-      throw new IllegalStateException("Could not look up Maven embedder", ex);
-    }
   }
 
   @Override
@@ -427,7 +411,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
         configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-        configuration.setRepositorySession(createRepositorySession(request));
+        configuration.setRepositorySession(
+            MavenExecutionContext.createRepositorySession(request, getMavenConfiguration(), this));
         return lookup(ProjectBuilder.class).build(pomFile, configuration).getProject();
       } catch(ProjectBuildingException | MavenExecutionRequestPopulationException ex) {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_project, ex));
@@ -965,14 +950,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return localRepositoryListeners;
   }
 
-  public WagonTransferListenerAdapter createTransferListener(IProgressMonitor monitor) {
-    return new WagonTransferListenerAdapter(this, monitor);
-  }
-
-  public TransferListener createArtifactTransferListener(IProgressMonitor monitor) {
-    return new ArtifactTransferListenerAdapter(this, monitor);
-  }
-
   public PlexusContainer getPlexusContainer() throws CoreException {
     try {
       return containerManager.aquire();
@@ -1095,7 +1072,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-    return new MavenExecutionContext(this, (IMavenProjectFacade) null);
+    try {
+      return new MavenExecutionContext(containerManager.aquire(), (IMavenProjectFacade) null);
+    } catch(Exception ex) {
+      throw new RuntimeException(Messages.MavenImpl_error_init_maven, ex);
+    }
   }
 
 }
