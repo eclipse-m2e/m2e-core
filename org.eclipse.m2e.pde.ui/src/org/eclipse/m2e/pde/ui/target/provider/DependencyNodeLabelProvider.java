@@ -43,8 +43,7 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		if (element instanceof DependencyNode) {
-			DependencyNode node = (DependencyNode) element;
+		if (element instanceof DependencyNode node) {
 			Artifact artifact = node.getArtifact();
 			MavenTargetLocation location = getTargetLocation(node);
 			String baseLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + " (" + artifact.getVersion()
@@ -65,10 +64,10 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 
 	private MavenTargetLocation getTargetLocation(DependencyNode node) {
 		Object object = node.getData().get(MavenTargetLocation.DEPENDENCYNODE_PARENT);
-		if (object instanceof DependencyNode) {
-			return getTargetLocation((DependencyNode) object);
-		} else if (object instanceof MavenTargetLocation) {
-			return (MavenTargetLocation) object;
+		if (object instanceof DependencyNode dependency) {
+			return getTargetLocation(dependency);
+		} else if (object instanceof MavenTargetLocation location) {
+			return location;
 		} else {
 			return null;
 		}
@@ -76,8 +75,7 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof DependencyNode) {
-			DependencyNode node = (DependencyNode) element;
+		if (element instanceof DependencyNode node) {
 			MavenTargetLocation location = getTargetLocation(node);
 			if (location != null) {
 				if (location.isExcluded(node.getArtifact())) {

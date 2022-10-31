@@ -63,9 +63,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
 
   @Override
   public String toString() {
-	  StringBuilder sb = new StringBuilder(
-        "\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    return sb.toString();
+    return "\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId();
   }
 
   public String getGroupId() {
@@ -100,10 +98,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
   }
 
   private int fieldHash(Object field) {
-    if(field == null) {
-      return SEED;
-    }
-    return field.hashCode();
+    return field == null ? SEED : field.hashCode();
   }
 
   /**
@@ -113,10 +108,9 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
   public boolean equals(Object artifact) {
     if(this == artifact) {
       return true;
-    } else if(!(artifact instanceof IndexedArtifact)) {
+    } else if(!(artifact instanceof IndexedArtifact other)) {
       return false;
     } else {
-      IndexedArtifact other = (IndexedArtifact) artifact;
       return fieldsEqual(this.getGroupId(), other.getGroupId())
           && fieldsEqual(this.getArtifactId(), other.getArtifactId())
           && fieldsEqual(this.getPackageName(), other.getPackageName())
@@ -131,7 +125,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
 
   @Override
   public int compareTo(IndexedArtifact o) {
-    if(this.equals(o))
+    if(equals(o))
       return 0;
     int comparison = 0;
     if(group != null && (comparison = group.compareTo(o.getGroupId())) != 0)

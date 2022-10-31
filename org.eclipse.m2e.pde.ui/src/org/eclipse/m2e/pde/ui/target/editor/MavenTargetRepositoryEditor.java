@@ -19,8 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -99,20 +97,16 @@ public class MavenTargetRepositoryEditor extends Dialog {
 		tableViewer.getTable().setLinesVisible(true);
 		MenuManager contextMenu = new MenuManager();
 		contextMenu.setRemoveAllWhenShown(true);
-		contextMenu.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(IMenuManager manager) {
-				Object selected = tableViewer.getStructuredSelection().getFirstElement();
-				if (selected instanceof MavenTargetRepository) {
-					MavenTargetRepository repository = (MavenTargetRepository) selected;
-					manager.add(new Action("Delete") {
-						@Override
-						public void run() {
-							editList.remove(repository);
-							tableViewer.refresh();
-						}
-					});
-				}
+		contextMenu.addMenuListener(manager -> {
+			Object selected = tableViewer.getStructuredSelection().getFirstElement();
+			if (selected instanceof MavenTargetRepository repository) {
+				manager.add(new Action("Delete") {
+					@Override
+					public void run() {
+						editList.remove(repository);
+						tableViewer.refresh();
+					}
+				});
 			}
 		});
 

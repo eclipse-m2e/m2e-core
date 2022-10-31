@@ -53,27 +53,15 @@ public class InstallCatalogItemMavenDiscoveryProposal implements IMavenDiscovery
     if(obj == this) {
       return true;
     }
-
-    if(!(obj instanceof InstallCatalogItemMavenDiscoveryProposal)) {
-      return false;
-    }
-
-    InstallCatalogItemMavenDiscoveryProposal other = (InstallCatalogItemMavenDiscoveryProposal) obj;
-
-    return item.getSiteUrl().equals(other.item.getSiteUrl())
+    return obj instanceof InstallCatalogItemMavenDiscoveryProposal other
+        && item.getSiteUrl().equals(other.item.getSiteUrl())
         && item.getInstallableUnits().equals(other.item.getInstallableUnits());
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal#getDescription()
-   */
   public String getDescription() {
     return item.getOverview() == null ? "" : item.getOverview().getSummary();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal#getLicense()
-   */
   public String getLicense() {
     return item.getLicense();
   }

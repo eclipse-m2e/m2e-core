@@ -51,16 +51,14 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
   @Override
   public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if(adapterType == IMavenExecutableLocation.class) {
-      if(adaptableObject instanceof IFile) {
-        IFile file = (IFile) adaptableObject;
+      if(adaptableObject instanceof IFile file) {
         if(file.getName().equalsIgnoreCase(IMavenConstants.POM_FILE_NAME)) {
           return adapterType.cast(getFacadeForPom(file));
         }
         //TODO not a pom file, but actually pom files can have any name...
         return null;
       }
-      if(adaptableObject instanceof IContainer) {
-        IContainer container = (IContainer) adaptableObject;
+      if(adaptableObject instanceof IContainer container) {
         IMavenExecutableLocation facade = Optional.of(container.getLocation())//
             .map(IPath::toFile)//
             .flatMap(basedir -> {
@@ -92,8 +90,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
     }
 
     IContainer parent = file.getParent();
-    if(parent instanceof IProject) {
-      IProject project = (IProject) parent;
+    if(parent instanceof IProject project) {
       //a direct child of a project, lets check if the project itself could be used...
       IMavenProjectFacade mavenProjectFacade = mavenProjectRegistry.getProject(project);
       if(mavenProjectFacade != null) {

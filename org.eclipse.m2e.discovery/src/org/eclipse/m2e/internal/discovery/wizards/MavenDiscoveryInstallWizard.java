@@ -80,8 +80,7 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
   private void workaroundBug348660() {
     for(IWizardPage page : getPages()) {
-      if(page instanceof AcceptLicensesWizardPage) {
-        AcceptLicensesWizardPage licensePage = (AcceptLicensesWizardPage) page;
+      if(page instanceof AcceptLicensesWizardPage licensePage) {
         licensePage.update(ElementUtils.elementsToIUs(planSelections).toArray(new IInstallableUnit[0]), operation);
       }
     }

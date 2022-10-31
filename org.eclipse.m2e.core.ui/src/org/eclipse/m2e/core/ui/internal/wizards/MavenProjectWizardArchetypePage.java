@@ -863,11 +863,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
 
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      if(!(element instanceof Archetype)) {
+      if(!(element instanceof Archetype archetype)) {
         return false;
       }
 
-      Archetype archetype = (Archetype) element;
       String version = archetype.getVersion();
 
       if(!includeSnapshots && isSnapshotVersion(version)) {

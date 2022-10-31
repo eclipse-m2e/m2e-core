@@ -73,8 +73,7 @@ public class PropertiesAdapter extends ListAdapter {
             }
           }
         } else if(changedFeature instanceof Text) {
-          if(notifier != node && notifier instanceof Element) {
-            Element e = (Element) notifier;
+          if(notifier != node && notifier instanceof Element e) {
             String name = e.getLocalName();
             for(PropertyElement prop : properties) {
               if(name.equals(prop.getName())) {
@@ -112,6 +111,7 @@ public class PropertiesAdapter extends ListAdapter {
     ((IDOMNode) newElement).addAdapter(this);
   }
 
+  @Override
   public void remove(Object oldValue, int position) {
     if(position == -1)
       position = 0;
@@ -146,8 +146,8 @@ public class PropertiesAdapter extends ListAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        properties.add(createObject((Element) child));
+      if(child instanceof Element element) {
+        properties.add(createObject(element));
       }
 
     }

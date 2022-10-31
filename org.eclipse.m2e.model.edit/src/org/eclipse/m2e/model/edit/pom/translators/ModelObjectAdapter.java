@@ -142,8 +142,8 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
             int removePosition = notification.getPosition();
             int removeIdx = removePosition;
             for(Object object : removeMany) {
-              removeManyListAdapter.remove(object, removePosition == Notification.NO_INDEX ? Notification.NO_INDEX
-                  : removeIdx);
+              removeManyListAdapter.remove(object,
+                  removePosition == Notification.NO_INDEX ? Notification.NO_INDEX : removeIdx);
               removeIdx++ ;
             }
             break;
@@ -174,8 +174,8 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
       if(feature.isMany()) {
         EClass elementType = null;
-        if(feature instanceof EReference) {
-          elementType = ((EReference) feature).getEReferenceType();
+        if(feature instanceof EReference reference) {
+          elementType = reference.getEReferenceType();
         }
 
         if(elementType != null
@@ -184,8 +184,7 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
         } else {
           ret = new ListAdapter(resource, element, (List<?>) eobject.eGet(feature), elementType);
         }
-      } else if(feature instanceof EReference) {
-        EReference ref = (EReference) feature;
+      } else if(feature instanceof EReference ref) {
         EObject eo = (EObject) eobject.eGet(feature);
         if(null == eo) {
           eo = PomFactory.eINSTANCE.create(ref.getEReferenceType());
@@ -193,7 +192,8 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
         }
 
         EClass elementType = ref.getEReferenceType();
-        if(elementType != null && elementType.getClassifierID() == PomPackage.Literals.CONFIGURATION.getClassifierID()) {
+        if(elementType != null
+            && elementType.getClassifierID() == PomPackage.Literals.CONFIGURATION.getClassifierID()) {
           ret = new ConfigurationAdapter(resource, element, (Configuration) eobject.eGet(feature));
         } else {
           ret = new ModelObjectAdapter(this.resource, eo, element);
@@ -247,8 +247,8 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
     if(beforeNode == null) {
       beforeNode = node.getLastChild();
-      while(!(beforeNode == null || beforeNode.getPreviousSibling() instanceof Element || beforeNode
-          .getPreviousSibling() == null)) {
+      while(!(beforeNode == null || beforeNode.getPreviousSibling() instanceof Element
+          || beforeNode.getPreviousSibling() == null)) {
         beforeNode = beforeNode.getPreviousSibling();
       }
     }
@@ -268,8 +268,7 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        Element element = (Element) child;
+      if(child instanceof Element element) {
         EStructuralFeature feature = eobject.eClass().getEStructuralFeature(element.getLocalName());
         if(feature != null) {
           createOrGetChildAdapter(feature).load();

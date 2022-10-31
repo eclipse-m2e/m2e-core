@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.wst.sse.core.internal.provisional.INodeAdapter;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -53,8 +54,8 @@ public abstract class TranslatorAdapter implements INodeAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Text) {
-        ret.append(((Text) child).getData());
+      if(child instanceof Text text) {
+        ret.append(text.getData());
       }
     }
     return ret.toString().trim();
@@ -87,14 +88,11 @@ public abstract class TranslatorAdapter implements INodeAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        Element e = (Element) child;
-        if(e.getLocalName().equals(element.getLocalName())) {
-          if(e == element) {
-            return ret;
-          }
-          ret++ ;
+      if(child instanceof Element e && e.getLocalName().equals(element.getLocalName())) {
+        if(e == element) {
+          return ret;
         }
+        ret++ ;
       }
     }
     return -1;
@@ -112,14 +110,11 @@ public abstract class TranslatorAdapter implements INodeAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        Element e = (Element) child;
-        if(e.getLocalName().equals(element.getLocalName())) {
-          if(e == element) {
-            return ret;
-          }
-          ret++ ;
+      if(child instanceof Element e && e.getLocalName().equals(element.getLocalName())) {
+        if(e == element) {
+          return ret;
         }
+        ret++ ;
       }
     }
     return -1;
@@ -148,14 +143,11 @@ public abstract class TranslatorAdapter implements INodeAdapter {
     int nChildren = children.getLength();
     for(int i = 0; i < nChildren; i++ ) {
       Node child = children.item(i);
-      if(child instanceof Element) {
-        Element e = (Element) child;
-        if(e.getTagName().equals(name) || "*".equals(name)) { //$NON-NLS-1$
-          if(matchCount == n) {
-            return e;
-          }
-          matchCount++ ;
+      if(child instanceof Element e && (e.getTagName().equals(name) || "*".equals(name))) { //$NON-NLS-1$
+        if(matchCount == n) {
+          return e;
         }
+        matchCount++ ;
       }
     }
     return null;
@@ -213,8 +205,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
         element.getParentNode().insertBefore(t, element);
       }
     } catch(BadLocationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      Platform.getLog(TranslatorAdapter.class).error("Failed to create whitespace before " + element, e);
     }
 
   }
@@ -272,8 +263,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
         }
       }
     } catch(BadLocationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      Platform.getLog(TranslatorAdapter.class).error("Failed to create whitespace after " + element, e);
     }
 
   }

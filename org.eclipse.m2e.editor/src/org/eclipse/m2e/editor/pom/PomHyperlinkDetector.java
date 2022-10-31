@@ -129,7 +129,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       if(link != null) {
         hyperlinks.add(link);
       }
-      link = openPOMbyID(node, textViewer, offset);
+      link = openPOMbyID(node, textViewer);
       if(link != null) {
         hyperlinks.add(link);
       }
@@ -539,7 +539,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     };
   }
 
-  private IHyperlink openPOMbyID(Node current, final ITextViewer viewer, int offset) {
+  private IHyperlink openPOMbyID(Node current, final ITextViewer viewer) {
     while(current != null && !(current instanceof Element)) {
       current = current.getParentNode();
     }
@@ -547,10 +547,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       return null;
     }
     current = current.getParentNode();
-    if(current == null || !(current instanceof Element)) {
+    if(current == null || !(current instanceof Element parent)) {
       return null;
     }
-    Element parent = (Element) current;
     String parentName = parent.getNodeName();
     if(DEPENDENCY.equals(parentName) || PARENT.equals(parentName) || PLUGIN.equals(parentName)
         || "reportPlugin".equals(parentName) || EXTENSION.equals(parentName)) {

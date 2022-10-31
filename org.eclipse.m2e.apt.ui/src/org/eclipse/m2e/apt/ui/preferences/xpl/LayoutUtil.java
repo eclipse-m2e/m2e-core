@@ -58,8 +58,8 @@ public class LayoutUtil {
 			modifyLabelSpans(controls, nCulumns);
 		}
 		GridLayout layout= null;
-		if (parent.getLayout() instanceof GridLayout) {
-			layout= (GridLayout) parent.getLayout();
+		if (parent.getLayout() instanceof GridLayout parentGridLayout) {
+			layout = parentGridLayout;
 		} else {
 			layout= new GridLayout();
 		}
@@ -84,8 +84,8 @@ public class LayoutUtil {
 	 */
 	public static void setHorizontalSpan(Control control, int span) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			((GridData)ld).horizontalSpan= span;
+		if (ld instanceof GridData gridData) {
+			gridData.horizontalSpan = span;
 		} else if (span != 1) {
 			GridData gd= new GridData();
 			gd.horizontalSpan= span;
@@ -98,8 +98,8 @@ public class LayoutUtil {
 	 */
 	public static void setWidthHint(Control control, int widthHint) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			((GridData)ld).widthHint= widthHint;
+		if (ld instanceof GridData gridData) {
+			gridData.widthHint = widthHint;
 		}
 	}
 
@@ -108,8 +108,8 @@ public class LayoutUtil {
 	 */
 	public static void setHeightHint(Control control, int heightHint) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			((GridData)ld).heightHint= heightHint;
+		if (ld instanceof GridData gridData) {
+			gridData.heightHint = heightHint;
 		}
 	}
 
@@ -118,8 +118,8 @@ public class LayoutUtil {
 	 */
 	public static void setHorizontalIndent(Control control, int horizontalIndent) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			((GridData)ld).horizontalIndent= horizontalIndent;
+		if (ld instanceof GridData gridData) {
+			gridData.horizontalIndent = horizontalIndent;
 		}
 	}
 
@@ -128,8 +128,8 @@ public class LayoutUtil {
 	 */
 	public static void setHorizontalGrabbing(Control control) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			((GridData)ld).grabExcessHorizontalSpace= true;
+		if (ld instanceof GridData gridData) {
+			gridData.grabExcessHorizontalSpace = true;
 		}
 	}
 
@@ -139,8 +139,7 @@ public class LayoutUtil {
 	 */
 	public static void setVerticalGrabbing(Control control) {
 		Object ld= control.getLayoutData();
-		if (ld instanceof GridData) {
-			GridData gd= ((GridData)ld);
+		if (ld instanceof GridData gd) {
 			gd.grabExcessVerticalSpace= true;
 			gd.verticalAlignment= SWT.FILL;
 		}

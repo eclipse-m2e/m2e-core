@@ -35,7 +35,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -68,9 +67,9 @@ import org.eclipse.m2e.profiles.ui.internal.Messages;
  */
 public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListener {
 
-  private static int PROFILE_ID_COLUMN = 0;
+  private static final int PROFILE_ID_COLUMN = 0;
 
-  private static int SOURCE_COLUMN = 1;
+  private static final int SOURCE_COLUMN = 1;
 
   private CheckboxTableViewer profileTableViewer;
 
@@ -93,10 +92,6 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
   final Action activationAction = new ChangeProfileStateAction(ProfileState.Active);
 
   final Action deActivationAction = new ChangeProfileStateAction(ProfileState.Disabled);
-
-  private Label warningImg;
-
-  private Label warningLabel;
 
   public SelectProfilesDialog(Shell parentShell, Set<IMavenProjectFacade> facades,
       List<ProfileSelection> sharedProfiles) {
@@ -167,8 +162,8 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
   }
 
   private void displayWarning(Composite container) {
-    warningImg = new Label(container, SWT.CENTER);
-    warningLabel = new Label(container, SWT.NONE);
+    Label warningImg = new Label(container, SWT.CENTER);
+    Label warningLabel = new Label(container, SWT.NONE);
     warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
     GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).applyTo(warningImg);
     warningImg.setImage(JFaceResources.getImage(DLG_IMG_MESSAGE_WARNING));
@@ -266,23 +261,17 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
     Button button = new Button(container, SWT.NONE);
     button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
     button.setText(label);
-    button.addSelectionListener(new SelectionListener() {
-      public void widgetSelected(SelectionEvent e) {
-        profileTableViewer.setAllGrayed(false);
-        for(ProfileSelection profile : sharedProfiles) {
-          profileTableViewer.setChecked(profile, ischecked);
-          profile.setSelected(ischecked);
-          if(!ischecked || profile.getActivationState() == null) {
-            profile.setActivationState(ProfileState.Active);
-          }
+    button.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      profileTableViewer.setAllGrayed(false);
+      for(ProfileSelection profile : sharedProfiles) {
+        profileTableViewer.setChecked(profile, ischecked);
+        profile.setSelected(ischecked);
+        if(!ischecked || profile.getActivationState() == null) {
+          profile.setActivationState(ProfileState.Active);
         }
-        refresh();
       }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-
-      }
-    });
+      refresh();
+    }));
 
     return button;
   }
@@ -291,21 +280,13 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
     Button button = new Button(container, SWT.NONE);
     button.setLayoutData(new GridData(SWT.FILL, SWT.UP, false, false, 1, 1));
     button.setText(label);
-    button.addSelectionListener(new SelectionListener() {
-      public void widgetSelected(SelectionEvent e) {
-        ISelection s = profileTableViewer.getSelection();
-        if(s instanceof IStructuredSelection) {
-          IStructuredSelection sel = (IStructuredSelection) s;
-          setActivationState(sel, state);
-        }
-        refresh();
+    button.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      ISelection s = profileTableViewer.getSelection();
+      if(s instanceof IStructuredSelection sel) {
+        setActivationState(sel, state);
       }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-
-      }
-    });
-
+      refresh();
+    }));
     return button;
   }
 
@@ -387,8 +368,7 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
     Iterator<?> ite = sel.iterator();
     while(ite.hasNext()) {
       Object o = ite.next();
-      if(o instanceof ProfileSelection) {
-        ProfileSelection ps = (ProfileSelection) o;
+      if(o instanceof ProfileSelection ps) {
         ps.setActivationState(state);
         profileTableViewer.setGrayed(ps, false);
         if(ProfileState.Disabled.equals(state)) {
