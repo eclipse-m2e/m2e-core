@@ -32,8 +32,9 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -61,10 +62,13 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
 
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
-    ProjectBuildingRequest configuration = MavenExecutionContext.getThreadContext().newProjectBuildingRequest();
-    configuration.setProject(facade.getMavenProject()); // TODO do we need this?
-    configuration.setResolveDependencies(true);
-    MavenExecutionResult mavenResult = getMaven().readMavenProject(facade.getPomFile(), configuration);
+    IMavenExecutionContext executionContext = facade.createExecutionContext();
+    MavenExecutionResult mavenResult = executionContext.execute((ctx, mon) -> {
+      ProjectBuildingRequest configuration = ctx.newProjectBuildingRequest();
+      configuration.setProject(facade.getMavenProject());
+      configuration.setResolveDependencies(true);
+      return IMavenToolbox.of(ctx).readMavenProject(facade.getPomFile(), configuration);
+    }, monitor);
 
     markerManager.addMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID, mavenResult);
 

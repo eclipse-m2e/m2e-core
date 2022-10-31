@@ -106,7 +106,10 @@ public interface IMaven extends IComponentLookup {
    * @since 1.4
    * @see {@link #readMavenProjects(File, ProjectBuildingRequest)} to group requests and improve performance (RAM and
    *      CPU)
+   * @deprecated this method should never have been API and is prone to errors, if you still need this method please
+   *             contact the m2e team to provide better alternatives for your use-case
    */
+  @Deprecated(forRemoval = true)
   MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
 
   /**

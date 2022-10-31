@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -214,7 +215,8 @@ public class PlexusContainerManager {
     // In contrast to a standalone Maven-build, which only has one multi-module-root ('.mvn'-folder), M2E can import multiple 
     // projects with different '.mvn'-folder. Because the id of an extension's realm is only based on the GAV, attempts to load 
     // the same extension from different locations result in a DuplicateRealmException. Therefore each container needs its own ClassWorld.
-    ClassWorld classWorld = new ClassWorld(PLEXUS_CORE_REALM, ClassWorld.class.getClassLoader());
+    ClassWorld classWorld = new M2EClassWorld(PLEXUS_CORE_REALM, ClassWorld.class.getClassLoader(),
+        multiModuleProjectDirectory);
     ClassRealm coreRealm = classWorld.getRealm(PLEXUS_CORE_REALM);
     CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
 
@@ -330,6 +332,29 @@ public class PlexusContainerManager {
       thread.setContextClassLoader(ccl);
       container.dispose();
     }
+  }
+
+  private static final class M2EClassWorld extends ClassWorld {
+
+    private File multiModuleProjectDirectory;
+
+    M2EClassWorld(String plexusCoreRealm, ClassLoader classLoader, File multiModuleProjectDirectory) {
+      super(plexusCoreRealm, classLoader);
+      this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+    }
+
+    @Override
+    public String toString() {
+      String name;
+      if(multiModuleProjectDirectory == null) {
+        name = "GLOBAL";
+      } else {
+        name = multiModuleProjectDirectory.getAbsolutePath();
+      }
+      return "ClassWorld [" + name + "] "
+          + getRealms().stream().map(ClassRealm::getId).collect(Collectors.joining(", "));
+    }
+
   }
 
   private static final class PlexusComponentLookup implements IComponentLookup {
