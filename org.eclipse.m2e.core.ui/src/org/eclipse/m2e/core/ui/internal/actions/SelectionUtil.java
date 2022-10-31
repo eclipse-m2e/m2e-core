@@ -55,9 +55,9 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -249,7 +249,7 @@ public class SelectionUtil {
         try (InputStream is = storage.getContents()) {
           tempPomFile = File.createTempFile("maven-pom", ".pom"); //$NON-NLS-1$ //$NON-NLS-2$
           Files.copy(is, tempPomFile.toPath());
-          return readMavenProject(tempPomFile, monitor);
+          return readExternalMavenProject(tempPomFile, monitor);
         } catch(IOException ex) {
           log.error("Can't close stream", ex); //$NON-NLS-1$
         } finally {
@@ -258,31 +258,31 @@ public class SelectionUtil {
           }
         }
       } else {
-        return readMavenProject(path.toFile(), monitor);
+        return readExternalMavenProject(path.toFile(), monitor);
       }
 
     } else if(editorInput.getClass().getName().endsWith("FileStoreEditorInput")) { //$NON-NLS-1$
-      return readMavenProject(new File(Util.proxy(editorInput, FileStoreEditorInputStub.class).getURI().getPath()),
+      return readExternalMavenProject(new File(Util.proxy(editorInput, FileStoreEditorInputStub.class).getURI().getPath()),
           monitor);
     }
 
     return null;
   }
 
-  private static MavenProject readMavenProject(final File pomFile, IProgressMonitor monitor) throws CoreException {
+  private static MavenProject readExternalMavenProject(final File pomFile, IProgressMonitor monitor) throws CoreException {
     if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
-
-    final IMaven maven = MavenPlugin.getMaven();
-
-    IMavenExecutionContext context = maven.createExecutionContext();
+    IMavenExecutionContext context = IMavenExecutionContext.of(pomFile);
     MavenExecutionRequest request = context.getExecutionRequest();
     request.setOffline(false);
     request.setUpdateSnapshots(false);
     request.setRecursive(false);
 
-    MavenExecutionResult result = context.execute((context1, monitor1) -> maven.readMavenProject(pomFile, context1.newProjectBuildingRequest()), monitor);
+    MavenExecutionResult result = context.execute((context1, monitor1) -> {
+      IMavenToolbox toolbox = IMavenToolbox.of(context1);
+      return toolbox.readMavenProject(pomFile, context1.newProjectBuildingRequest());
+    }, monitor);
 
     MavenProject project = result.getProject();
     if(project != null) {

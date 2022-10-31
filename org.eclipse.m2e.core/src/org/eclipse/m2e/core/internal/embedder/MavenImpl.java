@@ -1001,6 +1001,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public <T> T lookup(Class<T> clazz) throws CoreException {
+    if(clazz == PlexusContainerManager.class) {
+      return clazz.cast(containerManager);
+    }
     ClassLoader ccl = Thread.currentThread().getContextClassLoader();
     try {
       PlexusContainer plexusContainer = getPlexusContainer();

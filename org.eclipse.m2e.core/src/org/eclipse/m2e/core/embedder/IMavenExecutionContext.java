@@ -13,11 +13,13 @@
 
 package org.eclipse.m2e.core.embedder;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -27,7 +29,9 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -136,7 +140,7 @@ public interface IMavenExecutionContext {
    * <p>
    * To trigger a new execution, it's often better to create a new project-specific context with
    * {@link IMavenProjectFacade#createExecutionContext()} than to blindly reuse current thread context, as we do not
-   * know whether the current thread context maps the current project propertly.
+   * know whether the current thread context maps the current project properly.
    * </p>
    * 
    * @return the IMavenExecutionContext already in use for current thread, or {@link Optional#empty()} if absent.
@@ -144,6 +148,24 @@ public interface IMavenExecutionContext {
    */
   static Optional<IMavenExecutionContext> getThreadContext() {
     return Optional.ofNullable(MavenExecutionContext.getThreadContext());
+  }
+
+  /**
+   * Creates a detached execution context for the given base directory.
+   * 
+   * @param baseDir the basedir for what an execution context should be created
+   * @return
+   * @throws CoreException if creation failed
+   */
+  static IMavenExecutionContext of(File baseDir) throws CoreException {
+    PlexusContainerManager containerManager = MavenPlugin.getMaven().lookup(PlexusContainerManager.class);
+    try {
+      return new MavenExecutionContext(containerManager.aquire(baseDir), null);
+    } catch(Exception ex) {
+      throw new CoreException(
+          Status.error("aquire container for basedir " + baseDir.getAbsolutePath() + " failed!", ex));
+    }
+
   }
 
 

@@ -19,7 +19,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -33,10 +32,6 @@ public abstract class AbstractMavenDependencyResolver {
   private ProjectRegistryManager manager;
 
   private MutableProjectRegistry contextRegistry;
-
-  protected IMaven getMaven() {
-    return manager.getMaven();
-  }
 
   final void setManager(ProjectRegistryManager manager) {
     this.manager = manager;

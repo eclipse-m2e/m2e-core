@@ -27,17 +27,22 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.DefaultMaven;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -66,6 +71,29 @@ public interface IMavenToolbox {
    *         lookup could be acquired
    */
   Optional<MavenSession> getSession();
+
+  default MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration)
+      throws CoreException {
+    MavenExecutionResult result = new DefaultMavenExecutionResult();
+    IComponentLookup componentLookup = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP);
+    try {
+      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      ProjectBuildingResult projectBuildingResult = componentLookup.lookup(ProjectBuilder.class).build(pomFile,
+          configuration);
+      result.setProject(projectBuildingResult.getProject());
+      result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+    } catch(ProjectBuildingException ex) {
+      if(ex.getResults() != null && ex.getResults().size() == 1) {
+        ProjectBuildingResult projectBuildingResult = ex.getResults().get(0);
+        result.setProject(projectBuildingResult.getProject());
+        result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+      }
+      result.addException(ex);
+    } catch(RuntimeException e) {
+      result.addException(e);
+    }
+    return result;
+  }
 
   default MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, boolean setup) throws CoreException {
     MavenSession session = getSession().orElseThrow(ERROR_NO_SESSION);
