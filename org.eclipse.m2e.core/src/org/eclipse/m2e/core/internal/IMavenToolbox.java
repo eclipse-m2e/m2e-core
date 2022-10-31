@@ -18,7 +18,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -91,6 +96,33 @@ public interface IMavenToolbox {
       result.addException(ex);
     } catch(RuntimeException e) {
       result.addException(e);
+    }
+    return result;
+  }
+
+  default Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
+      ProjectBuildingRequest configuration) throws CoreException {
+    IComponentLookup componentLookup = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP);
+    List<ProjectBuildingResult> projectBuildingResults = new ArrayList<>();
+    Map<File, MavenExecutionResult> result = new LinkedHashMap<>(pomFiles.size(), 1.f);
+    try {
+      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      projectBuildingResults
+          .addAll(componentLookup.lookup(ProjectBuilder.class).build(new ArrayList<>(pomFiles), false, configuration));
+    } catch(ProjectBuildingException ex) {
+      if(ex.getResults() != null) {
+        projectBuildingResults.addAll(ex.getResults());
+      }
+    }
+    for(ProjectBuildingResult projectBuildingResult : projectBuildingResults) {
+      MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
+      mavenExecutionResult.setProject(projectBuildingResult.getProject());
+      mavenExecutionResult.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+      if(!projectBuildingResult.getProblems().isEmpty()) {
+        mavenExecutionResult
+            .addException(new ProjectBuildingException(Collections.singletonList(projectBuildingResult)));
+      }
+      result.put(projectBuildingResult.getPomFile(), mavenExecutionResult);
     }
     return result;
   }

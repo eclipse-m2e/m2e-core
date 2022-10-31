@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -154,11 +154,11 @@ public class PlexusContainerManager {
     }
   }
 
-  public PlexusContainer aquire(IFile pom) throws Exception {
-    if(pom == null) {
+  public PlexusContainer aquire(IResource basedir) throws Exception {
+    if(basedir == null || !basedir.isAccessible()) {
       return aquire();
     }
-    File file = pom.getLocation().toFile();
+    File file = basedir.getLocation().toFile();
     if(file == null) {
       return aquire();
     }
