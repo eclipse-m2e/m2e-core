@@ -55,6 +55,8 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationElement;
+import org.eclipse.m2e.core.embedder.IMaven.IConfigurationParameter;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -311,8 +313,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IPath[] inclusionTest = new IPath[0];
       IPath[] exclusionTest = new IPath[0];
 
-      String mainSourceEncoding = null;
-      String testSourceEncoding = null;
+      IConfigurationParameter mainSourceEncoding = null;
+      IConfigurationParameter testSourceEncoding = null;
 
       String mainResourcesEncoding = null;
       String testResourcesEncoding = null;
@@ -320,48 +322,32 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
       for(MojoExecution compile : executions) {
         if(isCompileExecution(compile, mavenProject, options, monitor)) {
-          mainSourceEncoding = maven.getMojoParameterValue(mavenProject, compile, "encoding", String.class, monitor); //$NON-NLS-1$
-          try {
-            inclusion = toPaths(
-                maven.getMojoParameterValue(mavenProject, compile, "includes", String[].class, monitor)); //$NON-NLS-1$
-          } catch(CoreException ex) {
-            log.error("Failed to determine compiler inclusions, assuming defaults", ex);
-          }
-          try {
-            exclusion = toPaths(
-                maven.getMojoParameterValue(mavenProject, compile, "excludes", String[].class, monitor)); //$NON-NLS-1$
-          } catch(CoreException ex) {
-            log.error("Failed to determine compiler exclusions, assuming defaults", ex);
-          }
+          IConfigurationElement mojoConfig = maven.getMojoConfiguration(mavenProject, compile, monitor);
+          mainSourceEncoding = mojoConfig.get("encoding"); //$NON-NLS-1$
+          inclusion = toPaths(mojoConfig.get("includes")); //$NON-NLS-1$
+          exclusion = toPaths(mojoConfig.get("excludes")); //$NON-NLS-1$
         }
       }
 
       for(MojoExecution compile : executions) {
         if(isTestCompileExecution(compile, mavenProject, options, monitor)) {
-          testSourceEncoding = maven.getMojoParameterValue(mavenProject, compile, "encoding", String.class, monitor); //$NON-NLS-1$
-          try {
-            inclusionTest = toPaths(
-                maven.getMojoParameterValue(mavenProject, compile, "testIncludes", String[].class, monitor)); //$NON-NLS-1$
-          } catch(CoreException ex) {
-            log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
-          }
-          try {
-            exclusionTest = toPaths(
-                maven.getMojoParameterValue(mavenProject, compile, "testExcludes", String[].class, monitor)); //$NON-NLS-1$
-          } catch(CoreException ex) {
-            log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
-          }
+          IConfigurationElement mojoConfiguration = maven.getMojoConfiguration(mavenProject, compile, monitor);
+          testSourceEncoding = mojoConfiguration.get("encoding");
+          inclusionTest = toPaths(mojoConfiguration.get("testIncludes")); //$NON-NLS-1$
+          exclusionTest = toPaths(mojoConfiguration.get("testExcludes")); //$NON-NLS-1$
         }
       }
 
       for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_RESOURCES)) {
-        mainResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
+        mainResourcesEncoding = maven.getMojoConfiguration(mavenProject, resources, monitor).get("encoding") //$NON-NLS-1$
+            .as(String.class);
       }
 
       for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
-        testResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
+        testResourcesEncoding = maven.getMojoConfiguration(mavenProject, resources, monitor).get("encoding") //$NON-NLS-1$
+            .as(String.class);
       }
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
           exclusion, mainSourceEncoding, mon.newChild(1), false);
@@ -391,16 +377,16 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private boolean isCompliant(MojoExecution execution, MavenProject mavenProject, Map<String, String> options,
       IProgressMonitor monitor) throws CoreException {
-    String release = maven.getMojoParameterValue(mavenProject, execution, "release", String.class, monitor); //$NON-NLS-1$
+    String release = maven.getMojoConfiguration(mavenProject, execution, monitor).get("release").as(String.class); //$NON-NLS-1$
     if(release != null && !sanitizeJavaVersion(release).equals(options.get(JavaCore.COMPILER_COMPLIANCE))) {
       return false;
     }
     if(release == null) {
-      String source = maven.getMojoParameterValue(mavenProject, execution, "source", String.class, monitor); //$NON-NLS-1$
+      String source = maven.getMojoConfiguration(mavenProject, execution, monitor).get("source").as(String.class); //$NON-NLS-1$
       if(source != null && !sanitizeJavaVersion(source).equals(options.get(JavaCore.COMPILER_SOURCE))) {
         return false;
       }
-      String target = maven.getMojoParameterValue(mavenProject, execution, "target", String.class, monitor); //$NON-NLS-1$
+      String target = maven.getMojoConfiguration(mavenProject, execution, monitor).get("target").as(String.class); //$NON-NLS-1$
       if(target != null
           && !sanitizeJavaVersion(target).equals(options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM))) {
         return false;
@@ -409,22 +395,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return true;
   }
 
-  private IPath[] toPaths(String[] values) {
-    if(values == null) {
+  private IPath[] toPaths(IConfigurationParameter configParameter) {
+    if(!configParameter.exists()) {
       return new IPath[0];
     }
-    IPath[] paths = new IPath[values.length];
-    for(int i = 0; i < values.length; i++ ) {
-      if(values[i] != null && !"".equals(values[i].trim())) {
-        paths[i] = new Path(values[i]);
-      }
-    }
-    return paths;
+    return Arrays.stream(configParameter.as(String[].class)).filter(v -> v != null && !v.isBlank()).map(Path::new)
+        .toArray(Path[]::new);
   }
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
-      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
-      boolean addTestFlag) throws CoreException {
+      IPath outputPath, IPath[] inclusion, IPath[] exclusion, IConfigurationParameter sourceEncoding,
+      IProgressMonitor monitor, boolean addTestFlag) throws CoreException {
 
     for(String sourceRoot : sourceRoots) {
       IFolder sourceFolder = getFolder(project, sourceRoot);
@@ -445,7 +426,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       // Set folder encoding (null = platform/container default)
       if(sourceFolder.exists()) {
-        sourceFolder.setDefaultCharset(sourceEncoding, monitor);
+        sourceFolder.setDefaultCharset(sourceEncoding.exists() ? sourceEncoding.as(String.class) : null, monitor);
       }
 
       IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
@@ -619,8 +600,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           || isEnablePreviewFeatures(request.mavenProject(), execution, monitor);
 
       // process -err:+deprecation , -warn:-serial ...
-      for(Object o : maven.getMojoParameterValue(request.mavenProject(), execution, "compilerArgs", List.class,
-          monitor)) {
+      for(Object o : maven.getMojoConfiguration(request.mavenProject(), execution, monitor).get("compilerArgs")
+          .as(List.class)) {
         if(o instanceof String compilerArg) {
           boolean err = false/*, warn = false*/;
           String[] settings = new String[0];
@@ -706,7 +687,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     Boolean generateParameters = null;
     //1st, check the parameters option
     try {
-      generateParameters = maven.getMojoParameterValue(mavenProject, execution, "parameters", Boolean.class, monitor);//$NON-NLS-1$
+      generateParameters = maven.getMojoConfiguration(mavenProject, execution, monitor).get("parameters") //$NON-NLS-1$
+          .as(Boolean.class);
     } catch(Exception ex) {
       //ignore
     }
@@ -714,7 +696,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //2nd, check the parameters flag in the compilerArgs list
     if(!Boolean.TRUE.equals(generateParameters)) {
       try {
-        List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+        List<?> args = maven.getMojoConfiguration(mavenProject, execution, monitor).get("compilerArgs").as(List.class);//$NON-NLS-1$
         if(args != null) {
           generateParameters = args.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
         }
@@ -726,8 +708,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //3rd, check the parameters flag in the compilerArgument String
     if(!Boolean.TRUE.equals(generateParameters)) {
       try {
-        String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
-            monitor);
+        String compilerArgument = maven.getMojoConfiguration(mavenProject, execution, monitor).get("compilerArgument")
+            .as(String.class);
         if(compilerArgument != null) {
           generateParameters = compilerArgument.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
         }
@@ -743,7 +725,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IProgressMonitor monitor) {
     //1st, check the --enable-preview flag in the compilerArgs list
     try {
-      List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      List<?> args = maven.getMojoConfiguration(mavenProject, execution, monitor).get("compilerArgs").as(List.class);//$NON-NLS-1$
       if(args != null && args.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
       }
@@ -753,8 +735,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     //2nd, check the --enable-preview flag in the compilerArgument String
     try {
-      String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
-          monitor);
+      String compilerArgument = maven.getMojoConfiguration(mavenProject, execution, monitor).get("compilerArgument")
+          .as(String.class);
       if(compilerArgument != null && compilerArgument.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
       }
@@ -804,7 +786,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     int levelIdx = getLevelIndex(source, levels);
 
     try {
-      source = maven.getMojoParameterValue(mavenProject, execution, parameter, String.class, monitor);
+      source = maven.getMojoConfiguration(mavenProject, execution, monitor).get(parameter).as(String.class);
     } catch(CoreException ex) {
       log.error("Failed to determine compiler " + parameter + " setting, assuming default", ex);
     }
@@ -958,7 +940,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     //1st, get the arguments in the compilerArgs list
     try {
-      List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      List<?> args = maven.getMojoConfiguration(mavenProject, execution, monitor).get("compilerArgs").as(List.class);//$NON-NLS-1$
       if(args != null) {//$NON-NLS-1$
         args.stream().filter(a -> a != null).forEach(a -> arguments.add(a.toString()));
       }
