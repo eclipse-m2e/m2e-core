@@ -114,7 +114,10 @@ public interface IMaven extends IComponentLookup {
 
   /**
    * @since 1.10
+   * @deprecated this method should never have been API and is prone to errors, if you still need this method please
+   *             contact the m2e team to provide better alternatives for your use-case
    */
+  @Deprecated(forRemoval = true)
   Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
       ProjectBuildingRequest configuration)
       throws CoreException;
