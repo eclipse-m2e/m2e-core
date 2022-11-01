@@ -18,7 +18,6 @@ import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
 import java.io.File;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.Maven;
@@ -92,8 +90,6 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private static final ThreadLocal<Deque<MavenExecutionContext>> threadLocal = new ThreadLocal<>();
 
-  private final PlexusContainer container;
-
   private MavenExecutionRequest request;
 
   // TODO maybe delegate to parent context
@@ -105,9 +101,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private IComponentLookup containerLookup;
 
-  public MavenExecutionContext(PlexusContainer container, IMavenProjectFacade projectFacade) {
-    this.container = container;
-    this.containerLookup = PlexusContainerManager.wrap(container);
+  public MavenExecutionContext(IComponentLookup lookup, IMavenProjectFacade projectFacade) {
+    this.containerLookup = lookup;
     this.projectFacade = projectFacade;
     if(projectFacade != null) {
       File basedir;
@@ -146,7 +141,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
     if(request == null) {
       request = createExecutionRequest(IMavenConfiguration.getWorkspaceConfiguration(),
-          PlexusContainerManager.wrap(container), MavenPlugin.getMaven().getSettings());
+          containerLookup, MavenPlugin.getMaven().getSettings());
       request.setBaseDirectory(basedir);
     }
     request.setMultiModuleProjectDirectory(PlexusContainerManager.computeMultiModuleProjectDirectory(basedir));
@@ -236,32 +231,34 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       if(request == null) {
         request = newExecutionRequest();
       }
-
+      IComponentLookup lookup = getComponentLookup();
       try {
-        containerLookup.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
+        lookup.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       } catch(MavenExecutionRequestPopulationException ex) {
         throw new CoreException(Status.error(Messages.MavenImpl_error_read_config, ex));
       }
       populateSystemProperties(request);
       setValue(CTX_LOCALREPOSITORY, request.getLocalRepository());
       final FilterRepositorySystemSession repositorySession = createRepositorySession(request,
-          MavenPlugin.getMavenConfiguration(), containerLookup);
+          MavenPlugin.getMavenConfiguration(), lookup);
       setValue(CTX_REPOSITORYSESSION, repositorySession);
       if(parent != null) {
         repositorySession.setData(parent.getRepositorySession().getData());
       }
       final MavenExecutionResult result = new DefaultMavenExecutionResult();
-      setValue(CTX_MAVENSESSION, new MavenSession(container, repositorySession, request, result));
+      setValue(CTX_MAVENSESSION,
+          new MavenSession(lookup.lookup(PlexusContainer.class), repositorySession, request, result));
     }
+    IComponentLookup lookup = getComponentLookup();
 
-    final LegacySupport legacySupport = containerLookup.lookup(LegacySupport.class);
+    final LegacySupport legacySupport = lookup.lookup(LegacySupport.class);
     final MavenSession origLegacySession = legacySupport.getSession(); // TODO validate == origSession
 
     stack.push(this);
 
     final MavenSession session = getSession();
     legacySupport.setSession(session);
-    final SessionScope sessionScope = containerLookup.lookup(SessionScope.class);
+    final SessionScope sessionScope = lookup.lookup(SessionScope.class);
     sessionScope.enter();
     sessionScope.seed(MavenSession.class, session);
 
@@ -484,47 +481,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     if(context == null) {
       throw new IllegalStateException();
     }
-    if(projectFacade == null) {
-      return containerLookup;
-    }
-    IComponentLookup projectComponentLookup = projectFacade.getComponentLookup();
-    MavenProject mavenProject = projectFacade.getMavenProject();
-    if(mavenProject == null) {
-      return projectComponentLookup;
-    }
-    //project scoped lookup...
-    return new IComponentLookup() {
-      @Override
-      public <T> T lookup(Class<T> clazz) throws CoreException {
-        Thread thread = Thread.currentThread();
-        ClassLoader ccl = thread.getContextClassLoader();
-        try {
-          ClassLoader projectRealm = mavenProject.getClassRealm();
-          if(projectRealm != null) {
-            thread.setContextClassLoader(projectRealm);
-          }
-          return projectComponentLookup.lookup(clazz);
-        } finally {
-          thread.setContextClassLoader(ccl);
-        }
-      }
-
-      @Override
-      public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
-        Thread thread = Thread.currentThread();
-        ClassLoader ccl = thread.getContextClassLoader();
-        try {
-          ClassRealm projectRealm = mavenProject.getClassRealm();
-          if(projectRealm != null) {
-            thread.setContextClassLoader(projectRealm);
-          }
-          return projectComponentLookup.lookupCollection(type);
-        } finally {
-          thread.setContextClassLoader(ccl);
-        }
-      }
-
-    };
+    return containerLookup;
   }
 
   static FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request,

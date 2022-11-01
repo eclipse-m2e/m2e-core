@@ -32,12 +32,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -58,6 +57,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -627,7 +627,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public IMavenExecutionContext createExecutionContext() {
     try {
-      return new MavenExecutionContext(manager.getContainerManager().aquire(getPomFile()), this);
+      PlexusContainer container = manager.getContainerManager().aquire(getPomFile());
+      MavenProject mavenProject = getMavenProject(new NullProgressMonitor());
+      if(mavenProject == null) {
+        return new MavenExecutionContext(PlexusContainerManager.wrap(container), this);
+      }
+      return new MavenExecutionContext(PlexusContainerManager.wrap(container, mavenProject.getClassRealm()), this);
     } catch(Exception ex) {
       throw new RuntimeException("Aquire container failed!", ex);
     }
@@ -635,47 +640,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IComponentLookup getComponentLookup() {
-    return new IComponentLookup() {
-
-      @Override
-      public <T> T lookup(Class<T> clazz) throws CoreException {
-        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        try {
-          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
-          if(ccl instanceof ClassRealm) {
-            //do not change here as a specific class realm is already set!
-          } else {
-            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
-          }
-          return plexusContainer.lookup(clazz);
-        } catch(Exception ex) {
-          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
-        } finally {
-          Thread.currentThread().setContextClassLoader(ccl);
-        }
-      }
-
-      @Override
-      public <C> Collection<C> lookupCollection(Class<C> type) throws CoreException {
-        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        try {
-          PlexusContainer plexusContainer = manager.getContainerManager().aquire(getPomFile());
-          if(ccl instanceof ClassRealm) {
-            //do not change here as a specific class realm is already set!
-          } else {
-            Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
-          }
-          Thread.currentThread().setContextClassLoader(plexusContainer.getContainerRealm());
-          return plexusContainer.lookupList(type);
-        } catch(ComponentLookupException ex) {
-          return List.of();
-        } catch(Exception ex) {
-          throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
-        } finally {
-          Thread.currentThread().setContextClassLoader(ccl);
-        }
-      }
-    };
+    return manager.getContainerManager().getComponentLookup(getPomFile());
   }
 
 }

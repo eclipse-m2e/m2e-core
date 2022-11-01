@@ -160,7 +160,7 @@ public interface IMavenExecutionContext {
   static IMavenExecutionContext of(File baseDir) throws CoreException {
     PlexusContainerManager containerManager = MavenPlugin.getMaven().lookup(PlexusContainerManager.class);
     try {
-      return new MavenExecutionContext(containerManager.aquire(baseDir), null);
+      return new MavenExecutionContext(containerManager.getComponentLookup(baseDir), null);
     } catch(Exception ex) {
       throw new CoreException(
           Status.error("aquire container for basedir " + baseDir.getAbsolutePath() + " failed!", ex));

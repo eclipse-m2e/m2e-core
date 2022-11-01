@@ -91,7 +91,6 @@ import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -744,7 +743,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       containerMonitor.setWorkRemaining(pomFiles.size());
       for(var containerEntry : pomFiles.entrySet()) {
         List<IFile> fileList = containerEntry.getValue();
-        MavenExecutionContext context = new MavenExecutionContext(containerEntry.getKey(), null);
+        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(containerEntry.getKey()),
+            null);
         configureExecutionRequest(context.getExecutionRequest(), state, fileList.size() == 1 ? fileList.get(0) : null,
             resolverConfiguration);
 
@@ -883,7 +883,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       HashMap<File, MavenExecutionResult> resultMap = new HashMap<>();
       for(var containerEntry : pomFilesMap.entrySet()) {
         List<IFile> fileList = containerEntry.getValue();
-        MavenExecutionContext context = new MavenExecutionContext(containerEntry.getKey(), null);
+        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(containerEntry.getKey()),
+            null);
         configureExecutionRequest(context.getExecutionRequest(), state, fileList.size() == 1 ? fileList.get(0) : null,
             resolverConfiguration);
         resultMap.putAll(context.execute((ctx, mon) -> {
@@ -1018,17 +1019,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return this.containerManager;
   }
 
-  private <V> V execute(IProjectRegistry state, IFile pom, ResolverConfiguration resolverConfiguration,
-      ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    return createExecutionContext(state, pom, resolverConfiguration).execute(callable, monitor);
-  }
-
   private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
       ResolverConfiguration resolverConfiguration) throws CoreException {
 
     IMavenExecutionContext context;
     try {
-      context = new MavenExecutionContext(containerManager.aquire(pom), projectRegistry.getProjectFacade(pom));
+      MavenProjectFacade facade = projectRegistry.getProjectFacade(pom);
+      if(facade != null) {
+        context = facade.createExecutionContext();
+      } else {
+        context = new MavenExecutionContext(PlexusContainerManager.wrap(containerManager.aquire(pom)), null);
+      }
     } catch(Exception ex) {
       throw new CoreException(Status.error("aquire container failed", ex));
     }
