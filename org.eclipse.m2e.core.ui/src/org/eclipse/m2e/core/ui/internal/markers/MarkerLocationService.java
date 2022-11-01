@@ -269,6 +269,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         return;
       }
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead((IFile) pomFile);
+      if(domModel == null) {
+        //the API claims this return never null but we still see null errors in the log...
+        return;
+      }
       IStructuredDocument document = domModel.getStructuredDocument();
 
       // iterate through document regions
@@ -620,6 +624,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         return;
       }
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead((IFile) pomFile);
+      if(domModel == null) {
+        return;
+      }
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
 
