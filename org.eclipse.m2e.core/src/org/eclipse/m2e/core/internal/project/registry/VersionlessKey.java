@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 
 /**
@@ -21,43 +22,10 @@ import java.io.Serializable;
  *
  * @author igor
  */
-public class VersionlessKey implements Serializable {
-  private static final long serialVersionUID = 2125977578206347429L;
-
-  private final String namespace;
-
-  private final String id;
-
-  public VersionlessKey(String namespace, String id) {
-    if(namespace == null || id == null) {
-      throw new NullPointerException();
-    }
-    this.namespace = namespace;
-    this.id = id;
-  }
-
-  public String getNamespace() {
-    return namespace;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = namespace.hashCode();
-    hash = hash * 17 + id.hashCode();
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(obj == this) {
-      return true;
-    }
-    return obj instanceof VersionlessKey other && //
-        namespace.equals(other.namespace) && id.equals(other.id);
+record VersionlessKey(String namespace, String id) implements Serializable {
+  VersionlessKey {
+    Objects.requireNonNull(namespace);
+    Objects.requireNonNull(id);
   }
 
   @Override

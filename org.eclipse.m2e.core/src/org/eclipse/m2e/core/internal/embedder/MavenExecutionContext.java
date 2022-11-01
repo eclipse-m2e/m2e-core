@@ -105,14 +105,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     this.containerLookup = lookup;
     this.projectFacade = projectFacade;
     if(projectFacade != null) {
-      File basedir;
       IFile pom = projectFacade.getPom();
       if(pom != null && pom.getLocation() != null) {
-        basedir = pom.getLocation().toFile();
+        File pomLocation = pom.getLocation().toFile();
+        this.basedir = pomLocation.isDirectory() ? pomLocation : pomLocation.getParentFile();
       } else {
-        basedir = null;
+        this.basedir = null;
       }
-      this.basedir = basedir == null ? null : (basedir.isDirectory() ? basedir : basedir.getParentFile());
     } else {
       this.basedir = null;
     }

@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -72,6 +73,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.PlexusContainer;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -88,7 +90,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectRealmCache;
 import org.apache.maven.project.artifact.MavenMetadataCache;
-import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -155,10 +156,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
   private ProjectRegistry projectRegistry;
 
   @Reference
-  /*package*/ IMaven maven;
+  IMaven maven;
 
   @Reference
-  /*package*/IMavenMarkerManager markerManager;
+  IMavenMarkerManager markerManager;
 
   @Reference
   private IMavenConfiguration configuration;
@@ -214,16 +215,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
     if(pom == null) {
       return null;
     }
-
-    // MavenProjectFacade projectFacade = (MavenProjectFacade) workspacePoms.get(pom.getFullPath());
     MavenProjectFacade projectFacade = projectRegistry.getProjectFacade(pom);
     if(projectFacade == null && load) {
-      ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
-      MavenExecutionResult executionResult = readProjectsWithDependencies(projectRegistry,
-          Collections.singletonList(pom), configuration, monitor).values().iterator().next();
+      ResolverConfiguration config = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
+      MavenExecutionResult executionResult = readProjectsWithDependencies(pom, config, monitor).iterator().next();
       MavenProject mavenProject = executionResult.getProject();
       if(mavenProject != null && mavenProject.getArtifact() != null) {
-        projectFacade = new MavenProjectFacade(this, pom, mavenProject, configuration);
+        projectFacade = new MavenProjectFacade(this, pom, mavenProject, config);
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
         if(exceptions != null) {
@@ -283,7 +281,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     MavenProjectFacade facade = state.getProjectFacade(pom);
     ArtifactKey mavenProject = facade != null ? facade.getArtifactKey() : null;
 
-    flushCaches(state, pom, facade, false);
+    flushCaches(facade, false);
 
     if(mavenProject == null) {
       state.removeProject(pom, null);
@@ -296,7 +294,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     pomSet.addAll(state.getDependents(MavenCapability.createMavenParent(mavenProject), false)); // TODO check packaging
     state.removeProject(pom, mavenProject);
 
-    pomSet.addAll(refreshWorkspaceModules(state, pom, mavenProject));
+    pomSet.addAll(refreshWorkspaceModules(state, mavenProject));
 
     pomSet.remove(pom);
 
@@ -404,7 +402,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
         monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
         MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
 
-        context.forcePomFiles(flushCaches(newState, pom, oldFacade, isForceDependencyUpdate()));
+        context.forcePomFiles(flushCaches(oldFacade, isForceDependencyUpdate()));
         if(oldFacade != null) {
           putMavenProject(oldFacade, null); // maintain maven project cache
         }
@@ -452,17 +450,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
           capabilities.add(mavenParentCapability);
           capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
           Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-          if(!originalCapabilities.containsKey(pom)) {
-            originalCapabilities.put(pom, oldCapabilities);
-          }
+          originalCapabilities.putIfAbsent(pom, oldCapabilities);
 
           MavenProject mavenProject = getMavenProject(newFacade);
           Set<RequiredCapability> requirements = new LinkedHashSet<>();
           DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, mavenProject);
           Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-          if(!originalRequirements.containsKey(pom)) {
-            originalRequirements.put(pom, oldRequirements);
-          }
+          originalRequirements.putIfAbsent(pom, oldRequirements);
         }
       }
       allNewFacades.addAll(newFacades.keySet());
@@ -541,7 +535,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     if(newFacade != null) {
       monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, newFacade.getProject().getName()));
 
-      setupLifecycleMapping(newState, monitor, newFacade);
+      setupLifecycleMapping(monitor, newFacade);
 
       capabilities = new LinkedHashSet<>();
       requirements = new LinkedHashSet<>();
@@ -570,7 +564,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         try (InputStream is = pom.getContents()) {
           // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
-          Model model = IMavenToolbox.of(getMaven()).readModel(is);
+          Model model = IMavenToolbox.of(maven).readModel(is);
           if(model != null && model.getParent() != null) {
             Parent parent = model.getParent();
             if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
@@ -597,7 +591,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     // refresh versioned dependents if only parent capability has changed
     boolean versionedCapabilitiesOnly = true;
     for(Capability capability : changedCapabilities) {
-      if(MavenCapability.NS_MAVEN_ARTIFACT.equals(capability.getVersionlessKey().getNamespace())) {
+      if(MavenCapability.NS_MAVEN_ARTIFACT.equals(capability.getVersionlessKey().namespace())) {
         versionedCapabilitiesOnly = false;
         break;
       }
@@ -620,8 +614,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  private void setupLifecycleMapping(MutableProjectRegistry newState, IProgressMonitor monitor,
-      MavenProjectFacade newFacade) throws CoreException {
+  private void setupLifecycleMapping(IProgressMonitor monitor, MavenProjectFacade newFacade) throws CoreException {
     LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(getMavenProject(newFacade),
         newFacade.getMojoExecutions(), newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor);
 
@@ -658,7 +651,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  static <T> Set<T> diff(Set<T> a, Set<T> b) {
+  private static <T> Set<T> diff(Set<T> a, Set<T> b) {
     if(a == null || a.isEmpty()) {
       if(b == null || b.isEmpty()) {
         return Collections.emptySet();
@@ -668,17 +661,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
     if(b == null || b.isEmpty()) {
       return a;
     }
-    Set<T> result = new HashSet<>();
-    Set<T> t;
-
-    t = new HashSet<>(a);
-    t.removeAll(b);
-    result.addAll(t);
-    t = new HashSet<>(b);
-    t.removeAll(a);
-    result.addAll(t);
-
-    return result;
+    Map<T, Long> m = Stream.concat(a.stream(), b.stream())
+        .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+    m.values().removeIf(c -> c > 1);
+    return m.keySet();
   }
 
   static <T> boolean hasDiff(Set<T> a, Set<T> b) {
@@ -775,23 +761,26 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return result;
   }
 
-  /**
-   * Converts a collection of resources into a map to their base container
-   * 
-   * @param files
-   * @return
-   */
-  private <X extends IResource> Map<PlexusContainer, List<X>> mapToContainer(Collection<X> files) {
-    Map<PlexusContainer, List<X>> map = new HashMap<>();
-    for(X file : files) {
-      try {
-        PlexusContainer plexusContainer = containerManager.aquire(file);
+  /** Converts a collection of resources into a map to their base container. */
+  private <R extends IResource> Map<PlexusContainer, List<R>> mapToContainer(Collection<R> files) {
+    Map<PlexusContainer, List<R>> map = new HashMap<>();
+    for(R file : files) {
+      PlexusContainer plexusContainer = mapToContainer(file);
+      if(plexusContainer != null) {
         map.computeIfAbsent(plexusContainer, nil -> new ArrayList<>()).add(file);
-      } catch(Exception ex) {
-        log.error("can't aquire container for file " + file + " skipping", ex);
       }
     }
     return map;
+  }
+
+  /** Returns the base container of the given resource. */
+  private <R extends IResource> PlexusContainer mapToContainer(R file) {
+    try {
+      return containerManager.aquire(file);
+    } catch(Exception ex) {
+      log.error("can't aquire container for file " + file + " skipping", ex);
+    }
+    return null;
   }
 
   /**
@@ -805,12 +794,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return pom.getParent().getFile(new Path(moduleName).append(IMavenConstants.POM_FILE_NAME));
   }
 
-  private Set<IFile> refreshWorkspaceModules(MutableProjectRegistry state, IFile pom, ArtifactKey mavenProject) {
+  private Set<IFile> refreshWorkspaceModules(MutableProjectRegistry state, ArtifactKey mavenProject) {
     if(mavenProject == null) {
       return Collections.emptySet();
     }
-
-    return state.removeWorkspaceModules(pom, mavenProject);
+    return state.removeWorkspaceModules(mavenProject);
   }
 
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
@@ -821,11 +809,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   public void removeMavenProjectChangedListener(IMavenProjectChangedListener listener) {
-    if(listener == null) {
-      return;
-    }
-    synchronized(projectChangeListeners) {
-      projectChangeListeners.remove(listener);
+    if(listener != null) {
+      synchronized(projectChangeListeners) {
+        projectChangeListeners.remove(listener);
+      }
     }
   }
 
@@ -848,12 +835,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) {
-    Map<File, MavenExecutionResult> results = readProjectsWithDependencies(projectRegistry,
-        Collections.singletonList(pomFile), resolverConfiguration, monitor);
+    Collection<MavenExecutionResult> results = readProjectsWithDependencies(pomFile, resolverConfiguration, monitor);
     if(results.size() != 1) {
       throw new IllegalStateException("Results should contain one entry.");
     }
-    MavenExecutionResult result = results.values().iterator().next();
+    MavenExecutionResult result = results.iterator().next();
     MavenProject mavenProject = result.getProject();
     if(mavenProject != null && !hasError(result)) {
       return mavenProject;
@@ -875,32 +861,24 @@ public class ProjectRegistryManager implements ISaveParticipant {
             .anyMatch(severity -> severity != Severity.WARNING);
   }
 
-  Map<File, MavenExecutionResult> readProjectsWithDependencies(IProjectRegistry state, Collection<IFile> pomFiles,
+  private Collection<MavenExecutionResult> readProjectsWithDependencies(IFile pomFile,
       ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
     try {
-      Map<PlexusContainer, List<IFile>> pomFilesMap = mapToContainer(pomFiles);
-      SubMonitor subMonitor = SubMonitor.convert(monitor, pomFilesMap.size());
-      HashMap<File, MavenExecutionResult> resultMap = new HashMap<>();
-      for(var containerEntry : pomFilesMap.entrySet()) {
-        List<IFile> fileList = containerEntry.getValue();
-        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(containerEntry.getKey()),
-            null);
-        configureExecutionRequest(context.getExecutionRequest(), state, fileList.size() == 1 ? fileList.get(0) : null,
-            resolverConfiguration);
-        resultMap.putAll(context.execute((ctx, mon) -> {
-          ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
-          configuration.setResolveDependencies(true);
-          return IMavenToolbox.of(ctx).readMavenProjects(pomFiles.stream().map(ProjectRegistryManager::toJavaIoFile)
-              .filter(Objects::nonNull).collect(Collectors.toList()), configuration);
-        }, subMonitor.split(1)));
+      PlexusContainer container = mapToContainer(pomFile);
+      Map<File, MavenExecutionResult> resultMap = Map.of();
+      if(container != null) {
+        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(container), null);
+        configureExecutionRequest(context.getExecutionRequest(), projectRegistry, pomFile, resolverConfiguration);
+        resultMap = context.execute((ctx, mon) -> {
+          ProjectBuildingRequest request = context.newProjectBuildingRequest();
+          request.setResolveDependencies(true);
+          List<File> pomFiles = Stream.of(toJavaIoFile(pomFile)).filter(Objects::nonNull).toList();
+          return IMavenToolbox.of(ctx).readMavenProjects(pomFiles, request);
+        }, monitor);
       }
-      return resultMap;
+      return resultMap.values();
     } catch(CoreException ex) {
-      MavenExecutionResult result = new DefaultMavenExecutionResult();
-      result.addException(ex);
-      return pomFiles.stream().filter(IResource::isAccessible).map(ProjectRegistryManager::toJavaIoFile)
-          .filter(Objects::nonNull).collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
-              (container, toFold) -> container.putAll(toFold));
+      return List.of(new DefaultMavenExecutionResult().addException(ex));
     }
   }
 
@@ -929,7 +907,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
+  private MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
       IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
     if(pom != null) {
       request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
@@ -950,7 +928,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     // eclipse workspace repository implements both workspace dependency resolution
     // and inter-module dependency resolution for multi-module projects.
 
-    request.setLocalRepository(getMaven().getLocalRepository());
+    request.setLocalRepository(maven.getLocalRepository());
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
     if(pom != null && pom.getLocation() != null) {
       request.setMultiModuleProjectDirectory(
@@ -960,11 +938,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return request;
   }
 
-  private EclipseWorkspaceArtifactRepository getWorkspaceReader(IProjectRegistry state, IFile pom,
+  private static EclipseWorkspaceArtifactRepository getWorkspaceReader(IProjectRegistry state, IFile pom,
       ResolverConfiguration resolverConfiguration) {
     Context context = new Context(state, resolverConfiguration, pom);
-    EclipseWorkspaceArtifactRepository workspaceReader = new EclipseWorkspaceArtifactRepository(context);
-    return workspaceReader;
+    return new EclipseWorkspaceArtifactRepository(context);
   }
 
   public MavenArtifactRepository getWorkspaceLocalRepository() throws CoreException {
@@ -972,11 +949,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     resolverConfiguration.setResolveWorkspaceProjects(true);
     EclipseWorkspaceArtifactRepository workspaceReader = getWorkspaceReader(projectRegistry, null,
         resolverConfiguration);
+    return createDelegate(workspaceReader, maven.getLocalRepository());
+  }
 
-    DelegatingLocalArtifactRepository localRepo = new DelegatingLocalArtifactRepository(
-        getMaven().getLocalRepository());
+  @SuppressWarnings("deprecation")
+  private MavenArtifactRepository createDelegate(EclipseWorkspaceArtifactRepository workspaceReader,
+      ArtifactRepository localRepository) {
+    var localRepo = new org.apache.maven.repository.DelegatingLocalArtifactRepository(localRepository);
     localRepo.setIdeWorkspace(workspaceReader);
-
     return localRepo;
   }
 
@@ -997,7 +977,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     for(MavenProjectFacade facade : newState.getProjects()) {
       MavenProject mavenProject = getMavenProject(facade);
       if(mavenProject != null) {
-        getMaven().detachFromSession(mavenProject);
+        maven.detachFromSession(mavenProject);
       }
     }
     List<MavenProjectChangedEvent> events = projectRegistry.apply(newState);
@@ -1009,10 +989,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
     if(stateReader != null && projectRegistry != null) {
       stateReader.writeWorkspaceState(projectRegistry);
     }
-  }
-
-  IMaven getMaven() {
-    return maven;
   }
 
   PlexusContainerManager getContainerManager() {
@@ -1076,6 +1052,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   MavenProject getMavenProject(MavenProjectFacade facade) {
     MavenProject mavenProject = mavenProjectCache.getIfPresent(facade);
     if(mavenProject != null) {
+      //if absent in context, the MavenProject was already created in another execution
       putMavenProject(facade, mavenProject);
     } else {
       mavenProject = getContextProjects().get(facade);
@@ -1129,8 +1106,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
         }).build();
   }
 
-  private Set<IFile> flushCaches(MutableProjectRegistry newState, IFile pom, MavenProjectFacade facade,
-      boolean forceDependencyUpdate) {
+  private Set<IFile> flushCaches(MavenProjectFacade facade, boolean forceDependencyUpdate) {
     if(facade != null) {
       ArtifactKey key = facade.getArtifactKey();
       mavenProjectCache.invalidate(facade);
@@ -1184,7 +1160,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       org.eclipse.core.filesystem.IFileStore fileStore = EFS.getStore(fileLocation);
       return fileStore.toLocalFile(EFS.CACHE, null);
     } catch(CoreException ex) {
-      log.warn("Failed to create local file representation of " + file);
+      log.warn("Failed to create local file representation of {}", file);
       return null;
     }
   }
@@ -1200,18 +1176,15 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   @Override
-  public void doneSaving(ISaveContext context) {
-
+  public void doneSaving(ISaveContext context) { // nothing to do
   }
 
   @Override
-  public void prepareToSave(ISaveContext context) {
-
+  public void prepareToSave(ISaveContext context) { // nothing to do
   }
 
   @Override
-  public void rollback(ISaveContext context) {
-
+  public void rollback(ISaveContext context) { // nothing to do
   }
 
   @Override

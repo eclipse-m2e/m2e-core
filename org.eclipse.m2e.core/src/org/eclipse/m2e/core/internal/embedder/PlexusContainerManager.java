@@ -345,12 +345,7 @@ public class PlexusContainerManager {
 
     @Override
     public String toString() {
-      String name;
-      if(multiModuleProjectDirectory == null) {
-        name = "GLOBAL";
-      } else {
-        name = multiModuleProjectDirectory.getAbsolutePath();
-      }
+      String name = multiModuleProjectDirectory == null ? "GLOBAL" : multiModuleProjectDirectory.getAbsolutePath();
       return "ClassWorld [" + name + "] "
           + getRealms().stream().map(ClassRealm::getId).collect(Collectors.joining(", "));
     }

@@ -58,7 +58,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
   public void resolveProjectDependencies(final IMavenProjectFacade facade, Set<Capability> capabilities,
       Set<RequiredCapability> requirements, final IProgressMonitor monitor) throws CoreException {
     long start = System.currentTimeMillis();
-    log.debug("Resolving dependencies for {}", facade.toString()); //$NON-NLS-1$
+    log.debug("Resolving dependencies for {}", facade); //$NON-NLS-1$
 
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
@@ -110,7 +110,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
       }
     }
 
-    log.debug("Resolved dependencies for {} in {} ms", facade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
+    log.debug("Resolved dependencies for {} in {} ms", facade, System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 
   public static void addProjectStructureRequirements(Set<RequiredCapability> requirements, MavenProject mavenProject) {
