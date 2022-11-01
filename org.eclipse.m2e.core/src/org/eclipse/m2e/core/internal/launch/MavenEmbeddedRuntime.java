@@ -13,9 +13,7 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -24,8 +22,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
@@ -200,30 +196,15 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     if(mavenVersion != null) {
       return mavenVersion;
     }
-    initClasspath();
-    try {
-      String mavenCoreJarPath = CLASSPATH.stream().filter(p -> p.contains("maven-core")).findFirst()
-          .orElseThrow(() -> new IllegalStateException("Could not find maven core jar file"));
-
-      Properties pomProperties = new Properties();
-
-      Path mavenCoreJar = Path.of(mavenCoreJarPath);
-      if(Files.isRegularFile(mavenCoreJar)) {
-        try (ZipFile zip = new ZipFile(mavenCoreJarPath)) {
-          ZipEntry zipEntry = zip.getEntry(MAVEN_CORE_POM_PROPERTIES);
-          if(zipEntry != null) {
-            pomProperties.load(zip.getInputStream(zipEntry));
-          }
+    ClassLoader mavenCL = findMavenEmbedderBundle().adapt(BundleWiring.class).getClassLoader();
+    try (InputStream stream = mavenCL.getResourceAsStream(MAVEN_CORE_POM_PROPERTIES)) {
+      if(stream != null) {
+        Properties pomProperties = new Properties();
+        pomProperties.load(stream);
+        mavenVersion = pomProperties.getProperty("version"); //$NON-NLS-1$
+        if(mavenVersion != null) {
+          return mavenVersion;
         }
-      } else if(Files.isDirectory(mavenCoreJar)) {
-        try (Reader r = Files.newBufferedReader(mavenCoreJar.resolve(MAVEN_CORE_POM_PROPERTIES))) {
-          pomProperties.load(r);
-        }
-      }
-      String version = pomProperties.getProperty("version"); //$NON-NLS-1$
-      if(version != null) {
-        mavenVersion = version;
-        return mavenVersion;
       }
     } catch(Exception e) {
       log.warn("Could not determine embedded maven version", e);
