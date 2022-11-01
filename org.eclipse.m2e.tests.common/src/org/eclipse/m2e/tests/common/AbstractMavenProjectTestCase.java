@@ -84,7 +84,6 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
@@ -664,7 +663,7 @@ public abstract class AbstractMavenProjectTestCase {
   }
 
   protected void injectFilexWagon() throws Exception {
-    PlexusContainer container = ((MavenImpl) MavenPlugin.getMaven()).getPlexusContainer();
+    PlexusContainer container = MavenPlugin.getMaven().lookup(PlexusContainer.class);
     if(container.getContainerRealm().getResource(FilexWagon.class.getName().replace('.', '/') + ".class") == null) {
       container.getContainerRealm().importFrom(FilexWagon.class.getClassLoader(), FilexWagon.class.getName());
       ComponentDescriptor<Wagon> descriptor = new ComponentDescriptor<>();

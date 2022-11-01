@@ -20,6 +20,7 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
@@ -34,7 +35,8 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 		waitForJobsToComplete(monitor);
 		IMavenProjectFacade facade = Adapters.adapt(project, IMavenProjectFacade.class);
 		Assert.assertNotNull(facade);
-		Collection<AbstractMavenLifecycleParticipant> participantList = facade.getComponentLookup()
+		IComponentLookup projectLookup = facade.getComponentLookup();
+		Collection<AbstractMavenLifecycleParticipant> participantList = projectLookup
 				.lookupCollection(AbstractMavenLifecycleParticipant.class);
 		assertTrue("Should not return a project scoped extension", participantList.isEmpty());
 		Collection<AbstractMavenLifecycleParticipant> buildParticipants = facade.createExecutionContext()
@@ -43,6 +45,9 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 					return context.getComponentLookup().lookupCollection(AbstractMavenLifecycleParticipant.class);
 				}, monitor);
 		assertTrue("the must be at laest one build participant!", buildParticipants.size() > 0);
+		Collection<AbstractMavenLifecycleParticipant> participantListAfterCall = projectLookup
+				.lookupCollection(AbstractMavenLifecycleParticipant.class);
+		assertTrue("Should not return a project scoped extension", participantListAfterCall.isEmpty());
 	}
 
 	@Test

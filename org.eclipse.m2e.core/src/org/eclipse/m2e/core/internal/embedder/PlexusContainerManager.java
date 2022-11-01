@@ -361,25 +361,42 @@ public class PlexusContainerManager {
 
     private PlexusContainer container;
 
-    public PlexusComponentLookup(PlexusContainer container) {
+    private ClassRealm lookupRealm;
+
+    public PlexusComponentLookup(PlexusContainer container, ClassRealm lookupRealm) {
       this.container = container;
+      this.lookupRealm = lookupRealm;
     }
 
     @Override
     public <C> C lookup(Class<C> type) throws CoreException {
+      if(type == PlexusContainer.class) {
+        return type.cast(container);
+      }
+      Thread thread = Thread.currentThread();
+      ClassLoader ccl = thread.getContextClassLoader();
       try {
+        thread.setContextClassLoader(lookupRealm);
         return container.lookup(type);
       } catch(ComponentLookupException ex) {
         throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
+      } finally {
+        thread.setContextClassLoader(ccl);
       }
     }
 
     @Override
     public <C> Collection<C> lookupCollection(Class<C> type) {
+      Thread thread = Thread.currentThread();
+      ClassLoader ccl = thread.getContextClassLoader();
       try {
-        return container.lookupList(type);
+        thread.setContextClassLoader(lookupRealm);
+        //copy is important here! Plexus is filtering items based on the current caller thread context!
+        return List.copyOf(container.lookupList(type));
       } catch(ComponentLookupException ex) {
         return List.of();
+      } finally {
+        thread.setContextClassLoader(ccl);
       }
     }
 
@@ -430,12 +447,12 @@ public class PlexusContainerManager {
     return null;
   }
 
-  /**
-   * @param container
-   * @return
-   */
   public static IComponentLookup wrap(PlexusContainer container) {
-    return new PlexusComponentLookup(container);
+    return wrap(container, container.getContainerRealm());
+  }
+
+  public static IComponentLookup wrap(PlexusContainer container, ClassRealm realm) {
+    return new PlexusComponentLookup(container, realm);
   }
 
 

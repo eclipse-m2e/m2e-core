@@ -41,8 +41,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelSource;
@@ -59,7 +57,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
-import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
@@ -270,11 +267,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
   }
 
   <T> T lookup(Class<T> clazz) throws CoreException {
-    try {
-      return maven.getPlexusContainer().lookup(clazz);
-    } catch(ComponentLookupException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_lookup, ex));
-    }
+    return maven.lookup(clazz);
   }
 
   List<MojoParameter> loadMojoParameters(PluginDescriptor desc, MojoDescriptor mojo, PlexusConfigHelper helper,

@@ -1004,6 +1004,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     if(clazz == PlexusContainerManager.class) {
       return clazz.cast(containerManager);
     }
+    if(clazz == PlexusContainer.class) {
+      return clazz.cast(getPlexusContainer());
+    }
     ClassLoader ccl = Thread.currentThread().getContextClassLoader();
     try {
       PlexusContainer plexusContainer = getPlexusContainer();
@@ -1075,11 +1078,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-    try {
-      return new MavenExecutionContext(containerManager.aquire(), (IMavenProjectFacade) null);
-    } catch(Exception ex) {
-      throw new RuntimeException(Messages.MavenImpl_error_init_maven, ex);
-    }
+      return new MavenExecutionContext(this, (IMavenProjectFacade) null);
   }
 
 }
