@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -339,10 +340,9 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     IProject project = getProject();
     int i = 0;
     for(IPath path : ProjectRegistryManager.METADATA_PATH) {
-      if(timestamp[i] != getModificationStamp(project.getFile(path))) {
+      if(timestamp[i++ ] != getModificationStamp(project.getFile(path))) {
         return true;
       }
-      i++ ;
     }
     return false;
   }
@@ -393,9 +393,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getProject().toString()).append(": ").append(getArtifactKey().toString());
-    return sb.toString();
+    return getProject() + ": " + getArtifactKey();
   }
 
   @Override
@@ -432,7 +430,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return executionPlans;
   }
 
-  /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProject mavenProject,
+  private Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProject mavenProject,
       IProgressMonitor monitor) {
     //TODO is there a way to lookup them instead of hardocde them here?
     Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<>();
@@ -448,17 +446,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return executionPlans;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#calculateExecutionPlan(java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
-   */
   @Override
   public MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, IProgressMonitor monitor) {
     return calculateExecutionPlan(getMavenProject(), tasks, false, monitor);
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#setupExecutionPlan(java.util.Collection, org.eclipse.core.runtime.IProgressMonitor)
-   */
   @Override
   public MavenExecutionPlan setupExecutionPlan(Collection<String> tasks, IProgressMonitor monitor) {
     return calculateExecutionPlan(getMavenProject(), tasks, true, monitor);
@@ -503,20 +495,18 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
     MojoExecution execution = setupMojoExecutions.get(mojoExecutionKey);
     if(execution == null) {
-      for(MojoExecution _execution : getMojoExecutions(monitor)) {
-        if(match(mojoExecutionKey, _execution)) {
-          execution = setupMojoExecution(this, _execution, monitor);
+      for(MojoExecution mojoExecution : getMojoExecutions(monitor)) {
+        if(match(mojoExecutionKey, mojoExecution)) {
+          execution = setupMojoExecution(mojoExecution, monitor);
+          setupMojoExecutions.put(mojoExecutionKey, execution);
           break;
         }
       }
-      putSetupMojoExecution(setupMojoExecutions, mojoExecutionKey, execution);
     }
     return execution;
   }
 
-  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws CoreException {
-
+  private MojoExecution setupMojoExecution(MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = getMavenProject(monitor);
     MojoExecution clone = new MojoExecution(mojoExecution.getPlugin(), mojoExecution.getGoal(),
         mojoExecution.getExecutionId());
@@ -547,43 +537,25 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
         && key.executionId().equals(mojoExecution.getExecutionId());
   }
 
-  private void putSetupMojoExecution(Map<MojoExecutionKey, MojoExecution> setupMojoExecutions,
-      MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
-    if(execution != null) {
-      setupMojoExecutions.put(mojoExecutionKey, execution);
-    }
-  }
-
   @Override
   public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException {
     List<MojoExecution> result = new ArrayList<>();
-    List<MojoExecution> _executions = getMojoExecutions(monitor);
-    if(_executions != null) {
-      for(MojoExecution _execution : _executions) {
-        if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
-            && contains(goals, _execution.getGoal())) {
-          MojoExecutionKey _key = new MojoExecutionKey(_execution);
-          Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
-          MojoExecution execution = setupMojoExecutions.get(_key);
-          if(execution == null) {
-            execution = setupMojoExecution(this, _execution, monitor);
-            putSetupMojoExecution(setupMojoExecutions, _key, execution);
-          }
-          result.add(execution);
+    Set<String> consideredGoals = Set.of(goals);
+    Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
+    for(MojoExecution mojoExecution : getMojoExecutions(monitor)) {
+      if(groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
+          && consideredGoals.contains(mojoExecution.getGoal())) {
+        MojoExecutionKey key = new MojoExecutionKey(mojoExecution);
+        MojoExecution execution = setupMojoExecutions.get(key);
+        if(execution == null) {
+          execution = setupMojoExecution(mojoExecution, monitor);
+          setupMojoExecutions.put(key, execution);
         }
+        result.add(execution);
       }
     }
     return result;
-  }
-
-  private static boolean contains(String[] goals, String goal) {
-    for(String goal2 : goals) {
-      if(goal2.equals(goal)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -607,21 +579,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    */
   public List<MojoExecution> getMojoExecutions(IProgressMonitor monitor) throws CoreException {
     Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
-    if(executionPlans == null) {
-      return null;
-    }
-    List<MojoExecution> mojoExecutions = new ArrayList<>();
-    for(List<MojoExecution> executionPlan : executionPlans.values()) {
-      if(executionPlan != null) { // null if execution plan could not be calculated
-        mojoExecutions.addAll(executionPlan);
-      }
-    }
-    return mojoExecutions;
+    // contains null values if execution plan could not be calculated
+    return executionPlans.values().stream().filter(Objects::nonNull).flatMap(List::stream).toList();
   }
 
   public List<MojoExecution> getExecutionPlan(String lifecycle, IProgressMonitor monitor) throws CoreException {
-    Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
-    return executionPlans != null ? executionPlans.get(lifecycle) : null;
+    return getExecutionPlans(monitor).get(lifecycle);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ package org.eclipse.m2e.core.internal.project.registry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -36,6 +37,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -52,8 +54,8 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 @Component(service = {ProjectRegistryRefreshJob.class, IResourceChangeListener.class}, property = "event.mask:Integer="
     + (IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE))
-public class ProjectRegistryRefreshJob extends Job implements IResourceChangeListener, IPreferenceChangeListener,
-    IBackgroundProcessingQueue {
+public class ProjectRegistryRefreshJob extends Job
+    implements IResourceChangeListener, IPreferenceChangeListener, IBackgroundProcessingQueue {
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
 
   private static final long SCHEDULE_DELAY = 1000L;
@@ -61,7 +63,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   private final Set<MavenUpdateRequest> queue = new LinkedHashSet<>();
 
   @Reference
-  /*package*/ ProjectRegistryManager manager;
+  ProjectRegistryManager manager;
 
   @Reference
   private IMavenConfiguration mavenConfiguration;
@@ -94,7 +96,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   @Override
   public IStatus run(final IProgressMonitor monitor) {
     monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
-    final ArrayList<MavenUpdateRequest> requests;
+    List<MavenUpdateRequest> requests;
     synchronized(this.queue) {
       requests = new ArrayList<>(this.queue);
       this.queue.clear();
@@ -102,15 +104,14 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
     try (MutableProjectRegistry newState = manager.newMutableProjectRegistry()) {
       maven.createExecutionContext().execute((context, theMonitor) -> {
+        SubMonitor subMonitor = SubMonitor.convert(theMonitor);
         // group requests
         Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
         Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
         Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
         Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
         for(MavenUpdateRequest request : requests) {
-          if(theMonitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
+          subMonitor.checkCanceled();
           if(request.isOffline() && request.isForceDependencyUpdate()) {
             offlineForceDependencyUpdate.addAll(request.getPomFiles());
           } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
@@ -123,10 +124,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         }
         // process requests
         // true * true
-        if(theMonitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
-        IMaven maven = manager.getMaven();
+        subMonitor.checkCanceled();
         if(!offlineForceDependencyUpdate.isEmpty()) {
           MavenImpl.execute(maven, true, true, (aContext, aMonitor) -> {
             manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
@@ -134,9 +132,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           }, theMonitor);
         }
         // true*false
-        if(theMonitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
+        subMonitor.checkCanceled();
         if(!offlineNotForceDependencyUpdate.isEmpty()) {
           MavenImpl.execute(maven, true, false, (aContext, aMonitor) -> {
             manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
@@ -144,9 +140,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           }, theMonitor);
         }
         // false*true
-        if(theMonitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
+        subMonitor.checkCanceled();
         if(!notOfflineForceDependencyUpdate.isEmpty()) {
           MavenImpl.execute(maven, false, true, (aContext, aMonitor) -> {
             manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
@@ -154,9 +148,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           }, theMonitor);
         }
         // false*false
-        if(theMonitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
+        subMonitor.checkCanceled();
         if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
           MavenImpl.execute(maven, false, false, (aContext, aMonitor) -> {
             manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
@@ -240,7 +232,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   private void queue(MavenUpdateRequest updateRequest) {
     synchronized(queue) {
       queue.add(updateRequest);
-      log.debug("Queued refresh request: {}", updateRequest.toString()); //$NON-NLS-1$
+      log.debug("Queued refresh request: {}", updateRequest); //$NON-NLS-1$
     }
   }
 

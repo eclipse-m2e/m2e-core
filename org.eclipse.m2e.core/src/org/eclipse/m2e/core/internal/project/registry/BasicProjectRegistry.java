@@ -94,18 +94,17 @@ abstract class BasicProjectRegistry implements Serializable {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   private static void copy(Map from, Map to) {
-    for(Map.Entry entry : (Set<Map.Entry>) from.entrySet()) {
-      Object value = entry.getValue();
+    from.forEach((key, value) -> {
       if(value instanceof Map mapValue) {
         Map map = new LinkedHashMap();
         copy(mapValue, map);
+        to.put(key, map);
         value = map;
       } else if(value instanceof Set setValue) {
-        Set set = new LinkedHashSet(setValue);
-        value = set;
+        value = new LinkedHashSet(setValue);
       }
-      to.put(entry.getKey(), value);
-    }
+      to.put(key, value);
+    });
   }
 
   public MavenProjectFacade getProjectFacade(IFile pom) {
@@ -148,13 +147,7 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public boolean isValid() {
-    return workspaceArtifacts != null //
-        && workspacePoms != null //
-        && workspacePomFiles != null //
-        && requiredCapabilities != null //
-        && projectCapabilities != null //
-        && projectRequirements != null //
-        && areFacadesValid();
+    return areFacadesValid();
   }
 
   private boolean areFacadesValid() {

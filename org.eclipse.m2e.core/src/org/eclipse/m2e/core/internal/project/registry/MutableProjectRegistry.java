@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -74,11 +72,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
       workspacePoms.put(pom, facade);
 
       // Add the project to workspaceArtifacts map
-      Set<IFile> paths = workspaceArtifacts.get(facade.getArtifactKey());
-      if(paths == null) {
-        paths = new LinkedHashSet<>();
-        workspaceArtifacts.put(facade.getArtifactKey(), paths);
-      }
+      Set<IFile> paths = workspaceArtifacts.computeIfAbsent(facade.getArtifactKey(), k -> new LinkedHashSet<>());
       paths.add(pom);
     }
   }
@@ -114,7 +108,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return r1.getProject().equals(r2.getProject());
   }
 
-  public Set<IFile> removeWorkspaceModules(IFile pom, ArtifactKey mavenProject) {
+  public Set<IFile> removeWorkspaceModules(ArtifactKey mavenProject) {
     assertNotClosed();
 
     return getDependents(MavenCapability.createMavenParent(mavenProject), true);
@@ -198,16 +192,13 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
       return Collections.emptySet();
     }
     Set<IFile> result = new LinkedHashSet<>();
-    Iterator<Entry<RequiredCapability, Set<IFile>>> iter = rs.entrySet().iterator();
-    while(iter.hasNext()) {
-      Entry<RequiredCapability, Set<IFile>> entry = iter.next();
+    rs.entrySet().removeIf(entry -> {
       if(entry.getKey().isPotentialMatch(capability, versionMatch)) {
         result.addAll(entry.getValue());
-        if(remove) {
-          iter.remove();
-        }
+        return remove;
       }
-    }
+      return false;
+    });
     if(remove && rs.isEmpty()) {
       requiredCapabilities.remove(capability.getVersionlessKey());
     }
@@ -234,20 +225,6 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return result;
   }
 
-  private void addRequiredCapability(IFile pom, RequiredCapability req) {
-    Map<RequiredCapability, Set<IFile>> keyEntry = requiredCapabilities.get(req.getVersionlessKey());
-    if(keyEntry == null) {
-      keyEntry = new HashMap<>();
-      requiredCapabilities.put(req.getVersionlessKey(), keyEntry);
-    }
-    Set<IFile> poms = keyEntry.get(req);
-    if(poms == null) {
-      poms = new HashSet<>();
-      keyEntry.put(req, poms);
-    }
-    poms.add(pom);
-  }
-
   public Set<Capability> setCapabilities(IFile pom, Set<Capability> capabilities) {
     return capabilities != null ? projectCapabilities.put(pom, capabilities) : projectCapabilities.remove(pom);
   }
@@ -256,7 +233,8 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     removeRequiredCapabilities(pom);
     if(requirements != null) {
       for(RequiredCapability requirement : requirements) {
-        addRequiredCapability(pom, requirement);
+        var poms = requiredCapabilities.computeIfAbsent(requirement.getVersionlessKey(), k -> new HashMap<>());
+        poms.computeIfAbsent(requirement, r -> new HashSet<>()).add(pom);
       }
       return projectRequirements.put(pom, requirements);
     }
@@ -264,25 +242,14 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
   }
 
   private void removeRequiredCapabilities(IFile pom) {
-    // TODO likely too slow
-    Iterator<Entry<VersionlessKey, Map<RequiredCapability, Set<IFile>>>> keysIter = requiredCapabilities.entrySet()
-        .iterator();
-    while(keysIter.hasNext()) {
-      Entry<VersionlessKey, Map<RequiredCapability, Set<IFile>>> keysEntry = keysIter.next();
-      Iterator<Entry<RequiredCapability, Set<IFile>>> requirementsIter = keysEntry.getValue().entrySet().iterator();
-      while(requirementsIter.hasNext()) {
-        Entry<RequiredCapability, Set<IFile>> requirementsEntry = requirementsIter.next();
-        requirementsEntry.getValue().remove(pom);
-        if(requirementsEntry.getValue().isEmpty()) {
-          // was last project that required this capability
-          requirementsIter.remove();
-        }
-      }
-      if(keysEntry.getValue().isEmpty()) {
-        // was last project that required this capability versionless key
-        keysIter.remove();
-      }
+    for(RequiredCapability requiredCapability : projectRequirements.getOrDefault(pom, Set.of())) {
+      requiredCapabilities.computeIfPresent(requiredCapability.getVersionlessKey(), (k, rc2pom) -> {
+        rc2pom.computeIfPresent(requiredCapability, (rc, requiringPoms) -> {
+          requiringPoms.remove(pom);
+          return !requiringPoms.isEmpty() ? requiringPoms : null; // remove if was last project that required this capability 
+        });
+        return !rc2pom.isEmpty() ? rc2pom : null; // remove if was last project that required this capability version-less key
+      });
     }
   }
-
 }

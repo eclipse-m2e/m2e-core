@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2022 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -206,7 +205,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     final long start = System.currentTimeMillis();
 
     try {
-      methodClean.execute(CLEAN_BUILD, Collections.<String, String> emptyMap(), monitor);
+      methodClean.execute(CLEAN_BUILD, Collections.emptyMap(), monitor);
     } finally {
       log.debug("Cleaned project {} in {} ms", getProject().getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }
@@ -216,24 +215,15 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
   public static void addDebugHook(BuildDebugHook hook) {
     synchronized(debugHooks) {
-      for(BuildDebugHook other : debugHooks) {
-        if(other == hook) {
-          return;
-        }
+      if(debugHooks.stream().noneMatch(h -> h == hook)) {
+        debugHooks.add(hook);
       }
-      debugHooks.add(hook);
     }
   }
 
   public static void removeDebugHook(BuildDebugHook hook) {
     synchronized(debugHooks) {
-      ListIterator<BuildDebugHook> iter = debugHooks.listIterator();
-      while(iter.hasNext()) {
-        if(iter.next() == hook) {
-          iter.remove();
-          break;
-        }
-      }
+      debugHooks.removeIf(h -> h == hook);
     }
   }
 
