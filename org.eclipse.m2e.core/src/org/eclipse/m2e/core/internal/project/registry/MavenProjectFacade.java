@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -57,6 +56,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -299,6 +299,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public File getPomFile() {
     return pomFile;
+  }
+
+  public File getBaseDir() {
+    if(pomFile != null) {
+      return pomFile.isDirectory() ? pomFile : pomFile.getParentFile();
+    }
+    return null;
   }
 
   /**
@@ -590,12 +597,15 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public IMavenExecutionContext createExecutionContext() {
     try {
-      PlexusContainer container = manager.getContainerManager().aquire(getPomFile());
+      IMavenPlexusContainer container = manager.getContainerManager().aquire(getPomFile());
       MavenProject mavenProject = getMavenProject(new NullProgressMonitor());
       if(mavenProject == null) {
-        return new MavenExecutionContext(PlexusContainerManager.wrap(container), this);
+        //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the chaed variant here?
+        return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), null);
       }
-      return new MavenExecutionContext(PlexusContainerManager.wrap(container, mavenProject.getClassRealm()), this);
+      return new MavenExecutionContext(
+          PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()),
+          getBaseDir(), ctx -> mavenProject);
     } catch(Exception ex) {
       throw new RuntimeException("Aquire container failed!", ex);
     }

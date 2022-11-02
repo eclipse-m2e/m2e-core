@@ -71,8 +71,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
-import org.codehaus.plexus.PlexusContainer;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -101,6 +99,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
+import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -724,13 +723,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Map<IFile, MavenProjectFacade> result = new HashMap<>(poms.size(), 1.f);
     for(Entry<ResolverConfiguration, Collection<IFile>> entry : groupsToImport.entrySet()) {
       ResolverConfiguration resolverConfiguration = entry.getKey();
-      Map<PlexusContainer, List<IFile>> pomFiles = mapToContainer(entry.getValue());
+      Map<IMavenPlexusContainer, List<IFile>> pomFiles = mapToContainer(entry.getValue());
       SubMonitor containerMonitor = subMonitor.split(pomFiles.size());
       containerMonitor.setWorkRemaining(pomFiles.size());
       for(var containerEntry : pomFiles.entrySet()) {
         List<IFile> fileList = containerEntry.getValue();
-        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(containerEntry.getKey()),
-            null);
+        IMavenPlexusContainer mavenPlexusContainer = containerEntry.getKey();
+        MavenExecutionContext context = new MavenExecutionContext(mavenPlexusContainer.getComponentLookup(),
+            mavenPlexusContainer.getMavenDirectory().orElse(null), null);
         configureExecutionRequest(context.getExecutionRequest(), state, fileList.size() == 1 ? fileList.get(0) : null,
             resolverConfiguration);
 
@@ -762,10 +762,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   /** Converts a collection of resources into a map to their base container. */
-  private <R extends IResource> Map<PlexusContainer, List<R>> mapToContainer(Collection<R> files) {
-    Map<PlexusContainer, List<R>> map = new HashMap<>();
+  private <R extends IResource> Map<IMavenPlexusContainer, List<R>> mapToContainer(Collection<R> files) {
+    Map<IMavenPlexusContainer, List<R>> map = new HashMap<>();
     for(R file : files) {
-      PlexusContainer plexusContainer = mapToContainer(file);
+      IMavenPlexusContainer plexusContainer = mapToContainer(file);
       if(plexusContainer != null) {
         map.computeIfAbsent(plexusContainer, nil -> new ArrayList<>()).add(file);
       }
@@ -774,7 +774,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   /** Returns the base container of the given resource. */
-  private <R extends IResource> PlexusContainer mapToContainer(R file) {
+  private <R extends IResource> IMavenPlexusContainer mapToContainer(R file) {
     try {
       return containerManager.aquire(file);
     } catch(Exception ex) {
@@ -864,10 +864,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
   private Collection<MavenExecutionResult> readProjectsWithDependencies(IFile pomFile,
       ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
     try {
-      PlexusContainer container = mapToContainer(pomFile);
+      IMavenPlexusContainer container = mapToContainer(pomFile);
       Map<File, MavenExecutionResult> resultMap = Map.of();
       if(container != null) {
-        MavenExecutionContext context = new MavenExecutionContext(PlexusContainerManager.wrap(container), null);
+        MavenExecutionContext context = new MavenExecutionContext(container.getComponentLookup(),
+            container.getMavenDirectory().orElse(null), null);
         configureExecutionRequest(context.getExecutionRequest(), projectRegistry, pomFile, resolverConfiguration);
         resultMap = context.execute((ctx, mon) -> {
           ProjectBuildingRequest request = context.newProjectBuildingRequest();
@@ -1004,7 +1005,15 @@ public class ProjectRegistryManager implements ISaveParticipant {
       if(facade != null) {
         context = facade.createExecutionContext();
       } else {
-        context = new MavenExecutionContext(PlexusContainerManager.wrap(containerManager.aquire(pom)), null);
+        //if we have a pom but not a facade (why should this happen?) we still can use the pom to find a suitable basedir
+        File basedir;
+        if(pom != null && pom.getLocation() != null) {
+          File pomLocation = pom.getLocation().toFile();
+          basedir = pomLocation.isDirectory() ? pomLocation : pomLocation.getParentFile();
+        } else {
+          basedir = null;
+        }
+        context = new MavenExecutionContext(containerManager.aquire(pom).getComponentLookup(), basedir, null);
       }
     } catch(Exception ex) {
       throw new CoreException(Status.error("aquire container failed", ex));
