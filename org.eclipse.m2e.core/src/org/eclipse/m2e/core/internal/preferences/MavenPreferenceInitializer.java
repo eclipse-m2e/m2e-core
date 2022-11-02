@@ -62,8 +62,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     // set to null since the plugin state location is not available by the time execution reaches here
     store.remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);
 
-    //Setting to false until bug #462898 is fixed
-    store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, false);
+    store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, true);
 
     store.putBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, false);
   }
