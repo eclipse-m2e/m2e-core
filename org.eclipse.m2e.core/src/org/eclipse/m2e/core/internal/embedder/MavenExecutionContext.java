@@ -24,13 +24,14 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferListener;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -72,7 +73,6 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -92,29 +92,30 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private MavenExecutionRequest request;
 
-  // TODO maybe delegate to parent context
   private Map<String, Object> context;
 
   private final File basedir;
 
-  private IMavenProjectFacade projectFacade;
+  private final Function<? super MavenExecutionContext, MavenProject> projectSupplier;
 
-  private IComponentLookup containerLookup;
+  private final IComponentLookup containerLookup;
 
-  public MavenExecutionContext(IComponentLookup lookup, IMavenProjectFacade projectFacade) {
-    this.containerLookup = lookup;
-    this.projectFacade = projectFacade;
-    if(projectFacade != null) {
-      IFile pom = projectFacade.getPom();
-      if(pom != null && pom.getLocation() != null) {
-        File pomLocation = pom.getLocation().toFile();
-        this.basedir = pomLocation.isDirectory() ? pomLocation : pomLocation.getParentFile();
-      } else {
-        this.basedir = null;
-      }
-    } else {
-      this.basedir = null;
-    }
+  /**
+   * Creates a new execution context for the given environment.
+   * 
+   * @param lookup the lookup that is used to query for components, this lookup must support to lookup at least a
+   *          {@link PlexusContainer} for session setup
+   * @param baseDir the basedir of the execution, this is effectively the folder where one normally would execute the
+   *          maven command, also often refereed to as the working directory of the process. If it is <code>null</code>
+   *          we assume an anonymous execution, some feature might not work in such a context.
+   * @param projectSupplier if an execution is started without an explicit project and the projectSupplier is not
+   *          <code>null</code> it is queried to supply the MavenProject used for session setup.
+   */
+  public MavenExecutionContext(IComponentLookup lookup, File baseDir,
+      Function<? super MavenExecutionContext, MavenProject> projectSupplier) {
+    this.containerLookup = Objects.requireNonNull(lookup);
+    this.basedir = baseDir;
+    this.projectSupplier = projectSupplier;
   }
 
   @Override
@@ -345,8 +346,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     final List<MavenProject> origProjects = mavenSession.getProjects();
     final ClassLoader origTCCL = Thread.currentThread().getContextClassLoader();
     try {
-      if(project == null && projectFacade != null) {
-        project = projectFacade.getMavenProject();
+      if(project == null && projectSupplier != null) {
+        project = projectSupplier.apply(this);
       }
       if(project != null) {
         mavenSession.setCurrentProject(project);

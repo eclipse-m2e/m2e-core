@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,19 +83,15 @@ import org.eclipse.m2e.core.internal.Messages;
 public class PlexusContainerManager {
   private static final ILog LOG = Platform.getLog(PlexusContainerManager.class);
 
-  static final String MVN_FOLDER = ".mvn";
-
-  private static final String EXTENSIONS_FILENAME = MVN_FOLDER + "/extensions.xml";
-
   private static final String CONTAINER_CONFIGURATION_NAME = "maven";
 
   private static final String MAVEN_EXTENSION_REALM_PREFIX = "maven.ext.";
 
   private static final String PLEXUS_CORE_REALM = "plexus.core";
 
-  private PlexusContainer nonRootedContainer;
+  private IMavenPlexusContainer nonRootedContainer;
 
-  private final Map<File, PlexusContainer> containerMap = new HashMap<>();
+  private final Map<File, IMavenPlexusContainer> containerMap = new HashMap<>();
 
   @Reference
   private LoggerManager loggerManager;
@@ -123,7 +120,7 @@ public class PlexusContainerManager {
   void cleanup() {
     synchronized(containerMap) {
       containerMap.entrySet().removeIf(entry -> {
-        if(!new File(entry.getKey(), MVN_FOLDER).isDirectory()) {
+        if(!new File(entry.getKey(), IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
           disposeContainer(entry.getValue());
           return true;
         }
@@ -132,8 +129,9 @@ public class PlexusContainerManager {
     }
   }
 
-  private static void disposeContainer(PlexusContainer container) {
-    ClassWorld classWorld = container.getContainerRealm().getWorld();
+  private static void disposeContainer(IMavenPlexusContainer mavenPlexusContainer) {
+    PlexusContainer plexusContainer = mavenPlexusContainer.getContainer();
+    ClassWorld classWorld = plexusContainer.getContainerRealm().getWorld();
     for(ClassRealm realm : classWorld.getRealms()) {
       try {
         classWorld.disposeRealm(realm.getId());
@@ -141,10 +139,10 @@ public class PlexusContainerManager {
         LOG.error("Failed to dispose ClassRealm", e);
       }
     }
-    container.dispose();
+    plexusContainer.dispose();
   }
 
-  public PlexusContainer aquire() throws Exception {
+  public IMavenPlexusContainer aquire() throws Exception {
     synchronized(containerMap) {
       cleanup();
       if(nonRootedContainer == null) {
@@ -154,7 +152,7 @@ public class PlexusContainerManager {
     }
   }
 
-  public PlexusContainer aquire(IResource basedir) throws Exception {
+  public IMavenPlexusContainer aquire(IResource basedir) throws Exception {
     if(basedir == null || !basedir.isAccessible()) {
       return aquire();
     }
@@ -165,7 +163,7 @@ public class PlexusContainerManager {
     return aquire(file);
   }
 
-  public PlexusContainer aquire(File basedir) throws Exception {
+  public IMavenPlexusContainer aquire(File basedir) throws Exception {
     File directory = computeMultiModuleProjectDirectory(basedir);
     if(directory == null) {
       return aquire();
@@ -173,7 +171,7 @@ public class PlexusContainerManager {
     File canonicalDirectory = directory.getCanonicalFile();
     synchronized(containerMap) {
       cleanup();
-      PlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
+      IMavenPlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
       if(plexusContainer == null) {
         try {
           plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration);
@@ -184,7 +182,8 @@ public class PlexusContainerManager {
           throw new PlexusContainerException(
               "can't create plexus container for basedir = " + basedir.getAbsolutePath() + " because the extension "
                   + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion()
-                  + " can't be loaded (defined in " + new File(directory, EXTENSIONS_FILENAME).getAbsolutePath() + ").",
+                  + " can't be loaded (defined in "
+                  + new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME).getAbsolutePath() + ").",
               e);
         }
       }
@@ -194,7 +193,7 @@ public class PlexusContainerManager {
 
   public IComponentLookup getComponentLookup() {
     try {
-      return wrap(aquire());
+      return aquire().getComponentLookup();
     } catch(Exception ex) {
       return new ExceptionalLookup(ex);
     }
@@ -202,13 +201,13 @@ public class PlexusContainerManager {
 
   public IComponentLookup getComponentLookup(File basedir) {
     try {
-      return wrap(aquire(basedir));
+      return aquire(basedir).getComponentLookup();
     } catch(Exception ex) {
       return new ExceptionalLookup(ex);
     }
   }
 
-  private static PlexusContainer newPlexusContainer(File multiModuleProjectDirectory, LoggerManager loggerManager,
+  private static IMavenPlexusContainer newPlexusContainer(File multiModuleProjectDirectory, LoggerManager loggerManager,
       IMavenConfiguration mavenConfiguration) throws Exception {
 
     // In M2E it can happen that the same extension (with same GAV) is referenced/loaded from multiple locations ('.mvn'-folders).
@@ -258,7 +257,28 @@ public class PlexusContainerManager {
     } finally {
       thread.setContextClassLoader(ccl);
     }
-    return container;
+    return new IMavenPlexusContainer() {
+
+      private IComponentLookup lookup;
+
+      @Override
+      public Optional<File> getMavenDirectory() {
+        return Optional.ofNullable(multiModuleProjectDirectory);
+      }
+
+      @Override
+      public PlexusContainer getContainer() {
+        return container;
+      }
+
+      @Override
+      public IComponentLookup getComponentLookup() {
+        if(lookup == null) {
+          lookup = wrap(getContainer());
+        }
+        return lookup;
+      }
+    };
   }
 
   private static ClassRealm setupContainerRealm(ClassRealm coreRealm, List<File> extClassPath,
@@ -292,7 +312,7 @@ public class PlexusContainerManager {
     if(multiModuleProjectDirectory == null) {
       return Collections.emptyList();
     }
-    File extensionsXml = new File(multiModuleProjectDirectory, EXTENSIONS_FILENAME);
+    File extensionsXml = new File(multiModuleProjectDirectory, IMavenPlexusContainer.EXTENSIONS_FILENAME);
     if(!extensionsXml.isFile()) {
       return Collections.emptyList();
     }
@@ -435,7 +455,7 @@ public class PlexusContainerManager {
     File workspaceRoot = workspace.getRoot().getLocation().toFile();
 
     for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
-      if(new File(root, MVN_FOLDER).isDirectory()) {
+      if(new File(root, IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
         return root;
       }
     }

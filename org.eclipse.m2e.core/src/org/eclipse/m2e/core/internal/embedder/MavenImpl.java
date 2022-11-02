@@ -148,7 +148,6 @@ import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
@@ -952,7 +951,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public PlexusContainer getPlexusContainer() throws CoreException {
     try {
-      return containerManager.aquire();
+      return containerManager.aquire().getContainer();
     } catch(Exception ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_init_maven, ex));
     }
@@ -1040,7 +1039,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     ClassLoader classLoader = project.getClassRealm();
     if(classLoader == null) {
       try {
-        return containerManager.aquire(project.getBasedir()).getContainerRealm();
+        return containerManager.aquire(project.getBasedir()).getContainer().getContainerRealm();
       } catch(Exception ex) {
         throw new RuntimeException(ex);
       }
@@ -1078,7 +1077,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public MavenExecutionContext createExecutionContext() {
-      return new MavenExecutionContext(this, (IMavenProjectFacade) null);
+    //the global context do not has a basedir nor a project supplier...
+    return new MavenExecutionContext(this, null, null);
   }
 
 }
