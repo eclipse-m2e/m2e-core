@@ -858,16 +858,13 @@ public class LifecycleMappingFactory {
       if(monitor.isCanceled()) {
         break;
       }
-      boolean detach = false;
       AnnotationMappingMetadataSource annSource = AnnotationMappingMetadataSource.get(project);
       if(annSource != null) {
-        detach = true;
         sources.add(annSource);
       }
 
       LifecycleMappingMetadataSource embeddedSource = getEmbeddedMetadataSource(project);
       if(embeddedSource != null) {
-        detach = true;
         embeddedSource.setSource(project);
         sources.add(new SimpleMappingMetadataSource(embeddedSource));
       }
@@ -876,11 +873,6 @@ public class LifecycleMappingFactory {
           monitor)) {
         sources.add(new SimpleMappingMetadataSource(referencedSource));
       }
-
-      if(detach) {
-        maven.detachFromSession(project); // don't cache maven session
-      }
-
       project = project.getParent();
     } while(project != null);
 
