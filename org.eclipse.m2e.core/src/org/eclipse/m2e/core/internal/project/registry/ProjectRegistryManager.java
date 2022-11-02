@@ -974,13 +974,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
    *           been created
    */
   void applyMutableProjectRegistry(MutableProjectRegistry newState, IProgressMonitor monitor) throws CoreException {
-    // don't cache maven sessions
-    for(MavenProjectFacade facade : newState.getProjects()) {
-      MavenProject mavenProject = getMavenProject(facade);
-      if(mavenProject != null) {
-        maven.detachFromSession(mavenProject);
-      }
-    }
     List<MavenProjectChangedEvent> events = projectRegistry.apply(newState);
     //stateReader.writeWorkspaceState(projectRegistry);
     notifyProjectChangeListeners(events, monitor);

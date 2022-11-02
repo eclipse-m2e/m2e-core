@@ -123,11 +123,9 @@ public interface IMaven extends IComponentLookup {
       throws CoreException;
 
   /**
-   * Makes MavenProject instances returned by #readProject methods suitable for caching and reuse with other
-   * MavenSession instances.<br/>
-   * Do note that MavenProject.getParentProject() cannot be used for detached MavenProject instances,
-   * #resolveParentProject to read parent project instance.
+   * this method is a noop now
    */
+  @Deprecated(forRemoval = true)
   void detachFromSession(MavenProject project) throws CoreException;
 
   // execution

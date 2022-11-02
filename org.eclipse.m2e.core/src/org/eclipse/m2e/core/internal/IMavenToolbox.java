@@ -85,12 +85,16 @@ public interface IMavenToolbox {
       configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
       ProjectBuildingResult projectBuildingResult = componentLookup.lookup(ProjectBuilder.class).build(pomFile,
           configuration);
-      result.setProject(projectBuildingResult.getProject());
+      MavenProject project = projectBuildingResult.getProject();
+      clearProjectBuildingRequest(project);
+      result.setProject(project);
       result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
     } catch(ProjectBuildingException ex) {
       if(ex.getResults() != null && ex.getResults().size() == 1) {
         ProjectBuildingResult projectBuildingResult = ex.getResults().get(0);
-        result.setProject(projectBuildingResult.getProject());
+        MavenProject project = projectBuildingResult.getProject();
+        clearProjectBuildingRequest(project);
+        result.setProject(project);
         result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
       }
       result.addException(ex);
@@ -116,7 +120,9 @@ public interface IMavenToolbox {
     }
     for(ProjectBuildingResult projectBuildingResult : projectBuildingResults) {
       MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
-      mavenExecutionResult.setProject(projectBuildingResult.getProject());
+      MavenProject project = projectBuildingResult.getProject();
+      clearProjectBuildingRequest(project);
+      mavenExecutionResult.setProject(project);
       mavenExecutionResult.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
       if(!projectBuildingResult.getProblems().isEmpty()) {
         mavenExecutionResult
@@ -125,6 +131,18 @@ public interface IMavenToolbox {
       result.put(projectBuildingResult.getPomFile(), mavenExecutionResult);
     }
     return result;
+  }
+
+  /**
+   * clears the (deprecated) ProjectBuildingRequest in a maven project to not keep a hard reference to it
+   * 
+   * @param project
+   */
+  default void clearProjectBuildingRequest(MavenProject project) {
+    if(project != null) {
+      project.setProjectBuildingRequest(null);
+      clearProjectBuildingRequest(project.getParent());
+    }
   }
 
   default MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, boolean setup) throws CoreException {

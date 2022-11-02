@@ -484,15 +484,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return result;
   }
 
-  /**
-   * Makes MavenProject instances returned by #readProject methods suitable for caching and reuse with other
-   * MavenSession instances.<br/>
-   * Do note that MavenProject.getParentProject() cannot be used for detached MavenProject instances. Use
-   * #resolveParentProject to resolve parent project instance.
-   */
+  @Deprecated
   @Override
   public void detachFromSession(MavenProject project) throws CoreException {
-    project.getProjectBuildingRequest().setRepositorySession(lookup(ContextRepositorySystemSession.class));
+    //noop now
   }
 
   private MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,
