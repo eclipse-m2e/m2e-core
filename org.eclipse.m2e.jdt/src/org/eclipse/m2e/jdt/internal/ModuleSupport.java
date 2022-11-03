@@ -522,7 +522,17 @@ public class ModuleSupport {
             continue;
           }
 
-          String value = it.next();
+          String value = null;
+          if(argType.getArgumentName().equalsIgnoreCase(argumentName)) {
+            // full argument match
+            value = it.next();
+          } else {
+            // argument with delimiter match
+            String argumentWithDelimiter = argType.getArgumentName().toLowerCase() + JpmsArgType.argumentDelimiter;
+            if(argumentName.toLowerCase().startsWith(argumentWithDelimiter)) {
+              value = argumentName.substring(argumentWithDelimiter.length());
+            }
+          }
           JpmsArgValue argValue = argType.parse(value);
 
           if(argValue == null) {
@@ -629,6 +639,8 @@ public class ModuleSupport {
 
     private Function<JpmsArgs, List<JpmsArgValue>> getFunction;
 
+    public static final String argumentDelimiter = "=";
+
     /**
      * Jpms argument type enum constructor
      * 
@@ -655,6 +667,10 @@ public class ModuleSupport {
      * @return the parsed value
      */
     public JpmsArgValue parse(String value) {
+      if(value == null) {
+        return null;
+      }
+
       String trimed = value.trim();
       Matcher matcher = extractPattern.matcher(trimed);
 
@@ -682,14 +698,27 @@ public class ModuleSupport {
      * @return
      */
     static JpmsArgType valueFromArgumentName(String argumentName) {
-      Optional<JpmsArgType> result = Arrays.stream(JpmsArgType.values())
-          .filter(at -> at.getArgumentName().equalsIgnoreCase(argumentName)).findFirst();
-
-      if(result.isEmpty()) {
+      if(argumentName == null) {
         return null;
       }
 
-      return result.get();
+      Optional<JpmsArgType> result = Arrays.stream(JpmsArgType.values())
+          .filter(at -> at.getArgumentName().equalsIgnoreCase(argumentName)).findFirst();
+
+      if(!result.isEmpty()) {
+        return result.get();
+      }
+
+      // try to match argument with delimiter
+      result = Arrays.stream(JpmsArgType.values())
+          .filter(at -> argumentName.toLowerCase().startsWith(at.getArgumentName().toLowerCase() + argumentDelimiter))
+          .findFirst();
+
+      if(!result.isEmpty()) {
+        return result.get();
+      }
+
+      return null;
     }
 
     /**
