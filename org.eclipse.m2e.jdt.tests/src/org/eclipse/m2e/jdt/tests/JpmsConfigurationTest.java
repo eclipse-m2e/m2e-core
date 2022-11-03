@@ -68,6 +68,8 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     File pomFileFS = new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/pom.xml")).getFile());
     File argsSet1FS= new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/compilerArgsSet1.xml")).getFile());
     File argsSet2FS = new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/compilerArgsSet2.xml")).getFile());
+	File argsSet3FS = new File(FileLocator
+			.toFileURL(getClass().getResource("/projects/compilerJpmsSettings/compilerArgsSet3.xml")).getFile());
     
     IProject project = importProject(pomFileFS.getAbsolutePath());
     waitForJobsToComplete();
@@ -92,6 +94,7 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     String contents = Utils.read(project, pomFileFS);
     String argsSet1 = Utils.read(project, argsSet1FS);
     String argsSet2 = Utils.read(project, argsSet2FS);
+	String argsSet3 = Utils.read(project, argsSet3FS);
     
     IFile pomFileWS = project.getFile(pomFileFS.getName());
     
@@ -131,6 +134,24 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     assertEquals(M2E_ADD_READS_VALUE1 + ATTR_VALUE_SEPARATOR + M2E_ADD_READS_VALUE2, m2eAttributes.get(ADD_READS_ATTR));
     assertEquals(M2E_PATCH_MODULE_VALUE1 + ATTR_VALUE_SEPARATOR + M2E_PATCH_MODULE_VALUE2, m2eAttributes.get(PATCH_MODULE_ATTR));
     
+	// then test attributes are created with one value each
+	String argsSet3Content = contents.replace(REPLACED_POM_STRING, argsSet3);
+	pomFileWS.setContents(new ByteArrayInputStream(argsSet3Content.getBytes()), true, false, null);
+	waitForJobsToComplete();
+
+	jreAttributes = Utils.getJreContainerAttributes(javaProject);
+	m2eAttributes = Utils.getM2eContainerAttributes(javaProject);
+
+	assertEquals(JRE_ADD_EXPORTS_VALUE1, jreAttributes.get(ADD_EXPORTS_ATTR));
+	assertEquals(JRE_ADD_OPENS_VALUE1, jreAttributes.get(ADD_OPENS_ATTR));
+	assertEquals(JRE_ADD_READS_VALUE1, jreAttributes.get(ADD_READS_ATTR));
+	assertEquals(JRE_PATCH_MODULE_VALUE1, jreAttributes.get(PATCH_MODULE_ATTR));
+
+	assertEquals(M2E_ADD_EXPORTS_VALUE1, m2eAttributes.get(ADD_EXPORTS_ATTR));
+	assertEquals(M2E_ADD_OPENS_VALUE1, m2eAttributes.get(ADD_OPENS_ATTR));
+	assertEquals(M2E_ADD_READS_VALUE1, m2eAttributes.get(ADD_READS_ATTR));
+	assertEquals(M2E_PATCH_MODULE_VALUE1, m2eAttributes.get(PATCH_MODULE_ATTR));
+
     // then test attributes are removed
     pomFileWS.setContents(new ByteArrayInputStream(contents.getBytes()), true, false, null);
     waitForJobsToComplete();
