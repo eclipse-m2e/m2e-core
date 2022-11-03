@@ -46,3 +46,12 @@ jobs:
         if-no-files-found: error
         path: |
           ${{ github.workspace }}/**/target/surefire-reports/*.xml
+  event_file:
+    name: "Event File"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: Event File
+        path: ${{ github.event_path }}
