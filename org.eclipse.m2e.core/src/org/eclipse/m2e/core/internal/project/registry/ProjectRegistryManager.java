@@ -34,13 +34,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -126,6 +131,14 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  */
 @Component(service = ProjectRegistryManager.class)
 public class ProjectRegistryManager implements ISaveParticipant {
+
+  /**
+   * 
+   */
+  private static final int CACHE_CLEAN_DELAY = Integer.getInteger("m2e.project.cache.clean", 30);
+
+  private static final int MAX_CACHE_SIZE = Integer.getInteger("m2e.project.cache.size", 20);
+
   static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
 
   static final String ARTIFACT_TYPE_POM = "pom"; //$NON-NLS-1$
@@ -180,6 +193,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
    */
   Consumer<Map<MavenProjectFacade, MavenProject>> addContextProjectListener;
 
+  private ScheduledExecutorService cacheClearRunner;
+
   public ProjectRegistryManager() {
     this.mavenProjectCache = createProjectCache();
   }
@@ -194,7 +209,51 @@ public class ProjectRegistryManager implements ISaveParticipant {
       state = stateReader.readWorkspaceState(this);
     }
     this.projectRegistry = (state != null && state.isValid()) ? state : new ProjectRegistry();
+    this.cacheClearRunner = Executors.newSingleThreadScheduledExecutor();
+    cacheClearRunner.scheduleWithFixedDelay(() -> doCleanUp(), CACHE_CLEAN_DELAY, CACHE_CLEAN_DELAY, TimeUnit.SECONDS);
+  }
 
+  private void doCleanUp() {
+    log.debug("Perform cache cleanup tasks...");
+    mavenProjectCache.cleanUp();
+    log.debug("There are " + mavenProjectCache.size() + " items in the cache.. searching fo duplicates...");
+    ConcurrentMap<MavenProjectFacade, MavenProject> map = mavenProjectCache.asMap();
+    Set<String> uniqueFacadeSet = new HashSet<>();
+    Set<String> uniqueProjects = new HashSet<>();
+    IdentityHashMap<MavenProject, Boolean> allProjects = new IdentityHashMap<>();
+    for(var entry : map.entrySet()) {
+      MavenProjectFacade key = entry.getKey();
+      MavenProject value = entry.getValue();
+      uniqueFacadeSet.add(key.getArtifactKey().toPortableString());
+      addProjectToSet(value, uniqueProjects, allProjects);
+    }
+    //TODO we should do here:
+    //- String deduplication
+    //- Project deduplication
+    //- ... other objects deduplication (dependencies objects?)
+    log.debug("There are " + uniqueFacadeSet.size() + " unique facades in the cache (according to GAV)");
+    log.debug("There are " + uniqueProjects.size()
+        + " unique projects in the cache (according to GAV) and a total of " + allProjects.size());
+  }
+
+  /**
+   * @param value
+   * @param uniqueProjects
+   * @param allProjects 
+   */
+  private void addProjectToSet(MavenProject value, Set<String> uniqueProjects,
+      IdentityHashMap<MavenProject, Boolean> allProjects) {
+    if(value == null) {
+      return ;
+    }
+    allProjects.put(value, true);
+    uniqueProjects.add(value.getGroupId() + ":" + value.getArtifactId() + ":" + value.getVersion());
+    addProjectToSet(value.getParent(), uniqueProjects, allProjects);
+  }
+
+  @Deactivate
+  void shutdown() {
+    cacheClearRunner.shutdownNow();
   }
 
   /**
@@ -251,53 +310,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
       return file;
     }).orElse(null);
-  }
-
-  /**
-   * Removes specified poms from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
-   * Recursively removes all nested modules if appropriate.
-   *
-   * @return a {@link Set} of {@link IFile} affected poms
-   */
-  public Set<IFile> remove(MutableProjectRegistry state, Set<IFile> poms, boolean force) {
-    Set<IFile> pomSet = new LinkedHashSet<>();
-    for(IFile pom : poms) {
-      MavenProjectFacade facade = state.getProjectFacade(pom);
-      if(force || facade == null || facade.isStale()) {
-        pomSet.addAll(remove(state, pom));
-      }
-    }
-    return pomSet;
-  }
-
-  /**
-   * Removes the pom from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
-   * Recursively removes all nested modules if appropriate.
-   *
-   * @return a {@link Set} of {@link IFile} affected poms
-   */
-  public Set<IFile> remove(MutableProjectRegistry state, IFile pom) {
-    MavenProjectFacade facade = state.getProjectFacade(pom);
-    ArtifactKey mavenProject = facade != null ? facade.getArtifactKey() : null;
-
-    flushCaches(facade, false);
-
-    if(mavenProject == null) {
-      state.removeProject(pom, null);
-      return Collections.emptySet();
-    }
-
-    Set<IFile> pomSet = new LinkedHashSet<>();
-
-    pomSet.addAll(state.getDependents(MavenCapability.createMavenArtifact(mavenProject), false));
-    pomSet.addAll(state.getDependents(MavenCapability.createMavenParent(mavenProject), false)); // TODO check packaging
-    state.removeProject(pom, mavenProject);
-
-    pomSet.addAll(refreshWorkspaceModules(state, mavenProject));
-
-    pomSet.remove(pom);
-
-    return pomSet;
   }
 
   private boolean isForceDependencyUpdate() throws CoreException {
@@ -707,6 +719,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private Map<IFile, MavenProjectFacade> readMavenProjectFacades(Collection<IFile> poms, MutableProjectRegistry state,
       IProgressMonitor monitor) throws CoreException {
+    if(poms.isEmpty()) {
+      return Map.of();
+    }
+    long start = System.currentTimeMillis();
+    log.debug("Reading {} into facades...", poms.size());
     SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
     for(IFile pom : poms) {
       markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
@@ -728,6 +745,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       containerMonitor.setWorkRemaining(pomFiles.size());
       for(var containerEntry : pomFiles.entrySet()) {
         List<IFile> fileList = containerEntry.getValue();
+        log.debug("Processing {} grouped pom files for basedir {}...", fileList.size(), containerEntry.getKey().getMavenDirectory().orElse(null));
         IMavenPlexusContainer mavenPlexusContainer = containerEntry.getKey();
         MavenExecutionContext context = new MavenExecutionContext(mavenPlexusContainer.getComponentLookup(),
             mavenPlexusContainer.getMavenDirectory().orElse(null), null);
@@ -735,9 +753,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
             resolverConfiguration);
 
         result.putAll(context.execute((ctx, mon) -> {
+          ProjectBuildingRequest buildingRequest = ctx.newProjectBuildingRequest();
           Map<File, MavenExecutionResult> mavenResults = IMavenToolbox.of(ctx).readMavenProjects(
               fileList.stream().filter(IFile::isAccessible).map(ProjectRegistryManager::toJavaIoFile).toList(),
-              ctx.newProjectBuildingRequest());
+              buildingRequest);
           Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
           for(IFile pom : fileList) {
             if(!pom.isAccessible()) {
@@ -758,6 +777,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
         }, containerMonitor.split(1)));
       }
     }
+    log.debug(
+            "Reading {} into facades has taken {}ms", poms.size(), (System.currentTimeMillis() - start));
+    doCleanUp();
     return result;
   }
 
@@ -863,6 +885,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private Collection<MavenExecutionResult> readProjectsWithDependencies(IFile pomFile,
       ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
+    long start = System.currentTimeMillis();
     try {
       IMavenPlexusContainer container = mapToContainer(pomFile);
       Map<File, MavenExecutionResult> resultMap = Map.of();
@@ -880,6 +903,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       return resultMap.values();
     } catch(CoreException ex) {
       return List.of(new DefaultMavenExecutionResult().addException(ex));
+    } finally {
+      log.debug("Reading {} with dependecies has taken {}ms", pomFile, (System.currentTimeMillis() - start));
     }
   }
 
@@ -1096,9 +1121,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
-    int maxCacheSize = Integer.getInteger("m2e.project.cache.size", 20);
     return CacheBuilder.newBuilder() //
-        .maximumSize(maxCacheSize) //
+        .maximumSize(MAX_CACHE_SIZE) //
         .removalListener((RemovalNotification<MavenProjectFacade, MavenProject> removed) -> {
           Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
           MavenProjectFacade facade = removed.getKey();
