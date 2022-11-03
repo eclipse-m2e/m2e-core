@@ -354,7 +354,7 @@ public class ProjectConfigurationManager
     SubMonitor monitor = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_updating_projects,
         pomFiles.size() * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0) + (refreshFromLocal ? 1 : 0)));
 
-    long l1 = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
     log.info("Update started"); //$NON-NLS-1$
 
     Map<IFile, IMavenProjectFacade> projects = new LinkedHashMap<>();
@@ -382,6 +382,7 @@ public class ProjectConfigurationManager
     // refresh projects and update all dependencies
     // this will ensure that project registry is up-to-date on GAV of all projects being updated
     // TODO this sends multiple update events, rework using low-level registry update methods
+    long refreshLocal = System.currentTimeMillis();
     try {
       projectManager.refresh(pomsToRefresh, monitor.split(pomFiles.size()));
 
@@ -400,6 +401,7 @@ public class ProjectConfigurationManager
         updateStatus.put(project.getName(), ex.getStatus());
       }
     }
+    long refreshProjects = System.currentTimeMillis();
 
     // update project configuration
     if(updateConfiguration) {
@@ -417,7 +419,9 @@ public class ProjectConfigurationManager
         }
         return false;
       });
+
     }
+    long updateConfig = System.currentTimeMillis();
 
     // rebuild
     if(cleanProjects) {
@@ -441,10 +445,24 @@ public class ProjectConfigurationManager
       });
     }
 
-    long l2 = System.currentTimeMillis();
-    log.info("Update completed: {} sec", ((l2 - l1) / 1000)); //$NON-NLS-1$
+    long clean = System.currentTimeMillis();
+    log.info("Update completed for {} poms: {}, {}, {} ", pomFiles.size(), //$NON-NLS-1$
+        printDelta("local refresh", start, refreshLocal), printDelta("refresh facades", refreshLocal, refreshProjects),
+        printDelta("update config", refreshProjects, updateConfig),
+        printDelta("clean projects config", updateConfig, clean),
+        printDelta("total", start, clean));
 
     return updateStatus;
+  }
+
+  /**
+   * @param start
+   * @param refreshLocal
+   * @return
+   */
+  private String printDelta(String type, long start, long end) {
+    double delay = (end - start) / 1000;
+    return String.format("%s takes %.2f sec", type, delay);
   }
 
   private void updateProjectConfiguration(ProjectConfigurationRequest request, IProgressMonitor monitor)
@@ -721,9 +739,6 @@ public class ProjectConfigurationManager
       folder.setDerived(true, new NullProgressMonitor());
     }
   }
-
-
-
 
   @Override
   public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {
