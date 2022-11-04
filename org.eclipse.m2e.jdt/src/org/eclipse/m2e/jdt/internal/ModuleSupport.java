@@ -702,23 +702,13 @@ public class ModuleSupport {
         return null;
       }
 
-      Optional<JpmsArgType> result = Arrays.stream(JpmsArgType.values())
-          .filter(at -> at.getArgumentName().equalsIgnoreCase(argumentName)).findFirst();
-
-      if(!result.isEmpty()) {
-        return result.get();
-      }
-
-      // try to match argument with delimiter
-      result = Arrays.stream(JpmsArgType.values())
-          .filter(at -> argumentName.toLowerCase().startsWith(at.getArgumentName().toLowerCase() + argumentDelimiter))
-          .findFirst();
-
-      if(!result.isEmpty()) {
-        return result.get();
-      }
-
-      return null;
+      return Arrays.stream(JpmsArgType.values()).filter(at -> at.getArgumentName().equalsIgnoreCase(argumentName))
+          .findFirst()
+          .or(() -> Arrays.stream(JpmsArgType.values())
+              .filter(
+                  at -> argumentName.toLowerCase().startsWith(at.getArgumentName().toLowerCase() + argumentDelimiter))
+              .findFirst())
+          .orElse(null);
     }
 
     /**
