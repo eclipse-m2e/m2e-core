@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -34,7 +33,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,10 +44,6 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalNotification;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
@@ -80,14 +74,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.plugin.ExtensionRealmCache;
-import org.apache.maven.plugin.PluginArtifactsCache;
-import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.project.ProjectRealmCache;
-import org.apache.maven.project.artifact.MavenMetadataCache;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -108,7 +97,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetad
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MarkerUtils;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
-import org.eclipse.m2e.core.internal.project.IManagedCache;
 import org.eclipse.m2e.core.internal.project.ProjectProcessingTracker;
 import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -150,8 +138,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       new Path("pom.xml"), // //$NON-NLS-1$
       new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$
 
-  private static final String CTX_MAVENPROJECTS = ProjectRegistryManager.class.getName() + "/mavenProjects";
-
   private ProjectRegistry projectRegistry;
 
   @Reference
@@ -169,19 +155,20 @@ public class ProjectRegistryManager implements ISaveParticipant {
   @Reference
   private ProjectRegistryReader stateReader;
 
+  @Reference
+  private MavenProjectCache mavenProjectCache;
+
   private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<>();
 
   private volatile Thread syncRefreshThread;
 
-  private final Cache<MavenProjectFacade, MavenProject> mavenProjectCache;
-
   /**
    * @noreference For tests only
    */
-  Consumer<Map<MavenProjectFacade, MavenProject>> addContextProjectListener;
+  Consumer<Map<IMavenProjectFacade, MavenProject>> addContextProjectListener;
 
   public ProjectRegistryManager() {
-    this.mavenProjectCache = createProjectCache();
+
   }
 
   @Activate
@@ -505,7 +492,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
               newFacade = new MavenProjectFacade(newFacade);
               putMavenProject(newFacade, mavenProject);
             }
-            mavenProjectCache.put(newFacade, mavenProject);
+            mavenProjectCache.updateMavenProject(newFacade, mavenProject);
           }
 
           if(newFacade != null) {
@@ -833,9 +820,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return projectRegistry.getProjectFacade(groupId, artifactId, version);
   }
 
-  private MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
-      IProgressMonitor monitor) {
-    Collection<MavenExecutionResult> results = readProjectsWithDependencies(pomFile, resolverConfiguration, monitor);
+  private MavenProject readProjectWithDependencies(IMavenProjectFacade facade) {
+    IFile pomFile = facade.getPom();
+    ResolverConfiguration resolverConfiguration = facade.getResolverConfiguration();
+    Collection<MavenExecutionResult> results = readProjectsWithDependencies(pomFile, resolverConfiguration, null);
     if(results.size() != 1) {
       throw new IllegalStateException("Results should contain one entry.");
     }
@@ -1031,16 +1019,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * </ul>
    */
 
-  MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-    Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
+  MavenProject getMavenProject(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+    Map<IMavenProjectFacade, MavenProject> mavenProjects = MavenProjectCache.getContextProjectMap();
     try {
       return mavenProjects.computeIfAbsent(facade, fac -> {
-        try {
-          return mavenProjectCache.get(fac,
-              () -> readProjectWithDependencies(fac.getPom(), fac.getResolverConfiguration(), monitor));
-        } catch(ExecutionException ex) {
-          throw new RuntimeException(ex);
-        }
+          return mavenProjectCache.getMavenProject(fac, this::readProjectWithDependencies);
       });
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();
@@ -1052,12 +1035,12 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   MavenProject getMavenProject(MavenProjectFacade facade) {
-    MavenProject mavenProject = mavenProjectCache.getIfPresent(facade);
+    MavenProject mavenProject = mavenProjectCache.getMavenProject(facade, null);
     if(mavenProject != null) {
       //if absent in context, the MavenProject was already created in another execution
       putMavenProject(facade, mavenProject);
     } else {
-      mavenProject = getContextProjects().get(facade);
+      mavenProject = MavenProjectCache.getContextProjectMap().get(facade);
     }
     return mavenProject;
   }
@@ -1066,7 +1049,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
    * @noreference public for test purposes only
    */
   public void putMavenProject(MavenProjectFacade facade, MavenProject mavenProject) {
-    Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
+    Map<IMavenProjectFacade, MavenProject> mavenProjects = MavenProjectCache.getContextProjectMap();
     if(mavenProject != null) {
       mavenProjects.put(facade, mavenProject);
       if(this.addContextProjectListener != null) {
@@ -1077,43 +1060,12 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  /**
-   * Do not modify this map directly, use {@link #putMavenProject(MavenProjectFacade, MavenProject)}
-   *
-   * @return
-   */
-  private Map<MavenProjectFacade, MavenProject> getContextProjects() {
-    MavenExecutionContext context = MavenExecutionContext.getThreadContext(false);
-    if(context != null) {
-      Map<MavenProjectFacade, MavenProject> projects = context.getValue(CTX_MAVENPROJECTS);
-      if(projects == null) {
-        projects = new IdentityHashMap<>();
-        context.setValue(CTX_MAVENPROJECTS, projects);
-      }
-      return projects;
-    }
-    return new IdentityHashMap<>();
-  }
-
-  private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
-    int maxCacheSize = Integer.getInteger("m2e.project.cache.size", 20);
-    return CacheBuilder.newBuilder() //
-        .maximumSize(maxCacheSize) //
-        .removalListener((RemovalNotification<MavenProjectFacade, MavenProject> removed) -> {
-          Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
-          MavenProjectFacade facade = removed.getKey();
-          if(!contextProjects.containsKey(facade)) {
-            flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), false);
-          }
-        }).build();
-  }
-
-  private Set<IFile> flushCaches(MavenProjectFacade facade, boolean forceDependencyUpdate) {
+  private Set<IFile> flushCaches(IMavenProjectFacade facade, boolean forceDependencyUpdate) {
     if(facade != null) {
       ArtifactKey key = facade.getArtifactKey();
-      mavenProjectCache.invalidate(facade);
+      mavenProjectCache.invalidateProjectFacade(facade);
       Set<IFile> ifiles = new HashSet<>();
-      for(File file : flushMavenCaches(facade.getPomFile(), key, forceDependencyUpdate)) {
+      for(File file : mavenProjectCache.flushMavenCaches(facade.getPomFile(), key, forceDependencyUpdate)) {
         MavenProjectFacade affected = projectRegistry.getProjectFacade(file);
         if(affected != null) {
           ifiles.add(affected.getPom());
@@ -1122,29 +1074,6 @@ public class ProjectRegistryManager implements ISaveParticipant {
       return ifiles;
     }
 
-    return Collections.emptySet();
-  }
-
-  /**
-   * Flushes caches maintained by Maven core.
-   */
-  private Set<File> flushMavenCaches(File pom, ArtifactKey key, boolean force) {
-    Set<File> affected = new HashSet<>();
-    affected.addAll(flushMavenCache(ProjectRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(ExtensionRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(PluginRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(MavenMetadataCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(PluginArtifactsCache.class, pom, key, force));
-    return affected;
-  }
-
-  private Set<File> flushMavenCache(Class<?> clazz, File pom, ArtifactKey key, boolean force) {
-    try {
-      IManagedCache cache = (IManagedCache) maven.lookup(clazz);
-      return cache.removeProject(pom, key, force);
-    } catch(CoreException ex) {
-      // can't really happen
-    }
     return Collections.emptySet();
   }
 
