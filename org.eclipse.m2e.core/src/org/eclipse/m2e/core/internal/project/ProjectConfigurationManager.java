@@ -916,7 +916,11 @@ public class ProjectConfigurationManager
 
   @Override
   public ResolverConfiguration getResolverConfiguration(IProject project) {
-    return ResolverConfigurationIO.readResolverConfiguration(project);
+    IProjectConfiguration cfg = ResolverConfigurationIO.readResolverConfiguration(project);
+    if(cfg instanceof ResolverConfiguration) {
+      return (ResolverConfiguration) cfg;
+    }
+    return new ResolverConfiguration(cfg);
   }
 
   /* (non-Javadoc)

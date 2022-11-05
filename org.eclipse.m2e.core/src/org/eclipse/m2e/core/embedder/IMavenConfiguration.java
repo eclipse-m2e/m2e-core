@@ -130,7 +130,11 @@ public interface IMavenConfiguration {
   boolean buildWithNullSchedulingRule();
 
   static IMavenConfiguration getWorkspaceConfiguration() {
-    return MavenPluginActivator.getDefault().getMavenConfiguration();
+    MavenPluginActivator activator = MavenPluginActivator.getDefault();
+    if(activator == null) {
+      throw new IllegalStateException("m2e is shut down!");
+    }
+    return activator.getMavenConfiguration();
   }
 
 }

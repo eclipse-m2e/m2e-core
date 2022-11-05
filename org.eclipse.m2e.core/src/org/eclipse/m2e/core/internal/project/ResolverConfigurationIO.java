@@ -110,7 +110,7 @@ public class ResolverConfigurationIO {
     return false;
   }
 
-  public static ResolverConfiguration readResolverConfiguration(IProject project) {
+  public static IProjectConfiguration readResolverConfiguration(IProject project) {
     IScopeContext projectScope = new ProjectScope(project);
     IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
     if(projectNode == null) {

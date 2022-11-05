@@ -204,7 +204,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
     MavenProjectFacade projectFacade = projectRegistry.getProjectFacade(pom);
     if(projectFacade == null && load) {
-      ResolverConfiguration config = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
+      IProjectConfiguration config = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
       MavenExecutionResult executionResult = readProjectsWithDependencies(pom, config, monitor).iterator().next();
       MavenProject mavenProject = executionResult.getProject();
       if(mavenProject != null && mavenProject.getArtifact() != null) {
@@ -700,17 +700,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
       markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
     }
 
-    Map<IFile, ResolverConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
-    Map<ResolverConfiguration, Collection<IFile>> groupsToImport = poms.stream().collect(Collectors.groupingBy(pom -> {
+    Map<IFile, IProjectConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
+    Map<IProjectConfiguration, Collection<IFile>> groupsToImport = poms.stream().collect(Collectors.groupingBy(pom -> {
       subMonitor.checkCanceled();
-      ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
+      IProjectConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
       resolverConfigurations.put(pom, resolverConfiguration);
       return resolverConfiguration;
     }, LinkedHashMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
     Map<IFile, MavenProjectFacade> result = new HashMap<>(poms.size(), 1.f);
-    for(Entry<ResolverConfiguration, Collection<IFile>> entry : groupsToImport.entrySet()) {
-      ResolverConfiguration resolverConfiguration = entry.getKey();
+    for(Entry<IProjectConfiguration, Collection<IFile>> entry : groupsToImport.entrySet()) {
+      IProjectConfiguration resolverConfiguration = entry.getKey();
       Map<IMavenPlexusContainer, List<IFile>> pomFiles = mapToContainer(entry.getValue());
       SubMonitor containerMonitor = subMonitor.split(pomFiles.size());
       containerMonitor.setWorkRemaining(pomFiles.size());

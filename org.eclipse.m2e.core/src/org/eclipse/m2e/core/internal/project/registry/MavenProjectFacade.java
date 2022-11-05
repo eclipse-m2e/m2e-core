@@ -33,7 +33,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
@@ -604,7 +603,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public IMavenExecutionContext createExecutionContext() {
     try {
       IMavenPlexusContainer container = manager.getContainerManager().aquire(getPomFile());
-      MavenProject mavenProject = getMavenProject(new NullProgressMonitor());
+      MavenProject mavenProject = getMavenProject(null);
       if(mavenProject == null) {
         //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the chaed variant here?
         return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), null);
