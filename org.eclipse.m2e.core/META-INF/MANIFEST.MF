@@ -49,7 +49,8 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.repository
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
-Import-Package: com.google.common.cache,
+Import-Package: com.google.common.base;version="30.1.0",
+ com.google.common.cache,
  javax.inject;version="1.0.0",
  org.slf4j;version="[1.7.0,3.0.0)"
 Automatic-Module-Name: org.eclipse.m2e.core
