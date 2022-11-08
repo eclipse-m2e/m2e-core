@@ -43,9 +43,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
@@ -199,7 +199,7 @@ public class ProjectRegistryRefreshJob extends Job
 
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
       IProject project = (IProject) event.getResource();
-      if(isMavenProject(project)) {
+      if(MavenPlugin.isMavenProject(project)) {
         queue(new MavenUpdateRequest(project, offline, forceDependencyUpdate));
       }
     } else {
@@ -211,7 +211,7 @@ public class ProjectRegistryRefreshJob extends Job
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
       for(IResourceDelta projectDelta : projectDeltas) {
         IProject project = (IProject) projectDelta.getResource();
-        if(!isMavenProject(project)) {
+        if(!MavenPlugin.isMavenProject(project)) {
           continue;
         }
         //Bug 436679: queue update request only for reopened projects.
@@ -253,12 +253,4 @@ public class ProjectRegistryRefreshJob extends Job
     }
   }
 
-  private boolean isMavenProject(IProject project) {
-    try {
-      return project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID);
-    } catch(CoreException ex) {
-      log.error(ex.getMessage(), ex);
-    }
-    return false;
-  }
 }
