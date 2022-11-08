@@ -335,5 +335,13 @@
             id="org.eclipse.m2e.jdt.keyword"
             label="java">
       </keyword>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickFixProcessors">
+      <quickFixProcessor
+            class="org.eclipse.m2e.jdt.ui.internal.AddDependencyQuickFixProcessor"
+            id="org.eclipse.m2e.jdt.ui.quickFixProcessor1"
+            name="M2Eclipse">
+      </quickFixProcessor>
    </extension>   
 </fragment>

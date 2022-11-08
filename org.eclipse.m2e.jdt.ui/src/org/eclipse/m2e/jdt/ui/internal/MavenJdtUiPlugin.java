@@ -9,10 +9,14 @@
 
 package org.eclipse.m2e.jdt.ui.internal;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 public class MavenJdtUiPlugin extends AbstractUIPlugin {
+
+  public static final String M2E_ICON = "M2E_ICON";
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt.ui"; //$NON-NLS-1$
 
@@ -24,5 +28,9 @@ public class MavenJdtUiPlugin extends AbstractUIPlugin {
 
   public static MavenJdtUiPlugin getDefault() {
     return instance;
+  }
+
+  protected void initializeImageRegistry(ImageRegistry reg) {
+    reg.put(M2E_ICON, ImageDescriptor.createFromURL(MavenJdtUiPlugin.class.getResource("/icons/m2.gif")));
   }
 }

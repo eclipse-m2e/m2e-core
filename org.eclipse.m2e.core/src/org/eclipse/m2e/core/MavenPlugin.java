@@ -13,9 +13,13 @@
 
 package org.eclipse.m2e.core;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -69,6 +73,14 @@ public final class MavenPlugin {
    */
   public static IWorkspaceClassifierResolverManager getWorkspaceClassifierResolverManager() {
     return MavenPluginActivator.getDefault().getWorkspaceClassifierResolverManager();
+  }
+
+  public static boolean isMavenProject(IProject project) {
+    try {
+      return project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID);
+    } catch(CoreException ex) {
+    }
+    return false;
   }
 
 }
