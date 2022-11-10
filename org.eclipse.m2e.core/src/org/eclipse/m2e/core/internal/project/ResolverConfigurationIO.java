@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.internal.project;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 
@@ -75,13 +77,13 @@ public class ResolverConfigurationIO {
    */
   private static final String VERSION = "1"; //$NON-NLS-1$
 
-  public static boolean saveResolverConfiguration(IProject project, ResolverConfiguration configuration) {
+  public static boolean saveResolverConfiguration(IProject project, IProjectConfiguration configuration) {
     IScopeContext projectScope = new ProjectScope(project);
     IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
     if(projectNode != null) {
       projectNode.put(P_VERSION, VERSION);
 
-      projectNode.putBoolean(P_RESOLVE_WORKSPACE_PROJECTS, configuration.shouldResolveWorkspaceProjects());
+      projectNode.putBoolean(P_RESOLVE_WORKSPACE_PROJECTS, configuration.isResolveWorkspaceProjects());
 
       projectNode.put(P_SELECTED_PROFILES, configuration.getSelectedProfiles());
 
@@ -91,8 +93,8 @@ public class ResolverConfigurationIO {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
       }
 
-      if(configuration.getProperties() != null && !configuration.getProperties().isEmpty()) {
-        projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getProperties()));
+      if(configuration.getConfigurationProperties() != null && !configuration.getConfigurationProperties().isEmpty()) {
+        projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getConfigurationProperties()));
       } else {
         projectNode.remove(P_PROPERTIES);
       }
@@ -129,9 +131,9 @@ public class ResolverConfigurationIO {
     return configuration;
   }
 
-  private static String propertiesAsString(Properties properties) {
-    Stream<Entry<Object, Object>> stream = properties.entrySet().stream();
-    String propAsString = stream.map(e -> encodeEntry(e)).collect(Collectors.joining(PROPERTIES_SEPARATOR));
+  private static String propertiesAsString(Map<?, ?> properties) {
+    String propAsString = properties.entrySet().stream().map(e -> encodeEntry(e))
+        .collect(Collectors.joining(PROPERTIES_SEPARATOR));
     return propAsString;
   }
 
@@ -154,7 +156,7 @@ public class ResolverConfigurationIO {
     p.put(urlDecode(key), urlDecode(value));
   }
 
-  private static String encodeEntry(Entry<Object, Object> e) {
+  private static String encodeEntry(Entry<?, ?> e) {
     String key = e.getKey().toString();
     String value = e.getValue() == null ? "" : e.getValue().toString();
     return urlEncode(key) + PROPERTIES_KV_SEPARATOR + urlEncode(value);

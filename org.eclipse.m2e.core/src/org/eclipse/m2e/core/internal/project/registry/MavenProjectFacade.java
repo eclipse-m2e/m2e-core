@@ -61,6 +61,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -336,6 +337,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public ResolverConfiguration getResolverConfiguration() {
+    return resolverConfiguration;
+  }
+
+  @Override
+  public IProjectConfiguration getConfiguration() {
     return resolverConfiguration;
   }
 

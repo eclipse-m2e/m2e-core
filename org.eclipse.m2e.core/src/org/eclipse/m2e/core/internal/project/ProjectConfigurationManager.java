@@ -82,6 +82,7 @@ import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -503,7 +504,7 @@ public class ProjectConfigurationManager
   }
 
   @Override
-  public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
+  public void enableMavenNature(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
     IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute(new AbstractRunnable() {
@@ -515,7 +516,7 @@ public class ProjectConfigurationManager
     }, monitor);
   }
 
-  void enableBasicMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
+  void enableBasicMavenNature(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
     ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 
@@ -838,7 +839,7 @@ public class ProjectConfigurationManager
       listener.projectCreated(project);
     }
 
-    ResolverConfiguration resolverConfiguration = configuration.getResolverConfiguration();
+    IProjectConfiguration resolverConfiguration = configuration.getResolverConfiguration();
     enableBasicMavenNature(project, resolverConfiguration, monitor);
 
     // create empty/marker persistent configuration
@@ -919,7 +920,7 @@ public class ProjectConfigurationManager
   }
 
   @Override
-  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
+  public boolean setResolverConfiguration(IProject project, IProjectConfiguration configuration) {
     return ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
   }
 

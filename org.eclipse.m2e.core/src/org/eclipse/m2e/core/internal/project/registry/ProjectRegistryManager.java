@@ -102,6 +102,7 @@ import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -497,7 +498,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
           if(newFacade != null) {
             MavenProjectFacade facade = newFacade;
-            ResolverConfiguration resolverConfiguration = facade.getResolverConfiguration();
+            IProjectConfiguration resolverConfiguration = facade.getResolverConfiguration();
             createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
                 (executionContext, pm) -> {
                   refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade, pm);
@@ -822,7 +823,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private MavenProject readProjectWithDependencies(IMavenProjectFacade facade) {
     IFile pomFile = facade.getPom();
-    ResolverConfiguration resolverConfiguration = facade.getResolverConfiguration();
+    IProjectConfiguration resolverConfiguration = facade.getResolverConfiguration();
     Collection<MavenExecutionResult> results = readProjectsWithDependencies(pomFile, resolverConfiguration, null);
     if(results.size() != 1) {
       throw new IllegalStateException("Results should contain one entry.");
@@ -850,7 +851,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Collection<MavenExecutionResult> readProjectsWithDependencies(IFile pomFile,
-      ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
+      IProjectConfiguration resolverConfiguration, IProgressMonitor monitor) {
     try {
       IMavenPlexusContainer container = mapToContainer(pomFile);
       Map<File, MavenExecutionResult> resultMap = Map.of();
@@ -885,11 +886,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
   static class Context {
     final IProjectRegistry state;
 
-    final ResolverConfiguration resolverConfiguration;
+    final IProjectConfiguration resolverConfiguration;
 
     final IFile pom;
 
-    Context(IProjectRegistry state, ResolverConfiguration resolverConfiguration, IFile pom) {
+    Context(IProjectRegistry state, IProjectConfiguration resolverConfiguration, IFile pom) {
       this.state = state;
       this.resolverConfiguration = resolverConfiguration;
       this.pom = pom;
@@ -897,7 +898,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
-      IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
+      IFile pom, IProjectConfiguration resolverConfiguration) throws CoreException {
     if(pom != null) {
       request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
     }
@@ -905,13 +906,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
     request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
 
-    Properties p = request.getUserProperties();
-    Properties addProperties = resolverConfiguration.getProperties();
+    Properties userProperties = request.getUserProperties();
+    Map<String, String> addProperties = resolverConfiguration.getConfigurationProperties();
     if(addProperties != null) {
-      if(p == null) {
-        p = new Properties();
+      if(userProperties == null) {
+        userProperties = new Properties();
+        //FIXME should we not set them here?? request.setUserProperties(p);
       }
-      p.putAll(addProperties);
+      userProperties.putAll(addProperties);
     }
 
     // eclipse workspace repository implements both workspace dependency resolution
@@ -928,7 +930,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private static EclipseWorkspaceArtifactRepository getWorkspaceReader(IProjectRegistry state, IFile pom,
-      ResolverConfiguration resolverConfiguration) {
+      IProjectConfiguration resolverConfiguration) {
     Context context = new Context(state, resolverConfiguration, pom);
     return new EclipseWorkspaceArtifactRepository(context);
   }
@@ -978,7 +980,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private IMavenExecutionContext createExecutionContext(IProjectRegistry state, IFile pom,
-      ResolverConfiguration resolverConfiguration) throws CoreException {
+      IProjectConfiguration resolverConfiguration) throws CoreException {
 
     IMavenExecutionContext context;
     try {
@@ -1003,7 +1005,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     return context;
   }
 
-  public IMavenExecutionContext createExecutionContext(IFile pom, ResolverConfiguration resolverConfiguration)
+  public IMavenExecutionContext createExecutionContext(IFile pom, IProjectConfiguration resolverConfiguration)
       throws CoreException {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
   }

@@ -58,6 +58,7 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -133,7 +134,7 @@ public class ProfileManager implements IProfileManager {
       return Collections.emptyList();
     }
 
-    ResolverConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
+    IProjectConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
         .getResolverConfiguration(facade.getProject());
 
     List<String> configuredProfiles = toList(resolverConfiguration.getSelectedProfiles());

@@ -36,6 +36,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -107,9 +108,9 @@ public class MavenProjectPreferencePage extends PropertyPage {
     init(new ResolverConfiguration());
   }
 
-  private void init(ResolverConfiguration configuration) {
+  private void init(IProjectConfiguration configuration) {
 
-    resolveWorspaceProjectsButton.setSelection(configuration.shouldResolveWorkspaceProjects());
+    resolveWorspaceProjectsButton.setSelection(configuration.isResolveWorkspaceProjects());
 //    includeModulesButton.setSelection(configuration.shouldIncludeModules());
     selectedProfilesText.setText(configuration.getSelectedProfiles());
   }
@@ -129,7 +130,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     final ResolverConfiguration configuration = getResolverConfiguration();
     if(configuration.getSelectedProfiles().equals(selectedProfilesText.getText()) &&
 //        configuration.shouldIncludeModules()==includeModulesButton.getSelection() &&
-        configuration.shouldResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()) {
+        configuration.isResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()) {
       return true;
     }
 

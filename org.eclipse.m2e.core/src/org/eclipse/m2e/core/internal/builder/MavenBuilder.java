@@ -42,8 +42,8 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -74,7 +74,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
         return null;
       }
 
-      ResolverConfiguration resolverConfiguration = configurationManager.getResolverConfiguration(project);
+      IProjectConfiguration resolverConfiguration = configurationManager.getResolverConfiguration(project);
 
       if(resolverConfiguration == null) {
         // TODO unit test me

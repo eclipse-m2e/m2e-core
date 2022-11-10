@@ -66,7 +66,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.internal.launch.LaunchingUtils;
 import org.eclipse.m2e.internal.launch.Messages;
 import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
@@ -236,7 +236,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     IFile pomFile = basedir.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
     if(projectFacade != null) {
-      ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
+      IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
 
       String selectedProfiles = configuration.getSelectedProfiles();
       if(selectedProfiles != null && selectedProfiles.length() > 0) {

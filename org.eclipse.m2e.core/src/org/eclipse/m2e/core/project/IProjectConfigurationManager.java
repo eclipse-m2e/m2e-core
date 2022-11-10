@@ -55,7 +55,7 @@ public interface IProjectConfigurationManager {
 
   Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects);
 
-  void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
+  void enableMavenNature(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor)
       throws CoreException;
 
   void disableMavenNature(IProject project, IProgressMonitor monitor) throws CoreException;
@@ -90,6 +90,6 @@ public interface IProjectConfigurationManager {
   /**
    * PROVISIONAL
    */
-  boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
+  boolean setResolverConfiguration(IProject project, IProjectConfiguration configuration);
 
 }
