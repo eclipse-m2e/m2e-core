@@ -136,7 +136,7 @@ public class MavenProjectManager implements IMavenProjectRegistry {
   @Override
   public <V> V execute(final IMavenProjectFacade facade, final ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException {
-    IMavenExecutionContext context = manager.createExecutionContext(facade.getPom(), facade.getResolverConfiguration());
+    IMavenExecutionContext context = manager.createExecutionContext(facade.getPom(), facade.getConfiguration());
     return context.execute(
         (context1, monitor1) -> context1.execute(facade.getMavenProject(monitor1), callable, monitor1), monitor);
   }

@@ -74,7 +74,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
         return null;
       }
 
-      IProjectConfiguration resolverConfiguration = configurationManager.getResolverConfiguration(project);
+      IProjectConfiguration resolverConfiguration = configurationManager.getProjectConfiguration(project);
 
       if(resolverConfiguration == null) {
         // TODO unit test me

@@ -560,7 +560,7 @@ public class LifecycleMappingsViewer {
           MavenProject mavenProject = facade.getMavenProject(monitor1);
           List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor1);
           LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
-              mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1);
+              mojoExecutions, facade.getConfiguration().getLifecycleMappingId(), monitor1);
           Map<MojoExecutionKey, List<IPluginExecutionMetadata>> result = mappingResult.getMojoExecutionMapping();
           Map<String, List<MojoExecutionKey>> phases = new LinkedHashMap<>();
           if(result != null) {

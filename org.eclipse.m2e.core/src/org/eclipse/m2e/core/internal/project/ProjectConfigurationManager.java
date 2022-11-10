@@ -483,7 +483,7 @@ public class ProjectConfigurationManager
     project.setDefaultCharset(sourceEncoding, monitor);
 
     IMavenExecutionContext executionContext = projectManager.createExecutionContext(mavenProjectFacade.getPom(),
-        mavenProjectFacade.getResolverConfiguration());
+        mavenProjectFacade.getConfiguration());
 
     executionContext.execute(mavenProject, (context, m) -> {
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade);
@@ -919,9 +919,33 @@ public class ProjectConfigurationManager
     return ResolverConfigurationIO.readResolverConfiguration(project);
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.IProjectConfigurationManager#getProjectConfiguration(org.eclipse.core.resources.IProject)
+   */
   @Override
-  public boolean setResolverConfiguration(IProject project, IProjectConfiguration configuration) {
+  public IProjectConfiguration getProjectConfiguration(IProject project) {
+    return ResolverConfigurationIO.readResolverConfiguration(project);
+  }
+
+  @Override
+  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
     return ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.IProjectConfigurationManager#updateProjectConfiguration(org.eclipse.core.resources.IProject, org.eclipse.m2e.core.project.IProjectConfiguration, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  @Override
+  public IStatus updateProjectConfiguration(IProject project, IProjectConfiguration configuration,
+      IProgressMonitor monitor) {
+    if(ResolverConfigurationIO.saveResolverConfiguration(project, configuration)) {
+      try {
+        updateProjectConfiguration(project, monitor);
+      } catch(CoreException ex) {
+        return ex.getStatus();
+      }
+    }
+    return Status.CANCEL_STATUS;
   }
 
   /**

@@ -45,6 +45,22 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private File multiModuleProjectDirectory;
 
+  public ResolverConfiguration() {
+  }
+
+  /**
+   * @param resolverConfiguration
+   */
+  public ResolverConfiguration(IProjectConfiguration resolverConfiguration) {
+    setLifecycleMappingId(resolverConfiguration.getLifecycleMappingId());
+    setMultiModuleProjectDirectory(resolverConfiguration.getMultiModuleProjectDirectory());
+    Properties properties2 = new Properties();
+    properties2.putAll(resolverConfiguration.getConfigurationProperties());
+    setProperties(properties2);
+    setResolveWorkspaceProjects(resolverConfiguration.isResolveWorkspaceProjects());
+    setSelectedProfiles(resolverConfiguration.getSelectedProfiles());
+  }
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IProjectConfiguration#getProperties()
    */
@@ -72,9 +88,14 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     this.properties = properties;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IProjectConfiguration#shouldResolveWorkspaceProjects()
+  /**
+   * @deprecated use {@link #isResolveWorkspaceProjects()}
    */
+  @Deprecated(forRemoval = true)
+  public boolean shouldResolveWorkspaceProjects() {
+    return isResolveWorkspaceProjects();
+  }
+
   @Override
   public boolean isResolveWorkspaceProjects() {
     return this.resolveWorkspaceProjects;

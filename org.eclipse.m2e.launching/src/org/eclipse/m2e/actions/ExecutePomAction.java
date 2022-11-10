@@ -236,7 +236,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     IFile pomFile = basedir.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
     if(projectFacade != null) {
-      IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
+      IProjectConfiguration configuration = projectFacade.getConfiguration();
 
       String selectedProfiles = configuration.getSelectedProfiles();
       if(selectedProfiles != null && selectedProfiles.length() > 0) {

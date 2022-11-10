@@ -85,7 +85,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final File pomFile;
 
-  private final ResolverConfiguration resolverConfiguration;
+  private final IProjectConfiguration resolverConfiguration;
 
   private final long[] timestamp;
 
@@ -128,7 +128,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private transient Map<String, Object> sessionProperties;
 
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
-      ResolverConfiguration resolverConfiguration) {
+      IProjectConfiguration resolverConfiguration) {
     this.manager = manager;
     this.pom = pom;
     this.pomFile = ProjectRegistryManager.toJavaIoFile(pom);
@@ -337,7 +337,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public ResolverConfiguration getResolverConfiguration() {
-    return resolverConfiguration;
+    return new ResolverConfiguration(resolverConfiguration);
   }
 
   @Override

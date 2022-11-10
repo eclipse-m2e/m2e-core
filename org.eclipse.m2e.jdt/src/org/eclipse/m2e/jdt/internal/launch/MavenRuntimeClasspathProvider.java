@@ -313,7 +313,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       return;
     }
 
-    IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
+    IProjectConfiguration configuration = projectFacade.getConfiguration();
     if(configuration == null) {
       return;
     }
