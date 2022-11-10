@@ -162,7 +162,8 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     private void changeNature(final IProject project, IProgressMonitor monitor) throws CoreException {
       IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 
-      final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
+      final ResolverConfiguration configuration = new ResolverConfiguration(
+          configurationManager.getProjectConfiguration(project));
 
       boolean updateSourceFolders = false;
 

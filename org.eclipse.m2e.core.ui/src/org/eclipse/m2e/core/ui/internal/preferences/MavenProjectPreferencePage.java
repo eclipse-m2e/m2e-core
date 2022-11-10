@@ -127,7 +127,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
       return false;
     }
 
-    final ResolverConfiguration configuration = getResolverConfiguration();
+    final ResolverConfiguration configuration = new ResolverConfiguration(getResolverConfiguration());
     if(configuration.getSelectedProfiles().equals(selectedProfilesText.getText()) &&
 //        configuration.shouldIncludeModules()==includeModulesButton.getSelection() &&
         configuration.isResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()) {
@@ -165,9 +165,9 @@ public class MavenProjectPreferencePage extends PropertyPage {
     return isSet;
   }
 
-  private ResolverConfiguration getResolverConfiguration() {
+  private IProjectConfiguration getResolverConfiguration() {
     IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
-    return projectManager.getResolverConfiguration(getProject());
+    return projectManager.getProjectConfiguration(getProject());
   }
 
   private IProject getProject() {

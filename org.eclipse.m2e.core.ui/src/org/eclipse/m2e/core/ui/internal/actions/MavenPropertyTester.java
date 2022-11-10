@@ -69,7 +69,7 @@ public class MavenPropertyTester extends PropertyTester {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.create(projectAdapter, new NullProgressMonitor());
         if(projectFacade != null) {
-          IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
+          IProjectConfiguration configuration = projectFacade.getConfiguration();
           return !configuration.isResolveWorkspaceProjects();
         }
       }

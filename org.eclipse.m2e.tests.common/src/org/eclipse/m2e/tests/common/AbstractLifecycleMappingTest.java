@@ -119,7 +119,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   protected LifecycleMappingResult calculateLifecycleMapping(MavenProjectFacade facade) throws CoreException {
     MavenProject mavenProject = facade.getMavenProject(monitor);
     List<MojoExecution> mojoExecutions = facade.getMojoExecutions(monitor);
-    String lifecycleMappingId = facade.getResolverConfiguration().getLifecycleMappingId();
+    String lifecycleMappingId = facade.getConfiguration().getLifecycleMappingId();
     return LifecycleMappingFactory.calculateLifecycleMapping(mavenProject, mojoExecutions, lifecycleMappingId, monitor);
   }
 

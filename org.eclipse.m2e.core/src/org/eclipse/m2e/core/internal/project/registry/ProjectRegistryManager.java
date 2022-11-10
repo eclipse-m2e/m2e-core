@@ -498,7 +498,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
           if(newFacade != null) {
             MavenProjectFacade facade = newFacade;
-            IProjectConfiguration resolverConfiguration = facade.getResolverConfiguration();
+            IProjectConfiguration resolverConfiguration = facade.getConfiguration();
             createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
                 (executionContext, pm) -> {
                   refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade, pm);
@@ -603,7 +603,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private void setupLifecycleMapping(IProgressMonitor monitor, MavenProjectFacade newFacade) throws CoreException {
     LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(getMavenProject(newFacade),
-        newFacade.getMojoExecutions(), newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor);
+        newFacade.getMojoExecutions(), newFacade.getConfiguration().getLifecycleMappingId(), monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = mappingResult
@@ -823,7 +823,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private MavenProject readProjectWithDependencies(IMavenProjectFacade facade) {
     IFile pomFile = facade.getPom();
-    IProjectConfiguration resolverConfiguration = facade.getResolverConfiguration();
+    IProjectConfiguration resolverConfiguration = facade.getConfiguration();
     Collection<MavenExecutionResult> results = readProjectsWithDependencies(pomFile, resolverConfiguration, null);
     if(results.size() != 1) {
       throw new IllegalStateException("Results should contain one entry.");

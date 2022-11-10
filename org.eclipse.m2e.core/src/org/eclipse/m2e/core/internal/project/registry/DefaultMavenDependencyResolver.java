@@ -72,7 +72,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
 
     markerManager.addMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID, mavenResult);
 
-    if(!facade.getResolverConfiguration().isResolveWorkspaceProjects()) {
+    if(!facade.getConfiguration().isResolveWorkspaceProjects()) {
       return;
     }
 

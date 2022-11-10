@@ -92,7 +92,8 @@ public class ProfileManager implements IProfileManager {
     }
     IProject project = mavenProjectFacade.getProject();
 
-    final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
+    final ResolverConfiguration configuration = new ResolverConfiguration(
+        configurationManager.getProjectConfiguration(project));
 
     final String profilesAsString = String.join(", ", profiles);
     if(profilesAsString.equals(configuration.getSelectedProfiles())) {
@@ -135,7 +136,7 @@ public class ProfileManager implements IProfileManager {
     }
 
     IProjectConfiguration resolverConfiguration = MavenPlugin.getProjectConfigurationManager()
-        .getResolverConfiguration(facade.getProject());
+        .getProjectConfiguration(facade.getProject());
 
     List<String> configuredProfiles = toList(resolverConfiguration.getSelectedProfiles());
 

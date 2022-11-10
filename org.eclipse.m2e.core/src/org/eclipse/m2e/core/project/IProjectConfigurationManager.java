@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 import org.apache.maven.model.Model;
@@ -62,6 +63,7 @@ public interface IProjectConfigurationManager {
 
   void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException;
 
+  @Deprecated(forRemoval = true)
   void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
 
   ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) throws CoreException;
@@ -82,14 +84,22 @@ public interface IProjectConfigurationManager {
   boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
       throws CoreException;
 
+  IProjectConfiguration getProjectConfiguration(IProject project);
+
+  IStatus updateProjectConfiguration(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor);
+
   /**
    * PROVISIONAL
+   * 
+   * @deprecated use {@link #getProjectConfiguration(IProject)}
    */
+  @Deprecated(forRemoval = true)
   ResolverConfiguration getResolverConfiguration(IProject project);
 
   /**
    * PROVISIONAL
    */
-  boolean setResolverConfiguration(IProject project, IProjectConfiguration configuration);
+  @Deprecated(forRemoval = true)
+  boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
 
 }
