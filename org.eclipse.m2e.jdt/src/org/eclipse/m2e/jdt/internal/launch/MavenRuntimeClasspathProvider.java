@@ -56,7 +56,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.jdt.IClassifierClasspathProvider;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IMavenClassifierManager;
@@ -313,7 +313,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       return;
     }
 
-    ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
+    IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
     if(configuration == null) {
       return;
     }

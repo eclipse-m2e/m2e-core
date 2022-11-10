@@ -46,6 +46,7 @@ import org.eclipse.m2e.apt.MavenJdtAptPlugin;
 import org.eclipse.m2e.apt.preferences.AnnotationProcessingMode;
 import org.eclipse.m2e.apt.preferences.IPreferencesManager;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -139,7 +140,7 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		}
 
 		IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-		ResolverConfiguration configuration = new ResolverConfiguration();
+		IProjectConfiguration configuration = new ResolverConfiguration();
 		configurationManager.enableMavenNature(project, configuration, monitor);
 		configurationManager.updateProjectConfiguration(project, monitor);
 		project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);

@@ -30,8 +30,8 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 
 /**
@@ -69,8 +69,8 @@ public class MavenPropertyTester extends PropertyTester {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.create(projectAdapter, new NullProgressMonitor());
         if(projectFacade != null) {
-          ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
-          return !configuration.shouldResolveWorkspaceProjects();
+          IProjectConfiguration configuration = projectFacade.getResolverConfiguration();
+          return !configuration.isResolveWorkspaceProjects();
         }
       }
       return enableWorkspaceResolution;

@@ -75,7 +75,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       return null;
     }
 
-    if(context.resolverConfiguration.shouldResolveWorkspaceProjects()) {
+    if(context.resolverConfiguration.isResolveWorkspaceProjects()) {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IPath file = pom.getLocation();
       if(file == null) {

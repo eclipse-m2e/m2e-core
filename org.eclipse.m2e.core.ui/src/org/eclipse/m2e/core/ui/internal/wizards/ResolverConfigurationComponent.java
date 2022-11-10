@@ -29,6 +29,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -117,14 +118,14 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
   }
 
   public void loadData() {
-    resolveWorkspaceProjects.setSelection(resolverConfiguration.shouldResolveWorkspaceProjects());
+    resolveWorkspaceProjects.setSelection(resolverConfiguration.isResolveWorkspaceProjects());
     profiles.setText(resolverConfiguration.getSelectedProfiles());
     if(template != null) {
       template.setText(projectImportConfiguration.getProjectNameTemplate());
     }
   }
 
-  public ResolverConfiguration getResolverConfiguration() {
+  public IProjectConfiguration getResolverConfiguration() {
     return this.resolverConfiguration;
   }
 

@@ -113,6 +113,16 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
 
   Set<ArtifactRef> getMavenProjectArtifacts();
 
+  /**
+   * @return the configuration associated with this facade
+   */
+  IProjectConfiguration getConfiguration();
+
+  /**
+   * @deprecated use {@link #getConfiguration()} instead
+   * @return
+   */
+  @Deprecated(forRemoval = true)
   ResolverConfiguration getResolverConfiguration();
 
   /**
