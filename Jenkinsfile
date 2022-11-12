@@ -19,6 +19,12 @@ pipeline {
 			}
 		}
 		stage('initialize PGP') {
+			when {
+				anyOf{
+				    branch 'master';
+				    branch pattern: 'm2e-[0-9]+\\.[0-9]+\\.x', comparator: "REGEXP"
+				}
+			}
 			steps {
 				withCredentials([file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING')]) {
 					sh 'gpg --batch --import "${KEYRING}"'
@@ -35,8 +41,16 @@ pipeline {
 			steps {
 				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -Dtycho.p2.baselineMode=failCommon \
-						-Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"'
+					sh '''
+						mavenArgs="clean verify -Dtycho.p2.baselineMode=failCommon"
+						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
+							mvn ${mavenArgs} -Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"
+						else
+							# Clear KEYRING_PASSPHRASE environment variable
+							export KEYRING_PASSPHRASE='EMPTY'
+							mvn ${mavenArgs} -Pits 
+						fi
+					'''
 				}}
 			}
 			post {
