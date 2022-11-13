@@ -232,7 +232,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         // copied from
         // org.eclipse.m2e.core.ui.internal.actions.EnableNatureAction
 
-        final ResolverConfiguration configuration = new ResolverConfiguration();
+        final ResolverConfiguration configuration = new ResolverConfiguration(project);
         configuration.setResolveWorkspaceProjects(true);
         try {
             if (!project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -257,21 +257,6 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
     public boolean shouldBeAnEclipseProject(IContainer container, IProgressMonitor monitor) {
         IFile pomFile = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
         return pomFile.exists();
-        // debated on m2e-dev:
-        // https://dev.eclipse.org/mhonarc/lists/m2e-dev/msg01852.html
-        // if (!pomFile.exists()) {
-        // return false;
-        // }
-        // try {
-        // Model pomModel =
-        // MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
-        // return !pomModel.getPackaging().equals("pom"); // TODO find symbol
-        // for "pom"
-        // } catch (CoreException ex) {
-        // Activator.log(IStatus.ERROR, "Could not parse pom file " +
-        // pomFile.getLocation(), ex);
-        // return false;
-        // }
     }
 
     @Override

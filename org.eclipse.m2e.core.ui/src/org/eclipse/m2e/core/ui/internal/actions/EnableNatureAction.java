@@ -129,7 +129,7 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
         @Override
         protected IStatus run(IProgressMonitor monitor) {
         try {
-          ResolverConfiguration configuration = new ResolverConfiguration();
+          ResolverConfiguration configuration = new ResolverConfiguration(project);
           configuration.setResolveWorkspaceProjects(workspaceProjects);
           configuration.setSelectedProfiles(""); //$NON-NLS-1$
 

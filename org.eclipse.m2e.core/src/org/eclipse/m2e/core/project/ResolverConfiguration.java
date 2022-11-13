@@ -16,14 +16,16 @@ package org.eclipse.m2e.core.project;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+
+import org.eclipse.core.resources.IProject;
+
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 
 
 /**
@@ -46,6 +48,11 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   private File multiModuleProjectDirectory;
 
   public ResolverConfiguration() {
+  }
+
+  public ResolverConfiguration(IProject project) {
+    setMultiModuleProjectDirectory(
+        PlexusContainerManager.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
   }
 
   /**
@@ -109,22 +116,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return this.selectedProfiles;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IProjectConfiguration#getActiveProfileList()
-   */
-  @Override
-  public List<String> getActiveProfileList() {
-    return parseProfiles(selectedProfiles, true);
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IProjectConfiguration#getInactiveProfileList()
-   */
-  @Override
-  public List<String> getInactiveProfileList() {
-    return parseProfiles(selectedProfiles, false);
-  }
-
   public void setResolveWorkspaceProjects(boolean resolveWorkspaceProjects) {
     this.resolveWorkspaceProjects = resolveWorkspaceProjects;
   }
@@ -133,23 +124,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     this.selectedProfiles = profiles;
   }
 
-  private static List<String> parseProfiles(String profilesAsText, boolean status) {
-    List<String> profiles;
-    if(profilesAsText != null && profilesAsText.trim().length() > 0) {
-      String[] profilesArray = profilesAsText.split("[,\\s\\|]");
-      profiles = new ArrayList<>(profilesArray.length);
-      for(String profile : profilesArray) {
-        boolean isActive = !profile.startsWith("!");
-        if(status == isActive) {
-          profile = (isActive) ? profile : profile.substring(1);
-          profiles.add(profile);
-        }
-      }
-    } else {
-      profiles = new ArrayList<>(0);
-    }
-    return profiles;
-  }
 
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IProjectConfiguration#getLifecycleMappingId()
