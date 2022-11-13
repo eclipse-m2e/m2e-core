@@ -29,6 +29,8 @@ import org.eclipse.core.resources.IFile;
  */
 public class ProjectProcessingTracker {
 
+  static final int MAX_INTERATIONS = Integer.getInteger("m2e.project.refresh.maxiterations", 5);
+
   static final Logger log = LoggerFactory.getLogger(ProjectProcessingTracker.class);
 
   private Set<IFile> processed = new LinkedHashSet<>();
@@ -38,6 +40,8 @@ public class ProjectProcessingTracker {
   private Set<IFile> seed;
 
   private DependencyResolutionContext context;
+
+  private int iterations;
 
   /**
    * @param allProcessedPoms
@@ -58,6 +62,11 @@ public class ProjectProcessingTracker {
     }
     if(seed.isEmpty()) {
       log.debug("Seed is empty.");
+      return false;
+    }
+    iterations++ ;
+    if(iterations > MAX_INTERATIONS) {
+      log.debug("Max iterations reached!");
       return false;
     }
     log.debug("seed =      {}", seed);

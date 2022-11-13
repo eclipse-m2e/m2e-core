@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,6 +66,8 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -74,9 +77,11 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectSorter;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -694,6 +699,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private Map<IFile, MavenProjectFacade> readMavenProjectFacades(Collection<IFile> poms, MutableProjectRegistry state,
       IProgressMonitor monitor) throws CoreException {
+    if(poms.isEmpty()) {
+      return Collections.emptyMap();
+    }
     SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
     for(IFile pom : poms) {
       markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
@@ -707,7 +715,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       return resolverConfiguration;
     }, LinkedHashMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
-    Map<IFile, MavenProjectFacade> result = new HashMap<>(poms.size(), 1.f);
+    Map<IFile, MavenProjectFacade> result = new LinkedHashMap<>(poms.size(), 1.f);
     for(Entry<IProjectConfiguration, Collection<IFile>> entry : groupsToImport.entrySet()) {
       IProjectConfiguration resolverConfiguration = entry.getKey();
       Collection<IFile> fileList = entry.getValue();
@@ -716,33 +724,52 @@ public class ProjectRegistryManager implements ISaveParticipant {
           containerManager.getComponentLookup(moduleProjectDirectory), moduleProjectDirectory, moduleProjectDirectory,
           null);
       configureExecutionRequest(context.getExecutionRequest(), state,
-          fileList.size() == 1 ? fileList.iterator().next() : null,
-            resolverConfiguration);
-
-        result.putAll(context.execute((ctx, mon) -> {
-          Map<File, MavenExecutionResult> mavenResults = IMavenToolbox.of(ctx).readMavenProjects(
-              fileList.stream().filter(IFile::isAccessible).map(ProjectRegistryManager::toJavaIoFile).toList(),
-              ctx.newProjectBuildingRequest());
-          Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
-          for(IFile pom : fileList) {
-            if(!pom.isAccessible()) {
-              continue;
-            }
-            MavenExecutionResult mavenResult = mavenResults.get(ProjectRegistryManager.toJavaIoFile(pom));
-            MavenProject mavenProject = mavenResult.getProject();
-            MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
-            markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
-            if(mavenProject != null && mavenProject.getArtifact() != null) {
-              MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
-                  mavenProject, resolverConfiguration);
-              putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
-              facades.put(pom, mavenProjectFacade);
-            }
+          fileList.size() == 1 ? fileList.iterator().next() : null, resolverConfiguration);
+      context.execute((ctx, mon) -> {
+        Map<IFile, File> pomFiles = fileList.stream().filter(IFile::isAccessible)
+            .collect(Collectors.toMap(Function.identity(), ProjectRegistryManager::toJavaIoFile));
+        Map<File, MavenExecutionResult> mavenResults = IMavenToolbox.of(ctx).readMavenProjects(pomFiles.values(),
+            ctx.newProjectBuildingRequest());
+        Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
+        Map<MavenProject, MavenProjectFacade> facadeMap = new HashMap<>();
+        for(var fileEntry : pomFiles.entrySet()) {
+          IFile pom = fileEntry.getKey();
+          File file = fileEntry.getValue();
+          if(!pom.isAccessible()) {
+            continue;
           }
-          return facades;
-        }, subMonitor.split(1)));
+          MavenExecutionResult mavenResult = mavenResults.get(file);
+          MavenProject mavenProject = mavenResult.getProject();
+          MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
+          markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
+          if(mavenProject != null && mavenProject.getArtifact() != null) {
+            MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
+                mavenProject, resolverConfiguration);
+            putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
+            facadeMap.put(mavenProject, mavenProjectFacade);
+          }
+        }
+        for(var mp : getSortedProjects(facadeMap.keySet())) {
+          MavenProjectFacade facade = facadeMap.get(mp);
+          result.put(facade.getPom(), facade);
+        }
+        return facades;
+      }, subMonitor.split(1));
     }
     return result;
+  }
+
+  private Collection<MavenProject> getSortedProjects(Collection<MavenProject> projects) {
+    if(projects.size() <= 1) {
+      return projects;
+    }
+    try {
+      //sort project according to their declared dependencies...
+      ProjectSorter sorter = new ProjectSorter(projects);
+      return sorter.getSortedProjects();
+    } catch(CycleDetectedException | DuplicateProjectException ex) {
+      return projects;
+    }
   }
 
   /**
@@ -832,13 +859,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
       MavenExecutionContext context = new MavenExecutionContext(
           containerManager.getComponentLookup(multiModuleProjectDirectory), pomFile.getLocation().toFile(),
           multiModuleProjectDirectory, null);
-        configureExecutionRequest(context.getExecutionRequest(), projectRegistry, pomFile, resolverConfiguration);
-        resultMap = context.execute((ctx, mon) -> {
-          ProjectBuildingRequest request = context.newProjectBuildingRequest();
-          request.setResolveDependencies(true);
-          List<File> pomFiles = Stream.of(toJavaIoFile(pomFile)).filter(Objects::nonNull).toList();
-          return IMavenToolbox.of(ctx).readMavenProjects(pomFiles, request);
-        }, monitor);
+      configureExecutionRequest(context.getExecutionRequest(), projectRegistry, pomFile, resolverConfiguration);
+      resultMap = context.execute((ctx, mon) -> {
+        ProjectBuildingRequest request = context.newProjectBuildingRequest();
+        request.setResolveDependencies(true);
+        List<File> pomFiles = Stream.of(toJavaIoFile(pomFile)).filter(Objects::nonNull).toList();
+        return IMavenToolbox.of(ctx).readMavenProjects(pomFiles, request);
+      }, monitor);
       return resultMap.values();
     } catch(CoreException ex) {
       return List.of(new DefaultMavenExecutionResult().addException(ex));
@@ -998,7 +1025,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Map<IMavenProjectFacade, MavenProject> mavenProjects = MavenProjectCache.getContextProjectMap();
     try {
       return mavenProjects.computeIfAbsent(facade, fac -> {
-          return mavenProjectCache.getMavenProject(fac, this::readProjectWithDependencies);
+        return mavenProjectCache.getMavenProject(fac, this::readProjectWithDependencies);
       });
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();
