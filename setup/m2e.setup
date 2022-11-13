@@ -137,47 +137,30 @@
     <description>Set an Oomph redirection system property to redirect the logical location of this setup to its physical location in the Git clone.</description>
   </setupTask>
   <setupTask
-      xsi:type="setup:CompoundTask"
-      name="Project Imports">
-    <setupTask
-        xsi:type="projects:ProjectsImportTask">
-      <sourceLocator
-          rootFolder="${git.clone.m2e.core.location}"
-          locateNestedProjects="true">
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}"/>
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}/[^/]+"/>
-      </sourceLocator>
-    </setupTask>
-    <setupTask
-        xsi:type="projects:ProjectsImportTask">
-      <sourceLocator
-          rootFolder="${git.clone.m2e.core.location}/m2e-maven-runtime"
-          locateNestedProjects="true">
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}/m2e-maven-runtime"/>
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}/m2e-maven-runtime/[^/]+"/>
-      </sourceLocator>
-    </setupTask>
-    <setupTask
-        xsi:type="projects:ProjectsImportTask">
-      <sourceLocator
-          rootFolder="${git.clone.m2e.core.location}/m2e-core-tests"
-          locateNestedProjects="true">
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}/m2e-core-tests"/>
-        <predicate
-            xsi:type="predicates:LocationPredicate"
-            pattern="${git.clone.m2e.core.location|path}/m2e-core-tests/[^/]+"/>
-      </sourceLocator>
-    </setupTask>
+      xsi:type="projects:ProjectsImportTask">
+    <sourceLocator
+        rootFolder="${git.clone.m2e.core.location}"
+        locateNestedProjects="true">
+      <predicate
+          xsi:type="predicates:LocationPredicate"
+          pattern="${git.clone.m2e.core.location|path}"/>
+      <predicate
+          xsi:type="predicates:LocationPredicate"
+          pattern="${git.clone.m2e.core.location|path}/[^/]+"/>
+    </sourceLocator>
+    <sourceLocator
+        rootFolder="${git.clone.m2e.core.location/m2e-maven-runtime}"
+        locateNestedProjects="true"/>
+    <sourceLocator
+        rootFolder="${git.clone.m2e.core.location/m2e-core-tests}"
+        locateNestedProjects="true">
+      <predicate
+          xsi:type="predicates:LocationPredicate"
+          pattern="${git.clone.m2e.core.location|path}/m2e-core-tests"/>
+      <predicate
+          xsi:type="predicates:LocationPredicate"
+          pattern="${git.clone.m2e.core.location|path}/m2e-core-tests/[^/]+"/>
+    </sourceLocator>
   </setupTask>
   <setupTask
       xsi:type="setup:CompoundTask"
