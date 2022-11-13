@@ -33,6 +33,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -163,13 +166,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private volatile Thread syncRefreshThread;
 
+  private AtomicLong fullProjectLoads = new AtomicLong();
+
   /**
    * @noreference For tests only
    */
   Consumer<Map<IMavenProjectFacade, MavenProject>> addContextProjectListener;
 
   public ProjectRegistryManager() {
-
+    Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
+      System.out.println("Full project loads: " + fullProjectLoads);
+    }, 30, 30, TimeUnit.SECONDS);
   }
 
   @Activate
@@ -829,6 +836,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
       throw new IllegalStateException("Results should contain one entry.");
     }
     MavenExecutionResult result = results.iterator().next();
+    return getMavenProject(result);
+  }
+
+  static MavenProject getMavenProject(MavenExecutionResult result) {
     MavenProject mavenProject = result.getProject();
     if(mavenProject != null && !hasError(result)) {
       return mavenProject;
@@ -852,6 +863,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   private Collection<MavenExecutionResult> readProjectsWithDependencies(IFile pomFile,
       IProjectConfiguration resolverConfiguration, IProgressMonitor monitor) {
+    fullProjectLoads.incrementAndGet();
     try {
       IMavenPlexusContainer container = mapToContainer(pomFile);
       Map<File, MavenExecutionResult> resultMap = Map.of();
@@ -1025,7 +1037,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Map<IMavenProjectFacade, MavenProject> mavenProjects = MavenProjectCache.getContextProjectMap();
     try {
       return mavenProjects.computeIfAbsent(facade, fac -> {
-          return mavenProjectCache.getMavenProject(fac, this::readProjectWithDependencies);
+        return mavenProjectCache.getMavenProject(fac, this::readProjectWithDependencies);
       });
     } catch(RuntimeException ex) { // thrown by method called in lambda to carry CoreException
       Throwable cause = ex.getCause();

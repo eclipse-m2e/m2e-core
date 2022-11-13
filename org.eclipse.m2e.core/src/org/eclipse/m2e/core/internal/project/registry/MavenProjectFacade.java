@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
 import java.io.Serializable;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,12 +40,14 @@ import org.eclipse.osgi.util.NLS;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
@@ -126,6 +129,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private transient Map<String, Object> sessionProperties;
 
+  private transient SoftReference<MavenProject> mavenProjectReference;
+
+  boolean resolved;
+
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       IProjectConfiguration resolverConfiguration) {
     this.manager = manager;
@@ -165,6 +172,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       i++ ;
     }
     timestamp[timestamp.length - 1] = getModificationStamp(pom);
+    this.mavenProjectReference = new SoftReference<>(mavenProject);
   }
 
   private Set<ArtifactRepositoryRef> toRepositoryReferences(List<ArtifactRepository> artifactRepositories) {
@@ -201,6 +209,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.pluginArtifactRepositories = new LinkedHashSet<>(other.pluginArtifactRepositories);
 
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
+    this.mavenProjectReference = other.mavenProjectReference;
   }
 
   /**
@@ -273,12 +282,64 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    */
   @Override
   public MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException {
-    return manager.getMavenProject(this, monitor);
+    //first ask the cache
+    MavenProject project = manager.getMavenProject(this);
+    if(project == null) {
+      //if not found check our local cache...
+      MavenProject ref = getMavenProjectFromRef(monitor);
+      if(ref != null) {
+        return ref;
+      }
+    }
+    //let the manager load the stuff...
+    MavenProject managedProject = manager.getMavenProject(this, monitor);
+    synchronized(this) {
+      //keep a reference for further usage...
+      this.mavenProjectReference = new SoftReference<>(managedProject);
+      resolved = true;
+    }
+    return managedProject;
+  }
+
+  public void clearMavenProjectReference() {
+    synchronized(this) {
+      mavenProjectReference.clear();
+      mavenProjectReference = null;
+      resolved = false;
+    }
   }
 
   @Override
   public MavenProject getMavenProject() {
     return manager.getMavenProject(this);
+  }
+
+  synchronized MavenProject getMavenProjectFromRef(IProgressMonitor monitor) {
+    if(mavenProjectReference != null) {
+      MavenProject project = mavenProjectReference.get();
+      if(!resolved) {
+        MavenExecutionResult mavenResult;
+        try {
+          IMavenExecutionContext executionContext = createExecutionContext(project);
+          mavenResult = executionContext.execute((ctx, mon) -> {
+            ProjectBuildingRequest configuration = ctx.newProjectBuildingRequest();
+            configuration.setProject(project);
+            configuration.setResolveDependencies(true);
+            return IMavenToolbox.of(ctx).readMavenProject(getPomFile(), configuration);
+          }, monitor);
+        } catch(CoreException ex) {
+          throw new IllegalStateException(ex);
+        } catch(Exception ex) {
+          throw new IllegalStateException(
+              new CoreException(Status.error("aquire execution container failed", ex)).fillInStackTrace());
+        }
+        MavenProject mavenProject = ProjectRegistryManager.getMavenProject(mavenResult);
+        resolved = true;
+        return mavenProject;
+      }
+      return project;
+    }
+    return null;
   }
 
   @Override
@@ -602,18 +663,22 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public IMavenExecutionContext createExecutionContext() {
     try {
-      IMavenPlexusContainer container = manager.getContainerManager().aquire(getPomFile());
       MavenProject mavenProject = getMavenProject(null);
-      if(mavenProject == null) {
-        //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the chaed variant here?
-        return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), null);
-      }
-      return new MavenExecutionContext(
-          PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()),
-          getBaseDir(), ctx -> mavenProject);
+      return createExecutionContext(mavenProject);
     } catch(Exception ex) {
       throw new RuntimeException("Aquire container failed!", ex);
     }
+  }
+
+  private IMavenExecutionContext createExecutionContext(MavenProject mavenProject) throws Exception {
+    IMavenPlexusContainer container = manager.getContainerManager().aquire(getPomFile());
+    if(mavenProject == null) {
+      //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the chaed variant here?
+      return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), null);
+    }
+    return new MavenExecutionContext(
+        PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()), getBaseDir(),
+        ctx -> mavenProject);
   }
 
   @Override

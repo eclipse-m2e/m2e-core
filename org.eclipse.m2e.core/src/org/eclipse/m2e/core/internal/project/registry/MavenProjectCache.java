@@ -88,6 +88,10 @@ public class MavenProjectCache {
     if(cacheLine != null) {
       cacheLine.remove(facade.getPomFile());
     }
+    if(facade instanceof MavenProjectFacade) {
+      MavenProjectFacade mavenProjectFacade = (MavenProjectFacade) facade;
+      mavenProjectFacade.clearMavenProjectReference();
+    }
   }
 
   /**
