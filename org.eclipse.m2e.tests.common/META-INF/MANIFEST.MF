@@ -10,12 +10,10 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  org.eclipse.debug.core,
- org.eclipse.core.resources,
  org.eclipse.jetty.server,
  org.eclipse.jetty.util,
  org.eclipse.jetty.http,
  org.eclipse.jetty.security,
- org.eclipse.jetty.io,
  org.eclipse.swt;bundle-version="3.119.0",
  org.eclipse.m2e.core.ui
 Bundle-ActivationPolicy: lazy

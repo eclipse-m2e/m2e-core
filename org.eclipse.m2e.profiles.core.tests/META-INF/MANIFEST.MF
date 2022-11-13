@@ -9,8 +9,6 @@ Bundle-Vendor: Eclipse.org - m2e
 Require-Bundle: org.eclipse.m2e.tests.common,
  org.junit,
  org.eclipse.core.resources,
- org.eclipse.core.runtime,
- org.eclipse.m2e.maven.runtime
-Import-Package: javax.annotation;version="1.2.0"
+ org.eclipse.core.runtime
 Eclipse-BundleShape: dir
 Automatic-Module-Name: org.eclipse.m2e.profiles.core.tests
