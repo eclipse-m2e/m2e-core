@@ -131,7 +131,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.manager = manager;
     this.pom = pom;
     this.pomFile = ProjectRegistryManager.toJavaIoFile(pom);
-    this.resolverConfiguration = resolverConfiguration;
+    //TODO we currently always use the computed directory here 
+    // but https://github.com/eclipse-m2e/m2e-core/issues/904 will add support for a user to specify a custom root directory
+    // and then we should really inherit this from the configuration!
+    this.resolverConfiguration = new MavenProjectConfiguration(resolverConfiguration,
+        PlexusContainerManager.computeMultiModuleProjectDirectory(pomFile));
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();
@@ -602,15 +606,17 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public IMavenExecutionContext createExecutionContext() {
     try {
-      IMavenPlexusContainer container = manager.getContainerManager().aquire(getPomFile());
+      File multiModuleProjectDirectory = getConfiguration().getMultiModuleProjectDirectory();
+      IMavenPlexusContainer container = manager.getContainerManager().aquire(multiModuleProjectDirectory);
       MavenProject mavenProject = getMavenProject(null);
       if(mavenProject == null) {
-        //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the chaed variant here?
-        return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), null);
+        //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the cached variant here?
+        return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(),
+            multiModuleProjectDirectory, null);
       }
       return new MavenExecutionContext(
           PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()),
-          getBaseDir(), ctx -> mavenProject);
+          getBaseDir(), multiModuleProjectDirectory, ctx -> mavenProject);
     } catch(Exception ex) {
       throw new RuntimeException("Aquire container failed!", ex);
     }
@@ -618,7 +624,82 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IComponentLookup getComponentLookup() {
-    return manager.getContainerManager().getComponentLookup(getPomFile());
+    return manager.getContainerManager().getComponentLookup(getConfiguration().getMultiModuleProjectDirectory());
   }
+
+  private static final class MavenProjectConfiguration implements IProjectConfiguration, Serializable {
+
+    private final File multiModuleProjectDirectory;
+
+    private final String mappingId;
+
+    private final Map<String, String> properties;
+
+    private final boolean resolveWorkspace;
+
+    private final String profiles;
+
+    public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
+      if(baseConfiguration == null) {
+        //we should really forbid this but some test seem to pass null!
+        baseConfiguration = new ResolverConfiguration();
+      }
+      this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+      this.mappingId = baseConfiguration.getLifecycleMappingId();
+      this.properties = Map.copyOf(baseConfiguration.getConfigurationProperties());
+      this.resolveWorkspace = baseConfiguration.isResolveWorkspaceProjects();
+      this.profiles = baseConfiguration.getSelectedProfiles();
+    }
+
+    @Override
+    public Map<String, String> getConfigurationProperties() {
+      return properties;
+    }
+
+    @Override
+    public boolean isResolveWorkspaceProjects() {
+      return resolveWorkspace;
+    }
+
+    @Override
+    public String getSelectedProfiles() {
+      return profiles;
+    }
+
+    @Override
+    public String getLifecycleMappingId() {
+      return mappingId;
+    }
+
+    @Override
+    public File getMultiModuleProjectDirectory() {
+      return multiModuleProjectDirectory;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if(this == obj) {
+        return true;
+      }
+      if(obj == null) {
+        return false;
+      }
+      if(getClass() != obj.getClass()) {
+        return false;
+      }
+      MavenProjectConfiguration other = (MavenProjectConfiguration) obj;
+      return Objects.equals(this.mappingId, other.mappingId)
+          && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory)
+          && Objects.equals(this.profiles, other.profiles) && Objects.equals(this.properties, other.properties)
+          && this.resolveWorkspace == other.resolveWorkspace;
+    }
+
+  }
+
 
 }

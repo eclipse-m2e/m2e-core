@@ -70,8 +70,7 @@ public class BinaryProjectPlugin {
     Artifact pomArtifact =
         maven.resolve(groupId, artifactId, version, "pom" /* type */, null /* classifier */, repositories, monitor);
 
-    ResolverConfiguration resolverConfig = new ResolverConfiguration();
-    resolverConfig.setLifecycleMappingId(LIFECYCLE_MAPPING_ID);
+
 
     String projectName = groupId + "_" + artifactId + "_" + version;
 
@@ -105,8 +104,6 @@ public class BinaryProjectPlugin {
     projectNode.put(P_GROUPID, groupId);
     projectNode.put(P_ARTIFACTID, artifactId);
     projectNode.put(P_VERSION, version);
-    // String type = projectNode.get( P_TYPE, "jar" );
-    // String classifier = projectNode.get( P_CLASSIFIER, (String) null );
 
     try {
       projectNode.flush();
@@ -115,7 +112,8 @@ public class BinaryProjectPlugin {
     }
 
     IProjectConfigurationManager configManager = MavenPlugin.getProjectConfigurationManager();
-
+	ResolverConfiguration resolverConfig = new ResolverConfiguration(project);
+	resolverConfig.setLifecycleMappingId(LIFECYCLE_MAPPING_ID);
     configManager.enableMavenNature(project, resolverConfig, monitor);
 
     return project;

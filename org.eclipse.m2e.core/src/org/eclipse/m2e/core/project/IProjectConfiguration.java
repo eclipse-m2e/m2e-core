@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +32,34 @@ public interface IProjectConfiguration {
 
   String getSelectedProfiles();
 
-  List<String> getActiveProfileList();
+  default List<String> getActiveProfileList() {
+    return parseProfiles(getSelectedProfiles(), true);
+  }
 
-  List<String> getInactiveProfileList();
+  default List<String> getInactiveProfileList() {
+    return parseProfiles(getSelectedProfiles(), false);
+  }
 
   String getLifecycleMappingId();
 
   File getMultiModuleProjectDirectory();
+
+  private static List<String> parseProfiles(String profilesAsText, boolean status) {
+    List<String> profiles;
+    if(profilesAsText != null && profilesAsText.trim().length() > 0) {
+      String[] profilesArray = profilesAsText.split("[,\\s\\|]");
+      profiles = new ArrayList<>(profilesArray.length);
+      for(String profile : profilesArray) {
+        boolean isActive = !profile.startsWith("!");
+        if(status == isActive) {
+          profile = (isActive) ? profile : profile.substring(1);
+          profiles.add(profile);
+        }
+      }
+    } else {
+      profiles = new ArrayList<>(0);
+    }
+    return profiles;
+  }
 
 }

@@ -100,6 +100,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private final IComponentLookup containerLookup;
 
+  private File multiModuleProjectDirectory;
+
   /**
    * Creates a new execution context for the given environment.
    * 
@@ -113,6 +115,12 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    */
   public MavenExecutionContext(IComponentLookup lookup, File baseDir,
       Function<? super MavenExecutionContext, MavenProject> projectSupplier) {
+    this(lookup, baseDir, PlexusContainerManager.computeMultiModuleProjectDirectory(baseDir), projectSupplier);
+  }
+
+  public MavenExecutionContext(IComponentLookup lookup, File baseDir, File multiModuleProjectDirectory,
+      Function<? super MavenExecutionContext, MavenProject> projectSupplier) {
+    this.multiModuleProjectDirectory = multiModuleProjectDirectory;
     this.containerLookup = Objects.requireNonNull(lookup);
     this.basedir = baseDir;
     this.projectSupplier = projectSupplier;
@@ -144,7 +152,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
           containerLookup, MavenPlugin.getMaven().getSettings());
       request.setBaseDirectory(basedir);
     }
-    request.setMultiModuleProjectDirectory(PlexusContainerManager.computeMultiModuleProjectDirectory(basedir));
+    request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
 
     return request;
   }

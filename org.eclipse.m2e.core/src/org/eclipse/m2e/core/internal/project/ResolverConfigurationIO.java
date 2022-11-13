@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.core.internal.project;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -66,6 +67,8 @@ public class ResolverConfigurationIO {
 
   private static final String P_PROPERTIES = "properties";
 
+  private static final String P_BASEDIR = "basedir";
+
   private static final String PROPERTIES_KV_SEPARATOR = ">";
 
   private static final String PROPERTIES_SEPARATOR = "|";
@@ -92,6 +95,12 @@ public class ResolverConfigurationIO {
       } else {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
       }
+      File directory = configuration.getMultiModuleProjectDirectory();
+      if(directory != null) {
+        projectNode.put(P_BASEDIR, directory.getAbsolutePath());
+      } else {
+        projectNode.remove(P_BASEDIR);
+      }
 
       if(configuration.getConfigurationProperties() != null && !configuration.getConfigurationProperties().isEmpty()) {
         projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getConfigurationProperties()));
@@ -113,21 +122,26 @@ public class ResolverConfigurationIO {
   public static IProjectConfiguration readResolverConfiguration(IProject project) {
     IScopeContext projectScope = new ProjectScope(project);
     IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
+    ResolverConfiguration configuration = new ResolverConfiguration(project);
     if(projectNode == null) {
-      return new ResolverConfiguration();
+      return configuration;
     }
 
     String version = projectNode.get(P_VERSION, null);
     if(version == null) { // migrate from old config
-      // return LegacyBuildPathManager.getResolverConfiguration(project);
-      return new ResolverConfiguration();
+      return configuration;
     }
-
-    ResolverConfiguration configuration = new ResolverConfiguration();
     configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
     configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
+    String basedirSetting = projectNode.get(P_BASEDIR, null);
+    if(basedirSetting != null) {
+      File directory = new File(basedirSetting);
+      if(directory.isDirectory()) {
+        configuration.setMultiModuleProjectDirectory(directory);
+      }
+    }
     return configuration;
   }
 
