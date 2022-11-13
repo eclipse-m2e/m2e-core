@@ -4,19 +4,13 @@ Bundle-SymbolicName: org.eclipse.m2e.sourcelookup;singleton:=true
 Bundle-Version: 2.0.1.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Bundle-Name: M2E Source Lookup Core
-Require-Bundle: org.eclipse.m2e.launching;bundle-version="[2.0.0,3.0.0)",
- org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
  org.eclipse.jdt.core;bundle-version="3.7.0",
- org.eclipse.jdt.debug;bundle-version="3.8.0",
  org.eclipse.jdt.launching;bundle-version="3.9.0",
- org.eclipse.debug.core;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
- org.eclipse.core.expressions;bundle-version="3.4.400",
  org.eclipse.debug.ui;bundle-version="3.10.0",
- org.eclipse.core.resources,
  com.google.gson;bundle-version="2.2.4",
- org.eclipse.core.variables;bundle-version="3.2.0",
  org.apache.commons.codec;bundle-version="1.14.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
