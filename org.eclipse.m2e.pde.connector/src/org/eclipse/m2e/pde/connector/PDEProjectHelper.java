@@ -137,7 +137,9 @@ public class PDEProjectHelper {
 			model.load();
 			monitor.done();
 			IBuildEntry entry = model.getBuild().getEntry("output." + ".");
-			return org.eclipse.core.runtime.Path.forPosix(entry.getTokens()[0]);
+			if (entry != null) {
+				return org.eclipse.core.runtime.Path.forPosix(entry.getTokens()[0]);
+			}
 		}
 		return null;
 	}
@@ -146,7 +148,7 @@ public class PDEProjectHelper {
 		AbstractProjectConfigurator.addNature(project, PDE_PLUGIN_NATURE, monitor);
 		IProjectDescription description = project.getDescription();
 		Stream<ICommand> builders = Arrays.stream(description.getBuildSpec())
-				.filter(b -> !b.getBuilderName().startsWith("org.eclipse.pde"));
+				.filter(b -> !b.getBuilderName().startsWith("org.eclipse.pde."));
 		description.setBuildSpec(builders.toArray(ICommand[]::new));
 		project.setDescription(description, monitor);
 
