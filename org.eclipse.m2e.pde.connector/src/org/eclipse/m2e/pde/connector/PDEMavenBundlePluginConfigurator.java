@@ -11,16 +11,38 @@
 package org.eclipse.m2e.pde.connector;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -37,7 +59,13 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
+import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
+import org.eclipse.osgi.util.ManifestElement;
+import org.eclipse.pde.internal.core.project.PDEProject;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 
 /**
  * This configurator performs the following tasks:
@@ -73,7 +101,6 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
 								"Incremental updates are currently disabled, set supportIncrementalBuild=true to support automatic manifest updates for this project.");
 					}
-
 					hasManifestExecution = true;
 				}
 			} else if (isBND(plugin) && isBNDBundleGoal(execution)) {
@@ -134,6 +161,8 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 	private IPath getMetainfPath(IMavenProjectFacade facade, List<MojoExecution> executions, IProgressMonitor monitor)
 			throws CoreException {
 		IMaven maven = MavenPlugin.getMaven();
+		// TODO: warn on multiple executions and prefer the one without classifier (i.e.
+		// the main artifact or the one for the bnd-process/jar goal??
 		for (MojoExecution execution : executions) {
 			Plugin plugin = execution.getPlugin();
 			MavenProject project = facade.getMavenProject(monitor);
@@ -164,10 +193,135 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 	@Override
 	public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
 			IPluginExecutionMetadata executionMetadata) {
-		if ((isFelix(execution.getPlugin()) && isFelixManifestGoal(execution))
-				|| (isBND(execution.getPlugin()) && isBNDBundleGoal(execution))) {
-			return new MojoExecutionBuildParticipant(execution, true, true);
+		Plugin plugin = execution.getPlugin();
+		if ((isFelix(plugin) && isFelixManifestGoal(execution)) || (isBND(plugin) && isBNDBundleGoal(execution))) {
+			// Run .classpath synchronization on each incremental build in order to consider
+			// potential changes on the Bundle-ClassPath and the resources recognized by the
+			// '-includeResource' instruction that are caused by previous mojo executions.
+			return new ClasspathSynchronizer(execution, true, true);
 		}
-		return super.getBuildParticipant(projectFacade, execution, executionMetadata);
+		return null;
 	}
+
+	private static final class ClasspathSynchronizer extends MojoExecutionBuildParticipant {
+
+		public ClasspathSynchronizer(MojoExecution execution, boolean runOnIncremental, boolean runOnConfiguration) {
+			super(execution, runOnIncremental, runOnConfiguration);
+		}
+
+		@Override
+		public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
+			if (!appliesToBuildKind(kind)) {
+				return null;
+			}
+			Set<IProject> buildProjects = super.build(kind, monitor);
+
+			// TODO: is deriving the .classpath from the MANIFEST.MF and build.properties
+			// something useful for PDE?
+
+			IProject project = getMavenProjectFacade().getProject();
+			Path manifest = Path.of(PDEProject.getManifest(project).getLocationURI());
+			if (!Files.isRegularFile(manifest)) {
+				return buildProjects;
+			}
+			getBuildContext().refresh(manifest.toFile());
+
+			List<ManifestElement> bundleClassPath = getBundleClassPathEntries(manifest);
+
+			IJavaProject javaProject = JavaCore.create(project);
+			Set<IPath> bundleClasspathJars = getBundleClassPathJars(bundleClassPath, javaProject, monitor);
+
+			if (!bundleClasspathJars.isEmpty()) {
+
+				List<IClasspathEntry> rawClasspath = new ArrayList<>(Arrays.asList(javaProject.getRawClasspath()));
+
+				Set<IPath> existingLibraryPaths = new HashSet<>();
+				int sizeBefore = rawClasspath.size();
+				rawClasspath.removeIf(entry -> {
+					if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+						existingLibraryPaths.add(entry.getPath());
+						return !bundleClasspathJars.contains(entry.getPath()) && isPomDerived(entry);
+					}
+					return false;
+				});
+
+				boolean changed = sizeBefore != rawClasspath.size();
+				for (IPath jarPath : bundleClasspathJars) {
+					if (!existingLibraryPaths.contains(jarPath)) {
+						rawClasspath.add(createLibraryEntry(jarPath, monitor));
+						changed = true;
+					}
+				}
+				if (changed) {
+					javaProject.setRawClasspath(rawClasspath.toArray(IClasspathEntry[]::new), monitor);
+				}
+			}
+			return buildProjects;
+		}
+
+		private List<ManifestElement> getBundleClassPathEntries(Path manifest) throws IOException, BundleException {
+			try (var input = Files.newInputStream(manifest)) {
+				Map<String, String> headers = ManifestElement.parseBundleManifest(input, null);
+				String bcpEntries = headers.get(Constants.BUNDLE_CLASSPATH);
+				ManifestElement[] elements = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, bcpEntries);
+				return elements != null ? List.of(elements) : List.of();
+			}
+		}
+
+		private Set<IPath> getBundleClassPathJars(List<ManifestElement> bundleClassPath, IJavaProject javaProject,
+				IProgressMonitor monitor) throws IOException, CoreException {
+
+			IProject project = javaProject.getProject();
+			IContainer bundleRootContainer = PDEProject.getBundleRoot(project);
+			Path bundleRoot = Path.of(bundleRootContainer.getLocationURI());
+
+			Path bcpContainer = bundleRoot;
+			IPath bcpContainerPath = bundleRootContainer.getFullPath();
+			if (javaProject.getOutputLocation().equals(bundleRootContainer.getFullPath())) {
+				// The project's PDE Bundle-Root is the build output folder. Because JDT does
+				// not permit to reference Jars in the classpath located within the output
+				// folder, the relevant files are copied to a co-located folder.
+				Path buildDirectory = Path.of(getMavenProjectFacade().getMavenProject().getBuild().getDirectory());
+				bcpContainer = buildDirectory.resolve("m2e-bundleClassPath");
+				Path relativeBCPContainerPath = Path.of(project.getLocationURI()).relativize(bcpContainer);
+				bcpContainerPath = project.getFolder(relativeBCPContainerPath.toString()).getFullPath();
+			}
+
+			IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+			Set<IPath> bundleClasspathJars = new LinkedHashSet<>();
+			for (ManifestElement entry : bundleClassPath) {
+				String path = entry.getValueComponents()[0];
+				Path jar = bundleRoot.resolve(path);
+				if (path.endsWith(".jar") && Files.exists(jar)) {
+					Path referencedJar = bcpContainer.resolve(path);
+					IPath jarPath = bcpContainerPath.append(path);
+					if (!Files.exists(referencedJar)) {
+						Files.createDirectories(referencedJar.getParent());
+						Files.copy(jar, referencedJar);
+						wsRoot.getFile(jarPath).refreshLocal(IResource.DEPTH_ZERO, monitor);
+					}
+					bundleClasspathJars.add(jarPath);
+				}
+			}
+			return bundleClasspathJars;
+		}
+
+		private static boolean isPomDerived(IClasspathEntry entry) {
+			return Arrays.stream(entry.getExtraAttributes())
+					.anyMatch(a -> a.getName().equals(IClasspathManager.POMDERIVED_ATTRIBUTE)
+							&& Boolean.parseBoolean(a.getValue()));
+		}
+
+		private static IClasspathEntry createLibraryEntry(IPath libPath, IProgressMonitor monitor) {
+			IClasspathAttribute[] attributes = new IClasspathAttribute[] {
+					JavaCore.newClasspathAttribute(IClasspathManager.POMDERIVED_ATTRIBUTE, Boolean.toString(true)) };
+			IFile libFile = ResourcesPlugin.getWorkspace().getRoot().getFile(libPath);
+			Collection<ArtifactKey> artifacts = MavenArtifactIdentifier.identify(libFile.getLocation().toFile());
+			IPath sourcePath = artifacts.stream().map(a -> MavenArtifactIdentifier.resolveSourceLocation(a, monitor))
+					.filter(Objects::nonNull).map(Path::toString).map(org.eclipse.core.runtime.Path::fromOSString)
+					.findFirst().orElse(null);
+			return JavaCore.newLibraryEntry(libPath, sourcePath, null, null, attributes, true);
+		}
+	}
+
 }

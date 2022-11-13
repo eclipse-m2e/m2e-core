@@ -4,7 +4,6 @@
 	<artifactId>felix</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -47,7 +46,7 @@
 						</goals>
 						<configuration>
 							<instructions>
-								<Bundle-SymbolicName>${groupId}.${artifactId}</Bundle-SymbolicName>
+								<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 								<Export-Package>felix</Export-Package>
 							</instructions>
 							<niceManifest>true</niceManifest>
