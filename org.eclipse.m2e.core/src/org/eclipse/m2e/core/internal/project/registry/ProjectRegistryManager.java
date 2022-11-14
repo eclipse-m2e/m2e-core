@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -320,7 +321,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   void refresh(MutableProjectRegistry newState, Collection<IFile> pomFiles, IProgressMonitor monitor)
       throws CoreException {
-    log.debug("Refreshing: {}", pomFiles); //$NON-NLS-1$
+    long start = System.currentTimeMillis();
+    log.debug("Refreshing ({} files): {}", pomFiles.size(), pomFiles); //$NON-NLS-1$
 
     // 442524 safety guard
     URLConnectionCaches.assertDisabled();
@@ -359,13 +361,12 @@ public class ProjectRegistryManager implements ISaveParticipant {
     } finally {
       maven.removeLocalRepositoryListener(listener);
     }
-
-    log.debug("Refreshed: {}", pomFiles); //$NON-NLS-1$
+    log.debug("Refresh takes {} ms", (System.currentTimeMillis() - start)); //$NON-NLS-1$
   }
 
   private void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
       throws CoreException {
-    Set<IFile> allProcessedPoms = new HashSet<>();
+    Set<IFile> allProcessedPoms = new LinkedHashSet<>();
     Set<IFile> allNewFacades = new HashSet<>();
 
     Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
@@ -373,8 +374,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
-      List<IFile> pomsForUpdate = calculateFacadesForUpdate(newState, context, monitor, allProcessedPoms,
-          allNewFacades);
+      List<IFile> pomsForUpdate = calculateFacadesForUpdate(newState, context, allProcessedPoms::add,
+          allNewFacades::contains,
+          monitor);
       Map<IFile, MavenProjectFacade> newFacades = readMavenProjectFacades(pomsForUpdate, newState, monitor);
       for(Entry<IFile, MavenProjectFacade> entry : newFacades.entrySet()) {
         IFile pom = entry.getKey();
@@ -471,34 +473,34 @@ public class ProjectRegistryManager implements ISaveParticipant {
           } else {
             refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
           }
-
           monitor.worked(1);
         }
       }
     } while(tracker.needsImprovement());
   }
 
-  private List<IFile> calculateFacadesForUpdate(MutableProjectRegistry newState, DependencyResolutionContext context,
-      IProgressMonitor monitor, Set<IFile> allProcessedPoms, Set<IFile> allNewFacades) throws CoreException {
+  private List<IFile> calculateFacadesForUpdate(MutableProjectRegistry registry, DependencyResolutionContext context,
+      Consumer<IFile> processingListener, Predicate<IFile> alreadyProcessed, IProgressMonitor monitor)
+      throws CoreException {
     List<IFile> toReadPomFiles = new ArrayList<>();
     while(!context.isEmpty()) { // Group build of all current context
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
 
-      if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
+      if(registry.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
         throw new StaleMutableProjectRegistryException();
       }
 
       IFile pom = context.pop();
-      if(allNewFacades.contains(pom)) {
+      if(alreadyProcessed.test(pom)) {
         // pom was already in context and successfully read
         continue;
       }
-      allProcessedPoms.add(pom);
+      processingListener.accept(pom);
 
       monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
-      MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
+      MavenProjectFacade oldFacade = registry.getProjectFacade(pom);
 
       context.forcePomFiles(flushCaches(oldFacade, isForceDependencyUpdate()));
       if(oldFacade != null) {
@@ -509,23 +511,23 @@ public class ProjectRegistryManager implements ISaveParticipant {
         if(oldFacade != null) {
           // refresh old child modules
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
-          context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
+          context.forcePomFiles(registry.getVersionedDependents(mavenParentCapability, true));
 
           // refresh projects that import dependencyManagement from this one
           MavenCapability mavenArtifactImportCapability = MavenCapability
               .createMavenArtifactImport(oldFacade.getArtifactKey());
-          context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
+          context.forcePomFiles(registry.getVersionedDependents(mavenArtifactImportCapability, true));
         }
       } else {
-        newState.setProject(pom, null); // discard closed/deleted pom in workspace
+        registry.setProject(pom, null); // discard closed/deleted pom in workspace
         // refresh children of deleted/closed parent
         if(oldFacade != null) {
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
-          context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
+          context.forcePomFiles(registry.getDependents(mavenParentCapability, true));
 
           MavenCapability mavenArtifactImportCapability = MavenCapability
               .createMavenArtifactImport(oldFacade.getArtifactKey());
-          context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
+          context.forcePomFiles(registry.getVersionedDependents(mavenArtifactImportCapability, true));
         }
       }
     }
