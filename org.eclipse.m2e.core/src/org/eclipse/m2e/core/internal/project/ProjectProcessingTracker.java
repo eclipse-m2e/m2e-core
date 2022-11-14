@@ -29,7 +29,7 @@ import org.eclipse.core.resources.IFile;
  */
 public class ProjectProcessingTracker {
 
-  static final int MAX_INTERATIONS = Integer.getInteger("m2e.project.refresh.maxiterations", 5);
+  static final int MAX_ITERATIONS = Integer.getInteger("m2e.project.refresh.maxiterations", 5);
 
   static final Logger log = LoggerFactory.getLogger(ProjectProcessingTracker.class);
 
@@ -65,8 +65,8 @@ public class ProjectProcessingTracker {
       return false;
     }
     iterations++ ;
-    if(iterations > MAX_INTERATIONS) {
-      log.debug("Max iterations reached!");
+    if(iterations > MAX_ITERATIONS) {
+      log.debug("Configured maximum of {} iterations reached!", iterations);
       return false;
     }
     log.debug("seed =      {}", seed);
