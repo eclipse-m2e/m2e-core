@@ -53,4 +53,11 @@ public class DependencyResolutionContext {
     return new LinkedHashSet<>(pomFiles);
   }
 
+  /**
+   * @param file
+   */
+  public void forcePomFile(IFile file) {
+    pomFiles.add(file);
+  }
+
 }
