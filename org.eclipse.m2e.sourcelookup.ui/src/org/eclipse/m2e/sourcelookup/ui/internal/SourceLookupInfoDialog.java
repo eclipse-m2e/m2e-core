@@ -164,7 +164,7 @@ public class SourceLookupInfoDialog extends Dialog {
       ISourceContainer container = sourceLookup.getSourceContainer(debugElement, false, moninor /* sync */);
 
       // TODO consider extracting artifact keys from container
-      final Collection<ArtifactKey> artifacts = new MavenArtifactIdentifier().identify(location);
+      final Collection<ArtifactKey> artifacts = MavenArtifactIdentifier.identify(location);
       textGAV.setText(artifacts.toString());
 
       // TODO extract project(s) from the container

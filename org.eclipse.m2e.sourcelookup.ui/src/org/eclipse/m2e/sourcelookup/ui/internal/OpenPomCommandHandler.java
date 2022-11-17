@@ -13,9 +13,10 @@
 package org.eclipse.m2e.sourcelookup.ui.internal;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -56,8 +57,10 @@ public class OpenPomCommandHandler extends AbstractHandler {
 
       List<IEditorInput> inputs = new MetaInfMavenScanner<IEditorInput>() {
         @Override
-        protected IEditorInput visitFile(File file) throws IOException {
-          return toEditorInput(name, new FileInputStream(file));
+        protected IEditorInput visitFile(Path file) throws IOException {
+          try (InputStream stream = Files.newInputStream(file)) {
+            return toEditorInput(name, stream);
+          }
         }
 
         @Override
@@ -65,18 +68,15 @@ public class OpenPomCommandHandler extends AbstractHandler {
           return toEditorInput(name, jar.getInputStream(entry));
         }
 
-      }.scan(location, "pom.xml");
+      }.scan(location.toPath(), "pom.xml");
 
-      if (inputs.isEmpty()) {
-        return null;
+      if (!inputs.isEmpty()) {
+        OpenPomAction.openEditor(inputs.get(0), "pom.xml");
       }
-
-      OpenPomAction.openEditor(inputs.get(0), "pom.xml");
     } catch (CoreException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
     return null;
   }
 

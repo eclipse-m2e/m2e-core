@@ -13,13 +13,11 @@
 package org.eclipse.m2e.sourcelookup.internal.launch;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ExternalArchiveSourceContainer;
@@ -28,7 +26,6 @@ import org.eclipse.jdt.launching.sourcelookup.advanced.ISourceContainerResolver;
 import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
@@ -36,14 +33,12 @@ import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
 
 public class MavenSourceContainerResolver implements ISourceContainerResolver {
 
-  private static final MavenArtifactIdentifier INDENTIFIER = new MavenArtifactIdentifier();
-
   @Override
   public Collection<ISourceContainer> resolveSourceContainers(File classesLocation, IProgressMonitor monitor) {
-    Collection<ArtifactKey> classesArtifacts = INDENTIFIER.identify(classesLocation);
+    Collection<ArtifactKey> classesArtifacts = MavenArtifactIdentifier.identify(classesLocation);
 
-    if (classesArtifacts == null) {
-      return null;
+    if (classesArtifacts.isEmpty()) {
+      return List.of();
     }
 
     List<ISourceContainer> result = new ArrayList<>();
@@ -61,28 +56,16 @@ public class MavenSourceContainerResolver implements ISourceContainerResolver {
     String artifactId = artifact.artifactId();
     String version = artifact.version();
 
-    IMaven maven = MavenPlugin.getMaven();
     IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
 
     IMavenProjectFacade mavenProject = projectRegistry.getMavenProject(groupId, artifactId, version);
     if (mavenProject != null) {
       return new JavaProjectSourceContainer(JavaCore.create(mavenProject.getProject()));
     }
-
-    try {
-      List<ArtifactRepository> repositories = new ArrayList<>();
-      repositories.addAll(maven.getArtifactRepositories());
-      repositories.addAll(maven.getPluginArtifactRepositories());
-
-      if (!maven.isUnavailable(groupId, artifactId, version, "jar", "sources", repositories)) {
-        Artifact resolve = maven.resolve(groupId, artifactId, version, "jar", "sources", null, monitor);
-
-        return new ExternalArchiveSourceContainer(resolve.getFile().getAbsolutePath(), true);
-      }
-    } catch (CoreException e) {
-      // TODO maybe log, ignore otherwise
+    Path sourceLocation = MavenArtifactIdentifier.resolveSourceLocation(artifact, monitor);
+    if (sourceLocation != null) {
+      return new ExternalArchiveSourceContainer(sourceLocation.toString(), true);
     }
-
     return null;
   }
 }
