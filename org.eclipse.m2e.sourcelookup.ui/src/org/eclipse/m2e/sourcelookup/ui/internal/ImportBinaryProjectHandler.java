@@ -73,10 +73,9 @@ public class ImportBinaryProjectHandler extends AbstractHandler {
       }
 
       @Override
-		protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) {
-        return new MavenArtifactIdentifier().identify(location);
+      protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) {
+    	return MavenArtifactIdentifier.identify(location);
       }
-
     };
     job.setUser(true);
     job.schedule();
