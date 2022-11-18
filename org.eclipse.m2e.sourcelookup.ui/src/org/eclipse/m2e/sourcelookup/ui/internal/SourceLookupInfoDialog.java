@@ -28,7 +28,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.sourcelookup.internal.launch.MavenArtifactIdentifier;
+import org.eclipse.m2e.sourcelookup.internal.MavenArtifactIdentifier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;

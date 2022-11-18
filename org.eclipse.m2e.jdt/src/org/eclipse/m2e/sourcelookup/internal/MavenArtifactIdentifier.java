@@ -10,7 +10,7 @@
  * Contributors:
  *      Igor Fedorenko - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.sourcelookup.internal.launch;
+package org.eclipse.m2e.sourcelookup.internal;
 
 import java.io.BufferedInputStream;
 import java.io.File;
