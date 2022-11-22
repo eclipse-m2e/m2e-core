@@ -141,6 +141,11 @@
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
 						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>aarch64</arch>
+						</environment>
 					</environments>
 				</configuration>
 			</plugin>
@@ -330,33 +335,9 @@
 				</os>
 			</activation>
 			<properties>
-				<tycho.testArgLine>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.testArgLine>
+				<!-- SWT on Mac OS needs to be started on main thread -->
+				<tycho.testArgLine>-XstartOnFirstThread</tycho.testArgLine>
 			</properties>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>tycho-surefire-plugin</artifactId>
-							<version>${tycho-version}</version>
-							<configuration>
-								<dependencies combine.children="append">
-									<dependency>
-										<artifactId>org.eclipse.jdt.launching.macosx</artifactId>
-										<version>0.0.0</version>
-										<type>eclipse-plugin</type>
-									</dependency>
-									<dependency>
-										<type>eclipse-feature</type>
-										<artifactId>org.eclipse.e4.rcp</artifactId>
-										<version>0.0.0</version>
-									</dependency>
-								</dependencies>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 		<profile>
 			<id>its</id>
