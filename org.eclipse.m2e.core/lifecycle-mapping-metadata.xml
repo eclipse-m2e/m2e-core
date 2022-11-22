@@ -17,6 +17,75 @@
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <goals>
+          <goal>copy</goal>
+          <goal>copy-dependencies</goal>
+          <goal>properties</goal>
+          <goal>unpack</goal>
+          <goal>unpack-dependencies</goal>
+        </goals>
+        <versionRange>[3.4,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <execute>
+          <runOnIncremental>true</runOnIncremental>
+        </execute>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <goals>
+          <goal>analyze</goal>
+          <goal>analyze-dep-mgmt</goal>
+          <goal>analyze-only</goal>
+          <goal>analyze-report</goal>
+          <goal>analyze-duplicate</goal>
+          <goal>build-classpath</goal>
+          <goal>display-ancestors</goal>
+          <goal>get</goal>
+          <goal>go-offline</goal>
+          <goal>list</goal>
+          <goal>list-classes</goal>
+          <goal>list-repositories</goal>
+          <goal>purge-local-repository</goal>
+          <goal>resolve</goal>
+          <goal>resolve-plugins</goal>
+          <goal>sources</goal>
+          <goal>tree</goal>
+        </goals>
+        <versionRange>[3.4,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <ignore>
+          <message>maven-dependency-plugin (some goals) are ignored by m2e.</message>
+        </ignore>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependencies-plugin</artifactId>
+        <goals>
+          <goal>copy</goal>
+          <goal>copy-dependencies</goal>
+          <goal>properties</goal>
+          <goal>unpack</goal>
+          <goal>unpack-dependencies</goal>
+        </goals>
+        <versionRange>[0.0.1,3.4)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <error>
+          <message>maven-dependencies-plugin prior to 3.4 is not supported by m2e. Use maven-dependencies-plugin version 3.4 or later.</message>
+        </error>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <goals>
           <goal>resources</goal>
