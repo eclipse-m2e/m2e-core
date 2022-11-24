@@ -2,8 +2,20 @@
 
 ## 2.1.0
 
-* 📅 Release Date: _expected_ December 2022
+* 📅 Release Date: November 24th 2022
 * All changes: https://github.com/eclipse-m2e/m2e-core/compare/2.0.2...2.1.0
+
+### Automatic configuration updates of Maven projects enabled by default
+
+The previously experimental feature of M2E to update Maven projects automatically on configuration changes matured and is now enabled by default.
+
+### Performance and memory consumption improvements
+
+For large projects the build performance has been improved and the memory consumption has been reduced.
+
+### Improved connectors for bnd-maven-plugin and maven-bundle-plugin
+
+The connector for the `bnd-maven-plugin` and `maven-bundle-plugin`, which is included into M2E, has been improved to consider the jars specified on the `Bundle-Classpath` of the generated MANIFEST.MF, when updating the Plugins JDT `.classpath`.
 
 ### Console support for polyglot Maven projects and projects without Maven nature
 
