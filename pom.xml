@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>3.8.602-SNAPSHOT</version>
+			<version>3.8.603-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
