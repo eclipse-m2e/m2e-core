@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -144,9 +146,9 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 			this.groupId = Objects.requireNonNull(data.get("groupId"));
 			this.artifactId = Objects.requireNonNull(data.get("artifactId"));
 			this.version = Objects.requireNonNull(data.get("version"));
-			this.projectBasedir = Path.of(data.get("basedir"));
-			this.projectFile = Path.of(data.get("file"));
-			this.projectBuildDirectory = Path.of(data.get("build.directory"));
+			this.projectBasedir = Paths.get(data.get("basedir"));
+			this.projectFile = Paths.get(data.get("file"));
+			this.projectBuildDirectory = Paths.get(data.get("build.directory"));
 		}
 	}
 
@@ -180,7 +182,7 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 			try (ServerSocketChannel s = server; SocketChannel readChannel = server.accept()) {
 				ByteBuffer buffer = ByteBuffer.allocate(512);
 				StringBuilder message = new StringBuilder();
-				while (readChannel.read(buffer.clear()) >= 0) {
+				while (readChannel.read(buffer) >= 0) {
 					message.append(new String(buffer.array(), 0, buffer.position()));
 					for (int terminatorIndex; (terminatorIndex = message.indexOf(DATA_SET_SEPARATOR)) >= 0;) {
 						String dataSet = message.substring(0, terminatorIndex);
@@ -189,6 +191,9 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 						MavenProjectBuildData buildData = parseMavenBuildProject(dataSet);
 						datasetListener.accept(buildData);
 					}
+					// Explicit cast for compatibility with covariant return type on JDK 9's
+					// ByteBuffer
+					((Buffer) buffer).clear();
 				}
 			} catch (IOException ex) { // ignore, happens if Maven process is forcibly terminated
 			} finally {
