@@ -158,17 +158,20 @@ public class PDEProjectHelper {
 	private static void setManifestLocaton(IProject project, IPath manifestPath, IProgressMonitor monitor)
 			throws CoreException {
 		IBundleProjectService projectService = Activator.getBundleProjectService().orElseThrow();
-		if (manifestPath != null && manifestPath.segmentCount() > 1) {
-			IPath manifestContainer;
+		if (manifestPath != null) {
+			IPath bundleRootPath;
+			IFile manifest;
 			if (manifestPath.toFile().toPath().endsWith("META-INF")) {
-				manifestContainer = manifestPath.removeLastSegments(1);
+				bundleRootPath = manifestPath.removeLastSegments(1);
+				manifest = project.getFolder(manifestPath).getFile("MANIFEST.MF");
 			} else if (manifestPath.toFile().toPath().endsWith(Path.of("META-INF", "MANIFEST.MF"))) {
-				manifestContainer = manifestPath.removeLastSegments(2);
+				bundleRootPath = manifestPath.removeLastSegments(2);
+				manifest = project.getFile(manifestPath);
 			} else {
 				return;
 			}
-			project.getFolder(manifestContainer).refreshLocal(IResource.DEPTH_INFINITE, monitor);
-			projectService.setBundleRoot(project, manifestContainer);
+			manifest.refreshLocal(IResource.DEPTH_ZERO, monitor);
+			projectService.setBundleRoot(project, bundleRootPath.isEmpty() ? null : bundleRootPath);
 		} else {
 			// in case of configuration update, reset to the default value
 			projectService.setBundleRoot(project, null);

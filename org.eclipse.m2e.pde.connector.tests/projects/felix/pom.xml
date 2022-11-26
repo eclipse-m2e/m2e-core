@@ -6,6 +6,7 @@
 	<packaging>pom</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<metaInfPath>${project.build.outputDirectory}/META-INF</metaInfPath>
 	</properties>
 	<modules>
 		<module>bundle-project</module>
@@ -45,6 +46,7 @@
 							<goal>manifest</goal>
 						</goals>
 						<configuration>
+							<manifestLocation>${metaInfPath}</manifestLocation>
 							<instructions>
 								<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 								<Export-Package>felix</Export-Package>
@@ -61,7 +63,7 @@
 				<version>3.3.0</version>
 				<configuration>
 					<archive>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+						<manifestFile>${metaInfPath}/MANIFEST.MF</manifestFile>
 					</archive>
 				</configuration>
 			</plugin>

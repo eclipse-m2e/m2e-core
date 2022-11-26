@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -49,6 +50,7 @@ public class FelixConnectorTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void importFelixJarProject() throws IOException, CoreException {
 		IProject project = importFelixProject("jar-project/pom.xml");
+		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES,
 				Set.of(JavaCore.BUILDER_ID, IMavenConstants.BUILDER_ID));
 		assertPluginProjectExists(project, "m2e.pde.connector.tests.jar-project");
