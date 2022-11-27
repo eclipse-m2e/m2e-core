@@ -42,7 +42,6 @@ import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.pde.core.project.IBundleProjectService;
 
 public class PDEProjectHelper {
 
@@ -155,27 +154,23 @@ public class PDEProjectHelper {
 		setManifestLocaton(project, manifestPath, monitor);
 	}
 
+	@SuppressWarnings("restriction")
 	private static void setManifestLocaton(IProject project, IPath manifestPath, IProgressMonitor monitor)
 			throws CoreException {
-		IBundleProjectService projectService = Activator.getBundleProjectService().orElseThrow();
+		IContainer bundleRoot = null; // in case of configuration update, reset to the default value
 		if (manifestPath != null) {
-			IPath bundleRootPath;
 			IFile manifest;
 			if (manifestPath.toFile().toPath().endsWith("META-INF")) {
-				bundleRootPath = manifestPath.removeLastSegments(1);
 				manifest = project.getFolder(manifestPath).getFile("MANIFEST.MF");
 			} else if (manifestPath.toFile().toPath().endsWith(Path.of("META-INF", "MANIFEST.MF"))) {
-				bundleRootPath = manifestPath.removeLastSegments(2);
 				manifest = project.getFile(manifestPath);
 			} else {
 				return;
 			}
 			manifest.refreshLocal(IResource.DEPTH_ZERO, monitor);
-			projectService.setBundleRoot(project, bundleRootPath.isEmpty() ? null : bundleRootPath);
-		} else {
-			// in case of configuration update, reset to the default value
-			projectService.setBundleRoot(project, null);
+			bundleRoot = manifest.getParent().getParent();
 		}
+		org.eclipse.pde.internal.core.project.PDEProject.setBundleRoot(project, bundleRoot);
 	}
 
 	/**
