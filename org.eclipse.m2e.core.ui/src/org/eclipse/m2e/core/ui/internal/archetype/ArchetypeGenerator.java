@@ -65,22 +65,27 @@ public class ArchetypeGenerator {
   IMavenLauncher mavenLauncher;
 
   /**
-   * Creates project structure using Archetype and then imports created project(s). May block during execution. Pumps
-   * the UI event loop if called from the UI thread. Cancellation from progress monitor is honored and signaled in the
-   * return value. Equivalent to
+   * Creates project structure(s) using the given {@link IArchetype}. These projects are not imported automatically so
+   * {@link IProjectConfigurationManager#importProjects(Collection, org.eclipse.m2e.core.project.ProjectImportConfiguration, IProgressMonitor)
+   * IProjectConfigurationManager.importProjects()} must be called if they are to be imported into the workspace.
+   * <p>
+   * May block during execution. Pumps the UI event loop if called from the UI thread. Cancellation from progress
+   * monitor is honored and signaled in the return value.
+   * <p>
+   * Equivalent to
    * {@link #createArchetypeProjects(IPath, IArchetype, String, String, String, String, Map, boolean, IProgressMonitor)}
    * with <code>interactive = false</code>
    * 
-   * @param location where to place them. may be null for the workspace root
+   * @param location where to place them, may be {@code null} for the workspace root
    * @param archetype archetype
    * @param groupId groupid
    * @param artifactId artifactid
    * @param version version
    * @param javaPackage java package
    * @param properties initial properties (some properties will be set/overriden by this call)
-   * @param monitor monitor for progress and cancellation, may be null
+   * @param monitor monitor for progress and cancellation, may be {@code null}
    * @return a list of created projects.
-   * @throws CoreException to signal an error, or a cancellation (if the contained status is CANCEL)
+   * @throws CoreException to signal an error or a cancellation (if the contained status is CANCEL)
    * @since 1.8
    */
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
@@ -91,11 +96,14 @@ public class ArchetypeGenerator {
   }
 
   /**
-   * Creates project structure using Archetype and then imports created project(s). May block during execution. Pumps
-   * the UI event loop if called from the UI thread. Cancellation from progress monitor is honored and signaled in the
-   * return value.
+   * Creates project structure(s) using the given {@link IArchetype}. These projects are not imported automatically so
+   * {@link IProjectConfigurationManager#importProjects(Collection, org.eclipse.m2e.core.project.ProjectImportConfiguration, IProgressMonitor)
+   * IProjectConfigurationManager.importProjects()} must be called if they are to be imported into the workspace.
+   * <p>
+   * May block during execution. Pumps the UI event loop if called from the UI thread. Cancellation from progress
+   * monitor is honored and signaled in the return value.
    * 
-   * @param location where to place them. may be null for the workspace root
+   * @param location where to place them, may be {@code null} for the workspace root
    * @param archetype archetype
    * @param groupId groupid
    * @param artifactId artifactid
@@ -103,9 +111,10 @@ public class ArchetypeGenerator {
    * @param javaPackage java package
    * @param properties initial properties (some properties will be set/overriden by this call)
    * @param interactive see {@link IMavenLauncher#runMaven(File, String, Map, boolean)}
-   * @param monitor monitor for progress and cancellation, may be null
+   * @param monitor monitor for progress and cancellation, may be {@code null}
    * @return a list of created projects.
-   * @throws CoreException to signal an error, or a cancellation (if the contained status is CANCEL)
+   * @throws CoreException to signal an error or a cancellation (if the contained status is CANCEL)
+   * @since 1.8
    */
   public Collection<MavenProjectInfo> createArchetypeProjects(IPath location, IArchetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Map<String, String> properties, boolean interactive,
