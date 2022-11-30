@@ -27,11 +27,11 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Test;
 
-public class JavaConfigurationFromEnforcer extends AbstractMavenProjectTestCase {
+public class JavaConfigurationFromEnforcerTest extends AbstractMavenProjectTestCase {
 	private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/";
 
 	@Test
-	public void testEnforcerVersion() throws Exception {
+	public void testEnforcer_Version() throws Exception {
 		IProject project = importProject("projects/enforcerSettingsWithVersion/pom.xml");
 		waitForJobsToComplete();
 		IJavaProject jproject = JavaCore.create(project);
@@ -41,7 +41,7 @@ public class JavaConfigurationFromEnforcer extends AbstractMavenProjectTestCase 
 	}
 
 	@Test
-	public void testEnforcerVersionRange() throws Exception {
+	public void testEnforcer_VersionRange() throws Exception {
 		IProject project = importProject("projects/enforcerSettingsWithVersionRange/pom.xml");
 		waitForJobsToComplete();
 		IJavaProject jproject = JavaCore.create(project);
@@ -49,6 +49,17 @@ public class JavaConfigurationFromEnforcer extends AbstractMavenProjectTestCase 
 		assertEquals("1.8", jproject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false));
 		assertEquals(List.of("JavaSE-11"), getJREContainerVMType(jproject));
 	}
+
+	@Test
+	public void testEnforcer_NoVersionRange() throws Exception {
+		IProject project = importProject("projects/enforcerSettingsWithoutRequiredJavaVersion/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject jproject = JavaCore.create(project);
+		assertEquals("1.8", jproject.getOption(JavaCore.COMPILER_SOURCE, false));
+		assertEquals("1.8", jproject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false));
+		assertEquals(List.of("JavaSE-1.8"), getJREContainerVMType(jproject));
+	}
+
 
 	private static List<String> getJREContainerVMType(IJavaProject jproject) throws JavaModelException {
 		return Arrays.stream(jproject.getRawClasspath())
