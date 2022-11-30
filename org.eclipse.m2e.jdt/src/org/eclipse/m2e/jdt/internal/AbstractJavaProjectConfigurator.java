@@ -862,6 +862,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
     String version = ((MavenImpl) maven).getMojoParameterValue(mavenProject, mojoExecution,
         List.of("rules", "requireJavaVersion", "version"), String.class, monitor);
+    if(version == null) {
+      return null;
+    }
     return getMinimumJavaBuildEnvironmentId(version);
   }
 
