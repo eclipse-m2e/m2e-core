@@ -208,6 +208,7 @@
 									<arg value="-n 1" />
 									<arg value="--pretty=format:%cd" />
 									<arg value="--date=format:${buildqualifier.format}" />
+									<arg value="." />
 								</exec>
 								<loadfile property="buildQualifier" srcFile="${project.build.directory}/git/buildQualifier" />
 								<delete file="${project.build.directory}/git/buildQualifier" />
@@ -222,6 +223,7 @@
 									<arg value="log" />
 									<arg value="-n 1" />
 									<arg value="--pretty=format:%H" />
+									<arg value="." />
 								</exec>
 								<loadfile property="gitCommitId" srcFile="${project.build.directory}/git/commitId" />
 								<delete file="${project.build.directory}/git/commitId" />
