@@ -119,6 +119,16 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<supportedProjectTypes>
+							<value>jar</value>
+						</supportedProjectTypes>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -338,26 +348,6 @@
 							<goal>generate-pde-source-header</goal>
 						</goals>
 						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<executions>
-					<execution>
-						<?m2e ignore?>
-						<id>attached-p2-metadata</id> <!-- Required to make this project's sources discoverable for the sources-features -->
-						<goals>
-							<goal>p2-metadata</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<supportedProjectTypes>
-								<value>jar</value>
-							</supportedProjectTypes>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

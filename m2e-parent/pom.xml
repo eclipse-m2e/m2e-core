@@ -71,6 +71,61 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>feature-source</id>
+						<goals>
+							<goal>feature-source</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<plugin id="org.eclipse.m2e.workspace.cli" />
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>p2-metadata</id>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<defaultP2Metadata>false</defaultP2Metadata>
+					<baselineRepositories>
+						<repository>
+							<url>https://download.eclipse.org/technology/m2e/snapshots/latest/</url>
+						</repository>
+					</baselineRepositories>
+					<baselineReplace>all</baselineReplace>
+					<baselineMode>${tycho.p2.baselineMode}</baselineMode>
+					<writeComparatorDelta>true</writeComparatorDelta>
+					<ignoredPatterns>
+						<pattern>META-INF/ECLIPSE_.RSA</pattern>
+						<pattern>META-INF/ECLIPSE_.SF</pattern>
+						<pattern>**/org/fusesource/jansi/internal/native/Mac/*/libjansi.jnilib</pattern>
+						<pattern>org/eclipse/m2e/core/internal/lifecyclemapping/model/**/*.java</pattern>
+					</ignoredPatterns>
+				</configuration>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -117,7 +172,6 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
-								<phase>pre-integration-test</phase>
 							</execution>
 						</executions>
 					</plugin>
