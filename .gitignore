@@ -1,6 +1,5 @@
 target/
 bin/
-src-gen/
 .DS_Store
 .polyglot*
 .tycho-consumer-pom.xml
