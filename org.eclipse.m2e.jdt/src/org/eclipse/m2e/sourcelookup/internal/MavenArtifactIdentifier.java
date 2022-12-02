@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -92,14 +93,14 @@ public class MavenArtifactIdentifier {
     // GAV extracted from pom.properties
     // checksum-based lookup in central
     Path location = classesLocation.toPath();
-    Collection<ArtifactKey> classesArtifacts = scanPomProperties(location);
+    Set<ArtifactKey> classesArtifacts = scanPomProperties(location);
     if(classesArtifacts.isEmpty()) {
       classesArtifacts = identifyCentralSearch(location);
     }
     return classesArtifacts;
   }
 
-  private static Collection<ArtifactKey> identifyCentralSearch(Path file) {
+  private static Set<ArtifactKey> identifyCentralSearch(Path file) {
     if(!Files.isRegularFile(file)) {
       return Set.of();
     }
@@ -120,7 +121,7 @@ public class MavenArtifactIdentifier {
           String v = doc.get("v").getAsString();
           result.add(new ArtifactKey(g, a, v, null));
         }
-        return !result.isEmpty() ? Set.copyOf(result) : null;
+        return !result.isEmpty() ? Collections.unmodifiableSet(result) : Collections.emptySet();
       }
     } catch(IOException e) {
       LOG.log(Status.error("Failed to identify file by its hash using search.maven.org: " + file));
@@ -128,7 +129,7 @@ public class MavenArtifactIdentifier {
     }
   }
 
-  private static Collection<ArtifactKey> scanPomProperties(Path classesLocation) {
+  private static Set<ArtifactKey> scanPomProperties(Path classesLocation) {
     return new HashSet<>(SCANNER.scan(classesLocation, "pom.properties"));
   }
 
