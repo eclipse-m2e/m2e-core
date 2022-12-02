@@ -98,6 +98,12 @@
 					<type>jar</type>
 				</dependency>
 				<dependency>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+					<version>2.11.0</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
 					<groupId>io.takari.m2e.workspace</groupId>
 					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
 					<version>0.3.1</version>
