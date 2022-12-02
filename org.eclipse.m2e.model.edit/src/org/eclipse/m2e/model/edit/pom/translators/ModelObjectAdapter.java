@@ -180,7 +180,9 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
         if(elementType != null
             && elementType.getClassifierID() == PomPackage.Literals.PROPERTY_ELEMENT.getClassifierID()) {
-          ret = new PropertiesAdapter(resource, element, (List<PropertyElement>) eobject.eGet(feature));
+          @SuppressWarnings("unchecked")
+          var adapter = new PropertiesAdapter(resource, element, (List<PropertyElement>) eobject.eGet(feature));
+          ret = adapter;
         } else {
           ret = new ListAdapter(resource, element, (List<?>) eobject.eGet(feature), elementType);
         }

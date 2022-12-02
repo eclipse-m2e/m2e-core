@@ -39,7 +39,6 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -595,15 +594,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
               String versionString = version == null ? null : XmlUtils.getTextValue(version);
               if(prj != null && gridString != null && artidString != null
                   && (versionString == null || versionString.contains("${"))) { //$NON-NLS-1$
-                try {
-                  //TODO how do we decide here if the hyperlink is a dependency or a plugin
-                  // hyperlink??
-                  versionString = PomTemplateContext.extractVersion(prj, null, versionString, gridString, artidString,
-                      PomTemplateContext.EXTRACT_STRATEGY_DEPENDENCY);
-
-                } catch(CoreException e) {
-                  versionString = null;
-                }
+                //TODO how do we decide here if the hyperlink is a dependency or a plugin
+                // hyperlink??
+                versionString = PomTemplateContext.extractVersion(prj, null, versionString, gridString, artidString,
+                    PomTemplateContext.EXTRACT_STRATEGY_DEPENDENCY);
               }
               if(versionString == null) {
                 return Status.OK_STATUS;

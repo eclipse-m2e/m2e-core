@@ -859,7 +859,6 @@ public class LifecycleMappingFactory {
    */
   public static List<MappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
       IProgressMonitor monitor) throws CoreException {
-    IMaven maven = MavenPlugin.getMaven();
 
     List<MappingMetadataSource> sources = new ArrayList<>();
 

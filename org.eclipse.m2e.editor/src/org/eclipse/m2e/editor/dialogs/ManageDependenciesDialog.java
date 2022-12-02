@@ -506,6 +506,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     public Object[] getElements(Object inputElement) {
 
       if(inputElement instanceof LinkedList) {
+        @SuppressWarnings("unchecked")
         LinkedList<MavenProject> projects = (LinkedList<MavenProject>) inputElement;
         if(projects.isEmpty()) {
           return new Object[0];

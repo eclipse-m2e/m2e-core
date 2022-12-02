@@ -313,7 +313,7 @@ public enum PomTemplateContext {
   GROUP_ID("groupId") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       for(String groupId : getSearchEngine(eclipseprj).findGroupIds(prefix, getPackaging(node),
           getContainingArtifact(node))) {
         checkAndAdd(proposals, prefix, groupId);
@@ -324,7 +324,7 @@ public enum PomTemplateContext {
   ARTIFACT_ID("artifactId") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -342,7 +342,7 @@ public enum PomTemplateContext {
   VERSION("version") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -412,7 +412,7 @@ public enum PomTemplateContext {
   CLASSIFIER("classifier") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
@@ -428,7 +428,7 @@ public enum PomTemplateContext {
   TYPE("type") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
@@ -523,7 +523,7 @@ public enum PomTemplateContext {
   GOAL("goal") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+        String prefix) {
       if(!"goals".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         return;
       }
@@ -977,7 +977,7 @@ public enum PomTemplateContext {
     return context;
   }
 
-  protected static SearchEngine getSearchEngine(IProject project) throws CoreException {
+  protected static SearchEngine getSearchEngine(IProject project) {
     if(searchEngineForTests != null) {
       return searchEngineForTests;
     }
@@ -1076,7 +1076,7 @@ public enum PomTemplateContext {
   static int EXTRACT_STRATEGY_SEARCH = 4;
 
   static String extractVersion(MavenProject mp, IProject project, String version, String groupId, String artifactId,
-      int strategy) throws CoreException {
+      int strategy) {
 
     assert mp != null;
     version = simpleInterpolate(mp, version);

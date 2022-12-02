@@ -396,7 +396,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException {
-    if(MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.key())
+    if(MavenPreferenceConstants.P_USER_SETTINGS_FILE.equals(event.key())
         || MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE.equals(event.key())) {
       reloadSettings();
     }
@@ -486,7 +486,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Deprecated
   @Override
-  public void detachFromSession(MavenProject project) throws CoreException {
+  public void detachFromSession(MavenProject project) {
     //noop now
   }
 
@@ -757,7 +757,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    * Resolves a nested configuration parameter from the given {@code mojoExecution}. It coerces from String to the given
    * type and considers expressions and default values. Deliberately no public API yet as probably refactored in the
    * near future.
-   * 
+   *
    * @param <T>
    * @param project the Maven project
    * @param mojoExecution the mojo execution from which to retrieve the configuration value
