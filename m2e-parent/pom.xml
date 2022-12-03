@@ -8,8 +8,7 @@
 
 	SPDX-License-Identifier: EPL-2.0
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.eclipse.m2e</groupId>
@@ -91,6 +90,36 @@
 							<excludes>
 								<plugin id="org.eclipse.m2e.workspace.cli" />
 							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-baseline-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>baseline-check</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<baselines>
+								<repository>
+									<id>baseline-repo</id>
+									<url>https://download.eclipse.org/technology/m2e/releases/latest/</url>
+								</repository>
+							</baselines>
+							<ignores>
+								<ignore>META-INF/maven/*/pom.xml</ignore>
+								<ignore>META-INF/maven/*/pom.properties</ignore>
+								<ignore>OSGI-INF/*</ignore>
+								<ignore>jars/*.jar</ignore>
+								<ignore>Eclipse-SourceReferences</ignore>
+							</ignores>
+							<extensions>true</extensions>
 						</configuration>
 					</execution>
 				</executions>
