@@ -55,7 +55,7 @@
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
-					<version>6.3.1</version>
+					<version>6.4.0</version>
 					<extensions>true</extensions>
 					<configuration>
 						<bnd>
@@ -90,7 +90,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.4.0</version>
 					<configuration>
 						<overWriteIfNewer>true</overWriteIfNewer>
 						<includeScope>runtime</includeScope> <!-- only include runtime and compile time dependencies, not test or provided! -->
@@ -156,7 +156,6 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<?m2e execute onIncremental?>
 						<id>fetch-dependency-jars</id>
 						<goals>
 							<goal>copy-dependencies</goal>

@@ -138,7 +138,7 @@
 				<plugin>
 					<groupId>org.eclipse.cbi.maven.plugins</groupId>
 					<artifactId>eclipse-jarsigner-plugin</artifactId>
-					<version>1.3.3</version>
+					<version>1.3.4</version>
 					<configuration>
 						<excludeInnerJars>true</excludeInnerJars>
 						<resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
