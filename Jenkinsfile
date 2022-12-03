@@ -35,7 +35,7 @@ pipeline {
 			steps {
 				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
 				wrap([$class: 'Xvnc', useXauthority: true]) {
-					sh 'mvn clean verify -B -V \
+					sh 'mvn clean verify -B -V -e -U \
 						-Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true \
 						-Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"'
 				}}
