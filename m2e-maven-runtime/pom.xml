@@ -152,6 +152,22 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<configuration>
+					<jgit.ignore>NOTHING</jgit.ignore><!-- Overwrite values from parent -->
+				</configuration>
+				<executions>
+					<execution>
+						<?m2e execute onIncremental?>
+						<id>compute-qualifier</id>
+						<goals>
+							<goal>build-qualifier</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -211,22 +227,6 @@
 							<target>
 								<taskdef resource="net/sf/antcontrib/antlib.xml" />
 								<mkdir dir="${project.build.directory}/git" />
-
-								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/buildQualifier" failonerror="true">
-									<arg value="log" />
-									<arg value="-n 1" />
-									<arg value="--pretty=format:%cd" />
-									<arg value="--date=format:${buildqualifier.format}" />
-									<arg value="." />
-								</exec>
-								<loadfile property="buildQualifier" srcFile="${project.build.directory}/git/buildQualifier" />
-								<delete file="${project.build.directory}/git/buildQualifier" />
-								<propertyregex property="buildQualifier" input="${buildQualifier}" regexp="\s" replace="" override="true" /> <!-- strip off leading/trailing whitespace -->
-								<echo message="buildQualifier: ${buildQualifier}" level="info" />
-
-								<property name="outputTimestamp" value="${buildQualifier}" />
-								<propertyregex property="qualifiedVersion" input="${project.version}" regexp="-SNAPSHOT" replace=".${buildQualifier}" />
-								<echo message="qualifiedVersion: ${qualifiedVersion}" level="info" />
 
 								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/commitId" failonerror="true">
 									<arg value="log" />
