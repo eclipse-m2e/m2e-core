@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
     <setAttribute key="additional_plugins">
-        <setEntry value="org.apache.felix.scr:2.2.2:default:true:2:true"/>
+        <setEntry value="org.apache.felix.scr:2.2.4:default:true:2:true"/>
         <setEntry value="org.apache.xml.resolver:1.2.0.v20220715-1206:default:true:default:default"/>
-        <setEntry value="org.eclipse.core.runtime:3.26.0.v20220813-0916:default:true:default:true"/>
-        <setEntry value="org.eclipse.equinox.common:3.16.200.v20220817-1601:default:true:2:true"/>
+        <setEntry value="org.eclipse.core.runtime:3.26.100.v20221021-0005:default:true:default:true"/>
+        <setEntry value="org.eclipse.equinox.common:3.17.0.v20221108-1156:default:true:2:true"/>
         <setEntry value="org.eclipse.equinox.event:1.6.100.v20211021-1418:default:true:2:true"/>
-        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.100.v20220620-1617:default:true:1:true"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.200.v20221111-1340:default:true:1:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
     <booleanAttribute key="askclear" value="true"/>

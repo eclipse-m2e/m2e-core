@@ -4,8 +4,8 @@
 	<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
 	<locations>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/eclipse/updates/4.25/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
-			<repository location="https://download.eclipse.org/tools/orbit/downloads/2022-09/"/>
+			<repository location="https://download.eclipse.org/eclipse/updates/4.26/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
+			<repository location="https://download.eclipse.org/tools/orbit/downloads/2022-12/"/>
 			<unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
@@ -13,26 +13,26 @@
 			<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/egit/updates-6.2/"/>
+			<repository location="https://download.eclipse.org/egit/updates-6.4/"/>
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.31"/>
+			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.32"/>
 			<unit id="org.eclipse.emf.edit.ui.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.emf.ecore.edit.feature.group" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.27.0/R-3.27.0-20220829002010/repository/"/>
+			<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.28.0/R-3.28.0-20221120050827/repository/"/>
 			<unit id="org.eclipse.wst.common.uriresolver" version="0.0.0"/>
 			<unit id="org.eclipse.wst.common.emf" version="0.0.0"/>
 			<unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/1.0.0/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
+			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/1.0.1/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
 			<unit id="org.eclipse.wildwebdeveloper.xml.feature.feature.group" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/lsp4e/releases/0.20.7/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
+			<repository location="https://download.eclipse.org/lsp4e/releases/0.21.0/"/><!--Keep in sync with repo-ref in org.eclipse.m2e.repository/category.xml-->
 			<unit id="org.eclipse.lsp4e" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -44,13 +44,13 @@
 				<dependency>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>biz.aQute.bnd.util</artifactId>
-					<version>6.3.1</version>
+					<version>6.4.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>biz.aQute.bndlib</artifactId>
-					<version>6.3.1</version>
+					<version>6.4.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>

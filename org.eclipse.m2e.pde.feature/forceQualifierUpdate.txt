@@ -1,3 +1,4 @@
 # To force a version qualifier update add the bug here
 [PDE] update biz.aQute.bndlib and -util to version 6.3.1 - https://github.com/eclipse-m2e/m2e-core/pull/772
 Ensure Features are jar-signed - https://github.com/eclipse-m2e/m2e-core/issues/1097
+[PDE] update biz.aQute.bndlib and -util to version 6.4.0 - https://github.com/eclipse-m2e/m2e-core/pull/1127
