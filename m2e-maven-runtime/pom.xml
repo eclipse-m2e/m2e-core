@@ -155,7 +155,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<configuration>
-					<jgit.ignore>NOTHING</jgit.ignore><!-- Overwrite values from parent -->
+					<jgit.ignore>NOTHING</jgit.ignore> <!-- Overwrite values from parent -->
 				</configuration>
 				<executions>
 					<execution>
@@ -166,6 +166,13 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<configuration>
+					<baselineMode>warn</baselineMode>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -215,9 +222,8 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<!-- TODO: Make the tycho-packaging-plugin:build-qualifier goal to work with non 'eclipse-plugin' typed projects -->
 						<?m2e execute onIncremental?>
-						<id>generate-build-qualifier</id>
+						<id>generate-eclipse-source-reference-value</id>
 						<goals>
 							<goal>run</goal>
 						</goals>
