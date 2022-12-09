@@ -907,6 +907,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private static ArtifactVersion getMajorMinorOnlyVersion(ArtifactVersion lower) {
+    if(lower.getMajorVersion() == 0) {
+      // not every version constraint has a major version, in case it doesn't just rely on compareTo semantics as is
+      return lower;
+    }
     return new DefaultArtifactVersion(lower.getMajorVersion() + "." + lower.getMinorVersion());
   }
 
