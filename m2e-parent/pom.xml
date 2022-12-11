@@ -116,6 +116,8 @@
 								<ignore>META-INF/maven/*/pom.xml</ignore>
 								<ignore>META-INF/maven/*/pom.properties</ignore>
 								<ignore>OSGI-INF/*</ignore>
+								<ignore>META-INF/ECLIPSE_.RSA</ignore>                                        │
+								<ignore>META-INF/ECLIPSE_.SF</ignore>
 								<ignore>jars/*.jar</ignore>
 								<ignore>Eclipse-SourceReferences</ignore>
 							</ignores>
