@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc. and others.
+ * Copyright (c) 2008, 2023 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -42,11 +42,6 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.debug.ui.RefreshTab;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -216,11 +211,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
       setProjectConfiguration(workingCopy, basedir);
 
-      IPath path = getJREContainerPath(basedir);
-      if(path != null) {
-        workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, path.toPortableString());
-      }
-
       // TODO when launching Maven with debugger consider to add the following property
       // -Dmaven.surefire.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
 
@@ -243,21 +233,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         workingCopy.setAttribute(MavenLaunchConstants.ATTR_PROFILES, selectedProfiles);
       }
     }
-  }
-
-  // TODO ideally it should use MavenProject, but it is faster to scan IJavaProjects
-  private IPath getJREContainerPath(IContainer basedir) throws CoreException {
-    IProject project = basedir.getProject();
-    if(project != null && project.hasNature(JavaCore.NATURE_ID)) {
-      IJavaProject javaProject = JavaCore.create(project);
-      IClasspathEntry[] entries = javaProject.getRawClasspath();
-      for(IClasspathEntry entry : entries) {
-        if(JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0))) {
-          return entry.getPath();
-        }
-      }
-    }
-    return null;
   }
 
   private ILaunchConfiguration getLaunchConfiguration(IContainer basedir, String mode) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2019 Sonatype, Inc.
+ * Copyright (c) 2008, 2023 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -20,35 +20,60 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMInstall2;
+import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.JavaLaunchDelegate;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.internal.launch.MavenRuntimeLaunchSupport.VMArguments;
 
 
 public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaunchConstants {
-  static final Logger log = LoggerFactory.getLogger(MavenLaunchDelegate.class);
+  private static final Logger log = LoggerFactory.getLogger(MavenLaunchDelegate.class);
+
+  private static final ILog ECLIPSE_LOG = Platform.getLog(MavenLaunchDelegate.class);
 
   private static final String LAUNCHER_TYPE = "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
 
@@ -161,6 +186,176 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       programArguments = sb.toString();
     }
     return programArguments;
+  }
+
+  public static File getPomDirectory(ILaunchConfiguration configuration) {
+    if(configuration == null) {
+      return null;
+    }
+    // set associated project name (if there is some)
+    String pomDir;
+    try {
+      pomDir = configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, "");
+    } catch(CoreException ex) {
+      log.warn("Failed to retrieve attribute '{}' from launch configuration {}", MavenLaunchConstants.ATTR_POM_DIR,
+          configuration.getName());
+      return null;
+    }
+    try {
+      return new File(LaunchingUtils.substituteVar(pomDir));
+    } catch(CoreException e) {
+      log.debug("Cannot substitute vars in {}", pomDir, e);
+      return null;
+    }
+  }
+
+  public static Optional<IContainer> getContainer(File file) {
+    // try to retrieve associated Eclipse project
+    return Optional.ofNullable(file).map(f -> Path.fromOSString(f.toString()))
+        .map(ResourcesPlugin.getWorkspace().getRoot()::getContainerForLocation);
+  }
+
+  @Override
+  public IVMInstall getVMInstall(ILaunchConfiguration configuration) throws CoreException {
+    // use the Maven JVM if nothing explicitly configured in the launch configuration
+    File pomDirectory = getPomDirectory(configuration);
+    if(!configuration.hasAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH)) {
+      String requiredJavaVersion = readEnforcedJavaVersion(pomDirectory, monitor);
+      if(requiredJavaVersion != null) {
+        IVMInstall jre = getBestMatchingVM(requiredJavaVersion);
+        if(jre != null) {
+          return jre;
+        }
+      }
+    }
+    Optional<IProject> project = getContainer(pomDirectory).map(IContainer::getProject);
+    if(project.isPresent()) {
+      // Set the project name so that super.getVMInstall() called below, can find the JDT-Compiler JDK 
+      ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
+      workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.get().getName());
+      configuration = workingCopy;
+    }
+    return super.getVMInstall(configuration);
+  }
+
+  public static String readEnforcedJavaVersion(File pomDirectory, IProgressMonitor monitor) {
+    try {
+      Optional<IContainer> container = getContainer(pomDirectory);
+      if(container.isPresent()) {
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+        IFile pomFile = container.get().getFile(Path.fromOSString(IMavenConstants.POM_FILE_NAME));
+        IMavenProjectFacade mavenProject = projectManager.create(pomFile, true, new NullProgressMonitor());
+        if(mavenProject != null) {
+          return readEnforcedVersion(mavenProject, monitor);
+        }
+      }
+      //TODO: handle the case if the pomDirectory points to a project not in the project. Then load the bare project.
+    } catch(CoreException ex) {
+      logEnforcedJavaVersionCalculationError(ex);
+    }
+    return null;
+  }
+
+  private static final String GOAL_ENFORCE = "enforce"; //$NON-NLS-1$
+
+  private static final String ENFORCER_PLUGIN_ARTIFACT_ID = "maven-enforcer-plugin"; //$NON-NLS-1$
+
+  private static final String ENFORCER_PLUGIN_GROUP_ID = "org.apache.maven.plugins"; //$NON-NLS-1$
+
+  private static String readEnforcedVersion(IMavenProjectFacade project, IProgressMonitor monitor)
+      throws CoreException {
+    List<MojoExecution> mojoExecutions = project.getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID,
+        ENFORCER_PLUGIN_ARTIFACT_ID, monitor, GOAL_ENFORCE);
+    for(MojoExecution mojoExecution : mojoExecutions) {
+      String version = getRequiredJavaVersionFromEnforcerRule(project.getMavenProject(monitor), mojoExecution, monitor);
+      if(version != null) {
+        return version;
+      }
+    }
+    return null;
+  }
+
+  private static String getRequiredJavaVersionFromEnforcerRule(MavenProject mavenProject, MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
+    // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
+    List<String> parameter = List.of("rules", "requireJavaVersion", "version");
+    @SuppressWarnings("restriction")
+    String version = ((org.eclipse.m2e.core.internal.embedder.MavenImpl) MavenPlugin.getMaven())
+        .getMojoParameterValue(mavenProject, mojoExecution, parameter, String.class, monitor);
+    if(version == null) {
+      return null;
+    }
+    // normalize version (https://issues.apache.org/jira/browse/MENFORCER-440)
+    if("8".equals(version)) {
+      version = "1.8";
+    }
+    return version;
+  }
+
+  private static void logEnforcedJavaVersionCalculationError(Throwable e) {
+    ECLIPSE_LOG.error(
+        "Failed to determine required Java version from maven-enforcer-plugin configuration, assuming default", e);
+  }
+
+  public static IVMInstall getBestMatchingVM(String requiredVersion) {
+    try {
+      VersionRange versionRange = VersionRange.createFromVersionSpec(requiredVersion);
+      // find all matching JVMs (sorted by version)
+      List<IVMInstall> matchingJREs = getAllMatchingJREs(versionRange);
+
+      // for ranges with only lower bound or just a recommended version pick newest version having equal major version
+      ArtifactVersion mainVersion;
+      if(versionRange.getRecommendedVersion() != null) {
+        mainVersion = versionRange.getRecommendedVersion();
+      } else if(versionRange.getRestrictions().size() == 1
+          && versionRange.getRestrictions().get(0).getUpperBound() == null) {
+        mainVersion = versionRange.getRestrictions().get(0).getLowerBound();
+      } else {
+        mainVersion = null;
+      }
+      if(mainVersion != null) {
+        return matchingJREs.stream()
+            .filter(jre -> getArtifactVersion(jre).getMajorVersion() == mainVersion.getMajorVersion()).findFirst()
+            .orElse(null);
+      }
+      return !matchingJREs.isEmpty() ? matchingJREs.get(0) : null;
+    } catch(InvalidVersionSpecificationException ex) {
+      log.warn("Invalid version range", ex);
+    }
+    return null;
+  }
+
+  private static List<IVMInstall> getAllMatchingJREs(VersionRange versionRange) {
+    // find all matching JVMs and sort by their version (highest first)
+    SortedMap<ArtifactVersion, IVMInstall> installedJREsByVersion = new TreeMap<>(Comparator.reverseOrder());
+
+    for(IVMInstallType vmType : JavaRuntime.getVMInstallTypes()) {
+      for(IVMInstall vm : vmType.getVMInstalls()) {
+        if(satisfiesVersionRange(vm, versionRange)) {
+          if(vm instanceof IVMInstall2 vm2) {
+            installedJREsByVersion.put(new DefaultArtifactVersion(vm2.getJavaVersion()), vm);
+          } else {
+            log.debug("Skipping IVMInstall '{}' from type {} as not implementing IVMInstall2", vm.getName(),
+                vmType.getName());
+          }
+        }
+      }
+    }
+    return List.copyOf(installedJREsByVersion.values());
+  }
+
+  private static boolean satisfiesVersionRange(IVMInstall jre, VersionRange versionRange) {
+    ArtifactVersion jreVersion = getArtifactVersion(jre);
+    if(versionRange.getRecommendedVersion() != null) {
+      return jreVersion.compareTo(versionRange.getRecommendedVersion()) >= 0;
+    }
+    return versionRange.containsVersion(jreVersion);
+  }
+
+  private static final ArtifactVersion DEFAULT_JAVA_VERSION = new DefaultArtifactVersion("0.0.0");
+
+  private static ArtifactVersion getArtifactVersion(IVMInstall jre) {
+    return jre instanceof IVMInstall2 jre2 ? new DefaultArtifactVersion(jre2.getJavaVersion()) : DEFAULT_JAVA_VERSION;
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2023 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,14 +13,28 @@
 
 package org.eclipse.m2e.ui.internal.launch;
 
+import java.io.File;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaJRETab;
+import org.eclipse.jdt.internal.debug.ui.jres.JREDescriptor;
 import org.eclipse.jdt.internal.debug.ui.launcher.VMArgumentsBlock;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+
+import org.eclipse.m2e.internal.launch.MavenLaunchDelegate;
+import org.eclipse.m2e.internal.launch.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -38,6 +52,67 @@ public class MavenJRETab extends JavaJRETab {
 
     vmArgumentsBlock.createControl(comp);
     ((GridData) vmArgumentsBlock.getControl().getLayoutData()).horizontalSpan = 2;
+  }
+
+  @Override
+  protected IJavaProject getJavaProject() {
+    File pomDir = MavenLaunchDelegate.getPomDirectory(getLaunchConfiguration());
+    return MavenLaunchDelegate.getContainer(pomDir) //
+        .map(IContainer::getProject).filter(IProject::exists) //
+        .map(JavaCore::create).orElse(null);
+  }
+
+  /**
+   * Retrieves information about Maven JRE set in Maven project properties.
+   * 
+   * @return the descriptor for the default Maven JRE
+   */
+  @Override
+  protected JREDescriptor getDefaultJREDescriptor() {
+    File pomDirectory = MavenLaunchDelegate.getPomDirectory(getLaunchConfiguration());
+    String version = MavenLaunchDelegate.readEnforcedJavaVersion(pomDirectory, null);
+    IVMInstall mavenJre = version != null ? MavenLaunchDelegate.getBestMatchingVM(version) : null;
+    String details;
+    if(mavenJre != null) { // add link
+      details = NLS.bind(Messages.MavenJRETab_lblDefaultDetailsRequiredJavaVersion, mavenJre.getName(), version);
+    } else {
+      // TODO: add logic for getting the underlying project then fall back to default
+      details = super.getDefaultJREDescriptor().getDescription();
+    }
+    return new JREDescriptor() {
+      @Override
+      public String getDescription() {
+        return NLS.bind(Messages.MavenJRETab_lblDefault, details);
+      }
+    };
+  }
+
+  /**
+   * Need to overwrite from parent, to prevent calling JavaJRETab.checkCompliance().
+   */
+  @Override
+  public boolean isValid(ILaunchConfiguration config) {
+    setErrorMessage(null);
+    setMessage(null);
+
+    IStatus status = fJREBlock.getStatus();
+    if(!status.isOK()) {
+      setErrorMessage(status.getMessage());
+      return false;
+    }
+    // prevent calling JavaJRETab.checkCompliance(), as that uses the wrong JDK for the checks when the default is checked
+    // also Maven launch type is not detected as external program
+    //TODO: isExternalToolConfiguration() should be protected and be overrideable
+    /**
+     * if(!isExternalToolConfiguration(fLaunchConfiguration)) { status = checkCompliance(); if (!status.isOK()) {
+     * setErrorMessage(status.getMessage()); return false; } }
+     */
+
+    ILaunchConfigurationTab dynamicTab = getDynamicTab();
+    if(dynamicTab != null) {
+      return dynamicTab.isValid(config);
+    }
+    return true;
   }
 
   @Override
