@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,18 +43,12 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.Restriction;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -88,12 +81,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   public static final String COMPILER_PLUGIN_ARTIFACT_ID = "maven-compiler-plugin";
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
-
-  private static final String GOAL_ENFORCE = "enforce"; //$NON-NLS-1$
-
-  public static final String ENFORCER_PLUGIN_ARTIFACT_ID = "maven-enforcer-plugin"; //$NON-NLS-1$
-
-  public static final String ENFORCER_PLUGIN_GROUP_ID = "org.apache.maven.plugins"; //$NON-NLS-1$
 
   protected static final List<String> RELEASES;
 
@@ -171,8 +158,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     addProjectSourceFolders(classpath, options, request, monitor);
 
     String executionEnvironmentId = getExecutionEnvironmentId(options);
-    String buildEnvironmentId = getMinimumJavaBuildEnvironmentId(request, monitor);
-    addJREClasspathContainer(classpath, buildEnvironmentId != null ? buildEnvironmentId : executionEnvironmentId);
+    addJREClasspathContainer(classpath, executionEnvironmentId);
 
     addMavenClasspathContainer(classpath);
 
@@ -794,12 +780,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
-  protected List<MojoExecution> getEnforcerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
-      throws CoreException {
-    return request.mavenProjectFacade().getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID, ENFORCER_PLUGIN_ARTIFACT_ID,
-        monitor, GOAL_ENFORCE);
-  }
-
   private String getCompilerLevel(MavenProject mavenProject, MojoExecution execution, String parameter, String source,
       List<String> levels, IProgressMonitor monitor) {
     int levelIdx = getLevelIndex(source, levels);
@@ -840,74 +820,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
     return idx;
-  }
-
-  private String getMinimumJavaBuildEnvironmentId(ProjectConfigurationRequest request, IProgressMonitor monitor) {
-    try {
-      List<MojoExecution> mojoExecutions = getEnforcerMojoExecutions(request, monitor);
-      for(MojoExecution mojoExecution : mojoExecutions) {
-        String version = getMinimumJavaBuildEnvironmentId(request.mavenProject(), mojoExecution, monitor);
-        if(version != null) {
-          return version;
-        }
-      }
-    } catch(CoreException | InvalidVersionSpecificationException ex) {
-      log.error("Failed to determine minimum build Java version, assuming default", ex);
-    }
-    return null;
-  }
-
-  private String getMinimumJavaBuildEnvironmentId(MavenProject mavenProject, MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws InvalidVersionSpecificationException, CoreException {
-    // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
-    String version = ((MavenImpl) maven).getMojoParameterValue(mavenProject, mojoExecution,
-        List.of("rules", "requireJavaVersion", "version"), String.class, monitor);
-    if(version == null) {
-      return null;
-    }
-    return getMinimumJavaBuildEnvironmentId(version);
-  }
-
-  private String getMinimumJavaBuildEnvironmentId(String versionSpec) throws InvalidVersionSpecificationException {
-    VersionRange vr = VersionRange.createFromVersionSpec(versionSpec);
-    ArtifactVersion recommendedVersion = vr.getRecommendedVersion();
-    List<Restriction> versionRestrictions = List.of();
-    if(recommendedVersion == null) {
-      versionRestrictions = getVersionRangeRestrictionsIgnoringMicroAndQualifier(vr);
-    } else {
-      // only consider major and minor version here, micro and qualifier not relevant inside IDE (probably)
-      recommendedVersion = getMajorMinorOnlyVersion(recommendedVersion);
-    }
-    // find lowest matching environment id
-    for(Entry<String, String> entry : ENVIRONMENTS.entrySet()) {
-      ArtifactVersion environmentVersion = new DefaultArtifactVersion(entry.getKey());
-      boolean foundMatchingVersion;
-      if(recommendedVersion == null) {
-        foundMatchingVersion = versionRestrictions.stream().anyMatch(r -> r.containsVersion(environmentVersion));
-      } else {
-        // only singular versions ever have a recommendedVersion
-        int compareTo = recommendedVersion.compareTo(environmentVersion);
-        foundMatchingVersion = compareTo <= 0;
-      }
-      if(foundMatchingVersion) {
-        return entry.getValue();
-      }
-    }
-    return null;
-  }
-
-  private static List<Restriction> getVersionRangeRestrictionsIgnoringMicroAndQualifier(VersionRange versionRange) {
-    return versionRange.getRestrictions().stream().map(restriction -> {
-      ArtifactVersion lowerBound = restriction.getLowerBound();
-      ArtifactVersion upperBound = restriction.getUpperBound();
-      return new Restriction(// 
-          lowerBound != null ? getMajorMinorOnlyVersion(lowerBound) : null, restriction.isLowerBoundInclusive(),
-          upperBound != null ? getMajorMinorOnlyVersion(upperBound) : null, restriction.isUpperBoundInclusive());
-    }).toList();
-  }
-
-  private static ArtifactVersion getMajorMinorOnlyVersion(ArtifactVersion lower) {
-    return new DefaultArtifactVersion(lower.getMajorVersion() + "." + lower.getMinorVersion());
   }
 
   private double asDouble(String level) {

@@ -649,6 +649,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private final String profiles;
 
+    private final String requiredJavaVersion;
+
     public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
@@ -659,6 +661,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.properties = Map.copyOf(baseConfiguration.getConfigurationProperties());
       this.resolveWorkspace = baseConfiguration.isResolveWorkspaceProjects();
       this.profiles = baseConfiguration.getSelectedProfiles();
+      this.requiredJavaVersion = baseConfiguration.getRequiredJavaVersion();
     }
 
     @Override
@@ -687,8 +690,14 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
 
     @Override
+    public String getRequiredJavaVersion() {
+      return requiredJavaVersion;
+    }
+
+    @Override
     public int hashCode() {
-      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace);
+      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace,
+          requiredJavaVersion);
     }
 
     @Override
@@ -706,7 +715,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       return Objects.equals(this.mappingId, other.mappingId)
           && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory)
           && Objects.equals(this.profiles, other.profiles) && Objects.equals(this.properties, other.properties)
-          && this.resolveWorkspace == other.resolveWorkspace;
+          && this.resolveWorkspace == other.resolveWorkspace
+          && Objects.equals(this.requiredJavaVersion, other.requiredJavaVersion);
     }
 
   }

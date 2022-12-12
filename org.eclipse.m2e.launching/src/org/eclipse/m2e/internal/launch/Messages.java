@@ -81,6 +81,10 @@ public class Messages extends NLS {
 
   public static String MavenLaunchMainTab_property_dialog_title;
 
+  public static String MavenJRETab_lblDefault;
+
+  public static String MavenJRETab_lblDefaultDetailsRequiredJavaVersion;
+
   public static String MavenLaunchExtensionsTab_name;
 
   public static String MavenLaunchExtensionsTab_lblExtensions;

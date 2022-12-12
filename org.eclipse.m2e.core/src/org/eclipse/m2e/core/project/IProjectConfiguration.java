@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.artifact.versioning.VersionRange;
+
 
 /**
  * {@link IProjectConfiguration} represents the project specific configuration, many projects can share the same
@@ -62,4 +64,13 @@ public interface IProjectConfiguration {
     return profiles;
   }
 
+  /**
+   * Gets the required Java version for executing Maven. If {@code null} is returned the project's build JRE or (if not
+   * available) the workspace default JRE should be used. Derived from the
+   * <a href="https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html">{@code maven-enforcer-plugin}'s
+   * {@code requireJavaVersion} rule</a>.
+   * 
+   * @return a version spec compliant with {@link VersionRange} spec
+   */
+  String getRequiredJavaVersion();
 }

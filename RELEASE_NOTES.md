@@ -1,5 +1,17 @@
 # Eclipse m2e - Release notes
 
+## Next version
+
+### Configuration of Maven Execution JRE
+
+In the past the project's build JRE was also used by default to execute Maven itself. 
+Now the default Java version for executing Maven is determined from the configuration of the `maven-enforcer-plugin` rule [`requireJavaVersion`](https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html) when creating or updating the Maven configuration. This value is no longer considered for configuring the project's build JRE.
+In case this plugin configuration is not found one falls back to either project's build JRE or workspace default JRE.
+
+For each Maven build configuration you can overwrite the default execution JRE in the Maven Launch configuration's JRE tab:
+
+![Maven Launch Configuration JRE Tab](https://user-images.githubusercontent.com/185025/208966517-7d847058-23b9-4e2e-8b1a-7a86df4836bd.png)
+
 ## 2.1.0
 
 * 📅 Release Date: November 24th 2022
