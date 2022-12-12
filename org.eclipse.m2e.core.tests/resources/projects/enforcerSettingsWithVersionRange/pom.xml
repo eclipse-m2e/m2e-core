@@ -35,7 +35,7 @@
 						<configuration>
 							<rules>
 								<requireJavaVersion>
-									<version>[11.0.10,16)</version>
+									<version>[11.0.6,13)</version>
 								</requireJavaVersion>
 							</rules>
 						</configuration>

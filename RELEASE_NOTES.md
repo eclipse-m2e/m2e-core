@@ -2,6 +2,8 @@
 
 ## 2.2.0
 
+* 📅 Release Date: _expected_ end of Februar 2023
+
 ### Mojos without a mapping are now executed by default in incremental builds
 
 Before it was necessary to explicitly configure a mapping or there is a connector or the plugin itself contains mappings for a mojo to participate in the incremental maven build.
@@ -23,8 +25,20 @@ The property "<maven.test.skip>true</maven.test.skip>" and the "skip" property i
 account by M2E in the sense that, if enabled, M2E ignores the corresponding folder, which no longer appear in the Package Explorer as "Java" folders but as standard folders.
 This allows, depending on the need (especially compilation time), to either not compile tests or not copy test resources.
 
-In general it is not recomended to use the mentioned properties but to use `-DskipTests` instead:
+In general it is not recommended to use the mentioned properties but to use `-DskipTests` instead:
 https://maven.apache.org/surefire/maven-surefire-plugin/examples/skipping-tests.html
+
+
+### Configuration of Maven Execution JRE
+
+In the past the project's build JRE was also used by default to execute Maven itself. 
+Now the default Java version for executing Maven is determined from the configuration of the `maven-enforcer-plugin` rule [`requireJavaVersion`](https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html) when creating or updating the Maven configuration. This value is no longer considered for configuring the project's build JRE.
+In case this plugin configuration is not found one falls back to either project's build JRE or workspace default JRE.
+
+For each Maven build configuration you can overwrite the default execution JRE in the Maven Launch configuration's JRE tab:
+
+![Maven Launch Configuration JRE Tab](https://user-images.githubusercontent.com/185025/208966517-7d847058-23b9-4e2e-8b1a-7a86df4836bd.png)
+
 
 ## 2.1.0
 
