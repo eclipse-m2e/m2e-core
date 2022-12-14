@@ -605,20 +605,30 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   @Override
   public IMavenExecutionContext createExecutionContext() {
+    File multiModuleProjectDirectory = getConfiguration().getMultiModuleProjectDirectory();
+    PlexusContainerManager containerManager = manager.getContainerManager();
+    IMavenPlexusContainer container;
     try {
-      File multiModuleProjectDirectory = getConfiguration().getMultiModuleProjectDirectory();
-      IMavenPlexusContainer container = manager.getContainerManager().aquire(multiModuleProjectDirectory);
-      MavenProject mavenProject = getMavenProject(null);
-      if(mavenProject == null) {
-        //could this actually happen or will a core exception be thrown instead? Should we still be able to create an execution? use always the cached variant here?
-        return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(),
-            multiModuleProjectDirectory, null);
-      }
-      return new MavenExecutionContext(
-          PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()),
-          getBaseDir(), multiModuleProjectDirectory, ctx -> mavenProject);
+      container = containerManager.aquire(multiModuleProjectDirectory);
     } catch(Exception ex) {
       throw new RuntimeException("Aquire container failed!", ex);
+    }
+    MavenProject mavenProject = tryGetMavenProject();
+    if(mavenProject == null) {
+      return new MavenExecutionContext(container.getComponentLookup(), getBaseDir(), multiModuleProjectDirectory, null);
+    }
+    return new MavenExecutionContext(
+        PlexusContainerManager.wrap(container.getContainer(), mavenProject.getClassRealm()), getBaseDir(),
+        multiModuleProjectDirectory, ctx -> mavenProject);
+  }
+
+  private MavenProject tryGetMavenProject() {
+    try {
+      return manager.getMavenProject(this, null);
+    } catch(CoreException ex) {
+      //TODO can we handle this more graceful? E.g. one error condition is that project dependencies can not be resolved, maybe we can try to load the project without dependencies then?
+      manager.getMarkerManager().addErrorMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, ex);
+      return null;
     }
   }
 
