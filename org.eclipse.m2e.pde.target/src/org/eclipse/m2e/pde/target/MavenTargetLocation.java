@@ -374,8 +374,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
 							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
 							repositories, new NullProgressMonitor()));
-					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve,
-							cacheManager);
+					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve);
 					targetBundles.bundles.put(resolve, sourceBundle);
 					targetBundles.sourceBundles.put(artifact, sourceBundle);
 				} catch (Exception e) {
