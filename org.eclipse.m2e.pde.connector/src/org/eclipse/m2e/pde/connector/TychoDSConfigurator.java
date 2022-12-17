@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
@@ -25,17 +24,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.ds.internal.annotations.DSAnnotationVersion;
-import org.eclipse.pde.internal.core.natures.PDE;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 @SuppressWarnings("restriction")
-public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
+public class TychoDSConfigurator extends AbstractProjectConfigurator {
 
-	private static final ILog LOG = Platform.getLog(TychoPackagingsConfigurator.class);
+	private static final ILog LOG = Platform.getLog(TychoDSConfigurator.class);
 
 	private static final String TYCHO_GROUP_ID = "org.eclipse.tycho";
 	private static final String TYCHO_DS_PLUGIN_ARTIFACT_ID = "tycho-ds-plugin";
@@ -43,24 +42,7 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-		MavenProject mavenProject = request.mavenProject();
-		IProject project = request.mavenProjectFacade().getProject();
-		String packaging = mavenProject.getPackaging();
-		if ("eclipse-plugin".equals(packaging) || "eclipse-test-plugin".equals(packaging)) {
-			PDEProjectHelper.configurePDEBundleProject(project, mavenProject, monitor);
-			applyDsConfiguration(request, monitor);
-		} else if ("eclipse-feature".equals(packaging)) {
-			// see
-			// org.eclipse.pde.internal.ui.wizards.feature.AbstractCreateFeatureOperation
-			if (!project.hasNature(PDE.FEATURE_NATURE)) {
-				addNature(project, PDE.FEATURE_NATURE, monitor);
-			}
-		}
-	}
-
-	private void applyDsConfiguration(ProjectConfigurationRequest request, IProgressMonitor monitor)
-			throws CoreException {
-		List<MojoExecution> mojoExecutions = getTychoDsPluginMojoExecutions(request, monitor);
+		List<MojoExecution> mojoExecutions = getTychoDsPluginMojoExecutions(request.mavenProjectFacade(), monitor);
 		if (mojoExecutions.isEmpty()) {
 			return;
 		}
@@ -116,9 +98,9 @@ public class TychoPackagingsConfigurator extends AbstractProjectConfigurator {
 		return null;
 	}
 
-	private List<MojoExecution> getTychoDsPluginMojoExecutions(ProjectConfigurationRequest request,
+	private List<MojoExecution> getTychoDsPluginMojoExecutions(IMavenProjectFacade projectFacade,
 			IProgressMonitor monitor) throws CoreException {
-		return request.mavenProjectFacade().getMojoExecutions(TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, monitor,
+		return projectFacade.getMojoExecutions(TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, monitor,
 				GOAL_DECLARATIVE_SERVICES);
 	}
 

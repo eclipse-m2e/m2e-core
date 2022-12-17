@@ -16,6 +16,18 @@
 			<packagingType>bundle</packagingType>
 			<lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
 		</lifecycleMapping>
+		<lifecycleMapping>
+			<packagingType>eclipse-plugin</packagingType>
+			<lifecycleMappingId>org.eclipse.m2e.pde.connector.TychoLifecycleMapping</lifecycleMappingId>
+		</lifecycleMapping>
+		<lifecycleMapping>
+			<packagingType>eclipse-test-plugin</packagingType>
+			<lifecycleMappingId>org.eclipse.m2e.pde.connector.TychoLifecycleMapping</lifecycleMappingId>
+		</lifecycleMapping>
+		<lifecycleMapping>
+			<packagingType>eclipse-feature</packagingType>
+			<lifecycleMappingId>org.eclipse.m2e.pde.connector.TychoLifecycleMapping</lifecycleMappingId>
+		</lifecycleMapping>
 	</lifecycleMappings>
 
 	<pluginExecutions>
@@ -54,31 +66,15 @@
 		<pluginExecution>
 			<pluginExecutionFilter>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-packaging-plugin</artifactId>
+				<artifactId>tycho-ds-plugin</artifactId>
 				<versionRange>[1.0.0,)</versionRange>
 				<goals>
-					<goal>package-plugin</goal>
-					<goal>package-feature</goal>
+					<goal>declarative-services</goal>
 				</goals>
 			</pluginExecutionFilter>
 			<action>
 				<configurator>
-					<id>org.apache.m2e.pde.connector.configurator.tycho</id>
-				</configurator>
-			</action>
-		</pluginExecution>
-		<pluginExecution>
-			<pluginExecutionFilter>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-surefire-plugin</artifactId>
-				<versionRange>[1.0.0,)</versionRange>
-				<goals>
-					<goal>test</goal>
-				</goals>
-			</pluginExecutionFilter>
-			<action>
-				<configurator>
-					<id>org.apache.m2e.pde.connector.configurator.tycho</id>
+					<id>org.apache.m2e.pde.connector.configurator.tycho.ds</id>
 				</configurator>
 			</action>
 		</pluginExecution>
