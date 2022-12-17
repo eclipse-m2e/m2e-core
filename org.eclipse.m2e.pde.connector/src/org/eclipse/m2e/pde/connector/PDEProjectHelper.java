@@ -36,12 +36,14 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.natures.PDE;
 
 public class PDEProjectHelper {
 
@@ -101,6 +103,19 @@ public class PDEProjectHelper {
 			setClasspath(project, model, monitor);
 		} else {
 			addProjectForUpdateClasspath(project);
+		}
+	}
+
+	@SuppressWarnings("restriction")
+	static void configurePDEFeatureProject(IMavenProjectFacade projectFacade, IProgressMonitor monitor)
+			throws CoreException {
+		IProject project = projectFacade.getProject();
+		if (project != null) {
+			// see
+			// org.eclipse.pde.internal.ui.wizards.feature.AbstractCreateFeatureOperation
+			if (!project.hasNature(PDE.FEATURE_NATURE)) {
+				AbstractProjectConfigurator.addNature(project, PDE.FEATURE_NATURE, monitor);
+			}
 		}
 	}
 
