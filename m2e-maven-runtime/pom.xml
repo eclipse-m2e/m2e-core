@@ -105,24 +105,6 @@
 					<version>3.3.0</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>3.1.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>ant-contrib</groupId>
-							<artifactId>ant-contrib</artifactId>
-							<version>1.0b3</version>
-							<exclusions>
-								<exclusion>
-									<groupId>ant</groupId>
-									<artifactId>ant</artifactId>
-								</exclusion>
-							</exclusions>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-p2-plugin</artifactId>
 					<version>${tycho-version}</version>
@@ -221,48 +203,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<?m2e ignore?>
-						<id>build-sources-jar</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<target>
-								<taskdef resource="net/sf/antcontrib/antlib.xml" />
-								<if>
-									<equals arg1="${project.packaging}" arg2="pom" /> <!-- only consider children of m2e-maven-runtime project -->
-									<then>
-										<echo message="Skip packing sources jar for pom project" />
-									</then>
-									<else>
-										<!-- Delete directories that are empty after moving the java-sources to the root -->
-										<delete includeemptydirs="true">
-											<fileset dir="${outputDirectory.sources}">
-												<and>
-													<size value="0" />
-													<type type="dir" />
-												</and>
-											</fileset>
-										</delete>
-										<jar destfile="${project.build.directory}/${project.artifactId}.source_${qualifiedVersion}.jar"
-											manifestencoding="UTF-8" defaultexcludes="false" duplicate="fail">
-											<fileset dir="src/main/java" erroronmissingdir="false" />
-											<fileset dir="src/main/resources" erroronmissingdir="false" />
-											<fileset dir="${outputDirectory.sources}" />
-										</jar>
-									</else>
-								</if>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-maven-plugin</artifactId>
 				<executions>
@@ -292,20 +232,32 @@
 				<executions>
 					<execution>
 						<?m2e ignore?>
-						<id>attach-sources-artifact</id>
+						<id>add-source-resources</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attach-artifact</goal>
+							<goal>add-resource</goal>
 						</goals>
 						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${project.build.directory}/${project.artifactId}.source_${qualifiedVersion}.jar</file>
-									<type>java-source</type>
-									<classifier>sources</classifier>
-								</artifact>
-							</artifacts>
+							<resources>
+								<resource>
+									<directory>${outputDirectory.sources}</directory>
+								</resource>
+							</resources>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>sources-jar</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
@@ -350,6 +302,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<?m2e ignore?>
@@ -403,6 +356,19 @@
 								</configuration>
 							</execution>
 						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>ant-contrib</groupId>
+								<artifactId>ant-contrib</artifactId>
+								<version>1.0b3</version>
+								<exclusions>
+									<exclusion>
+										<groupId>ant</groupId>
+										<artifactId>ant</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
 					</plugin>
 				</plugins>
 			</build>
