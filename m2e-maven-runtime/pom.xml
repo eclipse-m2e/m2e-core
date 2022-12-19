@@ -72,6 +72,9 @@
 								Import-Package: !*
 								Automatic-Module-Name: ${bsn}
 								Eclipse-BundleShape: dir
+								
+								gitCommitId = ${system;git log -n 1 --pretty=format:%H .}
+								gitRelativePath = ${system;git rev-parse --show-prefix};
 								Eclipse-SourceReferences: ${scmConnectionRaw};path="${gitRelativePath}";commitId=${gitCommitId}
 							]]>
 						</bnd>
@@ -221,41 +224,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
-					<execution>
-						<?m2e execute onIncremental?>
-						<id>generate-eclipse-source-reference-value</id>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<phase>initialize</phase>
-						<configuration>
-							<exportAntProperties>true</exportAntProperties>
-							<target>
-								<taskdef resource="net/sf/antcontrib/antlib.xml" />
-								<mkdir dir="${project.build.directory}/git" />
-
-								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/commitId" failonerror="true">
-									<arg value="log" />
-									<arg value="-n 1" />
-									<arg value="--pretty=format:%H" />
-									<arg value="." />
-								</exec>
-								<loadfile property="gitCommitId" srcFile="${project.build.directory}/git/commitId" />
-								<delete file="${project.build.directory}/git/commitId" />
-								<propertyregex property="gitCommitId" input="${gitCommitId}" regexp="\s" replace="" override="true" /> <!-- strip off leading/trailing whitespace -->
-								<echo message="gitCommitHash: ${gitCommitId}" level="info" />
-
-								<exec executable="git" dir="${project.basedir}" output="${project.build.directory}/git/relativePath" failonerror="true">
-									<arg value="rev-parse" />
-									<arg value="--show-prefix" />
-								</exec>
-								<loadfile property="gitRelativePath" srcFile="${project.build.directory}/git/relativePath" />
-								<delete file="${project.build.directory}/git/relativePath" />
-								<propertyregex property="gitRelativePath" input="${gitRelativePath}" regexp="\s" replace="" global="true" override="true" /> <!-- strip off leading/trailing whitespace -->
-								<echo message="gitRelativePath: ${gitRelativePath}" level="info" />
-							</target>
-						</configuration>
-					</execution>
 					<execution>
 						<?m2e ignore?>
 						<id>build-sources-jar</id>
