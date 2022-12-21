@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright (c) 2008, 2021 Sonatype, Inc. and others
+	Copyright (c) 2008, 2023 Sonatype, Inc. and others
 	All rights reserved. This program and the accompanying materials
 	are made available under the terms of the Eclipse Public License 2.0
 	which accompanies this distribution, and is available at
@@ -148,8 +148,7 @@
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
 					<configuration>
-						<bnd>
-							<![CDATA[
+						<bnd><![CDATA[
 							# When launching a Maven build using this embedded runtime, we want the embedded SLF4J logger binding to be used.
 							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding 
 							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible 
@@ -174,15 +173,12 @@
 								org.slf4j.spi;version="[1.7.31,3.0.0)",\
 								org.slf4j.helpers;version="[1.7.31,3.0.0)",\
 								javax.inject;version="1.0.0",\
-								javax.annotation;version="[1.2.0,2.0.0)",\
-								javax.annotation.sql;version="[1.2.0,2.0.0)",\
-								javax.annotation.security;version="[1.2.0,2.0.0)"
+								javax.annotation;version="[1.2.0,2.0.0)"
 							Require-Bundle: \
 								com.google.guava
-						]]>
-							<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched 
+						]]></bnd>
+						<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched 
 							Maven-Build-JVM. See MavenEmbeddedRuntime for details. -->
-						</bnd>
 					</configuration>
 				</plugin>
 			</plugins>
