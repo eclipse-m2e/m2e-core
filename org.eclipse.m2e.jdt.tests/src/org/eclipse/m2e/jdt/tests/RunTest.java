@@ -33,6 +33,7 @@ public class RunTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void testRunTwice() throws Exception {
 		IProject project = importProject(FileLocator.toFileURL(getClass().getResource("/projects/basicProjectWithDep/pom.xml")).getPath());
+		waitForJobsToComplete(monitor);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationWorkingCopy launchConfig = launchManager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION).newInstance(project, "launch");

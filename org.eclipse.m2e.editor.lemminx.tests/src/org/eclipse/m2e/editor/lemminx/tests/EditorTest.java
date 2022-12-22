@@ -90,7 +90,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		Set<Shell> beforeShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
 		editorPart.getSelectionProvider().setSelection(new TextSelection(offset, 0));
 		editorPart.getAction(ITextEditorActionConstants.CONTENT_ASSIST).run();
-		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, 3000, () -> {
+		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, 10000, () -> {
 			Set<Shell> afterShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
 			afterShells.removeAll(beforeShells);
 			return afterShells.stream()

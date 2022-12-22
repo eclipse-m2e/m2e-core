@@ -216,8 +216,12 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 				debugLaunch.getLaunchConfiguration().getType().getIdentifier());
 		assertEquals(debugLaunchName, debugLaunch.getLaunchConfiguration()
 				.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""));
-		assertEquals("debug", debugLaunch.getLaunchMode());
-		assertTrue(debugLaunch.isTerminated());
+		assertEquals(ILaunchManager.DEBUG_MODE, debugLaunch.getLaunchMode());
+		long startTime = System.currentTimeMillis();
+		while (!debugLaunch.isTerminated() && System.currentTimeMillis() - startTime < 10000 ) {
+			Thread.onSpinWait();
+		}
+		assertTrue("Debug launch " + debugLaunch.getLaunchConfiguration().getName() + " is not terminated yet after waiting for 10 seconds", debugLaunch.isTerminated());
 	}
 
 	// --- common utility methods ---
