@@ -25,7 +25,8 @@
 	<name>Maven Integration for Eclipse (root)</name>
 
 	<properties>
-		<tycho.testArgLine>-Xmx800m</tycho.testArgLine>
+		<tychoDefaultTestArgLine>-Xmx800m</tychoDefaultTestArgLine>
+		<tycho.testArgLine>${tychoDefaultTestArgLine}</tycho.testArgLine>
 		<tycho.surefire.timeout>900</tycho.surefire.timeout>
 		<tycho.surefire.useUIHarness>true</tycho.surefire.useUIHarness>
 		<tycho.surefire.useUIThread>true</tycho.surefire.useUIThread>
@@ -226,8 +227,30 @@
 			</activation>
 			<properties>
 				<!-- SWT on Mac OS needs to be started on main thread -->
-				<tycho.testArgLine>-XstartOnFirstThread</tycho.testArgLine>
+				<tycho.testArgLine>-XstartOnFirstThread ${tychoDefaultTestArgLine}</tycho.testArgLine>
 			</properties>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.eclipse.tycho</groupId>
+							<artifactId>tycho-surefire-plugin</artifactId>
+							<version>${tycho-version}</version>
+							<configuration>
+								<dependencies combine.children="append">
+									<!--this dependency is needed to detect and set the default VM correctly on Mac OS,
+									 https://github.com/eclipse-jdt/eclipse.jdt.debug/tree/master/org.eclipse.jdt.launching.macosx -->
+									<dependency>
+										<artifactId>org.eclipse.jdt.launching.macosx</artifactId>
+										<type>eclipse-plugin</type>
+										<version>0.0.0</version>
+									</dependency>
+								</dependencies>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
 		</profile>
 		<profile>
 			<id>its</id>

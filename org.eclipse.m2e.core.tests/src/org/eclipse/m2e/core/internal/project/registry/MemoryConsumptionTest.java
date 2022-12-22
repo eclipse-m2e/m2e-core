@@ -14,7 +14,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.Collections;
@@ -69,7 +69,8 @@ public class MemoryConsumptionTest extends AbstractMavenProjectTestCase {
       waitForJobsToComplete(monitor);
       for(IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
         if(p.hasNature(IMavenConstants.NATURE_ID)) {
-          poms.remove(p.getFile("pom.xml").getLocation().toFile());
+          File pomFile = p.getFile("pom.xml").getLocation().toFile();
+          Assert.assertTrue("Could not remove pom path " + pomFile + " from list of projects to be imported: " + poms, poms.remove(pomFile));
         }
       }
       Assert.assertEquals("Some poms were not imported as project", Collections.emptySet(), poms);
@@ -80,13 +81,13 @@ public class MemoryConsumptionTest extends AbstractMavenProjectTestCase {
     }
   }
 
-  private Set<File> buildLinearHierarchy(int depth, File tempDirectory) throws FileNotFoundException {
+  private Set<File> buildLinearHierarchy(int depth, File tempDirectory) throws IOException {
     Set<File> poms = new HashSet<>(depth, 1.f);
     for(int i = 0; i < depth; i++ ) {
       File projectDir = new File(tempDirectory, "p" + i);
       projectDir.mkdirs();
       File pom = new File(projectDir, "pom.xml");
-      poms.add(pom);
+      poms.add(pom.getCanonicalFile()); // on Mac OS the temp file is reachable via /var which is a symbolic link to /private/var
       try (PrintStream content = new PrintStream(pom);) {
         content.println("<project>");
         content.println("  <modelVersion>4.0.0</modelVersion>");
