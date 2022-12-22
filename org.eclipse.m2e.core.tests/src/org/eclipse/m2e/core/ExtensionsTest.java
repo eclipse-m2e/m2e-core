@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
@@ -80,6 +82,16 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 		project1 = importPomlessProject("pomless", "bundle/pom.xml");
 		waitForJobsToComplete(monitor);
 		assertEquals("my.bundle", project1.getName());
+	}
+
+	@Test
+	public void testCopyResourcesWithMVNFolder() throws Exception {
+		IProject project = importProject("resources/projects/resourcesWithMVNFolder/pom.xml");
+		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		WorkspaceHelpers.assertNoErrors(project);
+		IFile file = project.getFile("target/classes/file.txt");
+		assertTrue(file.exists());
+		assertEquals("foo-bar-content", new String(file.getContents().readAllBytes()));
 	}
 
 	private IProject importPomlessProject(String rootProject, String... poms) throws IOException, CoreException {

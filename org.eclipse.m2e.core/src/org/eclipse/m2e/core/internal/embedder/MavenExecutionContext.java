@@ -317,7 +317,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
   }
 
-  private static void executeMojo(MavenSession session, MojoExecution execution, IComponentLookup lookup) {
+  private static void executeMojo(MavenSession session, MojoExecution execution, IComponentLookup lookup)
+      throws CoreException {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
     Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
     for(MavenProject project : session.getProjects()) {
@@ -331,6 +332,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       lookup.lookup(BuildPluginManager.class).executeMojo(session, execution);
     } catch(Exception ex) {
       session.getResult().addException(ex);
+      throw new CoreException(Status.error("Failed to execute mojo", ex));
     } finally {
       for(MavenProject project : session.getProjects()) {
         project.setArtifactFilter(null);
