@@ -13,6 +13,7 @@
 package org.eclipse.m2e.pde.ui.target.editor;
 
 import java.io.ByteArrayInputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +21,12 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -89,4 +94,49 @@ public class ClipboardParser {
 		return dependencies;
 	}
 
+	/**
+	 * Attempts to retrieve all Maven dependencies from the clipboard. The
+	 * dependencies are in the normal Maven format. Example:
+	 * 
+	 * <pre>
+	 * <dependency>
+	 *     <groupId>org.eclipse.jdt</groupId>
+	 *     <artifactId>org.eclipse.jdt.annotation</artifactId>
+	 *     <version>2.2.700</version>
+	 * </dependency>
+	 * </pre>
+	 * 
+	 * The clipboard may contain one or more of those entries. On an ill-formed
+	 * content, an exception is logged and an empty list returned.
+	 * 
+	 * @param display The display on which to allocate the clipboard
+	 * @return All dependencies which are stored in the clipboard. May be empty.
+	 */
+	public static List<MavenTargetDependency> getClipboardDependencies(Display display) {
+		String text = getClipboardContent(display);
+
+		ClipboardParser clipboardParser = new ClipboardParser(text);
+
+		try {
+			return clipboardParser.getDependencies();
+		} finally {
+			Exception clipboardError = clipboardParser.getError();
+
+			if (clipboardError != null) {
+				Platform.getLog(MavenTargetLocationWizard.class)
+						.warn(MessageFormat.format(Messages.ClipboardParser_1, clipboardError.getMessage()));
+			}
+		}
+	}
+
+	private static String getClipboardContent(Display display) {
+		Clipboard clipboard = new Clipboard(display);
+
+		try {
+			clipboard = new Clipboard(display);
+			return (String) clipboard.getContents(TextTransfer.getInstance());
+		} finally {
+			clipboard.dispose();
+		}
+	}
 }

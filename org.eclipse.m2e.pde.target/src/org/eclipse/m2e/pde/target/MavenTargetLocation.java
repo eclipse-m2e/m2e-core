@@ -396,33 +396,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		List<MavenTargetDependency> latest = new ArrayList<>();
 		int updated = 0;
 		for (MavenTargetDependency dependency : roots) {
-			Artifact artifact = new DefaultArtifact(
-					dependency.getGroupId() + ":" + dependency.getArtifactId() + ":(0,]");
-			IMaven maven = MavenPlugin.getMaven();
-			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-			IMavenExecutionContext context = maven.createExecutionContext();
-			List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
-			List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(repositories);
-			VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
-			VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
+			MavenTargetDependency result = update(dependency, monitor);
 
-				@Override
-				public VersionRangeResult call(IMavenExecutionContext context, IProgressMonitor monitor)
-						throws CoreException {
-					RepositorySystemSession session = context.getRepositorySession();
-					try {
-						return repoSystem.resolveVersionRange(session, request);
-					} catch (VersionRangeResolutionException e) {
-						throw new CoreException(Status.error("Resolving latest version failed", e));
-					}
-				}
-			}, monitor);
-			Version highestVersion = result.getHighestVersion();
-			if (highestVersion == null || highestVersion.toString().equals(dependency.getVersion())) {
-				latest.add(dependency.copy());
-			} else {
-				latest.add(new MavenTargetDependency(dependency.getGroupId(), dependency.getArtifactId(),
-						highestVersion.toString(), dependency.getType(), dependency.getClassifier()));
+			latest.add(result);
+
+			if (!dependency.matches(result)) {
 				updated++;
 			}
 		}
@@ -434,6 +412,35 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				dependencyScopes,
 				includeSource, instructionsMap.values(), excludedArtifacts, featureTemplate);
 
+	}
+
+	public MavenTargetDependency update(MavenTargetDependency source, IProgressMonitor monitor) throws CoreException {
+		Artifact artifact = new DefaultArtifact(source.getGroupId() + ":" + source.getArtifactId() + ":(0,]");
+		IMaven maven = MavenPlugin.getMaven();
+		RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+		IMavenExecutionContext context = maven.createExecutionContext();
+		List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
+		List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(repositories);
+		VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
+		VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
+			@Override
+			public VersionRangeResult call(IMavenExecutionContext context, IProgressMonitor monitor)
+					throws CoreException {
+				RepositorySystemSession session = context.getRepositorySession();
+				try {
+					return repoSystem.resolveVersionRange(session, request);
+				} catch (VersionRangeResolutionException e) {
+					throw new CoreException(Status.error("Resolving latest version failed", e));
+				}
+			}
+		}, monitor);
+		Version highestVersion = result.getHighestVersion();
+		if (highestVersion == null || highestVersion.toString().equals(source.getVersion())) {
+			return source.copy();
+		} else {
+			return new MavenTargetDependency(source.getGroupId(), source.getArtifactId(), highestVersion.toString(),
+					source.getType(), source.getClassifier());
+		}
 	}
 
 	private List<ArtifactRepository> getAvailableArtifactRepositories(IMaven maven) throws CoreException {
