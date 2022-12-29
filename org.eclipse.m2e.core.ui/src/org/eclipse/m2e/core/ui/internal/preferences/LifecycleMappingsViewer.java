@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
 
@@ -428,22 +429,14 @@ public class LifecycleMappingsViewer {
   }
 
   String toString(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
-    StringBuilder sb = new StringBuilder();
     if(mappings != null && !mappings.isEmpty()) {
-      for(IPluginExecutionMetadata mapping : mappings) {
-        if(sb.length() > 0) {
-          sb.append(',');
-        }
-        sb.append(mapping.getAction().toString());
-      }
-    } else {
-      if(LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
-        sb.append(PluginExecutionAction.error.toString());
-      } else {
-        sb.append(PluginExecutionAction.ignore.toString());
-      }
+      return mappings.stream().map(IPluginExecutionMetadata::getAction).map(PluginExecutionAction::toString)
+          .collect(Collectors.joining(", ")); //$NON-NLS-1$
     }
-    return sb.toString();
+    if(LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
+      return PluginExecutionAction.error.toString();
+    }
+    return PluginExecutionAction.ignore.toString();
   }
 
   String getSourcelabel(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings, boolean detailed) {
@@ -471,14 +464,7 @@ public class LifecycleMappingsViewer {
         sources.add("uninteresting"); //$NON-NLS-1$
       }
     }
-    StringBuilder sb = new StringBuilder();
-    for(String source : sources) {
-      if(sb.length() > 0) {
-        sb.append(',');
-      }
-      sb.append(source);
-    }
-    return sb.toString();
+    return String.join(", ", sources);
   }
 
   private String getSourceLabel(Bundle bundle, boolean detailed) {

@@ -44,6 +44,8 @@ public class MavenLifecycleMappingsView extends ViewPart {
     mappingsViewer = new LifecycleMappingsViewer();
     this.composite = mappingsViewer.createContents(parent);
 
+    // react to current selection when opening the view
+    handleSelectionChanged(getSite().getPage().getSelection());
   }
 
   /* (non-Javadoc)
@@ -56,18 +58,7 @@ public class MavenLifecycleMappingsView extends ViewPart {
 
       @Override
       public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        Object element;
-        if(selection instanceof IStructuredSelection structuredSelection) {
-          element = structuredSelection.getFirstElement();
-        } else {
-          element = null;
-        }
-        IResource resource = Adapters.adapt(element, IResource.class);
-        if(resource != null) {
-          mappingsViewer.setTarget(resource.getProject());
-        } else {
-          mappingsViewer.setTarget(null);
-        }
+        handleSelectionChanged(selection);
       }
     });
   }
@@ -78,6 +69,21 @@ public class MavenLifecycleMappingsView extends ViewPart {
   @Override
   public void setFocus() {
     composite.setFocus();
+  }
+
+  private void handleSelectionChanged(ISelection selection) {
+    Object element;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      element = structuredSelection.getFirstElement();
+    } else {
+      element = null;
+    }
+    IResource resource = Adapters.adapt(element, IResource.class);
+    if(resource != null) {
+      mappingsViewer.setTarget(resource.getProject());
+    } else {
+      mappingsViewer.setTarget(null);
+    }
   }
 
 }
