@@ -13,14 +13,17 @@
 
 package org.eclipse.m2e.core.ui.internal.views;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
@@ -36,9 +39,6 @@ public class MavenLifecycleMappingsView extends ViewPart {
 
   private Composite composite;
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-   */
   @Override
   public void createPartControl(Composite parent) {
     mappingsViewer = new LifecycleMappingsViewer();
@@ -48,24 +48,12 @@ public class MavenLifecycleMappingsView extends ViewPart {
     handleSelectionChanged(getSite().getPage().getSelection());
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.ViewPart#init(org.eclipse.ui.IViewSite)
-   */
   @Override
   public void init(IViewSite site) throws PartInitException {
     super.init(site);
-    site.getPage().addSelectionListener(new ISelectionListener() {
-
-      @Override
-      public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        handleSelectionChanged(selection);
-      }
-    });
+    site.getPage().addSelectionListener((part, selection) -> handleSelectionChanged(selection));
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-   */
   @Override
   public void setFocus() {
     composite.setFocus();
@@ -76,7 +64,9 @@ public class MavenLifecycleMappingsView extends ViewPart {
     if(selection instanceof IStructuredSelection structuredSelection) {
       element = structuredSelection.getFirstElement();
     } else {
-      element = null;
+      element = Optional.ofNullable(getSite()).map(IWorkbenchPartSite::getPage) //
+          .map(IWorkbenchPage::getActiveEditor).map(IEditorPart::getEditorInput) //
+          .orElse(null);
     }
     IResource resource = Adapters.adapt(element, IResource.class);
     if(resource != null) {
