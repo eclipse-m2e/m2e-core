@@ -464,7 +464,7 @@ public class LifecycleMappingsViewer {
         sources.add("uninteresting"); //$NON-NLS-1$
       }
     }
-    return sources.stream().collect(Collectors.joining(", ")); //$NON-NLS-1$
+    return String.join(", ", sources);
   }
 
   private String getSourceLabel(Bundle bundle, boolean detailed) {
