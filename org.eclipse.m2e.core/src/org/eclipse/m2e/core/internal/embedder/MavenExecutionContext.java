@@ -54,6 +54,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.DependencyContext;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.LegacySupport;
@@ -325,14 +326,18 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       artifacts.put(project, new LinkedHashSet<>(project.getArtifacts()));
       snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
     }
+    MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
     try {
+      MavenProject currentProject = session.getCurrentProject();
+      LifecycleExecutionPlanCalculator executionPlanCalculator = lookup.lookup(LifecycleExecutionPlanCalculator.class);
+      executionPlanCalculator.setupMojoExecution(session, currentProject, clone);
       MojoExecutor mojoExecutor = lookup.lookup(MojoExecutor.class);
-      DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(execution));
-      mojoExecutor.ensureDependenciesAreResolved(execution.getMojoDescriptor(), session, dependencyContext);
-      lookup.lookup(BuildPluginManager.class).executeMojo(session, execution);
+      DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(clone));
+      mojoExecutor.ensureDependenciesAreResolved(clone.getMojoDescriptor(), session, dependencyContext);
+      BuildPluginManager buildPluginManager = lookup.lookup(BuildPluginManager.class);
+      buildPluginManager.executeMojo(session, clone);
     } catch(Exception ex) {
-      session.getResult().addException(ex);
-      throw new CoreException(Status.error("Failed to execute mojo", ex));
+      throw new CoreException(Status.error("Failed to execute mojo " + clone, ex));
     } finally {
       for(MavenProject project : session.getProjects()) {
         project.setArtifactFilter(null);
