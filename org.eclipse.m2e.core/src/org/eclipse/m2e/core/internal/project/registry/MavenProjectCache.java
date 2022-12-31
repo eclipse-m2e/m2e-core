@@ -22,8 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.Designate;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -53,21 +56,28 @@ import org.eclipse.m2e.core.project.IProjectConfiguration;
  * @author christoph
  */
 @Component(service = MavenProjectCache.class)
+@Designate(ocd = MavenProjectCacheConfig.class)
 public class MavenProjectCache {
-
-  private static final int MAX_CACHE_SIZE = Integer.getInteger("m2e.project.cache.size", 50);
 
   private static final String CTX_MAVENPROJECTS = MavenProjectCache.class.getName() + "/mavenProjects";
 
   @Reference
   PlexusContainerManager containerManager;
 
-  private LoadingCache<CacheKey, CacheLine> loadingCache;
+  private volatile LoadingCache<CacheKey, CacheLine> loadingCache;
 
 
-  public MavenProjectCache() {
+  @Activate
+  @Modified
+  void activate(MavenProjectCacheConfig cacheConfig) {
+    int maxSize;
+    if(cacheConfig.cacheSize() > 0) {
+      maxSize = cacheConfig.cacheSize();
+    } else {
+      maxSize = Integer.getInteger("m2e.project.cache.size", MavenProjectCacheConfig.DEFAULT_CACHE_SIZE);
+    }
     this.loadingCache = CacheBuilder.newBuilder() //
-        .maximumSize(MAX_CACHE_SIZE) //
+        .maximumSize(maxSize) //
         .removalListener((RemovalNotification<CacheKey, CacheLine> removed) -> {
           Map<IMavenProjectFacade, MavenProject> contextProjects = getContextProjectMap();
           removed.getValue().projects.values().forEach(mavenProject -> {
