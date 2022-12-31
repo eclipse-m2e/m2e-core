@@ -239,6 +239,31 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<!-- The Tycho baselinging does not yet work well on Windows.
+				Temporarily skip it until it is fixed.-->
+				<tycho.baseline.skip>true</tycho.baseline.skip>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-p2-plugin</artifactId>
+						<version>${tycho-version}</version>
+						<configuration>
+							<baselineMode>warn</baselineMode>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<developers>
