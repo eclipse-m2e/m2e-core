@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
 
@@ -45,7 +45,11 @@ jobs:
     - name: Build m2e-core
       uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1.0.1
       with:
-       run: mvn clean verify --batch-mode -Pits -Dtycho.p2.baselineMode=failCommon -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true
+       run: >-
+           mvn clean verify --batch-mode -Pits
+           -Dtycho.p2.baselineMode=failCommon
+           -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true
+           -Dtycho.surefire.deleteWorkDir=true
     - name: Upload Test Results
       uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
       with:
