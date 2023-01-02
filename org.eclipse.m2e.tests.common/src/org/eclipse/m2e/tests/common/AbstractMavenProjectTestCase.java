@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -234,6 +236,11 @@ public abstract class AbstractMavenProjectTestCase {
     LifecycleMappingFactory.setDefaultLifecycleMappingMetadataSource(null);
 
     WorkspaceHelpers.cleanWorkspace();
+
+    // Create .mvn folder to prevent Maven launches in tests from using the .mvn folder of this git repo.
+    // Otherwise MavenLaunchDelegate.findMavenProjectBasedir() find this git repos .mvn folder and its content would interfer with the tests.
+    Files.createDirectories(Path.of(workspace.getRoot().getLocationURI()).resolve(".mvn"));
+
     FilexWagon.setRequestFailPattern(null);
     FilexWagon.setRequestFilterPattern(null, true);
     driveEvents();

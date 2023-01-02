@@ -227,9 +227,6 @@
 	<profiles>
 		<profile>
 			<id>eclipse-sign</id>
-			<properties>
-				<tycho.p2.baselineMode>failCommon</tycho.p2.baselineMode>
-			</properties>
 			<build>
 				<plugins>
 					<plugin>
