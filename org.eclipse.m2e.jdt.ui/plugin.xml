@@ -344,4 +344,12 @@
             name="M2Eclipse">
       </quickFixProcessor>
    </extension>   
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+	   <perspectiveExtension
+	         targetID="org.eclipse.jdt.ui.JavaPerspective">
+	      <newWizardShortcut
+	            id="org.eclipse.m2e.core.wizards.Maven2ProjectWizard">
+	      </newWizardShortcut>
+	   </perspectiveExtension>
+	</extension>
 </fragment>
