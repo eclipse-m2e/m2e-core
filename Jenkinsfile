@@ -69,7 +69,7 @@ pipeline {
 						}
 						# Read M2E branding version
 						version=$(xmllint --xpath 'string(/feature/@version)' org.eclipse.m2e.sdk.feature/feature.xml)
-						if [[ $version =~ ([0-9]\\.[0-9]\\.[0-9])\\.qualifier ]] # backslash itself has to be escaped in Jenkinsfile
+						if [[ $version =~ ([0-9]+\\.[0-9]+\\.[0-9]+)\\.qualifier ]] # backslash itself has to be escaped in Jenkinsfile
 						then
 							M2E_VERSION="${BASH_REMATCH[1]}"
 						else
