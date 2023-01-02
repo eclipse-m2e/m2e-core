@@ -730,4 +730,20 @@
 			</activeWhen>
 		</projectConfigurator>
 	</extension>
+	 <extension
+	       point="org.eclipse.ui.navigator.navigatorContent">
+	    <commonWizard
+           menuGroupId="org.eclipse.m2e"
+           type="new"
+           wizardId="org.eclipse.m2e.core.wizards.Maven2ModuleWizard">
+	       <enablement>
+				<or>
+					<and>
+						<instanceof value="org.eclipse.core.resources.IProject" />
+						<test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature" />
+					</and>
+				</or>
+			</enablement>
+	    </commonWizard>
+	 </extension>
 </plugin>

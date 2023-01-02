@@ -41,7 +41,8 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.ui.forms;bundle-version="3.4.1",
  org.eclipse.jface.text,
  org.eclipse.core.filebuffers,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.eclipse.ui.navigator
 Import-Package: org.eclipse.compare.rangedifferencer,
  org.eclipse.ltk.core.refactoring,
  org.slf4j;version="[1.7.0,3.0.0)"

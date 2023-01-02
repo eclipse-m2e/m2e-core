@@ -15,4 +15,12 @@
        </locationProvider>
        
     </extension>
+	<extension point="org.eclipse.ui.perspectiveExtensions">
+	   <perspectiveExtension
+	         targetID="org.eclipse.pde.ui.PDEPerspective">
+	      <newWizardShortcut
+	            id="org.eclipse.m2e.core.wizards.Maven2ProjectWizard">
+	      </newWizardShortcut>
+	   </perspectiveExtension>
+	</extension>
 </plugin>
