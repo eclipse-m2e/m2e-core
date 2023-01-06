@@ -25,6 +25,7 @@
 	<name>Maven Integration for Eclipse (root)</name>
 
 	<properties>
+		<rcptt-maven-version>2.5.4</rcptt-maven-version>
 		<tychoDefaultTestArgLine>-Xmx800m</tychoDefaultTestArgLine>
 		<tycho.testArgLine>${tychoDefaultTestArgLine}</tycho.testArgLine>
 		<tycho.surefire.timeout>900</tycho.surefire.timeout>
@@ -91,6 +92,9 @@
 		
 		<!-- products -->
 		<module>products</module>
+		
+		<!-- UI/Integration tests -->
+		<module>org.eclipse.m2e.rcptt.tests</module>
 	</modules>
 
 	<dependencies>
