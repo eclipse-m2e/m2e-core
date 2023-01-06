@@ -77,6 +77,23 @@ Some tests are in a separate repository which is referenced as a Git submodule i
 * Open the project modules you want to work on (right-click > Open project) and their dependencies; approve m2e connectors installation if prompted
 * Happy coding!
 
+### ⌨️ Setting up the RCPTT Test Environment
+
+* Download and install the RCPTT IDE from [here](https://www.eclipse.org/rcptt/download/).
+
+* Create an executable application .
+    * Right-click on [m2e-ide.product](products/m2e-ide/m2e-ide.product), *Export... > Plug-in Development > Eclipse product*
+    * Execute `mvn clean verify -D skipTests` in the command line. The application is located under `products/m2e-ide/target/products`.
+ 
+ * Launch the RCPTT IDE and import [org.eclipse.m2e.rcptt.tests](org.eclipse.m2e.rcptt.tests) into your workspace.
+ 
+ * Add m2e to your applications.
+ 
+ * Right-click on the test case you want to execute, *Run As... > Test Cases*. Select the m2e application.
+ 
+Alternatively, you may also install RCPTT directly into your Eclipse IDE via the update site.
+
+When creating new test cases, it is recommended to use the *Record* functionality, to track your actions in the test application. Check the [User Guide](https://www.eclipse.org/rcptt/documentation/userguide/getstarted/) for more information.
 
 ### 🏗️ Build
 
