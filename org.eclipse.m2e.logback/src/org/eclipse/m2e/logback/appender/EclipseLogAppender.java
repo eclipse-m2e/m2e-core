@@ -38,7 +38,7 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
       default -> -1;
     };
     if(severity != -1) {
-      IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
+      IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage().strip(), getThrowable(logEvent));
       ECLIPSE_LOG.log(status);
     }
   }
