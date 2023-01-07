@@ -302,13 +302,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
    *
    * @since 1.4
    */
-  public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException {
+  public void refresh(Collection<IFile> files, IProgressMonitor monitor) throws CoreException {
+    refresh(new DependencyResolutionContext(files), monitor);
+  }
+
+  public void refresh(DependencyResolutionContext context, IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectRegistryManager_task_refreshing, 100);
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
     Job.getJobManager().beginRule(rule, progress);
     syncRefreshThread = Thread.currentThread();
     try (MutableProjectRegistry newState = newMutableProjectRegistry()) {
-      refresh(newState, new DependencyResolutionContext(pomFiles), progress.newChild(95));
+      refresh(newState, context, progress.newChild(95));
 
       applyMutableProjectRegistry(newState, progress.newChild(5));
     } finally {

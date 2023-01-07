@@ -71,12 +71,11 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
+import org.eclipse.m2e.core.internal.project.registry.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
@@ -136,8 +135,7 @@ public class ProjectConfigurationManager
       throws CoreException {
 
     // overall execution context to share repository session data and cache for all projects
-    return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute((context, m) -> {
-      SubMonitor progress = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_importing, 100);
+    SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_importing, 100);
       long t1 = System.currentTimeMillis();
       List<IMavenProjectImportResult> result = new ArrayList<>();
       int total = projectInfos.size();
@@ -161,15 +159,14 @@ public class ProjectConfigurationManager
         }
       }
 
-      hideNestedProjectsFromParents(projects, existingProjects, m);
+      hideNestedProjectsFromParents(projects, existingProjects, progress.split(10));
       // then configure maven for all projects
-      configureNewMavenProjects(projects, progress.split(90));
+      configureNewMavenProjects(projects, false, false, progress.split(80));
 
       long t2 = System.currentTimeMillis();
       log.info("Imported and configured {} project(s) in {} sec", total, ((t2 - t1) / 1000));
 
       return result;
-    }, monitor);
   }
 
   private void setHidden(IResource resource) {
@@ -240,7 +237,8 @@ public class ProjectConfigurationManager
     }
   }
 
-  private void configureNewMavenProjects(List<IProject> projects, IProgressMonitor monitor) throws CoreException {
+  private void configureNewMavenProjects(List<IProject> projects, boolean offline, boolean updateSnapshots,
+      IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_configuring, 100);
 
     // first, resolve maven dependencies for all projects
@@ -253,7 +251,7 @@ public class ProjectConfigurationManager
     }
     progress.subTask(Messages.ProjectConfigurationManager_task_refreshing);
 
-    projectManager.refresh(pomFiles, progress.split(75));
+    projectManager.refresh(new DependencyResolutionContext(pomFiles, offline, updateSnapshots), progress.split(75));
 
     // TODO this emits project change events, which may be premature at this point
 
@@ -334,24 +332,8 @@ public class ProjectConfigurationManager
    * @since 1.4
    */
   public Map<String, IStatus> updateProjectConfiguration(MavenUpdateRequest request, boolean updateConfiguration,
-      boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor monitor) {
-    try {
-      return MavenImpl.execute(maven, request.isOffline(), request.isForceDependencyUpdate(),
-          (context, m) -> updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
-              refreshFromLocal, m),
-          monitor);
-    } catch(CoreException ex) {
-      Map<String, IStatus> result = new LinkedHashMap<>();
-      for(IFile pomFile : request.getPomFiles()) {
-        result.put(pomFile.getProject().getName(), ex.getStatus());
-      }
-      return result;
-    }
-  }
-
-  private Map<String, IStatus> updateProjectConfiguration0(Collection<IFile> pomFiles, boolean updateConfiguration,
       boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor m) {
-
+    Set<IFile> pomFiles = request.getPomFiles();
     SubMonitor monitor = SubMonitor.convert(m, Messages.ProjectConfigurationManager_task_updating_projects,
         pomFiles.size() * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0) + (refreshFromLocal ? 1 : 0)));
 
@@ -385,7 +367,9 @@ public class ProjectConfigurationManager
     // TODO this sends multiple update events, rework using low-level registry update methods
     long refreshLocal = System.currentTimeMillis();
     try {
-      projectManager.refresh(pomsToRefresh, monitor.split(pomFiles.size()));
+      projectManager.refresh(
+          new DependencyResolutionContext(pomsToRefresh, request.isOffline(), request.isForceDependencyUpdate()),
+          monitor.split(pomFiles.size()));
 
       for(IFile pom : pomsToRefresh) {
         IProject project = pom.getProject();
@@ -506,14 +490,9 @@ public class ProjectConfigurationManager
   @Override
   public void enableMavenNature(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
-    monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
-    IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute(new AbstractRunnable() {
-      @Override
-      protected void run(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        enableBasicMavenNature(project, configuration, monitor);
-        configureNewMavenProjects(Collections.singletonList(project), monitor);
-      }
-    }, monitor);
+    SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_enable_nature, 2);
+    enableBasicMavenNature(project, configuration, subMonitor.split(1));
+    configureNewMavenProjects(Collections.singletonList(project), false, false, subMonitor.split(1));
   }
 
   void enableBasicMavenNature(IProject project, IProjectConfiguration configuration, IProgressMonitor monitor)
