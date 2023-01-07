@@ -649,10 +649,12 @@ public class ProjectRegistryManager implements ISaveParticipant {
       if(executions != null) {
         ListIterator<IPluginExecutionMetadata> iterator = executions.listIterator();
         while(iterator.hasNext()) {
-          PluginExecutionMetadata execution = (PluginExecutionMetadata) iterator.next();
-          execution = execution.clone();
-          execution.setSource(null);
-          iterator.set(execution);
+          IPluginExecutionMetadata metadata = iterator.next();
+          if(metadata instanceof PluginExecutionMetadata execution) {
+            execution = execution.clone();
+            execution.setSource(null);
+            iterator.set(execution);
+          }
         }
       }
     }

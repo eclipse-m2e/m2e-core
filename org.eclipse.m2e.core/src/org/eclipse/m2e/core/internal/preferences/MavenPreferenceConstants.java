@@ -91,7 +91,6 @@ public interface MavenPreferenceConstants {
   /** boolean */
   String P_FULL_INDEX = PREFIX + "fullIndex"; //$NON-NLS-1$
 
-  /** boolean **/
   String P_WARN_INCOMPLETE_MAPPING = PREFIX + "warn_incomplete_mapping"; //$NON-NLS-1$
 
   /** boolean **/
@@ -149,6 +148,8 @@ public interface MavenPreferenceConstants {
    * @since 1.6
    **/
   String P_AUTO_UPDATE_CONFIGURATION = PREFIX + "autoUpdateProjects"; //$NON-NLS-1$
+
+  String P_DEFAULT_MOJO_EXECUTION_ACTION = PREFIX + "unkownMojoExecutionAction"; //$NON-NLS-1$
 
   /**
    * boolean.

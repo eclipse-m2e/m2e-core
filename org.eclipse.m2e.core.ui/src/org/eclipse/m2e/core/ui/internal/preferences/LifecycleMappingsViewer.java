@@ -65,6 +65,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.lifecyclemapping.DefaultPluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -430,7 +431,7 @@ public class LifecycleMappingsViewer {
 
   String toString(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
     if(mappings != null && !mappings.isEmpty()) {
-      return mappings.stream().map(IPluginExecutionMetadata::getAction).map(PluginExecutionAction::toString)
+      return mappings.stream().map(IPluginExecutionMetadata::getAction).map(PluginExecutionAction::toString).distinct()
           .collect(Collectors.joining(", ")); //$NON-NLS-1$
     }
     if(LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
@@ -443,8 +444,7 @@ public class LifecycleMappingsViewer {
     LinkedHashSet<String> sources = new LinkedHashSet<>();
     if(mappings != null && !mappings.isEmpty()) {
       for(IPluginExecutionMetadata mapping : mappings) {
-        LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
-        if(metadata != null) {
+        if(mapping instanceof LifecycleMappingMetadataSource metadata) {
           Object source = metadata.getSource();
           if(source instanceof String s) {
             sources.add(s);
@@ -457,6 +457,10 @@ public class LifecycleMappingsViewer {
           } else {
             sources.add("unknown"); //$NON-NLS-1$
           }
+        } else if(mapping instanceof DefaultPluginExecutionMetadata) {
+          sources.add("default"); //$NON-NLS-1$
+        } else {
+          sources.add("unknown"); //$NON-NLS-1$
         }
       }
     } else {

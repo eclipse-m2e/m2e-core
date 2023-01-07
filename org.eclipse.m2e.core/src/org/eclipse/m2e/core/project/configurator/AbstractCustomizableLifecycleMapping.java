@@ -60,7 +60,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         log.debug("Mojo execution key: {}", mojoExecutionKey);
         List<IPluginExecutionMetadata> executionMetadatas = mapping.get(mojoExecutionKey);
         List<AbstractBuildParticipant> executionMappings = new ArrayList<>();
-        if(executionMetadatas != null) {
+        if(executionMetadatas != null && !executionMetadatas.isEmpty()) {
           for(IPluginExecutionMetadata executionMetadata : executionMetadatas) {
             switch(executionMetadata.getAction()) {
               case execute:
@@ -86,6 +86,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                 }
                 break;
               case ignore:
+              case warn:
               case error:
                 log.debug("\tAction: {}", executionMetadata.getAction());
                 break;
@@ -93,6 +94,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                 throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());
             }
           }
+        } else {
+          log.debug("\t- execution is skipped as nothing is configured -");
         }
 
         result.put(mojoExecutionKey, executionMappings);

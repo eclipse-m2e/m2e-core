@@ -1,5 +1,15 @@
 # Eclipse m2e - Release notes
 
+## 2.2.0
+
+### Mojos without a mapping are now executed by default in incremental builds
+
+Before it was neccesary to explicitly configure a mapping or there is a connector or the plugin iself contains mappings for a mojo to participate in the incremental maven build.
+This often lead to a poor user-experience and we think that users are adding mojos by purpose because they perform valuable tasks.
+
+Because of this, m2e now automatically enables the execution of mojos if there is no mapping configured, in case you want to change this there is a new configuration option to control the behavior:
+![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png) 
+
 ## 2.1.0
 
 * 📅 Release Date: November 24th 2022

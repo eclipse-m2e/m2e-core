@@ -47,6 +47,7 @@ import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 
 
 @Component(service = {IMavenConfiguration.class})
@@ -355,6 +356,24 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   public void setAutomaticallyUpdateConfiguration(boolean value) {
     preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, value);
+  }
+
+  @Override
+  public void setDefaultMojoExecutionAction(PluginExecutionAction mojoAction) {
+    preferencesLookup[0].put(MavenPreferenceConstants.P_DEFAULT_MOJO_EXECUTION_ACTION, mojoAction.name());
+  }
+
+  @Override
+  public PluginExecutionAction getDefaultMojoExecutionAction() {
+    String value = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_MOJO_EXECUTION_ACTION,
+        PluginExecutionAction.DEFAULT_ACTION.toString(),
+        preferencesLookup);
+    try {
+      return PluginExecutionAction.valueOf(value);
+    } catch(IllegalArgumentException e) {
+      //fallback...
+      return PluginExecutionAction.DEFAULT_ACTION;
+    }
   }
 
   @Override

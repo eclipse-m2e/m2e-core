@@ -157,6 +157,8 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPropertyPage_invalidPom;
 
+  public static String LifecycleMappingPreferencePage_DefaultMojoExecution;
+
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 
   public static String LocalArchetypeCatalogDialog_dialog_title;
