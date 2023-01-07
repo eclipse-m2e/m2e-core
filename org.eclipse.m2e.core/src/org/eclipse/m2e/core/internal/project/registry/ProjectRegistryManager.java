@@ -101,8 +101,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MarkerUtils;
-import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
-import org.eclipse.m2e.core.internal.project.ProjectProcessingTracker;
 import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
@@ -310,7 +308,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Job.getJobManager().beginRule(rule, progress);
     syncRefreshThread = Thread.currentThread();
     try (MutableProjectRegistry newState = newMutableProjectRegistry()) {
-      refresh(newState, pomFiles, progress.newChild(95));
+      refresh(newState, new DependencyResolutionContext(pomFiles), progress.newChild(95));
 
       applyMutableProjectRegistry(newState, progress.newChild(5));
     } finally {
@@ -319,15 +317,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
-  void refresh(MutableProjectRegistry newState, Collection<IFile> pomFiles, IProgressMonitor monitor)
+  void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
       throws CoreException {
     long start = System.currentTimeMillis();
-    log.debug("Refreshing ({} files): {}", pomFiles.size(), pomFiles); //$NON-NLS-1$
+    if(log.isDebugEnabled()) {
+      Set<IFile> current = context.getCurrent();
+      log.debug("Refreshing ({} files): {}", current.size(), current); //$NON-NLS-1$
+    }
 
     // 442524 safety guard
     URLConnectionCaches.assertDisabled();
 
-    DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
 
     // safety net -- do not force refresh of the same installed/resolved artifact more than once
     Set<ArtifactKey> installedArtifacts = new HashSet<>();
@@ -357,14 +357,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
     maven.addLocalRepositoryListener(listener);
     try {
-      refresh(newState, context, monitor);
+      executeRefresh(newState, context, monitor);
     } finally {
       maven.removeLocalRepositoryListener(listener);
     }
     log.debug("Refresh takes {} ms", (System.currentTimeMillis() - start)); //$NON-NLS-1$
   }
 
-  private void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
+  private void executeRefresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
       throws CoreException {
     Set<IFile> allProcessedPoms = new LinkedHashSet<>();
     Set<IFile> allNewFacades = new HashSet<>();
@@ -377,7 +377,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
       List<IFile> pomsForUpdate = calculateFacadesForUpdate(newState, context, allProcessedPoms::add,
           allNewFacades::contains,
           monitor);
-      Map<IFile, MavenProjectFacade> newFacades = readMavenProjectFacades(pomsForUpdate, newState, monitor);
+      Map<IFile, MavenProjectFacade> newFacades = readMavenProjectFacades(pomsForUpdate, newState, context.isOffline(),
+          context.isUpdateSnapshots(),
+          monitor);
       for(Entry<IFile, MavenProjectFacade> entry : newFacades.entrySet()) {
         IFile pom = entry.getKey();
         MavenProjectFacade newFacade = entry.getValue();
@@ -450,7 +452,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
             MavenProject mavenProject = getMavenProject(newFacade);
             if(!allProcessedPoms.contains(newFacade.getPom())) {
               // facade from workspace state that has not been refreshed yet
-              newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
+              newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, context.isOffline(),
+                  context.isUpdateSnapshots(), monitor).get(pom);
             } else {
               // recreate facade instance to trigger project changed event
               // this is only necessary for facades that are refreshed because their dependencies changed
@@ -714,6 +717,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Map<IFile, MavenProjectFacade> readMavenProjectFacades(Collection<IFile> poms, MutableProjectRegistry state,
+      boolean offline, boolean updateSnapshots,
       IProgressMonitor monitor) throws CoreException {
     if(poms.isEmpty()) {
       return Collections.emptyMap();
@@ -739,8 +743,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
       MavenExecutionContext context = new MavenExecutionContext(
           containerManager.getComponentLookup(moduleProjectDirectory), moduleProjectDirectory, moduleProjectDirectory,
           null);
-      configureExecutionRequest(context.getExecutionRequest(), state,
+      MavenExecutionRequest request = configureExecutionRequest(context.getExecutionRequest(), state,
           fileList.size() == 1 ? fileList.iterator().next() : null, resolverConfiguration);
+      request.setOffline(offline);
+      request.setUpdateSnapshots(updateSnapshots);
       context.execute((ctx, mon) -> {
         Map<IFile, File> pomFiles = fileList.stream().filter(IFile::isAccessible)
             .collect(Collectors.toMap(Function.identity(), ProjectRegistryManager::toJavaIoFile));

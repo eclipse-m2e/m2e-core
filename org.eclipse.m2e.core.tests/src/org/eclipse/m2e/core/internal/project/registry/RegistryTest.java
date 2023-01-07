@@ -30,10 +30,8 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -72,23 +70,21 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
   }
 
-  @Test
-  public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
-    IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
-    IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
-    waitForJobsToComplete(monitor);
-    ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
-    Collection<IFile> pomFiles = new ArrayList<>(2);
-    pomFiles.add(dependentProject.getFile("pom.xml"));
-    pomFiles.add(dependencyProject.getFile("pom.xml"));
-    MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().newMutableProjectRegistry();
-    state.clear();
-	MavenImpl.execute(MavenPlugin.getMaven(), false, false, (context, aMonitor) -> {
-      registryManager.refresh(state, pomFiles, aMonitor);
-      return null;
-    }, monitor);
-    Assert.assertNotEquals(Collections.emptyMap(), state.requiredCapabilities);
-  }
+	@Test
+	public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
+		IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
+		IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
+		waitForJobsToComplete(monitor);
+		ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+		Collection<IFile> pomFiles = new ArrayList<>(2);
+		pomFiles.add(dependentProject.getFile("pom.xml"));
+		pomFiles.add(dependencyProject.getFile("pom.xml"));
+		MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
+				.newMutableProjectRegistry();
+		state.clear();
+		registryManager.refresh(state, new DependencyResolutionContext(pomFiles, false, false), monitor);
+		Assert.assertNotEquals(Collections.emptyMap(), state.requiredCapabilities);
+	}
 
   @Ignore(value = "This test doesn't manage to reproduce Bug 547172 while similar manual steps do lead to an error")
   @Test

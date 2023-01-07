@@ -47,7 +47,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
@@ -95,76 +94,64 @@ public class ProjectRegistryRefreshJob extends Job
 
   @Override
   public IStatus run(final IProgressMonitor monitor) {
-    monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
+    SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.ProjectRegistryRefreshJob_task_refreshing, 100);
     List<MavenUpdateRequest> requests;
     synchronized(this.queue) {
       requests = new ArrayList<>(this.queue);
       this.queue.clear();
     }
-
+    // group requests
+    Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
+    Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
+    Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
+    Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
+    for(MavenUpdateRequest request : requests) {
+      subMonitor.checkCanceled();
+      if(request.isOffline() && request.isForceDependencyUpdate()) {
+        offlineForceDependencyUpdate.addAll(request.getPomFiles());
+      } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
+        offlineNotForceDependencyUpdate.addAll(request.getPomFiles());
+      } else if(!request.isOffline() && request.isForceDependencyUpdate()) {
+        notOfflineForceDependencyUpdate.addAll(request.getPomFiles());
+      } else if(!request.isOffline() && !request.isForceDependencyUpdate()) {
+        notOfflineNotForceDependencyUpdate.addAll(request.getPomFiles());
+      }
+    }
     try (MutableProjectRegistry newState = manager.newMutableProjectRegistry()) {
-      maven.createExecutionContext().execute((context, theMonitor) -> {
-        SubMonitor subMonitor = SubMonitor.convert(theMonitor);
-        // group requests
-        Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
-        Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
-        Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
-        Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
-        for(MavenUpdateRequest request : requests) {
-          subMonitor.checkCanceled();
-          if(request.isOffline() && request.isForceDependencyUpdate()) {
-            offlineForceDependencyUpdate.addAll(request.getPomFiles());
-          } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
-            offlineNotForceDependencyUpdate.addAll(request.getPomFiles());
-          } else if(!request.isOffline() && request.isForceDependencyUpdate()) {
-            notOfflineForceDependencyUpdate.addAll(request.getPomFiles());
-          } else if(!request.isOffline() && !request.isForceDependencyUpdate()) {
-            notOfflineNotForceDependencyUpdate.addAll(request.getPomFiles());
-          }
-        }
         // process requests
         // true * true
         subMonitor.checkCanceled();
+        subMonitor.setWorkRemaining(offlineForceDependencyUpdate.size() + offlineNotForceDependencyUpdate.size()
+            + notOfflineForceDependencyUpdate.size() + notOfflineNotForceDependencyUpdate.size() + 10);
         if(!offlineForceDependencyUpdate.isEmpty()) {
-          MavenImpl.execute(maven, true, true, (aContext, aMonitor) -> {
-            manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
-            return null;
-          }, theMonitor);
+          manager.refresh(newState, new DependencyResolutionContext(offlineForceDependencyUpdate, true, true),
+              subMonitor.split(offlineForceDependencyUpdate.size()));
         }
         // true*false
         subMonitor.checkCanceled();
         if(!offlineNotForceDependencyUpdate.isEmpty()) {
-          MavenImpl.execute(maven, true, false, (aContext, aMonitor) -> {
-            manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
-            return null;
-          }, theMonitor);
+            manager.refresh(newState, new DependencyResolutionContext(offlineNotForceDependencyUpdate, true, false),
+              subMonitor.split(offlineNotForceDependencyUpdate.size()));
         }
         // false*true
         subMonitor.checkCanceled();
         if(!notOfflineForceDependencyUpdate.isEmpty()) {
-          MavenImpl.execute(maven, false, true, (aContext, aMonitor) -> {
-            manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
-            return null;
-          }, theMonitor);
+          manager.refresh(newState, new DependencyResolutionContext(notOfflineForceDependencyUpdate, false, true),
+              subMonitor.split(notOfflineForceDependencyUpdate.size()));
         }
         // false*false
         subMonitor.checkCanceled();
         if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
-          MavenImpl.execute(maven, false, false, (aContext, aMonitor) -> {
-            manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
-            return null;
-          }, theMonitor);
+          manager.refresh(newState, new DependencyResolutionContext(notOfflineNotForceDependencyUpdate, false, false),
+              subMonitor.split(notOfflineNotForceDependencyUpdate.size()));
         }
-
         ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
         getJobManager().beginRule(rule, monitor);
         try {
-          manager.applyMutableProjectRegistry(newState, monitor);
+          manager.applyMutableProjectRegistry(newState, subMonitor);
         } finally {
           getJobManager().endRule(rule);
         }
-        return null;
-      }, monitor);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     } catch(OperationCanceledException ex) {
@@ -182,9 +169,8 @@ public class ProjectRegistryRefreshJob extends Job
     } catch(Exception ex) {
       log.error(ex.getMessage(), ex);
     } finally {
-      monitor.done();
+      subMonitor.done();
     }
-
     return Status.OK_STATUS;
   }
 

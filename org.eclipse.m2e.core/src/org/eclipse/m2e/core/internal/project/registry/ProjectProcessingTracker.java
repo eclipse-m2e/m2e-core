@@ -11,7 +11,7 @@
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.project;
+package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;

@@ -12,7 +12,7 @@
  *      Christoph Läubrich - M2Eclipse gets stuck in endless update loop
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.project;
+package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,7 +30,17 @@ public class DependencyResolutionContext {
   /** Set of all pom files to resolve */
   private final LinkedHashSet<IFile> pomFiles;
 
+  private boolean offline;
+
+  private boolean updateSnapshots;
+
   public DependencyResolutionContext(Collection<IFile> pomFiles) {
+    this(pomFiles, false, false);
+  }
+
+  public DependencyResolutionContext(Collection<IFile> pomFiles, boolean offline, boolean updateSnapshots) {
+    this.offline = offline;
+    this.updateSnapshots = updateSnapshots;
     this.pomFiles = new LinkedHashSet<>(pomFiles);
   }
 
@@ -58,6 +68,14 @@ public class DependencyResolutionContext {
    */
   public void forcePomFile(IFile file) {
     pomFiles.add(file);
+  }
+
+  boolean isOffline() {
+    return offline;
+  }
+
+  boolean isUpdateSnapshots() {
+    return this.updateSnapshots;
   }
 
 }
