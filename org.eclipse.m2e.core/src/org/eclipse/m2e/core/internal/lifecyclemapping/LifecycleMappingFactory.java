@@ -583,6 +583,8 @@ public class LifecycleMappingFactory {
     //
     // PHASE 2. Bind project configurators to mojo executions.
     //
+    PluginExecutionAction defaultMojoExecutionAction = MavenPlugin.getMavenConfiguration()
+        .getDefaultMojoExecutionAction();
 
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<>();
 
@@ -678,9 +680,10 @@ public class LifecycleMappingFactory {
             }
           }
         }
-
-        // TODO valid executionMetadatas and convert to error mapping invalid entries.
-
+        if(defaultMojoExecutionAction != PluginExecutionAction.warn && executionMetadatas.isEmpty()
+            && isInterestingPhase(execution.getLifecyclePhase())) {
+          executionMetadatas.add(new DefaultPluginExecutionMetadata(execution, defaultMojoExecutionAction));
+        }
         executionMapping.put(executionKey, executionMetadatas);
       }
     } else {
@@ -717,7 +720,7 @@ public class LifecycleMappingFactory {
 
   private static boolean isValidPluginExecutionMetadata(PluginExecutionMetadata metadata) {
     return switch(metadata.getAction()) {
-      case error, execute, ignore -> true;
+      case error, warn, execute, ignore -> true;
       case configurator -> isConfigurator(metadata);
       default -> false;
     };
@@ -820,6 +823,12 @@ public class LifecycleMappingFactory {
           default:
             // TODO invalid metadata
         }
+        if(metadata instanceof DefaultPluginExecutionMetadata) {
+          //we want to have a discovery hint here!
+          SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
+          result.addProblem(
+              new NotCoveredMojoExecution(executionKey, IMarker.SEVERITY_INFO, markerLocation));
+        }
       }
     }
 
@@ -827,8 +836,11 @@ public class LifecycleMappingFactory {
   }
 
   private static boolean isPomMapping(IPluginExecutionMetadata metadata) {
-    LifecycleMappingMetadataSource source = ((PluginExecutionMetadata) metadata).getSource();
-    return source != null && source.getSource() instanceof MavenProject;
+    if(metadata instanceof PluginExecutionMetadata executionMetadata) {
+      LifecycleMappingMetadataSource source = executionMetadata.getSource();
+      return source != null && source.getSource() instanceof MavenProject;
+    }
+    return false;
   }
 
   /**
@@ -903,12 +915,15 @@ public class LifecycleMappingFactory {
   }
 
   private static String getActionMessage(IPluginExecutionMetadata metadata) {
-    Xpp3Dom configuration = ((PluginExecutionMetadata) metadata).getConfiguration();
-    Xpp3Dom child = configuration == null ? null : configuration.getChild(ELEMENT_MESSAGE);
-    if(child == null || child.getValue().trim().length() == 0) {
-      return null;
+    if(metadata instanceof PluginExecutionMetadata executionMetadata) {
+      Xpp3Dom configuration = executionMetadata.getConfiguration();
+      Xpp3Dom child = configuration == null ? null : configuration.getChild(ELEMENT_MESSAGE);
+      if(child == null || child.getValue().isBlank()) {
+        return null;
+      }
+      return child.getValue();
     }
-    return child.getValue();
+    return null;
   }
 
   public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(InputStream is)
@@ -950,14 +965,18 @@ public class LifecycleMappingFactory {
       IPluginExecutionMetadata executionMetadata) {
     boolean runOnIncremental = false;
     boolean runOnConfiguration = false;
-    Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration()
-        .getChild(ELEMENT_RUN_ON_INCREMENTAL);
-    if(child != null) {
-      runOnIncremental = Boolean.parseBoolean(child.getValue());
-    }
-    child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_CONFIGURATION);
-    if(child != null) {
-      runOnConfiguration = Boolean.parseBoolean(child.getValue());
+    if(executionMetadata instanceof PluginExecutionMetadata) {
+      Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration()
+          .getChild(ELEMENT_RUN_ON_INCREMENTAL);
+      if(child != null) {
+        runOnIncremental = Boolean.parseBoolean(child.getValue());
+      }
+      child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_CONFIGURATION);
+      if(child != null) {
+        runOnConfiguration = Boolean.parseBoolean(child.getValue());
+      }
+    } else {
+      runOnIncremental = true;
     }
     return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental, runOnConfiguration);
   }

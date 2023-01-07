@@ -20,6 +20,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.execution.MavenExecutionRequest;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 
 
 /**
@@ -136,5 +137,9 @@ public interface IMavenConfiguration {
     }
     return activator.getMavenConfiguration();
   }
+
+  void setDefaultMojoExecutionAction(PluginExecutionAction mojoAction);
+
+  PluginExecutionAction getDefaultMojoExecutionAction();
 
 }

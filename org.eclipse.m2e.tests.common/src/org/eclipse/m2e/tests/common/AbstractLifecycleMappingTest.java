@@ -36,10 +36,12 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.lifecyclemapping.DefaultPluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -105,12 +107,18 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
     List<MojoExecutionKey> result = new ArrayList<>();
     facade.getMojoExecutionMapping().forEach((key, executions) -> {
-      if((executions == null || executions.isEmpty())
-          && LifecycleMappingFactory.isInterestingPhase(key.lifecyclePhase())) {
+      if(notCovered(executions) && LifecycleMappingFactory.isInterestingPhase(key.lifecyclePhase())) {
         result.add(key);
       }
     });
     return result;
+  }
+
+  private boolean notCovered(List<IPluginExecutionMetadata> executions) {
+    if(executions == null || executions.isEmpty()) {
+      return true;
+    }
+    return executions.stream().allMatch(DefaultPluginExecutionMetadata.class::isInstance);
   }
 
   /**

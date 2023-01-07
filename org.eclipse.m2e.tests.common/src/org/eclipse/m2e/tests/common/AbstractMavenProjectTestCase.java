@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -91,6 +92,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -605,6 +607,18 @@ public abstract class AbstractMavenProjectTestCase {
 
   protected void copyContent(IProject project, File from, String to) throws Exception {
     copyContent(project, new FileInputStream(from), to, true);
+  }
+
+  protected static <T> T withDefaultLifecycleMapping(PluginExecutionAction defaultAction, Callable<T> action)
+      throws Exception {
+    IMavenConfiguration configuration = MavenPlugin.getMavenConfiguration();
+    PluginExecutionAction oldvalue = configuration.getDefaultMojoExecutionAction();
+    try {
+      configuration.setDefaultMojoExecutionAction(defaultAction);
+      return action.call();
+    } finally {
+      configuration.setDefaultMojoExecutionAction(oldvalue);
+    }
   }
 
   /**

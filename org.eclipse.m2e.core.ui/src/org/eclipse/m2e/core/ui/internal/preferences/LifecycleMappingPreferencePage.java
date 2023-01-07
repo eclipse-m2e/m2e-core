@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.io.File;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,9 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -42,8 +46,10 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -56,7 +62,11 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
 
   private String mappingFilePath;
 
+  private PluginExecutionAction mojoAction;
+
   private Text mappingFileTextBox;
+
+  private ComboViewer mojoExecutionComboViewer;
 
   public LifecycleMappingPreferencePage() {
     setMessage(Messages.LifecycleMappingPreferencePage_this_message);
@@ -68,6 +78,8 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
   protected void performDefaults() {
     // set to default
     mappingFilePath = getDefaultLocation();
+    mojoAction = PluginExecutionAction.DEFAULT_ACTION;
+    mojoExecutionComboViewer.setSelection(new StructuredSelection(mojoAction));
     mappingFileTextBox.setText(mappingFilePath);
     super.performDefaults();
   }
@@ -75,7 +87,9 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
   @Override
   public boolean performOk() {
     try {
-      MavenPlugin.getMavenConfiguration().setWorkspaceLifecycleMappingMetadataFile(mappingFilePath);
+      IMavenConfiguration configuration = MavenPlugin.getMavenConfiguration();
+      configuration.setDefaultMojoExecutionAction(mojoAction);
+      configuration.setWorkspaceLifecycleMappingMetadataFile(mappingFilePath);
       LifecycleMappingFactory.getWorkspaceMetadata(true);
       return super.performOk();
     } catch(CoreException ex) {
@@ -138,7 +152,20 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
       }
       mappingFileTextBox.setText(dialog.getFilterPath() + "/" + dialog.getFileName()); //$NON-NLS-1$
     }));
-
+    Composite mojoExeSettings = new Composite(composite, SWT.NONE);
+    mojoExeSettings.setLayout(new GridLayout(2, false));
+    new Label(mojoExeSettings, SWT.NONE).setText(Messages.LifecycleMappingPreferencePage_DefaultMojoExecution);
+    mojoExecutionComboViewer = new ComboViewer(mojoExeSettings);
+    mojoExecutionComboViewer.setContentProvider(ArrayContentProvider.getInstance());
+    mojoExecutionComboViewer
+        .setInput(List.of(PluginExecutionAction.execute, PluginExecutionAction.ignore, PluginExecutionAction.warn,
+            PluginExecutionAction.error));
+    mojoAction = MavenPlugin.getMavenConfiguration().getDefaultMojoExecutionAction();
+    mojoExecutionComboViewer
+        .setSelection(new StructuredSelection(mojoAction));
+      mojoExecutionComboViewer.addSelectionChangedListener(e -> {
+      mojoAction = (PluginExecutionAction) e.getStructuredSelection().getFirstElement();
+    });
     return composite;
   }
 
