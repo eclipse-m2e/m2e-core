@@ -17,7 +17,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,6 +35,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -109,7 +109,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     }
   }
 
-  static class UpdateJob extends WorkspaceJob {
+  static class UpdateJob extends MavenWorkspaceJob {
     private final Set<IProject> projects;
 
     private final int option;

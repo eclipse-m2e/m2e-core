@@ -17,7 +17,6 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,6 +26,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 
 
 /**
@@ -35,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
  * @author Fred Bricon
  * @since 1.6.0
  */
-public class MappingDiscoveryJob extends WorkspaceJob {
+public class MappingDiscoveryJob extends MavenWorkspaceJob {
 
   private final Collection<IProject> projects;
 

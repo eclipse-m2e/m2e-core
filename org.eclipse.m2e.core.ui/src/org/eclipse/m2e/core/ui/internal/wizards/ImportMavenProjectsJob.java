@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +27,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.IWorkingSet;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -42,7 +42,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * @author Eugene Kuleshov
  * @author Fred Bricon
  */
-public class ImportMavenProjectsJob extends WorkspaceJob {
+public class ImportMavenProjectsJob extends MavenWorkspaceJob {
 
   private final List<IWorkingSet> workingSets;
 

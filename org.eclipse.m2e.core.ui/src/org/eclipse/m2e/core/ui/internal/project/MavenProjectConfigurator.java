@@ -35,6 +35,7 @@ import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
@@ -125,7 +126,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
      *
      */
     @SuppressWarnings("restriction")
-    public static class UpdateMavenConfigurationJob extends Job
+    public static class UpdateMavenConfigurationJob extends MavenJob
         implements org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue {
 
         private static UpdateMavenConfigurationJob INSTANCE;

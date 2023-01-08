@@ -94,6 +94,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -549,7 +550,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    *
    * @author dyocum
    */
-  class LoadEffectivePomJob extends Job {
+  class LoadEffectivePomJob extends MavenJob {
 
     public LoadEffectivePomJob(String name) {
       super(name);

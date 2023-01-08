@@ -54,6 +54,7 @@ import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -71,7 +72,7 @@ import org.eclipse.m2e.scm.internal.Messages;
  *
  * @author Eugene Kuleshov
  */
-public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
+public abstract class MavenProjectCheckoutJob extends MavenWorkspaceJob {
   private static final Logger log = LoggerFactory.getLogger(MavenProjectCheckoutJob.class);
 
   final ProjectImportConfiguration configuration;

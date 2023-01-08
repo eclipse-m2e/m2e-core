@@ -19,18 +19,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.progress.IProgressConstants;
 
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 
-public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
+public abstract class AbstractCreateMavenProjectJob extends MavenWorkspaceJob {
 
   private List<IProject> createdProjects;
 

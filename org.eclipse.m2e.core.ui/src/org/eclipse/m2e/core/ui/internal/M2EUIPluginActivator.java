@@ -44,6 +44,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.progress.UIJob;
@@ -52,6 +53,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
@@ -107,7 +109,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     mavenUpdateConfigurationChangeListener = new MavenUpdateConfigurationChangeListener();
     workspace.addResourceChangeListener(mavenUpdateConfigurationChangeListener, IResourceChangeEvent.POST_CHANGE);
 
-    // Automatically delete obsolete caches 
+    // Automatically delete obsolete caches
     // TODO: can be removed when some time has passed and it is unlikely old workspaces that need clean-up are used.
     MavenPluginActivator mavenPlugin = MavenPluginActivator.getDefault();
     IPath nexusCache = Platform.getStateLocation(mavenPlugin.getBundle()).append("nexus");
@@ -118,6 +120,8 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     if(Files.isDirectory(m2eCache)) {
       deleteLegacyCacheDirectory(m2eCache);
     }
+    // use a custom icon in the progress user interface
+    PlatformUI.getWorkbench().getProgressService().registerIconForFamily(MavenImages.M2, MavenJob.FAMILY_M2);
   }
 
   @Override

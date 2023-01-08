@@ -20,8 +20,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 
-public abstract class AbstractBinaryProjectsImportJob extends Job {
+public abstract class AbstractBinaryProjectsImportJob extends MavenJob {
 
 	protected AbstractBinaryProjectsImportJob() {
 		super("Import binary projects");
