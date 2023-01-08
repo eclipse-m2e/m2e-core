@@ -3,7 +3,7 @@ Fragment-Host: org.eclipse.m2e.core.ui
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E Maven Integration for Eclipse UI Tests
 Bundle-SymbolicName: org.eclipse.m2e.core.ui.tests
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 2.0.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: Eclipse.org - m2e
 Require-Bundle: org.eclipse.m2e.tests.common,
