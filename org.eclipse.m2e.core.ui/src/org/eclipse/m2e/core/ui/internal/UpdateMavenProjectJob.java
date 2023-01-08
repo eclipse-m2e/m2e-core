@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -29,13 +28,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
 
-public class UpdateMavenProjectJob extends WorkspaceJob {
+public class UpdateMavenProjectJob extends MavenWorkspaceJob {
 
   private final Collection<IProject> projects;
 

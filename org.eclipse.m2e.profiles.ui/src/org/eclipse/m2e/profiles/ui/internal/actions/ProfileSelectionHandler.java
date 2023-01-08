@@ -32,7 +32,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -57,6 +56,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
+import org.eclipse.m2e.core.internal.jobs.MavenWorkspaceJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.profiles.core.internal.IProfileManager;
 import org.eclipse.m2e.profiles.core.internal.ProfileData;
@@ -176,7 +177,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     return facades;
   }
 
-  class GetProfilesJob extends Job {
+  class GetProfilesJob extends MavenJob {
 
     private final IProfileManager profileManager;
 
@@ -293,7 +294,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     }
   }
 
-  class UpdateProfilesJob extends WorkspaceJob {
+  class UpdateProfilesJob extends MavenWorkspaceJob {
 
     private final Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
 

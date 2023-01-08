@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -87,6 +86,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
@@ -938,7 +938,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage {
     });
   }
 
-  private class RetrievingArchetypesJob extends Job {
+  private class RetrievingArchetypesJob extends MavenJob {
 
     List<Archetype> catalogArchetypes;
 

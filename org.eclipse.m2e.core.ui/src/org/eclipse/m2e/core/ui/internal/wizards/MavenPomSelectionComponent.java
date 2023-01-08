@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
@@ -69,6 +68,7 @@ import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -394,7 +394,7 @@ public class MavenPomSelectionComponent extends Composite {
   /**
    * Search Job
    */
-  private class SearchJob extends Job {
+  private class SearchJob extends MavenJob {
 
     private String query;
 

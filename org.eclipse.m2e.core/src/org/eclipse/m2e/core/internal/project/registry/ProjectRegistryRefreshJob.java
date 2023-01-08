@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
@@ -49,12 +48,13 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
+import org.eclipse.m2e.core.internal.jobs.MavenJob;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 
 @Component(service = {ProjectRegistryRefreshJob.class, IResourceChangeListener.class}, property = "event.mask:Integer="
     + (IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_CLOSE | IResourceChangeEvent.PRE_DELETE))
-public class ProjectRegistryRefreshJob extends Job
+public class ProjectRegistryRefreshJob extends MavenJob
     implements IResourceChangeListener, IPreferenceChangeListener, IBackgroundProcessingQueue {
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
 
