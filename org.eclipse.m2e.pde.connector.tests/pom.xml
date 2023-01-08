@@ -19,6 +19,7 @@
 		<version>2.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.eclipse.m2e.pde.connector.tests</artifactId>
+	<name>M2E PDE Connector Tests</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 	<build>
