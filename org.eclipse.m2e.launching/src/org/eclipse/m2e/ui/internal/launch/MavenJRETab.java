@@ -13,12 +13,7 @@
 
 package org.eclipse.m2e.ui.internal.launch;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -36,16 +31,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
-import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
-import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.internal.launch.MavenLaunchDelegate;
 import org.eclipse.m2e.internal.launch.Messages;
 
 
 @SuppressWarnings("restriction")
 public class MavenJRETab extends JavaJRETab {
-
-  private static final Logger log = LoggerFactory.getLogger(MavenJRETab.class);
 
   private final VMArgumentsBlock vmArgumentsBlock = new VMArgumentsBlock();
 
@@ -61,17 +52,10 @@ public class MavenJRETab extends JavaJRETab {
     ((GridData) vmArgumentsBlock.getControl().getLayoutData()).horizontalSpan = 2;
   }
 
-  private IProjectConfiguration getResolverConfiguration() {
-    IJavaProject javaProject = getJavaProject();
-    if(javaProject == null) {
-      return null;
-    }
-    return ResolverConfigurationIO.readResolverConfiguration(javaProject.getProject());
-  }
-
   @Override
   protected IJavaProject getJavaProject() {
-    IProject project = MavenLaunchDelegate.getProjectFromConfiguration(getLaunchConfiguration());
+    IContainer container = MavenLaunchDelegate.getContainerFromConfiguration(getLaunchConfiguration());
+    IProject project = container != null ? container.getProject() : null;
     if(project != null && project.exists()) {
       return JavaCore.create(project);
     }
@@ -83,48 +67,31 @@ public class MavenJRETab extends JavaJRETab {
    * 
    * @return the descriptor for the default Maven JRE
    */
+  @Override
   protected JREDescriptor getDefaultJREDescriptor() {
-    return new MavenJREDescriptor(() -> Optional.ofNullable(getResolverConfiguration())
-        .map(IProjectConfiguration::getRequiredJavaVersion).orElse(null),
-        () -> super.getDefaultJREDescriptor().getDescription());
-  }
-
-  private static final class MavenJREDescriptor extends JREDescriptor {
-
-    private final Supplier<String> defaultDescription;
-
-    private final Supplier<String> requiredJavaVersion;
-
-    MavenJREDescriptor(Supplier<String> requiredJavaVersion, Supplier<String> defaultDescription) {
-      this.requiredJavaVersion = requiredJavaVersion;
-      this.defaultDescription = defaultDescription;
+    IContainer pomContainer = MavenLaunchDelegate.getContainerFromConfiguration(getLaunchConfiguration());
+    String version = MavenLaunchDelegate.getEnforcedJavaVersion(pomContainer, null);
+    IVMInstall mavenJre = version != null ? MavenLaunchDelegate.getBestMatchingVM(version) : null;
+    String details;
+    if(mavenJre != null) { // add link
+      details = NLS.bind(Messages.MavenJRETab_lblDefaultDetailsRequiredJavaVersion, mavenJre.getName(), version);
+    } else {
+      // TODO: add logic for getting the underlying project
+      // then fall back to default
+      details = super.getDefaultJREDescriptor().getDescription();
     }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.internal.debug.ui.jres.DefaultJREDescriptor#getDescription()
-     */
-    @Override
-    public String getDescription() {
-      // first check Maven JRE configuration
-      String version = requiredJavaVersion.get();
-      IVMInstall mavenJre = version != null ? MavenLaunchDelegate.getBestMatchingVM(version) : null;
-      final String details;
-      if(mavenJre != null) {
-        // add link
-        details = NLS.bind(Messages.MavenJRETab_lblDefaultDetailsRequiredJavaVersion, mavenJre.getName(),
-            requiredJavaVersion.get());
-      } else {
-        // TODO: add logic for getting the underlying project
-        // then fall back to default
-        details = defaultDescription.get();
+    return new JREDescriptor() {
+      @Override
+      public String getDescription() {
+        return NLS.bind(Messages.MavenJRETab_lblDefault, details);
       }
-      return NLS.bind(Messages.MavenJRETab_lblDefault, details);
-    }
-  };
+    };
+  }
 
   /**
    * Need to overwrite from parent, to prevent calling JavaJRETab.checkCompliance().
    */
+  @Override
   public boolean isValid(ILaunchConfiguration config) {
     setErrorMessage(null);
     setMessage(null);
@@ -136,6 +103,7 @@ public class MavenJRETab extends JavaJRETab {
     }
     // prevent calling JavaJRETab.checkCompliance(), as that uses the wrong JDK for the checks when the default is checked
     // also Maven launch type is not detected as external program
+    //TODO: isExternalToolConfiguration() should be protected and be overrideable
     /**
      * if(!isExternalToolConfiguration(fLaunchConfiguration)) { status = checkCompliance(); if (!status.isOK()) {
      * setErrorMessage(status.getMessage()); return false; } }

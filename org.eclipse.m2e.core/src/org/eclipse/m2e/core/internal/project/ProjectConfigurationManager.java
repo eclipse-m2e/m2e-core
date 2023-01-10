@@ -59,10 +59,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -125,12 +123,6 @@ public class ProjectConfigurationManager
 
   @Reference
   PlexusContainerManager containerManager;
-
-  private static final String GOAL_ENFORCE = "enforce"; //$NON-NLS-1$
-
-  private static final String ENFORCER_PLUGIN_ARTIFACT_ID = "maven-enforcer-plugin"; //$NON-NLS-1$
-
-  private static final String ENFORCER_PLUGIN_GROUP_ID = "org.apache.maven.plugins"; //$NON-NLS-1$
 
   @Override
   public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos,
@@ -508,60 +500,7 @@ public class ProjectConfigurationManager
       return null;
     }, monitor);
 
-    // must happen after calling the project configurators (as it checks the set Java project JRE)
-    configurationRequiredJavaVersion(mavenProjectFacade, monitor);
     log.debug("Updated project configuration for {} in {} ms.", mavenProjectFacade, System.currentTimeMillis() - start); //$NON-NLS-1$
-  }
-
-  /**
-   * Configure Java version required for Maven execution based on maven-enforcer-plugin configuration
-   */
-  private void configurationRequiredJavaVersion(IMavenProjectFacade facade, IProgressMonitor monitor) {
-    String version = getRequiredJavaVersionFromEnforcerRule(facade, monitor);
-    if(version != null) {
-      ResolverConfiguration resolverConfiguration = new ResolverConfiguration(facade.getConfiguration());
-      resolverConfiguration.setRequiredJavaVersion(version);
-      ResolverConfigurationIO.saveResolverConfiguration(facade.getProject(), resolverConfiguration);
-    }
-  }
-
-  private List<MojoExecution> getEnforcerMojoExecutions(IMavenProjectFacade facade, IProgressMonitor monitor)
-      throws CoreException {
-    return facade.getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID, ENFORCER_PLUGIN_ARTIFACT_ID, monitor, GOAL_ENFORCE);
-  }
-
-  private String getRequiredJavaVersionFromEnforcerRule(IMavenProjectFacade facade, IProgressMonitor monitor) {
-    try {
-      List<MojoExecution> mojoExecutions = getEnforcerMojoExecutions(facade, monitor);
-      for(MojoExecution mojoExecution : mojoExecutions) {
-        String version = getRequiredJavaVersionFromEnforcerRule(facade.getProject(), facade.getMavenProject(),
-            mojoExecution,
-            monitor);
-        if(version != null) {
-          return version;
-        }
-      }
-    } catch(CoreException | InvalidVersionSpecificationException ex) {
-      log.error("Failed to determine required Java version from maven-enforcer-plugin configuration, assuming default",
-          ex);
-    }
-    return null;
-  }
-
-  private String getRequiredJavaVersionFromEnforcerRule(IProject project, MavenProject mavenProject,
-      MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws CoreException, InvalidVersionSpecificationException {
-    // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
-    String version = ((MavenImpl) maven).getMojoParameterValue(mavenProject, mojoExecution,
-        List.of("rules", "requireJavaVersion", "version"), String.class, monitor);
-    if(version == null) {
-      return null;
-    }
-    // normalize version (https://issues.apache.org/jira/browse/MENFORCER-440)
-    if("8".equals(version)) {
-      version = "1.8";
-    }
-    return version;
   }
 
   @Override

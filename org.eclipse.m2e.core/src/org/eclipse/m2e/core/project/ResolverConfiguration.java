@@ -47,8 +47,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private File multiModuleProjectDirectory;
 
-  private String requiredJavaVersion;
-
   public ResolverConfiguration() {
   }
 
@@ -68,7 +66,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     setProperties(properties2);
     setResolveWorkspaceProjects(resolverConfiguration.isResolveWorkspaceProjects());
     setSelectedProfiles(resolverConfiguration.getSelectedProfiles());
-    requiredJavaVersion = resolverConfiguration.getRequiredJavaVersion();
   }
 
   /* (non-Javadoc)
@@ -185,17 +182,4 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   public void setMultiModuleProjectDirectory(File multiModuleProjectDirectory) {
     this.multiModuleProjectDirectory = multiModuleProjectDirectory;
   }
-
-  @Override
-  public String getRequiredJavaVersion() {
-    return requiredJavaVersion;
-  }
-
-  /**
-   * @param createFromVersionSpec
-   */
-  public void setRequiredJavaVersion(String version) {
-    this.requiredJavaVersion = version;
-  }
-
 }

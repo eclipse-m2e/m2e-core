@@ -69,8 +69,6 @@ public class ResolverConfigurationIO {
 
   private static final String P_BASEDIR = "basedir";
 
-  private static final String P_REQUIRED_JAVA_VERSION = "requiredJavaVersion";
-
   private static final String PROPERTIES_KV_SEPARATOR = ">";
 
   private static final String PROPERTIES_SEPARATOR = "|";
@@ -110,12 +108,6 @@ public class ResolverConfigurationIO {
         projectNode.remove(P_PROPERTIES);
       }
 
-      String requiredJavaVersion = configuration.getRequiredJavaVersion();
-      if(requiredJavaVersion != null) {
-        projectNode.put(P_REQUIRED_JAVA_VERSION, requiredJavaVersion);
-      } else {
-        projectNode.remove(P_REQUIRED_JAVA_VERSION);
-      }
       try {
         projectNode.flush();
         return true;
@@ -149,10 +141,6 @@ public class ResolverConfigurationIO {
       if(directory.isDirectory()) {
         configuration.setMultiModuleProjectDirectory(directory);
       }
-    }
-    String requiredJavaVersion = projectNode.get(P_REQUIRED_JAVA_VERSION, null);
-    if(requiredJavaVersion != null) {
-      configuration.setRequiredJavaVersion(requiredJavaVersion);
     }
     return configuration;
   }
