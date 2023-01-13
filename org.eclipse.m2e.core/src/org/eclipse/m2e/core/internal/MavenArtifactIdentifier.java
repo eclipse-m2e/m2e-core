@@ -17,18 +17,19 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -81,21 +82,19 @@ public class MavenArtifactIdentifier {
       try (InputStream fis = Files.newInputStream(file)) {
         sha1 = DigestUtils.sha1Hex(fis); // TODO use Locations for caching
       }
-      URL url = new URL("https://search.maven.org/solrsearch/select?q=1:" + sha1);
-      try (Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
-        Set<ArtifactKey> result = new LinkedHashSet<>();
-        JsonObject container = new Gson().fromJson(reader, JsonObject.class);
-        JsonArray docs = container.get("response").getAsJsonObject().get("docs").getAsJsonArray();
-        for(JsonElement element : docs) {
-          JsonObject doc = element.getAsJsonObject();
-          String g = doc.get("g").getAsString();
-          String a = doc.get("a").getAsString();
-          String v = doc.get("v").getAsString();
-          result.add(new ArtifactKey(g, a, v, null));
-        }
-        return !result.isEmpty() ? Collections.unmodifiableSet(result) : Collections.emptySet();
-      }
-    } catch(IOException e) {
+      HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+      HttpRequest request = HttpRequest.newBuilder(URI.create("https://search.maven.org/solrsearch/select?q=1:" + sha1))
+          .GET().build();
+      HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+      JsonObject container = new Gson().fromJson(response.body(), JsonObject.class);
+      JsonArray docs = container.get("response").getAsJsonObject().get("docs").getAsJsonArray();
+      return docs.asList().stream().map(JsonElement::getAsJsonObject).map(obj -> {
+        String g = obj.get("g").getAsString();
+        String a = obj.get("a").getAsString();
+        String v = obj.get("v").getAsString();
+        return new ArtifactKey(g, a, v, null);
+      }).collect(Collectors.toSet());
+    } catch(IOException | InterruptedException e) {
       LOG.log(Status.error("Failed to identify file by its hash using search.maven.org: " + file));
       return Set.of();
     }
