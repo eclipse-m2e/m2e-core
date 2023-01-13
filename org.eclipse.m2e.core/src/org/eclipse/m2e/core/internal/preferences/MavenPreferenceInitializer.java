@@ -48,6 +48,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.putBoolean(MavenPreferenceConstants.P_UPDATE_PROJECTS, false);
 
     store.putBoolean(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, false);
+    store.putBoolean(MavenPreferenceConstants.P_QUERY_CENTRAL_TO_IDENTIFY_ARTIFACT, false);
     store.putBoolean(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, true);
 
     store.putBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR, true);
