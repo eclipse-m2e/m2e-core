@@ -403,6 +403,8 @@ public class Messages extends NLS {
 
   public static String MavenPreferencePage_changingPreferencesRequiresProjectUpdate;
 
+  public static String MavenPreferencePage_queryCentralToIdentifyArtifacts;
+
   public static String MavenPreferencePage_download;
 
   public static String MavenPreferencePage_hide;

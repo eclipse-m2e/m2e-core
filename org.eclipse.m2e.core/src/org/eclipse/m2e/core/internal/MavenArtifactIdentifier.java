@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -50,6 +51,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
 public class MavenArtifactIdentifier {
@@ -65,12 +67,19 @@ public class MavenArtifactIdentifier {
     if(classesArtifacts.isEmpty()) {
       // GAV extracted from pom.xml
       classesArtifacts = MetaInfMavenScanner.scanForPomXml(location);
-      if(classesArtifacts.isEmpty()) {
-        // checksum-based lookup in central
+      if(classesArtifacts.isEmpty() && isQueryCentral()) {
+        // checksum-based lookup in central. This can be really slow and the chances are low that, 
+        // after we havn't found a pom.xml/.properties embedded into the jar that this exact 
+        // same jar is on Maven-Central (jars on central usually have that).
         classesArtifacts = identifyCentralSearch(location);
       }
     }
     return classesArtifacts;
+  }
+
+  private static boolean isQueryCentral() {
+    return InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID)
+        .getBoolean(MavenPreferenceConstants.P_QUERY_CENTRAL_TO_IDENTIFY_ARTIFACT, false);
   }
 
   private static Set<ArtifactKey> identifyCentralSearch(Path file) {

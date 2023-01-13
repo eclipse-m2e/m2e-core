@@ -97,8 +97,10 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
         Messages.MavenPreferencePage_hide, getFieldEditorParent()));
 
-    String[][] checksumPolicies = new String[][] {
-        new String[] {Messages.preferencesGlobalChecksumPolicy_default, null},
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_QUERY_CENTRAL_TO_IDENTIFY_ARTIFACT, //
+        Messages.MavenPreferencePage_queryCentralToIdentifyArtifacts, getFieldEditorParent()));
+
+    String[][] checksumPolicies = new String[][] {new String[] {Messages.preferencesGlobalChecksumPolicy_default, null},
         new String[] {Messages.preferencesGlobalChecksumPolicy_ignore, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE},
         new String[] {Messages.preferencesGlobalChecksumPolicy_warn, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN},
         new String[] {Messages.preferencesGlobalChecksumPolicy_fail, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL}};
@@ -106,8 +108,8 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
 
     FieldEditor checksumPolicy = new ComboFieldEditor(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY,
         Messages.preferencesGlobalChecksumPolicy, checksumPolicies, getFieldEditorParent());
-    checksumPolicy.getLabelControl(getFieldEditorParent()).setToolTipText(
-        Messages.preferencesGlobalChecksumPolicy_tooltip);
+    checksumPolicy.getLabelControl(getFieldEditorParent())
+        .setToolTipText(Messages.preferencesGlobalChecksumPolicy_tooltip);
     addField(checksumPolicy);
 
     if(M2EUIPluginActivator.showExperimentalFeatures()) {
