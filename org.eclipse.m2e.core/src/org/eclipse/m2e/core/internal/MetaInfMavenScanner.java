@@ -197,6 +197,6 @@ public abstract class MetaInfMavenScanner<T> {
     if(version == null && parent != null) {
       version = parent.getVersion();
     }
-    return new ArtifactKey(groupId, model.getArtifactId(), null, version);
+    return new ArtifactKey(groupId, model.getArtifactId(), version, null);
   }
 }
