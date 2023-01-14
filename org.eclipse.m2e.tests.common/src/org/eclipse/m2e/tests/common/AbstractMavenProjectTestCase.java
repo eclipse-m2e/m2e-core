@@ -109,7 +109,6 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
 
-@SuppressWarnings("restriction")
 public abstract class AbstractMavenProjectTestCase {
 
   private static final boolean STOP_ON_FAILED_TEST = Boolean.getBoolean("m2e.stopOnFailedTest");

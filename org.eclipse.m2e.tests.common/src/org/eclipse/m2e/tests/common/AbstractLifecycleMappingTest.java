@@ -49,7 +49,6 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
-@SuppressWarnings("restriction")
 @RequireMavenExecutionContext
 public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectTestCase {
   protected IMavenProjectRegistry mavenProjectManager;

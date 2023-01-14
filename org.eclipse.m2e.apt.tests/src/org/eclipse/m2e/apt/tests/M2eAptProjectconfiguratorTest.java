@@ -40,7 +40,6 @@ import org.eclipse.m2e.apt.preferences.IPreferencesManager;
 import org.eclipse.osgi.util.NLS;
 import org.junit.Test;
 
-@SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfiguratorTestCase {
 
 	static {

@@ -57,7 +57,6 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  *
  * @author igor
  */
-@SuppressWarnings("restriction")
 class DownloadSourcesJob extends MavenJob implements IBackgroundProcessingQueue {
   private static Logger log = LoggerFactory.getLogger(DownloadSourcesJob.class);
 

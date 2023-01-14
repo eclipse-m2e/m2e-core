@@ -53,7 +53,6 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Before;
 
-@SuppressWarnings("restriction")
 abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenProjectTestCase {
 	static final String COMPILER_OUTPUT_DIR = "target/generated-sources/annotations";
 	static final String PROCESSOR_OUTPUT_DIR = "target/generated-sources/apt";

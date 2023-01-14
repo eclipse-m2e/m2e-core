@@ -27,7 +27,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.m2e.editor;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.composites;x-friends:="org.eclipse.m2e.editor.xml",
- org.eclipse.m2e.editor.dialogs;x-friends:="org.eclipse.m2e.editor.xml",
+ org.eclipse.m2e.editor.dialogs;x-friends:="org.eclipse.m2e.editor.xml,org.eclipse.m2e.editor.tests",
  org.eclipse.m2e.editor.internal.lifecycle;x-internal:=true,
  org.eclipse.m2e.editor.internal.markers;x-internal:=true,
  org.eclipse.m2e.editor.mojo;x-friends:="org.eclipse.m2e.editor.xml",

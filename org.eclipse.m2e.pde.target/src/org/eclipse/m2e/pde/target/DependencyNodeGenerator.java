@@ -32,7 +32,6 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
-@SuppressWarnings("restriction")
 final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerator> {
 		private final Artifact artifact;
 		private final List<ArtifactRepository> repositories;

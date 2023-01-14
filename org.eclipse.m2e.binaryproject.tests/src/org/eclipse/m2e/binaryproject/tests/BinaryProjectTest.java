@@ -35,7 +35,6 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.m2e.tests.common.ClasspathHelpers;
 import org.junit.Test;
 
-@SuppressWarnings({"restriction"})
 public class BinaryProjectTest extends AbstractMavenProjectTestCase {
   IProgressMonitor monitor = new NullProgressMonitor();
 
