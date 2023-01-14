@@ -26,19 +26,15 @@ public class OpenSourceLookupInfoDialogCommandHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
-		if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
+		if (!(selection instanceof IStructuredSelection structuredSelection) || selection.isEmpty()) {
 			return null;
 		}
-
-		Object debugElement = ((IStructuredSelection) selection).getFirstElement();
-
-		final AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant
-				.getSourceLookup(debugElement);
+		Object debugElement = structuredSelection.getFirstElement();
+		AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant.getSourceLookup(debugElement);
 
 		if (debugElement != null && sourceLookup != null) {
 			new SourceLookupInfoDialog(HandlerUtil.getActiveShell(event), debugElement, sourceLookup).open();
 		}
-
 		return null;
 	}
 

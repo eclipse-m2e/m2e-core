@@ -185,15 +185,11 @@ public class SourceLookupInfoDialog extends Dialog {
 		if (container == null) {
 			return "";
 		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(container.getClass().getSimpleName()).append(" ").append(container.getName());
-
+		String str = container.getClass().getSimpleName() + " " + container.getName();
 		if (container instanceof PackageFragmentRootSourceContainer fragmentRoot) {
-			sb.append(" ").append(fragmentRoot.getPackageFragmentRoot().getJavaProject().getProject());
+			return str + " " + fragmentRoot.getPackageFragmentRoot().getJavaProject().getProject();
 		}
-
-		return sb.toString();
+		return str;
 	}
 
 	void copyToClipboard() {

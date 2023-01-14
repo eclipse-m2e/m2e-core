@@ -50,12 +50,10 @@ public class ImportBinaryProjectHandler extends AbstractHandler {
 
 	public static void importBinaryProjects(final Object debugElement) throws DebugException {
 
-		final File location = AdvancedSourceLookup.getClassesLocation(debugElement);
-
+		File location = AdvancedSourceLookup.getClassesLocation(debugElement);
 		if (location == null) {
 			return;
 		}
-
 		Job job = new AbstractBinaryProjectsImportJob() {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
