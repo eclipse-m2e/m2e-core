@@ -14,9 +14,9 @@ package org.eclipse.m2e.sourcelookup.internal.launch;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
@@ -39,15 +39,9 @@ public class MavenSourceContainerResolver implements ISourceContainerResolver {
 		if (classesArtifacts.isEmpty()) {
 			return List.of();
 		}
-
-		List<ISourceContainer> result = new ArrayList<>();
-		for (ArtifactKey classesArtifact : classesArtifacts) {
-			ISourceContainer container = resolveSourceContainer(classesArtifact, monitor);
-			if (container != null) {
-				result.add(container);
-			}
-		}
-		return result;
+		return classesArtifacts.stream()//
+				.map(classesArtifact -> resolveSourceContainer(classesArtifact, monitor))//
+				.filter(Objects::nonNull).toList();
 	}
 
 	protected ISourceContainer resolveSourceContainer(ArtifactKey artifact, IProgressMonitor monitor) {

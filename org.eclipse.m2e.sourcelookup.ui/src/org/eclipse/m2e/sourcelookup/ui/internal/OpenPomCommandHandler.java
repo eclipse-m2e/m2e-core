@@ -25,6 +25,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.launching.sourcelookup.advanced.AdvancedSourceLookup;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -36,25 +38,14 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 @SuppressWarnings("restriction")
 public class OpenPomCommandHandler extends AbstractHandler {
+	private static final ILog LOG = Platform.getLog(OpenPomCommandHandler.class);
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
-
-		if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
-			return null;
-		}
-
-		try {
-			final File location = AdvancedSourceLookup
-					.getClassesLocation(((IStructuredSelection) selection).getFirstElement());
-
-			if (location == null) {
-				return null;
-			}
-
-			final String name = location.getName();
-
+		File location = getSelectionLocation(selection);
+		if (location != null) {
+			String name = location.getName();
 			List<IEditorInput> inputs = new MetaInfMavenScanner<IEditorInput>() {
 				@Override
 				protected IEditorInput visitFile(Path file) throws IOException {
@@ -73,14 +64,22 @@ public class OpenPomCommandHandler extends AbstractHandler {
 			if (!inputs.isEmpty()) {
 				OpenPomAction.openEditor(inputs.get(0), "pom.xml");
 			}
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return null;
 	}
 
-	static StaticMavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
+	private static File getSelectionLocation(ISelection selection) {
+		if (selection instanceof IStructuredSelection structuredSelection && !selection.isEmpty()) {
+			try {
+				return AdvancedSourceLookup.getClassesLocation(structuredSelection.getFirstElement());
+			} catch (CoreException e) {
+				LOG.error("Failed to lookup selection locatio", e);
+			}
+		}
+		return null;
+	}
+
+	private static StaticMavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
 		return new StaticMavenStorageEditorInput(name, name, null, is.readAllBytes());
 	}
 }
