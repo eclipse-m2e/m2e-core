@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Igor Fedorenko
+ * Copyright (c) 2011-2023 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,24 +17,25 @@ import org.osgi.framework.BundleContext;
 
 public class SourceLookupUIActivator extends AbstractUIPlugin {
 
-  public static final String PLUGIN_ID = "org.eclipse.m2e.sourcelookup.ui"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.eclipse.m2e.sourcelookup.ui"; //$NON-NLS-1$
 
-  private static SourceLookupUIActivator plugin;
+	private static SourceLookupUIActivator plugin;
 
-  public SourceLookupUIActivator() {}
+	public SourceLookupUIActivator() {
+	}
 
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
-    plugin = this;
-  }
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+	}
 
-  public void stop(BundleContext context) throws Exception {
-    plugin = null;
-    super.stop(context);
-  }
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
 
-  public static SourceLookupUIActivator getDefault() {
-    return plugin;
-  }
+	public static SourceLookupUIActivator getDefault() {
+		return plugin;
+	}
 
 }

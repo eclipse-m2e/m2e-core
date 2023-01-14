@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2016 Igor Fedorenko
+ * Copyright (c) 2011-2023 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -33,51 +33,52 @@ import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ImportBinaryProjectHandler extends AbstractHandler {
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
-    ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
-    if (selection instanceof IStructuredSelection structuredSelection && !selection.isEmpty()) {
-      try {
-        importBinaryProjects(structuredSelection.getFirstElement());
-      } catch (DebugException e) {
-        throw new ExecutionException("Could not import binary project", e);
-      }
-    }
+		if (selection instanceof IStructuredSelection structuredSelection && !selection.isEmpty()) {
+			try {
+				importBinaryProjects(structuredSelection.getFirstElement());
+			} catch (DebugException e) {
+				throw new ExecutionException("Could not import binary project", e);
+			}
+		}
 
-    return null;
-  }
+		return null;
+	}
 
-  public static void importBinaryProjects(final Object debugElement) throws DebugException {
+	public static void importBinaryProjects(final Object debugElement) throws DebugException {
 
-    final File location = AdvancedSourceLookup.getClassesLocation(debugElement);
+		final File location = AdvancedSourceLookup.getClassesLocation(debugElement);
 
-    if (location == null) {
-      return;
-    }
+		if (location == null) {
+			return;
+		}
 
-    Job job = new AbstractBinaryProjectsImportJob() {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        IStatus status = super.run(monitor);
+		Job job = new AbstractBinaryProjectsImportJob() {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				IStatus status = super.run(monitor);
 
-        if (status.isOK()) {
-          AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant.getSourceLookup(debugElement);
-          try {
-            sourceLookup.getSourceContainer(debugElement, true, monitor);
-          } catch (CoreException e) {
-            status = e.getStatus();
-          }
-        }
-        return status;
-      }
+				if (status.isOK()) {
+					AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant
+							.getSourceLookup(debugElement);
+					try {
+						sourceLookup.getSourceContainer(debugElement, true, monitor);
+					} catch (CoreException e) {
+						status = e.getStatus();
+					}
+				}
+				return status;
+			}
 
-      @Override
-      protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) {
-    	return MavenArtifactIdentifier.identify(location);
-      }
-    };
-    job.setUser(true);
-    job.schedule();
-  }
+			@Override
+			protected Collection<ArtifactKey> getArtifactKeys(IProgressMonitor monitor) {
+				return MavenArtifactIdentifier.identify(location);
+			}
+		};
+		job.setUser(true);
+		job.schedule();
+	}
 }

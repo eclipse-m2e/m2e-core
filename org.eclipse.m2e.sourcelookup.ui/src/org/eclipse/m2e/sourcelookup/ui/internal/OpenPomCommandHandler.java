@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2012 Igor Fedorenko
+ * Copyright (c) 2011-2023 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -37,50 +37,50 @@ import org.eclipse.ui.handlers.HandlerUtil;
 @SuppressWarnings("restriction")
 public class OpenPomCommandHandler extends AbstractHandler {
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
-    ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
-    if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
-      return null;
-    }
+		if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
+			return null;
+		}
 
-    try {
-      final File location =
-          AdvancedSourceLookup.getClassesLocation(((IStructuredSelection) selection).getFirstElement());
+		try {
+			final File location = AdvancedSourceLookup
+					.getClassesLocation(((IStructuredSelection) selection).getFirstElement());
 
-      if (location == null) {
-        return null;
-      }
+			if (location == null) {
+				return null;
+			}
 
-      final String name = location.getName();
+			final String name = location.getName();
 
-      List<IEditorInput> inputs = new MetaInfMavenScanner<IEditorInput>() {
-        @Override
-        protected IEditorInput visitFile(Path file) throws IOException {
-          try (InputStream stream = Files.newInputStream(file)) {
-            return toEditorInput(name, stream);
-          }
-        }
+			List<IEditorInput> inputs = new MetaInfMavenScanner<IEditorInput>() {
+				@Override
+				protected IEditorInput visitFile(Path file) throws IOException {
+					try (InputStream stream = Files.newInputStream(file)) {
+						return toEditorInput(name, stream);
+					}
+				}
 
-        @Override
-        protected IEditorInput visitJarEntry(JarFile jar, JarEntry entry) throws IOException {
-          return toEditorInput(name, jar.getInputStream(entry));
-        }
+				@Override
+				protected IEditorInput visitJarEntry(JarFile jar, JarEntry entry) throws IOException {
+					return toEditorInput(name, jar.getInputStream(entry));
+				}
 
-      }.scan(location.toPath(), "pom.xml");
+			}.scan(location.toPath(), "pom.xml");
 
-      if (!inputs.isEmpty()) {
-        OpenPomAction.openEditor(inputs.get(0), "pom.xml");
-      }
-    } catch (CoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return null;
-  }
+			if (!inputs.isEmpty()) {
+				OpenPomAction.openEditor(inputs.get(0), "pom.xml");
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-  static StaticMavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
-    return new StaticMavenStorageEditorInput(name, name, null, is.readAllBytes());
-  }
+	static StaticMavenStorageEditorInput toEditorInput(String name, InputStream is) throws IOException {
+		return new StaticMavenStorageEditorInput(name, name, null, is.readAllBytes());
+	}
 }
