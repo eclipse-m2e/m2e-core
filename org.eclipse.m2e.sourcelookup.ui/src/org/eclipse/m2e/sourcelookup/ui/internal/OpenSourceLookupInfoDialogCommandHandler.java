@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2013 Igor Fedorenko
+ * Copyright (c) 2011-2023 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -22,23 +22,24 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class OpenSourceLookupInfoDialogCommandHandler extends AbstractHandler {
 
-  @Override
-  public Object execute(ExecutionEvent event) throws ExecutionException {
-    ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
 
-    if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
-      return null;
-    }
+		if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) {
+			return null;
+		}
 
-    Object debugElement = ((IStructuredSelection) selection).getFirstElement();
+		Object debugElement = ((IStructuredSelection) selection).getFirstElement();
 
-    final AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant.getSourceLookup(debugElement);
+		final AdvancedSourceLookupParticipant sourceLookup = AdvancedSourceLookupParticipant
+				.getSourceLookup(debugElement);
 
-    if (debugElement != null && sourceLookup != null) {
-      new SourceLookupInfoDialog(HandlerUtil.getActiveShell(event), debugElement, sourceLookup).open();
-    }
+		if (debugElement != null && sourceLookup != null) {
+			new SourceLookupInfoDialog(HandlerUtil.getActiveShell(event), debugElement, sourceLookup).open();
+		}
 
-    return null;
-  }
+		return null;
+	}
 
 }

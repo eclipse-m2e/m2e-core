@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2016 Igor Fedorenko
+ * Copyright (c) 2011-2023 Igor Fedorenko
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -21,25 +21,23 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
-
 public class MavenSourceLookupParticipant extends AdvancedSourceLookupParticipant
-    implements
-      IMavenProjectChangedListener {
+		implements IMavenProjectChangedListener {
 
-  @Override
-  public void init(ISourceLookupDirector director) {
-    super.init(director);
-    MavenPlugin.getMavenProjectRegistry().addMavenProjectChangedListener(this);
-  }
+	@Override
+	public void init(ISourceLookupDirector director) {
+		super.init(director);
+		MavenPlugin.getMavenProjectRegistry().addMavenProjectChangedListener(this);
+	}
 
-  @Override
-  public void dispose() {
-    MavenPlugin.getMavenProjectRegistry().removeMavenProjectChangedListener(this);
-    super.dispose();
-  }
+	@Override
+	public void dispose() {
+		MavenPlugin.getMavenProjectRegistry().removeMavenProjectChangedListener(this);
+		super.dispose();
+	}
 
-  @Override
-  public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
-    disposeContainers();
-  }
+	@Override
+	public void mavenProjectChanged(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
+		disposeContainers();
+	}
 }
