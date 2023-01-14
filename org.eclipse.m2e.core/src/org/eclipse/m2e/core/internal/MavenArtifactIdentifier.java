@@ -17,6 +17,7 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,10 +27,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkUtil;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -86,11 +95,19 @@ public class MavenArtifactIdentifier {
     if(!Files.isRegularFile(file)) {
       return Set.of();
     }
+    String sha1;
+    try (InputStream fis = Files.newInputStream(file)) {
+      sha1 = DigestUtils.sha1Hex(fis);
+    } catch(IOException ex) {
+      LOG.log(Status.error("Failed to compute sha1-hash of file: " + file));
+      return Set.of();
+    }
+    return ArtifactIdCache.IDS.computeIfAbsent(sha1,
+        h -> MavenArtifactIdentifier.lookUpFileHashOnMavenCentral(h, file));
+  }
+
+  private static Set<ArtifactKey> lookUpFileHashOnMavenCentral(String sha1, Path file) {
     try {
-      String sha1;
-      try (InputStream fis = Files.newInputStream(file)) {
-        sha1 = DigestUtils.sha1Hex(fis); // TODO use Locations for caching
-      }
       HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
       HttpRequest request = HttpRequest.newBuilder(URI.create("https://search.maven.org/solrsearch/select?q=1:" + sha1))
           .GET().build();
@@ -102,11 +119,61 @@ public class MavenArtifactIdentifier {
         String a = obj.get("a").getAsString();
         String v = obj.get("v").getAsString();
         return new ArtifactKey(g, a, v, null);
-      }).collect(Collectors.toSet());
+      }).collect(Collectors.toUnmodifiableSet());
     } catch(IOException | InterruptedException e) {
       LOG.log(Status.error("Failed to identify file by its hash using search.maven.org: " + file));
       return Set.of();
     }
+  }
+
+  private static class ArtifactIdCache { // encapsulated in an inner-class to have it loaded only if searching Central is enabled
+    static final Map<String, Set<ArtifactKey>> IDS = loadCachedIds();
+
+    private static Map<String, Set<ArtifactKey>> loadCachedIds() {
+      Bundle bundle = FrameworkUtil.getBundle(MavenArtifactIdentifier.class);
+      Path cacheFile = Platform.getStateLocation(bundle).append("artifactIdCache.properties").toFile().toPath();
+      bundle.getBundleContext().addBundleListener(event -> {
+        if(event.getType() == BundleEvent.STOPPED) { // called e.g. on shutdown
+          saveCachedIds(cacheFile);
+        }
+      });
+      if(!Files.exists(cacheFile)) {
+        return new ConcurrentHashMap<>();
+      }
+      Properties persistedCache = new Properties();
+      try (InputStream in = Files.newInputStream(cacheFile)) {
+        persistedCache.load(in);
+      } catch(IOException ex) {
+        LOG.error("Failed to load artifact-id cache", ex);
+      }
+      return persistedCache.entrySet().stream().collect(Collectors.toConcurrentMap(//
+          e -> e.getKey().toString(), //
+          e -> parseArtifactKeys((String) e.getValue())));
+    }
+
+    private static void saveCachedIds(Path cacheFile) {
+      Properties properties = new Properties(IDS.size() * 4 / 3 + 1);
+      IDS.forEach((sha1, keys) -> properties.setProperty(sha1, persistArtifactKeys(keys)));
+
+      try (OutputStream out = Files.newOutputStream(cacheFile)) {
+        properties.store(out, "M2E's cached results for looking up artifact-ids on Maven-Central");
+      } catch(IOException ex) {
+        LOG.error("Failed to persist artifact-id cache", ex);
+      }
+    }
+
+    private static Set<ArtifactKey> parseArtifactKeys(String value) {
+      if(value.isBlank()) {
+        return Set.of();
+      }
+      String[] elements = value.strip().split(",");
+      return Arrays.stream(elements).map(ArtifactKey::fromPortableString).collect(Collectors.toSet());
+    }
+
+    private static String persistArtifactKeys(Set<ArtifactKey> keys) {
+      return keys.stream().map(ArtifactKey::toPortableString).collect(Collectors.joining(","));
+    }
+
   }
 
   public static Path resolveSourceLocation(ArtifactKey artifact, IProgressMonitor monitor) {
