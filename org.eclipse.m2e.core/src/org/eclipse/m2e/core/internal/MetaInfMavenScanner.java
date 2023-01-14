@@ -54,58 +54,64 @@ public abstract class MetaInfMavenScanner<T> {
   private static final MetaInfMavenScanner<ArtifactKey> PROERTIES_SCANNER = new MetaInfMavenScanner<>() {
     @Override
     protected ArtifactKey visitFile(Path file) throws IOException {
-      try (InputStream is = Files.newInputStream(file)) {
-        return loadPomProperties(is, file);
-      }
+      return loadPomProperties(Files.newInputStream(file), file);
     }
 
     @Override
     protected ArtifactKey visitJarEntry(JarFile jar, JarEntry entry) throws IOException {
-      try (InputStream is = jar.getInputStream(entry)) {
-        return loadPomProperties(is, Path.of(entry.getName()));
-      }
+      return loadPomProperties(jar.getInputStream(entry), Path.of(entry.getName()));
     }
 
     private ArtifactKey loadPomProperties(InputStream is, Path path) throws IOException {
       Properties properties = new Properties();
-      properties.load(is);
-      ArtifactKey key = readArtifactKey(properties);
-      // validate properties and path match
-      if(key != null && path.endsWith(Path.of(key.groupId(), key.artifactId(), POM_PROPERTIES))) {
-        return key;
+      try (is) {
+        properties.load(is);
       }
-      return null;
+      String groupId = properties.getProperty("groupId");
+      String artifactId = properties.getProperty("artifactId");
+      String version = properties.getProperty("version");
+      return createKey(groupId, artifactId, version, path, POM_PROPERTIES);
     }
   };
 
   private static final MetaInfMavenScanner<ArtifactKey> XML_SCANNER = new MetaInfMavenScanner<>() {
     @Override
     protected ArtifactKey visitFile(Path file) throws IOException {
-      try (InputStream is = Files.newInputStream(file)) {
-        return loadPomProperties(is, file);
-      }
+      return loadPomProperties(Files.newInputStream(file), file);
     }
 
     @Override
     protected ArtifactKey visitJarEntry(JarFile jar, JarEntry entry) throws IOException {
-      try (InputStream is = jar.getInputStream(entry)) {
-        return loadPomProperties(is, Path.of(entry.getName()));
-      }
+      return loadPomProperties(jar.getInputStream(entry), Path.of(entry.getName()));
     }
 
     private ArtifactKey loadPomProperties(InputStream is, Path path) throws IOException {
-
-      try {
-        ArtifactKey key = readArtifactKey(MavenPlugin.getMavenModelManager().readMavenModel(is));
-        // validate properties and path match
-        if(key != null && path.endsWith(Path.of(key.groupId(), key.artifactId(), POM_XML))) {
-          return key;
-        }
+      Model model;
+      try (is) {
+        model = MavenPlugin.getMavenModelManager().readMavenModel(is);
       } catch(CoreException ex) {
+        return null;
       }
-      return null;
+      Parent parent = model.getParent();
+      String groupId = model.getGroupId();
+      if(groupId == null && parent != null) {
+        groupId = parent.getGroupId();
+      }
+      String version = model.getVersion();
+      if(version == null && parent != null) {
+        version = parent.getVersion();
+      }
+      return createKey(groupId, model.getArtifactId(), version, path, POM_XML);
     }
   };
+
+  private static ArtifactKey createKey(String groupId, String artifactId, String version, Path path, String source) {
+    if(groupId != null && artifactId != null && version != null
+        && path.endsWith(Path.of(groupId, artifactId, source))) { // validate that properties and path match
+      return new ArtifactKey(groupId, artifactId, version, /* classifier= */null);
+    }
+    return null;
+  }
 
   public List<T> scan(Path file, String filename) {
     if(file == null) {
@@ -175,28 +181,5 @@ public abstract class MetaInfMavenScanner<T> {
 
   public static Set<ArtifactKey> scanForPomXml(Path classesLocation) {
     return new LinkedHashSet<>(XML_SCANNER.scan(classesLocation, POM_XML));
-  }
-
-  private static ArtifactKey readArtifactKey(Properties pomProperties) {
-    String groupId = pomProperties.getProperty("groupId");
-    String artifactId = pomProperties.getProperty("artifactId");
-    String version = pomProperties.getProperty("version");
-    if(groupId != null && artifactId != null && version != null) {
-      return new ArtifactKey(groupId, artifactId, version, /* classifier= */null);
-    }
-    return null;
-  }
-
-  private static ArtifactKey readArtifactKey(Model model) {
-    Parent parent = model.getParent();
-    String groupId = model.getGroupId();
-    if(groupId == null && parent != null) {
-      groupId = parent.getGroupId();
-    }
-    String version = model.getVersion();
-    if(version == null && parent != null) {
-      version = parent.getVersion();
-    }
-    return new ArtifactKey(groupId, model.getArtifactId(), version, null);
   }
 }
