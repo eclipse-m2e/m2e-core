@@ -21,8 +21,8 @@ pipeline {
 		stage('initialize PGP') {
 			when {
 				anyOf{
-				    branch 'master';
-				    branch pattern: 'm2e-[0-9]+\\.[0-9]+\\.x', comparator: "REGEXP"
+					branch 'master';
+					branch pattern: 'm2e-[0-9]+\\.[0-9]+\\.x', comparator: "REGEXP"
 				}
 			}
 			steps {
@@ -31,7 +31,7 @@ pipeline {
 					sh '''
 						for fpr in $(gpg --list-keys --with-colons | awk -F: \'/fpr:/ {print $10}\' | sort -u)
 						do
-							echo -e "5\ny\n" | gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust 
+							echo -e "5\ny\n" | gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust
 						done
 					'''
 				}
@@ -42,13 +42,13 @@ pipeline {
 				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
 				wrap([$class: 'Xvnc', useXauthority: true]) {
 					sh '''
-						mavenArgs="clean verify -Dtycho.p2.baselineMode=failCommon"
+						mavenArgs="clean verify -Dtycho.p2.baselineMode=failCommon --batch-mode"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
 							mvn ${mavenArgs} -Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"
 						else
 							# Clear KEYRING_PASSPHRASE environment variable
 							export KEYRING_PASSPHRASE='EMPTY'
-							mvn ${mavenArgs} -Pits 
+							mvn ${mavenArgs} -Pits
 						fi
 					'''
 				}}
