@@ -119,7 +119,6 @@ public class DependencyTable {
 		getter = MavenTargetDependency::getType;
 		tableColumn = newColumn(layout, Messages.MavenTargetDependencyEditor_5, getter, true);
 		tableColumn.setEditingSupport(newTypeEditingSupport());
-		tableColumn.getColumn();
 	}
 
 	private void createButtons(Composite parent) {
