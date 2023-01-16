@@ -12,6 +12,6 @@ Require-Bundle: org.eclipse.m2e.tests.common,
  org.eclipse.core.runtime,
  org.eclipse.m2e.maven.runtime
 Import-Package: javax.annotation;version="1.2.0",
- org.apache.commons.io;version="2.11.0"
+ org.apache.commons.io
 Eclipse-BundleShape: dir
 Automatic-Module-Name: org.eclipse.m2e.core.tests
