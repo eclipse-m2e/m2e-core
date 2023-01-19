@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
+import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.databinding.swt.WidgetSideEffects;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -106,13 +108,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				setControl(composite);
 				composite.setLayout(new GridLayout(2, false));
 				createRepositoryLink(composite);
-				dependencyEditor = new MavenTargetDependencyEditor(composite,
-						targetLocation == null ? Collections.emptyList() : targetLocation.getRoots());
-				dependencyEditor.setSelected(selectedRoot);
-				GridData gd_dep = new GridData(GridData.FILL_BOTH);
-				gd_dep.horizontalSpan = 2;
-				gd_dep.heightHint = 200;
-				dependencyEditor.getControl().setLayoutData(gd_dep);
+				dependencyEditor = new MavenTargetDependencyEditor(composite, targetLocation, selectedRoot);
+				dependencyEditor.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_14);
 				locationLabel = new Text(composite, SWT.BORDER);
@@ -174,7 +171,18 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					includeSource.setSelection(true);
 				}
 
-				updateUI();
+				ISideEffectFactory factory = WidgetSideEffects.createFactory(composite);
+
+				factory.create(() -> {
+					if (dependencyEditor.hasErrors()) {
+						setErrorMessage(Messages.MavenTargetDependencyEditor_15);
+					} else {
+						setErrorMessage(null);
+					}
+
+					setPageComplete(!dependencyEditor.hasErrors());
+					updateUI();
+				});
 			}
 
 			private Button createCheckBox(Composite composite, String text) {

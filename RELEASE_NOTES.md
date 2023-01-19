@@ -10,6 +10,12 @@ This often lead to a poor user-experience and we think that users are adding moj
 Because of this, m2e now automatically enables the execution of mojos if there is no mapping configured, in case you want to change this there is a new configuration option to control the behavior:
 ![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png) 
 
+### Updated Dependency Editor
+
+The dependencies editor has been adapted to show all artifacts within a target location as a single table, instead of multiple tabs. This change also includes support for only updating a selected number of artifacts to their latest version, as well as a undo/redo functionality.
+
+![grafik](https://user-images.githubusercontent.com/70652978/212153011-160fa96a-1c06-4092-9b89-fcd7a3c2859e.png)
+
 ## 2.1.0
 
 * 📅 Release Date: November 24th 2022
