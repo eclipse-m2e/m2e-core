@@ -244,6 +244,7 @@ public class PlexusContainerManager {
         bind(CoreExports.class).toInstance(exports);
       }
     }, new ExtensionModule());
+    classWorld.addListener(new LifecycleManagerDisposer(container));
     container.setLookupRealm(null);
     Thread thread = Thread.currentThread();
     ClassLoader ccl = thread.getContextClassLoader();
