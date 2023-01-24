@@ -167,7 +167,8 @@
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
-								io.takari.*;provider=m2e;mandatory:=provider
+								io.takari.*;provider=m2e;mandatory:=provider,\
+								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
 							Import-Package: \
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.spi;version="[1.7.31,3.0.0)",\

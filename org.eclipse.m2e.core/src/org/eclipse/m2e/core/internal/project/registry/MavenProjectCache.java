@@ -40,6 +40,7 @@ import org.apache.maven.project.ProjectRealmCache;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
@@ -125,17 +126,19 @@ public class MavenProjectCache {
    */
   Set<File> flushMavenCaches(File pom, ArtifactKey key, boolean force) {
     Set<File> affected = new HashSet<>();
-    affected.addAll(flushMavenCache(ProjectRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(ExtensionRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(PluginRealmCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(MavenMetadataCache.class, pom, key, force));
-    affected.addAll(flushMavenCache(PluginArtifactsCache.class, pom, key, force));
+    IComponentLookup componentLookup = containerManager.getComponentLookup(pom);
+    affected.addAll(flushMavenCache(componentLookup, ProjectRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(componentLookup, ExtensionRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(componentLookup, PluginRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(componentLookup, MavenMetadataCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(componentLookup, PluginArtifactsCache.class, pom, key, force));
     return affected;
   }
 
-  private Set<File> flushMavenCache(Class<?> clazz, File pom, ArtifactKey key, boolean force) {
+  private Set<File> flushMavenCache(IComponentLookup componentLookup, Class<?> clazz, File pom, ArtifactKey key,
+      boolean force) {
     try {
-      Object lookup = containerManager.getComponentLookup(pom).lookup(clazz);
+      Object lookup = componentLookup.lookup(clazz);
       if(lookup instanceof IManagedCache cache) {
         return cache.removeProject(pom, key, force);
       }
