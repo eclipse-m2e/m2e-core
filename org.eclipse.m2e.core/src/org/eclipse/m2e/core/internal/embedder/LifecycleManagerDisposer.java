@@ -61,13 +61,7 @@ public class LifecycleManagerDisposer implements ClassWorldListener {
     lifecyclesMapField.setAccessible(true);
     Object lifecycles = lifecyclesMapField.get(manager);
     if(lifecycles instanceof Map<?, ?> map) {
-      for(Object key : map.keySet().toArray()) {
-        if(key instanceof Class<?> clazz) {
-          if(clazz.getClassLoader() == realm) {
-            map.remove(key);
-          }
-        }
-      }
+      map.keySet().removeIf(key -> key instanceof Class<?> clazz && clazz.getClassLoader() == realm);
     }
   }
 
