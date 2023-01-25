@@ -45,7 +45,6 @@ import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.junit.Test;
 
-@SuppressWarnings("restriction")
 public class M2EEditorTest extends AbstractMavenProjectTestCase {
 
 	@Test

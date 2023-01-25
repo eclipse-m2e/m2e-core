@@ -125,7 +125,6 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
      * @author mistria
      *
      */
-    @SuppressWarnings("restriction")
     public static class UpdateMavenConfigurationJob extends MavenJob
         implements org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue {
 

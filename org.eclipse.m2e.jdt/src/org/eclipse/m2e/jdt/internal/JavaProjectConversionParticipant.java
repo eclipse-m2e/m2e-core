@@ -448,7 +448,6 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
    * Returns the highest, non-snapshot plugin version between the given reference version and the versions found in the
    * Nexus indexes.
    */
-  @SuppressWarnings("restriction")
   //TODO extract as API when stabilized?
   private String getMostRecentPluginVersion(String groupId, String artifactId, String referenceVersion) {
     Assert.isNotNull(groupId, "groupId can not be null");

@@ -46,7 +46,6 @@ import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
-@SuppressWarnings("restriction")
 public class WorkspaceHelpers {
   public static String getModelId(MavenProject mavenProject) {
     return mavenProject.getGroupId() + ":" + mavenProject.getArtifactId() + ":" + mavenProject.getVersion();

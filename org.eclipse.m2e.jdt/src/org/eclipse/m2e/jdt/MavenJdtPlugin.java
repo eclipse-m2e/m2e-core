@@ -207,7 +207,6 @@ public class MavenJdtPlugin extends Plugin {
         .valueOf(preferencesService.get(PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION, PLUGIN_ID, preferencesLookup));
   }
 
-  @SuppressWarnings("restriction")
   private class WorkspaceSourceDownloadJob extends MavenJob
       implements org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue {
 

@@ -24,7 +24,7 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.jface.text
 Export-Package: org.eclipse.m2e.internal.discovery;x-internal:=true,
  org.eclipse.m2e.internal.discovery.handlers;x-internal:=true,
- org.eclipse.m2e.internal.discovery.markers;x-internal:=true,
+ org.eclipse.m2e.internal.discovery.markers;x-friends:="org.eclipse.m2e.editor",
  org.eclipse.m2e.internal.discovery.operation;x-internal:=true,
  org.eclipse.m2e.internal.discovery.preferences;x-internal:=true,
  org.eclipse.m2e.internal.discovery.startup;x-internal:=true,

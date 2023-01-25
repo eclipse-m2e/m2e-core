@@ -36,7 +36,6 @@ import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 
-@SuppressWarnings("restriction")
 public class JobHelpers {
 
   private static final int POLLING_DELAY = 10;
