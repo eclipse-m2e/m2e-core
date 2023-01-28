@@ -359,6 +359,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
         .setTransferListener(new ArtifactTransferListenerAdapter(monitor));
     final MavenProject origProject = mavenSession.getCurrentProject();
     final List<MavenProject> origProjects = mavenSession.getProjects();
+    final List<MavenProject> origAllProjects = mavenSession.getAllProjects();
     final ClassLoader origTCCL = Thread.currentThread().getContextClassLoader();
     try {
       if(project == null && projectSupplier != null) {
@@ -366,7 +367,9 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       }
       if(project != null) {
         mavenSession.setCurrentProject(project);
-        mavenSession.setProjects(Collections.singletonList(project));
+        List<MavenProject> projects = Collections.singletonList(project);
+        mavenSession.setProjects(projects);
+        mavenSession.setAllProjects(projects);
       }
       return callable.call(this, IProgressMonitor.nullSafe(monitor));
     } finally {
@@ -375,6 +378,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       if(project != null) {
         mavenSession.setCurrentProject(origProject);
         mavenSession.setProjects(origProjects != null ? origProjects : Collections.<MavenProject> emptyList());
+        mavenSession.setAllProjects(origAllProjects != null ? origAllProjects : Collections.<MavenProject> emptyList());
       }
     }
   }
