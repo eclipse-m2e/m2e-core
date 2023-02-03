@@ -84,7 +84,7 @@ public class DependencyTable {
 	}
 
 	private void createTable(Composite parent) {
-		viewer = new TableViewer(parent);
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		viewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		viewer.getTable().setHeaderVisible(true);
