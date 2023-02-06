@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.AssertionFailedException;
@@ -91,11 +93,10 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 
 		assertTrue("Annotation processing is disabled for " + p, AptConfig.isEnabled(javaProject));
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
-		assertTrue(annotationsFolder + " was not generated", annotationsFolder.exists());
-
+		waitForGeneratedResource(annotationsFolder);
 		if (expectedTestOutputFolder != null && expectTestAttribute) {
 			IFolder testAnnotationsFolder = p.getFolder(expectedTestOutputFolder);
-			assertTrue(testAnnotationsFolder + " was not generated", testAnnotationsFolder.exists());
+			waitForGeneratedResource(testAnnotationsFolder);
 		}
 
 		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
@@ -103,12 +104,12 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		assertFactoryContainerContains(factoryPath, "hibernate-jpa-2.0-api:1.0.0.Final");
 
 		IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
-		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		waitForGeneratedResource(generatedFile);
 
 		if (expectedTestOutputFolder != null) {
 			IFile generatedTestFile = p.getFile((expectTestAttribute ? expectedTestOutputFolder : expectedOutputFolder)
 					+ "/foo/bar/TestDummy_.java");
-			assertTrue(generatedTestFile + " was not generated", generatedTestFile.exists());
+			waitForGeneratedResource(generatedTestFile);
 
 			boolean testAttributeFound = false;
 			entryLoop: for (IClasspathEntry entry : javaProject.getRawClasspath()) {
@@ -127,6 +128,21 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		}
 
 		assertNoErrors(p);
+	}
+
+	private void waitForGeneratedResource(IResource resource) {
+		long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+		while (System.currentTimeMillis() < deadline) {
+			if (resource.exists()) {
+				return;
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(100);
+			} catch (InterruptedException e) {
+				break;
+			}
+		}
+		assertTrue(resource + " was not generated", resource.exists());
 	}
 
 	protected void updateProject(IProject project) throws Exception {

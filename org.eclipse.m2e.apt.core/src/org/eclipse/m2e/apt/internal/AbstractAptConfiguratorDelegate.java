@@ -20,14 +20,13 @@ import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.filterToResolvedJa
 import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.getProjectArtifacts;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +75,6 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
-
-  private static Method setGenTestSrcDirMethod = null;
-  static {
-    try {
-      setGenTestSrcDirMethod = AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
-    } catch(NoSuchMethodException | SecurityException ex) {
-      // ignore
-    }
-  }
 
   protected IMavenProjectFacade mavenFacade;
 
@@ -162,26 +152,19 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     LOG.debug("Enabling APT support on {}", eclipseProject.getName());
     if(generatedSourcesDirectory != null) {
       // Configure APT output path
-      File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
-      String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
+      String generatedSourcesRelativeDirectoryPath = getGenSrcDir(eclipseProject, generatedSourcesDirectory);
+      //these sync on the workspace so execute it in a separate thread to prevent deadlocks
+      ForkJoinPool.commonPool()
+          .execute(() -> AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath));
 
-      if (File.separatorChar != '/') {
-        generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
-      }
-      AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
     }
-    if(generatedTestSourcesDirectory != null && setGenTestSrcDirMethod != null) {
+    if(generatedTestSourcesDirectory != null) {
       // Configure APT output path
-      File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
+      String generatedTestSourcesRelativeDirectoryPath = getGenSrcTestDir(eclipseProject,
           generatedTestSourcesDirectory);
-      String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
-      if (File.separatorChar != '/') {
-        generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
-      }
-      try {
-        setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
-      } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-      }
+      //these sync on the workspace so execute it in a separate thread to prevent deadlocks
+      ForkJoinPool.commonPool()
+          .execute(() -> AptConfig.setGenTestSrcDir(javaProject, generatedTestSourcesRelativeDirectoryPath));
     }
 
     /* 
@@ -232,6 +215,26 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     // Apply that IFactoryPath to the project
     AptConfig.setFactoryPath(javaProject, factoryPath);
+  }
+
+  private String getGenSrcTestDir(IProject eclipseProject, File generatedTestSourcesDirectory) {
+    File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
+        generatedTestSourcesDirectory);
+    String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
+    if (File.separatorChar != '/') {
+      generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
+    }
+    return generatedTestSourcesRelativeDirectoryPath;
+  }
+
+  private String getGenSrcDir(IProject eclipseProject, File generatedSourcesDirectory) {
+    File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
+    String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
+
+    if (File.separatorChar != '/') {
+      generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
+    }
+    return generatedSourcesRelativeDirectoryPath;
   }
 
   private List<File> getJars(List<File> files) {
@@ -306,7 +309,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
             includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
-        if(isTest && setGenTestSrcDirMethod != null) {
+        if(isTest) {
           for(IClasspathEntry classpathEntry : classpath.getEntries()) {
             // test source folder should be found with test attribute, unless the property m2e.disableTestClasspathFlag is in effect.
             // (don't directly check for the property because only newer m2e versions handle it) 
