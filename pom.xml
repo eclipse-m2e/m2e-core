@@ -78,9 +78,6 @@
 		<module>org.eclipse.m2e.pde.feature</module>
 		<module>org.eclipse.m2e.repository</module>
 
-		<!-- products -->
-		<module>products</module>
-
 		<!-- testing -->
 		<module>org.eclipse.m2e.core.tests</module>
 		<module>org.eclipse.m2e.core.ui.tests</module>
@@ -91,6 +88,9 @@
 		<module>org.eclipse.m2e.profiles.core.tests</module>
 		<module>org.eclipse.m2e.apt.tests</module>
 		<module>org.eclipse.m2e.pde.connector.tests</module>
+		
+		<!-- products -->
+		<module>products</module>
 	</modules>
 
 	<dependencies>
