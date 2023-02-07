@@ -56,6 +56,7 @@ public class ImportMavenProjectsJob extends MavenWorkspaceJob {
     this.projects = projects;
     this.workingSets = workingSets;
     this.importConfiguration = importConfiguration;
+    setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
 
   @Override

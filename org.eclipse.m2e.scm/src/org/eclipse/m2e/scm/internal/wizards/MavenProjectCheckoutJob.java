@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -211,12 +210,7 @@ public abstract class MavenProjectCheckoutJob extends MavenWorkspaceJob {
 
       if(checkoutAllProjects) {
         WorkspaceJob job = new ImportMavenProjectsJob(projects, workingSets, configuration);
-
-        ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRuleFactory()
-            .modifyRule(ResourcesPlugin.getWorkspace().getRoot());
-        job.setRule(rule);
         job.schedule();
-
       } else {
         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
           MavenImportWizard wizard = new MavenImportWizard(configuration, collectedLocations);

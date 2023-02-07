@@ -20,8 +20,6 @@ import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.filterToResolvedJa
 import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.getProjectArtifacts;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -76,15 +74,6 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
-
-  private static Method setGenTestSrcDirMethod = null;
-  static {
-    try {
-      setGenTestSrcDirMethod = AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
-    } catch(NoSuchMethodException | SecurityException ex) {
-      // ignore
-    }
-  }
 
   protected IMavenProjectFacade mavenFacade;
 
@@ -170,7 +159,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       }
       AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
     }
-    if(generatedTestSourcesDirectory != null && setGenTestSrcDirMethod != null) {
+    if(generatedTestSourcesDirectory != null) {
       // Configure APT output path
       File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
           generatedTestSourcesDirectory);
@@ -178,10 +167,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       if (File.separatorChar != '/') {
         generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
       }
-      try {
-        setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
-      } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-      }
+      AptConfig.setGenTestSrcDir(javaProject, generatedTestSourcesRelativeDirectoryPath);
     }
 
     /* 
@@ -306,7 +292,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
             includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
-        if(isTest && setGenTestSrcDirMethod != null) {
+        if(isTest) {
           for(IClasspathEntry classpathEntry : classpath.getEntries()) {
             // test source folder should be found with test attribute, unless the property m2e.disableTestClasspathFlag is in effect.
             // (don't directly check for the property because only newer m2e versions handle it) 

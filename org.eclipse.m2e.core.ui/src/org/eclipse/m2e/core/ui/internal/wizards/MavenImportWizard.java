@@ -25,7 +25,6 @@ import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -125,7 +124,6 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     ImportMavenProjectsJob job = new ImportMavenProjectsJob(projects, workingSets, importConfiguration);
-    job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
     job.schedule();
 
     return true;
