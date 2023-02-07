@@ -140,7 +140,18 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     // Inspect the dependencies to see if any contain APT processors
     boolean isAnnotationProcessingEnabled = configuration.isAnnotationProcessingEnabled()
         && containsAptProcessors(resolvedJarArtifacts);
-
+    //first set the output path to not create default folders for no use... 
+    if(isAnnotationProcessingEnabled) {
+      //due to https://github.com/eclipse-jdt/eclipse.jdt.core/issues/689 setting the folder preferences can hang forever if APT is enabled, so disable it temporarily
+      AptConfig.setEnabled(javaProject, false);
+      if(generatedSourcesDirectory != null) {
+        // Configure APT output path
+        AptConfig.setGenSrcDir(javaProject, getOutputPath(eclipseProject, generatedSourcesDirectory));
+      }
+      if(generatedTestSourcesDirectory != null) {
+        AptConfig.setGenTestSrcDir(javaProject, getOutputPath(eclipseProject, generatedTestSourcesDirectory));
+      }
+    }
     // Enable/Disable APT (depends on whether APT processors were found)
     AptConfig.setEnabled(javaProject, isAnnotationProcessingEnabled);
 
@@ -149,26 +160,6 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       return;
     }
     LOG.debug("Enabling APT support on {}", eclipseProject.getName());
-    if(generatedSourcesDirectory != null) {
-      // Configure APT output path
-      File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
-      String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
-
-      if (File.separatorChar != '/') {
-        generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
-      }
-      AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
-    }
-    if(generatedTestSourcesDirectory != null) {
-      // Configure APT output path
-      File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject,
-          generatedTestSourcesDirectory);
-      String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
-      if (File.separatorChar != '/') {
-        generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
-      }
-      AptConfig.setGenTestSrcDir(javaProject, generatedTestSourcesRelativeDirectoryPath);
-    }
 
     /* 
      * Add all of the compile-scoped JAR artifacts to a new IFactoryPath (in 
@@ -218,6 +209,16 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     // Apply that IFactoryPath to the project
     AptConfig.setFactoryPath(javaProject, factoryPath);
+  }
+
+  private String getOutputPath(IProject eclipseProject, File dir) {
+    File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, dir);
+    String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
+
+    if (File.separatorChar != '/') {
+      generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectoryPath.replace(File.separatorChar, '/');
+    }
+    return generatedSourcesRelativeDirectoryPath;
   }
 
   private List<File> getJars(List<File> files) {
