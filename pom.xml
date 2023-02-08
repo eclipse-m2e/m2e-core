@@ -90,10 +90,10 @@
 		<module>org.eclipse.m2e.profiles.core.tests</module>
 		<module>org.eclipse.m2e.apt.tests</module>
 		<module>org.eclipse.m2e.pde.connector.tests</module>
-		
+
 		<!-- products -->
 		<module>products</module>
-		
+
 		<!-- UI/Integration tests -->
 		<module>org.eclipse.m2e.rcptt.tests</module>
 	</modules>
@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>3.8.701-SNAPSHOT</version>
+			<version>3.9.100-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
