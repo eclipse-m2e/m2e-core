@@ -19,19 +19,19 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.8.701-SNAPSHOT</version>
+	<version>3.9.100-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.8.7</maven-core.version>
+		<maven-core.version>3.9.1</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-		<maven-resolver.version>1.6.3</maven-resolver.version>
+		<maven-resolver.version>1.9.7</maven-resolver.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
@@ -51,10 +51,6 @@
 				<exclusion>
 					<groupId>org.checkerframework</groupId>
 					<artifactId>checker-compat-qual</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>aopalliance</groupId>
-					<artifactId>aopalliance</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -156,8 +152,8 @@
 					<configuration>
 						<bnd><![CDATA[
 							# When launching a Maven build using this embedded runtime, we want the embedded SLF4J logger binding to be used.
-							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding 
-							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible 
+							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding
+							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible
 							# for OSGi, by simply NOT placing the binding's jar on the Bundle-ClassPath.
 							slf4jBinding=maven-slf4j-provider-${maven-core.version}.jar
 							M2E-SLF4JBinding=jars/${slf4jBinding}
@@ -185,7 +181,7 @@
 							Require-Bundle: \
 								com.google.guava
 						]]></bnd>
-						<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched 
+						<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched
 							Maven-Build-JVM. See MavenEmbeddedRuntime for details. -->
 					</configuration>
 				</plugin>

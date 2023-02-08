@@ -11,7 +11,6 @@
 package org.eclipse.m2e.mavenarchiver.internal;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -466,7 +465,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	}
 
 	private void writeManifest(File manifestFile, Object manifest) throws UnsupportedEncodingException,
-			FileNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 		Method write = getWriteMethod(manifest);
 		if (write != null) {
 			try (PrintWriter printWriter = new PrintWriter(

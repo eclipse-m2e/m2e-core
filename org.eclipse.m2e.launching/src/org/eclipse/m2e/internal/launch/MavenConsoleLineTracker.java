@@ -15,6 +15,7 @@
 package org.eclipse.m2e.internal.launch;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -109,7 +110,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private ProjectReference mavenProject;
 
-  private final Deque<IRegion> projectDefinitionLines = new ArrayDeque<>(2);
+  private final Deque<IRegion> projectDefinitionLines = new ArrayDeque<>(3);
 
   private final List<int[]> removedLineLocations = new ArrayList<>();
 
@@ -190,42 +191,47 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
   private static final int VERSION = 1;
 
+  private static final Pattern FROM_FILE_LINE = Pattern.compile("^\\[INFO\\] +from ");
+
   private static final Pattern PACKAGING_TYPE_LINE = Pattern.compile("^\\[INFO\\] -+\\[ [\\w\\-\\. ]+ \\]-+$");
 
   private String getText(IRegion lineRegion) throws BadLocationException {
     removedLineLocations.clear();
     String line0 = getLineText(lineRegion, removedLineLocations);
 
-    if(projectDefinitionLines.size() < 2) {
+    if(projectDefinitionLines.size() < 3) {
       projectDefinitionLines.add(lineRegion);
       return line0;
     }
     // Read groupId, artifactId and version from a sequence like the following lines:
     // [INFO] -----------< org.eclipse.m2e:org.eclipse.m2e.maven.runtime >------------
     // [INFO] Building M2E Embedded Maven Runtime (includes Incubating components) 1.18.2-SNAPSHOT [4/5]
+    // [INFO]   from pom.xml
     // [INFO] ---------------------------[ eclipse-plugin ]---------------------------
 
     if(PACKAGING_TYPE_LINE.matcher(line0).matches()) {
       Iterator<IRegion> previousLines = projectDefinitionLines.descendingIterator();
 
-      IRegion line1Region = previousLines.next();
-      String line1 = getLineText(line1Region, null);
+      String line1 = getLineText(previousLines.next(), null);
+      if(FROM_FILE_LINE.matcher(line1).find()) {
 
-      Matcher vMatcher = VERSION_LINE.matcher(line1);
-      if(vMatcher.matches()) {
-        String version = vMatcher.group(VERSION);
+        String line2 = getLineText(previousLines.next(), null);
+        Matcher vMatcher = VERSION_LINE.matcher(line2);
+        if(vMatcher.matches()) {
+          String version = vMatcher.group(VERSION);
 
-        IRegion line2Region = previousLines.next();
-        List<int[]> removedLine2Locations = new ArrayList<>();
-        String line2 = getLineText(line2Region, removedLine2Locations);
-        Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line2);
-        if(gaMatcher.matches()) {
-          String groupId = gaMatcher.group(GROUP_ID);
-          String artifactId = gaMatcher.group(ARTIFACT_ID);
+          IRegion line3Region = previousLines.next();
+          List<int[]> removedLine3Locations = new ArrayList<>();
+          String line3 = getLineText(line3Region, removedLine3Locations);
+          Matcher gaMatcher = GROUP_ARTIFACT_LINE.matcher(line3);
+          if(gaMatcher.matches()) {
+            String groupId = gaMatcher.group(GROUP_ID);
+            String artifactId = gaMatcher.group(ARTIFACT_ID);
 
-          mavenProject = getProject(groupId, artifactId, version);
-          if(mavenProject != null) {
-            addProjectLink(line2Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine2Locations);
+            mavenProject = getProject(groupId, artifactId, version);
+            if(mavenProject != null) {
+              addProjectLink(line3Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine3Locations);
+            }
           }
         }
       }
@@ -265,9 +271,9 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     if(buildProject == null) {
       return null;
     }
-    Optional<IProject> project = Arrays
-        .stream(
-            ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(buildProject.projectBasedir.toUri()))
+    IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+    URI basedirURI = buildProject.projectBasedir.toUri();
+    Optional<IProject> project = Arrays.stream(wsRoot.findContainersForLocationURI(basedirURI))
         .filter(IProject.class::isInstance).map(IProject.class::cast).findFirst();
     //if project is absent, the project build in Maven is not in the workspace
     return project.isPresent() ? new ProjectReference(project.get(), buildProject) : null;

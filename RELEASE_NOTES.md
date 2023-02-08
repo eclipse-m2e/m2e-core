@@ -1,5 +1,13 @@
 # Eclipse m2e - Release notes
 
+## 2.3.0
+
+* 📅 Release Date: _expected_ May 2023
+
+### Embedded and use Maven 3.9.1
+
+Updated the embedded Maven from version 3.8.7 to 3.9.1; [Maven 3.9.1 Release Notes](https://maven.apache.org/docs/3.9.1/release-notes.html).
+
 ## 2.2.1
 
 * 📅 Release Date: 7th March 2023
@@ -21,7 +29,7 @@ Previously, to participate in the incremental maven build it was necessary to
 This often leads to a poor user experience and we think that users are adding mojos on purpose because they perform valuable tasks.
 
 Because of this, M2E now automatically enables the execution of mojos if there is no mapping configured. In case you want to change this there is a new configuration option to control the behavior:
-![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png) 
+![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png)
 
 ### Updated Dependency Editor
 
@@ -41,7 +49,7 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/skipping-tests.
 
 ### Configuration of Maven Execution JRE
 
-In the past, the project's build JRE was also used by default to execute Maven itself. 
+In the past, the project's build JRE was also used by default to execute Maven itself.
 Now the default Java version for executing Maven is determined from the configuration of the `maven-enforcer-plugin` rule [`requireJavaVersion`](https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html) when creating or updating the Maven configuration. This value is no longer considered for configuring the project's build JRE.
 In case this plugin configuration is not found, M2E falls back to either the project's build JRE or the workspace's default JRE.
 
@@ -70,7 +78,7 @@ The connector for the `bnd-maven-plugin` and `maven-bundle-plugin`, which is inc
 
 The M2E Maven-Console now also supports tracking of so called _polyglot_ Maven-projects. Those are projects that don't have a standard `pom.xml` and whose Maven-model is instead created from another source. One prominent example in the Eclipse world are Eclipse-PDE projects that are build with Tycho(-pomless).
 
-Due to this new support, polyglot Maven projects now also benefit from the 
+Due to this new support, polyglot Maven projects now also benefit from the
 [Improved links to JUnit test-reports and project file in the Console](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#improved-links-to-junit-test-reports-and-project-pomxml-in-the-console-of-a-maven-build)
 as well as the capability to
 [Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#automatically-launch-and-attach-remote-application-debugger-when-maven-plug-in-starts-a-forked-jvm-that-waits-for-a-debugger) introduced in previous releases.
