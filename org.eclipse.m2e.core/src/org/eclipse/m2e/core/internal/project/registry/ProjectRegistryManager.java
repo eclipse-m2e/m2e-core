@@ -92,9 +92,11 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
@@ -375,8 +377,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
       List<IFile> pomsForUpdate = calculateFacadesForUpdate(newState, context, allProcessedPoms::add,
-          allNewFacades::contains,
-          monitor);
+          allNewFacades::contains, monitor);
       Map<IFile, MavenProjectFacade> newFacades = readMavenProjectFacades(pomsForUpdate, newState, monitor);
       for(Entry<IFile, MavenProjectFacade> entry : newFacades.entrySet()) {
         IFile pom = entry.getKey();
@@ -716,13 +717,17 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private Map<IFile, MavenProjectFacade> readMavenProjectFacades(Collection<IFile> poms, MutableProjectRegistry state,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor)/* throws CoreException */ {
     if(poms.isEmpty()) {
       return Collections.emptyMap();
     }
     SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
     for(IFile pom : poms) {
-      markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
+      try {
+        markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
+      } catch(CoreException ex) {
+        // not good but also not too bad..
+      }
     }
 
     Map<IFile, IProjectConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
@@ -741,38 +746,42 @@ public class ProjectRegistryManager implements ISaveParticipant {
       MavenExecutionContext context = new MavenExecutionContext(
           containerManager.getComponentLookup(moduleProjectDirectory), moduleProjectDirectory, moduleProjectDirectory,
           null);
-      configureExecutionRequest(context.getExecutionRequest(), state,
-          fileList.size() == 1 ? fileList.iterator().next() : null, resolverConfiguration);
-      context.execute((ctx, mon) -> {
-        Map<IFile, File> pomFiles = fileList.stream().filter(IFile::isAccessible)
-            .collect(Collectors.toMap(Function.identity(), ProjectRegistryManager::toJavaIoFile));
-        Map<File, MavenExecutionResult> mavenResults = IMavenToolbox.of(ctx).readMavenProjects(pomFiles.values(),
-            ctx.newProjectBuildingRequest());
-        Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
-        Map<MavenProject, MavenProjectFacade> facadeMap = new HashMap<>();
-        for(var fileEntry : pomFiles.entrySet()) {
-          IFile pom = fileEntry.getKey();
-          File file = fileEntry.getValue();
-          if(!pom.isAccessible()) {
-            continue;
+      try {
+        configureExecutionRequest(context.getExecutionRequest(), state,
+            fileList.size() == 1 ? fileList.iterator().next() : null, resolverConfiguration);
+        context.execute((ctx, mon) -> {
+          Map<IFile, File> pomFiles = fileList.stream().filter(IFile::isAccessible)
+              .collect(Collectors.toMap(Function.identity(), ProjectRegistryManager::toJavaIoFile));
+          Map<File, MavenExecutionResult> mavenResults = IMavenToolbox.of(ctx).readMavenProjects(pomFiles.values(),
+              ctx.newProjectBuildingRequest());
+          Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
+          Map<MavenProject, MavenProjectFacade> facadeMap = new HashMap<>();
+          for(var fileEntry : pomFiles.entrySet()) {
+            IFile pom = fileEntry.getKey();
+            File file = fileEntry.getValue();
+            if(!pom.isAccessible()) {
+              continue;
+            }
+            MavenExecutionResult mavenResult = mavenResults.get(file);
+            MavenProject mavenProject = mavenResult.getProject();
+            MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
+            markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
+            if(mavenProject != null && mavenProject.getArtifact() != null) {
+              MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
+                  mavenProject, resolverConfiguration);
+              putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
+              facadeMap.put(mavenProject, mavenProjectFacade);
+            }
           }
-          MavenExecutionResult mavenResult = mavenResults.get(file);
-          MavenProject mavenProject = mavenResult.getProject();
-          MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
-          markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
-          if(mavenProject != null && mavenProject.getArtifact() != null) {
-            MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
-                mavenProject, resolverConfiguration);
-            putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
-            facadeMap.put(mavenProject, mavenProjectFacade);
+          for(var mp : getSortedProjects(facadeMap.keySet())) {
+            MavenProjectFacade facade = facadeMap.get(mp);
+            result.put(facade.getPom(), facade);
           }
-        }
-        for(var mp : getSortedProjects(facadeMap.keySet())) {
-          MavenProjectFacade facade = facadeMap.get(mp);
-          result.put(facade.getPom(), facade);
-        }
-        return facades;
-      }, subMonitor.split(1));
+          return facades;
+        }, subMonitor.split(1));
+      } catch(CoreException e) {
+        MavenPluginActivator.getDefault().getLog().error("Can't update project configuration!", e);
+      }
     }
     return result;
   }
@@ -933,6 +942,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
       userProperties.putAll(addProperties);
     }
+    userProperties.putAll(resolverConfiguration.getUserProperties());
 
     // eclipse workspace repository implements both workspace dependency resolution
     // and inter-module dependency resolution for multi-module projects.
@@ -941,7 +951,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
     if(pom != null && pom.getLocation() != null) {
       request.setMultiModuleProjectDirectory(
-          PlexusContainerManager.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
+          MavenProperties.computeMultiModuleProjectDirectory(pom.getLocation().toFile()));
     }
 
     return request;

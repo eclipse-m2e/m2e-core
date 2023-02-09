@@ -188,26 +188,29 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
   };
 
   @Override
-  protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor)
-      throws CoreException {
+  protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor) {
     log.debug("Building project {}", getProject().getName()); //$NON-NLS-1$
     final long start = System.currentTimeMillis();
     try {
-      return methodBuild.execute(kind, args, monitor);
-    } finally {
+      IProject[] projects = methodBuild.execute(kind, args, monitor);
       log.debug("Built project {} in {} ms", getProject().getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
+      return projects;
+    } catch(CoreException | RuntimeException ex) {
+      MavenPluginActivator.getDefault().getLog().error("Can't build project " + getProject().getName(), ex);
+      return null;
     }
   }
 
   @Override
-  protected void clean(final IProgressMonitor monitor) throws CoreException {
+  protected void clean(final IProgressMonitor monitor) {
     log.debug("Cleaning project {}", getProject().getName()); //$NON-NLS-1$
     final long start = System.currentTimeMillis();
 
     try {
       methodClean.execute(CLEAN_BUILD, Collections.emptyMap(), monitor);
-    } finally {
       log.debug("Cleaned project {} in {} ms", getProject().getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
+    } catch(CoreException ex) {
+      MavenPluginActivator.getDefault().getLog().error("Cleaning project " + getProject().getName() + " failed", ex);
     }
   }
 

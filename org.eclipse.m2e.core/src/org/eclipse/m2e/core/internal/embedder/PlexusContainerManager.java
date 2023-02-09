@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,11 +35,12 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.cli.CommandLine;
+
 import com.google.inject.AbstractModule;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -164,7 +166,7 @@ public class PlexusContainerManager {
   }
 
   public IMavenPlexusContainer aquire(File basedir) throws Exception {
-    File directory = computeMultiModuleProjectDirectory(basedir);
+    File directory = MavenProperties.computeMultiModuleProjectDirectory(basedir);
     if(directory == null) {
       return aquire();
     }
@@ -177,13 +179,14 @@ public class PlexusContainerManager {
           plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration);
           containerMap.put(canonicalDirectory, plexusContainer);
         } catch(ExtensionResolutionException e) {
-          //TODO should we fail or should we return the standard container then and for example create an error marker on the project?
+          //TODO how can we create an error marker on the extension file?
           CoreExtension extension = e.getExtension();
+          File file = new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME);
           throw new PlexusContainerException(
               "can't create plexus container for basedir = " + basedir.getAbsolutePath() + " because the extension "
                   + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion()
                   + " can't be loaded (defined in "
-                  + new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME).getAbsolutePath() + ").",
+                  + file.getAbsolutePath() + ").",
               e);
         }
       }
@@ -347,6 +350,9 @@ public class PlexusContainerManager {
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
+      CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+      Properties userProperties = request.getUserProperties();
+      MavenProperties.getCliProperties(commandLine, userProperties::setProperty);
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
       return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
     } finally {
@@ -441,26 +447,6 @@ public class PlexusContainerManager {
           : new CoreException(Status.error("container creation failed", exception));
     }
 
-  }
-
-  /**
-   * @param file a base file or directory, may be <code>null</code>
-   * @return the value for `maven.multiModuleProjectDirectory` as defined in Maven launcher
-   */
-  public static File computeMultiModuleProjectDirectory(File file) {
-    if(file == null) {
-      return null;
-    }
-    final File basedir = file.isDirectory() ? file : file.getParentFile();
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    File workspaceRoot = workspace.getRoot().getLocation().toFile();
-
-    for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
-      if(new File(root, IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
-        return root;
-      }
-    }
-    return null;
   }
 
   public static IComponentLookup wrap(PlexusContainer container) {

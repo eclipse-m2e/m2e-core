@@ -57,6 +57,7 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -135,7 +136,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     // but https://github.com/eclipse-m2e/m2e-core/issues/904 will add support for a user to specify a custom root directory
     // and then we should really inherit this from the configuration!
     this.resolverConfiguration = new MavenProjectConfiguration(resolverConfiguration,
-        PlexusContainerManager.computeMultiModuleProjectDirectory(pomFile));
+        MavenProperties.computeMultiModuleProjectDirectory(pomFile));
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();
@@ -649,6 +650,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private final String profiles;
 
+    private final Map<String, String> userProperties;
+
     public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
@@ -657,6 +660,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.multiModuleProjectDirectory = multiModuleProjectDirectory;
       this.mappingId = baseConfiguration.getLifecycleMappingId();
       this.properties = Map.copyOf(baseConfiguration.getConfigurationProperties());
+      this.userProperties = Map.copyOf(baseConfiguration.getUserProperties());
       this.resolveWorkspace = baseConfiguration.isResolveWorkspaceProjects();
       this.profiles = baseConfiguration.getSelectedProfiles();
     }
@@ -664,6 +668,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     @Override
     public Map<String, String> getConfigurationProperties() {
       return properties;
+    }
+
+    @Override
+    public Map<String, String> getUserProperties() {
+      return userProperties;
     }
 
     @Override
@@ -688,7 +697,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     @Override
     public int hashCode() {
-      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace);
+      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace,
+          userProperties);
     }
 
     @Override
@@ -706,6 +716,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       return Objects.equals(this.mappingId, other.mappingId)
           && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory)
           && Objects.equals(this.profiles, other.profiles) && Objects.equals(this.properties, other.properties)
+          && Objects.equals(this.userProperties, other.userProperties)
           && this.resolveWorkspace == other.resolveWorkspace;
     }
 

@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -67,7 +68,7 @@ public class ResolverConfigurationIO {
 
   private static final String P_PROPERTIES = "properties";
 
-  private static final String P_BASEDIR = "basedir";
+  private static final String P_MULTI_MODULE_PROJECT_DIRECTORY = "multimoduleprojectdirectory";
 
   private static final String PROPERTIES_KV_SEPARATOR = ">";
 
@@ -95,13 +96,6 @@ public class ResolverConfigurationIO {
       } else {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
       }
-      File directory = configuration.getMultiModuleProjectDirectory();
-      if(directory != null) {
-        projectNode.put(P_BASEDIR, directory.getAbsolutePath());
-      } else {
-        projectNode.remove(P_BASEDIR);
-      }
-
       if(configuration.getConfigurationProperties() != null && !configuration.getConfigurationProperties().isEmpty()) {
         projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getConfigurationProperties()));
       } else {
@@ -122,11 +116,12 @@ public class ResolverConfigurationIO {
   public static IProjectConfiguration readResolverConfiguration(IProject project) {
     IScopeContext projectScope = new ProjectScope(project);
     IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
-    ResolverConfiguration configuration = new ResolverConfiguration(project);
     if(projectNode == null) {
-      return configuration;
+      //use defaults...
+      return new ResolverConfiguration(project);
     }
-
+    //create an empty one, we will init it here...
+    ResolverConfiguration configuration = new ResolverConfiguration();
     String version = projectNode.get(P_VERSION, null);
     if(version == null) { // migrate from old config
       return configuration;
@@ -135,12 +130,16 @@ public class ResolverConfigurationIO {
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
     configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
-    String basedirSetting = projectNode.get(P_BASEDIR, null);
-    if(basedirSetting != null) {
-      File directory = new File(basedirSetting);
+    String multiModuleProjectDirectoryUserSetting = projectNode.get(P_MULTI_MODULE_PROJECT_DIRECTORY, null);
+    if(multiModuleProjectDirectoryUserSetting != null) {
+      //this is explicitly configured in the preferences, so use this one
+      File directory = new File(multiModuleProjectDirectoryUserSetting);
       if(directory.isDirectory()) {
         configuration.setMultiModuleProjectDirectory(directory);
       }
+    } else {
+      //compute it dynamically
+      configuration.setMultiModuleProjectDirectory(MavenProperties.computeMultiModuleProjectDirectory(project));
     }
     return configuration;
   }

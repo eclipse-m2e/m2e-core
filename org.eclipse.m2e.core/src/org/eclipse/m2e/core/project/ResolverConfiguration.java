@@ -15,17 +15,23 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
+
 import org.eclipse.core.resources.IProject;
 
-import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 
 
 /**
@@ -45,14 +51,15 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private Properties properties;
 
+  private Map<String, String> userProperties;
+
   private File multiModuleProjectDirectory;
 
   public ResolverConfiguration() {
   }
 
   public ResolverConfiguration(IProject project) {
-    setMultiModuleProjectDirectory(
-        PlexusContainerManager.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
+    setMultiModuleProjectDirectory(MavenProperties.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
   }
 
   /**
@@ -91,6 +98,14 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return Collections.unmodifiableMap(map);
   }
 
+  @Override
+  public Map<String, String> getUserProperties() {
+    if(userProperties == null) {
+      return Collections.emptyMap();
+    }
+    return userProperties;
+  }
+
   public void setProperties(Properties properties) {
     this.properties = properties;
   }
@@ -123,7 +138,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   public void setSelectedProfiles(String profiles) {
     this.selectedProfiles = profiles;
   }
-
 
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IProjectConfiguration#getLifecycleMappingId()
@@ -158,13 +172,15 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return this.resolveWorkspaceProjects == other.resolveWorkspaceProjects
         && Objects.equals(this.selectedProfiles, other.selectedProfiles)
         && Objects.equals(this.lifecycleMappingId, other.lifecycleMappingId)
-        && Objects.equals(this.properties, other.properties)
+        && Objects.equals(this.getProperties(), other.getProperties())
+        && Objects.equals(this.getUserProperties(), other.getUserProperties())
         && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, properties,
+    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, getProperties(),
+        getUserProperties(),
         multiModuleProjectDirectory);
   }
 
@@ -180,6 +196,18 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
    * @param multiModuleProjectDirectory The multiModuleProjectDirectory to set.
    */
   public void setMultiModuleProjectDirectory(File multiModuleProjectDirectory) {
-    this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+    if(!Objects.equals(this.multiModuleProjectDirectory, multiModuleProjectDirectory)) {
+      this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+      try {
+        CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+        Map<String, String> props = new LinkedHashMap<>();
+        MavenProperties.getCliProperties(commandLine, props::put);
+        userProperties = Collections.unmodifiableMap(props);
+      } catch(IOException | ParseException ex) {
+        //can't use it then... :-(
+        MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,
+            ex);
+      }
+    }
   }
 }

@@ -26,7 +26,21 @@ import java.util.Map;
  */
 public interface IProjectConfiguration {
 
+  /**
+   * Additional properties of a project can be stored in the org.eclipse.m2e.core.prefs file under the key
+   * <code>properties</code>, will be handled as user-properties
+   * 
+   * @return return project configuration properties
+   */
   Map<String, String> getConfigurationProperties();
+
+  /**
+   * User properties are stored in the <code>.mvn/maven.config</code> file with <code>-Dkey=value</code>, they are
+   * therefore not persisted in the project configuration
+   * 
+   * @return the user properties
+   */
+  Map<String, String> getUserProperties();
 
   boolean isResolveWorkspaceProjects();
 

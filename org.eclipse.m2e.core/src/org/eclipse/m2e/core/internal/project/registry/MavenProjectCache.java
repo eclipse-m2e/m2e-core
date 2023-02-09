@@ -143,8 +143,7 @@ public class MavenProjectCache {
         return cache.removeProject(pom, key, force);
       }
     } catch(CoreException ex) {
-      // can't really happen
-      throw new AssertionError(ex);
+      // can't do anything then...
     }
     return Collections.emptySet();
   }
