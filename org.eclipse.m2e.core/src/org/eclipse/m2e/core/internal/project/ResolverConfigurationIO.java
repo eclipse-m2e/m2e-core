@@ -29,10 +29,12 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -67,7 +69,7 @@ public class ResolverConfigurationIO {
 
   private static final String P_PROPERTIES = "properties";
 
-  private static final String P_BASEDIR = "basedir";
+  private static final String P_MULTI_MODULE_PROJECT_DIRECTORY = "multimoduleprojectdirectory";
 
   private static final String PROPERTIES_KV_SEPARATOR = ">";
 
@@ -95,13 +97,6 @@ public class ResolverConfigurationIO {
       } else {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
       }
-      File directory = configuration.getMultiModuleProjectDirectory();
-      if(directory != null) {
-        projectNode.put(P_BASEDIR, directory.getAbsolutePath());
-      } else {
-        projectNode.remove(P_BASEDIR);
-      }
-
       if(configuration.getConfigurationProperties() != null && !configuration.getConfigurationProperties().isEmpty()) {
         projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getConfigurationProperties()));
       } else {
@@ -135,11 +130,19 @@ public class ResolverConfigurationIO {
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
     configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
-    String basedirSetting = projectNode.get(P_BASEDIR, null);
-    if(basedirSetting != null) {
-      File directory = new File(basedirSetting);
+    String multiModuleProjectDirectoryUserSetting = projectNode.get(P_MULTI_MODULE_PROJECT_DIRECTORY, null);
+    if(multiModuleProjectDirectoryUserSetting != null) {
+      //this is explicitly configured in the preferences, so use this one
+      File directory = new File(multiModuleProjectDirectoryUserSetting);
       if(directory.isDirectory()) {
         configuration.setMultiModuleProjectDirectory(directory);
+      }
+    } else {
+      //compute it dynamically
+      IPath location = project.getLocation();
+      if (location != null) {
+        configuration.setMultiModuleProjectDirectory(
+            PlexusContainerManager.computeMultiModuleProjectDirectory(location.toFile()));
       }
     }
     return configuration;
