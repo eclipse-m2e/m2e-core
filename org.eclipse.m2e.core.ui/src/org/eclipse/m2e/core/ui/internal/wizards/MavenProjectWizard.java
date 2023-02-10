@@ -264,7 +264,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
               NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage()));
         }
 
-        MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(job.getCreatedProjects());
+        MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(job.getCreatedProjects(), true);
         discoveryJob.schedule();
 
       }

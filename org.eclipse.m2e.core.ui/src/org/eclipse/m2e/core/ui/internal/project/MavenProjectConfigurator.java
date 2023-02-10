@@ -65,7 +65,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
 
         private CumulativeMappingDiscoveryJob() {
-            super(Collections.<IProject>emptyList());
+          super(Collections.<IProject> emptyList(), true);
             this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
         }
 

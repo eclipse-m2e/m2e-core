@@ -79,7 +79,7 @@ public class ImportMavenProjectsJob extends MavenWorkspaceJob {
     try {
       importOperation.run(monitor);
       List<IProject> createdProjects = importOperation.getCreatedProjects();
-      MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(createdProjects);
+      MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(createdProjects, true);
       discoveryJob.schedule();
     } catch(InvocationTargetException e) {
       return AbstractCreateMavenProjectsOperation.toStatus(e);
