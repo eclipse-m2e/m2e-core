@@ -241,7 +241,7 @@ public class LifecycleMappingPage extends WizardPage {
           for(IMavenDiscoveryProposal prop : all) {
             values.add(NLS.bind(Messages.LifecycleMappingPage_installDescription, prop.toString()));
           }
-          values.add(Messages.LifecycleMappingPage_resolveLaterDescription);
+          values.add(Messages.LifecycleMappingPage_useDefaultMapping);
 
           addIgnoreProposals(values, prov);
           ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(),
@@ -390,12 +390,7 @@ public class LifecycleMappingPage extends WizardPage {
       public String getColumnText(Object element, int columnIndex) {
         if(element instanceof ILifecycleMappingLabelProvider prov) {
           if(columnIndex == MAVEN_INFO_IDX) {
-            String text = prov.getMavenText();
-            if(prov instanceof AggregateMappingLabelProvider aggProv && !isHandled(prov)) {
-              text = NLS.bind(Messages.LifecycleMappingPage_errorMavenBuild,
-                  new String[] {text, String.valueOf(aggProv.getChildren().length)});
-            }
-            return text;
+            return prov.getMavenText();
           } else if(columnIndex == ACTION_INFO_IDX && element instanceof AggregateMappingLabelProvider) {
             IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
             if(ignore.contains(element)) {
@@ -409,7 +404,7 @@ public class LifecycleMappingPage extends WizardPage {
             } else if(loading || !prov.isError(mappingConfiguration)) {
               return EMPTY_STRING;
             } else {
-              return Messages.LifecycleMappingPage_resolveLaterDescription;
+              return Messages.LifecycleMappingPage_useDefaultMapping;
             }
           }
         }
@@ -423,7 +418,10 @@ public class LifecycleMappingPage extends WizardPage {
         }
         if(element instanceof AggregateMappingLabelProvider prov) {
           if(prov.isError(mappingConfiguration) && !isHandled(prov)) {
-            return MavenImages.IMG_ERROR;
+            //historically missing mappings where shows as ERROR (therefore the name isError)
+            //but now m2e execute missing mappings according on user request so this is more an info that
+            //it is handled automatic and the user can choose to change this
+            return MavenImages.IMG_INFO_AUTO;
           }
           return MavenImages.IMG_PASSED;
         }

@@ -129,7 +129,7 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_numErrors;
 
-  public static String LifecycleMappingPage_resolveLaterDescription;
+  public static String LifecycleMappingPage_useDefaultMapping;
 
   public static String LifecycleMappingPage_title;
 

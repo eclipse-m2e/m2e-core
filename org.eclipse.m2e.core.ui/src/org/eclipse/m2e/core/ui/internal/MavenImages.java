@@ -87,6 +87,8 @@ public class MavenImages {
 
   public static final Image IMG_PASSED = createImage("passed.png"); //$NON-NLS-1$
 
+  public static final Image IMG_INFO_AUTO = createImage("quick_fix_info_obj.png"); //$NON-NLS-1$
+
   public static final Image IMG_POM = POM.createImage();
 
   public static final Image IMG_ERROR = createImage("error_st_obj.png"); //$NON-NLS-1$
