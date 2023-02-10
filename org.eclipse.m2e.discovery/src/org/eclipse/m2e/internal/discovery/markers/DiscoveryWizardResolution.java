@@ -68,7 +68,7 @@ public class DiscoveryWizardResolution extends MavenProblemResolution {
   public void fix(IMarker[] markers, IDocument document, IProgressMonitor monitor) {
     Set<IProject> projects = Stream.of(markers).map(m -> m.getResource().getProject()).collect(Collectors.toSet());
 
-    MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(projects);
+    MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(projects, false);
     discoveryJob.schedule();
   }
 }
