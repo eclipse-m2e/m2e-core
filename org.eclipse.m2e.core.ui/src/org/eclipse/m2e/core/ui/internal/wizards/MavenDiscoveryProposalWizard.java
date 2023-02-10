@@ -35,13 +35,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -55,7 +51,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -114,7 +109,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
   @Override
   public boolean performFinish() {
-    if(lifecycleMappingPage != null && !lifecycleMappingPage.isMappingComplete() && !warnIncompleteMapping()) {
+    if(lifecycleMappingPage != null && !lifecycleMappingPage.isMappingComplete()) {
       return false;
     }
 
@@ -249,23 +244,4 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     return mappingDiscoveryRequest;
   }
 
-  private boolean skipIncompleteWarning() {
-    return M2EUIPluginActivator.getDefault().getPreferenceStore()
-        .getBoolean(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING);
-  }
-
-  private boolean warnIncompleteMapping() {
-    if(!skipIncompleteWarning()) {
-      MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.CONFIRM, getShell(),
-          Messages.MavenImportWizard_titleIncompleteMapping, Messages.MavenImportWizard_messageIncompleteMapping,
-          Messages.MavenImportWizard_hideWarningMessage, false, null, null, SWT.SHEET);
-      if(dialog.getReturnCode() == Window.OK) {
-        M2EUIPluginActivator.getDefault().getPreferenceStore()
-            .setValue(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING, dialog.getToggleState());
-        return true;
-      }
-      return false;
-    }
-    return true;
-  }
 }

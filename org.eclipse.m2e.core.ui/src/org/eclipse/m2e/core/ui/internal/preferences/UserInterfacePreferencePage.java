@@ -47,8 +47,5 @@ public class UserInterfacePreferencePage extends FieldEditorPreferencePage imple
     parent = getFieldEditorParent();
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, Messages.pomEditorDefaultPage,
         parent));
-
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING,
-        Messages.MavenPreferencePage_warnIncompleteMapping, getFieldEditorParent()));
   }
 }
