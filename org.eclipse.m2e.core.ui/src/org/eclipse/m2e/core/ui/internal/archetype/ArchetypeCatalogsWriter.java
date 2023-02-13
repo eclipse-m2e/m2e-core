@@ -45,7 +45,6 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
@@ -78,13 +77,13 @@ public class ArchetypeCatalogsWriter {
 
   public static final String ATT_CATALOG_ENABLED = "enabled";
 
-  public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is,
-      Map<String, ArchetypeCatalogFactory> existingCatalogs) throws IOException {
+  Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is,
+      Map<String, ArchetypeCatalogFactory> existingCatalogs, ArchetypePlugin plugin) throws IOException {
     Collection<ArchetypeCatalogFactory> catalogs = new ArrayList<>();
     try {
       SAXParserFactory parserFactory = SAXParserFactory.newInstance();
       SAXParser parser = parserFactory.newSAXParser();
-      parser.parse(is, new ArchetypeCatalogsContentHandler(catalogs, existingCatalogs));
+      parser.parse(is, new ArchetypeCatalogsContentHandler(catalogs, existingCatalogs, plugin));
     } catch(SAXException ex) {
       String msg = Messages.ArchetypeCatalogsWriter_error_parse;
       log.error(msg, ex);
@@ -159,9 +158,12 @@ public class ArchetypeCatalogsWriter {
 
     private final Map<String, ArchetypeCatalogFactory> existingCatalogs;
 
+    private ArchetypePlugin plugin;
+
     public ArchetypeCatalogsContentHandler(Collection<ArchetypeCatalogFactory> catalogs,
-        Map<String, ArchetypeCatalogFactory> existingCatalogs) {
+        Map<String, ArchetypeCatalogFactory> existingCatalogs, ArchetypePlugin plugin) {
       this.catalogs = catalogs;
+      this.plugin = plugin;
       this.existingCatalogs = existingCatalogs == null ? Collections.emptyMap() : existingCatalogs;
     }
 
@@ -175,14 +177,14 @@ public class ArchetypeCatalogsWriter {
           String path = attributes.getValue(ATT_CATALOG_LOCATION);
           if(path != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(M2EUIPluginActivator.getDefault().getArchetypePlugin().newLocalCatalogFactory(path,
+            catalogs.add(plugin.newLocalCatalogFactory(path,
                 description, true, enabled));
           }
         } else if(TYPE_REMOTE.equals(type)) {
           String url = attributes.getValue(ATT_CATALOG_LOCATION);
           if(url != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(M2EUIPluginActivator.getDefault().getArchetypePlugin().newRemoteCatalogFactory(url,
+            catalogs.add(plugin.newRemoteCatalogFactory(url,
                 description, true, enabled));
           }
         } else {
