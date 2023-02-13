@@ -24,8 +24,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -39,10 +38,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.BorderData;
+import org.eclipse.swt.layout.BorderLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
@@ -57,9 +59,9 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin;
 
 
 /**
@@ -67,7 +69,7 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
  *
  * @author Eugene Kuleshov
  */
-public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class MavenArchetypesPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
   ArchetypePlugin archetypeManager;
@@ -76,8 +78,9 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
 
   List<ArchetypeCatalogFactory> archetypeCatalogs;
 
+  private Button snapshotsBtn;
+
   public MavenArchetypesPreferencePage() {
-    super(GRID);
     setTitle(Messages.MavenArchetypesPreferencePage_title);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
     this.archetypeManager = M2EUIPluginActivator.getDefault().getArchetypePlugin();
@@ -121,6 +124,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       return false;
     }
 
+    getPreferenceStore().setValue(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, snapshotsBtn.getSelection());
     return super.performOk();
   }
 
@@ -129,16 +133,12 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
   }
 
   @Override
-  protected void createFieldEditors() {
-    Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
-    GridLayout gridLayout = new GridLayout(2, false);
-    gridLayout.marginWidth = 0;
-    gridLayout.marginHeight = 0;
-    composite.setLayout(gridLayout);
+  protected Control createContents(Composite parent) {
+    Composite composite = new Composite(parent, SWT.NONE);
+    composite.setLayout(new BorderLayout());
 
     Link addRemoveOrLink = new Link(composite, SWT.NONE);
-    GridData gd_addRemoveOrLink = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
-    addRemoveOrLink.setLayoutData(gd_addRemoveOrLink);
+    addRemoveOrLink.setLayoutData(new BorderData(SWT.TOP));
     addRemoveOrLink.setText(Messages.MavenArchetypesPreferencePage_link);
     addRemoveOrLink.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
       try {
@@ -159,6 +159,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     archetypesViewer.setContentProvider(new ArrayContentProvider());
 
     Table table = archetypesViewer.getTable();
+    table.setLayoutData(new BorderData(SWT.CENTER));
     table.setLinesVisible(false);
     table.setHeaderVisible(false);
     table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 6));
@@ -167,17 +168,20 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     typeColumn.setWidth(250);
     typeColumn.setText(""); //$NON-NLS-1$
 
-    Button enableAllBtn = new Button(composite, SWT.NONE);
+    Composite buttons = new Composite(composite, SWT.NONE);
+    buttons.setLayoutData(new BorderData(SWT.RIGHT));
+    buttons.setLayout(new GridLayout(1, true));
+    Button enableAllBtn = new Button(buttons, SWT.NONE);
     enableAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     enableAllBtn.setText(Messages.MavenArchetypesPreferencePage_btnEnableAll);
     enableAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> toggleRepositories(true)));
 
-    Button disableAllBtn = new Button(composite, SWT.NONE);
+    Button disableAllBtn = new Button(buttons, SWT.NONE);
     disableAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     disableAllBtn.setText(Messages.MavenArchetypesPreferencePage_btnDisableAll);
     disableAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> toggleRepositories(false)));
 
-    Button addLocalButton = new Button(composite, SWT.NONE);
+    Button addLocalButton = new Button(buttons, SWT.NONE);
     addLocalButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     addLocalButton.setText(Messages.MavenArchetypesPreferencePage_btnAddLocal);
     addLocalButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
@@ -187,7 +191,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       }
     }));
 
-    Button addRemoteButton = new Button(composite, SWT.NONE);
+    Button addRemoteButton = new Button(buttons, SWT.NONE);
     addRemoteButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     addRemoteButton.setText(Messages.MavenArchetypesPreferencePage_btnAddRemote);
     addRemoteButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
@@ -197,7 +201,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       }
     }));
 
-    final Button editButton = new Button(composite, SWT.NONE);
+    final Button editButton = new Button(buttons, SWT.NONE);
     editButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     editButton.setEnabled(false);
     editButton.setText(Messages.MavenArchetypesPreferencePage_btnEdit);
@@ -225,7 +229,7 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
       }
     }));
 
-    final Button removeButton = new Button(composite, SWT.NONE);
+    final Button removeButton = new Button(buttons, SWT.NONE);
     removeButton.setEnabled(false);
     removeButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
     removeButton.setText(Messages.MavenArchetypesPreferencePage_btnRemove);
@@ -254,8 +258,10 @@ public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage imp
     archetypeCatalogs.forEach(a -> archetypesViewer.setChecked(a, a.isEnabled()));
     archetypesViewer.refresh(); // should listen on property changes instead?
 
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots,
-        getFieldEditorParent()));
+    this.snapshotsBtn = new Button(composite, SWT.CHECK);
+    this.snapshotsBtn.setLayoutData(new BorderData(SWT.BOTTOM));
+    this.snapshotsBtn.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
+    return composite;
   }
 
   protected void toggleRepositories(boolean toggle) {
