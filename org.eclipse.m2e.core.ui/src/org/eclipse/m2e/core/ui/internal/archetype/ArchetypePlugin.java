@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
@@ -104,7 +103,7 @@ public class ArchetypePlugin {
   }
 
   @Activate
-  void activate() throws IOException, PlexusContainerException, ComponentLookupException {
+  void activate() throws PlexusContainerException, ComponentLookupException {
     final Module logginModule = new AbstractModule() {
       @Override
       protected void configure() {
@@ -119,10 +118,6 @@ public class ArchetypePlugin {
     container = new DefaultPlexusContainer(cc, logginModule);
     archetypeArtifactManager = container.lookup(ArchetypeArtifactManager.class);
     archetypeDataSourceMap = container.lookupMap(ArchetypeDataSource.class);
-    for(Entry<String, ArchetypeDataSource> entry : archetypeDataSourceMap.entrySet()) {
-      System.out.println(entry.getKey() + " :: " + entry.getValue());
-    }
-    System.out.println(archetypeArtifactManager);
     addArchetypeCatalogFactory(
         new ArchetypeCatalogFactory.InternalCatalogFactory(archetypeDataSourceMap.get("internal-catalog")));
     addArchetypeCatalogFactory(
@@ -130,7 +125,11 @@ public class ArchetypePlugin {
     for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions(this)) {
       addArchetypeCatalogFactory(archetypeCatalogFactory);
     }
-    readCatalogs();
+    try {
+      readCatalogs();
+    } catch(IOException e) {
+      M2EUIPluginActivator.getDefault().getLog().error("Can't read catalogs!", e);
+    }
   }
 
   @Deactivate
@@ -185,7 +184,7 @@ public class ArchetypePlugin {
   public void readCatalogs() throws IOException {
     if(configFile.exists()) {
       try (InputStream is = new FileInputStream(configFile)) {
-        Collection<ArchetypeCatalogFactory> userDefinedCatalogs = writer.readArchetypeCatalogs(is, catalogs);
+        Collection<ArchetypeCatalogFactory> userDefinedCatalogs = writer.readArchetypeCatalogs(is, catalogs, this);
         for(ArchetypeCatalogFactory it : userDefinedCatalogs) {
           addArchetypeCatalogFactory(it);
         }
@@ -229,8 +228,7 @@ public class ArchetypePlugin {
         ArchetypeDescriptor descriptor;
         try {
           descriptor = archetypeArtifactManager.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
-              localRepository,
-              repositories, context.newProjectBuildingRequest());
+              localRepository, repositories, context.newProjectBuildingRequest());
         } catch(UnknownArchetype ex) {
           throw new CoreException(Status.error("UnknownArchetype", ex));
         }
