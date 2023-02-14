@@ -88,7 +88,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
       LifecycleMappingDiscoveryRequest mappingDiscoveryRequest) {
     this.projects = projects;
     this.mappingDiscoveryRequest = mappingDiscoveryRequest;
-    setNeedsProgressMonitor(true);
+    setNeedsProgressMonitor(false);
     setWindowTitle(Messages.MavenDiscoveryProposalWizard_title);
   }
 
