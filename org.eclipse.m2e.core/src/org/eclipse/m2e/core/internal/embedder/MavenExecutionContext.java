@@ -116,7 +116,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    */
   public MavenExecutionContext(IComponentLookup lookup, File baseDir,
       Function<? super MavenExecutionContext, MavenProject> projectSupplier) {
-    this(lookup, baseDir, PlexusContainerManager.computeMultiModuleProjectDirectory(baseDir), projectSupplier);
+    this(lookup, baseDir, MavenProperties.computeMultiModuleProjectDirectory(baseDir), projectSupplier);
   }
 
   public MavenExecutionContext(IComponentLookup lookup, File baseDir, File multiModuleProjectDirectory,

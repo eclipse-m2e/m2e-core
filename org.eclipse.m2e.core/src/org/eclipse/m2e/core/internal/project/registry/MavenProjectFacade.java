@@ -57,6 +57,7 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -135,7 +136,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     // but https://github.com/eclipse-m2e/m2e-core/issues/904 will add support for a user to specify a custom root directory
     // and then we should really inherit this from the configuration!
     this.resolverConfiguration = new MavenProjectConfiguration(resolverConfiguration,
-        PlexusContainerManager.computeMultiModuleProjectDirectory(pomFile));
+        MavenProperties.computeMultiModuleProjectDirectory(pomFile));
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();

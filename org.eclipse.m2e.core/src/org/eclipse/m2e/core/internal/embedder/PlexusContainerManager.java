@@ -38,7 +38,6 @@ import com.google.inject.AbstractModule;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -164,7 +163,7 @@ public class PlexusContainerManager {
   }
 
   public IMavenPlexusContainer aquire(File basedir) throws Exception {
-    File directory = computeMultiModuleProjectDirectory(basedir);
+    File directory = MavenProperties.computeMultiModuleProjectDirectory(basedir);
     if(directory == null) {
       return aquire();
     }
@@ -441,26 +440,6 @@ public class PlexusContainerManager {
           : new CoreException(Status.error("container creation failed", exception));
     }
 
-  }
-
-  /**
-   * @param file a base file or directory, may be <code>null</code>
-   * @return the value for `maven.multiModuleProjectDirectory` as defined in Maven launcher
-   */
-  public static File computeMultiModuleProjectDirectory(File file) {
-    if(file == null) {
-      return null;
-    }
-    final File basedir = file.isDirectory() ? file : file.getParentFile();
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    File workspaceRoot = workspace.getRoot().getLocation().toFile();
-
-    for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
-      if(new File(root, IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
-        return root;
-      }
-    }
-    return null;
   }
 
   public static IComponentLookup wrap(PlexusContainer container) {

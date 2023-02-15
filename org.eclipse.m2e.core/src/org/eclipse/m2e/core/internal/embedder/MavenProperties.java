@@ -21,6 +21,7 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,9 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.shared.utils.StringUtils;
@@ -132,5 +136,25 @@ public class MavenProperties {
       properties.setProperty("maven.version", mavenVersion);
       properties.setProperty("maven.build.version", mavenBuildVersion);
     }
+  }
+
+  /**
+   * @param file a base file or directory, may be <code>null</code>
+   * @return the value for `maven.multiModuleProjectDirectory` as defined in Maven launcher
+   */
+  public static File computeMultiModuleProjectDirectory(File file) {
+    if(file == null) {
+      return null;
+    }
+    final File basedir = file.isDirectory() ? file : file.getParentFile();
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    File workspaceRoot = workspace.getRoot().getLocation().toFile();
+  
+    for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
+      if(new File(root, IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
+        return root;
+      }
+    }
+    return null;
   }
 }
