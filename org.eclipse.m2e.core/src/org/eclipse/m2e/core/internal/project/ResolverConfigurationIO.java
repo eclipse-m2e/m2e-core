@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -95,13 +96,6 @@ public class ResolverConfigurationIO {
       } else {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
       }
-      File directory = configuration.getMultiModuleProjectDirectory();
-      if(directory != null) {
-        projectNode.put(P_BASEDIR, directory.getAbsolutePath());
-      } else {
-        projectNode.remove(P_BASEDIR);
-      }
-
       if(configuration.getConfigurationProperties() != null && !configuration.getConfigurationProperties().isEmpty()) {
         projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getConfigurationProperties()));
       } else {
@@ -122,27 +116,31 @@ public class ResolverConfigurationIO {
   public static IProjectConfiguration readResolverConfiguration(IProject project) {
     IScopeContext projectScope = new ProjectScope(project);
     IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
-    ResolverConfiguration configuration = new ResolverConfiguration(project);
     if(projectNode == null) {
-      return configuration;
+      return new ResolverConfiguration(project);
     }
-
     String version = projectNode.get(P_VERSION, null);
     if(version == null) { // migrate from old config
-      return configuration;
+      return new ResolverConfiguration(project);
     }
+    ResolverConfiguration configuration = new ResolverConfiguration();
     configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
     configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
+    configuration.setMultiModuleProjectDirectory(getBasedir(projectNode, project));
+    return configuration;
+  }
+
+  private static File getBasedir(IEclipsePreferences projectNode, IProject project) {
     String basedirSetting = projectNode.get(P_BASEDIR, null);
     if(basedirSetting != null) {
       File directory = new File(basedirSetting);
       if(directory.isDirectory()) {
-        configuration.setMultiModuleProjectDirectory(directory);
+        return directory;
       }
     }
-    return configuration;
+    return MavenProperties.computeMultiModuleProjectDirectory(project);
   }
 
   private static String propertiesAsString(Map<?, ?> properties) {

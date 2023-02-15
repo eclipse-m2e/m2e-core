@@ -53,8 +53,7 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   }
 
   public ResolverConfiguration(IProject project) {
-    setMultiModuleProjectDirectory(
-        MavenProperties.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
+    setMultiModuleProjectDirectory(MavenProperties.computeMultiModuleProjectDirectory(project));
   }
 
   /**
