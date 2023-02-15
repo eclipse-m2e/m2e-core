@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 
-import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
+import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 
 
 /**
@@ -52,7 +52,7 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   public ResolverConfiguration(IProject project) {
     setMultiModuleProjectDirectory(
-        PlexusContainerManager.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
+        MavenProperties.computeMultiModuleProjectDirectory(project.getLocation().toFile()));
   }
 
   /**
