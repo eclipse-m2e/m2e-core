@@ -650,6 +650,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private final String profiles;
 
+    private final Map<String, String> userProperties;
+
     public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
@@ -658,6 +660,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.multiModuleProjectDirectory = multiModuleProjectDirectory;
       this.mappingId = baseConfiguration.getLifecycleMappingId();
       this.properties = Map.copyOf(baseConfiguration.getConfigurationProperties());
+      this.userProperties = Map.copyOf(baseConfiguration.getUserProperties());
       this.resolveWorkspace = baseConfiguration.isResolveWorkspaceProjects();
       this.profiles = baseConfiguration.getSelectedProfiles();
     }
@@ -665,6 +668,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     @Override
     public Map<String, String> getConfigurationProperties() {
       return properties;
+    }
+
+    @Override
+    public Map<String, String> getUserProperties() {
+      return userProperties;
     }
 
     @Override
