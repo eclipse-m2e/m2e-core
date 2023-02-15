@@ -31,8 +31,10 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.shared.utils.StringUtils;
@@ -136,6 +138,17 @@ public class MavenProperties {
       properties.setProperty("maven.version", mavenVersion);
       properties.setProperty("maven.build.version", mavenBuildVersion);
     }
+  }
+
+  public static File computeMultiModuleProjectDirectory(IResource resource) {
+    if(resource == null) {
+      return null;
+    }
+    IPath location = resource.getLocation();
+    if(location == null) {
+      return null;
+    }
+    return computeMultiModuleProjectDirectory(location.toFile());
   }
 
   /**
