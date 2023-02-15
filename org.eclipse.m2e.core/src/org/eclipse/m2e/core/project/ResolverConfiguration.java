@@ -45,6 +45,8 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private Properties properties;
 
+  private Map<String, String> userProperties;
+
   private File multiModuleProjectDirectory;
 
   public ResolverConfiguration() {
@@ -89,6 +91,14 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
       map.put(key, properties.getProperty(key));
     }
     return Collections.unmodifiableMap(map);
+  }
+
+  @Override
+  public Map<String, String> getUserProperties() {
+    if(userProperties == null) {
+      return Collections.emptyMap();
+    }
+    return userProperties;
   }
 
   public void setProperties(Properties properties) {
@@ -158,13 +168,15 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return this.resolveWorkspaceProjects == other.resolveWorkspaceProjects
         && Objects.equals(this.selectedProfiles, other.selectedProfiles)
         && Objects.equals(this.lifecycleMappingId, other.lifecycleMappingId)
-        && Objects.equals(this.properties, other.properties)
+        && Objects.equals(this.getProperties(), other.getProperties())
+        && Objects.equals(this.getUserProperties(), other.getUserProperties())
         && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, properties,
+    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, getProperties(),
+        getUserProperties(),
         multiModuleProjectDirectory);
   }
 
