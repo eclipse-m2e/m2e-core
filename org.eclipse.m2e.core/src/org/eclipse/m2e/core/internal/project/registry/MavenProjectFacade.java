@@ -652,6 +652,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private final Map<String, String> userProperties;
 
+    private List<String> activeProfiles;
+
+    private List<String> inactiveProfiles;
+
     public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
@@ -663,6 +667,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.userProperties = Map.copyOf(baseConfiguration.getUserProperties());
       this.resolveWorkspace = baseConfiguration.isResolveWorkspaceProjects();
       this.profiles = baseConfiguration.getSelectedProfiles();
+      this.activeProfiles = List.copyOf(baseConfiguration.getActiveProfileList());
+      this.inactiveProfiles = List.copyOf(baseConfiguration.getInactiveProfileList());
     }
 
     @Override
@@ -697,7 +703,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     @Override
     public int hashCode() {
-      return Objects.hash(mappingId, multiModuleProjectDirectory, profiles, properties, resolveWorkspace);
+      return IProjectConfiguration.contentsHashCode(this);
     }
 
     @Override
@@ -705,17 +711,20 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       if(this == obj) {
         return true;
       }
-      if(obj == null) {
-        return false;
+      if(obj instanceof IProjectConfiguration other) {
+        return IProjectConfiguration.contentsEquals(this, other);
       }
-      if(getClass() != obj.getClass()) {
-        return false;
-      }
-      MavenProjectConfiguration other = (MavenProjectConfiguration) obj;
-      return Objects.equals(this.mappingId, other.mappingId)
-          && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory)
-          && Objects.equals(this.profiles, other.profiles) && Objects.equals(this.properties, other.properties)
-          && this.resolveWorkspace == other.resolveWorkspace;
+      return false;
+    }
+
+    @Override
+    public List<String> getActiveProfileList() {
+      return activeProfiles;
+    }
+
+    @Override
+    public List<String> getInactiveProfileList() {
+      return inactiveProfiles;
     }
 
   }

@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Copyright (c) 2022 Christoph Läubrich
- * All rights reserved. This program and the accompanying materials
+ * All rights reserved. configuration program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
+ * which accompanies configuration distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
@@ -12,17 +12,17 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
  * {@link IProjectConfiguration} represents the project specific configuration, many projects can share the same
  * configuration and are usually resolved together.
  * 
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @noimplement configuration interface is not intended to be implemented by clients.
+ * @noextend configuration interface is not intended to be extended by clients.
  */
 public interface IProjectConfiguration {
 
@@ -46,34 +46,42 @@ public interface IProjectConfiguration {
 
   String getSelectedProfiles();
 
-  default List<String> getActiveProfileList() {
-    return parseProfiles(getSelectedProfiles(), true);
-  }
+  List<String> getActiveProfileList();
 
-  default List<String> getInactiveProfileList() {
-    return parseProfiles(getSelectedProfiles(), false);
-  }
+  List<String> getInactiveProfileList();
 
   String getLifecycleMappingId();
 
   File getMultiModuleProjectDirectory();
 
-  private static List<String> parseProfiles(String profilesAsText, boolean status) {
-    List<String> profiles;
-    if(profilesAsText != null && profilesAsText.trim().length() > 0) {
-      String[] profilesArray = profilesAsText.split("[,\\s\\|]");
-      profiles = new ArrayList<>(profilesArray.length);
-      for(String profile : profilesArray) {
-        boolean isActive = !profile.startsWith("!");
-        if(status == isActive) {
-          profile = (isActive) ? profile : profile.substring(1);
-          profiles.add(profile);
-        }
-      }
-    } else {
-      profiles = new ArrayList<>(0);
+  /**
+   * Computes a hashcode over the contents of the given configuration, that is a semantic hash-code that can be used in
+   * combination of {@link #contentsEquals(IProjectConfiguration, IProjectConfiguration)}
+   * 
+   * @param configuration
+   * @return
+   */
+  public static int contentsHashCode(IProjectConfiguration configuration) {
+    return Objects.hash(configuration.isResolveWorkspaceProjects(), configuration.getActiveProfileList(),
+        configuration.getInactiveProfileList(), configuration.getLifecycleMappingId(),
+        configuration.getConfigurationProperties(), configuration.getUserProperties(),
+        configuration.getMultiModuleProjectDirectory());
+  }
+
+  public static boolean contentsEquals(IProjectConfiguration configuration, IProjectConfiguration other) {
+    if(configuration == other) {
+      return true;
     }
-    return profiles;
+    if(configuration == null || other == null) {
+      return false;
+    }
+    return configuration.isResolveWorkspaceProjects() == other.isResolveWorkspaceProjects()
+        && Objects.equals(configuration.getLifecycleMappingId(), other.getLifecycleMappingId())
+        && Objects.equals(configuration.getActiveProfileList(), other.getActiveProfileList())
+        && Objects.equals(configuration.getInactiveProfileList(), other.getInactiveProfileList())
+        && Objects.equals(configuration.getConfigurationProperties(), other.getConfigurationProperties())
+        && Objects.equals(configuration.getUserProperties(), other.getUserProperties())
+        && Objects.equals(configuration.getMultiModuleProjectDirectory(), other.getMultiModuleProjectDirectory());
   }
 
 }

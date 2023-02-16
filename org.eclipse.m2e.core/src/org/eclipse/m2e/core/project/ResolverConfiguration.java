@@ -16,10 +16,11 @@ package org.eclipse.m2e.core.project;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -48,6 +49,10 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   private Map<String, String> userProperties;
 
   private File multiModuleProjectDirectory;
+
+  private List<String> activeProfiles;
+
+  private List<String> inactiveProfiles;
 
   public ResolverConfiguration() {
   }
@@ -131,6 +136,8 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   public void setSelectedProfiles(String profiles) {
     this.selectedProfiles = profiles;
+    this.activeProfiles = parseProfiles(profiles, true);
+    this.inactiveProfiles = parseProfiles(profiles, false);
   }
 
 
@@ -157,26 +164,15 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
+    if(obj instanceof IProjectConfiguration other) {
+      return IProjectConfiguration.contentsEquals(this, other);
     }
-    if(obj.getClass() != this.getClass()) {
-      return false;
-    }
-    ResolverConfiguration other = (ResolverConfiguration) obj;
-    return this.resolveWorkspaceProjects == other.resolveWorkspaceProjects
-        && Objects.equals(this.selectedProfiles, other.selectedProfiles)
-        && Objects.equals(this.lifecycleMappingId, other.lifecycleMappingId)
-        && Objects.equals(this.getProperties(), other.getProperties())
-        && Objects.equals(this.getUserProperties(), other.getUserProperties())
-        && Objects.equals(this.multiModuleProjectDirectory, other.multiModuleProjectDirectory);
+    return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, getProperties(),
-        getUserProperties(),
-        multiModuleProjectDirectory);
+    return IProjectConfiguration.contentsHashCode(this);
   }
 
   /* (non-Javadoc)
@@ -192,5 +188,39 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
    */
   public void setMultiModuleProjectDirectory(File multiModuleProjectDirectory) {
     this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+  }
+
+  @Override
+  public List<String> getActiveProfileList() {
+    if(activeProfiles == null) {
+      return List.of();
+    }
+    return List.copyOf(activeProfiles);
+  }
+
+  @Override
+  public List<String> getInactiveProfileList() {
+    if(inactiveProfiles == null) {
+      return List.of();
+    }
+    return List.copyOf(inactiveProfiles);
+  }
+
+  private static List<String> parseProfiles(String profilesAsText, boolean status) {
+    List<String> profiles;
+    if(profilesAsText != null && profilesAsText.trim().length() > 0) {
+      String[] profilesArray = profilesAsText.split("[,\\s\\|]");
+      profiles = new ArrayList<>(profilesArray.length);
+      for(String profile : profilesArray) {
+        boolean isActive = !profile.startsWith("!");
+        if(status == isActive) {
+          profile = (isActive) ? profile : profile.substring(1);
+          profiles.add(profile);
+        }
+      }
+    } else {
+      profiles = new ArrayList<>(0);
+    }
+    return profiles;
   }
 }
