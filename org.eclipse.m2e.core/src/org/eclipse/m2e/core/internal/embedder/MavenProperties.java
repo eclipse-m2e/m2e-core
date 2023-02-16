@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,6 +198,32 @@ public class MavenProperties {
       }
     }
     return null;
+  }
+
+  public static void getProfiles(CommandLine commandLine, Consumer<String> activeProfilesConsumer,
+      Consumer<String> inactiveProfilesConsumer) {
+    if(commandLine != null && commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
+      String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
+      if(profileOptionValues != null) {
+        for(String profileOptionValue : profileOptionValues) {
+          StringTokenizer tokenizer = new StringTokenizer(profileOptionValue, ",");
+          while(tokenizer.hasMoreTokens()) {
+            getProfile(tokenizer.nextToken().trim(), activeProfilesConsumer, inactiveProfilesConsumer);
+          }
+        }
+      }
+    }
+  }
+
+  public static void getProfile(String profile, Consumer<String> activeProfilesConsumer,
+      Consumer<String> inactiveProfilesConsumer) {
+    if(profile.startsWith("-") || profile.startsWith("!")) {
+      inactiveProfilesConsumer.accept(profile.substring(1));
+    } else if(profile.startsWith("+")) {
+      activeProfilesConsumer.accept(profile.substring(1));
+    } else {
+      activeProfilesConsumer.accept(profile);
+    }
   }
 
   public static void getCliProperties(CommandLine commandLine, BiConsumer<String, String> consumer) {

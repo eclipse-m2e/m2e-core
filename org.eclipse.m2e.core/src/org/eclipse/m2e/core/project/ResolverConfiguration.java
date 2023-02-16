@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -60,6 +61,10 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   private List<String> activeProfiles;
 
   private List<String> inactiveProfiles;
+
+  private List<String> userActiveProfiles;
+
+  private List<String> userInactiveProfiles;
 
   public ResolverConfiguration() {
   }
@@ -201,6 +206,9 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
         Map<String, String> props = new LinkedHashMap<>();
         MavenProperties.getCliProperties(commandLine, props::put);
         userProperties = Collections.unmodifiableMap(props);
+        userActiveProfiles = new ArrayList<>();
+        userInactiveProfiles = new ArrayList<>();
+        MavenProperties.getProfiles(commandLine, userActiveProfiles::add, userInactiveProfiles::add);
       } catch(IOException | ParseException ex) {
         //can't use it then... :-(
         MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,
@@ -212,7 +220,13 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   @Override
   public List<String> getActiveProfileList() {
     if(activeProfiles == null) {
+      if(userActiveProfiles != null) {
+        return List.copyOf(userActiveProfiles);
+      }
       return List.of();
+    }
+    if(userActiveProfiles != null) {
+      return Stream.concat(userActiveProfiles.stream(), activeProfiles.stream()).distinct().toList();
     }
     return List.copyOf(activeProfiles);
   }
@@ -220,7 +234,13 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   @Override
   public List<String> getInactiveProfileList() {
     if(inactiveProfiles == null) {
+      if(userInactiveProfiles != null) {
+        return List.copyOf(userInactiveProfiles);
+      }
       return List.of();
+    }
+    if(userInactiveProfiles != null) {
+      return Stream.concat(userInactiveProfiles.stream(), inactiveProfiles.stream()).distinct().toList();
     }
     return List.copyOf(inactiveProfiles);
   }
