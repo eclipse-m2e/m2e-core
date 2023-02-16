@@ -15,17 +15,24 @@
 package org.eclipse.m2e.core.project;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
+
 import org.eclipse.core.resources.IProject;
 
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 
 
@@ -187,7 +194,19 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
    * @param multiModuleProjectDirectory The multiModuleProjectDirectory to set.
    */
   public void setMultiModuleProjectDirectory(File multiModuleProjectDirectory) {
-    this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+    if(!Objects.equals(this.multiModuleProjectDirectory, multiModuleProjectDirectory)) {
+      this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+      try {
+        CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+        Map<String, String> props = new LinkedHashMap<>();
+        MavenProperties.getCliProperties(commandLine, props::put);
+        userProperties = Collections.unmodifiableMap(props);
+      } catch(IOException | ParseException ex) {
+        //can't use it then... :-(
+        MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,
+            ex);
+      }
+    }
   }
 
   @Override

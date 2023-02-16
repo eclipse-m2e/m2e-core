@@ -24,18 +24,26 @@ package org.eclipse.m2e.core.internal.embedder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
+import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.shared.utils.StringUtils;
 
@@ -50,6 +58,8 @@ import org.apache.maven.shared.utils.StringUtils;
  * @since 1.15
  */
 public class MavenProperties {
+
+  private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
   private static final Logger log = LoggerFactory.getLogger(MavenProperties.class);
 
@@ -169,5 +179,42 @@ public class MavenProperties {
       }
     }
     return null;
+  }
+
+  public static CommandLine getMavenArgs(File multiModuleProjectDirectory) throws IOException, ParseException {
+    if(multiModuleProjectDirectory != null) {
+      File configFile = new File(multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
+      if(configFile.isFile()) {
+        List<String> args = new ArrayList<>();
+        for(String arg : new String(Files.readAllBytes(configFile.toPath())).split("\\s+")) {
+          if(!arg.isEmpty()) {
+            args.add(arg);
+          }
+        }
+        CLIManager manager = new CLIManager();
+        return manager.parse(args.toArray(String[]::new));
+      }
+    }
+    return null;
+  }
+
+  public static void getCliProperties(CommandLine commandLine, BiConsumer<String, String> consumer) {
+    if(commandLine != null && commandLine.hasOption(CLIManager.SET_SYSTEM_PROPERTY)) {
+      String[] defStrs = commandLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY);
+      if(defStrs != null) {
+        for(String defStr : defStrs) {
+          MavenProperties.getCliProperty(defStr, consumer);
+        }
+      }
+    }
+  }
+
+  public static void getCliProperty(String property, BiConsumer<String, String> consumer) {
+    int index = property.indexOf('=');
+    if(index <= 0) {
+      consumer.accept(property.trim(), "true");
+    } else {
+      consumer.accept(property.substring(0, index).trim(), property.substring(index + 1).trim());
+    }
   }
 }
