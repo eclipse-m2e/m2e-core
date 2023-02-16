@@ -926,14 +926,14 @@ public class ProjectRegistryManager implements ISaveParticipant {
     request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
 
     Properties userProperties = request.getUserProperties();
+    //User properties (from maven.config or alike) first
+    userProperties.putAll(resolverConfiguration.getUserProperties());
+    //then use explicit project configuration to overrule anything else...
     Map<String, String> addProperties = resolverConfiguration.getConfigurationProperties();
-    if(addProperties != null) {
-      if(userProperties == null) {
-        userProperties = new Properties();
-        //FIXME should we not set them here?? request.setUserProperties(p);
-      }
+    if(addProperties != null && !addProperties.isEmpty()) {
       userProperties.putAll(addProperties);
     }
+
 
     // eclipse workspace repository implements both workspace dependency resolution
     // and inter-module dependency resolution for multi-module projects.
