@@ -385,10 +385,15 @@ public class ProjectConfigurationManager
     // TODO this sends multiple update events, rework using low-level registry update methods
     long refreshLocal = System.currentTimeMillis();
     try {
-      projectManager.refresh(pomsToRefresh, monitor.split(pomFiles.size()));
+      Map<IFile, IStatus> refresh = projectManager.refresh(pomsToRefresh, monitor.split(pomFiles.size()));
 
       for(IFile pom : pomsToRefresh) {
         IProject project = pom.getProject();
+        IStatus status = refresh.get(pom);
+        if(status != null && !status.isOK()) {
+          updateStatus.put(project.getName(), status);
+          continue;
+        }
         IMavenProjectFacade facade = projectManager.getProject(project);
         if(facade != null) { // facade is null if pom.xml cannot be read
           projects.put(pom, facade);
@@ -396,7 +401,6 @@ public class ProjectConfigurationManager
         updateStatus.put(project.getName(), Status.OK_STATUS);
       }
     } catch(CoreException ex) {
-      // TODO per-project status
       for(IFile pom : pomsToRefresh) {
         IProject project = pom.getProject();
         updateStatus.put(project.getName(), ex.getStatus());
@@ -408,14 +412,20 @@ public class ProjectConfigurationManager
     if(updateConfiguration) {
 
       projects.values().removeIf(facade -> {
-        monitor.subTask(facade.getProject().getName());
+        String projectName = facade.getProject().getName();
+        IStatus status = updateStatus.get(projectName);
+        if(status != null && !status.isOK()) {
+          updateStatus.put(projectName, status);
+          return true;
+        }
+        monitor.subTask(projectName);
         try {
           SubMonitor submonitor = monitor.split(1, SubMonitor.SUPPRESS_SUBTASK);
           ProjectConfigurationRequest cfgRequest = new ProjectConfigurationRequest(facade,
               facade.getMavenProject(submonitor));
           updateProjectConfiguration(cfgRequest, submonitor);
         } catch(CoreException ex) {
-          updateStatus.put(facade.getProject().getName(), ex.getStatus());
+          updateStatus.put(projectName, ex.getStatus());
           return true;
         }
         return false;
