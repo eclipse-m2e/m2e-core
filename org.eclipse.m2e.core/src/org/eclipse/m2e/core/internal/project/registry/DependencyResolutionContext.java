@@ -12,14 +12,18 @@
  *      Christoph Läubrich - M2Eclipse gets stuck in endless update loop
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.project;
+package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 
 /**
@@ -28,7 +32,9 @@ import org.eclipse.core.resources.IFile;
 public class DependencyResolutionContext {
 
   /** Set of all pom files to resolve */
-  private final LinkedHashSet<IFile> pomFiles;
+  private final Set<IFile> pomFiles;
+
+  private final Map<IFile, IStatus> statusMap = new HashMap<>();
 
   public DependencyResolutionContext(Collection<IFile> pomFiles) {
     this.pomFiles = new LinkedHashSet<>(pomFiles);
@@ -40,6 +46,7 @@ public class DependencyResolutionContext {
 
   public synchronized void forcePomFiles(Collection<IFile> pomFiles) {
     this.pomFiles.addAll(pomFiles);
+
   }
 
   public synchronized IFile pop() {
@@ -58,6 +65,21 @@ public class DependencyResolutionContext {
    */
   public void forcePomFile(IFile file) {
     pomFiles.add(file);
+    statusMap.remove(file);
+  }
+
+  public IStatus getStatus(IFile file) {
+    return statusMap.getOrDefault(file, Status.OK_STATUS);
+  }
+
+  void setStatus(IFile file, IStatus status) {
+    statusMap.put(file, status);
+  }
+
+  void clearErrors(Collection<? extends IFile> pomFiles) {
+    for(IFile file : pomFiles) {
+      statusMap.remove(file);
+    }
   }
 
 }
