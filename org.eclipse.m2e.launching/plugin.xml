@@ -94,6 +94,56 @@
            </enablement>
         </contextualLaunch>
      </shortcut>
+     <shortcut id="org.eclipse.m2e.actions.LifeCycleClean"
+               class="org.eclipse.m2e.actions.ExecutePomAction:clean"
+               icon="icons/m2.gif"
+               label="%m2.popup.lifecycle.clean"
+               modes="run,debug">
+        <contextualLaunch>
+           <contextLabel label="%m2.popup.lifecycle.clean" mode="run"/>
+           <contextLabel label="%m2.popup.lifecycle.clean" mode="debug"/>
+           <enablement>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
+                    </adapt>
+                 </or>
+              </iterate>
+           </enablement>
+        </contextualLaunch>
+     </shortcut>
+     <shortcut id="org.eclipse.m2e.actions.LifeCycleGenerateSources"
+           class="org.eclipse.m2e.actions.ExecutePomAction:generate-sources"
+           icon="icons/m2.gif"
+           label="%m2.popup.lifecycle.generate-sources"
+           modes="run,debug">
+        <contextualLaunch>
+           <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="run"/>
+           <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="debug"/>
+           <enablement>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
+                    </adapt>
+                 </or>
+              </iterate>
+           </enablement>
+        </contextualLaunch>
+     </shortcut>
      <shortcut id="org.eclipse.m2e.actions.LifeCycleInstall"
                class="org.eclipse.m2e.actions.ExecutePomAction:install"
                icon="icons/m2.gif"
@@ -144,39 +194,14 @@
            </enablement>
         </contextualLaunch>
      </shortcut>
-     <shortcut id="org.eclipse.m2e.actions.LifeCycleGenerateSources"
-           class="org.eclipse.m2e.actions.ExecutePomAction:generate-sources"
-           icon="icons/m2.gif"
-           label="%m2.popup.lifecycle.generate-sources"
-           modes="run,debug">
-        <contextualLaunch>
-           <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="run"/>
-           <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="debug"/>
-           <enablement>
-              <count value="1"/>
-              <iterate>
-                 <or>
-                    <adapt type="org.eclipse.core.resources.IFile">
-                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
-                    </adapt>
-                    <adapt type="org.eclipse.core.resources.IProject">
-                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
-                    </adapt>
-                    <adapt type="org.eclipse.m2e.core.embedder.IMavenExecutableLocation">
-                    </adapt>
-                 </or>
-              </iterate>
-           </enablement>
-        </contextualLaunch>
-     </shortcut>
-     <shortcut id="org.eclipse.m2e.actions.LifeCycleClean"
-               class="org.eclipse.m2e.actions.ExecutePomAction:clean"
+     <shortcut id="org.eclipse.m2e.actions.LifeCycleVerify"
+               class="org.eclipse.m2e.actions.ExecutePomAction:verify"
                icon="icons/m2.gif"
-               label="%m2.popup.lifecycle.clean"
+               label="%m2.popup.lifecycle.verify"
                modes="run,debug">
         <contextualLaunch>
-           <contextLabel label="%m2.popup.lifecycle.clean" mode="run"/>
-           <contextLabel label="%m2.popup.lifecycle.clean" mode="debug"/>
+           <contextLabel label="%m2.popup.lifecycle.verify" mode="run"/>
+           <contextLabel label="%m2.popup.lifecycle.verify" mode="debug"/>
            <enablement>
               <count value="1"/>
               <iterate>
