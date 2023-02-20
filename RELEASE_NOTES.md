@@ -16,6 +16,13 @@ The dependencies editor has been adapted to show all artifacts within a target l
 
 ![grafik](https://user-images.githubusercontent.com/70652978/212153011-160fa96a-1c06-4092-9b89-fcd7a3c2859e.png)
 
+
+### Skip on Tests
+
+Before, the property "<maven.test.skip>true</maven.test.skip>" and the "skip" configurations on "maven-compiler-plugin" and "maven-resources-plugin" were not taken into account by M2E.
+Now, they are well taken into account by M2E and this allows, depending on the need (especially compilation time), to either not compile tests or not copy test resources.
+The folders thus ignored no longer appear in the Package Explorer as "Java" folders but as standard folders.
+
 ## 2.1.0
 
 * 📅 Release Date: November 24th 2022
