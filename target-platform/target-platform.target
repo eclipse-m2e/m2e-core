@@ -9,7 +9,6 @@
 			<unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
-			<unit id="org.mockito.mockito-core" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -107,6 +106,16 @@
 					<groupId>io.takari.m2e.workspace</groupId>
 					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
 					<version>0.3.1</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
+		<location includeDependencyDepth="infinite" includeDependencyScopes="compile,runtime" includeSource="true" label="Testing" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-core</artifactId>
+					<version>5.1.1</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
