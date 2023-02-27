@@ -4,8 +4,8 @@
 
 ### Mojos without a mapping are now executed by default in incremental builds
 
-Before it was neccesary to explicitly configure a mapping or there is a connector or the plugin iself contains mappings for a mojo to participate in the incremental maven build.
-This often lead to a poor user-experience and we think that users are adding mojos by purpose because they perform valuable tasks.
+Before it was necessary to explicitly configure a mapping or there is a connector or the plugin itself contains mappings for a mojo to participate in the incremental maven build.
+This often leads to a poor user-experience and we think that users are adding mojos by purpose because they perform valuable tasks.
 
 Because of this, m2e now automatically enables the execution of mojos if there is no mapping configured, in case you want to change this there is a new configuration option to control the behavior:
 ![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png) 
@@ -26,8 +26,7 @@ The dependencies editor has been adapted to show all artifacts within a target l
 The previously experimental feature of M2E to update Maven projects automatically on configuration changes matured and is now enabled by default.
 
 ### Performance and memory consumption improvements
-
-For large projects the build performance has been improved and the memory consumption has been reduced.
+For large projects, the build performance has been improved and the memory consumption has been reduced.
 
 ### Improved connectors for bnd-maven-plugin and maven-bundle-plugin
 
@@ -73,16 +72,16 @@ m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e 
 
 #### Inclusion of maven archiver connector
 
-m2e mavenarchiver connector so far part of some external repository were migrated into m2e and are shipped by default with m2e installations.
+The m2e mavenarchiver connector, so far part of some external repository, was migrated into m2e and is shipped by default with m2e installations.
 
 ### Stop caching of Maven-projects for legacy clients
 
-For for clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is not longer cached any more.
-In general MojoExecutions should be set up within the scope of `MavenExecutionContext`.
+For clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is no longer cached anymore.
+In general, MojoExecutions should be set up within the scope of `MavenExecutionContext`.
 
 ### Improved support for Maven archetypes
 
-Maven archetypes can use Groovy scripts for processing of input parameters since Maven 3, which is now also supported via m2e. In addition, validation of parameters with regular expressions is now also supported:
+Maven archetypes can use Groovy scripts for the processing of input parameters since Maven 3, which is now also supported via m2e. In addition, validation of parameters with regular expressions is now also supported:
 ![archetype parameter validation](https://user-images.githubusercontent.com/17798/189828315-2deb2fd4-c310-4e75-a83b-9603acfb4198.png)
 
 Any additional inputs required by the Groovy script are handled in the Eclipse console:
@@ -92,7 +91,7 @@ This feature was sponsored by [Faktor Zehn](https://faktorzehn.org)
 
 ### Multiple API breakage
 
-This major release improves (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement to removed APIs.
+This major release improves (and cleans up) various legacy APIs. Some clients may require to update their code if they use removed APIs. [This commit](https://github.com/eclipse-m2e/m2e-wtp/commit/0705044047ec83124f7f3905431d0027ad4112e8) can be used as an example of how to adapt to newer APIs. Usually, calling `mavenProjectFacade.createExecutionContext().execute(...)` is a good replacement for removed APIs.
 
 ## 1.20.1
 
@@ -109,7 +108,7 @@ Embedded *.jnilib files are now signed for macOS to fulfill macOS-notarization r
 * 📅 Release Date: February 11th 2022
 * All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.19.0...1.20.0
 
-📢 This is most probably the last 1.x release of m2e. m2e will then start working on a 2.0 version, with some disruptive changes. If you're using m2e in your application and rely on its API, please consider following closely future development to facilitate integration of further versions.
+📢 This is most probably the last 1.x release of m2e. m2e will then start working on a 2.0 version, with some disruptive changes. If you're using m2e in your application and rely on its API, please consider following closely future development to facilitate the integration of further versions.
 
 #### Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger
 
@@ -120,7 +119,7 @@ For example to debug a test executed by the Maven-surefire plug-in within a Mave
 
 ![grafik](https://user-images.githubusercontent.com/44067969/152249878-c0e0e5bd-1a72-4772-8554-75d97be3bc33.png)
 
-Further information, how to activate the debug mode of forked JVMs for the plug-ins mentioned above, can be found at the following links:
+Further information on how to activate the debug mode of forked JVMs for the plug-ins mentioned above, can be found at the following links:
 - [Maven-Surefire](https://maven.apache.org/surefire/maven-surefire-plugin/examples/debugging.html)
 - [Tycho-Surefire](https://www.eclipse.org/tycho/sitedocs/tycho-surefire-plugin/test-mojo.html#debugPort)
 - [Tycho-Eclipserun](https://www.eclipse.org/tycho/sitedocs/tycho-extras/tycho-eclipserun-plugin/eclipse-run-mojo.html#jvmArgs)
@@ -141,11 +140,11 @@ In case of a build failure another link, that opens the `pom.xml` of the failed 
 
 #### the m2e-pde editor now supports generation of a feature from a location:
 
-In the wizard it is now possible to request generation of a feature
+In the wizard, it is now possible to request the generation of a feature
 
 ![grafik](https://user-images.githubusercontent.com/1331477/139412713-e0218ff7-642c-4c19-afac-55fca49ef325.png)
 
-If the option is checked the wizard contains a new page to enter basic infos
+If the option is checked the wizard contains a new page to enter basic info
 
 ![grafik](https://user-images.githubusercontent.com/1331477/139412847-5268aaae-de32-472c-b30e-44a8e88728cd.png)
 
@@ -153,17 +152,17 @@ If one likes he can add additional plugins as well that should be mentioned in t
 
 ![grafik](https://user-images.githubusercontent.com/1331477/139413014-ff0463e2-cd89-41c4-89dd-fe4402be05b2.png)
 
-Afterwards this will end up in the target source and one can add/edit/adjust additional data, effectivly everything the feature.xml supports is allowed here:
+Afterward this will end up in the target source and one can add/edit/adjust additional data, effectively everything the feature.xml supports is allowed here:
 
 ![grafik](https://user-images.githubusercontent.com/1331477/139413236-f04d9b5f-54a5-4240-b83f-86167c7519b2.png)
 
 #### Include and use Maven 3.8.4
 
-Maven 3.8.4 is now used internally in m2e. This allows to benefit from various improvements of recent Maven versions
+Maven 3.8.4 is now used internally in m2e. This allows benefiting from various improvements of recent Maven versions
 
 #### Improved LemMinX-based editor with newer LemMinX-Maven
 
-LemMinX-Maven 0.5.1 is now used and provide many major improvements. A noticeable one is the search.maven.org engine is now used instead of the indexer. This will greatly improve the "warmup" time of the editor. Other bugfixes and performance improvements have a very positive and visible impact on the user experience when using the Generic Editor.
+LemMinX-Maven 0.5.1 is now used and provides many major improvements. A noticeable one is the search.maven.org engine is now used instead of the indexer. This will greatly improve the "warmup" time of the editor. Other bugfixes and performance improvements have a very positive and visible impact on the user experience when using the Generic Editor.
 
 #### Other noticeable changes
 
@@ -242,9 +241,9 @@ Old target formats are automatically converted.
 </target>
 ```
 
-#### Multiple fixes and improvement in LemMinX based editor
+#### Multiple fixes and improvements in LemMinX based editor
 
-With upgrade to newer LemMinX-Maven, the edition of pom.xml with the Generic Editor receives several comfortable fixes and improvements.
+With the upgrade to the newer LemMinX-Maven, the edition of pom.xml with the Generic Editor receives several comfortable fixes and improvements.
 
 #### One way synchronization for jpms directives from maven compiler arguments to .classpath file
 
