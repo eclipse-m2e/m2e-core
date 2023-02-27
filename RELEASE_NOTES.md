@@ -74,6 +74,10 @@ m2e-apt plugins that were so far included in JBoss Tools were migrated into m2e 
 
 The m2e mavenarchiver connector, so far part of some external repository, was migrated into m2e and is shipped by default with m2e installations.
 
+### Updated embedded maven
+
+Updated the embedded maven from 3.8.4 to 3.8.6.
+
 ### Stop caching of Maven-projects for legacy clients
 
 For clients that request setup MojoExecution outside of MavenBuilder context the MavenProject is no longer cached anymore.
