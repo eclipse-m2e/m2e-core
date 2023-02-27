@@ -318,6 +318,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String mainResourcesEncoding = null;
       String testResourcesEncoding = null;
 
+      boolean isTestCompilationSkipped = false;
+      boolean isTestResourcesSkipped = false;
+
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
       for(MojoExecution compile : executions) {
         if(isCompileExecution(compile, mavenProject, options, monitor)) {
@@ -352,6 +355,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           } catch(CoreException ex) {
             log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
           }
+          try {
+            isTestCompilationSkipped = Boolean.TRUE
+                .equals(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor)); //$NON-NLS-1$
+          } catch(Exception ex) {
+            //ignore
+          }
         }
       }
 
@@ -363,6 +372,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
         testResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
+        try {
+          isTestResourcesSkipped = Boolean.TRUE
+              .equals(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor)); //$NON-NLS-1$
+        } catch(Exception ex) {
+          //ignore
+        }
       }
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
           exclusion, mainSourceEncoding, mon.newChild(1), false);
@@ -371,10 +386,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       //If the project properties contain m2e.disableTestClasspathFlag=true, then the test flag must not be set
       boolean addTestFlag = !MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
-      addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
-          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), addTestFlag);
-      addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getTestResources(),
-          testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), addTestFlag);
+      if(!isTestCompilationSkipped) {
+        addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
+            inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), addTestFlag);
+      }
+      if(!isTestResourcesSkipped) {
+        addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getTestResources(),
+            testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), addTestFlag);
+      }
     } finally {
       mon.done();
     }
