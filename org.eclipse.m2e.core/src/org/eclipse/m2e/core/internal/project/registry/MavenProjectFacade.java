@@ -57,7 +57,6 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
-import org.eclipse.m2e.core.internal.embedder.MavenProperties;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -104,6 +103,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final List<IPath> testCompileSourceLocations;
 
+  private IPath buildOutputLocation;
+
   private final IPath outputLocation;
 
   private final IPath testOutputLocation;
@@ -135,12 +136,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     //TODO we currently always use the computed directory here 
     // but https://github.com/eclipse-m2e/m2e-core/issues/904 will add support for a user to specify a custom root directory
     // and then we should really inherit this from the configuration!
-    this.resolverConfiguration = new MavenProjectConfiguration(resolverConfiguration,
-        MavenProperties.computeMultiModuleProjectDirectory(pomFile));
+    this.resolverConfiguration = new MavenProjectConfiguration(resolverConfiguration);
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();
-    this.modules = mavenProject.getModules();
+    this.modules = List.copyOf(mavenProject.getModules());
 
     this.resourceLocations = MavenProjectUtils.getResourceLocations(getProject(), mavenProject.getResources());
     this.testResourceLocations = MavenProjectUtils.getResourceLocations(getProject(), mavenProject.getTestResources());
@@ -153,6 +153,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     IPath path = getProjectRelativePath(mavenProject.getBuild().getOutputDirectory());
     this.outputLocation = (path != null) ? fullPath.append(path) : null;
+    path = getProjectRelativePath(mavenProject.getBuild().getDirectory());
+    this.buildOutputLocation = (path != null) ? fullPath.append(path) : null;
 
     path = getProjectRelativePath(mavenProject.getBuild().getTestOutputDirectory());
     this.testOutputLocation = path != null ? fullPath.append(path) : null;
@@ -190,7 +192,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     this.artifactKey = other.artifactKey;
     this.packaging = other.packaging;
-    this.modules = new ArrayList<>(other.modules);
+    this.modules = other.modules;
 
     this.resourceLocations = List.copyOf(other.resourceLocations);
     this.testResourceLocations = List.copyOf(other.testResourceLocations);
@@ -198,6 +200,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.testCompileSourceLocations = List.copyOf(other.testCompileSourceLocations);
 
     this.outputLocation = other.outputLocation;
+    this.buildOutputLocation = other.buildOutputLocation;
     this.testOutputLocation = other.testOutputLocation;
     this.finalName = other.finalName;
 
@@ -243,6 +246,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public IPath getProjectRelativePath(String resourceLocation) {
     return MavenProjectUtils.getProjectRelativePath(getProject(), resourceLocation);
+  }
+
+  @Override
+  public IPath getBuildOutputLocation() {
+    return buildOutputLocation;
   }
 
   /**
@@ -656,12 +664,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private List<String> inactiveProfiles;
 
-    public MavenProjectConfiguration(IProjectConfiguration baseConfiguration, File multiModuleProjectDirectory) {
+    private MavenProjectConfiguration(IProjectConfiguration baseConfiguration) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
         baseConfiguration = new ResolverConfiguration();
       }
-      this.multiModuleProjectDirectory = multiModuleProjectDirectory;
+      this.multiModuleProjectDirectory = baseConfiguration.getMultiModuleProjectDirectory();
       this.mappingId = baseConfiguration.getLifecycleMappingId();
       this.properties = Map.copyOf(baseConfiguration.getConfigurationProperties());
       this.userProperties = Map.copyOf(baseConfiguration.getUserProperties());
