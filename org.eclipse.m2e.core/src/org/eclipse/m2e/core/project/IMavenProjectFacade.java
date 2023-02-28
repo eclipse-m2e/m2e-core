@@ -70,6 +70,12 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   IPath getProjectRelativePath(String resourceLocation);
 
   /**
+   * @return the full, absolute path of this project where build results are placed relative to the workspace or
+   *         <code>null</code> if the directory cannot be determined or is outside of the workspace.
+   */
+  IPath getBuildOutputLocation();
+
+  /**
    * Returns the full, absolute path of this project maven build output directory relative to the workspace or null if
    * maven build output directory cannot be determined or outside of the workspace.
    */
