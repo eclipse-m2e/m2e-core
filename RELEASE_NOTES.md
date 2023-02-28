@@ -2,7 +2,7 @@
 
 ## 2.2.0
 
-* 📅 Release Date: _expected_ end of Februar 2023
+* 📅 Release Date: 28th February 2023
 
 ### Mojos without a mapping are now executed by default in incremental builds
 
