@@ -620,7 +620,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     try {
       container = containerManager.aquire(multiModuleProjectDirectory);
     } catch(Exception ex) {
-      throw new RuntimeException("Aquire container failed!", ex);
+      throw new RuntimeException("Acquire container failed!", ex);
     }
     MavenProject mavenProject = tryGetMavenProject();
     if(mavenProject == null) {
