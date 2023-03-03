@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstall2;
@@ -228,7 +229,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         }
       }
     }
-    Optional<IProject> project = getContainer(pomDirectory).map(IContainer::getProject);
+    Optional<IProject> project = getContainer(pomDirectory).map(IContainer::getProject)
+        .filter(p -> JavaCore.create(p).exists());
     if(project.isPresent()) {
       // Set the project name so that super.getVMInstall() called below, can find the JDT-Compiler JDK 
       ILaunchConfigurationWorkingCopy workingCopy = configuration.getWorkingCopy();
