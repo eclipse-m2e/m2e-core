@@ -59,7 +59,7 @@ public class MavenJRETab extends JavaJRETab {
     File pomDir = MavenLaunchDelegate.getPomDirectory(getLaunchConfiguration());
     return MavenLaunchDelegate.getContainer(pomDir) //
         .map(IContainer::getProject).filter(IProject::exists) //
-        .map(JavaCore::create).orElse(null);
+        .map(JavaCore::create).filter(IJavaProject::exists).orElse(null);
   }
 
   /**
