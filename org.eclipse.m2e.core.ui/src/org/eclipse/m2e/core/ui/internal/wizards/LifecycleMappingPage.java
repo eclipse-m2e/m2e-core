@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -133,6 +134,8 @@ public class LifecycleMappingPage extends WizardPage {
     setTitle(Messages.LifecycleMappingPage_title);
     setDescription(Messages.LifecycleMappingPage_description);
     setPageComplete(true); // always allow to leave mapping page, even when there are mapping problems
+    setImageDescriptor(ImageDescriptor
+        .createFromURL(LifecycleMappingPage.class.getResource("/icons/banner_lifecycleMappingPage.png")));
   }
 
   /**
