@@ -59,9 +59,7 @@
         <versionRange>[3.4,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore>
-          <message>maven-dependency-plugin (some goals) are ignored by m2e.</message>
-        </ignore>
+        <ignore />
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -127,9 +125,7 @@
         <versionRange>[1.0-alpha-1,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore>
-          <message>maven-enforcer-plugin (goal "enforce") is ignored by m2e.</message>
-        </ignore>
+        <ignore />
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -142,9 +138,7 @@
         <versionRange>[1.6-SONATYPE-r940877,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore>
-          <message>maven-invoker-plugin (goal "install") is ignored by m2e.</message>
-        </ignore>
+        <ignore />
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -157,9 +151,7 @@
         </goals>
       </pluginExecutionFilter>
       <action>
-        <ignore>
-          <message>maven-remote-resources-plugin (goal "process") is ignored by m2e.</message>
-        </ignore>
+        <ignore />
       </action>
     </pluginExecution>
     <pluginExecution>
