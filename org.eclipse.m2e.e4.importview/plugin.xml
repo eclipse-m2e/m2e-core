@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="Project Importer"
+            icon="icons/import_m2_project.gif"
+            category="org.eclipse.m2e.core.views.repositories"
+            class="org.eclipse.m2e.importview.views.ProjectImportView"
+            id="org.eclipse.m2e.importview.views.ProjectImportView">
+      </view>
+   </extension>
+<!--
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="viewzumkopieren.views.SampleView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+-->
+
+</plugin>
