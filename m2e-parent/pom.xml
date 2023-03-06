@@ -24,7 +24,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tycho-version>3.0.0</tycho-version>
+		<tycho-version>3.0.1</tycho-version>
 		<tycho.p2.baselineMode>warn</tycho.p2.baselineMode>
 		<scmConnectionRaw>scm:git:https://github.com/eclipse-m2e/m2e-core.git</scmConnectionRaw>
 	</properties>

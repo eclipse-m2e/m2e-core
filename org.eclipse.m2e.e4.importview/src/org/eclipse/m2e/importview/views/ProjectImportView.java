@@ -11,60 +11,26 @@
 
 package org.eclipse.m2e.importview.views;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.*;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.LocalProjectScanner;
-import org.eclipse.m2e.core.project.MavenProjectInfo;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.project.*;
 import org.eclipse.m2e.core.ui.internal.wizards.ImportMavenProjectsJob;
-import org.eclipse.m2e.e4.importview.MavenE4ImportViewPlugin;
-import org.eclipse.m2e.e4.importview.Messages;
+import org.eclipse.m2e.e4.importview.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.layout.*;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.ui.*;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -274,9 +240,9 @@ public class ProjectImportView extends ViewPart {
 			return false;
 		}
 
-		File workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
+		String workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 		MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
-		LocalProjectScanner scanner = new LocalProjectScanner(workspaceRoot, location.trim(), false, modelManager);
+		LocalProjectScanner scanner = new LocalProjectScanner(Collections.singletonList(workspaceRoot), false, modelManager);
 
 		// TODO: show progress to user (no null progress monitor, instead go async)
 		try {
@@ -555,11 +521,11 @@ public class ProjectImportView extends ViewPart {
 		private List<MavenProjectInfo> getProjectsToImport() {
 			List<MavenProjectInfo> projectList = new ArrayList<>();
 			Set<String> projectsInWorkspace = getGroupIdAndArtifactIdOfAllProjectsInWorkspace();
-			Iterator<MavenProjectInfo> iterator = projectsToImport.iterator();
 			MavenProjectInfo mavenProjectInfo;
 			Model mavenModel;
-			while (iterator.hasNext()) {
-				mavenProjectInfo = iterator.next();
+			for( MavenProjectInfo element : projectsToImport )
+      {
+				mavenProjectInfo = element;
 				mavenModel = mavenProjectInfo.getModel();
 				String groupId = getGroupId(mavenModel);
 				if (!projectsInWorkspace.contains(String.format("%s:%s", groupId, mavenModel.getArtifactId()))) {
@@ -582,10 +548,9 @@ public class ProjectImportView extends ViewPart {
 
 		private Set<String> getGroupIdAndArtifactIdOfAllProjectsInWorkspace() {
 			HashSet<String> result = new HashSet<>();
-			IMavenProjectFacade[] mavenProjectFacades = MavenPlugin.getMavenProjectRegistry().getProjects();
+			List<IMavenProjectFacade> mavenProjectFacades = MavenPlugin.getMavenProjectRegistry().getProjects();
 			for (IMavenProjectFacade mavenProjectFacade : mavenProjectFacades) {
-				result.add(String.format("%s:%s", mavenProjectFacade.getArtifactKey().getGroupId(),
-						mavenProjectFacade.getArtifactKey().getArtifactId()));
+				result.add(String.format("%s:%s", mavenProjectFacade.getArtifactKey().groupId(), mavenProjectFacade.getArtifactKey().artifactId()));
 			}
 			return result;
 		}
@@ -759,10 +724,10 @@ public class ProjectImportView extends ViewPart {
 			File file = new File(new File(saveFileDialog.getFilterPath()), fileNames[0]);
 
 			StringBuffer fileContent = new StringBuffer();
-			Iterator<MavenProjectInfo> iterator = projectsToImport.iterator();
 			MavenProjectInfo mavenProjectInfo;
-			while (iterator.hasNext()) {
-				mavenProjectInfo = iterator.next();
+			for( MavenProjectInfo element : projectsToImport )
+      {
+				mavenProjectInfo = element;
 				fileContent.append(getProjectPath(mavenProjectInfo) + "/pom.xml\n");
 			}
 

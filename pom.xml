@@ -42,6 +42,8 @@
 		<module>org.eclipse.m2e.model.edit</module>
 		<module>org.eclipse.m2e.core</module>
 		<module>org.eclipse.m2e.core.ui</module>
+		<module>org.eclipse.m2e.e4.service</module>
+		<module>org.eclipse.m2e.e4.importview</module>
 		<module>org.eclipse.m2e.launching</module>
 		<module>org.eclipse.m2e.jdt</module>
 		<module>org.eclipse.m2e.jdt.ui</module>
