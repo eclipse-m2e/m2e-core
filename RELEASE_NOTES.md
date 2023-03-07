@@ -1,5 +1,13 @@
 # Eclipse m2e - Release notes
 
+## 2.2.1
+
+* 📅 Release Date: 7th March 2023
+
+### Regression fixes
+
+This release fixes several regressions from the previous release.
+
 ## 2.2.0
 
 * 📅 Release Date: 28th February 2023
