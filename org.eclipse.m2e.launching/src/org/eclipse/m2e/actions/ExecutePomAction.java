@@ -14,6 +14,7 @@
 package org.eclipse.m2e.actions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.debug.ui.ILaunchShortcut;
+import org.eclipse.debug.ui.ILaunchShortcut2;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -73,7 +75,7 @@ import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
  */
-public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
+public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, ILaunchShortcut2 {
   private static final Logger log = LoggerFactory.getLogger(ExecutePomAction.class);
 
   private boolean showDialog = false;
@@ -81,6 +83,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   private String goalName = null;
 
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
+    System.out.println("ExecutePomAction.setInitializationData()");
     if("WITH_DIALOG".equals(data)) { //$NON-NLS-1$
       this.showDialog = true;
     } else {
@@ -96,33 +99,8 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   }
 
   public void launch(ISelection selection, String mode) {
-    if(selection instanceof IStructuredSelection structuredSelection) {
-      Object object = structuredSelection.getFirstElement();
 
-      IContainer basedir = null;
-      if(object instanceof IContainer container) {
-        basedir = container;
-      } else if(object instanceof IFile file) {
-        basedir = file.getParent();
-      } else if(object instanceof IAdaptable adaptable) {
-        Object adapter = adaptable.getAdapter(IProject.class);
-        if(adapter != null) {
-          basedir = (IContainer) adapter;
-        } else {
-          adapter = adaptable.getAdapter(IFolder.class);
-          if(adapter != null) {
-            basedir = (IContainer) adapter;
-          } else {
-            adapter = adaptable.getAdapter(IFile.class);
-            if(adapter != null) {
-              basedir = ((IFile) object).getParent();
-            }
-          }
-        }
-      }
-
-      launch(basedir, mode);
-    }
+    launch(findPomXmlBasedir(selection), mode);
   }
 
   private void launch(IContainer basecon, String mode) {
@@ -161,7 +139,35 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
   }
 
-  private IContainer findPomXmlBasedir(IContainer dir) {
+  static IContainer findPomXmlBasedir(ISelection selection) {
+    IContainer basedir = null;
+    if(selection instanceof IStructuredSelection structuredSelection) {
+      Object object = structuredSelection.getFirstElement();
+      if(object instanceof IContainer container) {
+        basedir = container;
+      } else if(object instanceof IFile file) {
+        basedir = file.getParent();
+      } else if(object instanceof IAdaptable adaptable) {
+        Object adapter = adaptable.getAdapter(IProject.class);
+        if(adapter != null) {
+          basedir = (IContainer) adapter;
+        } else {
+          adapter = adaptable.getAdapter(IFolder.class);
+          if(adapter != null) {
+            basedir = (IContainer) adapter;
+          } else {
+            adapter = adaptable.getAdapter(IFile.class);
+            if(adapter != null) {
+              basedir = ((IFile) object).getParent();
+            }
+          }
+        }
+      }
+    }
+    return findPomXmlBasedir(basedir);
+  }
+
+  private static IContainer findPomXmlBasedir(IContainer dir) {
     if(dir == null) {
       return null;
     }
@@ -248,39 +254,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     IPath basedirLocation = basedir.getLocation();
     if(!showDialog) {
       try {
-//        ILaunch[] launches = launchManager.getLaunches();
-//        ILaunchConfiguration[] launchConfigurations = null;
-//        if(launches.length > 0) {
-//          for(int i = 0; i < launches.length; i++ ) {
-//            ILaunchConfiguration config = launches[i].getLaunchConfiguration();
-//            if(config != null && launchConfigurationType.equals(config.getType())) {
-//              launchConfigurations = new ILaunchConfiguration[] {config};
-//            }
-//          }
-//        }
-//        if(launchConfigurations == null) {
-//          launchConfigurations = launchManager.getLaunchConfigurations(launchConfigurationType);
-//        }
-
-        ILaunchConfiguration[] launchConfigurations = launchManager.getLaunchConfigurations(launchConfigurationType);
-        ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<>();
-        for(ILaunchConfiguration configuration : launchConfigurations) {
-          try {
-            // substitute variables (may throw exceptions)
-            String workDir = LaunchingUtils
-                .substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, (String) null));
-            if(workDir == null) {
-              continue;
-            }
-            IPath workPath = new Path(workDir);
-            if(basedirLocation.equals(workPath)) {
-              matchingConfigs.add(configuration);
-            }
-          } catch(CoreException e) {
-            log.error("Skipping launch configuration {}", configuration.getName(), e);
-          }
-
-        }
+        List<ILaunchConfiguration> matchingConfigs = getMatchingConfigurations(basedirLocation);
 
         if(matchingConfigs.size() == 1) {
           log.info("Using existing launch configuration");
@@ -359,6 +333,81 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
       log.error("Error creating new launch configuration", ex);
     }
     return null;
+  }
+
+  static List<ILaunchConfiguration> getMatchingConfigurations(IPath basedirLocation) throws CoreException {
+    ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+    ILaunchConfigurationType launchConfigurationType = launchManager
+        .getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID);
+    ILaunchConfiguration[] launchConfigurations = launchManager.getLaunchConfigurations(launchConfigurationType);
+    ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<>();
+    for(ILaunchConfiguration configuration : launchConfigurations) {
+      try {
+        // substitute variables (may throw exceptions)
+        String workDir = LaunchingUtils
+            .substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, (String) null));
+        if(workDir == null) {
+          continue;
+        }
+        IPath workPath = new Path(workDir);
+        if(basedirLocation.equals(workPath)) {
+          matchingConfigs.add(configuration);
+        }
+      } catch(CoreException e) {
+        log.debug("Skipping launch configuration {}", configuration.getName(), e);
+      }
+
+    }
+    return matchingConfigs;
+  }
+
+  public ILaunchConfiguration[] getLaunchConfigurations(ISelection selection) {
+    if(showLaunches()) {
+      return findLaunches(ExecutePomAction.findPomXmlBasedir(selection));
+    }
+    return null;
+  }
+
+  public ILaunchConfiguration[] getLaunchConfigurations(IEditorPart editorpart) {
+    if(showLaunches()) {
+      IEditorInput editorInput = editorpart.getEditorInput();
+      if(editorInput instanceof IFileEditorInput fileInput) {
+        return findLaunches(fileInput.getFile().getParent());
+      }
+    }
+    return null;
+  }
+
+  public IResource getLaunchableResource(ISelection selection) {
+    if(showLaunches()) {
+      return findPomXmlBasedir(selection);
+    }
+    return null;
+  }
+
+  public IResource getLaunchableResource(IEditorPart editorpart) {
+    if(showLaunches()) {
+      IEditorInput editorInput = editorpart.getEditorInput();
+      if(editorInput instanceof IFileEditorInput fileInput) {
+        return fileInput.getFile();
+      }
+    }
+    return null;
+  }
+
+  private boolean showLaunches() {
+    return showDialog;
+  }
+
+  private ILaunchConfiguration[] findLaunches(IContainer parent) {
+    try {
+      List<ILaunchConfiguration> matchingConfigurations = ExecutePomAction
+          .getMatchingConfigurations(parent.getLocation());
+      return matchingConfigurations.toArray(ILaunchConfiguration[]::new);
+    } catch(CoreException ex) {
+      ex.printStackTrace();
+      return new ILaunchConfiguration[0];
+    }
   }
 
 }
