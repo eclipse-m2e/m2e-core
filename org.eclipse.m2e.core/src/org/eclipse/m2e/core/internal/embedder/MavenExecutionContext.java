@@ -326,7 +326,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       artifacts.put(project, new LinkedHashSet<>(project.getArtifacts()));
       snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
     }
-    MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
+    MojoExecution clone = cloneMojoExecution(execution);
     try {
       MavenProject currentProject = session.getCurrentProject();
       LifecycleExecutionPlanCalculator executionPlanCalculator = lookup.lookup(LifecycleExecutionPlanCalculator.class);
@@ -349,6 +349,26 @@ public class MavenExecutionContext implements IMavenExecutionContext {
         }
       }
     }
+  }
+
+  private static MojoExecution cloneMojoExecution(MojoExecution execution) {
+    MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
+    //FIXME something's wrong with this "cloning" approach, as we lose the original mojoDescriptor.
+    // Intuitively, something like the following looks more "right", as it would clone the mojoDescriptor, 
+    // in order to avoid any caching shenanigans as mentioned in https://github.com/eclipse-m2e/m2e-core/issues/1304#issuecomment-1457955512.
+    // but even cloning the descriptor leads to an occurrence of https://github.com/eclipse-m2e/m2e-core/issues/1150 on project import
+    //    var descriptor = execution.getMojoDescriptor();
+    //    if(descriptor != null) {
+    //      clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
+    //    } else {
+    //      clone = new MojoExecution(descriptor.clone(), execution.getExecutionId(), execution.getSource());
+    //    }
+    clone.setConfiguration(execution.getConfiguration());
+    clone.setLifecyclePhase(execution.getLifecyclePhase());
+    execution.getForkedExecutions().forEach((k, v) -> {
+      clone.setForkedExecutions(k, v);
+    });
+    return clone;
   }
 
   private <V> V executeBare(MavenProject project, ICallable<V> callable, IProgressMonitor monitor)

@@ -1,41 +1,51 @@
 # Eclipse m2e - Release notes
 
+## 2.2.1
+
+* 📅 Release Date: 7th March 2023
+
+### Regression fixes
+
+This release fixes several regressions from the previous release.
+
 ## 2.2.0
 
 * 📅 Release Date: 28th February 2023
 
 ### Mojos without a mapping are now executed by default in incremental builds
 
-Before it was necessary to explicitly configure a mapping or there is a connector or the plugin itself contains mappings for a mojo to participate in the incremental maven build.
-This often leads to a poor user-experience and we think that users are adding mojos by purpose because they perform valuable tasks.
+Previously, to participate in the incremental maven build it was necessary to
+* explicitly configure a mapping, or
+* there had to be a connector, or
+* the plugin itself had to contain a mapping for a mojo
+This often leads to a poor user experience and we think that users are adding mojos on purpose because they perform valuable tasks.
 
-Because of this, m2e now automatically enables the execution of mojos if there is no mapping configured, in case you want to change this there is a new configuration option to control the behavior:
+Because of this, M2E now automatically enables the execution of mojos if there is no mapping configured. In case you want to change this there is a new configuration option to control the behavior:
 ![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png) 
 
 ### Updated Dependency Editor
 
-The dependencies editor has been adapted to show all artifacts within a target location as a single table, instead of multiple tabs. This change also includes support for only updating a selected number of artifacts to their latest version, as well as a undo/redo functionality.
+The dependencies editor has been adapted to show all artifacts within a target location as a single table, instead of multiple tabs. This change also includes support for updating only a selected number of artifacts to their latest version, as well as undo/redo functionality.
 
 ![grafik](https://user-images.githubusercontent.com/70652978/212153011-160fa96a-1c06-4092-9b89-fcd7a3c2859e.png)
 
 
 ### Ignore Test Sources and Resources compilation if `maven.test.skip=true` is specified
 
-The property "<maven.test.skip>true</maven.test.skip>" and the "skip" property in configurations of the "maven-compiler-plugin" and "maven-resources-plugin" are now taken into
-account by M2E in the sense that, if enabled, M2E ignores the corresponding folder, which no longer appear in the Package Explorer as "Java" folders but as standard folders.
+The property `<maven.test.skip>true</maven.test.skip>` and the `skip` property in configurations of the `maven-compiler-plugin` and `maven-resources-plugin` are now taken into account by M2E. If enabled, M2E ignores the corresponding folder. It will no longer appear in the Package Explorer as a "Java" folder, but as a regular folder.
 This allows, depending on the need (especially compilation time), to either not compile tests or not copy test resources.
 
-In general it is not recommended to use the mentioned properties but to use `-DskipTests` instead:
+In general, it is not recommended to use the mentioned properties but to use `-DskipTests` instead:
 https://maven.apache.org/surefire/maven-surefire-plugin/examples/skipping-tests.html
 
 
 ### Configuration of Maven Execution JRE
 
-In the past the project's build JRE was also used by default to execute Maven itself. 
+In the past, the project's build JRE was also used by default to execute Maven itself. 
 Now the default Java version for executing Maven is determined from the configuration of the `maven-enforcer-plugin` rule [`requireJavaVersion`](https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html) when creating or updating the Maven configuration. This value is no longer considered for configuring the project's build JRE.
-In case this plugin configuration is not found one falls back to either project's build JRE or workspace default JRE.
+In case this plugin configuration is not found, M2E falls back to either the project's build JRE or the workspace's default JRE.
 
-For each Maven build configuration you can overwrite the default execution JRE in the Maven Launch configuration's JRE tab:
+For each Maven build configuration, you can overwrite the default execution JRE in the Maven Launch configuration's JRE tab:
 
 ![Maven Launch Configuration JRE Tab](https://user-images.githubusercontent.com/185025/208966517-7d847058-23b9-4e2e-8b1a-7a86df4836bd.png)
 

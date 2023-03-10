@@ -1034,7 +1034,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
         context = new MavenExecutionContext(containerManager.aquire(pom).getComponentLookup(), basedir, null);
       }
     } catch(Exception ex) {
-      throw new CoreException(Status.error("aquire container failed", ex));
+      throw new CoreException(Status.error("Acquire container failed", ex));
     }
     configureExecutionRequest(context.getExecutionRequest(), state, pom, resolverConfiguration);
     return context;

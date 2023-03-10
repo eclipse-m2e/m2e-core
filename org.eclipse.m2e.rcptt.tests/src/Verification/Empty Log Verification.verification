@@ -1,0 +1,25 @@
+--- RCPTT verification ---
+Format-Version: 1.0
+Element-Name: Empty Log Verification
+Element-Type: verification
+Element-Version: 2.0
+Id: _7el9kIfGEe2DibE_7T1Sqw
+Runtime-Version: 2.5.4.202210020716
+Save-Time: 12/29/22, 11:33 PM
+Verification-Type: org.eclipse.rcptt.verifications.log
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Validates that no error has been thrown during the test execution.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57
+Content-Type: text/errorlog-verification
+Entry-Name: .errorlog.verification
+
+INCLUDE CONTEXTS: true
+DENIED:
+4 0 .* Message:.*
+
+------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57--

@@ -164,7 +164,7 @@ public interface IMavenExecutionContext {
       return new MavenExecutionContext(containerManager.getComponentLookup(baseDir), baseDir, null);
     } catch(Exception ex) {
       throw new CoreException(
-          Status.error("aquire container for basedir " + baseDir.getAbsolutePath() + " failed!", ex));
+          Status.error("Acquire container for basedir " + baseDir.getAbsolutePath() + " failed!", ex));
     }
 
   }
