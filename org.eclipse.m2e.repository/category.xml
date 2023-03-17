@@ -27,7 +27,8 @@
    <bundle id="com.google.gson"/>
    <bundle id="com.google.gson.source"/>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
-   <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/1.0.1/" enabled="true" />
-   <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.21.0/" enabled="true" />
-   <repository-reference location="https://download.eclipse.org/eclipse/updates/4.26/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/1.0.3/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/lsp4j/updates/releases/0.20.1/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.22.0/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/eclipse/updates/4.27/" enabled="true" />
 </site>
