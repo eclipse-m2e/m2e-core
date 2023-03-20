@@ -34,6 +34,7 @@
 		<jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
 		<tycho.scmUrl>scm:git:https://github.com/eclipse-m2e/m2e-core.git</tycho.scmUrl>
 		<trimStackTrace>false</trimStackTrace>
+		<ecjVersion>3.32.0</ecjVersion>
 	</properties>
 
 	<modules>
@@ -129,6 +130,9 @@
 							<version>2.1.0-SNAPSHOT</version>
 						</artifact>
 					</target>
+					<dependency-resolution>
+						<localArtifacts>ignore</localArtifacts>
+					</dependency-resolution>
 					<environments>
 						<environment>
 							<os>win32</os>
@@ -206,6 +210,13 @@
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho-version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.eclipse.jdt</groupId>
+							<artifactId>ecj</artifactId>
+							<version>${ecjVersion}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
