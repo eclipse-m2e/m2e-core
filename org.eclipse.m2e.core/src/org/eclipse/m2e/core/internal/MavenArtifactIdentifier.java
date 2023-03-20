@@ -35,7 +35,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
@@ -115,7 +114,7 @@ public class MavenArtifactIdentifier {
       HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
       JsonObject container = new Gson().fromJson(response.body(), JsonObject.class);
       JsonArray docs = container.get("response").getAsJsonObject().get("docs").getAsJsonArray();
-      return StreamSupport.stream(docs.spliterator(), false).map(JsonElement::getAsJsonObject).map(obj -> {
+      return docs.asList().stream().map(JsonElement::getAsJsonObject).map(obj -> {
         String g = obj.get("g").getAsString();
         String a = obj.get("a").getAsString();
         String v = obj.get("v").getAsString();
