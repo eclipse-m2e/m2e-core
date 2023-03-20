@@ -90,7 +90,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   /** Default constructor. Sets the title and image of the wizard. */
   public MavenModuleWizard() {
     setWindowTitle(Messages.wizardModuleTitle);
-    setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
+    setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_MODULE_PROJECT);
     setNeedsProgressMonitor(true);
   }
 

@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.NestedProjectsComposite;
 
@@ -136,7 +138,9 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
 
     setTitle(getDialogTitle());
     setMessage(getDialogMessage());
-
+    Image image = MavenImages.WIZ_UPDATE_PROJECT.createImage();
+    setTitleImage(image);
+    area.addDisposeListener(e -> image.dispose());
     return area;
   }
 
