@@ -336,6 +336,7 @@
             label="java">
       </keyword>
    </extension>
+   <!--
    <extension
          point="org.eclipse.jdt.ui.quickFixProcessors">
       <quickFixProcessor
@@ -343,7 +344,8 @@
             id="org.eclipse.m2e.jdt.ui.quickFixProcessor1"
             name="M2Eclipse">
       </quickFixProcessor>
-   </extension>   
+   </extension>
+   -->
 	<extension point="org.eclipse.ui.perspectiveExtensions">
 	   <perspectiveExtension
 	         targetID="org.eclipse.jdt.ui.JavaPerspective">
