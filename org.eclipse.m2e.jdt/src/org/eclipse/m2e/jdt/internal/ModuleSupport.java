@@ -109,7 +109,7 @@ public class ModuleSupport {
       try {
         targetCompliance = Integer.parseInt(option);
       } catch(NumberFormatException ex) {
-        log.error(ex.getMessage(), ex);
+        // ignore jsr14
       }
     }
     if(targetCompliance < 9) {

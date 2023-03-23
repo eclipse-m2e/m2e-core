@@ -15,13 +15,14 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,37 +100,31 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<>();
 
   static {
+    Set<String> supportedExecutionEnvironmentTypes = Set.of("JRE", "J2SE", "JavaSE");
 
-    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> sources = new ArrayList<>();
 
-    List<String> targets = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
-
-    List<String> releases = new ArrayList<>(Arrays.asList("6,7,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
-
-    ENVIRONMENTS.put("1.1", "JRE-1.1"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.2", "J2SE-1.2"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.3", "J2SE-1.3"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.4", "J2SE-1.4"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.5", "J2SE-1.5"); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> targets = new ArrayList<>();
+    //Special case
+    targets.add("jsr14"); //$NON-NLS-1$
     ENVIRONMENTS.put("jsr14", "J2SE-1.5"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.6", "JavaSE-1.6"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    for(int i = 9; i < 20; i++ ) { //Check from Java 9 to 20, because yeah, Java evolves that fast
-      String level = String.valueOf(i);
-      IExecutionEnvironment modernJavaSe = JavaRuntime.getExecutionEnvironmentsManager()
-          .getEnvironment("JavaSE-" + level);//$NON-NLS-1$
-      if(modernJavaSe == null) {
-        break;//we didn't find that level, so we bail because there's nothing after that
+    List<String> releases = new ArrayList<>(List.of("6", "7", "8"));
+
+    for(var ee : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+      var eeId = ee.getId();
+      if(supportedExecutionEnvironmentTypes.stream().filter(type -> eeId.startsWith(type)).findAny().isEmpty()) {
+        continue;
       }
-      String level1 = "1." + level;//$NON-NLS-1$
-      sources.add(level1);
-      sources.add(level);
-      targets.add(level1);
-      targets.add(level);
-      releases.add(level);
-      ENVIRONMENTS.put(level, modernJavaSe.getId());
+      var compliance = ee.getComplianceOptions().get(JavaCore.COMPILER_COMPLIANCE);
+      if(compliance != null) {
+        sources.add(compliance);
+        targets.add(compliance);
+        if(JavaCore.ENABLED.equals(ee.getComplianceOptions().get(JavaCore.COMPILER_RELEASE))) {
+          releases.add(compliance);
+        }
+        ENVIRONMENTS.put(compliance, eeId);
+      }
     }
 
     SOURCES = Collections.unmodifiableList(sources);
@@ -652,9 +647,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
 
-    if(release != null)
-
-    {
+    if(release != null) {
       source = release;
       target = release;
     } else {
@@ -669,11 +662,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
 
     }
-
-    // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source/target,
-    // Eclipse expects the values 1.5 and 1.6 and so on.
-    source = sanitizeJavaVersion(source);
-    target = sanitizeJavaVersion(target);
 
     options.put(JavaCore.COMPILER_SOURCE, source);
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
@@ -771,6 +759,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private String sanitizeJavaVersion(String version) {
+    if(version == null) {
+      return null;
+    }
     return switch(version) {
       case "5", "6", "7", "8" -> "1." + version;
       default -> {
@@ -799,53 +790,38 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
-  private String getCompilerLevel(MavenProject mavenProject, MojoExecution execution, String parameter, String source,
-      List<String> levels, IProgressMonitor monitor) {
-    int levelIdx = getLevelIndex(source, levels);
-
+  private String getCompilerLevel(MavenProject mavenProject, MojoExecution execution, String parameter,
+      String prevVersion, List<String> supportedVersions, IProgressMonitor monitor) {
     try {
-      source = maven.getMojoParameterValue(mavenProject, execution, parameter, String.class, monitor);
+      String version = maven.getMojoParameterValue(mavenProject, execution, parameter, String.class, monitor);
+      if(version == null) {
+        return prevVersion;
+      }
+      if(!"release".equals(parameter)) {
+        // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source/target,
+        // Eclipse expects the values 1.5 and 1.6 and so on.
+        version = sanitizeJavaVersion(version);
+      }
+      if(!supportedVersions.isEmpty() && !supportedVersions.contains(version)) {
+        // supported versions are sorted, so last === highest
+        String highestVersion = supportedVersions.get(supportedVersions.size() - 1);
+        try {
+          if(Version.valueOf(highestVersion).compareTo(Version.valueOf(version)) < 0) {
+            // project (javac) version is probably not yet supported by JDT, 
+            // so return the highest available version available at that time
+            return highestVersion;
+          }
+        } catch(Exception malformedVersion) {
+          //Ignore malformed version
+        }
+        return prevVersion;
+      }
+      return JavaCore.compareJavaVersions(prevVersion, version) < 0 ? version : prevVersion;
+
     } catch(CoreException ex) {
       log.error("Failed to determine compiler " + parameter + " setting, assuming default", ex);
     }
-
-    int newLevelIdx = getLevelIndex(source, levels);
-
-    if(newLevelIdx > levelIdx) {
-      levelIdx = newLevelIdx;
-    }
-
-    if(levelIdx < 0) {
-      return null;
-    }
-
-    return levels.get(levelIdx);
-  }
-
-  private int getLevelIndex(String level, List<String> levels) {
-    int idx = -1;
-    if(level != null) {
-      idx = levels.indexOf(level);
-      if(idx < 0) {
-        //JDK level probably not yet supported by JDT
-        int highestIdx = levels.size() - 1;
-        try {
-          if(asDouble(level) > asDouble(levels.get(highestIdx))) {
-            //take highest known value
-            idx = highestIdx;
-          }
-        } catch(NumberFormatException ignore) {
-        }
-      }
-    }
-    return idx;
-  }
-
-  private double asDouble(String level) {
-    if(level == null || level.isEmpty()) {
-      return -1;
-    }
-    return Double.parseDouble(sanitizeJavaVersion(level));
+    return prevVersion;
   }
 
   @Override
