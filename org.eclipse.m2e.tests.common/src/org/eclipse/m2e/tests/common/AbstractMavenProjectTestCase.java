@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -243,8 +244,8 @@ public abstract class AbstractMavenProjectTestCase {
     // Otherwise MavenLaunchDelegate.findMavenProjectBasedir() find this git repos .mvn folder and its content would interfer with the tests.
     Files.createDirectories(Path.of(workspace.getRoot().getLocationURI()).resolve(".mvn"));
 
-    FilexWagon.setRequestFailPattern(null);
-    FilexWagon.setRequestFilterPattern(null, true);
+    FilexWagon.reset();
+    HttxWagon.reset();
     driveEvents();
   }
 
@@ -268,6 +269,7 @@ public abstract class AbstractMavenProjectTestCase {
     setAutoBuilding(false);
     setAutomaticallyUpdateConfiguration(false);
     FilexWagon.reset();
+    HttxWagon.reset();
   }
 
   /**
@@ -683,15 +685,21 @@ public abstract class AbstractMavenProjectTestCase {
     return projects;
   }
 
-  protected void injectFilexWagon() throws Exception {
+  protected void injectRedirectingWagons() throws Exception {
+    injectWagon(FilexWagon.class, FilexWagon.PROTOCOL);
+    injectWagon(HttxWagon.class, HttxWagon.PROTOCOL);
+  }
+
+  private void injectWagon(Class<? extends Wagon> wagonClass, String wagonRoleHint)
+      throws CoreException, CycleDetectedInComponentGraphException {
     PlexusContainer container = MavenPlugin.getMaven().lookup(PlexusContainer.class);
-    if(container.getContainerRealm().getResource(FilexWagon.class.getName().replace('.', '/') + ".class") == null) {
-      container.getContainerRealm().importFrom(FilexWagon.class.getClassLoader(), FilexWagon.class.getName());
+    if(container.getContainerRealm().getResource(wagonClass.getName().replace('.', '/') + ".class") == null) {
+      container.getContainerRealm().importFrom(wagonClass.getClassLoader(), wagonClass.getName());
       ComponentDescriptor<Wagon> descriptor = new ComponentDescriptor<>();
       descriptor.setRealm(container.getContainerRealm());
       descriptor.setRoleClass(Wagon.class);
-      descriptor.setImplementationClass(FilexWagon.class);
-      descriptor.setRoleHint("filex");
+      descriptor.setImplementationClass(wagonClass);
+      descriptor.setRoleHint(wagonRoleHint);
       descriptor.setInstantiationStrategy("per-lookup");
       container.addComponentDescriptor(descriptor);
     }

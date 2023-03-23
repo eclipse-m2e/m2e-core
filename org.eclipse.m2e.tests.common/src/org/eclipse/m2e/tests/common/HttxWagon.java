@@ -9,34 +9,38 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Hannes Wellmann - Create HttxWagon based on FilexWagon
  *******************************************************************************/
 
 package org.eclipse.m2e.tests.common;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.InputData;
 import org.apache.maven.wagon.OutputData;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
-import org.apache.maven.wagon.providers.file.FileWagon;
+import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.proxy.ProxyInfoProvider;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.resource.Resource;
+
+import io.takari.aether.wagon.OkHttpsWagon;
 
 
 /**
  * A special wagon for testing that allows to record the requests made to a repository. Use
  * {@link #setRequestFilterPattern(String, boolean)} to configure what to record and to optionally clear previous
- * records. The repository URL to use with this wagon looks like {@code filex://localhost/<path-relative-to-project>}.
+ * records. The repository URL to use with this wagon looks like {@code httx://localhost/<path-relative-to-project>}.
  */
-public class FilexWagon extends FileWagon {
+public class HttxWagon extends OkHttpsWagon {
 
-  static final String PROTOCOL = "filex";
+//MUST NOT start with "http", because otherwise the io.takari.aether.connector.AetherRepositoryConnector will consider it as default http(s) and will handle the connection.
+  static String PROTOCOL = "httx";
 
   private static List<String> requests = new ArrayList<>();
 
@@ -59,23 +63,20 @@ public class FilexWagon extends FileWagon {
     requestFailPattern = regex;
   }
 
-  @Override
   public void connect(Repository repository, AuthenticationInfo authenticationInfo, ProxyInfoProvider proxyInfoProvider)
       throws ConnectionException, AuthenticationException {
-    String basedir = repository.getBasedir();
-    if(basedir != null && basedir.startsWith("/")) {
-      repository.setBasedir(basedir.substring(1));
+    if(PROTOCOL.equals(repository.getProtocol())) {
+      repository.setUrl("https" + repository.getUrl().substring(PROTOCOL.length()));
     }
     super.connect(repository, authenticationInfo, proxyInfoProvider);
   }
 
-  @Override
-  public void fillInputData(InputData inputData) throws TransferFailedException, ResourceDoesNotExistException {
-    recordOperation("GET", inputData.getResource());
-    super.fillInputData(inputData);
+  protected InputStream getInputStream(Resource resource)
+      throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException {
+    recordOperation("GET", resource);
+    return super.getInputStream(resource);
   }
 
-  @Override
   public void fillOutputData(OutputData outputData) throws TransferFailedException {
     recordOperation("PUT", outputData.getResource());
     super.fillOutputData(outputData);
