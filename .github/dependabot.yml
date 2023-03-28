@@ -9,3 +9,504 @@ updates:
   directory: "/"
   schedule:
     interval: daily
+
+
+  - package-ecosystem: maven
+    directory: /m2e-maven-runtime/org.eclipse.m2e.archetype.common
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /m2e-maven-runtime/org.eclipse.m2e.maven.runtime
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /m2e-maven-runtime
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /m2e-parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/argumentMap
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/autovalue
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/compilerArgs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/nonjar_plugin_deps
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/nullCompilerArgs
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p0
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p1
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p10
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p11
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p12
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p13
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p14
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p1_test_classpath_disabled
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p3
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p4
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p5
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p6
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p7
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p8
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.apt.tests/projects/p9
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/bug548652/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/bug548652
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/buildStartTime
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/dependency/dependency
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/dependency/dependent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/dotMvn/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/emptyPom
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/enforcerSettingsWithVersion
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/enforcerSettingsWithVersionRange
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/enforcerSettingsWithoutRequiredJavaVersion
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/invalidParent/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/invalidParent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/missingParent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/pomless
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/pomless2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/projectExtension
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/resourcesWithMVNFolder
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/simplePomOK
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/testMNG6530/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.tests/resources/projects/testMNG6530
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests/resources/projects/example1/module1
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests/resources/projects/example1
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests/resources/projects/simple-tycho
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests/resources/projects/simple.projectWithJUnit-5_Test
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core.ui.tests/resources/projects/simplePomOK
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.lemminx.tests/src/org/eclipse/m2e/editor/lemminx/tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.lemminx
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/broken_child/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/broken_target/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/broken_target/parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/colourprovider/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/dep_exists/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/dep_exists_diff_version/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/dep_exists_diff_version_diff_poms/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/dep_exists_diff_version_diff_poms/parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/diff/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/diff/parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/dirtyState/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/modules/project1/module1
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/modules/project1/module2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/modules/project1
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/modules/project2
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/modules/project3
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/multi/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/multi/parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/same/child
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/projects/same/parent
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.editor.tests/src/org/eclipse/m2e/editor/tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/basicProjectWithDep
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/compilerJpmsSettings
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/compilerSettings
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/compilerWarnings
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/parentproject/app
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/parentproject/core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/parentproject
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/skipAllTest
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/skipTestCompilation
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.jdt.tests/projects/skipTestResources
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/bnd
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/felix/bundle-project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/felix/jar-project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/felix
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/tycho/pde.tycho.feature
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/tycho/pde.tycho.plugin.with.ds
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/tycho/pde.tycho.plugin
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.pde.connector.tests/projects/tycho
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.profiles.core.tests/resources/projects/relative-path-profiles/modules/module-a
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.profiles.core.tests/resources/projects/relative-path-profiles/poms/classification-poms/api-classifier-pom
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.profiles.core.tests/resources/projects/relative-path-profiles/poms/parent-pom
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.profiles.core.tests/resources/projects/relative-path-profiles/poms
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.rcptt.tests
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /org.eclipse.m2e.repository
+    schedule:
+      interval: daily
