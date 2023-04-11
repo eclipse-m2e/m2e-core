@@ -300,7 +300,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String mainResourcesEncoding = null;
       String testResourcesEncoding = null;
 
-      boolean isTestCompilationSkipped = false;
+      boolean isTestCompilationSkipped = true;
       boolean isTestResourcesSkipped = false;
 
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
@@ -338,10 +338,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
           }
           try {
-            isTestCompilationSkipped = Boolean.TRUE
-                .equals(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor)); //$NON-NLS-1$
+            if( !Boolean.TRUE
+                .equals(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor))) //$NON-NLS-1$
+                isTestCompilationSkipped=false;
           } catch(Exception ex) {
-            //ignore
+            isTestCompilationSkipped=false;
           }
         }
       }
