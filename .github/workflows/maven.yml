@@ -37,7 +37,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build m2e-core
-      uses: GabrielBB/xvfb-action@v1
+      uses: coactions/setup-xvfb@v1
       with:
        run: mvn clean verify -Pits -Dtycho.p2.baselineMode=failCommon --batch-mode
     - name: Upload Test Results
