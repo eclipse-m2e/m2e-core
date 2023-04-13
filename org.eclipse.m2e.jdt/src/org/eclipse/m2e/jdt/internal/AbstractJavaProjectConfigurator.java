@@ -301,7 +301,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String testResourcesEncoding = null;
 
       boolean isTestCompilationSkipped = true;
-      boolean isTestResourcesSkipped = false;
+      boolean isTestResourcesSkipped = true;
 
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
       for(MojoExecution compile : executions) {
@@ -356,10 +356,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
         testResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
         try {
-          isTestResourcesSkipped = Boolean.TRUE
-              .equals(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor)); //$NON-NLS-1$
+          if ( !Boolean.TRUE
+              .equals(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor))) //$NON-NLS-1$
+              isTestResourcesSkipped=false;
         } catch(Exception ex) {
-          //ignore
+          isTestResourcesSkipped=false;
         }
       }
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
