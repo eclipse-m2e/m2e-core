@@ -177,14 +177,12 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:RepositoryPredicate"
-            project="org.eclipse.m2e.core"/>
+            project="org.eclipse.m2e.core"
+            includeNestedRepositories="true"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
             excludedWorkingSet="//@setupTasks.11/@workingSets[name='m2e-core-tests'] //@setupTasks.11/@workingSets[name='m2e-maven-runtime']"/>
       </predicate>
-      <predicate
-          xsi:type="predicates:LocationPredicate"
-          pattern="${git.clone.m2e.core.location|path}/m2e-core-tests"/>
     </workingSet>
     <workingSet
         name="m2e-maven-runtime"
@@ -198,8 +196,10 @@
         name="m2e-core-tests"
         id="m2e.core.tests">
       <predicate
-          xsi:type="predicates:LocationPredicate"
-          pattern="${git.clone.m2e.core.location|path}/m2e-core-tests/[^/]+"/>
+          xsi:type="predicates:RepositoryPredicate"
+          project="org.eclipse.m2e.core"
+          relativePathPattern="m2e-core-tests/.*"
+          includeNestedRepositories="true"/>
     </workingSet>
     <description>The dynamic working sets for ${scope.project.label}</description>
   </setupTask>
