@@ -9,7 +9,7 @@ pipeline {
 		label "centos-latest"
 	}
 	tools {
-		maven 'apache-maven-3.8.6'
+		maven 'apache-maven-3.9.1'
 		jdk 'openjdk-jdk17-latest'
 	}
 	stages {
@@ -40,7 +40,7 @@ pipeline {
 		stage('Build') {
 			steps {
 				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
-				wrap([$class: 'Xvnc', useXauthority: true]) {
+				xvnc(useXauthority: true) {
 					sh '''
 						mavenArgs="clean verify -Dtycho.p2.baselineMode=failCommon --batch-mode"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
