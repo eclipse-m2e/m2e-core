@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -495,47 +496,49 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         continue;
       }
       File resourceDirectory = new File(directory);
-      if(resourceDirectory.isDirectory()) {
-        IPath relativePath = getProjectRelativePath(project, directory);
-        IResource r = project.findMember(relativePath);
-        if(r == project) {
-          /*
-           * Workaround for the Java Model Exception:
-           *   Cannot nest output folder 'xxx/src/main/resources' inside output folder 'xxx'
-           * when pom.xml have something like this:
-           *
-           * <build>
-           *   <resources>
-           *     <resource>
-           *       <directory>${basedir}</directory>
-           *       <targetPath>META-INF</targetPath>
-           *       <includes>
-           *         <include>LICENSE</include>
-           *       </includes>
-           *     </resource>
-           */
-          log.error("Skipping resource folder " + r.getFullPath());
-
-        } else if(r != null && project.equals(r.getProject())) {
-
-          IPath path = r.getFullPath();
-          IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, path);
-          if(enclosing != null && overlapsWithSourceFolder(path, project, mavenProject)) {
-            configureOverlapWithSource(classpath, enclosing, path);
-          } else if(overlapsWithOtherResourceFolder(path, project, mavenProject)) {
-            // skip adding resource folders that are included by other resource folders
-            log.info("Skipping resource folder " + path + " since it's contained by another resource folder");
-          } else {
-            addResourceFolder(classpath, path, outputPath, addTestFlag);
-          }
-
-          // Set folder encoding (null = platform default)
-          IFolder resourceFolder = project.getFolder(relativePath);
-          resourceFolder.setDefaultCharset(resourceEncoding, monitor);
-
+      IPath relativePath = getProjectRelativePath(project, directory);
+      IResource r = project.findMember(relativePath);
+      if(r == project) {
+        /*
+         * Workaround for the Java Model Exception:
+         *   Cannot nest output folder 'xxx/src/main/resources' inside output folder 'xxx'
+         * when pom.xml have something like this:
+         *
+         * <build>
+         *   <resources>
+         *     <resource>
+         *       <directory>${basedir}</directory>
+         *       <targetPath>META-INF</targetPath>
+         *       <includes>
+         *         <include>LICENSE</include>
+         *       </includes>
+         *     </resource>
+         */
+        log.error("Skipping resource folder " + r.getFullPath());
+        return;
+      }
+      if(r == null) {
+        //this means the resources does not exits (yet) but might be created later on!
+        r = project.getFolder(relativePath);
+      }
+      if(project.equals(r.getProject())) {
+        IPath path = r.getFullPath();
+        IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, path);
+        if(enclosing != null && overlapsWithSourceFolder(path, project, mavenProject)) {
+          configureOverlapWithSource(classpath, enclosing, path);
+        } else if(overlapsWithOtherResourceFolder(path, project, mavenProject)) {
+          // skip adding resource folders that are included by other resource folders
+          log.info("Skipping resource folder " + path + " since it's contained by another resource folder");
         } else {
-          log.info("Not adding resources folder " + resourceDirectory.getAbsolutePath());
+          addResourceFolder(classpath, path, outputPath, addTestFlag);
         }
+        // Set folder encoding (null = platform default)
+        IFolder resourceFolder = project.getFolder(relativePath);
+        if(resourceFolder.exists()) {
+          resourceFolder.setDefaultCharset(resourceEncoding, monitor);
+        }
+      } else {
+        log.info("Not adding resources folder " + resourceDirectory.getAbsolutePath());
       }
     }
   }
@@ -546,6 +549,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
         new IPath[] {new Path("**")}, false /*optional*/);
     descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
+    descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
   }
 
   private void configureOverlapWithSource(IClasspathDescriptor classpath, IClasspathEntryDescriptor enclosing,
