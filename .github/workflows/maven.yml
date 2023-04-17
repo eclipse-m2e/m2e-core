@@ -20,16 +20,16 @@ jobs:
     timeout-minutes: 45
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       with:
         fetch-depth: 0
         submodules: true
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
       with:
         java-version: '17'
         distribution: 'temurin'
     - name: Cache local Maven repository
-      uses: actions/cache@v3
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
       with:
         path: ~/.m2/repository
         # re-cache on changes in the pom and target files
@@ -37,11 +37,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build m2e-core
-      uses: coactions/setup-xvfb@v1
+      uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1.0.1
       with:
        run: mvn clean verify -Pits -Dtycho.p2.baselineMode=failCommon --batch-mode
     - name: Upload Test Results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: test-results-${{ matrix.os }}
         if-no-files-found: error
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         name: Event File
         path: ${{ github.event_path }}
