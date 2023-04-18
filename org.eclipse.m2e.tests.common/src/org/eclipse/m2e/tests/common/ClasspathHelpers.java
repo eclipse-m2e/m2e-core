@@ -14,6 +14,10 @@
 package org.eclipse.m2e.tests.common;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
@@ -32,6 +36,10 @@ import org.eclipse.jdt.core.JavaCore;
  * @since 1.1
  */
 public class ClasspathHelpers {
+
+  public static final String JRE_CONTAINER = "org.eclipse.jdt.launching.JRE_CONTAINER.*";
+
+  public static final String M2E_CONTAINER = "org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER";
 
   /**
    * Returns classpath entry with given path. Throws AssertionError if no such entry.
@@ -90,39 +98,48 @@ public class ClasspathHelpers {
 
   /**
    * Asserts that classpath matches specified path regex patterns.
+   * 
+   * @return a mapping from pattern to classpath entry in the order they appear in the classpath
    */
-  public static void assertClasspath(String[] expectedPathPatterns, IClasspathEntry[] cp) {
-    boolean matches = false;
-    if(expectedPathPatterns.length == cp.length) {
-      matches = true;
-      for(int i = 0; i < expectedPathPatterns.length; i++ ) {
-        if(!Pattern.matches(expectedPathPatterns[i], cp[i].getPath().toPortableString())) {
-          matches = false;
+  public static Map<String, IClasspathEntry> assertClasspath(String[] expectedPathPatterns, IClasspathEntry[] entries) {
+    Map<String, IClasspathEntry> matchingEntry = new LinkedHashMap<>(expectedPathPatterns.length);
+    Set<String> unmatched = new LinkedHashSet<>(Arrays.asList(expectedPathPatterns));
+    for(IClasspathEntry entry : entries) {
+      String path = entry.getPath().toPortableString();
+      for(String pattern : expectedPathPatterns) {
+        if(Pattern.matches(pattern, path)) {
+          matchingEntry.put(pattern, entry);
+          unmatched.remove(pattern);
           break;
         }
       }
     }
-    if(!matches) {
-      // pretty format and fail
-      StringBuilder sb_expected = new StringBuilder();
-      for(String expected : expectedPathPatterns) {
-        sb_expected.append(expected).append("\n");
-      }
-      StringBuilder sb_actual = new StringBuilder();
-      for(IClasspathEntry cpe : cp) {
-        sb_actual.append(cpe.getPath().toPortableString()).append("\n");
-      }
-      Assert.assertEquals("Unexpected classpath", sb_expected.toString(), sb_actual.toString());
+    if(unmatched.isEmpty()) {
+      //everything is fine!
+      return matchingEntry;
     }
+    // pretty format and fail
+    StringBuilder sb_expected = new StringBuilder();
+    for(String expected : unmatched) {
+      sb_expected.append(expected).append("\n");
+    }
+    StringBuilder sb_actual = new StringBuilder();
+    for(IClasspathEntry cpe : entries) {
+      sb_actual.append(cpe.getPath().toPortableString()).append("\n");
+    }
+    Assert.fail("The following entries could not be matched to the classpath: \n" + sb_expected.toString()
+        + "\nThe actual classpath is:\n" + sb_actual.toString());
+    return Map.of();
   }
 
   /**
    * @since 1.6
    */
-  public static void assertClasspath(IProject project, String... expectedPatterns) throws CoreException {
+  public static Map<String, IClasspathEntry> assertClasspath(IProject project, String... expectedPatterns)
+      throws CoreException {
     IJavaProject javaProject = JavaCore.create(project);
     Assert.assertNotNull("Is a Java project", javaProject);
-    assertClasspath(expectedPatterns, javaProject.getRawClasspath());
+    return assertClasspath(expectedPatterns, javaProject.getRawClasspath());
   }
 
   public static IClasspathAttribute getClasspathAttribute(IClasspathEntry entry, String attributeName) {
