@@ -28,7 +28,7 @@ public record ArtifactKey(String groupId, String artifactId, String version, Str
    * Note that this constructor uses Artifact.getBaseVersion
    */
   public ArtifactKey(Artifact a) {
-    this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), null);
+    this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier());
   }
 
   /**
