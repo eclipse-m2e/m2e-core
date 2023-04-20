@@ -66,7 +66,7 @@
 								-nouses: true
 								-nodefaultversion: true
 								-noextraheaders: true
-								-snapshot: ${buildQualifier}
+								-snapshot: ${def;buildQualifier;qualifier}
 								-removeheaders: Private-Package
 
 								Import-Package: !*
