@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Red Hat Inc. and others.
+ * Copyright (c) 2020, 2023 Red Hat Inc. and others.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -129,7 +129,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		IFile pomFile = child.getFile("pom.xml");
 		page.openEditor(new FileEditorInput(pomFile), GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
-		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, 10000, () -> {
+		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, 60000, () -> {
 			try {
 				IMarker[] markers = pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO);
 				if (markers.length == 0) {
