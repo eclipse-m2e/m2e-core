@@ -29,7 +29,7 @@ import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.environment.EnvironmentInfo;
 
 import ch.qos.logback.classic.BasicConfigurator;
 import ch.qos.logback.classic.Level;
@@ -55,6 +56,9 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
 
   // This has to match the log directory in defaultLogbackConfiguration/logback.xml
   private static final String PROPERTY_LOG_DIRECTORY = "org.eclipse.m2e.log.dir"; //$NON-NLS-1$
+
+  // This has to match the log directory in defaultLogbackConfiguration/logback.xml
+  private static final String PROPERTY_LOG_CONSOLE_THRESHOLD = "org.eclipse.m2e.log.console.threshold"; //$NON-NLS-1$
 
   @Override
   public void configure(LoggerContext lc) {
@@ -89,6 +93,11 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
       if(System.getProperty(PROPERTY_LOG_DIRECTORY, "").length() <= 0) { //$NON-NLS-1$
         System.setProperty(PROPERTY_LOG_DIRECTORY, stateDir.toAbsolutePath().toString());
       }
+      if(System.getProperty(PROPERTY_LOG_CONSOLE_THRESHOLD, "").length() <= 0) { //$NON-NLS-1$
+        if(isConsoleLogEnable()) {
+          System.setProperty(PROPERTY_LOG_CONSOLE_THRESHOLD, Level.DEBUG.levelStr);
+        }
+      }
       loadConfiguration(lc, configFile.toUri().toURL());
 
       //Delete old logs in legacy logback plug-in's state location. Can sum up to 1GB of disk-space.
@@ -105,7 +114,17 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
         Files.delete(legacyLogbackState);
       }
     } catch(Exception e) {
-      LOG.log(Status.warning("Exception while setting up logging:" + e.getMessage(), e)); //$NON-NLS-1$
+      LOG.log(Status.warning("Exception while setting up logging:" + e.getMessage(), e));
+    }
+  }
+
+  private boolean isConsoleLogEnable() {
+    ServiceTracker<EnvironmentInfo, Object> tracker = openServiceTracker(EnvironmentInfo.class);
+    try {
+      EnvironmentInfo environmentInfo = (EnvironmentInfo) tracker.getService();
+      return environmentInfo != null && "true".equals(environmentInfo.getProperty("eclipse.consoleLog")); //$NON-NLS-1$
+    } finally {
+      tracker.close();
     }
   }
 
@@ -124,25 +143,29 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
   }
 
   private static void applyDebugLogLevels(LoggerContext lc) {
-    Bundle bundle = Platform.getBundle("org.eclipse.m2e.core"); // fragments don't have a BundleContext
-    ServiceReference<DebugOptions> debugOptionsRef = bundle.getBundleContext().getServiceReference(DebugOptions.class);
-    if(debugOptionsRef != null) {
-      DebugOptions debugOptions = bundle.getBundleContext().getService(debugOptionsRef);
+    ServiceTracker<DebugOptions, Object> tracker = openServiceTracker(DebugOptions.class);
+    try {
+      DebugOptions debugOptions = (DebugOptions) tracker.getService();
       if(debugOptions != null) {
-        try {
-          Map<String, String> options = debugOptions.getOptions();
-          for(Entry<String, String> entry : options.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if(key.endsWith("/debugLog") && "true".equals(value)) {
-              lc.getLogger(key.replace("/debugLog", "")).setLevel(Level.DEBUG);
-            }
+        Map<String, String> options = debugOptions.getOptions();
+        for(Entry<String, String> entry : options.entrySet()) {
+          String key = entry.getKey();
+          String value = entry.getValue();
+          if(key.endsWith("/debugLog") && "true".equals(value)) {
+            lc.getLogger(key.replace("/debugLog", "")).setLevel(Level.DEBUG);
           }
-        } finally {
-          bundle.getBundleContext().ungetService(debugOptionsRef);
         }
       }
+    } finally {
+      tracker.close();
     }
+  }
+
+  private static <T> ServiceTracker<T, Object> openServiceTracker(Class<T> serviceClass) {
+    Bundle bundle = Platform.getBundle("org.eclipse.m2e.core"); // fragments don't have a BundleContext
+    ServiceTracker<T, Object> tracker = new ServiceTracker<>(bundle.getBundleContext(), serviceClass, null);
+    tracker.open();
+    return tracker;
   }
 
   // --- utility methods ---
