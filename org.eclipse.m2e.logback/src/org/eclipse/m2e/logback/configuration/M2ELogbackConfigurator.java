@@ -19,6 +19,8 @@ import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.Timer;
@@ -27,14 +29,17 @@ import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.service.debug.DebugOptions;
 
 import ch.qos.logback.classic.BasicConfigurator;
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.Configurator;
@@ -53,7 +58,7 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
 
   @Override
   public void configure(LoggerContext lc) {
-    // Bug 337167: Configuring Logback requires the state-location. If not yet initialized it will be initialized to the default value, 
+    // Bug 337167: Configuring Logback requires the state-location. If not yet initialized it will be initialized to the default value,
     // but this prevents the workspace-chooser dialog to show up in a stand-alone Eclipse-product. Therefore we have to wait until the resources plug-in has started.
     // This happens if a Plug-in that uses SLF4J is started before the workspace has been selected.
     if(!isStateLocationInitialized()) {
@@ -86,7 +91,7 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
       }
       loadConfiguration(lc, configFile.toUri().toURL());
 
-      //Delete old logs in legacy logback plug-in's state location. Can sum up to 1GB of disk-space. 
+      //Delete old logs in legacy logback plug-in's state location. Can sum up to 1GB of disk-space.
       // TODO: can be removed when some time has passed and it is unlikely old workspaces that need clean-up are used.
       Path legacyLogbackState = stateDir.resolveSibling("org.eclipse.m2e.logback.configuration");
       if(Files.isDirectory(legacyLogbackState)) {
@@ -113,7 +118,31 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
 
     StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 
+    applyDebugLogLevels(lc);
+
     logJavaProperties(LoggerFactory.getLogger(M2ELogbackConfigurator.class));
+  }
+
+  private static void applyDebugLogLevels(LoggerContext lc) {
+    Bundle bundle = Platform.getBundle("org.eclipse.m2e.core"); // fragments don't have a BundleContext
+    ServiceReference<DebugOptions> debugOptionsRef = bundle.getBundleContext().getServiceReference(DebugOptions.class);
+    if(debugOptionsRef != null) {
+      DebugOptions debugOptions = bundle.getBundleContext().getService(debugOptionsRef);
+      if(debugOptions != null) {
+        try {
+          Map<String, String> options = debugOptions.getOptions();
+          for(Entry<String, String> entry : options.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if(key.endsWith("/debugLog") && "true".equals(value)) {
+              lc.getLogger(key.replace("/debugLog", "")).setLevel(Level.DEBUG);
+            }
+          }
+        } finally {
+          bundle.getBundleContext().ungetService(debugOptionsRef);
+        }
+      }
+    }
   }
 
   // --- utility methods ---
