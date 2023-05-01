@@ -4,7 +4,7 @@
       <pattern>%date [%thread] %-5level %logger{35} - %msg%n</pattern>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>OFF</level> <!-- change to DEBUG to mimic '-consolelog' behaviour -->
+      <level>${org.eclipse.m2e.log.console.threshold:-OFF}</level> <!-- change to DEBUG to mimic '-consolelog' behaviour -->
     </filter>
   </appender>
 
@@ -31,7 +31,7 @@
 
   <appender name="MavenConsoleLog" class="org.eclipse.m2e.logback.appender.MavenConsoleAppender">
   </appender>
-        
+
   <root level="INFO">
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
