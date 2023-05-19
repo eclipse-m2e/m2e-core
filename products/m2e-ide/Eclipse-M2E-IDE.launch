@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
     <setAttribute key="additional_plugins">
-        <setEntry value="org.apache.felix.scr:2.2.4:default:true:2:true"/>
+        <setEntry value="ch.qos.logback.classic:1.4.8:default:true:default:true"/>
+        <setEntry value="jakarta.servlet-api:5.0.0:default:true:default:default"/>
+        <setEntry value="org.apache.aries.spifly.dynamic.bundle:1.3.6:default:true:2:true"/>
+        <setEntry value="org.apache.felix.scr:2.2.6:default:true:2:true"/>
         <setEntry value="org.apache.xml.resolver:1.2.0.v20220715-1206:default:true:default:default"/>
-        <setEntry value="org.eclipse.core.runtime:3.26.100.v20221021-0005:default:true:default:true"/>
-        <setEntry value="org.eclipse.equinox.common:3.17.0.v20221108-1156:default:true:2:true"/>
-        <setEntry value="org.eclipse.equinox.event:1.6.100.v20211021-1418:default:true:2:true"/>
+        <setEntry value="org.eclipse.core.runtime:3.27.0.v20230515-1719:default:true:default:true"/>
+        <setEntry value="org.eclipse.equinox.common:3.18.0.v20230523-2142:default:true:2:true"/>
+        <setEntry value="org.eclipse.equinox.event:1.6.200.v20230120-0604:default:true:2:true"/>
         <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.200.v20221111-1340:default:true:1:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
@@ -41,7 +44,7 @@
         <setEntry value="org.eclipse.m2e.pde.feature:default"/>
         <setEntry value="org.eclipse.sdk:default"/>
     </setAttribute>
-    <booleanAttribute key="show_selected_only" value="false"/>
+    <booleanAttribute key="show_selected_only" value="true"/>
     <booleanAttribute key="tracing" value="false"/>
     <booleanAttribute key="useCustomFeatures" value="true"/>
     <booleanAttribute key="useDefaultConfig" value="true"/>

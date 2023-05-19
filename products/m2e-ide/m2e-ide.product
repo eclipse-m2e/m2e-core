@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="M2Eclipse IDE" uid="m2e-ide" id="org.eclipse.platform.ide" application="org.eclipse.ui.ide.workbench" version="2.0.0" useFeatures="true" includeLaunchers="true" autoIncludeRequirements="true">
+<product name="M2Eclipse IDE" uid="m2e-ide" id="org.eclipse.platform.ide" application="org.eclipse.ui.ide.workbench" version="2.0.0" type="mixed" includeLaunchers="true" autoIncludeRequirements="true">
 
    <configIni use="default">
    </configIni>
@@ -27,6 +27,7 @@
    </vm>
 
    <plugins>
+      <plugin id="jakarta.servlet-api" version="5.0.0"/>
    </plugins>
 
    <features>
@@ -38,6 +39,8 @@
    </features>
 
    <configurations>
+      <plugin id="ch.qos.logback.classic" autoStart="true" startLevel="0" />
+      <plugin id="org.apache.aries.spifly.dynamic.bundle" autoStart="true" startLevel="2" />
       <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />

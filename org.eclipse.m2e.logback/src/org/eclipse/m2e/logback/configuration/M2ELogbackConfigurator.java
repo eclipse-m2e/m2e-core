@@ -52,7 +52,7 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
   private static final String PROPERTY_LOG_DIRECTORY = "org.eclipse.m2e.log.dir"; //$NON-NLS-1$
 
   @Override
-  public void configure(LoggerContext lc) {
+  public ExecutionStatus configure(LoggerContext lc) {
     // Bug 337167: Configuring Logback requires the state-location. If not yet initialized it will be initialized to the default value, 
     // but this prevents the workspace-chooser dialog to show up in a stand-alone Eclipse-product. Therefore we have to wait until the resources plug-in has started.
     // This happens if a Plug-in that uses SLF4J is started before the workspace has been selected.
@@ -65,6 +65,7 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
     } else {
       configureLogback(lc);
     }
+    return ExecutionStatus.NEUTRAL;
   }
 
   private synchronized void configureLogback(LoggerContext lc) {
