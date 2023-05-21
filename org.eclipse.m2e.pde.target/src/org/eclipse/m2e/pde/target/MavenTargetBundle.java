@@ -162,7 +162,7 @@ public class MavenTargetBundle extends TargetBundle {
 				try (FileInputStream stream = new FileInputStream(file)) {
 					oldProperties.loadFromXML(stream);
 				}
-				return oldProperties.equals(properties);
+				return !oldProperties.equals(properties);
 			} catch (IOException e) {
 				// fall through and assume changed then
 			}

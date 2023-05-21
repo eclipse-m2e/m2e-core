@@ -183,7 +183,47 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 		assertNull(sourceAttributes.getValue(Constants.EXPORT_PACKAGE));
 		assertNull(sourceAttributes.getValue(Constants.REQUIRE_BUNDLE));
 		assertNull(sourceAttributes.getValue(Constants.DYNAMICIMPORT_PACKAGE));
+	}
 
+	@Test
+	public void testNonOSGiArtifact_missingArtifactGenerate_changedCustomInstructions() throws Exception {
+		String targetXML = """
+				<location includeDependencyDepth="none" includeDependencyScopes="" includeSource="true" missingManifest="generate" type="Maven">
+					<dependencies>
+						<dependency>
+							<groupId>com.google.errorprone</groupId>
+							<artifactId>error_prone_annotations</artifactId>
+							<version>2.18.0</version>
+							<type>jar</type>
+						</dependency>
+					</dependencies>
+					<instructions><![CDATA[
+						Bundle-Name:           Bundle in Test from artifact ${mvnGroupId}:${mvnArtifactId}:${mvnVersion}:${mvnClassifier}
+						version:               ${version_cleanup;${mvnVersion}}
+						Bundle-SymbolicName:   %s
+						Bundle-Version:        ${version}
+						Import-Package:        *
+						Export-Package:        *;version="${version}";-noimport:=true
+					]]></instructions>
+				</location>
+				""";
+		ITargetDefinition target = resolveMavenTarget(targetXML.formatted("m2e.wrapped.${mvnArtifactId}"));
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertEquals(2, target.getAllBundles().length);
+		assertEquals("m2e.wrapped.error_prone_annotations",
+				getGeneratedBundle(target).getBundleInfo().getSymbolicName());
+		assertEquals("m2e.wrapped.error_prone_annotations.source",
+				getGeneratedSourceBundle(target).getBundleInfo().getSymbolicName());
+
+		setMavenTargetLocationAndResolver(target, targetXML.formatted("others.wrapped.${mvnArtifactId}"));
+		assertTrue(target.getStatus().isOK());
+		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertEquals(2, target.getAllBundles().length);
+		assertEquals("others.wrapped.error_prone_annotations",
+				getGeneratedBundle(target).getBundleInfo().getSymbolicName());
+		assertEquals("others.wrapped.error_prone_annotations.source",
+				getGeneratedSourceBundle(target).getBundleInfo().getSymbolicName());
 	}
 
 	private static TargetBundle getGeneratedBundle(ITargetDefinition target) {
