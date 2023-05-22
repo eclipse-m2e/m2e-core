@@ -300,8 +300,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String mainResourcesEncoding = null;
       String testResourcesEncoding = null;
 
-      boolean isTestCompilationSkipped = true;
-      boolean isTestResourcesSkipped = true;
+      List<Boolean> isTestCompilationSkipped = new ArrayList<>();
+      List<Boolean> isTestResourcesSkipped = new ArrayList<>();
 
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
       for(MojoExecution compile : executions) {
@@ -338,10 +338,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
           }
           try {
-            if(!Boolean.TRUE.equals(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor))) //$NON-NLS-1$
-              isTestCompilationSkipped = false;
+            isTestCompilationSkipped
+                .add(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor));
           } catch(Exception ex) {
-            isTestCompilationSkipped = false;
+            isTestCompilationSkipped.add(Boolean.FALSE);
           }
         }
       }
@@ -355,10 +355,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
         testResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
         try {
-          if(!Boolean.TRUE.equals(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor))) //$NON-NLS-1$
-            isTestResourcesSkipped = false;
+          isTestResourcesSkipped
+              .add(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor));
         } catch(Exception ex) {
-          isTestResourcesSkipped = false;
+          isTestResourcesSkipped.add(Boolean.FALSE);
         }
       }
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
@@ -368,11 +368,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       //If the project properties contain m2e.disableTestClasspathFlag=true, then the test flag must not be set
       boolean addTestFlag = !MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
-      if(!isTestCompilationSkipped) {
+      if(isTestCompilationSkipped.isEmpty() || !isTestCompilationSkipped.stream().allMatch(Boolean.TRUE::equals)) {
         addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
             inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), addTestFlag);
       }
-      if(!isTestResourcesSkipped) {
+      if(isTestResourcesSkipped.isEmpty() || !isTestResourcesSkipped.stream().allMatch(Boolean.TRUE::equals)) {
         addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getTestResources(),
             testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), addTestFlag);
       }
