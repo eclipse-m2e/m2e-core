@@ -245,6 +245,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				// fetching only the pom but no dependencies does not makes much sense...
 				depth = DependencyDepth.DIRECT;
 			}
+			SubMonitor split = subMonitor.split(20);
 			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
 				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, depth,
 						dependencyScopes, repositories, this);
@@ -254,16 +255,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				} else {
 					dependecies = registry.execute(workspaceProject, callable, subMonitor);
 				}
-				for (Artifact a : dependecies.getArtifacts(true)) {
+				List<Artifact> artifacts = dependecies.getArtifacts(true);
+				split.setWorkRemaining(artifacts.size());
+				for (Artifact a : artifacts) {
 					if (a.getFile() == null) {
 						// this is a filtered dependency
 						continue;
 					}
-					addBundleForArtifact(a, cacheManager, maven, targetBundles);
+					addBundleForArtifact(a, cacheManager, maven, targetBundles, split.split(1));
 				}
 				targetBundles.dependencyNodes.put(root, dependecies.getNodes());
 			} else {
-				addBundleForArtifact(artifact, cacheManager, maven, targetBundles);
+				addBundleForArtifact(artifact, cacheManager, maven, targetBundles, split);
 			}
 		}
 
@@ -330,7 +333,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven,
-			TargetBundles targetBundles) {
+			TargetBundles targetBundles, IProgressMonitor monitor) {
 		File featureFile = getFeatureFile(artifact, cacheManager);
 
 		if (isPomType(artifact)) {
@@ -350,13 +353,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 			return;
 		}
-		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
-		if (bndInstructions == null) {
-			// no specific instructions for this artifact, try using the location default
-			// then
-			bndInstructions = instructionsMap.get("");
-		}
-		MavenTargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
+		MavenTargetBundle bundle = new MavenTargetBundle(artifact, this, monitor);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.addBundle(artifact, bundle);
@@ -381,6 +378,23 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			// failed ones must be added to the target as well to fail resolution of the TP
 			targetBundles.addBundle(artifact, bundle);
 		}
+	}
+
+	/**
+	 * Internal method that lookup the instructions in the map with a fallback to
+	 * the default specified instructions of the location.
+	 * 
+	 * @param artifact
+	 * @return
+	 */
+	BNDInstructions getInstructionsForArtifact(Artifact artifact) {
+		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
+		if (bndInstructions == null) {
+			// no specific instructions for this artifact, try using the location default
+			// then
+			bndInstructions = instructionsMap.get("");
+		}
+		return bndInstructions;
 	}
 
 	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
@@ -431,7 +445,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 	}
 
-	private List<ArtifactRepository> getAvailableArtifactRepositories(IMaven maven) throws CoreException {
+	List<ArtifactRepository> getAvailableArtifactRepositories(IMaven maven) throws CoreException {
 		List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
 		for (MavenTargetRepository repo : extraRepositories) {
 			ArtifactRepository repository = maven.createArtifactRepository(repo.getId(), repo.getUrl());

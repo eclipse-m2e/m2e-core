@@ -13,24 +13,35 @@
 package org.eclipse.m2e.pde.target;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
-import java.util.jar.Manifest;
+import java.util.function.Function;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.RepositoryUtils;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.impl.SyncContextFactory;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.pde.target.shared.MavenBundleWrapper;
+import org.eclipse.m2e.pde.target.shared.ProcessingMessage;
+import org.eclipse.m2e.pde.target.shared.WrappedBundle;
 import org.eclipse.pde.core.target.TargetBundle;
-
-import aQute.bnd.osgi.Analyzer;
-import aQute.bnd.osgi.Jar;
 
 public class MavenTargetBundle extends TargetBundle {
 
@@ -75,8 +86,7 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, BNDInstructions instructions, CacheManager cacheManager,
-			MissingMetadataMode metadataMode) {
+	public MavenTargetBundle(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor) {
 		this.artifact = artifact;
 		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
@@ -84,16 +94,13 @@ public class MavenTargetBundle extends TargetBundle {
 		try {
 			bundle = new TargetBundle(file);
 		} catch (Exception ex) {
+			MissingMetadataMode metadataMode = location.getMetadataMode();
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = Status.error(artifact + " is not a bundle", ex);
 				LOGGER.log(status);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
-					Properties bndInstructions = instructions == null
-							? BNDInstructions.getDefaultInstructionProperties()
-							: instructions.asProperties();
-					bundle = cacheManager.accessArtifactFile(artifact,
-							artifactFile -> getWrappedArtifact(artifact, bndInstructions, artifactFile));
+					bundle = getWrappedArtifact(artifact, location, monitor);
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
@@ -115,59 +122,54 @@ public class MavenTargetBundle extends TargetBundle {
 		return artifact;
 	}
 
-	public static TargetBundle getWrappedArtifact(Artifact artifact, Properties bndInstructions, File wrappedFile)
-			throws Exception {
-		File artifactFile = artifact.getFile();
-		File instructionsFile = new File(wrappedFile.getParentFile(),
-				FilenameUtils.getBaseName(wrappedFile.getName()) + ".xml");
-		if (CacheManager.isOutdated(wrappedFile, artifactFile)
-				|| propertiesChanged(bndInstructions, instructionsFile)) {
-			try (Jar jar = new Jar(artifactFile)) {
-				Manifest originalManifest = jar.getManifest();
-				try (Analyzer analyzer = new Analyzer();) {
-					analyzer.setJar(jar);
-					if (originalManifest != null) {
-						analyzer.mergeManifest(originalManifest);
-					}
-					analyzer.setProperty("mvnGroupId", artifact.getGroupId());
-					analyzer.setProperty("mvnArtifactId", artifact.getArtifactId());
-					analyzer.setProperty("mvnVersion", artifact.getBaseVersion());
-					analyzer.setProperty("mvnClassifier", artifact.getClassifier());
-					analyzer.setProperty("generatedOSGiVersion", TargetBundles.createOSGiVersion(artifact).toString());
-					analyzer.setProperties(bndInstructions);
-					jar.setManifest(analyzer.calcManifest());
-					jar.write(wrappedFile);
-					wrappedFile.setLastModified(artifactFile.lastModified());
-				}
-			}
-			TargetBundle targetBundle = new TargetBundle(wrappedFile);
-			try (FileOutputStream os = new FileOutputStream(instructionsFile)) {
-				bndInstructions.storeToXML(os, null);
-			}
-			return targetBundle;
-		}
-		try {
-			return new TargetBundle(wrappedFile);
-		} catch (Exception e) {
-			// cached file seems invalid/stale...
-			FileUtils.forceDelete(wrappedFile);
-			return getWrappedArtifact(artifact, bndInstructions, wrappedFile);
-		}
-	}
+	private static TargetBundle getWrappedArtifact(Artifact artifact, MavenTargetLocation location,
+			IProgressMonitor monitor) throws Exception {
+		IMaven maven = MavenPlugin.getMaven();
+		List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
+		Function<DependencyNode, Properties> instructionsLookup = node -> {
+			BNDInstructions instructions = location.getInstructionsForArtifact(node.getArtifact());
+			Properties bndInstructions = instructions == null ? BNDInstructions.getDefaultInstructionProperties()
+					: instructions.asProperties();
+			return bndInstructions;
+		};
+		IMavenExecutionContext context = IMavenExecutionContext.getThreadContext()
+				.orElseGet(maven::createExecutionContext);
 
-	private static boolean propertiesChanged(Properties properties, File file) {
-		Properties oldProperties = new Properties();
-		if (file.exists()) {
-			try {
-				try (FileInputStream stream = new FileInputStream(file)) {
-					oldProperties.loadFromXML(stream);
+		Path wrappedBundle = context.execute(new ICallable<Path>() {
+
+			@Override
+			public Path call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+				RepositorySystemSession repositorySession = context.getRepositorySession();
+				try {
+					WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup,
+							repositories, repoSystem, repositorySession,
+							context.getComponentLookup().lookup(SyncContextFactory.class));
+					List<ProcessingMessage> errors = wrap.messages()
+							.filter(msg -> msg.getType() == ProcessingMessage.Type.ERROR).toList();
+					if (errors.isEmpty()) {
+						return wrap.getFile();
+					}
+					if (errors.size() == 1) {
+						throw new CoreException(Status.error(errors.get(0).getMessage()));
+					}
+					MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR,
+							"wrapping artifact " + artifact.getArtifactId() + " failed!");
+					for (ProcessingMessage message : errors) {
+						multiStatus.add(Status.error(message.getMessage()));
+					}
+					throw new CoreException(multiStatus);
+				} catch (CoreException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new CoreException(Status.error("Can't collect dependencies!", e));
 				}
-				return oldProperties.equals(properties);
-			} catch (IOException e) {
-				// fall through and assume changed then
 			}
-		}
-		return true;
+
+		}, monitor);
+		TargetBundle targetBundle = new TargetBundle(wrappedBundle.toFile());
+		return targetBundle;
+
 	}
 
 	public boolean isWrapped() {

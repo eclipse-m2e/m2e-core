@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.core.target.ITargetHandle;
-import org.eclipse.pde.core.target.TargetBundle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -99,20 +98,6 @@ class CacheManager {
 		try (FileChannel channel = FileChannel.open(lockFile, LOCK_FILE_OPEN_OPTIONS); FileLock lock = channel.lock()) {
 			return consumer.consume(file.toFile());
 		}
-	}
-
-	/**
-	 * Get the requested Artifact as a {@link TargetBundle}, might wrap the content
-	 * as indicated by the {@link MissingMetadataMode}
-	 *
-	 * @param artifact        the artifact to acquire
-	 * @param bndInstructions
-	 * @param metadataMode    the mode to use if this artifact is not a bundle
-	 * @return
-	 */
-	public MavenTargetBundle getTargetBundle(Artifact artifact, BNDInstructions bndInstructions,
-			MissingMetadataMode metadataMode) {
-		return new MavenTargetBundle(artifact, bndInstructions, this, metadataMode);
 	}
 
 	/**
