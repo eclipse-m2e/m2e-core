@@ -15,11 +15,13 @@ package org.eclipse.m2e.pde.target.tests;
 import static org.eclipse.osgi.util.ManifestElement.parseHeader;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.jar.Attributes;
@@ -32,6 +34,8 @@ import org.eclipse.pde.core.target.TargetBundle;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
+import org.osgi.framework.VersionRange;
 
 public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 
@@ -185,6 +189,41 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 		assertNull(sourceAttributes.getValue(Constants.DYNAMICIMPORT_PACKAGE));
 
 	}
+	
+	@Test
+	public void testNonOSGiArtifact_missingArtifactGenerate_hasVersions() throws Exception {
+		ITargetDefinition target = resolveMavenTarget(
+				"""
+				<location includeDependencyDepth="infinite" includeDependencyScopes="compile,provided,runtime" missingManifest="generate" type="Maven">
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.lucene</groupId>
+							<artifactId>lucene-analysis-common</artifactId>
+							<version>9.5.0</version>
+							<type>jar</type>
+						</dependency>
+					</dependencies>
+				</location>
+				""");
+		assertTrue(target.getStatus().isOK());
+		Optional<TargetBundle> luceneAnalysisCommon = Arrays.stream(target.getBundles()).filter(
+				tb -> tb.getBundleInfo().getSymbolicName().equals("wrapped.org.apache.lucene.lucene-analysis-common"))
+				.findFirst();
+		assertTrue("lucene-analysis-common bundle not found in target state", luceneAnalysisCommon.isPresent());
+		Attributes manifest = getManifestMainAttributes(luceneAnalysisCommon.get());
+		ManifestElement[] importHeader = parseHeader(Constants.IMPORT_PACKAGE,
+				manifest.getValue(Constants.IMPORT_PACKAGE));
+		for (ManifestElement element : importHeader) {
+			String value = element.getValue();
+			if (value.startsWith("org.apache.lucene.")) {
+				String attribute = element.getAttribute(Constants.VERSION_ATTRIBUTE);
+				assertNotNull("Package " + value + " has no version attribute: " + element, attribute);
+				VersionRange versionRange = VersionRange.valueOf(attribute);
+				assertEquals("Unexpected version range " + versionRange + " on package " + value + ": " + element,
+						0, versionRange.getLeft().compareTo(Version.valueOf("9.5.0")));
+			}
+		}
+	}
 
 	private static TargetBundle getGeneratedBundle(ITargetDefinition target) {
 		return Arrays.stream(target.getBundles()).filter(b -> !b.isSourceBundle()).findFirst().orElseThrow();
@@ -197,7 +236,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 	private static void assertEqualManifestHeaders(String header, Attributes mainManifestAttributes,
 			String... expectedHeaderValues) throws BundleException {
 		ManifestElement[] expected = parseHeader(header, String.join(",", expectedHeaderValues));
-		ManifestElement[] actual = parseHeader(Constants.EXPORT_PACKAGE, mainManifestAttributes.getValue(header));
+		ManifestElement[] actual = parseHeader(header, mainManifestAttributes.getValue(header));
 		Function<ManifestElement[], String[]> toString = a -> Arrays.stream(a).map(ManifestElement::toString)
 				.toArray(String[]::new);
 		assertEquals(Set.of(toString.apply(expected)), Set.of(toString.apply(actual))); // order is irrelevant
