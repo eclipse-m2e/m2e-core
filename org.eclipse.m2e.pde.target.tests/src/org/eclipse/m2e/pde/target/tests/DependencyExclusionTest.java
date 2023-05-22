@@ -19,14 +19,26 @@ import java.util.List;
 
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class DependencyExclusionTest extends AbstractMavenTargetTest {
+	@Parameter(0)
+	public Boolean includeSource;
+
+	@Parameters(name = "includeSource={0}")
+	public static List<Boolean> dependencyConfigurations() {
+		return List.of(false, true);
+	}
 
 	@Test
 	public void testExclusionOfDirectRequirement() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetDefinition target = resolveMavenTarget(String.format(
 				"""
-						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
 								<dependency>
 									<groupId>org.junit.platform</groupId>
@@ -37,18 +49,19 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 							</dependencies>
 							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
 						</location>
-						""");
+						""",
+				includeSource));
 		assertTrue(target.getStatus().isOK());
 		assertArrayEquals(EMPTY, target.getAllFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(junitPlatformCommons("1.9.3"));
-		assertTargetBundles(target, expectedBundles);
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 	}
 
 	@Test
 	public void testExclusionOfDirectAndTransitivRequirement() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetDefinition target = resolveMavenTarget(String.format(
 				"""
-						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
 								<dependency>
 									<groupId>org.junit.jupiter</groupId>
@@ -59,22 +72,23 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 							</dependencies>
 							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
 						</location>
-						""");
+						""",
+				includeSource));
 		assertTrue(target.getStatus().isOK());
 		assertArrayEquals(EMPTY, target.getAllFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
 				junitJupiterAPI(), //
 				junitPlatformCommons("1.9.3"), //
 				opentest4j());
-		assertTargetBundles(target, expectedBundles);
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 
 	}
 
 	@Test
 	public void testExclusionOfMultipleVersions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetDefinition target = resolveMavenTarget(String.format(
 				"""
-						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
 								<dependency>
 									<groupId>org.junit.jupiter</groupId>
@@ -92,7 +106,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 							<exclude>org.apiguardian:apiguardian-api:1.1.2</exclude>
 							<exclude>org.apiguardian:apiguardian-api:1.1.0</exclude>
 						</location>
-						""");
+						""",
+				includeSource));
 		assertTrue(target.getStatus().isOK());
 		assertArrayEquals(EMPTY, target.getAllFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
@@ -100,14 +115,14 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 				junitPlatformCommons("1.9.3"), //
 				junitPlatformCommons("1.7.2"), //
 				opentest4j());
-		assertTargetBundles(target, expectedBundles);
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 	}
 
 	@Test
 	public void testExclusionOfDifferentVersions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetDefinition target = resolveMavenTarget(String.format(
 				"""
-						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="error" type="Maven">
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
 								<dependency>
 									<groupId>org.junit.jupiter</groupId>
@@ -124,7 +139,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 							</dependencies>
 							<exclude>org.apiguardian:apiguardian-api:1.1.0</exclude>
 						</location>
-						""");
+						""",
+				includeSource));
 		assertTrue(target.getStatus().isOK());
 		assertArrayEquals(EMPTY, target.getAllFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
@@ -132,7 +148,7 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 				junitPlatformCommons("1.9.3"), //
 				junitPlatformCommons("1.7.2"), //
 				apiGuardian("1.1.2"), opentest4j());
-		assertTargetBundles(target, expectedBundles);
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 	}
 
 	private static ExpectedBundle junitPlatformCommons(String version) {
