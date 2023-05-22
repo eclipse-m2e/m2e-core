@@ -360,12 +360,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			if (includeSource) {
 				try {
 					List<ArtifactRepository> repositories = getAvailableArtifactRepositories(maven);
-					Artifact resolve = RepositoryUtils.toArtifact(
+					Artifact sourceArtifact = RepositoryUtils.toArtifact(
 							maven.resolve(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(),
 									artifact.getExtension(), "sources", repositories, new NullProgressMonitor()));
-					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), resolve,
+					MavenSourceBundle sourceBundle = new MavenSourceBundle(bundle.getBundleInfo(), sourceArtifact,
 							cacheManager);
-					targetBundles.addBundle(resolve, sourceBundle);
+					targetBundles.addBundle(sourceArtifact, sourceBundle);
 					targetBundles.addSourceBundle(artifact, sourceBundle);
 				} catch (Exception e) {
 					// Source not available / usable
@@ -477,8 +477,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (classifier != null && !classifier.isBlank()) {
 			key += ":" + classifier;
 		}
-		key += ":" + artifact.getBaseVersion();
-		return key;
+		return key + ":" + artifact.getBaseVersion();
+	}
+
+	private static String getKeyWithoutClassifier(Artifact artifact) {
+		if (artifact == null) {
+			return "";
+		}
+		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
 	}
 
 	List<DependencyNode> getDependencyNodes(MavenTargetDependency dependency) {
@@ -623,7 +629,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	public boolean isExcluded(Artifact artifact) {
-		return excludedArtifacts.contains(getKey(artifact));
+		if (artifact == null) {
+			return false;
+		}
+		return excludedArtifacts.contains(getKey(artifact))
+				|| (artifact.getClassifier() != null && excludedArtifacts.contains(getKeyWithoutClassifier(artifact)));
 	}
 
 	public void setExcluded(Artifact artifact, boolean disabled) {

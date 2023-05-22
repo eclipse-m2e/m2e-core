@@ -19,14 +19,26 @@ import java.util.List;
 
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class MixedCasesTest extends AbstractMavenTargetTest {
+	@Parameter(0)
+	public Boolean includeSource;
+
+	@Parameters(name = "includeSource={0}")
+	public static List<Boolean> dependencyConfigurations() {
+		return List.of(false, true);
+	}
 
 	@Test
 	public void testMultipleArtifactsWithWrappingAndExclusion() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetDefinition target = resolveMavenTarget(String.format(
 				"""
-						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="false" missingManifest="generate" type="Maven">
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="generate" type="Maven">
 							<dependencies>
 								<dependency>
 									<groupId>com.google.guava</groupId>
@@ -61,7 +73,8 @@ public class MixedCasesTest extends AbstractMavenTargetTest {
 							<exclude>com.google.j2objc:j2objc-annotations:1.3</exclude>
 							<exclude>org.checkerframework:checker-qual:3.5.0</exclude>
 						</location>
-						""");
+						""",
+				includeSource));
 		assertTrue(target.getStatus().isOK());
 		assertArrayEquals(EMPTY, target.getAllFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
@@ -79,6 +92,12 @@ public class MixedCasesTest extends AbstractMavenTargetTest {
 				generatedBundle("m2e.wrapped.aopalliance.aopalliance", "1.0", "aopalliance:aopalliance"),
 				generatedBundle("m2e.wrapped.com.google.guava.listenablefuture",
 						"9999.0.0.empty-to-avoid-conflict-with-guava", "com.google.guava:listenablefuture"));
+		if (includeSource) {
+			expectedBundles = withSourceBundles(expectedBundles).stream()
+					.filter(e -> !"m2e.wrapped.com.google.guava.listenablefuture.source".equals(e.id())).toList();
+			// com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
+			// doesn't have sources
+		}
 		assertTargetBundles(target, expectedBundles);
 	}
 }
