@@ -341,7 +341,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             if(!Boolean.TRUE.equals(maven.getMojoParameterValue(mavenProject, compile, "skip", Boolean.class, monitor))) //$NON-NLS-1$
               isTestCompilationSkipped = false;
           } catch(Exception ex) {
-            isTestCompilationSkipped=false;
+            isTestCompilationSkipped = false;
           }
         }
       }
@@ -358,7 +358,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           if(!Boolean.TRUE.equals(maven.getMojoParameterValue(mavenProject, resources, "skip", Boolean.class, monitor))) //$NON-NLS-1$
             isTestResourcesSkipped = false;
         } catch(Exception ex) {
-          isTestResourcesSkipped=false;
+          isTestResourcesSkipped = false;
         }
       }
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
