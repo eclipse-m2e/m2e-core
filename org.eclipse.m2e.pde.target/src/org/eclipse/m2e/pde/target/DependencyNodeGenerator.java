@@ -32,43 +32,28 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
-final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerator> {
-		private final Artifact artifact;
-		private final List<ArtifactRepository> repositories;
-		private final MavenTargetDependency root;
-		private Collection<String> dependencyScopes;
-		private MavenTargetLocation parent;
-		private DependencyDepth dependencyDepth;
+final class DependencyNodeGenerator {
+	private DependencyNodeGenerator() {
+	}
 
-		DependencyNodeGenerator(MavenTargetDependency root, Artifact artifact, DependencyDepth dependencyDepth,
-				Collection<String> dependencyScopes, List<ArtifactRepository> repositories,
-				MavenTargetLocation parent) {
-			this.artifact = artifact;
-			this.dependencyDepth = dependencyDepth;
-			this.repositories = repositories;
-			this.root = root;
-			this.dependencyScopes = dependencyScopes;
-			this.parent = parent;
-		}
+	static ICallable<PreorderNodeListGenerator> create(MavenTargetDependency root, Artifact artifact,
+			DependencyDepth dependencyDepth, Collection<String> dependencyScopes, List<ArtifactRepository> repositories,
+			MavenTargetLocation parent) {
 
-
-		@Override
-		public PreorderNodeListGenerator call(IMavenExecutionContext context, IProgressMonitor monitor)
-				throws CoreException {
+		return (IMavenExecutionContext context, IProgressMonitor monitor) -> {
 			try {
 				CollectRequest collectRequest = new CollectRequest();
 				collectRequest.setRoot(new Dependency(artifact, null));
 				collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
 
 				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-				DependencyNode node = repoSystem
-						.collectDependencies(context.getRepositorySession(), collectRequest).getRoot();
+				DependencyNode node = repoSystem.collectDependencies(context.getRepositorySession(), collectRequest)
+						.getRoot();
 				node.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parent);
 				node.setData(MavenTargetLocation.DEPENDENCYNODE_ROOT, root);
 				DependencyRequest dependencyRequest = new DependencyRequest();
 				dependencyRequest.setRoot(node);
-				dependencyRequest
-						.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScopes));
+				dependencyRequest.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScopes));
 				repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
 				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 				node.accept(nlg);
@@ -78,5 +63,6 @@ final class DependencyNodeGenerator implements ICallable<PreorderNodeListGenerat
 			} catch (RuntimeException e) {
 				throw new CoreException(Status.error("Internal error", e));
 			}
-		}
+		};
 	}
+}
