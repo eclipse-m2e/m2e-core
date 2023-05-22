@@ -98,6 +98,12 @@
 					<type>jar</type>
 				</dependency>
 				<dependency>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+					<version>5.1.0</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
 					<groupId>commons-cli</groupId>
 					<artifactId>commons-cli</artifactId>
 					<version>1.5.0</version>
@@ -120,6 +126,26 @@
 					<type>jar</type>
 				</dependency>
 			</dependencies>
+		</location>
+		<location includeDependencyDepth="none" includeSource="true" label="Wrapped" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>com.google.errorprone</groupId>
+					<artifactId>error_prone_annotations</artifactId>
+					<version>2.19.1</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions>
+			<![CDATA[
+				Bundle-Name:           Bundle derived from maven artifact ${mvnGroupId}:${mvnArtifactId}:${mvnVersion} provided by m2eclipse
+				version:               ${version_cleanup;${mvnVersion}}
+				Bundle-SymbolicName:   m2e.wrapped.${mvnGroupId}.${mvnArtifactId}
+				Bundle-Version:        ${version}
+				Import-Package:        *
+				Export-Package:        *;version="${version}";-noimport:=true
+			]]>
+			</instructions>
 		</location>
 	</locations>
 </target>

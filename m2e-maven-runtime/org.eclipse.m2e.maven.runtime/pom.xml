@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.100-SNAPSHOT</version>
+	<version>3.9.200-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -52,6 +52,10 @@
 					<groupId>org.checkerframework</groupId>
 					<artifactId>checker-compat-qual</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -61,6 +65,10 @@
 				<exclusion>
 					<groupId>commons-cli</groupId>
 					<artifactId>commons-cli</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject</groupId>
+					<artifactId>guice</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -169,13 +177,13 @@
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
-								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								io.takari.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
 							Import-Package: \
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
 								javax.inject;version="1.0.0",\
+								com.google.inject.*,
 								javax.annotation;version="[1.2.0,2.0.0)", \
 								org.apache.commons.cli;version="[1.4.0,2.0.0)"
 							Require-Bundle: \
