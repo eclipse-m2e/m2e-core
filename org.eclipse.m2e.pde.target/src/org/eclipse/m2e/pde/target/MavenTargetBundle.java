@@ -23,8 +23,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.impl.SyncContextFactory;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -128,47 +127,39 @@ public class MavenTargetBundle extends TargetBundle {
 		List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
 		Function<DependencyNode, Properties> instructionsLookup = node -> {
 			BNDInstructions instructions = location.getInstructionsForArtifact(node.getArtifact());
-			Properties bndInstructions = instructions == null ? BNDInstructions.getDefaultInstructionProperties()
+			return instructions == null ? BNDInstructions.getDefaultInstructionProperties()
 					: instructions.asProperties();
-			return bndInstructions;
 		};
-		IMavenExecutionContext context = IMavenExecutionContext.getThreadContext()
+		IMavenExecutionContext exeContext = IMavenExecutionContext.getThreadContext()
 				.orElseGet(maven::createExecutionContext);
 
-		Path wrappedBundle = context.execute(new ICallable<Path>() {
-
-			@Override
-			public Path call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-				RepositorySystemSession repositorySession = context.getRepositorySession();
-				try {
-					WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup,
-							repositories, repoSystem, repositorySession,
-							context.getComponentLookup().lookup(SyncContextFactory.class));
-					List<ProcessingMessage> errors = wrap.messages()
-							.filter(msg -> msg.getType() == ProcessingMessage.Type.ERROR).toList();
-					if (errors.isEmpty()) {
-						return wrap.getFile();
-					}
-					if (errors.size() == 1) {
-						throw new CoreException(Status.error(errors.get(0).getMessage()));
-					}
-					MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR,
-							"wrapping artifact " + artifact.getArtifactId() + " failed!");
-					for (ProcessingMessage message : errors) {
-						multiStatus.add(Status.error(message.getMessage()));
-					}
-					throw new CoreException(multiStatus);
-				} catch (CoreException e) {
-					throw e;
-				} catch (Exception e) {
-					throw new CoreException(Status.error("Can't collect dependencies!", e));
+		Path wrappedBundle = exeContext.execute((context, monitor1) -> {
+			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+			RepositorySystemSession repositorySession = context.getRepositorySession();
+			try {
+				WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories,
+						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class));
+				List<ProcessingMessage> errors = wrap.messages()
+						.filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
+				if (errors.isEmpty()) {
+					return wrap.getFile();
 				}
+				if (errors.size() == 1) {
+					throw new CoreException(Status.error(errors.get(0).message()));
+				}
+				MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR,
+						"wrapping artifact " + artifact.getArtifactId() + " failed!");
+				for (ProcessingMessage message : errors) {
+					multiStatus.add(Status.error(message.message()));
+				}
+				throw new CoreException(multiStatus);
+			} catch (CoreException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new CoreException(Status.error("Can't collect dependencies!", e));
 			}
-
 		}, monitor);
-		TargetBundle targetBundle = new TargetBundle(wrappedBundle.toFile());
-		return targetBundle;
+		return new TargetBundle(wrappedBundle.toFile());
 
 	}
 

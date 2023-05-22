@@ -247,7 +247,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 			SubMonitor split = subMonitor.split(20);
 			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
-				ICallable<PreorderNodeListGenerator> callable = new DependencyNodeGenerator(root, artifact, depth,
+				ICallable<PreorderNodeListGenerator> callable = DependencyNodeGenerator.create(root, artifact, depth,
 						dependencyScopes, repositories, this);
 				PreorderNodeListGenerator dependecies;
 				if (workspaceProject == null) {
@@ -383,9 +383,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	/**
 	 * Internal method that lookup the instructions in the map with a fallback to
 	 * the default specified instructions of the location.
-	 * 
-	 * @param artifact
-	 * @return
 	 */
 	BNDInstructions getInstructionsForArtifact(Artifact artifact) {
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
