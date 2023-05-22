@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.pde.target.shared.MavenBundleWrapper;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.internal.core.NLResourceHelper;
 import org.eclipse.pde.internal.core.feature.AbstractFeatureModel;
@@ -80,7 +81,7 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 				id += ".source";
 			}
 			f.setId(id);
-			f.setVersion(TargetBundles.createOSGiVersion(model.getVersion()).toString());
+			f.setVersion(MavenBundleWrapper.createOSGiVersion(model.getVersion()).toString());
 			String name = model.getName();
 			if (isSourceFeature) {
 				name += " (Source)";

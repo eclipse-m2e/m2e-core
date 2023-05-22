@@ -23,13 +23,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
-
-import aQute.bnd.version.Version;
 
 /**
  * represents a resolved set of {@link Artifact} -> {@link TargetBundle}
@@ -66,32 +63,6 @@ class TargetBundles {
 			return artifact.flatMap(this::getMavenTargetBundle);
 		}
 		return Optional.empty();
-	}
-
-	public static Version createOSGiVersion(Artifact artifact) {
-		String version = artifact.getVersion();
-		return createOSGiVersion(version);
-	}
-
-	public static Version createOSGiVersion(Model model) {
-		return createOSGiVersion(model.getVersion());
-	}
-
-	public static Version createOSGiVersion(String version) {
-		if (version == null || version.isEmpty()) {
-			return new Version(0, 0, 1);
-		}
-		try {
-			int index = version.indexOf('-');
-			if (index > -1) {
-				StringBuilder sb = new StringBuilder(version);
-				sb.setCharAt(index, '.');
-				return Version.parseVersion(sb.toString());
-			}
-			return Version.parseVersion(version);
-		} catch (IllegalArgumentException e) {
-			return new Version(0, 0, 1, version);
-		}
 	}
 
 	public void addBundle(Artifact artifact, TargetBundle bundle) {
