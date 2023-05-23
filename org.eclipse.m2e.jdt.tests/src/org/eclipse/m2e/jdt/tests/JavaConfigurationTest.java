@@ -92,6 +92,20 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		assertEquals(0, classpathEntriesCount(project, TEST_RESOURCES));
 	}
 
+	@Test
+	public void testSkipOnlyOneOfMultipleExecutions() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/skipOnlyOneOfMultipleExecutions/pom.xml");
+		assertEquals(1, classpathEntriesCount(project, TEST_SOURCES));
+		assertEquals(1, classpathEntriesCount(project, TEST_RESOURCES));
+	}
+
+	@Test
+	public void testSkipNone() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/skipNone/pom.xml");
+		assertEquals(1, classpathEntriesCount(project, TEST_SOURCES));
+		assertEquals(1, classpathEntriesCount(project, TEST_RESOURCES));
+	}
+
 	// --- utility methods ---
 
 	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()
