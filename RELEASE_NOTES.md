@@ -2,11 +2,21 @@
 
 ## 2.3.0
 
-* 📅 Release Date: _expected_ May 2023
+* 📅 Release Date: 23th May 2023
 
 ### Embedded and use Maven 3.9.1
 
 Updated the embedded Maven from version 3.8.7 to 3.9.1; [Maven 3.9.1 Release Notes](https://maven.apache.org/docs/3.9.1/release-notes.html).
+
+### Support for Java 20 and later
+
+Projects that compile with Java 20 and therefore have a corresponding configuration of in their `maven-compiler-plugin` are now supported.
+Furthermore the processing has been enhanced to support future Java versions as soon as Eclipse JDT supports them.
+
+### Enhanced M2E Maven Target support
+
+* OSGi metadata generated for artifacts that don't contain a OSGi compliant MANIFEST.MF have been enhanced to also contain version ranges for `Import-Package` headers by default.
+* Source Bundles of excluded artifacts are now excluded too
 
 ## 2.2.1
 
