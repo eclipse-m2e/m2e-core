@@ -169,7 +169,6 @@
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
-								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								io.takari.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
 							Import-Package: \
