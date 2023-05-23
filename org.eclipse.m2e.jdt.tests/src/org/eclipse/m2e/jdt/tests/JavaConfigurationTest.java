@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Red Hat, Inc.
+ * Copyright (c) 2020, 2023 Red Hat, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -10,102 +10,105 @@
 
 package org.eclipse.m2e.jdt.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.jdt.core.*;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 
-  @Test
-  public void testFileChangeUpdatesJDTSettings() throws CoreException, IOException, InterruptedException {
-    ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
-    setAutoBuilding(true);
-    File pomFileFS = new File(FileLocator.toFileURL(getClass().getResource("/projects/compilerSettings/pom.xml")).getFile());
-    IProject project = importProject(pomFileFS.getAbsolutePath());
-    waitForJobsToComplete();
-    IJavaProject javaProject = (IJavaProject) project.getNature(JavaCore.NATURE_ID);
-    assertEquals("1.8", javaProject.getOption(JavaCore.COMPILER_SOURCE, false));
-    IFile pomFileWS = project.getFile("pom.xml");
-    byte[] bytes = new byte[(int) pomFileFS.length()];
-    try (InputStream stream = pomFileWS.getContents()) {
-      stream.read(bytes);
-    }
-    String contents = new String(bytes);
-    contents = contents.replace("1.8", "11");
-    pomFileWS.setContents(new ByteArrayInputStream(contents.getBytes()), true, false, null);
-    waitForJobsToComplete();
-    assertEquals("11", javaProject.getOption(JavaCore.COMPILER_SOURCE, false));
-  }
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
+		setAutoBuilding(true);
+	}
 
-  @Test
-  public void testJDTWarnings() throws CoreException, IOException, InterruptedException {
-    ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
-    setAutoBuilding(true);
-    File pomFileFS = new File(
-        FileLocator.toFileURL(getClass().getResource("/projects/compilerWarnings/pom.xml")).getFile());
-    waitForJobsToComplete();
-    IProject project = importProject(pomFileFS.getAbsolutePath());
-    IFile file = project.getFile("src/main/java/A.java");
-    project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-    waitForJobsToComplete();
-    IMarker[] findMarkers = file.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
-    assertArrayEquals(new IMarker[0], findMarkers);
-  }
+	@Test
+	public void testFileChangeUpdatesJDTSettings() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/compilerSettings/pom.xml");
+		assertEquals("1.8", project.getOption(JavaCore.COMPILER_SOURCE, false));
+		IFile pomFileWS = project.getProject().getFile("pom.xml");
+		String pomContent = Files.readString(Path.of(pomFileWS.getLocationURI()));
+		pomContent = pomContent.replace("1.8", "11");
+		pomFileWS.setContents(new ByteArrayInputStream(pomContent.getBytes()), true, false, null);
+		waitForJobsToComplete();
+		assertEquals("11", project.getOption(JavaCore.COMPILER_SOURCE, false));
+	}
 
-  @Test
-  public void testSkipAllTest() throws CoreException, IOException, InterruptedException {
-    ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
-    setAutoBuilding(true);
-    File pomFileFS = new File(
-        FileLocator.toFileURL(getClass().getResource("/projects/skipAllTest/pom.xml")).getFile());
-    waitForJobsToComplete();
-    IProject project = importProject(pomFileFS.getAbsolutePath());
-    waitForJobsToComplete();
-    IJavaProject jproject = JavaCore.create(project);
-    assertTrue(Arrays.stream(jproject.getRawClasspath()).noneMatch(IClasspathEntry::isTest));
-  }
+	@Test
+	public void testJDTWarnings() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/compilerWarnings/pom.xml");
+		IFile file = project.getProject().getFile("src/main/java/A.java");
+		project.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+		waitForJobsToComplete();
+		IMarker[] findMarkers = file.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO);
+		assertArrayEquals(new IMarker[0], findMarkers);
+	}
 
-  @Test
-  public void testSkipTestCompilation() throws CoreException, IOException, InterruptedException {
-    ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
-    setAutoBuilding(true);
-    File pomFileFS = new File(
-        FileLocator.toFileURL(getClass().getResource("/projects/skipTestCompilation/pom.xml")).getFile());
-    waitForJobsToComplete();
-    IProject project = importProject(pomFileFS.getAbsolutePath());
-    waitForJobsToComplete();
-    IJavaProject jproject = JavaCore.create(project);
-    assertTrue(Arrays.stream(jproject.getRawClasspath())
-                     .noneMatch(cp -> cp.isTest() && cp.getPath().toString().contains("test/java")));
-    assertEquals(1, Arrays.stream(jproject.getRawClasspath())
-                          .filter(cp -> cp.isTest() && cp.getPath().toString().contains("test/resources"))
-                          .count());
-  }
+	@Test
+	public void testSkipAllTest() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/skipAllTest/pom.xml");
+		assertTrue(Arrays.stream(project.getRawClasspath()).noneMatch(IClasspathEntry::isTest));
+	}
 
-  @Test
-  public void testSkipTestResources() throws CoreException, IOException, InterruptedException {
-    ((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
-    setAutoBuilding(true);
-    File pomFileFS = new File(
-        FileLocator.toFileURL(getClass().getResource("/projects/skipTestResources/pom.xml")).getFile());
-    waitForJobsToComplete();
-    IProject project = importProject(pomFileFS.getAbsolutePath());
-    waitForJobsToComplete();
-    IJavaProject jproject = JavaCore.create(project);
-    assertTrue(Arrays.stream(jproject.getRawClasspath())
-                     .noneMatch(cp -> cp.isTest() && cp.getPath().toString().contains("test/resources")));
-    assertEquals(1, Arrays.stream(jproject.getRawClasspath())
-                          .filter(cp -> cp.isTest() && cp.getPath().toString().contains("test/java"))
-                          .count());
-  }
+	@Test
+	public void testSkipTestCompilation() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/skipTestCompilation/pom.xml");
+		assertEquals(0, classpathEntriesCount(project, TEST_SOURCES));
+		assertEquals(1, classpathEntriesCount(project, TEST_RESOURCES));
+	}
+
+	@Test
+	public void testSkipTestResources() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/skipTestResources/pom.xml");
+		assertEquals(1, classpathEntriesCount(project, TEST_SOURCES));
+		assertEquals(0, classpathEntriesCount(project, TEST_RESOURCES));
+	}
+
+	// --- utility methods ---
+
+	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()
+			&& cp.getPath().toString().contains("test/java");
+	private static final Predicate<IClasspathEntry> TEST_RESOURCES = cp -> cp.isTest()
+			&& cp.getPath().toString().contains("test/resources");
+
+	private long classpathEntriesCount(IJavaProject project, Predicate<IClasspathEntry> testSources)
+			throws JavaModelException {
+		return Arrays.stream(project.getRawClasspath()).filter(testSources).count();
+	}
+
+	private IJavaProject importResourceProject(String name) throws IOException, InterruptedException, CoreException {
+		File pomFile = new File(FileLocator.toFileURL(JavaConfigurationTest.class.getResource(name)).getFile());
+		waitForJobsToComplete();
+		IProject project = importProject(pomFile.getAbsolutePath());
+		waitForJobsToComplete();
+		return JavaCore.create(project);
+	}
 }
