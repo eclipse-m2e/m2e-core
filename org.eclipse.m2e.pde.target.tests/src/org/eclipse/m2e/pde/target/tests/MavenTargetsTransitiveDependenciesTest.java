@@ -17,7 +17,7 @@ import static org.junit.Assert.assertArrayEquals;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.pde.core.target.ITargetLocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -133,8 +133,8 @@ public class MavenTargetsTransitiveDependenciesTest extends AbstractMavenTargetT
 				</location>
 				"""
 				.formatted(dependencyDepth, dependencyScopes, sources);
-		ITargetDefinition target = resolveMavenTarget(targetDefinition);
+		ITargetLocation target = resolveMavenTarget(targetDefinition);
 		assertTargetBundles(target, expectedBundles);
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertArrayEquals(EMPTY, target.getFeatures());
 	}
 }

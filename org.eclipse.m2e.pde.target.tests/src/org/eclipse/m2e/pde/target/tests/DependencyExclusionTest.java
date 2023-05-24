@@ -13,11 +13,10 @@
 package org.eclipse.m2e.pde.target.tests;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.pde.core.target.ITargetLocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,7 +35,7 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 
 	@Test
 	public void testExclusionOfDirectRequirement() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -51,15 +50,16 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(junitPlatformCommons("1.9.3"));
 		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 	}
 
 	@Test
 	public void testExclusionOfDirectAndTransitivRequirement() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -74,8 +74,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
 				junitJupiterAPI(), //
 				junitPlatformCommons("1.9.3"), //
@@ -86,7 +86,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 
 	@Test
 	public void testExclusionOfMultipleVersions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -108,8 +109,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
 				junitJupiterAPI(), //
 				junitPlatformCommons("1.9.3"), //
@@ -120,7 +121,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 
 	@Test
 	public void testExclusionOfDifferentVersions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -141,8 +143,8 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
 				junitJupiterAPI(), //
 				junitPlatformCommons("1.9.3"), //

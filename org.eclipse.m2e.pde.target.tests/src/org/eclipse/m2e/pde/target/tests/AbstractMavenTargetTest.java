@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.ServiceLoader.Provider;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -33,50 +35,50 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.pde.target.MavenTargetLocationFactory;
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.m2e.pde.target.tests.spi.TargetLocationLoader;
 import org.eclipse.pde.core.target.ITargetLocation;
-import org.eclipse.pde.core.target.ITargetPlatformService;
 import org.eclipse.pde.core.target.NameVersionDescriptor;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 public abstract class AbstractMavenTargetTest {
 	static final String SOURCE_BUNDLE_SUFFIX = ".source";
 	static final TargetBundle[] EMPTY = {};
 
-	static ITargetDefinition resolveMavenTarget(String targetXML) throws CoreException {
-		@SuppressWarnings("restriction")
-		ITargetPlatformService s = org.eclipse.pde.internal.core.PDECore.getDefault()
-				.acquireService(ITargetPlatformService.class);
-		ITargetDefinition target = s.newTarget();
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		setMavenTargetLocationAndResolver(target, targetXML);
-		return target;
+	private static ServiceLoader<TargetLocationLoader> LOCATION_LOADER = ServiceLoader.load(TargetLocationLoader.class,
+			AbstractMavenTargetTest.class.getClassLoader());
+	private static TargetLocationLoader loader;
+
+	ITargetLocation resolveMavenTarget(String targetXML) throws Exception {
+		return getLoader().resolveMavenTarget(targetXML, temporaryFolder.newFolder());
 	}
 
-	static void setMavenTargetLocationAndResolver(ITargetDefinition target, String targetXML) throws CoreException {
-		ITargetLocation targetLocation = new MavenTargetLocationFactory().getTargetLocation("Maven", targetXML);
-		target.setTargetLocations(new ITargetLocation[] { targetLocation });
-		target.resolve(null);
+	private static TargetLocationLoader getLoader() {
+		if (loader == null) {
+			Provider<TargetLocationLoader> provider = LOCATION_LOADER.stream().sorted().findFirst().orElseThrow(
+					() -> new IllegalStateException("No TargetLocationLoader found on classpath of test!"));
+			loader = provider.get();
+		}
+		return loader;
+	}
+
+	protected static void assertStatusOk(IStatus status) {
+		if (!status.isOK()) {
+			throw new AssertionError(status.toString(), status.getException());
+		}
 	}
 
 	// --- common assertion utilities ---
-
-	interface ExpectedUnit {
-
-		String id();
-
-		boolean isSourceBundle();
-
-		boolean isOriginal();
-
-		ArtifactKey key();
-	}
 
 	private static <U extends ExpectedUnit, T> Map<U, T> assertTargetContent(List<U> expectedUnits, T[] allUnit,
 			BiPredicate<U, T> matcher, Function<T, URI> getLocation, Predicate<T> isSourceUnit,
@@ -130,20 +132,6 @@ public abstract class AbstractMavenTargetTest {
 
 	// --- assertion utilities for Bundles in target ---
 
-	static record ExpectedBundle(String bsn, String version, boolean isSourceBundle, boolean isOriginal,
-			ArtifactKey key) implements ExpectedUnit {
-
-		@Override
-		public String id() {
-			return bsn();
-		}
-
-		@Override
-		public String toString() {
-			return bsn + ":" + version;
-		}
-	}
-
 	static ExpectedBundle originalOSGiBundle(String bsn, String version, String groupArtifact) {
 		return originalOSGiBundle(bsn, version, groupArtifact, version);
 	}
@@ -161,8 +149,8 @@ public abstract class AbstractMavenTargetTest {
 	static List<ExpectedBundle> withSourceBundles(List<ExpectedBundle> mainBundles) {
 		return mainBundles.stream().<ExpectedBundle>mapMulti((unit, downStream) -> {
 			downStream.accept(unit);
-			String sourceId = unit.bsn + SOURCE_BUNDLE_SUFFIX;
-			ExpectedBundle sourceUnit = new ExpectedBundle(sourceId, unit.version, true, false, unit.key);
+			String sourceId = unit.bsn() + SOURCE_BUNDLE_SUFFIX;
+			ExpectedBundle sourceUnit = new ExpectedBundle(sourceId, unit.version(), true, false, unit.key());
 			downStream.accept(sourceUnit);
 		}).toList();
 	}
@@ -175,12 +163,12 @@ public abstract class AbstractMavenTargetTest {
 		}
 	}
 
-	static void assertTargetBundles(ITargetDefinition target, List<ExpectedBundle> expectedUnits) {
-		assertTargetContent(expectedUnits, target.getAllBundles(), //
+	static void assertTargetBundles(ITargetLocation target, List<ExpectedBundle> expectedUnits) {
+		assertTargetContent(expectedUnits, target.getBundles(), //
 				(expectedBundle, bundle) -> {
 					BundleInfo info = bundle.getBundleInfo();
 					return expectedBundle.bsn().equals(info.getSymbolicName())
-							&& expectedBundle.version.equals(info.getVersion());
+							&& expectedBundle.version().equals(info.getVersion());
 				}, //
 				tb -> tb.getBundleInfo().getLocation(), //
 				tb -> tb.isSourceBundle(),
@@ -189,15 +177,6 @@ public abstract class AbstractMavenTargetTest {
 	}
 
 	// --- assertion utilities for Features in a target ---
-
-	static record ExpectedFeature(String id, String version, boolean isSourceBundle, boolean isOriginal,
-			ArtifactKey key, List<NameVersionDescriptor> containedPlugins) implements ExpectedUnit {
-
-		@Override
-		public String toString() {
-			return id + ":" + version;
-		}
-	}
 
 	static ExpectedFeature originalFeature(String id, String version, String groupArtifact,
 			List<NameVersionDescriptor> containedPlugins) {
@@ -217,19 +196,19 @@ public abstract class AbstractMavenTargetTest {
 		return mainFeatures.stream().<ExpectedFeature>mapMulti((feature, downStream) -> {
 			downStream.accept(feature);
 			String sourceId = feature.id() + SOURCE_BUNDLE_SUFFIX;
-			List<NameVersionDescriptor> sourcePlugins = feature.containedPlugins.stream()
+			List<NameVersionDescriptor> sourcePlugins = feature.containedPlugins().stream()
 					.map(d -> featurePlugin(d.getId() + SOURCE_BUNDLE_SUFFIX, d.getVersion())).toList();
-			ExpectedFeature sourceUnit = new ExpectedFeature(sourceId, feature.version, true, false, feature.key,
+			ExpectedFeature sourceUnit = new ExpectedFeature(sourceId, feature.version(), true, false, feature.key(),
 					sourcePlugins);
 			downStream.accept(sourceUnit);
 		}).toList();
 	}
 
-	static Map<ExpectedFeature, TargetFeature> assertTargetFeatures(ITargetDefinition target,
+	static Map<ExpectedFeature, TargetFeature> assertTargetFeatures(ITargetLocation target,
 			List<ExpectedFeature> expectedFeatures) {
-		var encounteredFeatures = assertTargetContent(expectedFeatures, target.getAllFeatures(), //
+		var encounteredFeatures = assertTargetContent(expectedFeatures, target.getFeatures(), //
 				(expectedFeature, feature) -> expectedFeature.id().equals(feature.getId())
-						&& expectedFeature.version.equals(feature.getVersion()), //
+						&& expectedFeature.version().equals(feature.getVersion()), //
 				f -> Path.of(f.getLocation()).toUri(), //
 				f -> isSourceFeature(f), //
 				f -> isSourceFeature(f) ? f.getId().substring(0, f.getId().length() - SOURCE_BUNDLE_SUFFIX.length())
@@ -241,8 +220,27 @@ public abstract class AbstractMavenTargetTest {
 		return encounteredFeatures;
 	}
 
-	private static boolean isSourceFeature(TargetFeature f) {
+	static boolean isSourceFeature(TargetFeature f) {
 		return f.getId().endsWith(SOURCE_BUNDLE_SUFFIX)
 				&& Arrays.stream(f.getPlugins()).allMatch(d -> d.getId().endsWith(SOURCE_BUNDLE_SUFFIX));
+	}
+
+	static IStatus getTargetStatus(ITargetLocation target) {
+		IStatus status = target.getStatus();
+		if (status != null && !status.isOK()) {
+			return status;
+		}
+		MultiStatus result = new MultiStatus("org.eclipse.pde.core", 0,
+				"Problems occurred getting the plug-ins in this container", null);
+		for (TargetBundle targetBundle : target.getBundles()) {
+			IStatus bundleStatus = targetBundle.getStatus();
+			if (!bundleStatus.isOK()) {
+				result.add(bundleStatus);
+			}
+		}
+		if (result.isOK()) {
+			return Status.OK_STATUS;
+		}
+		return result;
 	}
 }
