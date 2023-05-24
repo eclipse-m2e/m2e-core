@@ -12,12 +12,9 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.target.tests;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.pde.core.target.ITargetLocation;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +33,9 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
-	public void testLocationContentFeatureGeneration() throws CoreException {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+	public void testLocationContentFeatureGeneration() throws Exception {
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<feature id="my.junit.feature" label="My Junit Feature" provider-name="Me Inc." version="1.2.3.qualifier">
@@ -63,7 +61,7 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
+		assertStatusOk(target.getStatus());
 		List<ExpectedBundle> expectedBundles = List.of( //
 				junitJupiterAPI(), //
 				junitPlatformCommons(), //
@@ -89,8 +87,9 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
-	public void testPomArtifactFeatureGeneration() throws CoreException {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+	public void testPomArtifactFeatureGeneration() throws Exception {
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -104,7 +103,7 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
+		assertStatusOk(target.getStatus());
 		List<ExpectedBundle> expectedBundles = List.of( //
 				originalOSGiBundle("com.sun.xml.bind.jaxb-core", "4.0.2", "com.sun.xml.bind:jaxb-core"),
 				originalOSGiBundle("com.sun.xml.bind.jaxb-impl", "4.0.2", "com.sun.xml.bind:jaxb-impl"),
@@ -131,11 +130,12 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
-	public void testFeatureArtifact() throws CoreException {
+	public void testFeatureArtifact() throws Exception {
 		// TODO: For real feature artifacts, which don't have a source-artifact, a
 		// source feature is not generated (yet).
 		Assume.assumeFalse(includeSource);
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
 							<dependencies>
@@ -149,7 +149,7 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
+		assertStatusOk(target.getStatus());
 		assertTargetBundles(target, List.of());
 		List<ExpectedFeature> expectedFeature = List.of(generatedFeature("org.eclipse.vorto.feature", "1.0.0", List.of(//
 				featurePlugin("org.eclipse.vorto.core", "1.0.0"), //

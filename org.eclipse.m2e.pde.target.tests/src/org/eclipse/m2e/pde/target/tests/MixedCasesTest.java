@@ -13,11 +13,10 @@
 package org.eclipse.m2e.pde.target.tests;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.pde.core.target.ITargetLocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,7 +35,8 @@ public class MixedCasesTest extends AbstractMavenTargetTest {
 
 	@Test
 	public void testMultipleArtifactsWithWrappingAndExclusion() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(String.format(
+		ITargetLocation target = resolveMavenTarget(String
+				.format(
 				"""
 						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="generate" type="Maven">
 							<dependencies>
@@ -75,8 +75,8 @@ public class MixedCasesTest extends AbstractMavenTargetTest {
 						</location>
 						""",
 				includeSource));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
 		List<ExpectedBundle> expectedBundles = List.of(//
 				originalOSGiBundle("com.google.inject", "5.1.0", "com.google.inject:guice"),
 				originalOSGiBundle("com.google.guava", "30.1.0.jre", "com.google.guava:guava", "30.1-jre"),

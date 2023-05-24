@@ -26,10 +26,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.jar.Attributes;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.ManifestElement;
-import org.eclipse.pde.core.target.ITargetDefinition;
+import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
@@ -40,8 +39,9 @@ import org.osgi.framework.VersionRange;
 public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 
 	@Test
-	public void testNonOSGiArtifact_missingArtifactError() throws CoreException {
-		ITargetDefinition target = resolveMavenTarget("""
+//	@Ignore("currently fails on CI")
+	public void testNonOSGiArtifact_missingArtifactError() throws Exception {
+		ITargetLocation target = resolveMavenTarget("""
 				<location includeDependencyDepth="none" includeSource="true" missingManifest="error" type="Maven">
 					<dependencies>
 						<dependency>
@@ -53,15 +53,15 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 					</dependencies>
 				</location>
 				""");
-		IStatus targetStatus = target.getStatus();
-		assertEquals(IStatus.ERROR, targetStatus.getSeverity());
+		IStatus targetStatus = getTargetStatus(target);
+		assertEquals(String.valueOf(targetStatus), IStatus.ERROR, targetStatus.getSeverity());
 
 		assertEquals(1, targetStatus.getChildren().length);
 		String notABundleErrorMessage = "com.google.errorprone:error_prone_annotations:jar:2.18.0 is not a bundle";
 		assertEquals(notABundleErrorMessage, targetStatus.getChildren()[0].getMessage());
 
-		assertArrayEquals(EMPTY, target.getAllFeatures());
-		TargetBundle[] allBundles = target.getAllBundles();
+		assertArrayEquals(EMPTY, target.getFeatures());
+		TargetBundle[] allBundles = target.getBundles();
 		assertEquals(1, allBundles.length);
 		IStatus status = allBundles[0].getStatus();
 		assertEquals(IStatus.ERROR, status.getSeverity());
@@ -69,8 +69,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
-	public void testNonOSGiArtifact_missingArtifactIgnore() throws CoreException {
-		ITargetDefinition target = resolveMavenTarget("""
+	public void testNonOSGiArtifact_missingArtifactIgnore() throws Exception {
+		ITargetLocation target = resolveMavenTarget("""
 				<location includeDependencyDepth="none" includeSource="true" missingManifest="ignore" type="Maven">
 					<dependencies>
 						<dependency>
@@ -82,14 +82,14 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 					</dependencies>
 				</location>
 				""");
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
-		assertArrayEquals(EMPTY, target.getAllBundles());
+		assertStatusOk(getTargetStatus(target));
+		assertArrayEquals(EMPTY, target.getFeatures());
+		assertArrayEquals(EMPTY, target.getBundles());
 	}
 
 	@Test
 	public void testNonOSGiArtifact_missingArtifactGenerate_defaultInstructions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget("""
+		ITargetLocation target = resolveMavenTarget("""
 				<location includeDependencyDepth="none" includeSource="true" missingManifest="generate" type="Maven">
 					<dependencies>
 						<dependency>
@@ -101,8 +101,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 					</dependencies>
 				</location>
 				""");
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(getTargetStatus(target));
+		assertArrayEquals(EMPTY, target.getFeatures());
 		ExpectedBundle expectedBundle = generatedBundle("wrapped.com.google.errorprone.error_prone_annotations",
 				"2.18.0", "com.google.errorprone:error_prone_annotations");
 		assertTargetBundles(target, withSourceBundles(List.of(expectedBundle)));
@@ -136,7 +136,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 
 	@Test
 	public void testNonOSGiArtifact_missingArtifactGenerate_customInstructions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetLocation target = resolveMavenTarget(
 				"""
 						<location includeDependencyDepth="none" includeDependencyScopes="" includeSource="true" missingManifest="generate" type="Maven">
 							<dependencies>
@@ -157,8 +157,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 							]]></instructions>
 						</location>
 						""");
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
+		assertStatusOk(getTargetStatus(target));
+		assertArrayEquals(EMPTY, target.getFeatures());
 		ExpectedBundle expectedBundle = generatedBundle("m2e.custom.test.wrapped.error_prone_annotations", "2.18.0",
 				"com.google.errorprone:error_prone_annotations");
 		assertTargetBundles(target, withSourceBundles(List.of(expectedBundle)));
@@ -211,19 +211,19 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 					]]></instructions>
 				</location>
 				""";
-		ITargetDefinition target = resolveMavenTarget(targetXML.formatted("m2e.wrapped.${mvnArtifactId}"));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
-		assertEquals(2, target.getAllBundles().length);
+		ITargetLocation target = resolveMavenTarget(targetXML.formatted("m2e.wrapped.${mvnArtifactId}"));
+		assertStatusOk(getTargetStatus(target));
+		assertArrayEquals(EMPTY, target.getFeatures());
+		assertEquals(2, target.getBundles().length);
 		assertEquals("m2e.wrapped.error_prone_annotations",
 				getGeneratedBundle(target).getBundleInfo().getSymbolicName());
 		assertEquals("m2e.wrapped.error_prone_annotations.source",
 				getGeneratedSourceBundle(target).getBundleInfo().getSymbolicName());
 
-		setMavenTargetLocationAndResolver(target, targetXML.formatted("others.wrapped.${mvnArtifactId}"));
-		assertTrue(target.getStatus().isOK());
-		assertArrayEquals(EMPTY, target.getAllFeatures());
-		assertEquals(2, target.getAllBundles().length);
+		target = resolveMavenTarget(targetXML.formatted("others.wrapped.${mvnArtifactId}"));
+		assertStatusOk(getTargetStatus(target));
+		assertArrayEquals(EMPTY, target.getFeatures());
+		assertEquals(2, target.getBundles().length);
 		assertEquals("others.wrapped.error_prone_annotations",
 				getGeneratedBundle(target).getBundleInfo().getSymbolicName());
 		assertEquals("others.wrapped.error_prone_annotations.source",
@@ -232,7 +232,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 	
 	@Test
 	public void testNonOSGiArtifact_missingArtifactGenerate_hasVersions() throws Exception {
-		ITargetDefinition target = resolveMavenTarget(
+		ITargetLocation target = resolveMavenTarget(
 				"""
 				<location includeDependencyDepth="infinite" includeDependencyScopes="compile,provided,runtime" missingManifest="generate" type="Maven">
 					<dependencies>
@@ -245,7 +245,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 					</dependencies>
 				</location>
 				""");
-		assertTrue(target.getStatus().isOK());
+		assertStatusOk(getTargetStatus(target));
 		Optional<TargetBundle> luceneAnalysisCommon = Arrays.stream(target.getBundles()).filter(
 				tb -> tb.getBundleInfo().getSymbolicName().equals("wrapped.org.apache.lucene.lucene-analysis-common"))
 				.findFirst();
@@ -265,11 +265,11 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 		}
 	}
 
-	private static TargetBundle getGeneratedBundle(ITargetDefinition target) {
+	private static TargetBundle getGeneratedBundle(ITargetLocation target) {
 		return Arrays.stream(target.getBundles()).filter(b -> !b.isSourceBundle()).findFirst().orElseThrow();
 	}
 
-	private static TargetBundle getGeneratedSourceBundle(ITargetDefinition target) {
+	private static TargetBundle getGeneratedSourceBundle(ITargetLocation target) {
 		return Arrays.stream(target.getBundles()).filter(TargetBundle::isSourceBundle).findFirst().orElseThrow();
 	}
 
