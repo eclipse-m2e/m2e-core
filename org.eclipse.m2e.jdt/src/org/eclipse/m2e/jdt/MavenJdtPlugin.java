@@ -69,6 +69,7 @@ public class MavenJdtPlugin extends Plugin {
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 
   public static final String PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION = "jreSystemLibraryVersion"; //$NON-NLS-1$
+  private static final String PREFERENCE_LOOKUP_JVM_IN_TOOLCHAINS = "lookupJVMInToolchains"; //$NON-NLS-1$
 
   private static MavenJdtPlugin instance;
 
@@ -154,6 +155,11 @@ public class MavenJdtPlugin extends Plugin {
     this.launchConfigurationListener = new MavenLaunchConfigurationListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(launchConfigurationListener);
     projectManager.addMavenProjectChangedListener(launchConfigurationListener);
+
+    String lookupPref = preferencesService.get(PREFERENCE_LOOKUP_JVM_IN_TOOLCHAINS, Boolean.TRUE.toString(), preferencesLookup);
+    if (lookupPref == null || Boolean.parseBoolean(lookupPref)) {
+        new LookupJDKToolchainsJob().schedule();
+    }
 
     this.mavenClassifierManager = new MavenClassifierManager();
   }
