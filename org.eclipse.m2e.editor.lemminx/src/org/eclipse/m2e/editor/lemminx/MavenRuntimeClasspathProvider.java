@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2021 Red Hat Inc. and others.
+ * Copyright (c) 2019-2023 Red Hat Inc. and others.
  *
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -19,15 +19,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.lsp4e.LanguageServers;
 import org.eclipse.lsp4e.LanguageServersRegistry;
 import org.eclipse.lsp4e.LanguageServersRegistry.LanguageServerDefinition;
-import org.eclipse.lsp4e.LanguageServiceAccessor;
 import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -51,9 +52,11 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 				mavenConfigurationlistener = event -> {
 					Map<String, Object> options = InitializationOptionsProvider.toLemMinXOptions(mavenConfiguration);
 					DidChangeConfigurationParams params = new DidChangeConfigurationParams(Map.of("xml", options));
-					LanguageServiceAccessor.getActiveLanguageServers(null).stream()
-							.filter(s -> definition.equals(LanguageServiceAccessor.resolveServerDefinition(s).get()))
-							.forEach(ls -> ls.getWorkspaceService().didChangeConfiguration(params));
+
+					LanguageServers.forProject(null).withPreferredServer(definition).excludeInactive()
+					.collectAll((w, ls) -> CompletableFuture.completedFuture(ls)).thenAccept(
+							lss -> lss.stream().forEach(ls -> ls.getWorkspaceService().didChangeConfiguration(params)));
+
 				};
 				MavenPlugin.getMavenConfiguration().addConfigurationChangeListener(mavenConfigurationlistener);
 			}
