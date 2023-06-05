@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -47,5 +48,13 @@ public class UserInterfacePreferencePage extends FieldEditorPreferencePage imple
     parent = getFieldEditorParent();
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, Messages.pomEditorDefaultPage,
         parent));
+
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_RESOLVE_MISSING_PROJECTS,
+        Messages.resolveMissingWorkspaceProject,
+        parent));
+
+    addField(new IntegerFieldEditor(MavenPreferenceConstants.P_DEFAULT_COMPLETION_PROPOSAL_RELEVANCE,
+        Messages.defaultProposalRelevance, parent));
+
   }
 }
