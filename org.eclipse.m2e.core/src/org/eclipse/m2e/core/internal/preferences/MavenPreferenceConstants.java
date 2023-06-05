@@ -96,6 +96,11 @@ public interface MavenPreferenceConstants {
   /** boolean **/
   String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
 
+  /** boolean **/
+  String P_RESOLVE_MISSING_PROJECTS = "eclipse.m2.resolveMissingWorkspaceProjects"; //$NON-NLS-1$
+
+  String P_DEFAULT_COMPLETION_PROPOSAL_RELEVANCE = "eclipse.m2.defaultCompletionRelevance"; //$NON-NLS-1$
+
   /**
    * @since 1.5
    **/

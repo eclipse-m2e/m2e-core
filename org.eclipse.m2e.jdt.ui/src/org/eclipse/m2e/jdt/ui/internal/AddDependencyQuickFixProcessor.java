@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -41,6 +42,8 @@ import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -79,9 +82,10 @@ public class AddDependencyQuickFixProcessor implements IQuickFixProcessor {
           handleImportNotFound(context, location, possibleKeys);
       }
     }
+    int relevance = getRelevance();
     return possibleKeys.entrySet().stream()
         .flatMap(entry -> entry.getValue().stream()
-            .map(key -> new AddDependencyJavaCompletionProposal(key, entry.getKey().getPom())))
+            .map(key -> new AddDependencyJavaCompletionProposal(key, entry.getKey().getPom(), relevance)))
         .toArray(IJavaCompletionProposal[]::new);
   }
 
@@ -107,29 +111,31 @@ public class AddDependencyQuickFixProcessor implements IQuickFixProcessor {
   static Set<ArtifactKey> findMatchingArtifacts(String className, IMavenProjectFacade currentFacade)
       throws CoreException {
     Set<ArtifactKey> possibleKey = new HashSet<ArtifactKey>();
-    SearchPattern typePattern = SearchPattern.createPattern(className, IJavaSearchConstants.TYPE,
-        IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
-    IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
-    SearchEngine searchEngine = new SearchEngine();
-    SearchRequestor requestor = new SearchRequestor() {
+    if(isResolveMissingWorkspaceProject()) {
+      SearchPattern typePattern = SearchPattern.createPattern(className, IJavaSearchConstants.TYPE,
+          IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
+      IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
+      SearchEngine searchEngine = new SearchEngine();
+      SearchRequestor requestor = new SearchRequestor() {
 
-      @Override
-      public void acceptSearchMatch(SearchMatch aMatch) {
-        Object element = aMatch.getElement();
-        if(element instanceof IType) {
-          IType type = (IType) element;
-          IMavenProjectFacade facade = Adapters.adapt(type.getJavaProject(), IMavenProjectFacade.class);
-          if(facade != null) {
-            ArtifactKey artifactKey = facade.getArtifactKey();
-            if(!artifactKey.equals(currentFacade.getArtifactKey())) {
-              possibleKey.add(artifactKey);
+        @Override
+        public void acceptSearchMatch(SearchMatch aMatch) {
+          Object element = aMatch.getElement();
+          if(element instanceof IType) {
+            IType type = (IType) element;
+            IMavenProjectFacade facade = Adapters.adapt(type.getJavaProject(), IMavenProjectFacade.class);
+            if(facade != null) {
+              ArtifactKey artifactKey = facade.getArtifactKey();
+              if(!artifactKey.equals(currentFacade.getArtifactKey())) {
+                possibleKey.add(artifactKey);
+              }
             }
           }
         }
-      }
-    };
-    searchEngine.search(typePattern, new SearchParticipant[] {SearchEngine.getDefaultSearchParticipant()},
-        workspaceScope, requestor, null);
+      };
+      searchEngine.search(typePattern, new SearchParticipant[] {SearchEngine.getDefaultSearchParticipant()},
+          workspaceScope, requestor, null);
+    }
     return possibleKey;
   }
 
@@ -145,6 +151,16 @@ public class AddDependencyQuickFixProcessor implements IQuickFixProcessor {
       }
     }
     return className;
+  }
+
+  private static boolean isResolveMissingWorkspaceProject() {
+    return InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID)
+        .getBoolean(MavenPreferenceConstants.P_RESOLVE_MISSING_PROJECTS, true);
+  }
+
+  private static int getRelevance() {
+    return InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID)
+        .getInt(MavenPreferenceConstants.P_DEFAULT_COMPLETION_PROPOSAL_RELEVANCE, 100);
   }
 
 }

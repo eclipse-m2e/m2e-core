@@ -66,5 +66,8 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, true);
 
     store.putBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, false);
+
+    store.putBoolean(MavenPreferenceConstants.P_RESOLVE_MISSING_PROJECTS, true);
+    store.putInt(MavenPreferenceConstants.P_DEFAULT_COMPLETION_PROPOSAL_RELEVANCE, 100);
   }
 }

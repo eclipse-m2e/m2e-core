@@ -39,9 +39,12 @@ public class AddDependencyJavaCompletionProposal implements IJavaCompletionPropo
 
   private IFile pomfile;
 
-  public AddDependencyJavaCompletionProposal(ArtifactKey artifactKey, IFile pomfile) {
+  private int relevance;
+
+  public AddDependencyJavaCompletionProposal(ArtifactKey artifactKey, IFile pomfile, int relevance) {
     this.artifactKey = artifactKey;
     this.pomfile = pomfile;
+    this.relevance = relevance;
   }
 
   public void apply(IDocument javaDocument) {
@@ -81,7 +84,7 @@ public class AddDependencyJavaCompletionProposal implements IJavaCompletionPropo
   }
 
   public int getRelevance() {
-    return 100;
+    return relevance;
   }
 
 }
