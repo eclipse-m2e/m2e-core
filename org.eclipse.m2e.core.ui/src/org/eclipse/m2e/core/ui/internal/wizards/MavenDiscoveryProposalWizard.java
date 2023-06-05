@@ -109,10 +109,6 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
   @Override
   public boolean performFinish() {
-    if(lifecycleMappingPage != null && !lifecycleMappingPage.isMappingComplete()) {
-      return false;
-    }
-
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
 
     boolean doIgnore = !lifecycleMappingPage.getIgnore().isEmpty() || !lifecycleMappingPage.getIgnoreParent().isEmpty()

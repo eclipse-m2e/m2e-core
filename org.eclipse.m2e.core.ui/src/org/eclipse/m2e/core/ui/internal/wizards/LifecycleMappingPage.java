@@ -67,7 +67,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import org.apache.maven.project.MavenProject;
@@ -598,18 +597,6 @@ public class LifecycleMappingPage extends WizardPage {
       return Collections.emptyList();
     }
     return mappingConfiguration.getSelectedProposals();
-  }
-
-  /*
-   * Mapping is complete when mappings are handled (a proposal has been selected, or if it is an uninteresting phase).
-   */
-  public boolean isMappingComplete() {
-    for(TreeItem item : treeViewer.getTree().getItems()) {
-      if(!isHandled((ILifecycleMappingLabelProvider) item.getData())) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /*
