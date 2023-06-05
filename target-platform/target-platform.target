@@ -121,5 +121,53 @@
 				</dependency>
 			</dependencies>
 		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="maven-archetype" missingManifest="generate" type="Maven">
+
+			<feature id="org.eclipse.m2e.archetype.feature" label="M2Eclipse Maven ArcheType Fragments" version="1.0.0.qualifier">
+
+</feature>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-catalog</artifactId>
+					<version>3.2.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-common</artifactId>
+					<version>3.2.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-descriptor</artifactId>
+					<version>3.2.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.maven.shared</groupId>
+					<artifactId>maven-artifact-transfer</artifactId>
+					<version>0.13.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.jdom</groupId>
+					<artifactId>jdom2</artifactId>
+					<version>2.0.6</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions><![CDATA[
+Bundle-Name:           M2Eclipse supplement fragment for ${mvnGroupId}:${mvnArtifactId}:${mvnVersion}
+version:               ${version_cleanup;${mvnVersion}}
+Bundle-SymbolicName:   org.eclipse.m2e.archetype.${mvnArtifactId}
+Bundle-Version:        ${version}
+Export-Package:        *;version="${version}";-noimport:=true
+Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="[3,4)"
+-exportcontents:       META-INF.plexus;-noimport:=true;x-internal:=true,org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
+Import-Package:        !*
+]]></instructions>
+		</location>
 	</locations>
 </target>
