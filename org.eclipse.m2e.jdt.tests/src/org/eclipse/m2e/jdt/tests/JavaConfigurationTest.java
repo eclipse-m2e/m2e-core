@@ -63,6 +63,24 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 	}
 
 	@Test
+	public void testComplianceVsReleaseSettings() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/compilerReleaseSettings/pom.xml");
+		assertEquals("1.8", project.getOption(JavaCore.COMPILER_SOURCE, false));
+		assertEquals("1.8", project.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false));
+		assertEquals("1.8", project.getOption(JavaCore.COMPILER_COMPLIANCE, false));
+		assertEquals(JavaCore.ENABLED, project.getOption(JavaCore.COMPILER_RELEASE, false));
+		IFile pomFileWS = project.getProject().getFile("pom.xml");
+		String pomContent = Files.readString(Path.of(pomFileWS.getLocationURI()));
+		pomContent = pomContent.replace(">8<", ">11<");
+		pomFileWS.setContents(new ByteArrayInputStream(pomContent.getBytes()), true, false, null);
+		waitForJobsToComplete();
+		assertEquals("11", project.getOption(JavaCore.COMPILER_SOURCE, false));
+		assertEquals("11", project.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false));
+		assertEquals("11", project.getOption(JavaCore.COMPILER_COMPLIANCE, false));
+		assertEquals(JavaCore.ENABLED, project.getOption(JavaCore.COMPILER_RELEASE, false));
+	}
+
+	@Test
 	public void testJDTWarnings() throws CoreException, IOException, InterruptedException {
 		IJavaProject project = importResourceProject("/projects/compilerWarnings/pom.xml");
 		IFile file = project.getProject().getFile("src/main/java/A.java");

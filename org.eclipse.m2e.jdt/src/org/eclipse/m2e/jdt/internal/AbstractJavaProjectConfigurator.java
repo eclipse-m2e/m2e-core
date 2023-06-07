@@ -667,6 +667,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     }
 
+    // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source/target,
+    // Eclipse expects the values 1.5 and 1.6 and so on.
+    source = sanitizeJavaVersion(source);
+    target = sanitizeJavaVersion(target);
+
     options.put(JavaCore.COMPILER_SOURCE, source);
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
     options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, target);
