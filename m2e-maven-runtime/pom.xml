@@ -32,7 +32,6 @@
 	</properties>
 
 	<modules>
-		<module>org.eclipse.m2e.archetype.common</module>
 		<module>org.eclipse.m2e.maven.runtime</module>
 	</modules>
 

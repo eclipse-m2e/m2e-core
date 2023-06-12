@@ -122,10 +122,6 @@
 			</dependencies>
 		</location>
 		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="maven-archetype" missingManifest="generate" type="Maven">
-
-			<feature id="org.eclipse.m2e.archetype.feature" label="M2Eclipse Maven ArcheType Fragments" version="1.0.0.qualifier">
-
-</feature>
 			<dependencies>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
