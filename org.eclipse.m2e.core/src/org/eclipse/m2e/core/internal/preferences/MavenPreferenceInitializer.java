@@ -34,7 +34,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.putBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT, false);
 
     store.putBoolean(MavenPreferenceConstants.P_OFFLINE, false);
-    store.putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, true);
+    store.put(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY, MavenPreferenceConstants.GLOBAL_UPDATE_POLICY_DEFAULT);
 
     store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, false);
     store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, false);

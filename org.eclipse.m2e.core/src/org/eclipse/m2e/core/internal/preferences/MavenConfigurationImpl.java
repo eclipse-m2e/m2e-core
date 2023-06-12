@@ -241,18 +241,22 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public String getGlobalUpdatePolicy() {
-    boolean never = Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, null,
-        preferencesLookup));
-    return never ? RepositoryPolicy.UPDATE_POLICY_NEVER : null;
+    String string = preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY, null, preferencesLookup);
+    //for backward compat
+    if(string == null || "true".equalsIgnoreCase(string)) {
+      return RepositoryPolicy.UPDATE_POLICY_NEVER;
+    }
+    if(MavenPreferenceConstants.GLOBAL_UPDATE_POLICY_DEFAULT.equals(string) || "false".equals(string)) {
+      return null;
+    }
+    return string;
   }
 
   public void setGlobalUpdatePolicy(String policy) {
     if(policy == null) {
-      preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, false);
-    } else if(RepositoryPolicy.UPDATE_POLICY_NEVER.equals(policy)) {
-      preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, true);
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY);
     } else {
-      throw new IllegalArgumentException();
+      preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY, policy);
     }
   }
 
