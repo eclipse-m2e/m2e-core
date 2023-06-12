@@ -17,7 +17,9 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -43,6 +45,8 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
 
   private String originalChecksumPolicy;
 
+  private String originalUpdatePolicy;
+
   public MavenPreferencePage() {
     super(GRID);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
@@ -63,8 +67,8 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_OFFLINE, Messages.preferencesOffline,
         getFieldEditorParent()));
 
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER,
-        Messages.preferencesGlobalUpdateNever, getFieldEditorParent()));
+    //    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER,
+    //        Messages.preferencesGlobalUpdateNever, getFieldEditorParent()));
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEBUG_OUTPUT, //
         Messages.preferencesDebugOutput, getFieldEditorParent()));
@@ -112,6 +116,22 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
         .setToolTipText(Messages.preferencesGlobalChecksumPolicy_tooltip);
     addField(checksumPolicy);
 
+    String[][] updatePolicies = new String[][] {
+        new String[] {Messages.preferencesGlobalUpdatePolicy_default,
+            MavenPreferenceConstants.GLOBAL_UPDATE_POLICY_DEFAULT},
+        new String[] {Messages.preferencesGlobalUpdatePolicy_never, RepositoryPolicy.UPDATE_POLICY_NEVER},
+        new String[] {Messages.preferencesGlobalUpdatePolicy_always, RepositoryPolicy.UPDATE_POLICY_ALWAYS},
+        new String[] {Messages.preferencesGlobalUpdatePolicy_daily, RepositoryPolicy.UPDATE_POLICY_DAILY},
+        new String[] {Messages.preferencesGlobalUpdatePolicy_hourly,
+            RepositoryPolicy.UPDATE_POLICY_INTERVAL + ":" + TimeUnit.HOURS.toMinutes(1)}};
+    originalUpdatePolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY);
+
+    FieldEditor updatePolicy = new ComboFieldEditor(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY,
+        Messages.preferencesGlobalUpdatePolicy, updatePolicies, getFieldEditorParent());
+    updatePolicy.getLabelControl(getFieldEditorParent())
+        .setToolTipText(Messages.preferencesGlobalChecksumPolicy_tooltip);
+    addField(updatePolicy);
+
     if(M2EUIPluginActivator.showExperimentalFeatures()) {
       BooleanFieldEditor nullSchedulingRule = new BooleanFieldEditor(
           MavenPreferenceConstants.P_BUILDER_USE_NULL_SCHEDULING_RULE, Messages.preferencesNullSchedulingRule,
@@ -138,7 +158,9 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
   private void updateProjects() {
     //Update projects if the checksum policy changed
     String newChecksumPolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
-    boolean updateRequired = !originalChecksumPolicy.equals(newChecksumPolicy);
+    String newUpdatePolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
+    boolean updateRequired = !originalChecksumPolicy.equals(newChecksumPolicy)
+        || getMinutes(originalUpdatePolicy) > getMinutes(newUpdatePolicy);
     if(updateRequired) {
       List<IMavenProjectFacade> facades = MavenPlugin.getMavenProjectRegistry().getProjects();
       if(facades != null && !facades.isEmpty()) {
@@ -157,5 +179,20 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
       }
     }
     originalChecksumPolicy = newChecksumPolicy;
+    originalUpdatePolicy = newUpdatePolicy;
+  }
+
+  private static long getMinutes(String policy) {
+    if(policy != null) {
+      if(RepositoryPolicy.UPDATE_POLICY_NEVER.equals(policy) || "true".equals(policy)) {
+        return Long.MAX_VALUE;
+      }
+      try {
+        String s = policy.substring(RepositoryPolicy.UPDATE_POLICY_INTERVAL.length() + 1);
+        return Long.parseLong(s);
+      } catch(RuntimeException e) {
+      }
+    }
+    return TimeUnit.HOURS.toMinutes(24);
   }
 }
