@@ -42,6 +42,7 @@
 
 		<module>m2e-maven-runtime</module>
 
+		<module>org.eclipse.m2e.archetype.common</module>
 		<module>org.eclipse.m2e.model.edit</module>
 		<module>org.eclipse.m2e.core</module>
 		<module>org.eclipse.m2e.core.ui</module>
@@ -100,11 +101,6 @@
 	</modules>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.eclipse.m2e</groupId>
-			<artifactId>org.eclipse.m2e.archetype.common</artifactId>
-			<version>3.2.104-SNAPSHOT</version>
-		</dependency>
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>

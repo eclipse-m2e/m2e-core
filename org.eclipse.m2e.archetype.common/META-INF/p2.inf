@@ -1,0 +1,14 @@
+requires.0.namespace = osgi.bundle
+requires.0.name = org.eclipse.m2e.archetype.archetype-catalog
+
+requires.1.namespace = osgi.bundle
+requires.1.name = org.eclipse.m2e.archetype.archetype-common
+
+requires.2.namespace = osgi.bundle
+requires.2.name = org.eclipse.m2e.archetype.archetype-descriptor
+
+requires.3.namespace = osgi.bundle
+requires.3.name = org.eclipse.m2e.archetype.jdom2
+
+requires.4.namespace = osgi.bundle
+requires.4.name = org.eclipse.m2e.archetype.maven-artifact-transfer
