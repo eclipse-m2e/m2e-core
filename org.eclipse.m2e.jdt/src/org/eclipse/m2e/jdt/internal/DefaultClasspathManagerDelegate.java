@@ -148,6 +148,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
         entry.setArtifactKey(new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier()));
         entry.setScope(a.getScope());
         entry.setOptionalDependency(a.isOptional());
+        entry.setExported(isExportedArtifact(a));
       }
     }
 
@@ -159,6 +160,19 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
       descriptor.setClasspathAttribute(IClasspathManager.WITHOUT_TEST_CODE,
           (testAttributes.excludeTestSources) ? "true" : null);
     });
+  }
+
+  private boolean isExportedArtifact(Artifact a) {
+    if(Artifact.SCOPE_PROVIDED.equals(a.getScope())) {
+      //provided items are not transitive
+      return false;
+    }
+    if(a.isOptional()) {
+      //optional artifacts are also not transitive
+      return false;
+    }
+    //everything else is considered transitive
+    return true;
   }
 
   private boolean isOnlyVisibleByTests(Artifact a) {
