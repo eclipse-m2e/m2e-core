@@ -28,6 +28,16 @@
    <bundle id="com.google.gson.source"/>
    <bundle id="org.apache.commons.cli"/>
    <bundle id="org.apache.commons.cli.source"/>
+   <bundle id="org.eclipse.m2e.archetype.jdom2"/>
+   <bundle id="org.eclipse.m2e.archetype.jdom2.source"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-catalog"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-catalog.source"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-common"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-common.source"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-descriptor"/>
+   <bundle id="org.eclipse.m2e.archetype.archetype-descriptor.source"/>
+   <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer"/>
+   <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer.source"/>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
    <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/1.1.0/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4j/updates/releases/0.20.1/" enabled="true" />
