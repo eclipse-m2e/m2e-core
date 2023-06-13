@@ -82,18 +82,16 @@ public class LookupJDKToolchainsJob extends Job {
 					.noneMatch(install -> isSameCanonicalFile(candidate, install))) {
 					VMStandin workingCopy = new VMStandin(standardType, candidate.getAbsolutePath());
 					workingCopy.setInstallLocation(candidate);
-					if (workingCopy.getJavaVersion() != null) {
-						String name = candidate.getName();
-						int i = 1;
-						while (isDuplicateName(name)) {
-							name = candidate.getName() + '(' + i++ + ')';
-						}
-						workingCopy.setName(name);
-						IVMInstall newVM = workingCopy.convertToRealVM();
-						// next lines workaround https://github.com/eclipse-jdt/eclipse.jdt.debug/issues/248
-						if (!(newVM instanceof IVMInstall2 newVM2 && newVM2.getJavaVersion() != null)) {
-							standardType.disposeVMInstall(newVM.getId());
-						}
+					String name = candidate.getName();
+					int i = 1;
+					while (isDuplicateName(name)) {
+						name = candidate.getName() + '(' + i++ + ')';
+					}
+					workingCopy.setName(name);
+					IVMInstall newVM = workingCopy.convertToRealVM();
+					// next lines workaround https://github.com/eclipse-jdt/eclipse.jdt.debug/issues/248
+					if (!(newVM instanceof IVMInstall2 newVM2 && newVM2.getJavaVersion() != null)) {
+						standardType.disposeVMInstall(newVM.getId());
 					}
 				}
 			});
