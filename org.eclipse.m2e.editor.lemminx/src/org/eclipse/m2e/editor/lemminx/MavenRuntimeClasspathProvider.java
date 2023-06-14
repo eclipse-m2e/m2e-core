@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -54,8 +55,8 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 					DidChangeConfigurationParams params = new DidChangeConfigurationParams(Map.of("xml", options));
 
 					LanguageServers.forProject(null).withPreferredServer(definition).excludeInactive()
-					.collectAll((w, ls) -> CompletableFuture.completedFuture(ls)).thenAccept(
-							lss -> lss.stream().forEach(ls -> ls.getWorkspaceService().didChangeConfiguration(params)));
+							.collectAll((w, ls) -> CompletableFuture.completedFuture(ls)).thenAccept(lss -> lss.stream()
+									.forEach(ls -> ls.getWorkspaceService().didChangeConfiguration(params)));
 
 				};
 				MavenPlugin.getMavenConfiguration().addConfigurationChangeListener(mavenConfigurationlistener);
@@ -70,12 +71,9 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 		addJarsFromBundle(FrameworkUtil.getBundle(org.apache.maven.Maven.class), "/jars/", mavenRuntimeJars);
 		// Libraries that are also required and not included in
 		// org.eclipse.m2e.maven.runtime
-		try {
-			mavenRuntimeJars.add(FileLocator.getBundleFile(FrameworkUtil.getBundle(javax.inject.Inject.class)));
-			mavenRuntimeJars.add(FileLocator.getBundleFile(FrameworkUtil.getBundle(org.slf4j.Logger.class)));
-		} catch (IOException e) {
-			LOG.error(e.getMessage(), e);
-		}
+		Stream.of(javax.inject.Inject.class, org.slf4j.Logger.class)//
+				.map(FrameworkUtil::getBundle).map(FileLocator::getBundleFileLocation)//
+				.flatMap(Optional::stream).forEach(mavenRuntimeJars::add);
 		return mavenRuntimeJars;
 	}
 
