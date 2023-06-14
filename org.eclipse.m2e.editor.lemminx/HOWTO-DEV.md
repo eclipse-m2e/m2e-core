@@ -2,6 +2,12 @@
 
 This document gathers answers to main questions about technical process to troubleshot or improve m2e and lemminx-maven integration
 
+## How to try getting more information logged of lemminx-maven while developing m2e
+
+XML Language Server and Lemminx-maven extension used in Lemminx POM Editor are able to log more information than only severe errors and exceptions that may occur during the Editor work.
+
+See [Enable java.util.logging in the XML Language Server process](https://github.com/eclipse/wildwebdeveloper/blob/master/TIPS_and_FAQ.md#enable-javautillogging-in-the-xml-language-server-process) for details.
+ 
 ## How to try a different build of lemminx-maven while developing m2e
 
 In your development IDE, make sure the org.eclipse.m2e.editor.lemminx plugin is part of the workspace and can be resolved and built normally (no error marker). Then simply add/replace the `lemminx-maven.jar` file in its root with the particular lemminx-maven jar you're willing to work with. Then running as Eclipse Application will use the new jar for lemminx-maven.
