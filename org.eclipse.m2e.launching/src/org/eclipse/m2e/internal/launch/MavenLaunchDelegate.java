@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -244,14 +245,17 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     try {
       Optional<IContainer> container = getContainer(pomDirectory);
       if(container.isPresent()) {
-        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-        IFile pomFile = container.get().getFile(Path.fromOSString(IMavenConstants.POM_FILE_NAME));
-        IMavenProjectFacade mavenProject = projectManager.create(pomFile, true, new NullProgressMonitor());
-        if(mavenProject != null) {
-          return readEnforcedVersion(mavenProject, monitor);
+        IPath pomPath = Path.fromOSString(IMavenConstants.POM_FILE_NAME);
+        if(container.get().exists(pomPath)) {
+          IFile pomFile = container.get().getFile(pomPath);
+          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+          IMavenProjectFacade mavenProject = projectManager.create(pomFile, true, new NullProgressMonitor());
+          if(mavenProject != null) {
+            return readEnforcedVersion(mavenProject, monitor);
+          }
         }
       }
-      //TODO: handle the case if the pomDirectory points to a project not in the project. Then load the bare project.
+      //TODO: handle the case if the pomDirectory points to a project not in the workspace. Then load the bare project.
     } catch(CoreException ex) {
       logEnforcedJavaVersionCalculationError(ex);
     }
