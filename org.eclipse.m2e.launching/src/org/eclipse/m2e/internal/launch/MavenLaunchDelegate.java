@@ -321,7 +321,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       }
       if(mainVersion != null) {
         return matchingJREs.stream()
-            .filter(jre -> getArtifactVersion(jre).getMajorVersion() == mainVersion.getMajorVersion()).findFirst()
+            .filter(jre -> getJREVersion(jre).getMajorVersion() == mainVersion.getMajorVersion()).findFirst()
             .orElse(null);
       }
       return !matchingJREs.isEmpty() ? matchingJREs.get(0) : null;
@@ -338,8 +338,9 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     for(IVMInstallType vmType : JavaRuntime.getVMInstallTypes()) {
       for(IVMInstall vm : vmType.getVMInstalls()) {
         if(satisfiesVersionRange(vm, versionRange)) {
-          if(vm instanceof IVMInstall2 vm2) {
-            installedJREsByVersion.put(new DefaultArtifactVersion(vm2.getJavaVersion()), vm);
+          ArtifactVersion jreVersion = getJREVersion(vm);
+          if(jreVersion != DEFAULT_JAVA_VERSION) {
+            installedJREsByVersion.put(jreVersion, vm);
           } else {
             log.debug("Skipping IVMInstall '{}' from type {} as not implementing IVMInstall2", vm.getName(),
                 vmType.getName());
@@ -351,7 +352,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   private static boolean satisfiesVersionRange(IVMInstall jre, VersionRange versionRange) {
-    ArtifactVersion jreVersion = getArtifactVersion(jre);
+    ArtifactVersion jreVersion = getJREVersion(jre);
     if(versionRange.getRecommendedVersion() != null) {
       return jreVersion.compareTo(versionRange.getRecommendedVersion()) >= 0;
     }
@@ -360,8 +361,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private static final ArtifactVersion DEFAULT_JAVA_VERSION = new DefaultArtifactVersion("0.0.0");
 
-  private static ArtifactVersion getArtifactVersion(IVMInstall jre) {
-    return jre instanceof IVMInstall2 jre2 ? new DefaultArtifactVersion(jre2.getJavaVersion()) : DEFAULT_JAVA_VERSION;
+  private static ArtifactVersion getJREVersion(IVMInstall jre) {
+    if(jre instanceof IVMInstall2 jre2) {
+      String version = jre2.getJavaVersion();
+      if(version != null) {
+        return new DefaultArtifactVersion(version);
+      }
+    }
+    return DEFAULT_JAVA_VERSION;
   }
 
   @Override
