@@ -19,5 +19,6 @@ jobs:
     uses: eclipse-platform/eclipse.platform.releng.aggregator/.github/workflows/mavenLicenseCheck.yml@master
     with:
       projectId: technology.m2e
+      setupScript: 'cd m2e-maven-runtime && mvn generate-resources'
     secrets:
       gitlabAPIToken: ${{ secrets.M2E_GITLAB_API_TOKEN }}
