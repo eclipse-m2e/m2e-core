@@ -14,12 +14,18 @@
 package org.eclipse.m2e.core.internal.launch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.prefs.BackingStoreException;
@@ -29,6 +35,8 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+
+import org.apache.maven.Maven;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
@@ -70,9 +78,10 @@ public class MavenRuntimeManagerImpl {
 
   private AbstractMavenRuntime getDefaultRuntime() {
     String name = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
-    AbstractMavenRuntime runtime = getRuntimes().get(name);
+    Map<String, AbstractMavenRuntime> runtimes = getRuntimes();
+    AbstractMavenRuntime runtime = runtimes.get(name);
     if(runtime == null || !runtime.isAvailable()) {
-      runtime = new MavenEmbeddedRuntime();
+      runtime = runtimes.get(EMBEDDED);
     }
     return runtime;
   }
@@ -217,7 +226,20 @@ public class MavenRuntimeManagerImpl {
 
   public Map<String, AbstractMavenRuntime> getRuntimes() {
     Map<String, AbstractMavenRuntime> runtimes = new LinkedHashMap<>();
-    runtimes.put(EMBEDDED, new MavenEmbeddedRuntime());
+    Bundle defaultRuntimeBundle = FrameworkUtil.getBundle(Maven.class);
+    runtimes.put(EMBEDDED, new MavenEmbeddedRuntime(defaultRuntimeBundle, EMBEDDED,
+        MavenEmbeddedRuntime.getMavenVersionFromBundle(defaultRuntimeBundle)));
+    getMavenRuntimeBundles().filter(rtb -> rtb != defaultRuntimeBundle).forEach(rtb -> {
+      String mavenVersionFromBundle = MavenEmbeddedRuntime.getMavenVersionFromBundle(rtb);
+      String key;
+      if(mavenVersionFromBundle == null) {
+        Version version = rtb.getVersion();
+        key = EMBEDDED + "_" + version.getMajor() + "_" + version.getMinor() + "_" + version.getMicro();
+      } else {
+        key = EMBEDDED + "_" + mavenVersionFromBundle.replace('.', '_');
+      }
+      runtimes.put(key, new MavenEmbeddedRuntime(rtb, key, mavenVersionFromBundle));
+    });
     runtimes.put(WORKSPACE, new DefaultWorkspaceRuntime());
 
     String runtimesPreference = preferenceStore.get(MavenPreferenceConstants.P_RUNTIMES, null, preferencesLookup);
@@ -235,6 +257,19 @@ public class MavenRuntimeManagerImpl {
     }
 
     return runtimes;
+  }
+
+  private Stream<Bundle> getMavenRuntimeBundles() {
+    Bundle myBundle = FrameworkUtil.getBundle(MavenRuntimeManagerImpl.class);
+    if(myBundle == null) {
+      return Stream.empty();
+    }
+    BundleContext bundleContext = myBundle.getBundleContext();
+    if(bundleContext == null) {
+      return Stream.empty();
+    }
+    return Arrays.stream(bundleContext.getBundles())
+        .filter(bundle -> "org.eclipse.m2e.maven.runtime".equals(bundle.getSymbolicName()));
   }
 
   private AbstractMavenRuntime createRuntime(String name, Preferences preferences) {
