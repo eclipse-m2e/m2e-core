@@ -79,6 +79,7 @@
 		<module>org.eclipse.m2e.sdk.feature</module>
 		<module>org.eclipse.m2e.logback.feature</module>
 		<module>org.eclipse.m2e.pde.feature</module>
+		<module>org.eclipse.m2e.maven.runtime.feature</module>
 		<module>org.eclipse.m2e.repository</module>
 
 		<!-- testing -->

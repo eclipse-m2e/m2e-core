@@ -18,6 +18,9 @@
    <feature id="org.eclipse.m2e.sdk.feature">
       <category name="m2e"/>
    </feature>
+   <feature id="org.eclipse.m2e.maven.runtime.feature">
+      <category name="m2e.runtimes"/>
+   </feature>
    <bundle id="slf4j.api"/>
    <bundle id="slf4j.api.source"/>
    <bundle id="ch.qos.logback.core"/>
@@ -39,6 +42,7 @@
    <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer"/>
    <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer.source"/>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
+   <category-def name="m2e.runtimes" label="Maven Runtimes"/>
    <repository-reference location="https://download.eclipse.org/wildwebdeveloper/releases/1.1.0/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4j/updates/releases/0.20.1/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.23.0/" enabled="true" />
