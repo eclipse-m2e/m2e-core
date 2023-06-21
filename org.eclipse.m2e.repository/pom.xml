@@ -26,6 +26,31 @@
 
 	<name>Maven Integration for Eclipse Repository</name>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<dependency-resolution>
+						<extraRequirements>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.eclipse.m2e.maven.runtime</id>
+								<versionRange>[3.8.0, 3.9)</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.eclipse.m2e.maven.runtime</id>
+								<versionRange>[3.9.0, 4)</versionRange>
+							</requirement>
+						</extraRequirements>
+					</dependency-resolution>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<!-- Eclipse SimRel requires all artifacts to be jar- or pgp-signed. So we sign the (non eclipse) artifacts
 			and update the p2 metadata accordingly -->

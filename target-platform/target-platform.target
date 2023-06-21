@@ -165,5 +165,6 @@ Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="[3,4)"
 Import-Package:        !*
 ]]></instructions>
 		</location>
+		<location type="Target" uri="file:${project_loc:/m2e-core}/target-platform/m2e-runtimes.target"/>
 	</locations>
 </target>
