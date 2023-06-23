@@ -16,7 +16,7 @@ on:
 
 jobs:
   call-license-check:
-    uses: eclipse-platform/eclipse.platform.releng.aggregator/.github/workflows/mavenLicenseCheck.yml@master
+    uses: eclipse/dash-licenses/.github/workflows/mavenLicenseCheck.yml@master
     with:
       projectId: technology.m2e
       setupScript: 'cd m2e-maven-runtime && mvn generate-resources'
