@@ -12,6 +12,7 @@ package org.eclipse.m2e.jdt;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -45,19 +46,24 @@ public class LookupJDKToolchainsJob extends Job {
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		List<File> toolchainFiles = List.of(MavenCli.DEFAULT_GLOBAL_TOOLCHAINS_FILE, MavenCli.DEFAULT_USER_TOOLCHAINS_FILE);
 		ToolchainsReader reader = new DefaultToolchainsReader();
-		try {
-			PersistedToolchains toolchains = reader.read(MavenCli.DEFAULT_USER_TOOLCHAINS_FILE, null);
-			for (ToolchainModel toolchain : toolchains.getToolchains()) {
-				if (monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
+		for (File toolchainsFile : toolchainFiles) {
+			if (toolchainsFile.isFile() && toolchainsFile.canRead()) {
+				try {
+					PersistedToolchains toolchains = reader.read(toolchainsFile, null);
+					for (ToolchainModel toolchain : toolchains.getToolchains()) {
+						if (monitor.isCanceled()) {
+							return Status.CANCEL_STATUS;
+						}
+						addToolchain(toolchain);
+					}
+				} catch(IOException e) {
+					return Status.error(e.getMessage(), e);
 				}
-				addToolchain(toolchain);
 			}
-			return Status.OK_STATUS;
-		} catch(IOException e) {
-			return Status.error(e.getMessage(), e);
 		}
+		return Status.OK_STATUS;
 	}
 
 	private Optional<File> getVMInstallation(ToolchainModel toolchain) {
