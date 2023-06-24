@@ -1,0 +1,48 @@
+# Define IU for Maven 3.8
+units.0.id = org.eclipse.m2e.maven.runtime.38.iu
+units.0.version = 1.0.0
+units.0.properties.1.name=org.eclipse.equinox.p2.name
+units.0.properties.1.value=Maven 3.8.x
+units.0.provides.0.namespace=org.eclipse.equinox.p2.iu
+units.0.provides.0.name=org.eclipse.m2e.maven.runtime.38.iu
+units.0.provides.0.version=1.0.0
+units.0.requires.0.namespace = osgi.bundle
+units.0.requires.0.name = org.eclipse.m2e.maven.runtime
+units.0.requires.0.range = [3.8.0,3.9.0)
+units.0.requires.0.greedy = true
+units.0.requires.0.optional = false
+units.0.update.id = org.eclipse.m2e.maven.runtime.38.iu
+units.0.update.range = [1.0.0,1.0.0]
+
+# Define IU for Maven 3.9
+units.1.id = org.eclipse.m2e.maven.runtime.39.iu
+units.1.version = 1.0.0
+units.1.properties.1.name=org.eclipse.equinox.p2.name
+units.1.properties.1.value=Maven 3.9.x
+units.1.provides.0.namespace=org.eclipse.equinox.p2.iu
+units.1.provides.0.name=org.eclipse.m2e.maven.runtime.39.iu
+units.1.provides.0.version=1.0.0
+units.1.requires.0.namespace = osgi.bundle
+units.1.requires.0.name = org.eclipse.m2e.maven.runtime
+units.1.requires.0.range = [3.9.0,3.10.0)
+units.1.requires.0.greedy = true
+units.1.requires.0.optional = false
+units.1.update.id = org.eclipse.m2e.maven.runtime.39.iu
+units.1.update.range = [1.0.0,1.0.0]
+
+# Define Category for runtimes and include them
+units.100.id=org.eclipse.m2e.runtimes.category
+units.100.version=1.0.0
+units.100.provides.0.namespace=org.eclipse.equinox.p2.iu
+units.100.provides.0.name=org.eclipse.m2e.runtimes.category
+units.100.provides.0.version=1.0.0
+units.100.properties.0.name=org.eclipse.equinox.p2.type.category
+units.100.properties.0.value=true
+units.100.properties.1.name=org.eclipse.equinox.p2.name
+units.100.properties.1.value=Maven Embedded Runtimes
+units.100.requires.0.namespace=org.eclipse.equinox.p2.iu
+units.100.requires.0.name=org.eclipse.m2e.maven.runtime.38.iu
+units.100.requires.0.range=[1.0.0,1.0.0]
+units.100.requires.1.namespace=org.eclipse.equinox.p2.iu
+units.100.requires.1.name=org.eclipse.m2e.maven.runtime.39.iu
+units.100.requires.1.range=[1.0.0,1.0.0]
