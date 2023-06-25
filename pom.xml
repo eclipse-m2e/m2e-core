@@ -28,7 +28,7 @@
 		<rcptt-maven-version>2.5.4</rcptt-maven-version>
 		<tychoDefaultTestArgLine>-Xmx800m</tychoDefaultTestArgLine>
 		<tycho.testArgLine>${tychoDefaultTestArgLine}</tycho.testArgLine>
-		<tycho.surefire.timeout>900</tycho.surefire.timeout>
+		<surefire.timeout>900</surefire.timeout>
 		<tycho.surefire.useUIHarness>true</tycho.surefire.useUIHarness>
 		<tycho.surefire.useUIThread>true</tycho.surefire.useUIThread>
 		<jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
@@ -184,19 +184,6 @@
 							</configuration>
 						</execution>
 					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.eclipse.tycho</groupId>
-					<artifactId>tycho-surefire-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<useUIHarness>${tycho.surefire.useUIHarness}</useUIHarness>
-						<useUIThread>${tycho.surefire.useUIThread}</useUIThread>
-						<includes>
-							<include>**/*Test.java</include>
-						</includes>
-						<forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
