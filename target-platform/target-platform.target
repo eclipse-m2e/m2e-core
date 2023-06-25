@@ -11,6 +11,7 @@
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
 			<unit id="org.apache.aries.spifly.dynamic.bundle" version="0.0.0"/>
+			<unit id="org.mockito.mockito-core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/egit/updates-6.6/"/>
@@ -54,12 +55,6 @@
 					<version>6.4.1</version>
 					<type>jar</type>
 				</dependency>
-				<dependency>
-					<groupId>org.osgi</groupId>
-					<artifactId>org.osgi.service.repository</artifactId>
-					<version>1.1.0</version>
-					<type>jar</type>
-				</dependency>
 			</dependencies>
 		</location>
 		<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="true" label="Logging" missingManifest="generate" type="Maven">
@@ -75,12 +70,6 @@
 					<groupId>jakarta.servlet</groupId>
 					<artifactId>jakarta.servlet-api</artifactId>
 					<version>5.0.0</version>
-					<type>jar</type>
-				</dependency>
-				<dependency>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-					<version>2.0.7</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -115,16 +104,6 @@
 					<groupId>io.takari.m2e.workspace</groupId>
 					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
 					<version>0.3.1</version>
-					<type>jar</type>
-				</dependency>
-			</dependencies>
-		</location>
-		<location includeDependencyDepth="infinite" includeDependencyScopes="compile,runtime" includeSource="true" label="Testing" missingManifest="generate" type="Maven">
-			<dependencies>
-				<dependency>
-					<groupId>org.mockito</groupId>
-					<artifactId>mockito-core</artifactId>
-					<version>5.4.0</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
