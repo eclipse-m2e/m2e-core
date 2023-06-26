@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -189,10 +190,23 @@ public class MavenInstallationWizardPage extends WizardPage {
     location.addModifyListener(e -> updateStatus());
     location.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-    btnDirectory = new Button(container, SWT.NONE);
+    Composite btnComposite = new Composite(container, SWT.NONE);
+    btnComposite.setLayout((new GridLayout(2, true)));
+    btnDirectory = new Button(btnComposite, SWT.NONE);
     btnDirectory.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectLocationAction()));
     btnDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnDirectory.setText(Messages.ExternalInstallPage_btnDirectory_text);
+
+    Button variablesButton = new Button(btnComposite, SWT.NONE);
+    variablesButton.setText(Messages.ExternalInstallPage_btnVariables_text);
+    variablesButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getShell());
+      dialog.open();
+      String variable = dialog.getVariableExpression();
+      if(variable != null) {
+        location.setText(location.getText() + variable);
+      }
+    }));
 
     Label lblInstallationName = new Label(container, SWT.NONE);
     lblInstallationName.setText(Messages.ExternalInstallPage_lblInstallationName_text);
@@ -351,10 +365,6 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   private boolean isValidMavenInstall(String dir) {
     if(dir == null || dir.length() == 0) {
-      return false;
-    }
-    File selectedDir = new File(dir);
-    if(!selectedDir.isDirectory()) {
       return false;
     }
     return new MavenExternalRuntime(dir).isAvailable();

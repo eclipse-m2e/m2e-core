@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.core.ui;singleton:=true
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 2.4.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
@@ -41,7 +41,8 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.jface.text,
  org.eclipse.core.filebuffers,
  org.eclipse.ui,
- org.eclipse.ui.navigator
+ org.eclipse.ui.navigator,
+ org.eclipse.debug.ui
 Import-Package: org.apache.maven.archetype.catalog;provider=m2e;version="[3.2.1,4.0.0)",
  org.apache.maven.archetype.catalog.io.xpp3;provider=m2e;version="[3.2.1,4.0.0)",
  org.apache.maven.archetype.common;provider=m2e;version="[3.2.1,4.0.0)",
