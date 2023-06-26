@@ -83,7 +83,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, 
   private String goalName = null;
 
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
-    System.out.println("ExecutePomAction.setInitializationData()");
     if("WITH_DIALOG".equals(data)) { //$NON-NLS-1$
       this.showDialog = true;
     } else {
