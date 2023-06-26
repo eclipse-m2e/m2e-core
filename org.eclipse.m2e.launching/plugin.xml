@@ -46,29 +46,6 @@
   </extension>
 
    <extension point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut id="org.eclipse.m2e.core.pomFileAction"
-                class="org.eclipse.m2e.actions.ExecutePomAction"
-                icon="icons/m2.gif"
-                label="%m2.popup.pomFile.label"
-                modes="run,debug">
-         <contextualLaunch>
-           <contextLabel label="%m2.popup.pomFile.label" mode="run"/>
-           <contextLabel label="%m2.popup.pomFile.label" mode="debug"/>
-           <enablement>
-              <count value="1"/>
-              <iterate>
-                 <or>
-                    <adapt type="org.eclipse.core.resources.IFile">
-                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
-                    </adapt>
-                    <adapt type="org.eclipse.core.resources.IProject">
-                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
-                    </adapt>
-                 </or>
-              </iterate>
-           </enablement>
-       </contextualLaunch>
-     </shortcut>
      <shortcut id="org.eclipse.m2e.core.pomFileActionWithDialog"
                class="org.eclipse.m2e.actions.ExecutePomAction:WITH_DIALOG"
                icon="icons/m2.gif"
