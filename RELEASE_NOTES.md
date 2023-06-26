@@ -12,6 +12,9 @@ can not supply any useful completions.
 m2e now contains a new lemminx-extension that provides such completions in a
 basic way to support people writing such bnd instructions in pom xml configurations.
 
+### Support for variables in maven installations
+
+In the preferences for maven installations one can now specify variables for maven location.
 
 ## 2.7.0
 
