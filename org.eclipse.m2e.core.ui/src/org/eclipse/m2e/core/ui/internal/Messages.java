@@ -995,6 +995,8 @@ public class Messages extends NLS {
 
   public static String ExternalInstallPage_btnDirectory_text;
 
+  public static String ExternalInstallPage_btnVariables_text;
+
   public static String ExternalInstallPage_lblInstallationLibraries_text;
 
   public static String ExternalInstallPage_btnRestoreDefault_text;
