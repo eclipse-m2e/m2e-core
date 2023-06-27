@@ -180,7 +180,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     MavenJdtPlugin.getDefault().getBuildpathManager().updateClasspath(project, monitor);
   }
 
-  protected IContainer getOutputLocation(ProjectConfigurationRequest request, IProject project) {
+  @SuppressWarnings("unused")
+  protected IContainer getOutputLocation(ProjectConfigurationRequest request, IProject project) throws CoreException {
     MavenProject mavenProject = request.mavenProject();
     return getFolder(project, mavenProject.getBuild().getOutputDirectory());
   }
@@ -424,7 +425,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return paths;
   }
 
-  private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
+  protected void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
       IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
       boolean addTestFlag) throws CoreException {
 
