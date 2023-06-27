@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.core.ui;singleton:=true
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 2.4.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
@@ -56,4 +56,7 @@ Service-Component: OSGI-INF/component.xml,
  OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
  OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
 Automatic-Module-Name: org.eclipse.m2e.core.ui
+Service-Component: OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
+ OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
+Bundle-ActivationPolicy: lazy
 
