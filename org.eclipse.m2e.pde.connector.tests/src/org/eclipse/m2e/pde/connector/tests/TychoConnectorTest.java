@@ -16,6 +16,7 @@ package org.eclipse.m2e.pde.connector.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +36,8 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -69,6 +72,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 		IProject project = importTychoProject("pde.tycho.plugin/pom.xml");
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.plugin");
+		assertClasspathContainer(project);
 	}
 
 	@Test
@@ -79,6 +83,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 		IProject project = importTychoProject("pde.tycho.pomless.plugin/.polyglot.META-INF");
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.pomless.plugin");
+		assertClasspathContainer(project);
 	}
 
 	@Test
@@ -148,5 +153,17 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 		IPluginModelBase model = PluginRegistry.findModel(project);
 		assertNotNull("No Plug-in exists with id: " + expectedBSN, model);
 		assertEquals(expectedBSN, model.getPluginBase().getId());
+	}
+
+	void assertClasspathContainer(IProject project) throws CoreException {
+		IJavaProject javaProject = JavaCore.create(project);
+		IClasspathEntry[] entries = javaProject.getRawClasspath();
+		for (IClasspathEntry entry : entries) {
+			if ("org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER".equals(entry.getPath().toString())) {
+				return;
+			}
+		}
+		fail("M2EClasspath Container not found! ("
+				+ Arrays.stream(entries).map(String::valueOf).collect(Collectors.joining(", ")));
 	}
 }

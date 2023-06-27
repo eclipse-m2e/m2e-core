@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E PDE Connector
 Bundle-SymbolicName: org.eclipse.m2e.pde.connector;singleton:=true
-Bundle-Version: 2.1.300.qualifier
+Bundle-Version: 2.1.400.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde.connector
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: Eclipse.org - m2e
