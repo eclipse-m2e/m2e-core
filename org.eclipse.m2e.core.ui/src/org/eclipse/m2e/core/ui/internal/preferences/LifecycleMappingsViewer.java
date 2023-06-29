@@ -444,7 +444,8 @@ public class LifecycleMappingsViewer {
     LinkedHashSet<String> sources = new LinkedHashSet<>();
     if(mappings != null && !mappings.isEmpty()) {
       for(IPluginExecutionMetadata mapping : mappings) {
-        if(mapping instanceof LifecycleMappingMetadataSource metadata) {
+        LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
+        if(metadata != null) {
           Object source = metadata.getSource();
           if(source instanceof String s) {
             sources.add(s);
