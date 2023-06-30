@@ -85,6 +85,37 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 @SuppressWarnings("restriction")
 public class LifecycleMappingsViewer {
+
+  /**
+   * Uninteresting lifecycle phase
+   */
+  private static final String UNINTERESTING = "uninteresting"; //$NON-NLS-1$
+
+  /**
+   * Maven plugin lifecycle source
+   */
+  private static final String MAVEN_PLUGIN = "maven-plugin"; //$NON-NLS-1$
+
+  /**
+   * Pom lifecycle source
+   */
+  private static final String POM = "pom"; //$NON-NLS-1$
+
+  /**
+   * Eclipse extension lifecycle source
+   */
+  private static final String EXTENSION = "extension"; //$NON-NLS-1$
+
+  /**
+   * Default execution source
+   */
+  private static final String DEFAULT = "default"; //$NON-NLS-1$
+
+  /**
+   * Unknown lifecycle source
+   */
+  private static final String UNKNOWN = "unknown"; //$NON-NLS-1$
+
   /*package*/TreeViewer mappingsTreeViewer;
 
   /*package*/boolean showPhases = false;
@@ -102,7 +133,7 @@ public class LifecycleMappingsViewer {
   private IProject project;
 
   void updateMappingsTreeViewer() {
-    if(mappingsTreeViewer == null) {
+    if(mappingsTreeViewer == null || mappingsTreeViewer.getControl().isDisposed()) {
       return;
     }
     mappingsTreeViewer.refresh();
@@ -444,36 +475,40 @@ public class LifecycleMappingsViewer {
     LinkedHashSet<String> sources = new LinkedHashSet<>();
     if(mappings != null && !mappings.isEmpty()) {
       for(IPluginExecutionMetadata mapping : mappings) {
-        LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
-        if(metadata != null) {
-          Object source = metadata.getSource();
-          if(source instanceof String s) {
-            sources.add(s);
-          } else if(source instanceof Artifact artifact) {
-            sources.add(getSourceLabel(artifact, detailed));
-          } else if(source instanceof MavenProject mavenProject) {
-            sources.add(getSourceLabel(mavenProject, detailed));
-          } else if(source instanceof Bundle bundle) {
-            sources.add(getSourceLabel(bundle, detailed));
+        if(mapping instanceof PluginExecutionMetadata metadata) {
+          LifecycleMappingMetadataSource metadataSource = metadata.getSource();
+          if(metadataSource == null) {
+            sources.add(UNKNOWN);
           } else {
-            sources.add("unknown"); //$NON-NLS-1$
+            Object source = metadataSource.getSource();
+            if(source instanceof String s) {
+              sources.add(s);
+            } else if(source instanceof Artifact artifact) {
+              sources.add(getSourceLabel(artifact, detailed));
+            } else if(source instanceof MavenProject mavenProject) {
+              sources.add(getSourceLabel(mavenProject, detailed));
+            } else if(source instanceof Bundle bundle) {
+              sources.add(getSourceLabel(bundle, detailed));
+            } else {
+              sources.add(UNKNOWN); //$NON-NLS-1$
+            }
           }
         } else if(mapping instanceof DefaultPluginExecutionMetadata) {
-          sources.add("default"); //$NON-NLS-1$
+          sources.add(DEFAULT); //$NON-NLS-1$
         } else {
-          sources.add("unknown"); //$NON-NLS-1$
+          sources.add(UNKNOWN); //$NON-NLS-1$
         }
       }
     } else {
       if(!LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
-        sources.add("uninteresting"); //$NON-NLS-1$
+        sources.add(UNINTERESTING); //$NON-NLS-1$
       }
     }
     return String.join(", ", sources);
   }
 
   private String getSourceLabel(Bundle bundle, boolean detailed) {
-    StringBuilder sb = new StringBuilder("extension"); //$NON-NLS-1$
+    StringBuilder sb = new StringBuilder(EXTENSION); //$NON-NLS-1$
     if(detailed) {
       sb.append('(').append(bundle.getSymbolicName()).append('_').append(bundle.getVersion()).append(')');
     }
@@ -481,7 +516,7 @@ public class LifecycleMappingsViewer {
   }
 
   private String getSourceLabel(MavenProject project, boolean detailed) {
-    StringBuilder sb = new StringBuilder("pom"); //$NON-NLS-1$
+    StringBuilder sb = new StringBuilder(POM); //$NON-NLS-1$
     if(detailed) {
       sb.append('(').append(project.toString()).append(')');
     }
@@ -489,7 +524,7 @@ public class LifecycleMappingsViewer {
   }
 
   private String getSourceLabel(Artifact plugin, boolean detailed) {
-    StringBuilder sb = new StringBuilder("maven-plugin"); //$NON-NLS-1$
+    StringBuilder sb = new StringBuilder(MAVEN_PLUGIN); //$NON-NLS-1$
     if(detailed) {
       sb.append('(').append(plugin.toString()).append(')');
     }
