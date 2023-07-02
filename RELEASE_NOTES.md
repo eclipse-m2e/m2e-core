@@ -2,7 +2,7 @@
 
 ## 2.4.0
 
-### Support for multiple mebedded runtimes
+### Support for multiple embedded runtimes
 
 You can now install additional embedded Maven Runtimes using the m2eclipse update site
 
