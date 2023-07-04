@@ -22,7 +22,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
+import org.osgi.service.url.URLConstants;
+import org.osgi.service.url.URLStreamHandlerService;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -40,21 +44,24 @@ import org.eclipse.core.runtime.Status;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
-//@Component(service = URLStreamHandlerService.class, property = URLConstants.URL_HANDLER_PROTOCOL + "=mvn", immediate = true)
+@Component(service = URLStreamHandlerService.class, property = URLConstants.URL_HANDLER_PROTOCOL + "=mvn")
 public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
 
-  public MvnProtocolHandlerService() {
-  }
+  @Reference
+  IMaven maven;
 
   @Override
   public URLConnection openConnection(URL url) {
-    return new MavenURLConnection(url);
+    //TODO replace reference with IMaven maven = MavenPlugin.getMaven();
+    //this is required to make the component active even if m2e itself is not running at the moment
+    //that will make the m2e protocol available from the start of eclipse
+    //See https://github.com/eclipse-equinox/equinox/pull/290
+    return new MavenURLConnection(url, maven);
   }
 
   private static final class MavenURLConnection extends URLConnection {
@@ -63,8 +70,11 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
 
     private ArtifactResult artifactResult;
 
-    protected MavenURLConnection(URL url) {
+    private IMaven maven;
+
+    protected MavenURLConnection(URL url, IMaven maven) {
       super(url);
+      this.maven = maven;
     }
 
     @Override
@@ -92,9 +102,7 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       String classifier = coordinates.length > 4 ? coordinates[4] : null;
       Artifact artifact = new DefaultArtifact(coordinates[0], coordinates[1], classifier, type, coordinates[2]);
       try {
-        IMaven maven = MavenPlugin.getMaven();
-        RepositorySystem repoSystem = org.eclipse.m2e.core.internal.MavenPluginActivator.getDefault()
-            .getRepositorySystem();
+        RepositorySystem repoSystem = maven.lookup(RepositorySystem.class);
         IMavenExecutionContext context = maven.createExecutionContext();
         List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
         List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);

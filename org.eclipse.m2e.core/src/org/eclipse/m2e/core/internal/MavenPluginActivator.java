@@ -23,10 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
-import org.osgi.service.url.URLConstants;
-import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import org.eclipse.aether.RepositorySystem;
@@ -65,8 +62,6 @@ public class MavenPluginActivator extends Plugin {
   private static String version = "0.0.0"; //$NON-NLS-1$
 
   private final BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
-
-  private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
 
   private Map<Class<?>, ServiceTracker<?, ?>> trackers = new ConcurrentHashMap<>();
 
@@ -110,11 +105,6 @@ public class MavenPluginActivator extends Plugin {
     URLConnectionCaches.disable();
     // For static access, this also enables any of the services and keep them running forever...
     this.bundleContext = context;
-    //register URL handler, we can't use DS here because this triggers loading of m2e too early
-    Map<String, Object> properties = Map.of(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
-    this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
-        new MvnProtocolHandlerService(), FrameworkUtil.asDictionary(properties));
-
   }
 
   /**
@@ -123,9 +113,6 @@ public class MavenPluginActivator extends Plugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
-    if(protocolHandlerService != null) {
-      protocolHandlerService.unregister();
-    }
     context.removeBundleListener(bundleListener);
 
     toDisposeContainers.forEach(PlexusContainer::dispose);
