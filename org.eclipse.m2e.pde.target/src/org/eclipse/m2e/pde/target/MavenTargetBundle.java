@@ -132,24 +132,29 @@ public class MavenTargetBundle extends TargetBundle {
 		};
 		IMavenExecutionContext exeContext = IMavenExecutionContext.getThreadContext()
 				.orElseGet(maven::createExecutionContext);
-
+		MultiStatus bundleStatus = new MultiStatus(MavenTargetBundle.class, 0,
+				"Some problems where detected while wrapping " + artifact);
 		Path wrappedBundle = exeContext.execute((context, monitor1) -> {
 			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
 			RepositorySystemSession repositorySession = context.getRepositorySession();
 			try {
 				WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories,
 						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class));
-				List<ProcessingMessage> errors = wrap.messages()
+				List<ProcessingMessage> directErrors = wrap.messages(false)
 						.filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
-				if (errors.isEmpty()) {
+				if (directErrors.isEmpty()) {
+					// treat all items as warnings....
+					wrap.messages(true).map(ProcessingMessage::message).distinct().forEach(msg -> {
+						bundleStatus.add(Status.warning(msg));
+					});
 					return wrap.getFile();
 				}
-				if (errors.size() == 1) {
-					throw new CoreException(Status.error(errors.get(0).message()));
+				if (directErrors.size() == 1) {
+					throw new CoreException(Status.error(directErrors.get(0).message()));
 				}
 				MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR,
 						"wrapping artifact " + artifact.getArtifactId() + " failed!");
-				for (ProcessingMessage message : errors) {
+				for (ProcessingMessage message : directErrors) {
 					multiStatus.add(Status.error(message.message()));
 				}
 				throw new CoreException(multiStatus);
@@ -159,7 +164,17 @@ public class MavenTargetBundle extends TargetBundle {
 				throw new CoreException(Status.error("Can't collect dependencies!", e));
 			}
 		}, monitor);
-		return new TargetBundle(wrappedBundle.toFile());
+		TargetBundle bundle = new TargetBundle(wrappedBundle.toFile()) {
+			@Override
+			public IStatus getStatus() {
+				if (!bundleStatus.isOK()) {
+					// TODO see https://github.com/eclipse-pde/eclipse.pde/issues/656
+					// return bundleStatus;
+				}
+				return super.getStatus();
+			}
+		};
+		return bundle;
 
 	}
 

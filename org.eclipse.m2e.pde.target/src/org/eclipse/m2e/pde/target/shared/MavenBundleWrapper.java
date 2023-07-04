@@ -39,11 +39,15 @@ import org.eclipse.aether.SyncContext;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.impl.SyncContextFactory;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.pde.target.shared.ProcessingMessage.Type;
 import org.osgi.framework.Constants;
@@ -96,6 +100,22 @@ public class MavenBundleWrapper {
 
 		DependencyRequest dependencyRequest = new DependencyRequest();
 		dependencyRequest.setRoot(node);
+		dependencyRequest.setFilter(new DependencyFilter() {
+
+			@Override
+			public boolean accept(DependencyNode node, List<DependencyNode> parents) {
+				ArtifactRequest request = new ArtifactRequest();
+				request.setRepositories(repositories);
+				Artifact nodeArtifact = node.getArtifact();
+				request.setArtifact(nodeArtifact);
+				try {
+					repoSystem.resolveArtifact(repositorySession, request);
+				} catch (ArtifactResolutionException e) {
+					return false;
+				}
+				return true;
+			}
+		});
 		repoSystem.resolveDependencies(repositorySession, dependencyRequest);
 
 		try (SyncContext syncContext = syncContextFactory.newInstance(repositorySession, false)) {
@@ -117,7 +137,10 @@ public class MavenBundleWrapper {
 			Map<DependencyNode, WrappedBundle> visited = new HashMap<>();
 			WrappedBundle wrappedNode = getWrappedNode(node, instructionsLookup, visited);
 			for (WrappedBundle wrap : visited.values()) {
-				wrap.getJar().close();
+				Jar jar = wrap.getJar();
+				if (jar != null) {
+					jar.close();
+				}
 			}
 			return wrappedNode;
 		}
@@ -132,6 +155,18 @@ public class MavenBundleWrapper {
 		}
 		Artifact artifact = node.getArtifact();
 		File originalFile = artifact.getFile();
+		if (originalFile == null) {
+			if (node.getDependency().isOptional()) {
+				visited.put(node,
+						wrappedNode = new WrappedBundle(node, List.of(), null, null, null,
+								List.of(new ProcessingMessage(artifact, Type.WARN,
+										"Optional artifact " + node.getArtifact() + " was not found"))));
+			} else {
+				visited.put(node, wrappedNode = new WrappedBundle(node, List.of(), null, null, null, List.of(
+						new ProcessingMessage(artifact, Type.ERROR, "Artifact " + node.getArtifact() + " not found"))));
+			}
+			return wrappedNode;
+		}
 		Jar jar = new Jar(originalFile);
 		Manifest originalManifest = jar.getManifest();
 		if (originalManifest != null
@@ -174,8 +209,14 @@ public class MavenBundleWrapper {
 						analyzer.setProperty(property, trimValue);
 					}
 					for (WrappedBundle dep : depends) {
-						analyzer.addClasspath(dep.getJar());
-						analyzer.removeClose(dep.getJar());
+						Jar depJar = dep.getJar();
+						if (depJar == null) {
+							messages.add(new ProcessingMessage(artifact, Type.WARN,
+									"Dependency " + dep.getNode().getDependency() + " was ignored!"));
+							continue;
+						}
+						analyzer.addClasspath(depJar);
+						analyzer.removeClose(depJar);
 					}
 					analyzerJar.setManifest(analyzer.calcManifest());
 					analyzerJar.write(wrapArtifactFile);
