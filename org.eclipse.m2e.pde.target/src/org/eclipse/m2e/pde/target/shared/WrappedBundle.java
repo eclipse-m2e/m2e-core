@@ -48,14 +48,25 @@ public final class WrappedBundle {
 		return jar;
 	}
 
+	DependencyNode getNode() {
+		return node;
+	}
+
 	/** @return the location of the wrapped bundle's files */
 	public Path getFile() {
 		return file;
 	}
 
-	/** @return the messages that where produced */
-	public Stream<ProcessingMessage> messages() {
-		return Stream.concat(messages.stream(), depends.stream().flatMap(dep -> dep.messages()));
+	/**
+	 * @param includeDependent if <code>true</code> includes messages from dependent
+	 *                         items.
+	 * @return the messages that where produced
+	 */
+	public Stream<ProcessingMessage> messages(boolean includeDependent) {
+		if (includeDependent) {
+			return Stream.concat(messages.stream(), depends.stream().flatMap(dep -> dep.messages(true)));
+		}
+		return messages.stream();
 	}
 
 	@Override
