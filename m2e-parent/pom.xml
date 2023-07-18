@@ -23,7 +23,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tycho-version>4.0.0-SNAPSHOT</tycho-version>
+		<tycho-version>4.0.0</tycho-version>
 		<tycho.p2.baselineMode>warn</tycho.p2.baselineMode>
 		<scmConnectionRaw>scm:git:https://github.com/eclipse-m2e/m2e-core.git</scmConnectionRaw>
 	</properties>
@@ -217,10 +217,6 @@
 		<pluginRepository>
 			<id>cbi-releases</id>
 			<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>tycho-snapshots</id>
-			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
 		</pluginRepository>
 	</pluginRepositories>
 
