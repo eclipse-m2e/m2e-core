@@ -13,6 +13,10 @@
 			<unit id="org.mockito.mockito-core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2023-09/"/>
+			<unit id="org.jdom2" version="0.0.0"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/egit/updates-6.6/"/>
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
@@ -106,17 +110,32 @@
 				</dependency>
 			</dependencies>
 		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-archetype Common" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-common</artifactId>
+					<version>3.2.1</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions><![CDATA[
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
+version:               ${version_cleanup;${mvnVersion}}
+Bundle-SymbolicName:   org.eclipse.m2e.archetype.common
+Bundle-Version:        ${version}.1
+Eclipse-ExtensibleAPI: true
+Export-Package:        META-INF.plexus;-noimport:=true;x-internal:=true, \
+                       org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
+Require-Bundle:        org.eclipse.m2e.maven.runtime;bundle-version="[3.8.0,4.0.0)",com.ibm.icu
+Import-Package:        org.jdom2*
+]]></instructions>
+		</location>
 		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-archetype" missingManifest="generate" type="Maven">
 			<dependencies>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
-					<type>jar</type>
-				</dependency>
-				<dependency>
-					<groupId>org.apache.maven.archetype</groupId>
-					<artifactId>archetype-common</artifactId>
 					<version>3.2.1</version>
 					<type>jar</type>
 				</dependency>
@@ -132,21 +151,14 @@
 					<version>0.13.1</version>
 					<type>jar</type>
 				</dependency>
-				<dependency>
-					<groupId>org.jdom</groupId>
-					<artifactId>jdom2</artifactId>
-					<version>2.0.6.1</version>
-					<type>jar</type>
-				</dependency>
 			</dependencies>
 			<instructions><![CDATA[
-Bundle-Name:           M2Eclipse supplement fragment for ${mvnGroupId}:${mvnArtifactId}:${mvnVersion}
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
 version:               ${version_cleanup;${mvnVersion}}
-Bundle-SymbolicName:   org.eclipse.m2e.archetype.${mvnArtifactId}
-Bundle-Version:        ${version}
-Export-Package:        *;version="${version}";-noimport:=true
-Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="[3,4)"
--exportcontents:       META-INF.plexus;-noimport:=true;x-internal:=true,org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
+Bundle-SymbolicName:   org.eclipse.m2e.archetype.${replacestring;${mvnArtifactId};archetype-}
+Bundle-Version:        ${version}.1
+Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="${range;[===,+);3.2.1}"
+Export-Package:        org.apache.maven.*;-noimport:=true;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
 Import-Package:        !*
 ]]></instructions>
 		</location>

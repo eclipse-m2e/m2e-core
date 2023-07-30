@@ -42,7 +42,6 @@
 
 		<module>org.eclipse.m2e.maven.runtime</module>
 
-		<module>org.eclipse.m2e.archetype.common</module>
 		<module>org.eclipse.m2e.model.edit</module>
 		<module>org.eclipse.m2e.core</module>
 		<module>org.eclipse.m2e.core.ui</module>
