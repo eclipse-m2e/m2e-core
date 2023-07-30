@@ -35,6 +35,10 @@
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
+		<jars.directory>target/jars</jars.directory>
+		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
+		<failIfMacSigningFailed>false</failIfMacSigningFailed>
+		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
 
 	<dependencies>
@@ -116,6 +120,14 @@
 		</dependency>
 		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
 		<dependency>
+			<!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
+			<!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>[1.0.0,)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>2.0.7</version>
@@ -145,11 +157,14 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>${project.artifactId}_${qualifiedVersion}</finalName> <!-- Use Eclipse jar naming schema -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
+					<version>6.4.0</version>
+					<extensions>true</extensions>
 					<configuration>
 						<bnd><![CDATA[
 							# When launching a Maven build using this embedded runtime, we want the embedded SLF4J logger binding to be used.
@@ -180,14 +195,150 @@
 								org.apache.commons.cli;version="[1.4.0,2.0.0)"
 							Require-Bundle: \
 								com.google.guava
+
+							-failok: true
+							-nouses: true
+							-nodefaultversion: true
+							-noextraheaders: true
+							-snapshot: ${def;buildQualifier;qualifier}
+							-removeheaders: Private-Package
+
+							Automatic-Module-Name: ${bsn}
+							Eclipse-BundleShape: dir
+							
+							gitCommitId = ${system;git log -n 1 --pretty=format:%H .}
+							gitRelativePath = ${system;git rev-parse --show-prefix};
+							Eclipse-SourceReferences: ${scmConnectionRaw};path="${gitRelativePath}";commitId=${gitCommitId}
 						]]></bnd>
-						<!-- All direct dependencies specified as Require-Bundle or Import-package are added to the classpath of a launched
-							Maven-Build-JVM. See MavenEmbeddedRuntime for details. -->
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.10.1</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+						<proc>none</proc>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.4.0</version>
+					<configuration>
+						<overWriteIfNewer>true</overWriteIfNewer>
+						<includeScope>runtime</includeScope> <!-- only include runtime and compile time dependencies, not test or provided! -->
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<supportedProjectTypes>
+							<value>jar</value>
+						</supportedProjectTypes>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<version>1.22</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<signature>
+								<groupId>org.codehaus.mojo.signature</groupId>
+								<artifactId>java18</artifactId>
+								<version>1.0</version>
+							</signature>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<configuration>
+					<jgit.ignore>NOTHING</jgit.ignore> <!-- Overwrite values from parent -->
+				</configuration>
+				<executions>
+					<execution>
+						<?m2e execute onIncremental?>
+						<id>compute-qualifier</id>
+						<goals>
+							<goal>build-qualifier</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>fetch-dependency-jars</id>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${project.basedir}/${jars.directory}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e ignore?>
+						<id>unpack-dependency-sources-java</id>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${outputDirectory.sources}</outputDirectory>
+							<classifier>sources</classifier>
+							<includes>**/*.java</includes>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e ignore?>
+						<id>unpack-dependency-sources-resources</id>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<outputDirectory>${outputDirectory.sources}</outputDirectory>
+							<classifier>sources</classifier>
+							<excludes>**/*.java</excludes>
+							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-jar-with-manifest</id>
+						<goals>
+							<goal>bnd-process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.sisu</groupId>
 				<artifactId>sisu-maven-plugin</artifactId>
@@ -203,6 +354,164 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+					<skipIfEmpty>true</skipIfEmpty>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>add-source-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>add-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${outputDirectory.sources}</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>sources-jar</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<?m2e ignore?>
+						<id>generate-pde-source-header</id>
+						<goals>
+							<goal>generate-pde-source-header</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>eclipse-sign</id>
+			<properties>
+				<failIfMacSigningFailed>true</failIfMacSigningFailed>
+			</properties>
+		</profile>
+		<profile>
+			<id>eclipse-sign-jnilibs</id>
+			<activation>
+				<file>
+					<exists>eclipse-sign-jnilibs.properties</exists>
+				</file>
+			</activation>
+			<!-- 
+			To activate jnilib signing for a bundle, create a file in the project called 'eclipse-sign-jnilibs.properties' and
+			define as value of the key 'jars.directory' the directory that contains the jars whose *.jnilib files have to be signed.
+			The following ant-script then extracts all .jnilib files, sign them and repacks them into the jar file. 
+			-->
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<?m2e ignore?>
+								<id>sign-jnilibs-files</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>generate-resources</phase> <!-- Do this before extracting sources-->
+								<configuration>
+									<target>
+										<!-- See last answer of https://stackoverflow.com/questions/4368243/maven-antrun-with-sequential-ant-contrib-fails-to-run/45958355 -->
+										<!-- and http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
+										<taskdef resource="net/sf/antcontrib/antlib.xml" />
+										<loadproperties srcFile="${project.basedir}/eclipse-sign-jnilibs.properties" prefix="signProperties." />
+										<for param="jarFile">
+											<fileset dir="${project.basedir}/${signProperties.jars.directory}" includes="**/*.jar" />
+											<sequential>
+												<local name="jarFilename" />
+												<basename property="jarFilename" file="@{jarFile}" suffix=".jar" />
+												<local name="signingDir" />
+												<property name="signingDir" value="${project.build.directory}/jnilibs-signing/${jarFilename}" />
+
+												<unzip src="@{jarFile}" dest="${signingDir}">
+													<patternset includes="**/*.jnilib" />
+												</unzip>
+
+												<for param="jnilibFileAbsolute">
+													<fileset dir="${signingDir}" includes="**/*.jnilib" erroronmissingdir="false" />
+													<sequential>
+														<echo level="info" message="Mac-sign @{jnilibFileAbsolute}" />
+														<local name="jnilibFile" />
+														<property name="jnilibFile" value="@{jnilibFileAbsolute}" relative="true" basedir="${signingDir}" />
+														<move file="@{jnilibFileAbsolute}" tofile="@{jnilibFileAbsolute}-tosign" />
+														<exec executable="curl" dir="${signingDir}" failonerror="${failIfMacSigningFailed}">
+															<arg value="-o" />
+															<arg value="${jnilibFile}" />
+															<arg value="-F" />
+															<arg value="file=@${jnilibFile}-tosign" />
+															<arg value="https://cbi.eclipse.org/macos/codesign/sign" />
+														</exec>
+														<exec executable="jar" dir="${signingDir}" failonerror="${failIfMacSigningFailed}">
+															<arg value="--update" />
+															<arg value="--file=@{jarFile}" />
+															<arg value="${jnilibFile}" />
+														</exec>
+													</sequential>
+												</for>
+											</sequential>
+										</for>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>ant-contrib</groupId>
+								<artifactId>ant-contrib</artifactId>
+								<version>1.0b3</version>
+								<exclusions>
+									<exclusion>
+										<groupId>ant</groupId>
+										<artifactId>ant</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
