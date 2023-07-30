@@ -29,16 +29,6 @@
    <bundle id="org.apache.commons.cli"/>
    <bundle id="org.apache.commons.cli.source"/>
    <bundle id="jakarta.servlet-api"/>
-   <bundle id="org.eclipse.m2e.archetype.jdom2"/>
-   <bundle id="org.eclipse.m2e.archetype.jdom2.source"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-catalog"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-catalog.source"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-common"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-common.source"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-descriptor"/>
-   <bundle id="org.eclipse.m2e.archetype.archetype-descriptor.source"/>
-   <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer"/>
-   <bundle id="org.eclipse.m2e.archetype.maven-artifact-transfer.source"/>
    <iu>
      <query> 
        <expression type="match">
