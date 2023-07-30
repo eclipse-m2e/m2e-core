@@ -57,7 +57,7 @@ Step by Step guide:
     3. Click *Next* .
 7. Press *Finish* on the *Confirmation* page will start the installation process. 
 8. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclispe started, the progress bar in the status bar shows the progress of the overall setup.
-9. Once the *Executing startup task* job is finished you should have all the *m2-core*, *m2-core-tests* and *m2e-maven-runtime* projects imported into three working sets called *m2-core*, *m2-core-tests* and *m2e-maven-runtime*.
+9. Once the *Executing startup task* job is finished you should have all the *m2-core* and *m2-core-tests* projects imported into three working sets called *m2-core*  and *m2-core-tests*.
 10. Remaining errors are resolved after a restart of Eclipse.
 11. Happy coding!
 
@@ -70,10 +70,6 @@ Some tests are in a separate repository which is referenced as a Git submodule i
 * Use latest release of the Eclipse SDK or Eclipse IDE with the Plugin Development Environment installed.
 * Make sure m2e is installed in this IDE, including the "m2e PDE" feature,
 * _File > Open Projects from Filesystem..._ , select the path to m2e-core Git repo and the relevant children projects you want to import; approve m2e connectors installation if prompted
-* Depending on the task you're planning to work on, multiple workflows are available to configure the [target-platform](https://help.eclipse.org/2021-03/topic/org.eclipse.pde.doc.user/concepts/target.htm?cp=4_1_5)
-    * In many cases, this simplest workflow will be sufficient: Install latest m2e snapshot in your target-platform (can be your current IDE), or
-    * If you don't want to mix versions of m2e, open  __target-platform/dev-worksace.target__  and  _Set as Target-Platform_  from the editor, or
-    * In case you're working on the content of the `m2e-maven-runtime` folder, then run `mvn install -f m2e-maven-runtime/` after your changes to deploy them locally and then tweak the  _target-platform/dev-worksace.target_  to reference the versions of those artifacts you build locally and reload this target platform
 * Open the project modules you want to work on (right-click > Open project) and their dependencies; approve m2e connectors installation if prompted
 * Happy coding!
 

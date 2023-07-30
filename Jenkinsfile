@@ -58,7 +58,6 @@ pipeline {
 					archiveArtifacts artifacts: 'org.eclipse.m2e.repository/target/*.zip,\
 						*/target/work/data/.metadata/.log,\
 						m2e-core-tests/*/target/work/data/.metadata/.log,\
-						m2e-maven-runtime/target/*.properties,\
 						**/target/artifactcomparison/*'
 					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'

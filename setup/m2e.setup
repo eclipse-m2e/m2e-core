@@ -152,8 +152,7 @@
     <sourceLocator
         rootFolder="${git.clone.m2e.core.location/m2e-parent}"/>
     <sourceLocator
-        rootFolder="${git.clone.m2e.core.location/m2e-maven-runtime}"
-        locateNestedProjects="true"/>
+        rootFolder="${git.clone.m2e.core.location/org.eclipse.m2e.maven.runtime}"/>
   </setupTask>
   <setupTask
       xsi:type="setup.workingsets:WorkingSetTask"
@@ -169,16 +168,8 @@
             includeNestedRepositories="true"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//'m2e.workingsets'/@workingSets[name='m2e-core-tests'] //'m2e.workingsets'/@workingSets[name='m2e-maven-runtime']"/>
+            excludedWorkingSet="//'m2e.workingsets'/@workingSets[name='m2e-core-tests']"/>
       </predicate>
-    </workingSet>
-    <workingSet
-        name="m2e-maven-runtime"
-        id="m2e.maven.runtime">
-      <predicate
-          xsi:type="predicates:RepositoryPredicate"
-          project="org.eclipse.m2e.core"
-          relativePathPattern="m2e-maven-runtime/.*"/>
     </workingSet>
     <workingSet
         name="m2e-core-tests"
