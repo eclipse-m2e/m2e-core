@@ -27,7 +27,7 @@
       label="m2e Development Environment Workspace">
     <stream
         href="index:/org.eclipse.setup#//@projectCatalogs[name='org.eclipse']/@projects[name='m2e']/@streams[name='master']"/>
-    <description>The m2e development environment workspace includes m2e-core, m2e-maven-runtime and m2e-core-tests</description>
+    <description>The m2e development environment workspace includes m2e-core and m2e-core-tests</description>
   </workspace>
   <description>
     &lt;p>

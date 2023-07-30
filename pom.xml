@@ -40,7 +40,7 @@
 	<modules>
 		<module>target-platform</module>
 
-		<module>m2e-maven-runtime</module>
+		<module>org.eclipse.m2e.maven.runtime</module>
 
 		<module>org.eclipse.m2e.archetype.common</module>
 		<module>org.eclipse.m2e.model.edit</module>
@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>3.9.100-SNAPSHOT</version>
+			<version>3.9.101-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
