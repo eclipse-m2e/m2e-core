@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 
@@ -39,13 +38,13 @@ public class PlexusBuildAPI implements IIncrementalBuildFramework {
   public static QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
 
   @Override
-  public AbstractEclipseBuildContext setupProjectBuildContext(IProject project, int kind, IResourceDelta delta,
+  public BuildContext setupProjectBuildContext(IProject project, int kind, BuildDelta delta,
       IIncrementalBuildFramework.BuildResultCollector results) throws CoreException {
     @SuppressWarnings("unchecked")
     Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
-    AbstractEclipseBuildContext buildContext;
+    BuildContext buildContext;
     if(delta != null && contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
-      buildContext = new EclipseIncrementalBuildContext(delta, contextState, results);
+      buildContext = new EclipseIncrementalBuildContext(delta, contextState, results, project.getLocation().toFile());
     } else if(CLEAN_BUILD == kind) {
       project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
       buildContext = new EclipseBuildContext(project, new HashMap<String, Object>(), results);
@@ -59,7 +58,7 @@ public class PlexusBuildAPI implements IIncrementalBuildFramework {
         buildContext = new EclipseBuildContext(project, contextState, results);
       }
     }
-    ThreadBuildContext.setThreadBuildContext(buildContext);
+    ThreadBuildContext.setThreadBuildContext((org.sonatype.plexus.build.incremental.BuildContext) buildContext);
     return buildContext;
   }
 
