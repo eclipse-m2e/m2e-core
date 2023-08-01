@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 
@@ -47,13 +46,21 @@ public interface IIncrementalBuildFramework {
 
   /**
    * @experimental this interface is part of work in progress and can be changed or removed without notice.
+   * @since 2.4
+   */
+  public interface BuildDelta {
+    boolean hasDelta(File file);
+  }
+
+  /**
+   * @experimental this interface is part of work in progress and can be changed or removed without notice.
    * @since 1.6
    */
   public interface BuildContext {
     void release();
   }
 
-  BuildContext setupProjectBuildContext(IProject project, int kind, IResourceDelta delta,
-      BuildResultCollector results) throws CoreException;
+  BuildContext setupProjectBuildContext(IProject project, int kind, BuildDelta delta, BuildResultCollector results)
+      throws CoreException;
 
 }

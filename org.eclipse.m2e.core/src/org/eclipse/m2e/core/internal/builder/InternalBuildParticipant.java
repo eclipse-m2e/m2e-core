@@ -24,7 +24,6 @@ import org.apache.maven.execution.MavenSession;
 
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -36,7 +35,7 @@ public abstract class InternalBuildParticipant {
 
   private MavenSession session;
 
-  private AbstractEclipseBuildContext buildContext;
+  private BuildContext buildContext;
 
   protected IMavenProjectFacade getMavenProjectFacade() {
     return facade;
@@ -71,7 +70,7 @@ public abstract class InternalBuildParticipant {
 
   public abstract boolean callOnEmptyDelta();
 
-  void setBuildContext(AbstractEclipseBuildContext buildContext) {
+  void setBuildContext(BuildContext buildContext) {
     this.buildContext = buildContext;
   }
 

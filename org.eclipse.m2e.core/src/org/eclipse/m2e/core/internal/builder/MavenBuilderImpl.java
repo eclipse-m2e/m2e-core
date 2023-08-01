@@ -52,7 +52,9 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.BuildResultCollector.Message;
 import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildContext;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildDelta;
 import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseResourceBuildDelta;
 import org.eclipse.m2e.core.internal.builder.plexusbuildapi.PlexusBuildAPI;
 import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -65,6 +67,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class MavenBuilderImpl {
+
   private static Logger log = LoggerFactory.getLogger(MavenBuilderImpl.class);
 
   public static final QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
@@ -129,7 +132,10 @@ public class MavenBuilderImpl {
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(deltaProvider);
           participant.setSession(session);
-          participant.setBuildContext((AbstractEclipseBuildContext) incrementalContexts.get(0));
+          BuildContext buildContext = incrementalContexts.get(0);
+          if(buildContext instanceof org.sonatype.plexus.build.incremental.BuildContext incremental) {
+            participant.setBuildContext(incremental);
+          }
           if(participant instanceof InternalBuildParticipant2 participant2) {
             participant2.setArgs(args);
           }
@@ -223,8 +229,10 @@ public class MavenBuilderImpl {
   private List<IIncrementalBuildFramework.BuildContext> setupProjectBuildContext(IProject project, int kind,
       IResourceDelta delta, IIncrementalBuildFramework.BuildResultCollector results) throws CoreException {
     List<IIncrementalBuildFramework.BuildContext> contexts = new ArrayList<>();
+
+    BuildDelta buildDelta = delta != null ? new EclipseResourceBuildDelta(delta) : null;
     for(IIncrementalBuildFramework framework : incrementalBuildFrameworks) {
-      contexts.add(framework.setupProjectBuildContext(project, kind, delta, results));
+      contexts.add(framework.setupProjectBuildContext(project, kind, buildDelta, results));
     }
     return contexts;
   }

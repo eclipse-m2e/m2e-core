@@ -14,41 +14,57 @@
 package org.eclipse.m2e.core.internal.builder.plexusbuildapi;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.Scanner;
 
+import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.EmptyScanner;
+import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildDelta;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildResultCollector;
 
 
-public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext {
+public class EclipseIncrementalBuildContext implements BuildContext, IIncrementalBuildFramework.BuildContext {
 
-  private final IResourceDelta delta;
+  private final BuildDelta delta;
+
+  private BuildResultCollector results;
+
+  private Map<String, Object> context;
+
+  private File baseDir;
 
   public EclipseIncrementalBuildContext(IResourceDelta delta, Map<String, Object> context,
       IIncrementalBuildFramework.BuildResultCollector results) {
-    super(context, results);
+    this(new EclipseResourceBuildDelta(delta), context, results,
+        delta.getResource().getProject().getLocation().toFile());
+  }
+
+  public EclipseIncrementalBuildContext(BuildDelta delta, Map<String, Object> context,
+      IIncrementalBuildFramework.BuildResultCollector results, File baseDir) {
     this.delta = delta;
+    this.context = context;
+    this.results = results;
+    this.baseDir = baseDir;
   }
 
   @Override
   public boolean hasDelta(String relPath) {
-    IPath path = new Path(relPath);
-    return hasDelta(path);
-  }
-
-  protected boolean hasDelta(IPath path) {
-    return delta == null || path == null || delta.findMember(path) != null;
+    return hasDelta(new File(baseDir, relPath));
   }
 
   @Override
@@ -63,7 +79,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   @Override
   public boolean hasDelta(File file) {
-    return hasDelta(getRelativePath(file));
+    return delta.hasDelta(file);
   }
 
   @Override
@@ -77,6 +93,31 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
     return new ResourceDeltaScanner(reldelta, true);
   }
 
+  private IResourceDelta getDelta(File file) {
+    IResourceDelta adapt = Adapters.adapt(delta, IResourceDelta.class);
+    if(adapt == null) {
+      return null;
+    }
+    IPath relpath = getRelativePath(file);
+    if(relpath == null) {
+      return null;
+    }
+    return adapt.findMember(relpath);
+  }
+
+  private IPath getRelativePath(File file) {
+    IResource adapt = Adapters.adapt(delta, IResource.class);
+    if(adapt == null) {
+      return null;
+    }
+    IPath basepath = adapt.getLocation();
+    IPath path = Path.fromOSString(file.getAbsolutePath());
+    if(!basepath.isPrefixOf(path)) {
+      return null;
+    }
+    return path.removeFirstSegments(basepath.segmentCount());
+  }
+
   @Override
   public Scanner newScanner(File basedir) {
     return newScanner(basedir, false);
@@ -84,27 +125,19 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   @Override
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
-    if(!ignoreDelta) {
-      IResourceDelta reldelta = getDelta(basedir);
-
-      if(reldelta == null || !isContentChange(reldelta)) {
-        return new EmptyScanner(basedir);
-      }
-
-      return new ResourceDeltaScanner(reldelta, false);
+    DirectoryScanner ds;
+    if(ignoreDelta) {
+      ds = new DirectoryScanner();
+    } else {
+      ds = new DirectoryScanner() {
+        @Override
+        protected boolean isSelected(String name, File file) {
+          return hasDelta(file);
+        }
+      };
     }
-
-    DirectoryScanner ds = new DirectoryScanner();
     ds.setBasedir(basedir);
     return ds;
-  }
-
-  private IResourceDelta getDelta(File file) {
-    IPath relpath = getRelativePath(file);
-    if(relpath == null) {
-      return null;
-    }
-    return delta.findMember(relpath);
   }
 
   static boolean isContentChange(IResourceDelta delta) {
@@ -141,13 +174,68 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
   }
 
   @Override
-  protected IResource getBaseResource() {
-    return delta.getResource();
+  public boolean isIncremental() {
+    return true;
   }
 
   @Override
-  public boolean isIncremental() {
-    return true;
+  public void refresh(File file) {
+    results.refresh(file);
+  }
+
+  @Override
+  public OutputStream newFileOutputStream(File file) throws IOException {
+    return new ChangedFileOutputStream(file, this);
+  }
+
+  @Override
+  public void setValue(String key, Object value) {
+    context.put(key, value);
+  }
+
+  @Override
+  public Object getValue(String key) {
+    return context.get(key);
+  }
+
+  /**
+   * @deprecated Use addMessage instead
+   */
+  @Deprecated
+  @Override
+  public void addError(File file, int line, int column, String message, Throwable cause) {
+    addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, cause);
+  }
+
+  /**
+   * @deprecated
+   * @deprecated Use addMessage instead
+   */
+  @Deprecated
+  @Override
+  public void addWarning(File file, int line, int column, String message, Throwable cause) {
+    addMessage(file, line, column, message, BuildContext.SEVERITY_WARNING, cause);
+  }
+
+  @Override
+  public void addMessage(File file, int line, int column, String message, int severity, Throwable cause) {
+    results.addMessage(file, line, column, message, severity, cause);
+  }
+
+  @Override
+  public void removeMessages(File file) {
+    results.removeMessages(file);
+  }
+
+  @Override
+  public boolean isUptodate(File target, File source) {
+    return target != null && target.exists() && source != null && source.exists()
+        && target.lastModified() > source.lastModified();
+  }
+
+  @Override
+  public void release() {
+    ThreadBuildContext.setThreadBuildContext(null);
   }
 
 }
