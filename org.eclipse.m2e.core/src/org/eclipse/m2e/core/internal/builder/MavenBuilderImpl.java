@@ -16,15 +16,18 @@ package org.eclipse.m2e.core.internal.builder;
 import static org.eclipse.core.resources.IncrementalProjectBuilder.FULL_BUILD;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -37,7 +40,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
@@ -78,6 +83,8 @@ public class MavenBuilderImpl {
 
   private final List<IIncrementalBuildFramework> incrementalBuildFrameworks;
 
+  private final Map<IProject, ProjectBuildState> deltaState = new ConcurrentHashMap<>();
+
   public MavenBuilderImpl(DeltaProvider deltaProvider) {
     this.deltaProvider = deltaProvider;
     this.incrementalBuildFrameworks = loadIncrementalBuildFrameworks();
@@ -113,9 +120,10 @@ public class MavenBuilderImpl {
     if(!hasRelevantDelta(projectFacade, delta)) {
       return Set.of(project);
     }
-
+    ProjectBuildState buildState = deltaState.computeIfAbsent(project, ProjectBuildState::new);
     final BuildResultCollector participantResults = new BuildResultCollector();
-    List<BuildContext> incrementalContexts = setupProjectBuildContext(project, kind, delta, participantResults);
+    List<BuildContext> incrementalContexts = setupProjectBuildContext(project, kind, delta, participantResults,
+        buildState);
 
     debugBuildStart(debugHooks, projectFacade, kind, args, participants, delta, monitor);
 
@@ -184,7 +192,10 @@ public class MavenBuilderImpl {
     // Process errors and warnings
     MavenExecutionResult result = session.getResult();
     processBuildResults(project, mavenProject, result, participantResults, buildErrors);
-
+    if(buildErrors.isEmpty()) {
+      //we only commit this when there are no errors so just in case a failure is cased by a changed file it is again queried afterwards
+      buildState.commit();
+    }
     return dependencies;
   }
 
@@ -227,10 +238,12 @@ public class MavenBuilderImpl {
   }
 
   private List<IIncrementalBuildFramework.BuildContext> setupProjectBuildContext(IProject project, int kind,
-      IResourceDelta delta, IIncrementalBuildFramework.BuildResultCollector results) throws CoreException {
+      IResourceDelta delta, IIncrementalBuildFramework.BuildResultCollector results, ProjectBuildState buildState)
+      throws CoreException {
     List<IIncrementalBuildFramework.BuildContext> contexts = new ArrayList<>();
 
-    BuildDelta buildDelta = delta != null ? new EclipseResourceBuildDelta(delta) : null;
+    BuildDelta buildDelta = delta != null ? new ProjectBuildStateDelta(buildState, new EclipseResourceBuildDelta(delta))
+        : null;
     for(IIncrementalBuildFramework framework : incrementalBuildFrameworks) {
       contexts.add(framework.setupProjectBuildContext(project, kind, buildDelta, results));
     }
@@ -408,7 +421,7 @@ public class MavenBuilderImpl {
 
     final BuildResultCollector participantResults = new BuildResultCollector();
     List<BuildContext> incrementalContexts = setupProjectBuildContext(project, IncrementalProjectBuilder.CLEAN_BUILD,
-        null, participantResults);
+        null, participantResults, null);
 
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<>();
     try {
@@ -451,5 +464,65 @@ public class MavenBuilderImpl {
 
   DeltaProvider getDeltaProvider() {
     return deltaProvider;
+  }
+
+  private static final class ProjectBuildState {
+
+    private long lastBuild;
+
+    private IProject project;
+
+    public ProjectBuildState(IProject project) {
+      this.project = project;
+    }
+
+    public void commit() {
+      this.lastBuild = System.currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+      return "BuildState for " + project + " lat reccorded timestamp "
+          + DateFormat.getDateTimeInstance().format(new Date(lastBuild));
+    }
+  }
+
+  private static final class ProjectBuildStateDelta implements BuildDelta, IAdaptable {
+
+    private ProjectBuildState buildState;
+
+    private BuildDelta delegate;
+
+    /**
+     * @param buildState
+     * @param eclipseResourceBuildDelta
+     */
+    public ProjectBuildStateDelta(ProjectBuildState buildState, BuildDelta delegate) {
+      this.buildState = buildState;
+      this.delegate = delegate;
+    }
+
+    @Override
+    public boolean hasDelta(File file) {
+      //first check the delegate...
+      if(delegate != null && delegate.hasDelta(file)) {
+        return true;
+      }
+      //... now perform additional checks
+      if(file.isFile()) {
+        long lastModified = file.lastModified();
+        if(lastModified > buildState.lastBuild) {
+          //if the file is modified after the last build timestamp we assume it was modified even though not part of the current delta!
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+      return Adapters.adapt(delegate, adapter);
+    }
+
   }
 }
