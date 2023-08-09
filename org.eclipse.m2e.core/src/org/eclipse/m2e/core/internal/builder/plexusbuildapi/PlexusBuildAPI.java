@@ -23,12 +23,10 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
-
-import org.sonatype.plexus.build.incremental.ThreadBuildContext;
-
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant2;
+import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 
 /**
@@ -47,7 +45,7 @@ public class PlexusBuildAPI implements IIncrementalBuildFramework {
       buildContext = new EclipseIncrementalBuildContext(delta, contextState, results, project.getLocation().toFile());
     } else if(CLEAN_BUILD == kind) {
       project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
-      buildContext = new EclipseBuildContext(project, new HashMap<String, Object>(), results);
+      buildContext = new EclipseBuildContext(project, new HashMap<>(), results);
     } else {
       contextState = new HashMap<>();
       project.setSessionProperty(BUILD_CONTEXT_KEY, contextState);
