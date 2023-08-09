@@ -47,7 +47,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.pde.target.shared.ProcessingMessage.Type;
 import org.osgi.framework.Constants;

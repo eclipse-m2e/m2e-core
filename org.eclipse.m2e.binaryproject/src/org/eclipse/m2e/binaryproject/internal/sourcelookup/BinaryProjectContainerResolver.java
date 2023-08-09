@@ -25,7 +25,6 @@ import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.sourcelookup.advanced.ISourceContainerResolver;
 import org.eclipse.jdt.launching.sourcelookup.containers.PackageFragmentRootSourceContainer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
