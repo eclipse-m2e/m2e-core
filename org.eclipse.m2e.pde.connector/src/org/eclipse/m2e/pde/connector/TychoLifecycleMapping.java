@@ -75,8 +75,6 @@ public class TychoLifecycleMapping extends AbstractCustomizableLifecycleMapping 
 
 	private static final class EclipsePluginProjectConfigurator extends AbstractJavaProjectConfigurator {
 
-		private static final String JAVA_SE = "JavaSE-";
-
 		@Override
 		protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
 				ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {

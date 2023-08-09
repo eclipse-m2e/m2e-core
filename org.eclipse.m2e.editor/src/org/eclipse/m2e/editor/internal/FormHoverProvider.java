@@ -13,9 +13,7 @@
 
 package org.eclipse.m2e.editor.internal;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarker;
@@ -24,6 +22,8 @@ import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.Geometry;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.pom.PomTextHover;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -33,9 +33,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.pom.PomTextHover;
-
 
 public final class FormHoverProvider {
 
@@ -43,7 +40,6 @@ public final class FormHoverProvider {
       final ISourceViewer sourceViewer) {
     if(markers.length > 0) {
       return position -> {
-        List<IMarker> markersSet = Arrays.asList(markers);
         PomTextHover.CompoundRegion compound = new PomTextHover.CompoundRegion(sourceViewer, 0);
         Iterator<Annotation> it = sourceViewer.getAnnotationModel().getAnnotationIterator();
         while(it.hasNext()) {
