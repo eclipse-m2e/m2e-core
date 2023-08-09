@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.sourcelookup.internal.launch.MavenSourceContainerResolver;
 
 // useful to lookup shaded binary projects like wagon-http-2.10-shaded.jar
-public class BinaryProjectContainerResolver extends MavenSourceContainerResolver implements ISourceContainerResolver {
+public class BinaryProjectContainerResolver extends MavenSourceContainerResolver {
 
   @Override
   protected ISourceContainer resolveSourceContainer(ArtifactKey artifact, IProgressMonitor monitor) {

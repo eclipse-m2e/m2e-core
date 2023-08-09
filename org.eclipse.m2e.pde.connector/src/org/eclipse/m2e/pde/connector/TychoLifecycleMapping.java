@@ -44,7 +44,7 @@ import org.eclipse.pde.internal.core.build.WorkspaceBuildModel;
 import org.eclipse.pde.internal.core.project.PDEProject;
 
 @SuppressWarnings("restriction")
-public class TychoLifecycleMapping extends AbstractCustomizableLifecycleMapping implements ILifecycleMapping {
+public class TychoLifecycleMapping extends AbstractCustomizableLifecycleMapping {
 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
