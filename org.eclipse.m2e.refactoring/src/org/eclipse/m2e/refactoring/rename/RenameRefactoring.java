@@ -28,8 +28,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.osgi.util.NLS;
-
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.m2e.refactoring.AbstractPomRefactoring;
@@ -37,6 +35,7 @@ import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.m2e.refactoring.PomVisitor;
 import org.eclipse.m2e.refactoring.RefactoringModelResources;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -44,7 +43,6 @@ import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
  *
  * @author Anton Kraev
  */
-@SuppressWarnings("rawtypes")
 public class RenameRefactoring extends AbstractPomRefactoring {
 
   private static final String VERSION = "version"; //$NON-NLS-1$
