@@ -29,11 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.w3c.dom.Element;
-
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -48,6 +45,18 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyTreeWrapper;
+import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
+import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
+import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.pom.ValueProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -63,22 +72,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyTreeWrapper;
-import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
-import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
-import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
-import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
-import org.eclipse.m2e.editor.pom.ValueProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 
 /**
@@ -211,7 +207,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     dependenciesViewer = new TableViewer(dependenciesTable);
     dependenciesViewer.setLabelProvider(new DependencyLabelProvider());
-    dependenciesViewer.setContentProvider(new ListEditorContentProvider<Dependency>());
+    dependenciesViewer.setContentProvider(new ListEditorContentProvider<>());
     //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
     List<Dependency> deps = modelVProvider.getValue();
     List<Dependency> nonManaged = new ArrayList<>();

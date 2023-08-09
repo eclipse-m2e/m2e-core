@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
@@ -45,10 +46,6 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
-import org.eclipse.osgi.util.NLS;
-
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -58,6 +55,7 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -89,7 +87,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     ComposedAdapterFactory adapterFactory = new ComposedAdapterFactory(factories);
     BasicCommandStack commandStack = new BasicCommandStack();
     this.editingDomain = new AdapterFactoryEditingDomain(adapterFactory, //
-        commandStack, new HashMap<Resource, Boolean>());
+        commandStack, new HashMap<>());
   }
 
   // this gets actual refactoring visitor

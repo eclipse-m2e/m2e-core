@@ -31,8 +31,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.jobs.MavenJob;
@@ -47,6 +45,7 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.wizards.LifecycleMappingDiscoveryHelper;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
+import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 public class MavenProjectConfigurator implements ProjectConfigurator {
 
@@ -65,8 +64,8 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
 
         private CumulativeMappingDiscoveryJob() {
-          super(Collections.<IProject> emptyList(), true);
-            this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
+          super(Collections.emptyList(), true);
+          this.toProcess = Collections.synchronizedSet(new HashSet<>());
         }
 
         @Override
@@ -141,7 +140,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
         private UpdateMavenConfigurationJob() {
             super(UPDATE_MAVEN_CONFIGURATION_JOB_NAME);
-            this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
+            this.toProcess = Collections.synchronizedSet(new HashSet<>());
             this.setUser(true);
         }
 
