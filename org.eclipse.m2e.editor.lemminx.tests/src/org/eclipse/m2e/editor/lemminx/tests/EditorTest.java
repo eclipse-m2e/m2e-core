@@ -40,6 +40,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.wildwebdeveloper.xml.internal.Activator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,11 +50,17 @@ import org.junit.Test;
 public class EditorTest extends AbstractMavenProjectTestCase {
 
 	private static final String GENERIC_EDITOR = "org.eclipse.ui.genericeditor.GenericEditor";
+
+	private static final String XML_PREFERENCES_DOWNLOAD_EXTERNAL_RESOURCES = "org.eclipse.wildwebdeveloper.xml.downloadExternalResources.enabled";
+
+	private static final long WAIT_TIMEOUT = 15000;
+
 	private IWorkbenchPage page;
 	private IProject project;
 
 	@Before
 	public void setPage() {
+		Activator.getDefault().getPreferenceStore().setValue(XML_PREFERENCES_DOWNLOAD_EXTERNAL_RESOURCES, true);
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 	}
 
@@ -74,8 +81,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		pomFile.create(getClass().getResourceAsStream("pom.xml"), true, null);
 		ITextEditor editorPart = (ITextEditor)IDE.openEditor(page, pomFile, GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
-		assertTrue("Missing diagnostic report", DisplayHelper.waitForCondition(display, 10000, () ->
-			{
+		assertTrue("Missing diagnostic report", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
 				try {
 					return Arrays.stream(pomFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO)).anyMatch(marker ->
 						marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR &&
@@ -90,7 +96,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		Set<Shell> beforeShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
 		editorPart.getSelectionProvider().setSelection(new TextSelection(offset, 0));
 		editorPart.getAction(ITextEditorActionConstants.CONTENT_ASSIST).run();
-		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, 10000, () -> {
+		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
 			Set<Shell> afterShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
 			afterShells.removeAll(beforeShells);
 			return afterShells.stream()
@@ -129,7 +135,7 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		IFile pomFile = child.getFile("pom.xml");
 		page.openEditor(new FileEditorInput(pomFile), GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
-		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, 60000, () -> {
+		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
 			try {
 				IMarker[] markers = pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO);
 				if (markers.length == 0) {
