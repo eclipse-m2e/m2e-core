@@ -28,6 +28,7 @@
    <bundle id="com.google.gson.source"/>
    <bundle id="org.apache.commons.cli"/>
    <bundle id="org.apache.commons.cli.source"/>
+   <bundle id="jakarta.servlet-api"/>
    <bundle id="org.eclipse.m2e.archetype.jdom2"/>
    <bundle id="org.eclipse.m2e.archetype.jdom2.source"/>
    <bundle id="org.eclipse.m2e.archetype.archetype-catalog"/>
