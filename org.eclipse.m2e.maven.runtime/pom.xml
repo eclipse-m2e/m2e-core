@@ -33,15 +33,14 @@
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
 		<maven-resolver.version>1.9.16</maven-resolver.version>
+		<apache-commons-codec.version>1.16.0</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
-		<okhttp-connector.version>0.17.8</okhttp-connector.version>
 		<jars.directory>target/jars</jars.directory>
 		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
 		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -79,17 +78,6 @@
 			<version>${plexus-build-api.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.takari.aether</groupId>
-			<artifactId>aether-connector-okhttp</artifactId>
-			<version>${okhttp-connector.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.eclipse.aether</groupId>
-					<artifactId>aether-util</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-impl</artifactId>
 		</dependency>
@@ -100,6 +88,18 @@
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-transport-wagon</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-file</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-http</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>
@@ -138,6 +138,17 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>2.0.7</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${apache-commons-codec.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -192,14 +203,16 @@
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
-								io.takari.*;provider=m2e;mandatory:=provider,\
+								org.apache.maven.wagon.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
 							Import-Package: \
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
 								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
-								org.apache.commons.cli;version="[1.4.0,2.0.0)"
+								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
+								org.apache.commons.codec*, \
+								org.apache.commons.lang3*
 							Require-Bundle: \
 								com.google.guava;bundle-version="32.0.1"
 

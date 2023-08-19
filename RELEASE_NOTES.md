@@ -8,6 +8,19 @@
 
 Updated the embedded Maven from version 3.9.4 to 3.9.5; [Maven 3.9.5 Release Notes](https://maven.apache.org/docs/3.9.5/release-notes.html).
 
+### Dropped aether-okhttp-connector
+
+Previously, m2e embedded [`aether-okhttp-connector`](https://github.com/takari/aether-connector-okhttp), an alternative to Wagon HTTP connector, based on [OkHttp](https://square.github.io/okhttp/), which was developed at a time when Maven 2's HTTP Connector didn't leverage HTTP/2 and parallel downloads.
+
+However, the usage of this alternative connector introduced certain inconsistencies when compared to regular Maven CLI builds.
+These discrepancies, often revolving around matters of authentication and proxies, posed challenges.
+Maven 3.x significantly improved its resolver implementations, largely mitigating the advantages of `aether-okhttp-connector` and bringing new features.
+This shift left the `aether-okhttp-connector` outdated and that project has now been abandoned.
+
+m2e 2.4 has been adjusted to better align with the Maven 3.9 runtime.
+This adjustment is expected to result in fewer issues pertaining to artifact resolution and proxy authentication.
+However, due to its removal from the runtime, there exists a potential risk that third-party Plug-ins dependent on m2e's integrated `OkHttp` functionality might experience disruptions.
+
 ## 2.4.0
 
 * 📅 Release Date: 29th August 2023

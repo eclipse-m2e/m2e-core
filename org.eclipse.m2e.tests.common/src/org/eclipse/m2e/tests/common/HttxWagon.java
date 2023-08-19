@@ -25,11 +25,10 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
+import org.apache.maven.wagon.providers.http.HttpWagon;
 import org.apache.maven.wagon.proxy.ProxyInfoProvider;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.resource.Resource;
-
-import io.takari.aether.wagon.OkHttpsWagon;
 
 
 /**
@@ -37,7 +36,7 @@ import io.takari.aether.wagon.OkHttpsWagon;
  * {@link #setRequestFilterPattern(String, boolean)} to configure what to record and to optionally clear previous
  * records. The repository URL to use with this wagon looks like {@code httx://localhost/<path-relative-to-project>}.
  */
-public class HttxWagon extends OkHttpsWagon {
+public class HttxWagon extends HttpWagon {
 
 //MUST NOT start with "http", because otherwise the io.takari.aether.connector.AetherRepositoryConnector will consider it as default http(s) and will handle the connection.
   static String PROTOCOL = "httx";
