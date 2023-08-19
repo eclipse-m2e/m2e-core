@@ -147,7 +147,7 @@ public class MavenTargetBundle extends TargetBundle {
 					wrap.messages(true).map(ProcessingMessage::message).distinct().forEach(msg -> {
 						bundleStatus.add(Status.warning(msg));
 					});
-					return wrap.getFile();
+					return wrap.getFile().get();
 				}
 				if (directErrors.size() == 1) {
 					throw new CoreException(Status.error(directErrors.get(0).message()));
