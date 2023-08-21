@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.variables.IStringVariableManager;
+import org.eclipse.core.variables.VariablesPlugin;
 
 import org.codehaus.plexus.classworlds.ClassWorldException;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationException;
@@ -71,16 +73,22 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
   @Override
   public boolean isAvailable() {
-    return new File(location, "bin").exists() && getLauncherClasspath() != null && isSupportedVersion(); //$NON-NLS-1$
+    return new File(getLocation(), "bin").exists() && getLauncherClasspath() != null && isSupportedVersion(); //$NON-NLS-1$
   }
 
   @Override
   public String getLocation() {
+    IStringVariableManager manager = VariablesPlugin.getDefault().getStringVariableManager();
+    try {
+      return manager.performStringSubstitution(location);
+    } catch(CoreException ex) {
+      //if we can't parse the location we need to return the unparsed raw value...
+    }
     return location;
   }
 
   private File getLauncherConfigurationFile() {
-    return new File(location, "bin/m2.conf"); //$NON-NLS-1$
+    return new File(getLocation(), "bin/m2.conf"); //$NON-NLS-1$
   }
 
   @Override
@@ -140,7 +148,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
     Properties properties = new Properties();
     copyProperties(properties, System.getProperties());
-    properties.put(PROPERTY_MAVEN_HOME, location);
+    properties.put(PROPERTY_MAVEN_HOME, getLocation());
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
 
@@ -158,7 +166,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
   @Override
   public String toString() {
-    return location + ' ' + getVersion();
+    return getLocation() + ' ' + getVersion();
   }
 
   private static class ExceptionWrapper extends RuntimeException {
@@ -170,7 +178,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
   }
 
   private String getLauncherClasspath() {
-    File mavenHome = new File(location);
+    File mavenHome = new File(getLocation());
     DirectoryScanner ds = new DirectoryScanner();
     ds.setBasedir(mavenHome);
     ds.setIncludes(new String[] {"core/boot/classworlds*.jar", // 2.0.4 //$NON-NLS-1$
@@ -255,7 +263,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
     Properties properties = new Properties();
     copyProperties(properties, System.getProperties());
-    properties.put(PROPERTY_MAVEN_HOME, location);
+    properties.put(PROPERTY_MAVEN_HOME, getLocation());
 
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
       new ConfigurationParser(handler, properties).parse(is);

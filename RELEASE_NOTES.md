@@ -22,6 +22,10 @@ If you want to switch back to an older runtime you currently need to modify you 
 
 ![grafik](https://github.com/eclipse-m2e/m2e-core/assets/1331477/ef04e7f4-e36b-4bbc-a4d3-ff92e6a5f9f4)
 
+### Support for variables in maven installations
+
+In the preferences for maven installations one can now specify variables for maven location.
+
 ## 2.3.0
 
 * 📅 Release Date: 23th May 2023
