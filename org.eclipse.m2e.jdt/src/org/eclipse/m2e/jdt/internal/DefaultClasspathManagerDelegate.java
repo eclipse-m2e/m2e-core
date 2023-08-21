@@ -148,7 +148,10 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
         entry.setArtifactKey(new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier()));
         entry.setScope(a.getScope());
         entry.setOptionalDependency(a.isOptional());
-        entry.setExported(isExportedArtifact(a));
+        // Setting the entry's exported flag effectively changes the usual breath-first dependency resolution of Maven 
+        // to a depth-first resolution for dependencies that are in the workspace.
+        // See https://github.com/eclipse-m2e/m2e-core/issues/1501
+        entry.setExported(false); // isExportedArtifact(a)
       }
     }
 
@@ -162,6 +165,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     });
   }
 
+  @SuppressWarnings("unused")
   private boolean isExportedArtifact(Artifact a) {
     if(Artifact.SCOPE_PROVIDED.equals(a.getScope())) {
       //provided items are not transitive
