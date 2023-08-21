@@ -163,13 +163,11 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   private String getErrorMessage(Throwable ex) {
-    StringBuilder message = new StringBuilder();
-    if(ex.getMessage() != null) {
-      message.append(ex.getMessage()).append("\n\n");
-    }
-    StringWriter errorStackTrace = new StringWriter();
-    ex.printStackTrace(new PrintWriter(errorStackTrace));
-    return message.append(errorStackTrace).toString();
+    String exMessage = ex.getMessage();
+    StringWriter stackTrace = new StringWriter();
+    ex.printStackTrace(new PrintWriter(stackTrace));
+    String stackString = stackTrace.toString().replace("\r\n", "\n");
+    return exMessage != null ? exMessage + "\n\n" + stackString : stackString;
   }
 
   private Throwable getRootCause(Throwable ex) {
