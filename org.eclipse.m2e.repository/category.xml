@@ -29,6 +29,7 @@
    <bundle id="org.apache.commons.cli"/>
    <bundle id="org.apache.commons.cli.source"/>
    <bundle id="jakarta.servlet-api"/>
+   <bundle id="com.google.guava" />
    <iu>
      <query> 
        <expression type="match">
