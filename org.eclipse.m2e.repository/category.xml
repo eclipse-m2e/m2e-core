@@ -46,4 +46,5 @@
    <repository-reference location="https://download.eclipse.org/tm4e/releases/0.8.0/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4j/updates/releases/0.21.0/" enabled="true" />
    <repository-reference location="https://download.eclipse.org/lsp4e/releases/0.23.0/" enabled="true" />
+   <repository-reference location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2023-09/" enabled="true" />
 </site>
