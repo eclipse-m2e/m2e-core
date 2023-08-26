@@ -50,10 +50,6 @@
 				<!-- Excluded dependencies are fulfilled via the OSGi requirements specified below as Import-Package/Require-Bundle and
 					therefore don't have to be embedded. Or they are not required. -->
 				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.checkerframework</groupId>
 					<artifactId>checker-compat-qual</artifactId>
 				</exclusion>
@@ -126,6 +122,16 @@
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
 			<version>[1.0.0,)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>failureaccess</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
