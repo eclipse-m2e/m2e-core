@@ -123,7 +123,8 @@
 Bundle-Name:           M2Eclipse's ${mvnArtifactId}
 version:               ${version_cleanup;${mvnVersion}}
 Bundle-SymbolicName:   org.eclipse.m2e.archetype.common
-Bundle-Version:        ${version}.1
+# Change the following value to '${version}' once the next minor version of archetype is availble
+Bundle-Version:        ${versionmask;==;${version}}.104
 Bundle-Vendor: 	       Eclipse.org - m2e
 Eclipse-ExtensibleAPI: true
 Export-Package:        META-INF.plexus;-noimport:=true;x-internal:=true, \
@@ -157,9 +158,10 @@ Import-Package:        org.jdom2*
 Bundle-Name:           M2Eclipse's ${mvnArtifactId}
 version:               ${version_cleanup;${mvnVersion}}
 Bundle-SymbolicName:   org.eclipse.m2e.archetype.${replacestring;${mvnArtifactId};archetype-}
-Bundle-Version:        ${version}.1
+# Change the following value to '${version}' once the next minor version of archetype is availble
+Bundle-Version:        ${version}.2
 Bundle-Vendor: 	       Eclipse.org - m2e
-Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="${range;[===,+);3.2.1}"
+Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="${range;[===,+);3.2.104}"
 Export-Package:        org.apache.maven.*;-noimport:=true;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
 Import-Package:        !*
 ]]></instructions>
