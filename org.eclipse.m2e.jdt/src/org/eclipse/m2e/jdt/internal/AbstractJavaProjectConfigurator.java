@@ -765,6 +765,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     } catch(CoreException ex) {
       //ignore
     }
+
+    //3nd, check the --enable-preview flag in the ${maven.compiler.enablePreview}
+    try {
+      Boolean enablePreview = maven.getMojoParameterValue(mavenProject, execution, "enablePreview", Boolean.class, //$NON-NLS-1$
+          monitor);
+      if(Boolean.TRUE.equals(enablePreview)) {
+        return true;
+      }
+    } catch(CoreException ex) {
+      //ignore
+    }
     return false;
   }
 

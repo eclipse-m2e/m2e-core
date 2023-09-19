@@ -124,6 +124,14 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		assertEquals(1, classpathEntriesCount(project, TEST_RESOURCES));
 	}
 
+	
+	@Test
+	public void testComplianceVsEnablePreviewSettings() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/compilerEnablePreviewSettings/pom.xml");
+		assertEquals("11", project.getOption(JavaCore.COMPILER_COMPLIANCE, false));
+		assertEquals(JavaCore.ENABLED, project.getOption(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, false));
+		assertEquals(JavaCore.IGNORE, project.getOption(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, false));
+	}
 	// --- utility methods ---
 
 	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()
