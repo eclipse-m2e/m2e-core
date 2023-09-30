@@ -523,9 +523,13 @@ public class ModuleSupport {
           }
 
           String value = null;
+          boolean isNextArg = false;
           if(argType.getArgumentName().equalsIgnoreCase(argumentName)) {
             // full argument match
-            value = it.next();
+            if(it.hasNext()) {
+              value = it.next();
+              isNextArg = true;
+            }
           } else {
             // argument with delimiter match
             String argumentWithDelimiter = argType.getArgumentName().toLowerCase() + JpmsArgType.argumentDelimiter;
@@ -536,7 +540,9 @@ public class ModuleSupport {
           JpmsArgValue argValue = argType.parse(value);
 
           if(argValue == null) {
-            it.previous();
+            if(isNextArg) {
+              it.previous();
+            }
             continue;
           }
 
