@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.pde.feature"
       label="%featureName"
-      version="2.2.200.qualifier"
+      version="2.3.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.core"
       license-feature="org.eclipse.license"
@@ -24,27 +24,6 @@
       <import plugin="org.eclipse.m2e.core"/>
       <import plugin="org.eclipse.jface"/>
    </requires>
-
-   <plugin
-         id="biz.aQute.bnd.util"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="biz.aQute.bndlib"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.osgi.service.repository"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.eclipse.m2e.pde.target"
