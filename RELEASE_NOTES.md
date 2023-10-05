@@ -1,5 +1,13 @@
 # Eclipse m2e - Release notes
 
+## 2.5.0
+
+* 📅 Release Date: _expected_ end of November 2023
+
+### Embedded and use Maven 3.9.5
+
+Updated the embedded Maven from version 3.9.4 to 3.9.5; [Maven 3.9.5 Release Notes](https://maven.apache.org/docs/3.9.5/release-notes.html).
+
 ## 2.4.0
 
 * 📅 Release Date: 29th August 2023
