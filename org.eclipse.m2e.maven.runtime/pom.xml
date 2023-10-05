@@ -20,19 +20,19 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.400-SNAPSHOT</version>
+	<version>3.9.500-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.4</maven-core.version>
+		<maven-core.version>3.9.5</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-		<maven-resolver.version>1.9.14</maven-resolver.version>
+		<maven-resolver.version>1.9.16</maven-resolver.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>0.0.7</plexus-build-api.version>
 		<okhttp-connector.version>0.17.8</okhttp-connector.version>
@@ -197,7 +197,7 @@
 							Import-Package: \
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
-								javax.inject;version="1.0.0",\
+								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
 								org.apache.commons.cli;version="[1.4.0,2.0.0)"
 							Require-Bundle: \
