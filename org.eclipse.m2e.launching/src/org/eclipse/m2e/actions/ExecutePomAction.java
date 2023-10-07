@@ -399,6 +399,9 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, 
   }
 
   private ILaunchConfiguration[] findLaunches(IContainer parent) {
+    if(parent == null) {
+      return new ILaunchConfiguration[0];
+    }
     try {
       List<ILaunchConfiguration> matchingConfigurations = ExecutePomAction
           .getMatchingConfigurations(parent.getLocation());
