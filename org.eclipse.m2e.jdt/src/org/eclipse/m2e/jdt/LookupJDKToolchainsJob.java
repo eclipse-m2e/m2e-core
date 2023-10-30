@@ -58,7 +58,7 @@ public class LookupJDKToolchainsJob extends Job {
 						}
 						addToolchain(toolchain);
 					}
-				} catch(IOException e) {
+				} catch(Exception e) {
 					return Status.error(e.getMessage(), e);
 				}
 			}
