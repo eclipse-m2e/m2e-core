@@ -120,6 +120,7 @@
 								<ignore>META-INF/ECLIPSE_.SF</ignore>
 								<ignore>jars/*.jar</ignore>
 								<ignore>Eclipse-SourceReferences</ignore>
+								<ignore>Bundle-License</ignore>
 							</ignores>
 							<extensions>true</extensions>
 						</configuration>
