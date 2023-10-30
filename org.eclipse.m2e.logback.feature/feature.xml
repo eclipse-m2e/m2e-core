@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.logback.feature"
       label="%featureName"
-      version="2.2.0.qualifier"
+      version="2.2.1.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.core"
       license-feature="org.eclipse.license"
@@ -17,8 +17,6 @@
    </copyright>
 
    <requires>
-      <!-- This is only necessary until Aries can handle the absence of the servlet-api for logback:
-        https://github.com/apache/aries/pull/233 -->
       <import plugin="jakarta.servlet-api" version="5.0.0" match="compatible"/>
    </requires>
 
