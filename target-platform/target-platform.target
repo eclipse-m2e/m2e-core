@@ -102,6 +102,11 @@
 					<version>1.5.0</version>
 					<type>jar</type>
 				</dependency>
+			</dependencies>
+		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="false" label="M2E Workspace CLI" missingManifest="error" type="Maven">
+			<!-- Dedicated location to *NOT* include sources -->
+			<dependencies>
 				<dependency>
 					<groupId>io.takari.m2e.workspace</groupId>
 					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
