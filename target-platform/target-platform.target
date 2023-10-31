@@ -110,6 +110,16 @@
 				</dependency>
 			</dependencies>
 		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="false" label="Misc" missingManifest="error" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>io.takari.m2e.workspace</groupId>
+					<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
+					<version>0.3.1</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
 		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-archetype Common" missingManifest="generate" type="Maven">
 			<dependencies>
 				<dependency>
