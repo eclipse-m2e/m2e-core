@@ -28,8 +28,6 @@ class MavenFeaturePlugin extends FeaturePlugin {
 		BundleInfo bundleInfo = child.getBundleInfo();
 		setId(bundleInfo.getSymbolicName());
 		setVersion(bundleInfo.getVersion());
-		setFragment(child.isFragment());
-		setUnpack(false);
 	}
 
 	@Override
