@@ -38,7 +38,6 @@ import org.eclipse.pde.internal.core.feature.FeaturePlugin;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
-import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.eclipse.pde.internal.ui.IHelpContextIds;
 import org.eclipse.pde.internal.ui.PDEPlugin;
 import org.eclipse.pde.internal.ui.shared.CachedCheckboxTreeViewer;
@@ -174,7 +173,6 @@ public class PluginListPage extends BasePluginListPage {
 			FeaturePlugin fplugin = (FeaturePlugin) featureModel.getFactory().createPlugin();
 			fplugin.loadFrom(plugin);
 			fplugin.setVersion(id2version.getOrDefault(plugin.getId(), ICoreConstants.DEFAULT_VERSION));
-			fplugin.setUnpack(CoreUtility.guessUnpack(plugin.getPluginModel().getBundleDescription()));
 			added[i] = fplugin;
 		}
 		IFeature feature = featureModel.getFeature();
