@@ -9,7 +9,6 @@
 			<unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.executable.feature.group" version="0.0.0"/>
-			<unit id="org.apache.aries.spifly.dynamic.bundle" version="0.0.0"/>
 			<unit id="org.mockito.mockito-core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -59,7 +58,7 @@
 				</dependency>
 			</dependencies>
 		</location>
-		<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="true" label="Logging" missingManifest="generate" type="Maven">
+		<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="true" label="Logging" missingManifest="error" type="Maven">
 			<dependencies>
 				<dependency>
 					<groupId>ch.qos.logback</groupId>
@@ -68,10 +67,9 @@
 					<type>jar</type>
 				</dependency>
 				<dependency>
-					<!-- Logback provides a Servlet Container service which is also loaded and that needs servlet (by default optional) -->
-					<groupId>jakarta.servlet</groupId>
-					<artifactId>jakarta.servlet-api</artifactId>
-					<version>5.0.0</version>
+					<groupId>org.apache.aries.spifly</groupId>
+					<artifactId>org.apache.aries.spifly.dynamic.bundle</artifactId>
+					<version>1.3.7</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
