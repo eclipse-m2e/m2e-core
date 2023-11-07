@@ -16,10 +16,6 @@
       %copyright
    </copyright>
 
-   <requires>
-      <import plugin="jakarta.servlet-api" version="5.0.0" match="compatible"/>
-   </requires>
-
    <plugin
          id="org.eclipse.m2e.logback"
          version="0.0.0"/>
