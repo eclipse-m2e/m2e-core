@@ -24,179 +24,102 @@
 
    <plugin
          id="org.eclipse.m2e.archetype.common"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.archetype.catalog"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.archetype.descriptor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.archetype.maven-artifact-transfer"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.model.edit"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.launching"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.workspace.cli"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.jdt"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.maven.runtime"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.refactoring"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.discovery"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.core.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.scm"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.jdt.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.profiles.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.profiles.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.sourcelookup"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.sourcelookup.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.binaryproject"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.binaryproject.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.apt.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.apt.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.mavenarchiver"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
