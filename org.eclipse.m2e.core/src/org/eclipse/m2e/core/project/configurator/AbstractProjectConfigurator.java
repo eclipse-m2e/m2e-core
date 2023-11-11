@@ -189,7 +189,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   protected void assertHasNature(IProject project, String natureId) throws CoreException {
     if(project.getNature(natureId) == null) {
-      throw new CoreException(Status.error(Messages.AbstractProjectConfigurator_error_missing_nature + natureId));
+      throw new CoreException(Status.error(Messages.AbstractProjectConfigurator_error_missing_nature + ' ' + natureId));
     }
   }
 

@@ -200,10 +200,6 @@ public class Messages extends NLS {
 
   public static String ProjectConfigurationManager_error_rename;
 
-  public static String ProjectConfigurationManager_error_resolve;
-
-  public static String ProjectConfigurationManager_error_resolve2;
-
   public static String ProjectConfigurationManager_error_targetDir;
 
   public static String ProjectConfigurationManager_error_unable_archetype;
