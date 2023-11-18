@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
@@ -195,7 +194,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     if(isInWorkspace()) {
       return ResourcesPlugin.getWorkspace().getRoot().getLocation();
     }
-    return Path.fromOSString(locationCombo.getText().trim());
+    return IPath.fromOSString(locationCombo.getText().trim());
   }
 
   public void setLocationPath(IPath location) {
@@ -283,7 +282,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     }
 
     // check whether the location is a syntactically correct path
-    if(!Path.ROOT.isValidPath(location)) {
+    if(!IPath.ROOT.isValidPath(location)) {
       setErrorMessage(Messages.wizardProjectPageProjectValidatorInvalidLocation);
       setPageComplete(false);
       return;

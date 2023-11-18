@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -127,7 +126,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
         projectEntry = JavaRuntime.newProjectRuntimeClasspathEntry(javaProject);
       }
       IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(
-          new Path(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
+          IPath.fromOSString(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
 
       final List<IRuntimeClasspathEntry> entries = new ArrayList<>();
       if(jreEntry != null) {
@@ -294,7 +293,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
           .resolve(groupId, artifactId, version, "jar", null, mavenProject.getRemoteArtifactRepositories(), monitor) //$NON-NLS-1$
           .getFile();
       if(file != null) {
-        resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(Path.fromOSString(file.getAbsolutePath()),
+        resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(IPath.fromOSString(file.getAbsolutePath()),
             IRuntimeClasspathEntry.USER_CLASSES));
       }
     } catch(CoreException ex) {

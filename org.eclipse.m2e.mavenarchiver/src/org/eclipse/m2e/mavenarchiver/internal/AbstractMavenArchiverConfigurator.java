@@ -223,7 +223,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	protected void mavenProjectChanged(IMavenProjectFacade newFacade, IMavenProjectFacade oldFacade,
 			boolean forceGeneration, IProgressMonitor monitor) throws CoreException {
 		IContainer outputdir = getBuildOutputDir(newFacade);
-		IFile manifest = outputdir.getFile(org.eclipse.core.runtime.Path.forPosix(JarFile.MANIFEST_NAME));
+		IFile manifest = outputdir.getFile(IPath.forPosix(JarFile.MANIFEST_NAME));
 		if (forceGeneration || needsNewManifest(manifest, oldFacade, newFacade)) {
 			generateManifest(newFacade, manifest, monitor);
 			refresh(outputdir, monitor);
@@ -825,8 +825,8 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 	private IFile getOutputPomXML(IMavenProjectFacade facade) {
 		ArtifactKey project = facade.getArtifactKey();
-		return getBuildOutputDir(facade).getFile(org.eclipse.core.runtime.Path
-				.forPosix("META-INF/maven/" + project.groupId() + "/" + project.artifactId() + "/" + POM_XML));
+		return getBuildOutputDir(facade).getFile(
+				IPath.forPosix("META-INF/maven/" + project.groupId() + "/" + project.artifactId() + "/" + POM_XML));
 	}
 
 }

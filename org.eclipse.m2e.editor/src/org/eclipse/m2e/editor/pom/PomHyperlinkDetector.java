@@ -39,9 +39,9 @@ import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
@@ -453,7 +453,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         IMarker marker = mark.getAnnotation().getMarker();
         String loc = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, null);
         if(loc != null) {
-          IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(loc));
+          IFileStore fileStore = EFS.getLocalFileSystem().getStore(IPath.fromOSString(loc));
           int row = marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, 0);
           int column = marker.getAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, 0);
           String name = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_ID, null);

@@ -20,8 +20,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -136,7 +136,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
     if(dialog.open() == Window.OK) {
       Object[] result = dialog.getResult();
       if(result.length == 1) {
-        projectText.setText(((Path) result[0]).toString());
+        projectText.setText(((IPath) result[0]).toString());
       }
     }
 
@@ -173,7 +173,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
    * Ensures that both text fields are set.
    */
   void dialogChanged() {
-    IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getProject()));
+    IResource container = ResourcesPlugin.getWorkspace().getRoot().findMember(IPath.fromOSString(getProject()));
 
     if(getProject().length() == 0) {
       updateStatus(Messages.MavenPomWizardPage_error_folder);

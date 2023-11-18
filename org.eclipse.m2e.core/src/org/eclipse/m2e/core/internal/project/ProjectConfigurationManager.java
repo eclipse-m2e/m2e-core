@@ -53,7 +53,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -837,7 +836,7 @@ public class ProjectConfigurationManager
       project.create(monitor);
     } else {
       IProjectDescription description = workspace.newProjectDescription(projectName);
-      description.setLocation(new Path(projectDir.getAbsolutePath()));
+      description.setLocation(IPath.fromOSString(projectDir.getAbsolutePath()));
       project.create(description, monitor);
     }
 

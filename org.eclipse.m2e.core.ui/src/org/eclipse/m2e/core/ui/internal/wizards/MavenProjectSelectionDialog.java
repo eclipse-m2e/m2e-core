@@ -25,7 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -152,7 +152,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
             IResource[] members = container.members();
             for(IResource member : members) {
               if(member instanceof IContainer memberContainer
-                  && memberContainer.exists(new Path(IMavenConstants.POM_FILE_NAME))) {
+                  && memberContainer.exists(IPath.fromOSString(IMavenConstants.POM_FILE_NAME))) {
                 children.add(member);
               }
             }

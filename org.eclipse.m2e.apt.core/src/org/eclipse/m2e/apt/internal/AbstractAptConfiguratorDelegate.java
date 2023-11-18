@@ -35,7 +35,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
@@ -189,11 +188,11 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
 
     for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
-      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
+      IPath absolutePath = IPath.fromOSString(resolvedJarArtifact.getAbsolutePath());
       //reference jars in a portable way
       if((m2RepoPath != null) && m2RepoPath.isPrefixOf(absolutePath)) {
         IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
-        IPath variablePath = new Path(M2_REPO).append(relativePath);
+        IPath variablePath = IPath.fromOSString(M2_REPO).append(relativePath);
         factoryPath.addVarJar(variablePath);
       } else {
         //fall back on using absolute references.

@@ -19,7 +19,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.pde.core.IPluginSourcePathLocator;
@@ -44,7 +43,7 @@ public class MavenPluginSourcePathLocator implements IPluginSourcePathLocator {
 				String baseName = FilenameUtils.getBaseName(installLocation);
 				File localFile = new File(file.getParentFile(), baseName + "-sources." + ext);
 				if (localFile.isFile()) {
-					return new Path(localFile.getAbsolutePath());
+					return IPath.fromOSString(localFile.getAbsolutePath());
 				}
 				ArtifactKey artifact = aquireFromTargetState(file);
 				if (artifact == null) {
@@ -55,7 +54,7 @@ public class MavenPluginSourcePathLocator implements IPluginSourcePathLocator {
 				}
 				java.nio.file.Path location = MavenArtifactIdentifier.resolveSourceLocation(artifact, null);
 				if (location != null) {
-					return new Path(location.toFile().getAbsolutePath());
+					return IPath.fromOSString(location.toFile().getAbsolutePath());
 				}
 			}
 		}

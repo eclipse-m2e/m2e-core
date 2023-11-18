@@ -28,9 +28,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.jobs.MavenJob;
@@ -45,7 +46,6 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.wizards.LifecycleMappingDiscoveryHelper;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
-import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 public class MavenProjectConfigurator implements ProjectConfigurator {
 
@@ -263,7 +263,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
     @Override
     public boolean shouldBeAnEclipseProject(IContainer container, IProgressMonitor monitor) {
-        IFile pomFile = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
+        IFile pomFile = container.getFile(IPath.fromOSString(IMavenConstants.POM_FILE_NAME));
         return pomFile.exists();
     }
 

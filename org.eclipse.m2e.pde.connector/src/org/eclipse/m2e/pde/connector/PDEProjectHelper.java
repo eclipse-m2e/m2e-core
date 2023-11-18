@@ -154,7 +154,7 @@ public class PDEProjectHelper {
 			monitor.done();
 			IBuildEntry entry = model.getBuild().getEntry("output." + ".");
 			if (entry != null) {
-				return org.eclipse.core.runtime.Path.forPosix(entry.getTokens()[0]);
+				return IPath.forPosix(entry.getTokens()[0]);
 			}
 		}
 		return null;

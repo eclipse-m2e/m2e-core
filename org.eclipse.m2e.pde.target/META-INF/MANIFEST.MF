@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.m2e.pde.target;singleton:=true
 Bundle-Version: 2.0.500.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde.target
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.19.0",
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.27.0,4.0.0)",
  org.eclipse.pde.core;bundle-version="3.14.0",
  org.eclipse.equinox.frameworkadmin;bundle-version="2.1.400",
  org.eclipse.m2e.maven.runtime;bundle-version="[3.8.0,4.0.0)",

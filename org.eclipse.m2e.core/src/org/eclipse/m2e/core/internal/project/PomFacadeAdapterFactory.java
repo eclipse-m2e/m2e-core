@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
@@ -65,7 +64,7 @@ public class PomFacadeAdapterFactory implements IAdapterFactory {
               IComponentLookup lookup = containerManager.getComponentLookup(basedir);
               return IMavenToolbox.of(lookup).locatePom(basedir);
             })//
-            .map(pomfile -> container.getFile(Path.fromPortableString(pomfile.getName())))//
+            .map(pomfile -> container.getFile(IPath.fromPortableString(pomfile.getName())))//
             .map(this::getFacadeForPom)//
             .orElse(null);
         return adapterType.cast(facade);

@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.Scanner;
@@ -111,7 +110,7 @@ public class EclipseIncrementalBuildContext implements BuildContext, IIncrementa
       return null;
     }
     IPath basepath = adapt.getLocation();
-    IPath path = Path.fromOSString(file.getAbsolutePath());
+    IPath path = IPath.fromOSString(file.getAbsolutePath());
     if(!basepath.isPrefixOf(path)) {
       return null;
     }

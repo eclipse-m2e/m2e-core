@@ -25,8 +25,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -119,14 +119,14 @@ public class MavenPomWizard extends Wizard implements INewWizard {
   void doFinish(String projectName, final Model model, IProgressMonitor monitor) throws CoreException {
     // monitor.beginTask("Creating " + fileName, 2);
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    IResource resource = root.findMember(new Path(projectName));
+    IResource resource = root.findMember(IPath.fromOSString(projectName));
     if(!resource.exists() || (resource.getType() & IResource.FOLDER | IResource.PROJECT) == 0) {
       // TODO show warning popup
       throw new CoreException(Status.error(NLS.bind(Messages.MavenPomWizard_status_not_exists, projectName)));
     }
 
     IContainer container = (IContainer) resource;
-    final IFile file = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
+    final IFile file = container.getFile(IPath.fromOSString(IMavenConstants.POM_FILE_NAME));
     if(file.exists()) {
       // TODO show warning popup
       throw new CoreException(Status.error(Messages.MavenPomWizard_error_exists));

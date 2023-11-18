@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IFileEditorInput;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -114,7 +113,7 @@ public class MavenPropertyTester extends PropertyTester {
           if(projectFacade == null || projectFacade.getMavenProject() == null) {
             //If the project facade has not been cached yet (ex. during workspace startup),
             //fall back on the default value
-            outputLocation = new Path(DEFAULT_BUILD_DIR);
+            outputLocation = IPath.fromOSString(DEFAULT_BUILD_DIR);
           } else {
             String buildDir = projectFacade.getMavenProject().getBuild().getDirectory();
             outputLocation = MavenProjectUtils.getProjectRelativePath(project, buildDir);

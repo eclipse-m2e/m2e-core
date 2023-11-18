@@ -25,7 +25,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -44,7 +43,7 @@ public class BNDConnectorTest extends AbstractMavenProjectTestCase {
 				Set.of(JavaCore.BUILDER_ID, IMavenConstants.BUILDER_ID));
 		assertPluginProjectExists(project, "m2e.pde.connector.tests.bnd");
 
-		IPath expectedJavaxLibPath = Path.fromOSString("/bnd/target/m2e-bundleClassPath/slf4j-api-1.7.36.jar");
+		IPath expectedJavaxLibPath = IPath.fromOSString("/bnd/target/m2e-bundleClassPath/slf4j-api-1.7.36.jar");
 		List<IClasspathEntry> javaxLibEntries = Arrays.stream(JavaCore.create(project).getRawClasspath())
 				.filter(e -> e.getEntryKind() == IClasspathEntry.CPE_LIBRARY)
 				.filter(e -> e.getPath().equals(expectedJavaxLibPath)).toList();

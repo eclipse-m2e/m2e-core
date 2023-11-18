@@ -23,7 +23,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -139,7 +138,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
       } else {
         File artifactFile = a.getFile();
         if(artifactFile != null /*&& artifactFile.canRead()*/) {
-          entry = classpath.addLibraryEntry(Path.fromOSString(artifactFile.getAbsolutePath()));
+          entry = classpath.addLibraryEntry(IPath.fromOSString(artifactFile.getAbsolutePath()));
           entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
         }
       }

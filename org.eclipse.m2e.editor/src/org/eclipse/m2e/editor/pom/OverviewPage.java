@@ -69,7 +69,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.Notification;
@@ -1354,7 +1353,7 @@ public class OverviewPage extends MavenPomEditorPage {
         container = pomFile.getParent();
       } else if(selection instanceof IContainer c && !selection.equals(getProject())) {
         container = c;
-        pomFile = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
+        pomFile = container.getFile(IPath.fromOSString(IMavenConstants.POM_FILE_NAME));
       }
 
       if(pomFile == null || !pomFile.exists() || container == null) {

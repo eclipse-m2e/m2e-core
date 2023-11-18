@@ -14,7 +14,6 @@ import java.io.InputStream;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
@@ -78,7 +77,7 @@ public class StaticMavenStorageEditorInput implements IStorageEditorInput {
   }
 
   public IPath getPath() {
-    return path == null ? null : new Path(path);
+    return path == null ? null : IPath.fromOSString(path);
   }
 
 }
@@ -106,7 +105,7 @@ class StaticContentStorage implements IStorage {
 
   @Override
   public IPath getFullPath() {
-    return path == null ? null : new Path(path);
+    return path == null ? null : IPath.fromOSString(path);
   }
 
   @Override

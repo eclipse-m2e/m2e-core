@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
@@ -207,7 +206,7 @@ public class MavenClasspathContainerSaveHelper {
     }
 
     IPath getPath() {
-      return Path.fromPortableString(path);
+      return IPath.fromPortableString(path);
     }
   }
 

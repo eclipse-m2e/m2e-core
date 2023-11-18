@@ -30,7 +30,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
@@ -103,7 +102,7 @@ public class M2EUtils {
     }
     //XXX copied from XmlUtils.extractProject()
     File file = new File(project.getFile().toURI());
-    IPath path = Path.fromOSString(file.getAbsolutePath());
+    IPath path = IPath.fromOSString(file.getAbsolutePath());
     Stack<IFile> stack = new Stack<>();
     //here we need to find the most inner project to the path.
     //we do so by shortening the path and remembering all the resources identified.
