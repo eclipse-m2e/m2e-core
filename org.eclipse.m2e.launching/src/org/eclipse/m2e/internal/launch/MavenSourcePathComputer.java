@@ -25,8 +25,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourcePathComputer;
@@ -147,8 +147,8 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     File sourcesJar = getSourcesJar(groupId, artifactId, version);
     if(sourcesJar != null) {
       IRuntimeClasspathEntry entry = null;
-      entry = JavaRuntime.newArchiveRuntimeClasspathEntry(Path.fromOSString(entryPath));
-      entry.setSourceAttachmentPath(Path.fromOSString(sourcesJar.getAbsolutePath()));
+      entry = JavaRuntime.newArchiveRuntimeClasspathEntry(IPath.fromOSString(entryPath));
+      entry.setSourceAttachmentPath(IPath.fromOSString(sourcesJar.getAbsolutePath()));
       entries.add(entry);
     }
   }

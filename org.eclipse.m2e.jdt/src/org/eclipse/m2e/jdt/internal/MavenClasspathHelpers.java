@@ -16,7 +16,6 @@ package org.eclipse.m2e.jdt.internal;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -57,11 +56,11 @@ public class MavenClasspathHelpers {
   }
 
   public static IClasspathEntry getDefaultContainerEntry() {
-    return JavaCore.newContainerEntry(new Path(IClasspathManager.CONTAINER_ID));
+    return JavaCore.newContainerEntry(IPath.fromOSString(IClasspathManager.CONTAINER_ID));
   }
 
   public static IClasspathEntry getDefaultContainerEntry(boolean isExported) {
-    return JavaCore.newContainerEntry(new Path(IClasspathManager.CONTAINER_ID), isExported);
+    return JavaCore.newContainerEntry(IPath.fromOSString(IClasspathManager.CONTAINER_ID), isExported);
   }
 
   public static boolean isTestSource(IClasspathEntry entry) {

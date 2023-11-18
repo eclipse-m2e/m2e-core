@@ -40,9 +40,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -657,7 +657,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
 
       IMavenProjectFacade facade = null;
-      if(pomFile != null && new Path(IMavenConstants.POM_FILE_NAME).equals(pomFile.getProjectRelativePath())) {
+      if(pomFile != null
+          && IPath.fromOSString(IMavenConstants.POM_FILE_NAME).equals(pomFile.getProjectRelativePath())) {
         facade = MavenPlugin.getMavenProjectRegistry().getProject(pomFile.getProject());
       }
 

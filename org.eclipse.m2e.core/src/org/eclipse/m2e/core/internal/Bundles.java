@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.ManifestElement;
 
 
@@ -84,7 +84,7 @@ public class Bundles {
       URL url = bundle.getEntry(cp);
       if(url != null) {
         String path = FileLocator.toFileURL(url).getFile();
-        return new Path(path).toOSString();
+        return IPath.fromOSString(path).toOSString();
       }
     } catch(IOException | NoSuchElementException ex) {
       log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);

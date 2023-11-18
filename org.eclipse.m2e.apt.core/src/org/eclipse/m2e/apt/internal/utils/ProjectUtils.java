@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.apt.core.util.AptConfig;
@@ -288,7 +288,7 @@ public class ProjectUtils {
   }
 
   public static boolean isJar(File file) {
-    return file.isFile() && "jar".equals(new Path(file.getAbsolutePath()).getFileExtension());
+    return file.isFile() && "jar".equals(IPath.fromOSString(file.getAbsolutePath()).getFileExtension());
   }
 
   private static boolean containsWhitespace(String seq) {

@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -55,7 +54,7 @@ public class ClasspathHelpers {
   }
 
   public static IClasspathEntry getClasspathEntry(IClasspathEntry[] cp, String path) {
-    return getClasspathEntry(cp, new Path(path));
+    return getClasspathEntry(cp, IPath.fromOSString(path));
   }
 
   /**

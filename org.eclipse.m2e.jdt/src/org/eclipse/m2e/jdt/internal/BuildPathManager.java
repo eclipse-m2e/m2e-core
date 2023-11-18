@@ -57,7 +57,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -197,7 +196,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     if(javaProject != null) {
       try {
         IClasspathEntry containerEntry = getMavenContainerEntry(javaProject);
-        IPath path = containerEntry != null ? containerEntry.getPath() : new Path(CONTAINER_ID);
+        IPath path = containerEntry != null ? containerEntry.getPath() : IPath.fromOSString(CONTAINER_ID);
         IClasspathEntry[] classpath = getClasspath(project, monitor);
         IClasspathContainer container = new MavenClasspathContainer(path, classpath);
         JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] {javaProject},
@@ -271,9 +270,9 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         IPath srcPath = desc.getSourceAttachmentPath();
         IPath srcRoot = desc.getSourceAttachmentRootPath();
         if(srcPath == null && sourceAttachment != null && sourceAttachment.containsKey(key + PROPERTY_SRC_PATH)) {
-          srcPath = Path.fromPortableString((String) sourceAttachment.get(key + PROPERTY_SRC_PATH));
+          srcPath = IPath.fromPortableString((String) sourceAttachment.get(key + PROPERTY_SRC_PATH));
           if(sourceAttachment.containsKey(key + PROPERTY_SRC_ROOT)) {
-            srcRoot = Path.fromPortableString((String) sourceAttachment.get(key + PROPERTY_SRC_ROOT));
+            srcRoot = IPath.fromPortableString((String) sourceAttachment.get(key + PROPERTY_SRC_ROOT));
           }
         }
         if(srcPath == null && a != null) {
@@ -637,7 +636,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     try {
       File localRepositoryDir = new File(maven.getLocalRepository().getBasedir());
       IPath oldPath = JavaCore.getClasspathVariable(M2_REPO);
-      IPath newPath = new Path(localRepositoryDir.getAbsolutePath());
+      IPath newPath = IPath.fromOSString(localRepositoryDir.getAbsolutePath());
       JavaCore.setClasspathVariable(M2_REPO, //
           newPath, //
           new NullProgressMonitor());
@@ -679,7 +678,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     File file = getAttachedArtifactFile(a, getSourcesClassifier(a.classifier()));
 
     if(file != null) {
-      return Path.fromOSString(file.getAbsolutePath());
+      return IPath.fromOSString(file.getAbsolutePath());
     }
 
     return null;
@@ -866,7 +865,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   void attachSourcesAndJavadoc(IPackageFragmentRoot fragment, File sources, File javadoc, IProgressMonitor monitor) {
     IJavaProject javaProject = fragment.getJavaProject();
 
-    IPath srcPath = sources != null ? Path.fromOSString(sources.getAbsolutePath()) : null;
+    IPath srcPath = sources != null ? IPath.fromOSString(sources.getAbsolutePath()) : null;
     String javaDocUrl = getJavaDocUrl(javadoc);
 
     try {

@@ -320,8 +320,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			IFile libFile = ResourcesPlugin.getWorkspace().getRoot().getFile(libPath);
 			Collection<ArtifactKey> artifacts = MavenArtifactIdentifier.identify(libFile.getLocation().toFile());
 			IPath sourcePath = artifacts.stream().map(a -> MavenArtifactIdentifier.resolveSourceLocation(a, monitor))
-					.filter(Objects::nonNull).map(Path::toString).map(org.eclipse.core.runtime.Path::fromOSString)
-					.findFirst().orElse(null);
+					.filter(Objects::nonNull).map(Path::toString).map(IPath::fromOSString).findFirst().orElse(null);
 			return JavaCore.newLibraryEntry(libPath, sourcePath, null, null, attributes, true);
 		}
 	}

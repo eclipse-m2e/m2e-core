@@ -21,7 +21,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.ThreadBuildContext;
@@ -59,7 +58,7 @@ public abstract class AbstractEclipseBuildContext implements BuildContext, IIncr
    */
   protected IPath getRelativePath(File file) {
     IPath basepath = getBaseResource().getLocation();
-    IPath path = Path.fromOSString(file.getAbsolutePath());
+    IPath path = IPath.fromOSString(file.getAbsolutePath());
 
     if(!basepath.isPrefixOf(path)) {
       return null;

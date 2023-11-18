@@ -37,7 +37,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -371,7 +370,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   protected boolean rootDirectoryChanged() {
     String _rootDirectory = rootDirectory;
     rootDirectory = rootDirectoryCombo.getText().trim();
-    IPath p = new Path(rootDirectory);
+    IPath p = IPath.fromOSString(rootDirectory);
     if(p.isRoot()) {
       setErrorMessage(Messages.MavenImportWizardPage_forbiddenImportFromRoot);
       return false;

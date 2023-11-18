@@ -16,7 +16,6 @@ package org.eclipse.m2e.pde.connector;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.m2e.core.project.IBuildProjectFileResolver;
 import org.osgi.service.component.annotations.Component;
 
@@ -24,8 +23,8 @@ import org.osgi.service.component.annotations.Component;
 public class PDEBuildProjectFileResolver implements IBuildProjectFileResolver {
 
 	private static final Map<String, IPath> POM_NAME_2_PROJECT_FILE = Map.of( //
-			".polyglot.META-INF", Path.forPosix("META-INF/MANIFEST.MF"), //
-			".polyglot.feature.xml", Path.forPosix("feature.xml"));
+			".polyglot.META-INF", IPath.forPosix("META-INF/MANIFEST.MF"), //
+			".polyglot.feature.xml", IPath.forPosix("feature.xml"));
 
 	@Override
 	public IPath resolveProjectFile(String pomFilename) {
@@ -35,7 +34,7 @@ public class PDEBuildProjectFileResolver implements IBuildProjectFileResolver {
 		}
 		if (pomFilename.startsWith(".polyglot.")
 				&& (pomFilename.endsWith(".product") || pomFilename.endsWith(".target"))) {
-			return Path.forPosix(pomFilename.substring(".polyglot.".length()));
+			return IPath.forPosix(pomFilename.substring(".polyglot.".length()));
 		}
 		return null;
 	}

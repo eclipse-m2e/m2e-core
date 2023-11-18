@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
@@ -148,7 +147,7 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 	}
 
 	protected void assertClasspathEntry(IJavaProject jp, String path, boolean present) throws Exception {
-		IPath expectedPath = new Path(path);
+		IPath expectedPath = IPath.fromOSString(path);
 		for (IClasspathEntry cpe : jp.getRawClasspath()) {
 			if (expectedPath.equals(cpe.getPath())) {
 				if (present) {

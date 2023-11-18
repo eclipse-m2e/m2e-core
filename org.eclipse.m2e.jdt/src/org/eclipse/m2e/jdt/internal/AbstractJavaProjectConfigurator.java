@@ -33,7 +33,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -419,7 +418,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IPath[] paths = new IPath[values.length];
     for(int i = 0; i < values.length; i++ ) {
       if(values[i] != null && !"".equals(values[i].trim())) {
-        paths[i] = new Path(values[i]);
+        paths[i] = IPath.fromOSString(values[i]);
       }
     }
     return paths;
@@ -548,7 +547,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       boolean addTestFlag) {
     log.info("Adding resource folder " + resourceFolder);
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
-        new IPath[] {new Path("**")}, false /*optional*/);
+        new IPath[] {IPath.fromOSString("**")}, false /*optional*/);
     descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
     descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
   }
@@ -557,8 +556,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IPath resourceFolder) {
     // resources and sources folders overlap. make sure JDT only processes java sources.
     log.info("Resources folder " + resourceFolder + " overlaps with sources folder " + enclosing.getPath());
-    enclosing.addInclusionPattern(new Path("**/*.java"));
-    enclosing.removeExclusionPattern(new Path("**"));
+    enclosing.addInclusionPattern(IPath.fromOSString("**/*.java"));
+    enclosing.removeExclusionPattern(IPath.fromOSString("**"));
     classpath.touchEntry(resourceFolder);
   }
 
@@ -866,7 +865,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected IFolder getFolder(IProject project, String absolutePath) {
-    if(project.getLocation().makeAbsolute().equals(Path.fromOSString(absolutePath))) {
+    if(project.getLocation().makeAbsolute().equals(IPath.fromOSString(absolutePath))) {
       return project.getFolder(project.getLocation());
     }
     return project.getFolder(getProjectRelativePath(project, absolutePath));
@@ -882,7 +881,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     } else {
       relative = absolutePath;
     }
-    return new Path(relative.replace('\\', '/'));
+    return IPath.fromOSString(relative.replace('\\', '/'));
   }
 
   /**

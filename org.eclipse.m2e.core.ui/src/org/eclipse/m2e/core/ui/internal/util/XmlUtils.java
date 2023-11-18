@@ -34,7 +34,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -104,7 +103,7 @@ public class XmlUtils {
     }
     IFileStore folder = buf.getFileStore();
     File file = new File(folder.toURI());
-    IPath path = Path.fromOSString(file.getAbsolutePath());
+    IPath path = IPath.fromOSString(file.getAbsolutePath());
     Stack<IFile> stack = new Stack<>();
     //here we need to find the most inner project to the path.
     //we do so by shortening the path and remembering all the resources identified.

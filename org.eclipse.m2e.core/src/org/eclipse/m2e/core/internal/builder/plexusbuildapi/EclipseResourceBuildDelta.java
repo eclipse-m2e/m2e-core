@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
 
@@ -53,7 +52,7 @@ public final class EclipseResourceBuildDelta implements IIncrementalBuildFramewo
    */
   private IPath getRelativePath(File file) {
     IPath basepath = this.resource.getLocation();
-    IPath path = Path.fromOSString(file.getAbsolutePath());
+    IPath path = IPath.fromOSString(file.getAbsolutePath());
 
     if(!basepath.isPrefixOf(path)) {
       return null;

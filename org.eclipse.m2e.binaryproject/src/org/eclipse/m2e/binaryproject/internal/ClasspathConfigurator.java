@@ -22,8 +22,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.JavaCore;
@@ -79,9 +79,9 @@ public class ClasspathConfigurator extends AbstractJavaProjectConfigurator {
 
     Artifact sources =
         maven.resolve(groupId, artifactId, version, type, getSourcesClassifier(classifier), repositories, monitor);
-    IClasspathEntryDescriptor libEntry = classpath.addLibraryEntry(Path.fromOSString(jarLocation));
+	IClasspathEntryDescriptor libEntry = classpath.addLibraryEntry(IPath.fromOSString(jarLocation));
     libEntry.setExported(true);
-    libEntry.setSourceAttachment(Path.fromOSString(sources.getFile().getAbsolutePath()), null);
+	libEntry.setSourceAttachment(IPath.fromOSString(sources.getFile().getAbsolutePath()), null);
     libEntry.setArtifactKey(new ArtifactKey(groupId, artifactId, version, classifier));
   }
 

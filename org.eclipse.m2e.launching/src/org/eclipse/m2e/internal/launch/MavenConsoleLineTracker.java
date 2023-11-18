@@ -405,7 +405,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         projectFile = project.project().getFile(IMavenConstants.POM_FILE_NAME);
       } else {
         Optional<IPath> resolvedPomfile = resolvePath(filename);
-        IPath projectFilePath = org.eclipse.core.runtime.Path.fromOSString(relativePath.toString());
+        IPath projectFilePath = IPath.fromOSString(relativePath.toString());
         if(resolvedPomfile.isPresent()) {
           projectFilePath = projectFilePath.removeLastSegments(1).append(resolvedPomfile.get());
         }

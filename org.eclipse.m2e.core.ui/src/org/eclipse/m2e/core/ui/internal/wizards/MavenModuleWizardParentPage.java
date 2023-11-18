@@ -26,8 +26,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
@@ -172,7 +172,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     }
 
     // check if the given folder already exists
-    if(parentContainer != null && parentContainer.exists(new Path(moduleName))) {
+    if(parentContainer != null && parentContainer.exists(IPath.fromOSString(moduleName))) {
       setErrorMessage(Messages.wizardModulePageParentValidatorNameExists);
       setPageComplete(false);
       return;
@@ -214,7 +214,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
       workingSetGroup.selectWorkingSets(WorkingSets.getAssignedWorkingSets(project));
     } else if(parentObject instanceof IContainer container) {
-      pom = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
+      pom = container.getFile(IPath.fromOSString(IMavenConstants.POM_FILE_NAME));
     }
 
     if(pom != null && pom.exists()) {

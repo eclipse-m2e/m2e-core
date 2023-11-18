@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
@@ -213,7 +212,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   public static Optional<IContainer> getContainer(File file) {
     // try to retrieve associated Eclipse project
-    return Optional.ofNullable(file).map(f -> Path.fromOSString(f.toString()))
+    return Optional.ofNullable(file).map(f -> IPath.fromOSString(f.toString()))
         .map(ResourcesPlugin.getWorkspace().getRoot()::getContainerForLocation);
   }
 
@@ -245,7 +244,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     try {
       Optional<IContainer> container = getContainer(pomDirectory);
       if(container.isPresent()) {
-        IPath pomPath = Path.fromOSString(IMavenConstants.POM_FILE_NAME);
+        IPath pomPath = IPath.fromOSString(IMavenConstants.POM_FILE_NAME);
         if(container.get().exists(pomPath)) {
           IFile pomFile = container.get().getFile(pomPath);
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();

@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.model.Resource;
 
@@ -46,7 +45,7 @@ public class MavenProjectUtils {
       return null;
     }
     IPath projectLocation = project.getLocation();
-    IPath directory = Path.fromOSString(resourceLocation); // this is an absolute path!
+    IPath directory = IPath.fromOSString(resourceLocation); // this is an absolute path!
     if(projectLocation == null || !projectLocation.isPrefixOf(directory)) {
       return null;
     }

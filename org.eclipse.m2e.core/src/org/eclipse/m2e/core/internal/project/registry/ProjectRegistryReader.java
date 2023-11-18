@@ -37,7 +37,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 
@@ -184,7 +183,7 @@ public class ProjectRegistryReader {
     }
 
     public IPath getPath() {
-      return Path.fromPortableString(path);
+      return IPath.fromPortableString(path);
     }
   }
 
@@ -202,7 +201,7 @@ public class ProjectRegistryReader {
 
     public IFile getFile() {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      return root.getFile(Path.fromPortableString(path));
+      return root.getFile(IPath.fromPortableString(path));
     }
   }
 

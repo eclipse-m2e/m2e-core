@@ -15,7 +15,6 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
@@ -150,7 +149,7 @@ public class MavenLocationComponent extends Composite {
     if(isInWorkspace()) {
       return Platform.getLocation();
     }
-    return Path.fromOSString(locationCombo.getText().trim());
+    return IPath.fromOSString(locationCombo.getText().trim());
   }
 
   /**
