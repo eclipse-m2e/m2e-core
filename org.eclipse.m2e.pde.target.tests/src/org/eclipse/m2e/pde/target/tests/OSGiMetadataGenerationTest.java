@@ -164,8 +164,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 				attributes.getValue(Constants.BUNDLE_SYMBOLICNAME));
 		assertEquals("Bundle derived from maven artifact com.google.errorprone:error_prone_annotations:2.18.0",
 				attributes.getValue(Constants.BUNDLE_NAME));
-		assertEqualManifestHeaders(Constants.IMPORT_PACKAGE, attributes,
-				"javax.lang.model.element;resolution:=optional");
+		assertEqualManifestHeaders(Constants.IMPORT_PACKAGE, attributes, "java.lang;resolution:=optional",
+				"java.lang.annotation;resolution:=optional", "javax.lang.model.element;resolution:=optional");
 		assertEqualManifestHeaders(Constants.EXPORT_PACKAGE, attributes,
 				"com.google.errorprone.annotations;version=\"2.18.0\";uses:=\"javax.lang.model.element\"",
 				"com.google.errorprone.annotations.concurrent;version=\"2.18.0\"");
@@ -220,7 +220,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 				attributes.getValue(Constants.BUNDLE_SYMBOLICNAME));
 		assertEquals("Bundle in Test from artifact com.google.errorprone:error_prone_annotations:2.18.0:",
 				attributes.getValue(Constants.BUNDLE_NAME));
-		assertEqualManifestHeaders(Constants.IMPORT_PACKAGE, attributes, "javax.lang.model.element");
+		assertEqualManifestHeaders(Constants.IMPORT_PACKAGE, attributes, "java.lang", "java.lang.annotation",
+				"javax.lang.model.element");
 		assertEqualManifestHeaders(Constants.EXPORT_PACKAGE, attributes,
 				"com.google.errorprone.annotations;version=\"2.18.0\";uses:=\"javax.lang.model.element\"",
 				"com.google.errorprone.annotations.concurrent;version=\"2.18.0\"");
@@ -280,7 +281,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 		assertEquals("others.wrapped.error_prone_annotations.source",
 				getGeneratedSourceBundle(target).getBundleInfo().getSymbolicName());
 	}
-	
+
 	@Test
 	public void testNonOSGiArtifact_missingArtifactGenerate_hasVersions() throws Exception {
 		ITargetLocation target = resolveMavenTarget(
@@ -310,8 +311,8 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 				String attribute = element.getAttribute(Constants.VERSION_ATTRIBUTE);
 				assertNotNull("Package " + value + " has no version attribute: " + element, attribute);
 				VersionRange versionRange = VersionRange.valueOf(attribute);
-				assertEquals("Unexpected version range " + versionRange + " on package " + value + ": " + element,
-						0, versionRange.getLeft().compareTo(Version.valueOf("9.5.0")));
+				assertEquals("Unexpected version range " + versionRange + " on package " + value + ": " + element, 0,
+						versionRange.getLeft().compareTo(Version.valueOf("9.5.0")));
 			}
 		}
 	}

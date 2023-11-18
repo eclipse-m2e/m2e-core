@@ -13,18 +13,16 @@
 
 package org.eclipse.m2e.tests.common;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,13 +30,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.security.Authenticator;
+import org.eclipse.jetty.security.Constraint;
+import org.eclipse.jetty.security.Constraint.Authorization;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
@@ -48,14 +48,14 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.URIUtil;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.PathResourceFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 
@@ -276,15 +276,15 @@ public class HttpServer {
   }
 
   protected Handler newProxyHandler() {
-    return new AbstractHandler() {
+    return new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-        String auth = request.getHeader("Proxy-Authorization");
+      public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        String auth = request.getHeaders().get(HttpHeader.PROXY_AUTHORIZATION);
         if(auth != null) {
           auth = auth.substring(auth.indexOf(' ') + 1).trim();
           auth = new String(Base64.getDecoder().decode(auth));
-
         }
+        return false;
       }
     };
   }
@@ -302,19 +302,19 @@ public class HttpServer {
   }
 
   protected Handler newSslRedirectHandler() {
-    return new AbstractHandler() {
+    return new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+      public boolean handle(Request request, Response response, Callback callback) throws Exception {
         int httpsPort = getHttpsPort();
-        if(!((Request) request).isHandled() && request.getServerPort() != httpsPort) {
-          String url = "https://" + request.getServerName() + ":" + httpsPort + request.getRequestURI();
-
-          response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-          response.setHeader("Location", url);
-          ((Request) request).setHandled(true);
+        if(Request.getServerPort(request) != httpsPort) {
+          String url = "https://" + Request.getServerName(request) + ":" + httpsPort + request.getHttpURI().getPath();
+          response.setStatus(HttpStatus.MOVED_PERMANENTLY_301);
+          response.getHeaders().put(HttpHeader.LOCATION, url);
+          callback.succeeded();
+          return true;
         }
+        return false;
       }
-
     };
   }
 
@@ -346,22 +346,13 @@ public class HttpServer {
     return this;
   }
 
-  protected SecurityHandler newSecurityHandler() {
-    List<ConstraintMapping> mappings = new ArrayList<>();
+  protected SecurityHandler newSecurityHandler() throws IOException {
+    SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
 
     for(String pathSpec : securedRealms.keySet()) {
       String[] roles = securedRealms.get(pathSpec);
-
-      Constraint constraint = new Constraint();
-      constraint.setName(Constraint.__BASIC_AUTH);
-      constraint.setRoles(roles);
-      constraint.setAuthenticate(true);
-
-      ConstraintMapping constraintMapping = new ConstraintMapping();
-      constraintMapping.setConstraint(constraint);
-      constraintMapping.setPathSpec(pathSpec);
-
-      mappings.add(constraintMapping);
+      Constraint constraint = Constraint.from(Authenticator.BASIC_AUTH, Authorization.SPECIFIC_ROLE, roles);
+      securityHandler.put(pathSpec, constraint);
     }
 
     Properties p = new Properties();
@@ -380,17 +371,14 @@ public class HttpServer {
     File propFile = new File("target/users.properties");
     try (FileOutputStream in = new FileOutputStream(propFile)) {
       p.store(in, null);
-    } catch(IOException ex) {
-      fail("Unable to create users properties file");
     }
 
-    HashLoginService userRealm = new HashLoginService("TestRealm", "target/users.properties");
+    HashLoginService userRealm = new HashLoginService("TestRealm",
+        new PathResourceFactory().newResource("target/users.properties"));
     server.addBean(userRealm);
 
-    ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
     securityHandler.setAuthenticator(new BasicAuthenticator());
     securityHandler.setLoginService(userRealm);
-    securityHandler.setConstraintMappings(mappings);
 
     return securityHandler;
   }
@@ -488,9 +476,9 @@ public class HttpServer {
   }
 
   protected Handler newSleepHandler(final long millis) {
-    return new AbstractHandler() {
+    return new Handler.Abstract() {
       @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+      public boolean handle(Request request, Response response, Callback callback) throws Exception {
         if(millis >= 0) {
           try {
             Thread.sleep(millis);
@@ -506,8 +494,8 @@ public class HttpServer {
             }
           }
         }
+        return false;
       }
-
     };
   }
 
@@ -534,7 +522,7 @@ public class HttpServer {
       connectors.add(newHttpsConnector());
     }
 
-    HandlerList handlerList = new HandlerList();
+    Handler.Sequence handlerList = new Handler.Sequence();
     if(!recordedPatterns.isEmpty()) {
       handlerList.addHandler(new RecordingHandler());
     }
@@ -645,14 +633,10 @@ public class HttpServer {
     }
   }
 
-  class ResHandler extends AbstractHandler {
-
+  private class ResHandler extends Handler.Abstract {
     @Override
-
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-
-      String uri = request.getRequestURI();
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+      String uri = request.getHttpURI().getPath();
 
       for(String contextRoot : resourceDirs.keySet()) {
         String path = URIUtil.decodePath(trimContextRoot(uri, contextRoot));
@@ -660,43 +644,44 @@ public class HttpServer {
           File basedir = resourceDirs.get(contextRoot);
           File file = new File(basedir, path);
 
-          if(HttpMethod.HEAD.equals(request.getMethod())) {
-            if(file.exists())
-              response.setStatus(HttpServletResponse.SC_OK);
-            else
-              response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            ((Request) request).setHandled(true);
-            return;
-          } else if(HttpMethod.PUT.equals(request.getMethod()) || HttpMethod.POST.equals(request.getMethod())) {
+          HttpMethod requestMethod = HttpMethod.fromString(request.getMethod());
+          if(HttpMethod.HEAD == requestMethod) {
+            if(file.exists()) {
+              response.setStatus(HttpStatus.OK_200);
+            } else {
+              response.setStatus(HttpStatus.NOT_FOUND_404);
+            }
+            callback.succeeded();
+            return true;
+          } else if(HttpMethod.PUT == requestMethod || HttpMethod.POST == requestMethod) {
             file.getParentFile().mkdirs();
 
-            try (var input = request.getInputStream()) {
+            try (var input = Content.Source.asInputStream(request)) {
               Files.copy(input, file.toPath());
             }
 
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            ((Request) request).setHandled(true);
+            response.setStatus(HttpStatus.CREATED_201);
+            callback.succeeded();
+            return true;
           } else if(file.isFile()) {
 
-            try (var outputStream = response.getOutputStream()) {
-              String filterEncoding = getFilterEncoding(path, resourceFilters.get(contextRoot));
-              if(filterEncoding == null) {
-                Files.copy(file.toPath(), outputStream);
-              } else {
-                String text = Files.readString(file.toPath(), Charset.forName(filterEncoding));
-                text = filter(text, filterTokens);
-                outputStream.write(text.getBytes(filterEncoding));
-              }
+            String filterEncoding = getFilterEncoding(path, resourceFilters.get(contextRoot));
+            byte[] bytes;
+            if(filterEncoding == null) {
+              bytes = Files.readAllBytes(file.toPath());
+            } else {
+              String text = Files.readString(file.toPath(), Charset.forName(filterEncoding));
+              text = filter(text, filterTokens);
+              bytes = text.getBytes(filterEncoding);
             }
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            ((Request) request).setHandled(true);
+            response.setStatus(HttpStatus.OK_200);
+            response.write(true, ByteBuffer.wrap(bytes), callback);
+            return true;
           }
-
-          break;
+          return false;
         }
       }
-
+      return false;
     }
 
     private String getExtension(String path) {
@@ -727,11 +712,10 @@ public class HttpServer {
 
   }
 
-  class RecordingHandler extends AbstractHandler {
-
+  private class RecordingHandler extends Handler.Abstract {
     @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-      String uri = request.getRequestURI();
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+      String uri = request.getHttpURI().getPath();
 
       for(String pattern : recordedPatterns) {
         if(uri.matches(pattern)) {
@@ -740,14 +724,13 @@ public class HttpServer {
 
           Map<String, String> headers = new HashMap<>();
           recordedHeaders.put(uri, headers);
-          for(Enumeration<String> h = request.getHeaderNames(); h.hasMoreElements();) {
-            String headername = h.nextElement();
-            headers.put(headername, request.getHeader(headername));
+          for(HttpField field : request.getHeaders()) {
+            headers.put(field.getName(), field.getValue());
           }
         }
       }
+      return false;
     }
-
   }
 
   private static String normalizeContextRoot(String contextRoot) {
