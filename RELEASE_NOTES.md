@@ -2,7 +2,7 @@
 
 ## 2.5.0
 
-* 📅 Release Date: _expected_ end of November 2023
+* 📅 Release Date: 27th November 2023
 
 ### Embedded and use Maven 3.9.5
 
