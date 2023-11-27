@@ -14,6 +14,9 @@
 package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,9 +33,11 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -133,6 +138,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
+
+  private static final QualifiedName LINKED_MAVEN_RESOURCE = new QualifiedName(MavenJdtPlugin.PLUGIN_ID,
+      "linkedSource");
 
   @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
@@ -282,8 +290,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       MavenProject mavenProject = request.mavenProject();
       IMavenProjectFacade projectFacade = request.mavenProjectFacade();
 
-      IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
-      IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
+      IContainer classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
+      IContainer testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
 
       M2EUtils.createFolder(classes, true, mon.newChild(1));
       M2EUtils.createFolder(testClasses, true, mon.newChild(1));
@@ -361,6 +369,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           isTestResourcesSkipped.add(Boolean.FALSE);
         }
       }
+
+      cleanLinkedSourceDirs(project, monitor);
+
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
           exclusion, mainSourceEncoding, mon.newChild(1), false);
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getResources(), classes.getFullPath(),
@@ -429,7 +440,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       boolean addTestFlag) throws CoreException {
 
     for(String sourceRoot : sourceRoots) {
-      IFolder sourceFolder = getFolder(project, sourceRoot);
+      IContainer sourceFolder = getFolder(project, sourceRoot);
 
       if(sourceFolder == null) {
         // this cannot actually happen, unless I misunderstand how project.getFolder works
@@ -468,6 +479,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   }
 
+  private void cleanLinkedSourceDirs(IProject project, IProgressMonitor monitor) throws CoreException {
+    for(IResource resource : project.members()) {
+      if(resource instanceof IFolder && "true".equals(resource.getPersistentProperty(LINKED_MAVEN_RESOURCE))) {
+        resource.delete(false, monitor);
+      }
+    }
+  }
+
   private IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().isPrefixOf(fullPath)) {
@@ -495,9 +514,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       if(directory == null) {
         continue;
       }
-      File resourceDirectory = new File(directory);
-      IPath relativePath = getProjectRelativePath(project, directory);
-      IResource r = project.findMember(relativePath);
+      File resourceDirectory = null;
+      try {
+        resourceDirectory = new File(directory).getCanonicalFile();
+      } catch(IOException ex) {
+        resourceDirectory = new File(directory).getAbsoluteFile();
+      }
+      IContainer r = getFolder(project, resourceDirectory.getPath());
       if(r == project) {
         /*
          * Workaround for the Java Model Exception:
@@ -517,10 +540,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         log.error("Skipping resource folder " + r.getFullPath());
         return;
       }
-      if(r == null) {
-        //this means the resources does not exits (yet) but might be created later on!
-        r = project.getFolder(relativePath);
-      }
       if(project.equals(r.getProject())) {
         IPath path = r.getFullPath();
         IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, path);
@@ -533,12 +552,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           addResourceFolder(classpath, path, outputPath, addTestFlag);
         }
         // Set folder encoding (null = platform default)
-        IFolder resourceFolder = project.getFolder(relativePath);
-        if(resourceFolder.exists()) {
-          resourceFolder.setDefaultCharset(resourceEncoding, monitor);
+        if(r.exists()) {
+          r.setDefaultCharset(resourceEncoding, monitor);
         }
       } else {
-        log.info("Not adding resources folder " + resourceDirectory.getAbsolutePath());
+        log.info("Not adding resources folder " + resourceDirectory);
       }
     }
   }
@@ -864,11 +882,22 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  protected IFolder getFolder(IProject project, String absolutePath) {
-    if(project.getLocation().makeAbsolute().equals(IPath.fromOSString(absolutePath))) {
-      return project.getFolder(project.getLocation());
+  protected IContainer getFolder(IProject project, String absolutePath) throws CoreException {
+    Path projectLocation = project.getLocation().toPath().toAbsolutePath();
+    Path folderPath = Path.of(absolutePath);
+    if(projectLocation.equals(folderPath)) {
+      return project;
     }
-    return project.getFolder(getProjectRelativePath(project, absolutePath));
+    IPath relativePath = getProjectRelativePath(project, absolutePath);
+    if(!project.exists(relativePath) && Files.exists(folderPath)
+        && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
+      String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
+      IFolder folder = project.getFolder(linkName);
+      folder.createLink(folderPath.toUri(), IResource.REPLACE, null);
+      folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
+      return folder;
+    }
+    return project.getFolder(relativePath);
   }
 
   protected IPath getProjectRelativePath(IProject project, String absolutePath) {
