@@ -61,8 +61,7 @@ public class M2EUtils {
         }
       } catch(CoreException ex) {
         //Don't fail if the resource already exists, in case of a race condition
-        int code = ex.getStatus().getCode();
-        if(code != IResourceStatus.RESOURCE_EXISTS && code != IResourceStatus.PATH_OCCUPIED) {
+        if (!folder.exists()) {
           throw ex;
         }
       }
