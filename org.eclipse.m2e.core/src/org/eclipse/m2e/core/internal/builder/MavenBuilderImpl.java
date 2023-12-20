@@ -209,6 +209,10 @@ public class MavenBuilderImpl {
     if(project == null || buildOutputLocation == null) {
       return true;
     }
+
+    IPath outputLocation = projectFacade.getOutputLocation();
+    IPath testOutputLocation = projectFacade.getTestOutputLocation();
+
     IPath projectPath = project.getFullPath();
     List<IPath> moduleLocations = projectFacade.getMavenProjectModules().stream()
         .map(module -> projectPath.append(module)).toList();
@@ -219,7 +223,12 @@ public class MavenBuilderImpl {
         IPath fullPath = delta.getFullPath();
         if(buildOutputLocation.isPrefixOf(fullPath)) {
           //anything in the build output is not interesting for a change as it is produced by the build
-          //lets see if there are more interesting parts...
+          // ... unless a classpath resource that existed before has been deleted, possibly by another builder
+          if(!resource.exists() && ((outputLocation != null && outputLocation.isPrefixOf(fullPath))
+              || (testOutputLocation != null && testOutputLocation.isPrefixOf(fullPath)))) {
+            hasRelevantDelta.set(true);
+            return false;
+          }
           return true;
         }
         for(IPath modulePath : moduleLocations) {
