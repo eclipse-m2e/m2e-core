@@ -226,7 +226,7 @@ public class MavenBuilderImpl {
         if(buildOutputLocation.isPrefixOf(fullPath)) {
           //anything in the build output is not interesting for a change as it is produced by the build
           // ... unless a classpath resource that existed before has been deleted, possibly by another builder
-          if(!resource.exists() && isOutputOrTestOutput.test(fullPath)) {
+          if(isOutputOrTestOutput.test(fullPath) && !resource.exists()) {
             hasRelevantDelta.set(true);
             return false;
           }
