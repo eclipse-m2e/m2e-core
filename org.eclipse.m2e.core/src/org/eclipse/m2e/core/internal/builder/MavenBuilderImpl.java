@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,6 +210,11 @@ public class MavenBuilderImpl {
     if(project == null || buildOutputLocation == null) {
       return true;
     }
+
+    Predicate<IPath> isOutput = toPrefixPredicate(projectFacade.getOutputLocation());
+    Predicate<IPath> isTestOutput = toPrefixPredicate(projectFacade.getTestOutputLocation());
+    Predicate<IPath> isOutputOrTestOutput = isOutput.or(isTestOutput);
+
     IPath projectPath = project.getFullPath();
     List<IPath> moduleLocations = projectFacade.getMavenProjectModules().stream()
         .map(module -> projectPath.append(module)).toList();
@@ -219,7 +225,11 @@ public class MavenBuilderImpl {
         IPath fullPath = delta.getFullPath();
         if(buildOutputLocation.isPrefixOf(fullPath)) {
           //anything in the build output is not interesting for a change as it is produced by the build
-          //lets see if there are more interesting parts...
+          // ... unless a classpath resource that existed before has been deleted, possibly by another builder
+          if(isOutputOrTestOutput.test(fullPath) && !resource.exists()) {
+            hasRelevantDelta.set(true);
+            return false;
+          }
           return true;
         }
         for(IPath modulePath : moduleLocations) {
@@ -235,6 +245,13 @@ public class MavenBuilderImpl {
       return true;
     });
     return hasRelevantDelta.get();
+  }
+
+  private static Predicate<IPath> toPrefixPredicate(IPath location) {
+    if(location == null) {
+      return (p) -> false;
+    }
+    return (p) -> location.isPrefixOf(p);
   }
 
   private List<IIncrementalBuildFramework.BuildContext> setupProjectBuildContext(IProject project, int kind,
