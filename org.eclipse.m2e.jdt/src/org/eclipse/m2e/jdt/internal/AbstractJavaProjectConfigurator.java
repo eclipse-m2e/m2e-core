@@ -23,7 +23,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -221,14 +224,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addJREClasspathContainer(IClasspathDescriptor classpath, String environmentId) {
 
-    IClasspathEntry cpe;
     IExecutionEnvironment executionEnvironment = getExecutionEnvironment(environmentId);
-    if(executionEnvironment == null) {
-      cpe = JavaRuntime.getDefaultJREContainerEntry();
-    } else {
-      IPath containerPath = JavaRuntime.newJREContainerPath(executionEnvironment);
-      cpe = JavaCore.newContainerEntry(containerPath);
-    }
+    IPath containerPath = executionEnvironment == null //
+        ? JavaRuntime.newDefaultJREContainerPath() //
+        : JavaRuntime.newJREContainerPath(executionEnvironment);
+
+    // ensure the external annotation path is kept
+    IClasspathAttribute[] externalAnnotations = readExternalAnnotationAttributes(classpath,
+        p -> JavaRuntime.JRE_CONTAINER.equals(p.getPath().segment(0)));
+    IClasspathEntry cpe = MavenClasspathHelpers.newContainerEntry(containerPath, externalAnnotations);
 
     IClasspathEntryDescriptor cped = classpath
         .replaceEntry(descriptor -> JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0)), cpe);
@@ -268,13 +272,26 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
 
-    IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry();
+    // ensure the external annotation path is kept
+    IClasspathAttribute[] externalAnnotations = readExternalAnnotationAttributes(classpath,
+        p -> MavenClasspathHelpers.MAVEN_CLASSPATH_CONTAINER_PATH.equals(p.getPath()));
+    IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry(externalAnnotations);
+
     // add new entry without removing existing entries first, see bug398121
     IClasspathEntryDescriptor entryDescriptor = classpath.addEntry(cpe);
     entryDescriptor.setExported(isExported);
     for(IAccessRule accessRule : accessRules) {
       entryDescriptor.addAccessRule(accessRule);
     }
+  }
+
+  private static IClasspathAttribute[] readExternalAnnotationAttributes(IClasspathDescriptor classpath,
+      Predicate<IClasspathEntryDescriptor> annotationSourceEntry) {
+    Optional<String> annotationPath = classpath.getEntryDescriptors().stream().filter(annotationSourceEntry)
+        .map(descr -> descr.getClasspathAttributes().get(IClasspathAttribute.EXTERNAL_ANNOTATION_PATH))
+        .filter(Objects::nonNull).filter(p -> !p.isBlank()).findFirst();
+    return annotationPath.map(p -> JavaCore.newClasspathAttribute(IClasspathAttribute.EXTERNAL_ANNOTATION_PATH, p))
+        .map(a -> new IClasspathAttribute[] {a}).orElseGet(() -> new IClasspathAttribute[] {});
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,

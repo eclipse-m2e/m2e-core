@@ -384,4 +384,9 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
       attributes.remove(IClasspathManager.POMDERIVED_ATTRIBUTE);
     }
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "@" + System.identityHashCode(this) + "{path=" + path + "}";
+  }
 }
