@@ -103,6 +103,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   }
 
   @Override
+  public String getUserToolchainsFile() {
+    return getStringPreference(MavenPreferenceConstants.P_USER_TOOLCHAINS_FILE, null);
+  }
+
+  @Override
   public boolean isDebugOutput() {
     return getBooleanPreference(MavenPreferenceConstants.P_DEBUG_OUTPUT);
   }
@@ -147,6 +152,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   @Override
   public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
     setSettingsFile(globalSettingsFile, MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+  }
+
+  @Override
+  public void setUserToolchainsFile(String settingsFile) throws CoreException {
+    setSettingsFile(settingsFile, MavenPreferenceConstants.P_USER_TOOLCHAINS_FILE);
   }
 
   private void setSettingsFile(String settingsFile, String preferenceKey) throws CoreException {

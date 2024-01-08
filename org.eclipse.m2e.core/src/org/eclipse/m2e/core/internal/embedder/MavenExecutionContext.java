@@ -44,6 +44,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -176,6 +177,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.setUserSettingsFile(userSettingsFile);
 
     //and settings are actually derived from IMavenConfiguration
+
+    File userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
+    if(mavenConfiguration.getUserToolchainsFile() != null) {
+      userToolchainsFile = new File(mavenConfiguration.getUserToolchainsFile());
+    }
+    request.setUserToolchainsFile(userToolchainsFile);
+
     try {
       request = lookup.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, settings);
     } catch(MavenExecutionRequestPopulationException ex) {

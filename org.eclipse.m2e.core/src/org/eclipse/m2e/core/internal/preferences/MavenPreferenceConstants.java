@@ -62,6 +62,9 @@ public interface MavenPreferenceConstants {
   String P_USER_SETTINGS_FILE = PREFIX + "userSettingsFile"; //$NON-NLS-1$
 
   /** String */
+  String P_USER_TOOLCHAINS_FILE = PREFIX + "userToolchainsFile"; //$NON-NLS-1$
+
+  /** String */
   String P_OUTPUT_FOLDER = PREFIX + "outputFolder"; //$NON-NLS-1$
 
   /** boolean */
