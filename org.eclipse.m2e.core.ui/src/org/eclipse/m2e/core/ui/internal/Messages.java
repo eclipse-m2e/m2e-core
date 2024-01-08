@@ -569,6 +569,10 @@ public class Messages extends NLS {
 
   public static String MavenSettingsPreferencePage_error_userSettingsParse;
 
+  public static String MavenSettingsPreferencePage_error_userToolchainsMissing;
+
+  public static String MavenSettingsPreferencePage_error_userToolchainsParse;
+
   public static String MavenSettingsPreferencePage_job_indexing;
 
   public static String MavenSettingsPreferencePage_job_updating;
@@ -602,6 +606,12 @@ public class Messages extends NLS {
   public static String MavenWarningsPreferencePage_groupidDupParent;
 
   public static String MavenWarningsPreferencePage_notCoveredMojoExecution;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink1;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink2;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink_tooltip;
 
   public static String MavenWarningsPreferencePage_versionDupParent;
 

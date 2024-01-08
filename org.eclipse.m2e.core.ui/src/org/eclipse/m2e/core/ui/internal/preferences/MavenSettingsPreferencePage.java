@@ -58,6 +58,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
+import org.apache.maven.building.Problem;
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
@@ -66,6 +68,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -95,6 +98,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
   private Link userSettingsLink;
 
+  private Link userToolchainsLink;
+
+  private Text userToolchainsText;
+
   public MavenSettingsPreferencePage() {
     setTitle(Messages.MavenSettingsPreferencePage_title);
 
@@ -119,10 +126,12 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     updateLocalRepository();
 
     String userSettings = getUserSettings();
+    String userToolchains = getUserToolchains();
     String globalSettings = getGlobalSettings();
 
     if(Objects.equals(globalSettings, mavenConfiguration.getGlobalSettingsFile())
-        && Objects.equals(userSettings, mavenConfiguration.getUserSettingsFile())) {
+        && Objects.equals(userSettings, mavenConfiguration.getUserSettingsFile())
+        && Objects.equals(userToolchains, mavenConfiguration.getUserToolchainsFile())) {
       return; // current preferences  not changed 
     }
 
@@ -142,6 +151,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
         // this clears cached settings.xml instance
         mavenConfiguration.setGlobalSettingsFile(globalSettings);
         mavenConfiguration.setUserSettingsFile(userSettings);
+        mavenConfiguration.setUserToolchainsFile(userToolchains);
 
         if(Boolean.TRUE.equals(updateProjects[0])) {
           List<IMavenProjectFacade> projects = MavenPlugin.getMavenProjectRegistry().getProjects();
@@ -197,6 +207,12 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
         SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE);
     userSettingsText = createFileSelectionWidgets(composite, mavenConfiguration.getUserSettingsFile(),
         SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE);
+
+    userToolchainsLink = createLink(composite, Messages.MavenSettingsPreferencePage_userToolchainslink2,
+        Messages.MavenSettingsPreferencePage_userToolchainslink_tooltip, this::getUserToolchains,
+        MavenCli.DEFAULT_USER_TOOLCHAINS_FILE);
+    userToolchainsText = createFileSelectionWidgets(composite, mavenConfiguration.getUserToolchainsFile(),
+        MavenCli.DEFAULT_USER_TOOLCHAINS_FILE);
 
     Button updateSettings = new Button(composite, SWT.NONE);
     updateSettings.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -293,6 +309,11 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     updateLink(userSettingsLink, userSettings, SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE,
         Messages.MavenSettingsPreferencePage_userSettingslink2, Messages.MavenSettingsPreferencePage_userSettingslink1);
 
+    String userToolchains = getUserToolchains();
+    updateLink(userToolchainsLink, userToolchains, MavenCli.DEFAULT_USER_TOOLCHAINS_FILE,
+        Messages.MavenSettingsPreferencePage_userToolchainslink2,
+        Messages.MavenSettingsPreferencePage_userToolchainslink1);
+
     setMessage(null);
     checkSettings(globalSettings, Messages.MavenSettingsPreferencePage_error_globalSettingsMissing,
         l -> maven.validateSettings(l).stream().map(SettingsProblem::getMessage),
@@ -300,6 +321,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     checkSettings(userSettings, Messages.MavenSettingsPreferencePage_error_userSettingsMissing,
         l -> maven.validateSettings(l).stream().map(SettingsProblem::getMessage),
         Messages.MavenSettingsPreferencePage_error_userSettingsParse);
+    checkSettings(userToolchains, Messages.MavenSettingsPreferencePage_error_userToolchainsMissing,
+        l -> IMavenToolbox.of(maven).validateToolchains(l).stream().map(Problem::getMessage),
+        Messages.MavenSettingsPreferencePage_error_userToolchainsParse);
   }
 
   private void checkSettings(String location, String errorMissing, Function<String, Stream<String>> validator,
@@ -341,6 +365,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
   private String getUserSettings() {
     return getSettings(userSettingsText);
+  }
+
+  private String getUserToolchains() {
+    return getSettings(userToolchainsText);
   }
 
   private String getGlobalSettings() {
