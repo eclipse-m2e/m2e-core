@@ -514,7 +514,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(roots, dependencyScopes, failedArtifacts, metadataMode);
+		return serialize().hashCode();
 	}
 
 	@Override
@@ -523,9 +523,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return true;
 		}
 		return obj instanceof MavenTargetLocation other //
-				&& Objects.equals(roots, other.roots)//
-				&& Objects.equals(dependencyScopes, other.dependencyScopes)
-				&& Objects.equals(failedArtifacts, other.failedArtifacts);
+				// check each and every relevant attribute, including nested ones
+				&& serialize().equals(other.serialize());
 	}
 
 	public boolean isIncludeSource() {
