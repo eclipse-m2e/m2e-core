@@ -40,7 +40,7 @@ class EclipseLogger implements Logger {
   @Override
   public void debug(String msg, Throwable t) {
     if(isDebugEnabled()) {
-      log.debug(msg + " " + t.getMessage(), t);
+      log.debug(toMessageString(msg, t), t);
     }
   }
 
@@ -54,7 +54,7 @@ class EclipseLogger implements Logger {
   @Override
   public void info(String msg, Throwable t) {
     if(isInfoEnabled()) {
-      log.info(msg + " " + t.getMessage(), t);
+      log.info(toMessageString(msg, t), t);
     }
   }
 
@@ -68,7 +68,7 @@ class EclipseLogger implements Logger {
   @Override
   public void warn(String msg, Throwable t) {
     if(isWarnEnabled()) {
-      log.warn(msg + " " + t.getMessage(), t);
+      log.warn(toMessageString(msg, t), t);
     }
   }
 
@@ -82,7 +82,7 @@ class EclipseLogger implements Logger {
   @Override
   public void fatalError(String msg, Throwable t) {
     if(isFatalErrorEnabled()) {
-      log.error(msg + " " + t.getMessage(), t);
+      log.error(toMessageString(msg, t), t);
     }
   }
 
@@ -96,7 +96,7 @@ class EclipseLogger implements Logger {
   @Override
   public void error(String msg, Throwable t) {
     if(isErrorEnabled()) {
-      log.error(msg + " " + t.getMessage(), t);
+      log.error(toMessageString(msg, t), t);
     }
   }
 
@@ -142,5 +142,15 @@ class EclipseLogger implements Logger {
   @Override
   public String getName() {
     return Messages.EclipseLogger_name;
+  }
+
+  private String toMessageString(String msg, Throwable t) {
+    if(t == null || t.getMessage() == null) {
+      return msg;
+    }
+    if(msg == null) {
+      return t.getMessage();
+    }
+    return msg + " " + t.getMessage();
   }
 }
