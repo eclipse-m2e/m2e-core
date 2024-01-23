@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -600,42 +601,27 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IPath relPath = path.makeRelativeTo(project.getFullPath());
     List<String> compile = mavenProject.getCompileSourceRoots();
     List<String> test = mavenProject.getTestCompileSourceRoots();
-    return isContained(relPath, project, getSourceFolders(project, compile))
-        || isContained(relPath, project, getSourceFolders(project, test));
+    return isContained(relPath, getSourceFolders(project, compile))
+        || isContained(relPath, getSourceFolders(project, test));
   }
 
   private boolean overlapsWithOtherResourceFolder(IPath path, IProject project, MavenProject mavenProject) {
     IPath relPath = path.makeRelativeTo(project.getFullPath());
-    return isContained(relPath, project, getOtherResourceFolders(project, mavenProject.getResources(), relPath))
-        || isContained(relPath, project, getOtherResourceFolders(project, mavenProject.getTestResources(), relPath));
+    return isContained(relPath, getOtherResourceFolders(project, mavenProject.getResources(), relPath))
+        || isContained(relPath, getOtherResourceFolders(project, mavenProject.getTestResources(), relPath));
   }
 
-  private IPath[] getSourceFolders(IProject project, List<String> sources) {
-    List<IPath> paths = new ArrayList<>();
-    for(String source : sources) {
-      paths.add(getProjectRelativePath(project, source));
-    }
-    return paths.toArray(new IPath[paths.size()]);
+  private Stream<IPath> getSourceFolders(IProject project, List<String> sources) {
+    return sources.stream().map(Path::of).map(source -> getProjectRelativePath(project, source));
   }
 
-  private IPath[] getOtherResourceFolders(IProject project, List<Resource> resources, IPath curPath) {
-    List<IPath> paths = new ArrayList<>();
-    for(Resource res : resources) {
-      IPath path = getProjectRelativePath(project, res.getDirectory());
-      if(!path.equals(curPath)) {
-        paths.add(path);
-      }
-    }
-    return paths.toArray(new IPath[paths.size()]);
+  private Stream<IPath> getOtherResourceFolders(IProject project, List<Resource> resources, IPath curPath) {
+    return resources.stream().map(Resource::getDirectory).map(Path::of)//
+        .map(res -> getProjectRelativePath(project, res)).filter(path -> !path.equals(curPath));
   }
 
-  private boolean isContained(IPath path, IProject project, IPath[] otherPaths) {
-    for(IPath otherPath : otherPaths) {
-      if(otherPath.isPrefixOf(path)) {
-        return true;
-      }
-    }
-    return false;
+  private static boolean isContained(IPath path, Stream<IPath> otherPaths) {
+    return otherPaths.anyMatch(p -> p.isPrefixOf(path));
   }
 
   protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request,
@@ -899,13 +885,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  protected IContainer getFolder(IProject project, String absolutePath) throws CoreException {
+  protected IContainer getFolder(IProject project, String path) throws CoreException {
     Path projectLocation = project.getLocation().toPath().toAbsolutePath();
-    Path folderPath = Path.of(absolutePath);
+    Path folderPath = Path.of(path);
     if(projectLocation.equals(folderPath)) {
       return project;
     }
-    IPath relativePath = getProjectRelativePath(project, absolutePath);
+    IPath relativePath;
+    if(folderPath.isAbsolute()) {
+      relativePath = getProjectRelativePath(project, folderPath);
+    } else {
+      folderPath = projectLocation.resolve(path);
+      relativePath = IPath.fromOSString(path);
+    }
     if(!project.exists(relativePath) && Files.exists(folderPath)
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
       String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
@@ -917,17 +909,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return project.getFolder(relativePath);
   }
 
-  protected IPath getProjectRelativePath(IProject project, String absolutePath) {
-    File basedir = project.getLocation().toFile();
-    String relative;
-    if(absolutePath.equals(basedir.getAbsolutePath())) {
-      relative = "."; //$NON-NLS-1$
-    } else if(absolutePath.startsWith(basedir.getAbsolutePath())) {
-      relative = absolutePath.substring(basedir.getAbsolutePath().length() + 1);
+  private static IPath getProjectRelativePath(IProject project, Path absolutePath) {
+    Path basedir = project.getLocation().toPath().toAbsolutePath();
+    if(absolutePath.equals(basedir)) {
+      return IPath.fromOSString(".");
+    } else if(absolutePath.startsWith(basedir)) {
+      return IPath.fromPath(basedir.relativize(absolutePath));
     } else {
-      relative = absolutePath;
+      return IPath.fromPath(absolutePath);
     }
-    return IPath.fromOSString(relative.replace('\\', '/'));
   }
 
   /**
