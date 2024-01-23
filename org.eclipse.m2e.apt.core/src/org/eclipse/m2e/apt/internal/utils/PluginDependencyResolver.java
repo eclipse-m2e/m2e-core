@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.Status;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
@@ -93,8 +95,20 @@ public class PluginDependencyResolver {
       request.setRepositories(mavenProject.getRemoteProjectRepositories());
 
       Collection<Dependency> dependencies = getDependencies(plugin);
-
       for(Dependency dependency : dependencies) {
+        if(dependency.getVersion() == null) {
+          DependencyManagement depMngt = mavenProject.getDependencyManagement();
+          if(depMngt != null) {
+            Dependency mngtDep = depMngt.getDependencies().stream()
+                .filter(d -> Objects.equals(d.getGroupId(), dependency.getGroupId())
+                    && Objects.equals(d.getArtifactId(), dependency.getArtifactId())
+                    && Objects.equals(d.getType(), dependency.getType()))
+                .findFirst().get();
+            if(mngtDep != null) {
+              dependency.setVersion(mngtDep.getVersion());
+            }
+          }
+        }
         request.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
       }
 
