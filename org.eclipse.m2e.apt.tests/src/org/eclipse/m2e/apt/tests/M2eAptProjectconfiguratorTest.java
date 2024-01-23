@@ -435,4 +435,13 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 			}
 		}
 	}
+
+	@Test
+	public void testDependencyManagement() throws Exception {
+		IProject p = importProject("projects/p15/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		assertNoErrors(p);
+	}
 }
