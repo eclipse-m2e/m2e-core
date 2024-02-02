@@ -30,10 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.embedder.MavenProperties;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceInitializer;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -54,6 +55,8 @@ public class ResolverConfigurationIO {
    * resolution is enabled.
    */
   private static final String P_RESOLVE_WORKSPACE_PROJECTS = "resolveWorkspaceProjects"; //$NON-NLS-1$
+
+  private static final String P_AUTO_UPDATE_CONFIGURATION = MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION;
 
   /**
    * Active profiles project preference key. Value is comma-separated list of enabled profiles.
@@ -82,13 +85,11 @@ public class ResolverConfigurationIO {
   private static final String VERSION = "1"; //$NON-NLS-1$
 
   public static boolean saveResolverConfiguration(IProject project, IProjectConfiguration configuration) {
-    IScopeContext projectScope = new ProjectScope(project);
-    IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
+    IEclipsePreferences projectNode = getMavenProjectPreferences(project);
     if(projectNode != null) {
       projectNode.put(P_VERSION, VERSION);
 
       projectNode.putBoolean(P_RESOLVE_WORKSPACE_PROJECTS, configuration.isResolveWorkspaceProjects());
-
       projectNode.put(P_SELECTED_PROFILES, configuration.getSelectedProfiles());
 
       if(configuration.getLifecycleMappingId() != null) {
@@ -101,21 +102,13 @@ public class ResolverConfigurationIO {
       } else {
         projectNode.remove(P_PROPERTIES);
       }
-
-      try {
-        projectNode.flush();
-        return true;
-      } catch(BackingStoreException ex) {
-        log.error("Failed to save resolver configuration", ex);
-      }
+      return savePreferences(projectNode);
     }
-
     return false;
   }
 
   public static IProjectConfiguration readResolverConfiguration(IProject project) {
-    IScopeContext projectScope = new ProjectScope(project);
-    IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
+    IEclipsePreferences projectNode = getMavenProjectPreferences(project);
     if(projectNode == null) {
       return new ResolverConfiguration(project);
     }
@@ -132,6 +125,34 @@ public class ResolverConfigurationIO {
     return configuration;
   }
 
+  public static boolean isAutomaticallyUpdateConfiguration(IProject project) {
+    IEclipsePreferences preferences = getMavenProjectPreferences(project);
+    boolean defaultValue = MavenPreferenceInitializer.P_AUTO_UPDATE_CONFIGURATION_DEFAULT;
+    return preferences != null ? preferences.getBoolean(P_AUTO_UPDATE_CONFIGURATION, defaultValue) : defaultValue;
+  }
+
+  public static void setAutomaticallyUpdateConfiguration(IProject project, boolean isAutomaticallyUpdateConfiguration) {
+    IEclipsePreferences preferences = getMavenProjectPreferences(project);
+    if(preferences != null) {
+      preferences.putBoolean(P_AUTO_UPDATE_CONFIGURATION, isAutomaticallyUpdateConfiguration);
+      savePreferences(preferences);
+    }
+  }
+
+  private static IEclipsePreferences getMavenProjectPreferences(IProject project) {
+    return new ProjectScope(project).getNode(IMavenConstants.PLUGIN_ID);
+  }
+
+  private static boolean savePreferences(IEclipsePreferences node) {
+    try {
+      node.flush();
+      return true;
+    } catch(BackingStoreException ex) {
+      log.error("Failed to save resolver configuration", ex);
+    }
+    return false;
+  }
+
   private static File getBasedir(IEclipsePreferences projectNode, IProject project) {
     String basedirSetting = projectNode.get(P_BASEDIR, null);
     if(basedirSetting != null) {
@@ -144,9 +165,7 @@ public class ResolverConfigurationIO {
   }
 
   private static String propertiesAsString(Map<?, ?> properties) {
-    String propAsString = properties.entrySet().stream().map(e -> encodeEntry(e))
-        .collect(Collectors.joining(PROPERTIES_SEPARATOR));
-    return propAsString;
+    return properties.entrySet().stream().map(e -> encodeEntry(e)).collect(Collectors.joining(PROPERTIES_SEPARATOR));
   }
 
   private static Properties stringAsProperties(String properties) {

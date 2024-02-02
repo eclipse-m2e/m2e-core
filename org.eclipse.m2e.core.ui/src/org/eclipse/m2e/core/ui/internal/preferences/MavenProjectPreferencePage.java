@@ -36,10 +36,12 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.project.IProjectConfiguration;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceInitializer;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
 
 
 /**
@@ -51,6 +53,8 @@ public class MavenProjectPreferencePage extends PropertyPage {
   private static final Logger log = LoggerFactory.getLogger(MavenProjectPreferencePage.class);
 
   private Button resolveWorspaceProjectsButton;
+
+  private Button autoUpdateConfigurationButton;
 
 //  private Button includeModulesButton;
 
@@ -74,9 +78,17 @@ public class MavenProjectPreferencePage extends PropertyPage {
     selectedProfilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
     resolveWorspaceProjectsButton = new Button(composite, SWT.CHECK);
-    GridData resolveWorspaceProjectsButtonData = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-    resolveWorspaceProjectsButton.setLayoutData(resolveWorspaceProjectsButtonData);
+    resolveWorspaceProjectsButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
     resolveWorspaceProjectsButton.setText(Messages.MavenProjectPreferencePage_btnResolve);
+
+    autoUpdateConfigurationButton = new Button(composite, SWT.CHECK);
+    autoUpdateConfigurationButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+    autoUpdateConfigurationButton.setText(Messages.MavenPreferencePage_autoUpdateProjectConfiguration);
+    if(MavenUpdateConfigurationChangeListener.isAutoConfigurationUpdateDisabled()) {
+      autoUpdateConfigurationButton.setEnabled(false);
+      String text = autoUpdateConfigurationButton.getText() + " (disabled in workspace preferences)";
+      autoUpdateConfigurationButton.setText(text);
+    }
 
 //    includeModulesButton = new Button(composite, SWT.CHECK);
 //    GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
@@ -100,16 +112,19 @@ public class MavenProjectPreferencePage extends PropertyPage {
 
     init(getResolverConfiguration());
 
+    boolean isAutoUpdate = ResolverConfigurationIO.isAutomaticallyUpdateConfiguration(getProject());
+    autoUpdateConfigurationButton.setSelection(isAutoUpdate);
+
     return composite;
   }
 
   @Override
   protected void performDefaults() {
     init(new ResolverConfiguration());
+    autoUpdateConfigurationButton.setSelection(MavenPreferenceInitializer.P_AUTO_UPDATE_CONFIGURATION_DEFAULT);
   }
 
-  private void init(IProjectConfiguration configuration) {
-
+  private void init(ResolverConfiguration configuration) {
     resolveWorspaceProjectsButton.setSelection(configuration.isResolveWorkspaceProjects());
 //    includeModulesButton.setSelection(configuration.shouldIncludeModules());
     selectedProfilesText.setText(configuration.getSelectedProfiles());
@@ -130,11 +145,14 @@ public class MavenProjectPreferencePage extends PropertyPage {
     final ResolverConfiguration configuration = new ResolverConfiguration(getResolverConfiguration());
     if(configuration.getSelectedProfiles().equals(selectedProfilesText.getText()) &&
 //        configuration.shouldIncludeModules()==includeModulesButton.getSelection() &&
-        configuration.isResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()) {
+        configuration.isResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()
+        && ResolverConfigurationIO.isAutomaticallyUpdateConfiguration(project) == autoUpdateConfigurationButton
+            .getSelection()) {
       return true;
     }
 
     configuration.setResolveWorkspaceProjects(resolveWorspaceProjectsButton.getSelection());
+    ResolverConfigurationIO.setAutomaticallyUpdateConfiguration(project, autoUpdateConfigurationButton.getSelection());
 //    configuration.setIncludeModules(includeModulesButton.getSelection());
     configuration.setSelectedProfiles(selectedProfilesText.getText());
 
@@ -165,9 +183,9 @@ public class MavenProjectPreferencePage extends PropertyPage {
     return isSet;
   }
 
-  private IProjectConfiguration getResolverConfiguration() {
+  private ResolverConfiguration getResolverConfiguration() {
     IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
-    return projectManager.getProjectConfiguration(getProject());
+    return (ResolverConfiguration) projectManager.getProjectConfiguration(getProject());
   }
 
   private IProject getProject() {

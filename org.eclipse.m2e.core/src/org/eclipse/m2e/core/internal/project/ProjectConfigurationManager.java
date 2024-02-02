@@ -885,12 +885,16 @@ public class ProjectConfigurationManager
 
         if(facade != null) {
           ProblemSeverity outOfDateSeverity = ProblemSeverity.get(mavenConfiguration.getOutOfDateProjectSeverity());
-          mavenMarkerManager.deleteMarkers(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
+          IProject project = facade.getProject();
+          mavenMarkerManager.deleteMarkers(project, IMavenConstants.MARKER_CONFIGURATION_ID);
           if(!ProblemSeverity.ignore.equals(outOfDateSeverity)) {
             LifecycleMappingConfiguration oldConfiguration = LifecycleMappingConfiguration.restore(facade, monitor);
             if(oldConfiguration != null
                 && LifecycleMappingFactory.isLifecycleMappingChanged(facade, oldConfiguration, monitor)) {
-              mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID,
+              if(!ResolverConfigurationIO.isAutomaticallyUpdateConfiguration(project)) {
+                outOfDateSeverity = ProblemSeverity.info;
+              }
+              mavenMarkerManager.addMarker(project, IMavenConstants.MARKER_CONFIGURATION_ID,
                   Messages.ProjectConfigurationUpdateRequired, -1, outOfDateSeverity.getSeverity());
             }
           }

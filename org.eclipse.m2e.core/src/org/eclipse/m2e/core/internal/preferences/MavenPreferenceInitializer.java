@@ -27,6 +27,8 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
  */
 public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
 
+  public static final boolean P_AUTO_UPDATE_CONFIGURATION_DEFAULT = true;
+
   @Override
   public void initializeDefaultPreferences() {
     IEclipsePreferences store = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
@@ -63,7 +65,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     // set to null since the plugin state location is not available by the time execution reaches here
     store.remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);
 
-    store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, true);
+    store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, P_AUTO_UPDATE_CONFIGURATION_DEFAULT);
 
     store.putBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, false);
 
