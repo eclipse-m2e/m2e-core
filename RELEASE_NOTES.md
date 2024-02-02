@@ -8,6 +8,13 @@
 
 Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Notes](https://maven.apache.org/docs/3.9.6/release-notes.html).
 
+### New project preference for automated Maven project configuration updates
+
+Automatic configuration updates for Maven projects can now be disabled the in the project preferences.
+This allows to disable these updates individually per project and to store the setting in a preference-file under version control,
+which is useful for projects that require special workspace configuration that doesn't exactly match the configuration in the `pom.xml`.
+
+![grafik](https://github.com/eclipse-m2e/m2e-core/assets/44067969/7d27ceda-5d13-4f0e-97f0-ff34c94d7493)
 
 ## 2.5.0
 
