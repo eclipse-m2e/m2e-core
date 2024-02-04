@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.internal.preferences;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -93,17 +94,17 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public String getGlobalSettingsFile() {
-    return preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null, preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null);
   }
 
   @Override
   public String getUserSettingsFile() {
-    return preferenceStore.get(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null, preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null);
   }
 
   @Override
   public boolean isDebugOutput() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DEBUG_OUTPUT, null, preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_DEBUG_OUTPUT);
   }
 
   public void setDebugOutput(boolean debug) {
@@ -112,14 +113,12 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public boolean isDownloadJavaDoc() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, null,
-        preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC);
   }
 
   @Override
   public boolean isDownloadSources() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, null,
-        preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_DOWNLOAD_SOURCES);
   }
 
   public void setDownloadSources(boolean downloadSources) {
@@ -132,63 +131,46 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public boolean isHideFoldersOfNestedProjects() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, null,
-        preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS);
   }
 
   @Override
   public boolean isOffline() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_OFFLINE, null, preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_OFFLINE);
   }
 
   @Override
   public void setUserSettingsFile(String settingsFile) throws CoreException {
-    settingsFile = trim(settingsFile);
-    if(!eq(settingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null))) {
-      if(settingsFile != null) {
-        preferencesLookup[0].put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, settingsFile);
-      } else {
-        preferencesLookup[0].remove(MavenPreferenceConstants.P_USER_SETTINGS_FILE);
-      }
-      preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
-    }
+    setSettingsFile(settingsFile, MavenPreferenceConstants.P_USER_SETTINGS_FILE);
   }
 
   @Override
   public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
-    globalSettingsFile = trim(globalSettingsFile);
-    if(!eq(globalSettingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null))) {
-      if(globalSettingsFile != null) {
-        preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, globalSettingsFile);
+    setSettingsFile(globalSettingsFile, MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+  }
+
+  private void setSettingsFile(String settingsFile, String preferenceKey) throws CoreException {
+    if(settingsFile != null) {
+      settingsFile = settingsFile.isBlank() ? null : settingsFile.strip();
+    }
+    if(!Objects.equals(settingsFile, preferencesLookup[0].get(preferenceKey, null))) {
+      if(settingsFile != null) {
+        preferencesLookup[0].put(preferenceKey, settingsFile);
       } else {
-        preferencesLookup[0].remove(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+        preferencesLookup[0].remove(preferenceKey);
       }
-      preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+      preferenceStore.applyPreferences(preferencesLookup[0], PREFERENCE_FILTERS);
     }
-  }
-
-  private boolean eq(String a, String b) {
-    return a != null ? a.equals(b) : b == null;
-  }
-
-  private String trim(String str) {
-    if(str == null) {
-      return null;
-    }
-    str = str.trim();
-    return !str.isEmpty() ? str : null;
   }
 
   @Override
   public boolean isUpdateProjectsOnStartup() {
-    return Boolean.parseBoolean(preferenceStore
-        .get(MavenPreferenceConstants.P_UPDATE_PROJECTS, null, preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_UPDATE_PROJECTS);
   }
 
   @Override
   public boolean isUpdateIndexesOnStartup() {
-    return Boolean
-        .parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_UPDATE_INDEXES, null, preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_UPDATE_INDEXES);
   }
 
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
@@ -225,23 +207,21 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
   }
 
-  private IPreferenceFilter getPreferenceFilter() {
-    return new IPreferenceFilter() {
-      @Override
-      public String[] getScopes() {
-        return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
-      }
+  private static final IPreferenceFilter[] PREFERENCE_FILTERS = new IPreferenceFilter[] {new IPreferenceFilter() {
+    @Override
+    public String[] getScopes() {
+      return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
+    }
 
-      @Override
-      public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
-        return null;
-      }
-    };
-  }
+    @Override
+    public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
+      return null;
+    }
+  }};
 
   @Override
   public String getGlobalUpdatePolicy() {
-    String string = preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY, null, preferencesLookup);
+    String string = getStringPreference(MavenPreferenceConstants.P_GLOBAL_UPDATE_POLICY, null);
     //for backward compat
     if(string == null || "true".equalsIgnoreCase(string)) {
       return RepositoryPolicy.UPDATE_POLICY_NEVER;
@@ -265,7 +245,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     IPath stateLocation = MavenPluginActivator.getDefault().getStateLocation();
     String defaultValue = stateLocation.append(LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME)
         .toString();
-    return preferenceStore.get(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, defaultValue, preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, defaultValue);
   }
 
   @Override
@@ -275,13 +255,13 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     } else {
       preferencesLookup[0].remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);
     }
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    preferenceStore.applyPreferences(preferencesLookup[0], PREFERENCE_FILTERS);
   }
 
   @Override
   public String getOutOfDateProjectSeverity() {
-    return preferenceStore.get(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB,
-        ProblemSeverity.error.toString(), preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB,
+        ProblemSeverity.error.toString());
   }
 
   /**
@@ -293,12 +273,12 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     } else {
       preferencesLookup[0].put(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB, severity);
     }
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    preferenceStore.applyPreferences(preferencesLookup[0], PREFERENCE_FILTERS);
   }
 
   @Override
   public String getGlobalChecksumPolicy() {
-    return preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, null, preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, null);
   }
 
   /**
@@ -318,8 +298,8 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public String getNotCoveredMojoExecutionSeverity() {
-    return preferenceStore.get(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB,
-        ProblemSeverity.warning.toString(), preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB,
+        ProblemSeverity.warning.toString());
   }
 
   /**
@@ -331,13 +311,13 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     } else {
       preferencesLookup[0].put(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB, severity);
     }
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    preferenceStore.applyPreferences(preferencesLookup[0], PREFERENCE_FILTERS);
   }
 
   @Override
   public String getOverridingManagedVersionExecutionSeverity() {
-    return preferenceStore.get(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB,
-        ProblemSeverity.warning.toString(), preferencesLookup);
+    return getStringPreference(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB,
+        ProblemSeverity.warning.toString());
   }
 
   /**
@@ -349,13 +329,12 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     } else {
       preferencesLookup[0].put(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB, severity);
     }
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    preferenceStore.applyPreferences(preferencesLookup[0], PREFERENCE_FILTERS);
   }
 
   @Override
   public boolean isAutomaticallyUpdateConfiguration() {
-    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, null,
-        preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION);
   }
 
   public void setAutomaticallyUpdateConfiguration(boolean value) {
@@ -369,9 +348,8 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public PluginExecutionAction getDefaultMojoExecutionAction() {
-    String value = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_MOJO_EXECUTION_ACTION,
-        PluginExecutionAction.DEFAULT_ACTION.toString(),
-        preferencesLookup);
+    String value = getStringPreference(MavenPreferenceConstants.P_DEFAULT_MOJO_EXECUTION_ACTION,
+        PluginExecutionAction.DEFAULT_ACTION.toString());
     try {
       return PluginExecutionAction.valueOf(value);
     } catch(IllegalArgumentException e) {
@@ -382,7 +360,15 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   @Override
   public boolean buildWithNullSchedulingRule() {
-    return Boolean.parseBoolean(
-        preferenceStore.get(MavenPreferenceConstants.P_BUILDER_USE_NULL_SCHEDULING_RULE, null, preferencesLookup));
+    return getBooleanPreference(MavenPreferenceConstants.P_BUILDER_USE_NULL_SCHEDULING_RULE);
   }
+
+  private boolean getBooleanPreference(String key) {
+    return Boolean.parseBoolean(getStringPreference(key, null));
+  }
+
+  private String getStringPreference(String key, String defaultValue) {
+    return preferenceStore.get(key, defaultValue, preferencesLookup);
+  }
+
 }
