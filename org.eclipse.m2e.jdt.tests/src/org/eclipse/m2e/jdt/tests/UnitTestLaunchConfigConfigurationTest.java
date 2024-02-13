@@ -13,7 +13,7 @@ package org.eclipse.m2e.jdt.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -63,7 +63,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	@Parameters
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
-				// { MavenRuntimeClasspathProvider.JDT_TESTNG_TEST }, // not by default yet
+				{ MavenRuntimeClasspathProvider.JDT_TESTNG_TEST },
 				{ MavenRuntimeClasspathProvider.JDT_JUNIT_TEST } });
 	}
 
@@ -86,7 +86,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
-		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+		assumeTrue(testType + " support not available", type != null);
 
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = getTestFile("argumentsAreSet/surefireArgsSet.xml");
@@ -135,7 +135,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
-		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+		assumeTrue(testType + " support not available", type != null);
 
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = null;
@@ -184,7 +184,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
-		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+		assumeTrue(testType + " support not available", type != null);
 
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = getTestFile("argumentsAreSet/surefireArgsSet.xml");
@@ -226,7 +226,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
-		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+		assumeTrue(testType + " support not available", type != null);
 
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = null;
@@ -268,7 +268,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
-		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+		assumeTrue(testType + " support not available", type != null);
 
 		File pomFile = getTestFile("prerequisitesAreLoaded/pom.xml");
 
