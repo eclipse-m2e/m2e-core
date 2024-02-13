@@ -55,4 +55,8 @@ public class MavenClasspathContainer implements IClasspathContainer, Serializabl
     return path;
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "@" + System.identityHashCode(this) + "{path=" + path + "}";
+  }
 }

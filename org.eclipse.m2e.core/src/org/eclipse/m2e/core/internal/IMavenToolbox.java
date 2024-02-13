@@ -34,6 +34,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.DefaultMaven;
+import org.apache.maven.building.FileSource;
+import org.apache.maven.building.Problem;
+import org.apache.maven.building.ProblemCollector;
+import org.apache.maven.building.ProblemCollectorFactory;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -50,6 +54,11 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
+import org.apache.maven.toolchain.building.ToolchainsBuilder;
+import org.apache.maven.toolchain.building.ToolchainsBuildingException;
+import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
+import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -235,6 +244,39 @@ public interface IMavenToolbox {
     } catch(IOException e) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_read_pom, e));
     }
+  }
+
+  /**
+   * Validates the toolchains definition
+   * 
+   * @param toolchains The path to the toolchains definition file to test.
+   * @return List of all problems. Is never <code>null</code>.
+   * @throws CoreException if reading failed
+   */
+  default List<Problem> validateToolchains(String toolchains) {
+    List<Problem> problems = new ArrayList<>();
+    if(toolchains != null) {
+      File toolchainsFile = new File(toolchains);
+      ProblemCollector problemsFactory = ProblemCollectorFactory.newInstance(null);
+      if(toolchainsFile.canRead()) {
+        ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
+        request.setUserToolchainsSource(new FileSource(toolchainsFile));
+        try {
+          ToolchainsBuildingResult result = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP).lookup(ToolchainsBuilder.class).build(request);
+          problems.addAll(result.getProblems());
+        } catch(ToolchainsBuildingException ex) {
+          problems.addAll(ex.getProblems());
+        } catch(CoreException ex) {
+          problemsFactory.add(Problem.Severity.FATAL, toolchains, -1, -1, ex);
+          problems.addAll(problemsFactory.getProblems());
+        }
+      } else {
+        problemsFactory.add(Problem.Severity.ERROR, NLS.bind(Messages.MavenImpl_error_read_toolchains, toolchains), -1,
+            -1, null);
+        problems.addAll(problemsFactory.getProblems());
+      }
+    }
+    return problems;
   }
 
   /**

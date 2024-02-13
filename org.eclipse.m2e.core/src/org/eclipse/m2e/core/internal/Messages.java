@@ -132,6 +132,8 @@ public class Messages extends NLS {
 
   public static String MavenImpl_error_read_settings2;
 
+  public static String MavenImpl_error_read_toolchains;
+
   public static String MavenImpl_error_resolve;
 
   public static String MavenImpl_error_sort;

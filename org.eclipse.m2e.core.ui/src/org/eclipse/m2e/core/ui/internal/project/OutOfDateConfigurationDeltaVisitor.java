@@ -35,7 +35,7 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 public class OutOfDateConfigurationDeltaVisitor implements IResourceDeltaVisitor {
 
-  List<IProject> outOfDateProjects = new ArrayList<>();
+  final List<IProject> outOfDateProjects = new ArrayList<>();
 
   @Override
   public boolean visit(IResourceDelta delta) throws CoreException {

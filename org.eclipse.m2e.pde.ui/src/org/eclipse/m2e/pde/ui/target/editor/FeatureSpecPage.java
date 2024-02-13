@@ -53,7 +53,9 @@ public class FeatureSpecPage extends AbstractFeatureSpecPage {
 
 	@Override
 	protected void initialize() {
-		fFeatureVersionText.setText("1.0.0.qualifier"); //$NON-NLS-1$
+		if (fFeatureVersionText != null && fFeatureVersionText.getText().isEmpty()) {
+			fFeatureVersionText.setText("1.0.0.qualifier"); //$NON-NLS-1$
+		}
 		setMessage(PDEUIMessages.NewFeatureWizard_MainPage_desc);
 	}
 

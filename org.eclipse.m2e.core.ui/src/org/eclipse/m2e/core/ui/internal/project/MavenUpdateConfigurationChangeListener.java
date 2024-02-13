@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 
@@ -40,10 +41,10 @@ public class MavenUpdateConfigurationChangeListener implements IResourceChangeLi
 
   @Override
   public void resourceChanged(IResourceChangeEvent event) {
-    if(isDisabled()) {
+    if(isAutoConfigurationUpdateDisabled()) {
       return;
     }
-    List<IProject> outOfDateProjects = null;
+    List<IProject> outOfDateProjects;
     try {
       OutOfDateConfigurationDeltaVisitor visitor = new OutOfDateConfigurationDeltaVisitor();
       event.getDelta().accept(visitor);
@@ -52,10 +53,12 @@ public class MavenUpdateConfigurationChangeListener implements IResourceChangeLi
       LOG.error("An error occurred while checking for out-of-date configuration markers", e);
       return;
     }
+    outOfDateProjects = outOfDateProjects.stream() //
+        .filter(ResolverConfigurationIO::isAutomaticallyUpdateConfiguration).toList();
     updateProjectConfiguration(outOfDateProjects);
   }
 
-  private boolean isDisabled() {
+  public static boolean isAutoConfigurationUpdateDisabled() {
     return !MavenPlugin.getMavenConfiguration().isAutomaticallyUpdateConfiguration();
   }
 

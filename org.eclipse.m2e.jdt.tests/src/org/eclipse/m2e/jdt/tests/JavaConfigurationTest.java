@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
@@ -29,12 +31,19 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.jdt.IClasspathManager;
+import org.eclipse.m2e.jdt.internal.ClasspathDescriptor;
+import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +62,17 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void testFileChangeUpdatesJDTSettings() throws CoreException, IOException, InterruptedException {
 		IJavaProject project = importResourceProject("/projects/compilerSettings/pom.xml");
+
+		// set external annotation path to JRE and Maven classpaths
+		var classpath = new ClasspathDescriptor(project);
+		var containerPath = classpath.getEntryDescriptors().stream().filter(e -> JavaRuntime.JRE_CONTAINER.equals(e.getPath().segment(0)))
+			.findFirst().get().getPath();
+		classpath.addEntry(MavenClasspathHelpers.newContainerEntry(containerPath, JavaCore.newClasspathAttribute(
+			IClasspathAttribute.EXTERNAL_ANNOTATION_PATH, "/jre_external_anno_path")));
+		classpath.addEntry(MavenClasspathHelpers.getDefaultContainerEntry(
+			JavaCore.newClasspathAttribute(IClasspathAttribute.EXTERNAL_ANNOTATION_PATH, "/maven_external_anno_path")));
+		project.setRawClasspath(classpath.getEntries(), project.getOutputLocation(), monitor);
+
 		assertEquals("1.8", project.getOption(JavaCore.COMPILER_SOURCE, false));
 		IFile pomFileWS = project.getProject().getFile("pom.xml");
 		String pomContent = Files.readString(Path.of(pomFileWS.getLocationURI()));
@@ -60,6 +80,15 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		pomFileWS.setContents(new ByteArrayInputStream(pomContent.getBytes()), true, false, null);
 		waitForJobsToComplete();
 		assertEquals("11", project.getOption(JavaCore.COMPILER_SOURCE, false));
+
+		// ensure external annotation paths are still present after update
+		classpath = new ClasspathDescriptor(project);
+		var jreCpe = classpath.getEntryDescriptors().stream().filter(e -> JavaRuntime.JRE_CONTAINER.equals(e.getPath().segment(0)))
+			.findFirst().get();
+		assertEquals("/jre_external_anno_path", jreCpe.getClasspathAttributes().get(IClasspathAttribute.EXTERNAL_ANNOTATION_PATH));
+		var mavenCpePath = IPath.fromOSString(IClasspathManager.CONTAINER_ID);
+		var mavenCpe = classpath.getEntryDescriptors().stream().filter(e -> mavenCpePath.equals(e.getPath())).findFirst().get();
+		assertEquals("/maven_external_anno_path", mavenCpe.getClasspathAttributes().get(IClasspathAttribute.EXTERNAL_ANNOTATION_PATH));
 	}
 
 	@Test
@@ -124,7 +153,6 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		assertEquals(1, classpathEntriesCount(project, TEST_RESOURCES));
 	}
 
-	
 	@Test
 	public void testComplianceVsEnablePreviewSettings() throws CoreException, IOException, InterruptedException {
 		IJavaProject project = importResourceProject("/projects/compilerEnablePreviewSettings/pom.xml");
@@ -132,6 +160,32 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		assertEquals(JavaCore.ENABLED, project.getOption(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, false));
 		assertEquals(JavaCore.IGNORE, project.getOption(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, false));
 	}
+
+	@Test
+	public void testAddSourceResource() throws CoreException, IOException, InterruptedException {
+		File baseDir = new File(FileLocator
+				.toFileURL(JavaConfigurationTest.class.getResource("/projects/add-source-resource/submoduleA/pom.xml"))
+				.getFile()).getParentFile().getParentFile();
+		waitForJobsToComplete();
+		IProject project = importProjects(baseDir.getAbsolutePath(), new String[] { "submoduleA/pom.xml" },
+				new ResolverConfiguration())[0];
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(project);
+
+		List<String> srcEntryPaths = Arrays.stream(javaProject.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind()).filter(cp -> !cp.isTest())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		assertEquals(Set.of("/submoduleA/src/main/java", "/submoduleA/src/main/resources", //
+				"/submoduleA/.._parent_src_main_java", "/submoduleA/.._parent_src_main_resources"),
+				Set.copyOf(srcEntryPaths));
+		List<String> testEntryPaths = Arrays.stream(javaProject.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind()).filter(cp -> cp.isTest())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		assertEquals(Set.of("/submoduleA/src/test/java", "/submoduleA/src/test/resources", //
+				"/submoduleA/.._parent_src_test_java", "/submoduleA/.._parent_src_test_resources"),
+				Set.copyOf(testEntryPaths));
+	}
+
 	// --- utility methods ---
 
 	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()

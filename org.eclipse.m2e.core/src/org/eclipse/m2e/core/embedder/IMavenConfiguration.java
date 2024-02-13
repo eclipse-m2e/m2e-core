@@ -55,6 +55,10 @@ public interface IMavenConfiguration {
 
   void setUserSettingsFile(String absolutePath) throws CoreException;
 
+  String getUserToolchainsFile();
+
+  void setUserToolchainsFile(String absolutePath) throws CoreException;
+
   // resolution
 
   boolean isDownloadSources();

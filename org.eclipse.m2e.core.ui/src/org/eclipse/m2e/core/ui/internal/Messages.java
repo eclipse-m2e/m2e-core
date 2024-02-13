@@ -557,7 +557,7 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_update_one;
 
-  public static String MavenSettingsPreferencePage_userSettingsBrowseButton_text;
+  public static String MavenSettingsPreferencePage_settingsBrowseButton_text;
 
   public static String MavenSettingsPreferencePage_btnUpdate;
 
@@ -568,6 +568,10 @@ public class Messages extends NLS {
   public static String MavenSettingsPreferencePage_error_globalSettingsParse;
 
   public static String MavenSettingsPreferencePage_error_userSettingsParse;
+
+  public static String MavenSettingsPreferencePage_error_userToolchainsMissing;
+
+  public static String MavenSettingsPreferencePage_error_userToolchainsParse;
 
   public static String MavenSettingsPreferencePage_job_indexing;
 
@@ -602,6 +606,12 @@ public class Messages extends NLS {
   public static String MavenWarningsPreferencePage_groupidDupParent;
 
   public static String MavenWarningsPreferencePage_notCoveredMojoExecution;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink1;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink2;
+
+  public static String MavenSettingsPreferencePage_userToolchainslink_tooltip;
 
   public static String MavenWarningsPreferencePage_versionDupParent;
 
@@ -1024,8 +1034,6 @@ public class Messages extends NLS {
   public static String MavenInstallationWizardPage_selectProjectMessage;
 
   public static String MavenInstallationWizardPage_selectProjectTitle;
-
-  public static String MavenSettingsPreferencePage_globalSettingsBrowseButton_text;
 
   public static String MavenProjectWizardArchetypeParametersPage_runInteractive;
 

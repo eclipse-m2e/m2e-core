@@ -20,7 +20,6 @@ import java.util.Map;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -96,7 +95,7 @@ public class TychoLifecycleMapping extends AbstractCustomizableLifecycleMapping 
 				} else {
 					outputDirectory = mavenProject.getBuild().getOutputDirectory();
 				}
-				IFolder outputFolder = getFolder(project, outputDirectory);
+				IContainer outputFolder = getFolder(project, outputDirectory);
 				M2EUtils.createFolder(outputFolder, true, subMonitor.split(10));
 				IPath[] inclusion = new IPath[0];
 				IPath[] exclusion = new IPath[0];
