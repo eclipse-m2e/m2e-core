@@ -35,6 +35,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.jdt.internal.UnitTestSupport;
 
 
 public class MavenLaunchConfigurationListener implements ILaunchConfigurationListener, IMavenProjectChangedListener {
@@ -43,6 +44,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
   @Override
   public void launchConfigurationAdded(ILaunchConfiguration configuration) {
     updateLaunchConfiguration(configuration);
+    UnitTestSupport.setupLaunchConfigurationFromMavenConfiguration(configuration);
   }
 
   @Override
