@@ -8,6 +8,17 @@
 
 Updated the embedded Maven from version 3.9.7 to 3.9.9; [Maven 3.9.9 Release Notes](https://maven.apache.org/docs/3.9.9/release-notes.html).
 
+### Surefire/Failsafe plugin configuration propagated to Junit/TestNG launch configuration
+
+The following arguments are supported: <br/>
+`<argLine>`, <br/>
+`<environmentVariables>`, <br/>
+`<systemPropertyVariables>`, <br/>
+`<workingDirectory>`,<br/>
+`<enableAssertions>`,<br/>
+
+Configuration is propagated on unit test launch configuration creation and also when executing `maven > update project`
+
 ## 2.6.1
 
 * 📅 Release Date: 04th June 2024
