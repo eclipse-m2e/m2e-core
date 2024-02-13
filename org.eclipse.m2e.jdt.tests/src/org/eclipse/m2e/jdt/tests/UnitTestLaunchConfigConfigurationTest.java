@@ -13,6 +13,7 @@ package org.eclipse.m2e.jdt.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -85,6 +86,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
+		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = getTestFile("argumentsAreSet/surefireArgsSet.xml");
 		File failsafeConf = null;
@@ -131,6 +134,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 			throws CoreException, IOException, InterruptedException {
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
+
+		assumeNotNull(type);// if null unit test support for junit or testng is not installed
 
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = null;
@@ -179,6 +184,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
+		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = getTestFile("argumentsAreSet/surefireArgsSet.xml");
 		File failsafeConf = null;
@@ -219,6 +226,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
 
+		assumeNotNull(type);// if null unit test support for junit or testng is not installed
+
 		File pomFile = getTestFile("argumentsAreSet/pom.xml");
 		File surefireConf = null;
 		File failsafeConf = getTestFile("argumentsAreSet/failsafeArgsSet.xml");
@@ -258,6 +267,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 			throws CoreException, IOException, InterruptedException {
 		// Get launch type
 		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
+
+		assumeNotNull(type);// if null unit test support for junit or testng is not installed
 
 		File pomFile = getTestFile("prerequisitesAreLoaded/pom.xml");
 
