@@ -8,6 +8,28 @@
 
 Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Notes](https://maven.apache.org/docs/3.9.6/release-notes.html).
 
+### Surefire/Failsafe plugin configuration propagated to Junit/TestNG launch configuration
+
+The following arguments are supported: <br/>
+`<argLine>`, <br/>
+`<environmentVariables>`, <br/>
+`<systemPropertyVariables>`, <br/>
+`<workingDirectory>`,<br/>
+`<enableAssertions>`,<br/>
+
+Configuration is propagated on unit test launch configuration creation and also when executing `maven > update project`
+
+By default and if found, the plugin maven-dependency-plugin (goal: properties) is executed before updating the launch configuration to load properties.
+
+If properties set by other plugins are used in the failsafe/surefire plugin configuration it is possible to override the default loading behaviour by providing the list plugins and goals to execute using the property `m2e.launch.configuration.prerequisites`
+
+The expected format is as follow:
+
+groupId1:artifactId1:goal1[,groupIdX:artifactIdX:goalX]*
+
+Ex:
+<m2e.launch.configuration.prerequisites>org.apache.maven.plugins:maven-dependency-plugin:properties,org.codehaus.mojo:properties-maven-plugin:read-project-properties</m2e.launch.configuration.prerequisites>
+
 
 ## 2.5.0
 
