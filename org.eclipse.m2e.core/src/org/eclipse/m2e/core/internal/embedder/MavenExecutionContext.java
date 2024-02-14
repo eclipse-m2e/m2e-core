@@ -17,6 +17,7 @@ package org.eclipse.m2e.core.internal.embedder;
 import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -25,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
@@ -73,6 +75,7 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 
@@ -149,32 +152,59 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       }
       request = DefaultMavenExecutionRequest.copy(parent);
     }
-    if(request == null) {
-      request = createExecutionRequest(IMavenConfiguration.getWorkspaceConfiguration(),
-          containerLookup, MavenPlugin.getMaven().getSettings());
-      request.setBaseDirectory(basedir);
+    if(request == null || !Objects.equals(request.getMultiModuleProjectDirectory(), multiModuleProjectDirectory)) {
+      IMavenConfiguration workspaceConfiguration = IMavenConfiguration.getWorkspaceConfiguration();
+      Optional<MavenProperties> mavenArgs;
+      try {
+        mavenArgs = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+      } catch(IOException ex) {
+        throw new CoreException(Status.error("Loading maven.config failed!", ex));
+      }
+      MavenSettingsLocations mavenSettingsLocations = mavenArgs
+          .map(mavenCfg -> mavenCfg.getSettingsLocations(workspaceConfiguration))
+          .orElseGet(workspaceConfiguration::getSettingsLocations);
+      if(request == null) {
+        //create a fresh one ....
+        request = createExecutionRequest(workspaceConfiguration, containerLookup, mavenSettingsLocations);
+        request.setBaseDirectory(basedir);
+      } else {
+        //update existing configuration, we might have copied from an outer context here, but if the multi-module directory is different, we need to update some things...
+        Settings settings = MavenPlugin.getMaven().getSettings(mavenSettingsLocations);
+        File requestLocalRepositoryPath = request.getLocalRepositoryPath();
+        File settingsLocalRepositoryPath = getLocalRepositoryPath(settings);
+        if(!pathEquals(requestLocalRepositoryPath, settingsLocalRepositoryPath)) {
+          updateLocalRepository(request, settingsLocalRepositoryPath, containerLookup);
+        }
+        //TODO maybe also need to update user properties?!?
+        updateSettingsFiles(request, mavenSettingsLocations);
+      }
+      request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
     }
-    request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
-
     return request;
   }
 
-  static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration, IComponentLookup lookup,
-      Settings settings) throws CoreException {
-    MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+  private boolean pathEquals(File file1, File file2) {
+    if(Objects.equals(file1, file2)) {
+      return true;
+    }
+    if(file1 != null && file2 != null) {
+      try {
+        return Objects.equals(file1.getCanonicalFile(), file2.getCanonicalFile());
+      } catch(IOException ex) {
+        //can't compare then...
+      }
+    }
+    return false;
+  }
 
+  static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration, IComponentLookup lookup,
+      MavenSettingsLocations settingsLocations) throws CoreException {
+    MavenExecutionRequest request = new DefaultMavenExecutionRequest();
     // this causes problems with unexpected "stale project configuration" error markers
     // need to think how to manage ${maven.build.timestamp} properly inside workspace
     //request.setStartTime( new Date() );
-
-    if(mavenConfiguration.getGlobalSettingsFile() != null) {
-      request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
-    }
-    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
-    if(mavenConfiguration.getUserSettingsFile() != null) {
-      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
-    }
-    request.setUserSettingsFile(userSettingsFile);
+    Settings settings = MavenPlugin.getMaven().getSettings(settingsLocations);
+    updateSettingsFiles(request, settingsLocations);
 
     //and settings are actually derived from IMavenConfiguration
 
@@ -183,26 +213,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       userToolchainsFile = new File(mavenConfiguration.getUserToolchainsFile());
     }
     request.setUserToolchainsFile(userToolchainsFile);
-
     try {
       request = lookup.lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, settings);
     } catch(MavenExecutionRequestPopulationException ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_no_exec_req, ex));
     }
 
-    String localRepositoryPath = settings.getLocalRepository();
-    if(localRepositoryPath == null) {
-      localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
-    }
-
-    ArtifactRepository localRepository;
-    try {
-      localRepository = lookup.lookup(RepositorySystem.class).createLocalRepository(new File(localRepositoryPath));
-    } catch(InvalidRepositoryException ex) {
-      throw new AssertionError("Should never happen!", ex);
-    }
-    request.setLocalRepository(localRepository);
-    request.setLocalRepositoryPath(localRepository.getBasedir());
+    updateLocalRepository(request, getLocalRepositoryPath(settings), lookup);
     request.setOffline(mavenConfiguration.isOffline());
 
     request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
@@ -215,6 +232,39 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
     request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
     return request;
+  }
+
+  private static void updateSettingsFiles(MavenExecutionRequest request, MavenSettingsLocations settingsLocations) {
+    File global = settingsLocations.globalSettings();
+    if(global != null) {
+      request.setGlobalSettingsFile(global);
+    }
+    File userSettingsFile = settingsLocations.userSettings();
+    if(userSettingsFile == null) {
+      request.setUserSettingsFile(SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE);
+    } else {
+      request.setUserSettingsFile(userSettingsFile);
+    }
+  }
+
+  private static void updateLocalRepository(MavenExecutionRequest request, File localRepositoryPath,
+      IComponentLookup lookup) throws CoreException, AssertionError {
+    ArtifactRepository localRepository;
+    try {
+      localRepository = lookup.lookup(RepositorySystem.class).createLocalRepository(localRepositoryPath);
+    } catch(InvalidRepositoryException ex) {
+      throw new AssertionError("Should never happen!", ex);
+    }
+    request.setLocalRepository(localRepository);
+    request.setLocalRepositoryPath(localRepository.getBasedir());
+  }
+
+  private static File getLocalRepositoryPath(Settings settings) {
+    String localRepositoryPath = settings.getLocalRepository();
+    if(localRepositoryPath == null) {
+      return RepositorySystem.defaultUserLocalRepository;
+    }
+    return new File(localRepositoryPath);
   }
 
   @Override
