@@ -187,6 +187,8 @@ public interface IMaven extends IComponentLookup {
    */
   Settings getSettings() throws CoreException;
 
+  Settings getSettings(MavenSettingsLocations locations) throws CoreException;
+
   String getLocalRepositoryPath();
 
   ArtifactRepository getLocalRepository() throws CoreException;
@@ -209,6 +211,10 @@ public interface IMaven extends IComponentLookup {
 
   List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException;
 
+  /**
+   * @deprecated use {@link #getSettings(MavenSettingsLocations)} instead
+   */
+  @Deprecated(forRemoval = true)
   Settings buildSettings(String globalSettings, String userSettings) throws CoreException;
 
   void writeSettings(Settings settings, OutputStream out) throws CoreException;
