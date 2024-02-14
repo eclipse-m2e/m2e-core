@@ -664,6 +664,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     private List<String> inactiveProfiles;
 
+    private String globalSettingsFile;
+
+    private String userSettingsFile;
+
     private MavenProjectConfiguration(IProjectConfiguration baseConfiguration) {
       if(baseConfiguration == null) {
         //we should really forbid this but some test seem to pass null!
@@ -677,6 +681,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.profiles = baseConfiguration.getSelectedProfiles();
       this.activeProfiles = List.copyOf(baseConfiguration.getActiveProfileList());
       this.inactiveProfiles = List.copyOf(baseConfiguration.getInactiveProfileList());
+      this.globalSettingsFile = baseConfiguration.getGlobalSettingsFile();
+      this.userSettingsFile = baseConfiguration.getUserSettingsFile();
     }
 
     @Override
@@ -733,6 +739,16 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     @Override
     public List<String> getInactiveProfileList() {
       return inactiveProfiles;
+    }
+
+    @Override
+    public String getGlobalSettingsFile() {
+      return globalSettingsFile;
+    }
+
+    @Override
+    public String getUserSettingsFile() {
+      return userSettingsFile;
     }
 
   }
