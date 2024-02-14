@@ -66,6 +66,10 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private List<String> userInactiveProfiles;
 
+  private String globalSettingsFile;
+
+  private String userSettingsFile;
+
   public ResolverConfiguration() {
   }
 
@@ -79,9 +83,9 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   public ResolverConfiguration(IProjectConfiguration resolverConfiguration) {
     setLifecycleMappingId(resolverConfiguration.getLifecycleMappingId());
     setMultiModuleProjectDirectory(resolverConfiguration.getMultiModuleProjectDirectory());
-    Properties properties2 = new Properties();
-    properties2.putAll(resolverConfiguration.getConfigurationProperties());
-    setProperties(properties2);
+    Properties properties = new Properties();
+    properties.putAll(resolverConfiguration.getConfigurationProperties());
+    setProperties(properties);
     setResolveWorkspaceProjects(resolverConfiguration.isResolveWorkspaceProjects());
     setSelectedProfiles(resolverConfiguration.getSelectedProfiles());
   }
@@ -195,6 +199,16 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return multiModuleProjectDirectory;
   }
 
+  @Override
+  public String getGlobalSettingsFile() {
+    return globalSettingsFile;
+  }
+
+  @Override
+  public String getUserSettingsFile() {
+    return userSettingsFile;
+  }
+
   /**
    * @param multiModuleProjectDirectory The multiModuleProjectDirectory to set.
    */
@@ -209,6 +223,8 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
         userActiveProfiles = new ArrayList<>();
         userInactiveProfiles = new ArrayList<>();
         MavenProperties.getProfiles(commandLine, userActiveProfiles::add, userInactiveProfiles::add);
+        globalSettingsFile = MavenProperties.getAlternateGlobalToolchainsFile(commandLine);
+        userSettingsFile = MavenProperties.getAlternateUserToolchainsFile(commandLine);
       } catch(IOException | ParseException ex) {
         //can't use it then... :-(
         MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,

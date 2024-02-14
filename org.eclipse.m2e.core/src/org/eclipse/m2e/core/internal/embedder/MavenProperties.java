@@ -237,6 +237,20 @@ public class MavenProperties {
     }
   }
 
+  public static String getAlternateGlobalToolchainsFile(CommandLine commandline) {
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_USER_SETTINGS);
+    }
+    return null;
+  }
+
+  public static String getAlternateUserToolchainsFile(CommandLine commandline) {
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_USER_TOOLCHAINS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS);
+    }
+    return null;
+  }
+
   public static void getCliProperty(String property, BiConsumer<String, String> consumer) {
     int index = property.indexOf('=');
     if(index <= 0) {
