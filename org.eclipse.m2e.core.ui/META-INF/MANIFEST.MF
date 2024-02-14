@@ -56,9 +56,4 @@ Service-Component: OSGI-INF/component.xml,
  OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
  OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
 Automatic-Module-Name: org.eclipse.m2e.core.ui
-Service-Component: OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
- OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
-Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypeGenerator.xml,
- OSGI-INF/org.eclipse.m2e.core.ui.internal.archetype.ArchetypePlugin.xml
-Bundle-ActivationPolicy: lazy
+
