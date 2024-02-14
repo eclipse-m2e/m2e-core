@@ -15,8 +15,6 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
-import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -36,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
@@ -138,6 +137,7 @@ import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -145,7 +145,9 @@ import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
+import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
@@ -169,15 +171,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private PlexusContainerManager containerManager;
 
   /**
-   * Cached parsed settings.xml instance
+   * Cached parsed settingsCacheMap.xml instance
    */
-  private Settings settings;
-
-  /** File length of cached user settings */
-  private long settingsLength;
-
-  /** Last modified timestamp of cached user settings */
-  private long settingsTimestamp;
+  private Map<MavenSettingsLocations, MavenSettings> settingsCacheMap = new ConcurrentHashMap<>();
 
   @Override
   public String getLocalRepositoryPath() {
@@ -274,54 +270,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public Settings getSettings() throws CoreException {
-    return getSettings(false);
+    return getSettings(mavenConfiguration.getSettingsLocations());
   }
 
-  public synchronized Settings getSettings(boolean forceReload) throws CoreException {
-    // MUST NOT use createRequest!
-
-    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
-    if(mavenConfiguration.getUserSettingsFile() != null) {
-      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
-    }
-
-    boolean reload = forceReload || settings == null;
-
-    if(!reload && userSettingsFile != null) {
-      reload = userSettingsFile.lastModified() != settingsTimestamp || userSettingsFile.length() != settingsLength;
-    }
-
-    if(reload) {
-      // TODO: Can't that delegate to buildSettings()?
-      SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-      // 440696 guard against ConcurrentModificationException
-      Properties systemProperties = new Properties();
-      copyProperties(systemProperties, System.getProperties());
-      request.setSystemProperties(systemProperties);
-      if(mavenConfiguration.getGlobalSettingsFile() != null) {
-        request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
-      }
-      if(userSettingsFile != null) {
-        request.setUserSettingsFile(userSettingsFile);
-      }
-      try {
-        settings = lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
-      } catch(SettingsBuildingException ex) {
-        String msg = "Could not read settings.xml, assuming default values";
-        log.error(msg, ex);
-        /*
-         * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly
-         * unusuable. Instead, we fail gracefully and just ignore the broken settings, using defaults.
-         */
-        settings = new Settings();
-      }
-
-      if(userSettingsFile != null) {
-        settingsLength = userSettingsFile.length();
-        settingsTimestamp = userSettingsFile.lastModified();
-      }
-    }
-    return settings;
+  @Override
+  public Settings getSettings(MavenSettingsLocations locations) throws CoreException {
+    MavenSettings cache = settingsCacheMap.computeIfAbsent(locations, key -> new MavenSettings(key, MavenImpl.this));
+    return cache.getSettings();
   }
 
   @Override
@@ -372,7 +327,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @Override
   public void reloadSettings() throws CoreException {
-    Settings reloadedSettings = getSettings(true);
+    settingsCacheMap.clear();
+    Settings reloadedSettings = getSettings(mavenConfiguration.getSettingsLocations());
     for(ISettingsChangeListener listener : settingsListeners) {
       try {
         listener.settingsChanged(reloadedSettings);
@@ -1101,6 +1057,79 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public MavenExecutionContext createExecutionContext() {
     //the global context do not has a basedir nor a project supplier...
     return new MavenExecutionContext(this, null, null);
+  }
+
+  private static final class MavenSettings {
+    private long userSettingsLength;
+
+    private long userSettingsTimestamp;
+
+    private long globalSettingsLength;
+
+    private long globalSettingsTimestamp;
+
+    private MavenSettingsLocations locations;
+
+    private Settings settings;
+
+    private IComponentLookup lookup;
+
+    public MavenSettings(MavenSettingsLocations locations, IComponentLookup lookup) {
+      this.locations = locations;
+      this.lookup = lookup;
+    }
+
+    private synchronized Settings getSettings() throws CoreException {
+      File global = locations.globalSettings();
+      long gs;
+      long gt;
+      if(global != null && global.isFile()) {
+        gs = global.length();
+        gt = global.lastModified();
+      } else {
+        gs = -1;
+        gt = -1;
+      }
+      File user = locations.userSettings();
+      long us;
+      long ut;
+      if(user != null && user.isFile()) {
+        us = user.length();
+        ut = user.lastModified();
+      } else {
+        us = -1;
+        ut = -1;
+      }
+      boolean reload = settings == null || gs != globalSettingsLength || gt != globalSettingsTimestamp
+          || us != userSettingsLength || ut != userSettingsTimestamp;
+      if(reload) {
+        SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        Properties systemProperties = new Properties();
+        M2EUtils.copyProperties(systemProperties, System.getProperties());
+        request.setSystemProperties(systemProperties);
+        if(global != null) {
+          request.setGlobalSettingsFile(global);
+        }
+        if(user != null) {
+          request.setUserSettingsFile(user);
+        }
+        try {
+          settings = lookup.lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
+        } catch(SettingsBuildingException ex) {
+          log.error("Could not read settingsCacheMap.xml, assuming default values", ex);
+          /*
+           * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly
+           * unusable. Instead, we fail gracefully and just ignore the broken settingsCacheMap, using defaults.
+           */
+          settings = new Settings();
+        }
+        globalSettingsLength = gs;
+        globalSettingsTimestamp = gt;
+        userSettingsLength = us;
+        userSettingsTimestamp = ut;
+      }
+      return settings;
+    }
   }
 
 }

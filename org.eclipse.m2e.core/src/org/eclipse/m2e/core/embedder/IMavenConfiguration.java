@@ -134,6 +134,8 @@ public interface IMavenConfiguration {
    */
   boolean buildWithNullSchedulingRule();
 
+  MavenSettingsLocations getSettingsLocations();
+
   static IMavenConfiguration getWorkspaceConfiguration() {
     MavenPluginActivator activator = MavenPluginActivator.getDefault();
     if(activator == null) {

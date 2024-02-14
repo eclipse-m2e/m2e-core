@@ -35,8 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.cli.CommandLine;
-
 import com.google.inject.AbstractModule;
 
 import org.eclipse.core.resources.IResource;
@@ -350,9 +348,9 @@ public class PlexusContainerManager {
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
-      CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+      Optional<MavenProperties> mavenProperties = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
       Properties userProperties = request.getUserProperties();
-      MavenProperties.getCliProperties(commandLine, userProperties::setProperty);
+      mavenProperties.ifPresent(prop -> prop.getCliProperties(userProperties::setProperty));
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
       return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
     } finally {

@@ -24,12 +24,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
 
 import org.eclipse.core.resources.IProject;
 
@@ -202,14 +200,16 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     if(!Objects.equals(this.multiModuleProjectDirectory, multiModuleProjectDirectory)) {
       this.multiModuleProjectDirectory = multiModuleProjectDirectory;
       try {
-        CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+        Optional<MavenProperties> mavenProps = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
         Map<String, String> props = new LinkedHashMap<>();
-        MavenProperties.getCliProperties(commandLine, props::put);
-        userProperties = Collections.unmodifiableMap(props);
         userActiveProfiles = new ArrayList<>();
         userInactiveProfiles = new ArrayList<>();
-        MavenProperties.getProfiles(commandLine, userActiveProfiles::add, userInactiveProfiles::add);
-      } catch(IOException | ParseException ex) {
+        mavenProps.ifPresent(args -> {
+          args.getCliProperties(props::put);
+          args.getProfiles(userActiveProfiles::add, userInactiveProfiles::add);
+        });
+        userProperties = Collections.unmodifiableMap(props);
+      } catch(IOException ex) {
         //can't use it then... :-(
         MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,
             ex);

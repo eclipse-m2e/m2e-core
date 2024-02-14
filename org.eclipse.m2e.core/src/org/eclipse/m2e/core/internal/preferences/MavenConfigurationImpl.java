@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,10 +42,12 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.PreferenceFilterEntry;
 
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
+import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -204,6 +207,25 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
         log.error("Could not deliver maven configuration change event", e);
       }
     }
+  }
+
+  @Override
+  public MavenSettingsLocations getSettingsLocations() {
+    File userSettings;
+    File globalSettings;
+    String configSettingsFile = getUserSettingsFile();
+    if (configSettingsFile==null) {
+      userSettings = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
+    } else {
+      userSettings = new File(configSettingsFile);
+    }
+    String configGlobalSettingsFile = getGlobalSettingsFile();
+    if(configGlobalSettingsFile == null) {
+      globalSettings = null;
+    } else {
+      globalSettings = new File(configGlobalSettingsFile);
+    }
+    return new MavenSettingsLocations(globalSettings, userSettings);
   }
 
   @Override
