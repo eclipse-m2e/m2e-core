@@ -29,7 +29,7 @@ Configuration is propagated on unit test launch configuration creation and also 
 
 By default and if found, the plugin maven-dependency-plugin (goal: properties) is executed before updating the launch configuration to load properties.
 
-If properties set by other plugins are used in the failsafe/surefire plugin configuration it is possible to override the default loading behaviour by providing the list plugins and goals to execute using the property `m2e.launch.configuration.prerequisites`
+If properties set by other plugins are used in the failsafe/surefire plugin configuration it is possible to override the default loading behaviour by providing the list of plugins and goals to execute using the property `m2e.launch.configuration.prerequisites`
 
 The expected format is as follow:
 
