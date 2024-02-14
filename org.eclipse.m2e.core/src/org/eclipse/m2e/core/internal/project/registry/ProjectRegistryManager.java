@@ -989,7 +989,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
     // eclipse workspace repository implements both workspace dependency resolution
     // and inter-module dependency resolution for multi-module projects.
-
+//???
     request.setLocalRepository(maven.getLocalRepository());
     request.setWorkspaceReader(getWorkspaceReader(state, pom, resolverConfiguration));
     if(pom != null && pom.getLocation() != null) {
