@@ -29,8 +29,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -73,14 +76,63 @@ public class MavenProperties {
 
   private static String mavenBuildVersion;
 
+  private static Map<File, MavenProperties> mavenProperties = new ConcurrentHashMap<>();
+
+  private File configFile;
+
+  private CommandLine commandline;
+
+  private long lastModified;
+
+  private long lastSize;
+
   static {
     Properties properties = getMavenRuntimeProperties();
     mavenVersion = properties.getProperty(BUILD_VERSION_PROPERTY, BUILD_VERSION_UNKNOWN_PROPERTY);
     mavenBuildVersion = createMavenVersionString(properties);
   }
 
-  private MavenProperties() {
-    //prevent instanciation
+  private MavenProperties(File configFile) {
+    this.configFile = configFile;
+  }
+
+  /**
+   * @return the configFile
+   */
+  public File getConfigFile() {
+    return this.configFile;
+  }
+
+  private synchronized boolean checkForUpdate() throws IOException {
+    if(configFile.isFile()) {
+      long modified = configFile.lastModified();
+      long size = configFile.length();
+      if(commandline == null || lastModified != modified || size != lastSize) {
+        List<String> args = new ArrayList<>();
+        for(String arg : new String(Files.readAllBytes(configFile.toPath())).split("\\s+")) {
+          if(!arg.isEmpty()) {
+            args.add(arg);
+          }
+        }
+        CLIManager manager = new CLIManager();
+        try {
+          commandline = manager.parse(args.toArray(String[]::new));
+        } catch(ParseException ex) {
+          throw new IOException("Couldn't parse file " + configFile, ex);
+        }
+      }
+      lastModified = modified;
+      lastSize = size;
+      return true;
+    }
+    commandline = null;
+    lastModified = -1;
+    lastSize = -1;
+    return false;
+  }
+
+  private synchronized CommandLine getCommandline() {
+    return this.commandline;
   }
 
   static Properties getMavenRuntimeProperties() {
@@ -174,7 +226,7 @@ public class MavenProperties {
     final File basedir = file.isDirectory() ? file : file.getParentFile();
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     File workspaceRoot = workspace.getRoot().getLocation().toFile();
-  
+
     for(File root = basedir; root != null && !root.equals(workspaceRoot); root = root.getParentFile()) {
       if(new File(root, IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
         return root;
@@ -183,27 +235,24 @@ public class MavenProperties {
     return null;
   }
 
-  public static CommandLine getMavenArgs(File multiModuleProjectDirectory) throws IOException, ParseException {
+  public static Optional<MavenProperties> getMavenArgs(File multiModuleProjectDirectory) throws IOException {
     if(multiModuleProjectDirectory != null) {
       File configFile = new File(multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
       if(configFile.isFile()) {
-        List<String> args = new ArrayList<>();
-        for(String arg : new String(Files.readAllBytes(configFile.toPath())).split("\\s+")) {
-          if(!arg.isEmpty()) {
-            args.add(arg);
-          }
+        MavenProperties properties = mavenProperties.computeIfAbsent(configFile, MavenProperties::new);
+        if(properties.checkForUpdate()) {
+          return Optional.of(properties);
         }
-        CLIManager manager = new CLIManager();
-        return manager.parse(args.toArray(String[]::new));
       }
     }
-    return null;
+    return Optional.empty();
   }
 
-  public static void getProfiles(CommandLine commandLine, Consumer<String> activeProfilesConsumer,
+  public void getProfiles(Consumer<String> activeProfilesConsumer,
       Consumer<String> inactiveProfilesConsumer) {
-    if(commandLine != null && commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
-      String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.ACTIVATE_PROFILES)) {
+      String[] profileOptionValues = commandline.getOptionValues(CLIManager.ACTIVATE_PROFILES);
       if(profileOptionValues != null) {
         for(String profileOptionValue : profileOptionValues) {
           StringTokenizer tokenizer = new StringTokenizer(profileOptionValue, ",");
@@ -226,15 +275,48 @@ public class MavenProperties {
     }
   }
 
-  public static void getCliProperties(CommandLine commandLine, BiConsumer<String, String> consumer) {
-    if(commandLine != null && commandLine.hasOption(CLIManager.SET_SYSTEM_PROPERTY)) {
-      String[] defStrs = commandLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY);
+  public void getCliProperties(BiConsumer<String, String> consumer) {
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.SET_SYSTEM_PROPERTY)) {
+      String[] defStrs = commandline.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY);
       if(defStrs != null) {
         for(String defStr : defStrs) {
           MavenProperties.getCliProperty(defStr, consumer);
         }
       }
     }
+  }
+
+  public String getAlternateGlobalSettingsFile() {
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_GLOBAL_SETTINGS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_GLOBAL_SETTINGS);
+    }
+    return null;
+  }
+
+  public String getAlternateUserSettingsFile() {
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_USER_SETTINGS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_USER_SETTINGS);
+    }
+    return null;
+  }
+
+  public String getAlternateGlobalToolchainsFile() {
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_USER_SETTINGS);
+    }
+    return null;
+  }
+
+  public String getAlternateUserToolchainsFile() {
+    CommandLine commandline = getCommandline();
+    if(commandline != null && commandline.hasOption(CLIManager.ALTERNATE_USER_TOOLCHAINS)) {
+      return commandline.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS);
+    }
+    return null;
   }
 
   public static void getCliProperty(String property, BiConsumer<String, String> consumer) {
@@ -245,4 +327,5 @@ public class MavenProperties {
       consumer.accept(property.substring(0, index).trim(), property.substring(index + 1).trim());
     }
   }
+
 }
