@@ -128,6 +128,7 @@ import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
@@ -355,7 +356,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setUserSettingsFile(settingsFile);
         try {
-          lookup(SettingsBuilder.class).build(request);
+          SettingsBuildingResult result = lookup(SettingsBuilder.class).build(request);
+          problems.addAll(result.getProblems());
         } catch(SettingsBuildingException ex) {
           problems.addAll(ex.getProblems());
         } catch(CoreException ex) {

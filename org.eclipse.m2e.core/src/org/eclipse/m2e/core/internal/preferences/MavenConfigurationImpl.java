@@ -98,6 +98,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   }
 
   @Override
+  public String getGlobalToolchainsFile() {
+    return getStringPreference(MavenPreferenceConstants.P_GLOBAL_TOOLCHAINS_FILE, null);
+  }
+
+  @Override
   public String getUserSettingsFile() {
     return getStringPreference(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null);
   }
@@ -152,6 +157,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   @Override
   public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
     setSettingsFile(globalSettingsFile, MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+  }
+
+  @Override
+  public void setGlobalToolchainsFile(String globalToolchainsFile) throws CoreException {
+    setSettingsFile(globalToolchainsFile, MavenPreferenceConstants.P_GLOBAL_TOOLCHAINS_FILE);
   }
 
   @Override
