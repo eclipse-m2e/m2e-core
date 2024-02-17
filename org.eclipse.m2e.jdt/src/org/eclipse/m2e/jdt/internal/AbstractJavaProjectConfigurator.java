@@ -586,7 +586,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     log.info("Adding resource folder " + resourceFolder);
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, 
       toIPathList(resource.getIncludes(), null),
-      toIPathList(resource.getExcludes(), "**/*.java"), false /*optional*/);
+      toIPathList(resource.getExcludes(), null), false /*optional*/);
     descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
     descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
   }
@@ -598,9 +598,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     final List<IPath> retList = new ArrayList<>();
     for (final String files : fileNames) {
       retList.add(IPath.fromOSString(files));
-    }
-    if (defaultPattern != null) {
-      retList.add(IPath.fromOSString(defaultPattern));
     }
     return retList.toArray(DEFAULT_INCLUSIONS);
   }
