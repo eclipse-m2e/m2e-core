@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.sdk.feature"
       label="%featureName"
-      version="2.5.1.qualifier"
+      version="2.6.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
