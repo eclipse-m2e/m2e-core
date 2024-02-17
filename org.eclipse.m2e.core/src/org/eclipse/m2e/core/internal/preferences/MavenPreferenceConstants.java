@@ -59,6 +59,9 @@ public interface MavenPreferenceConstants {
   String P_GLOBAL_SETTINGS_FILE = PREFIX + "globalSettingsFile"; //$NON-NLS-1$
 
   /** String */
+  String P_GLOBAL_TOOLCHAINS_FILE = PREFIX + "globalToolchainsFile"; //$NON-NLS-1$
+
+  /** String */
   String P_USER_SETTINGS_FILE = PREFIX + "userSettingsFile"; //$NON-NLS-1$
 
   /** String */

@@ -64,6 +64,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.ISupplier;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -433,7 +434,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     try {
       String profiles = configuration.getAttribute(ATTR_PROFILES, (String) null);
       if(profiles != null && profiles.trim().length() > 0) {
-        sb.append(" -P").append(profiles.replaceAll("\\s+", ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append(" -P").append(profiles.replaceAll("\\s+", ",")); ////$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       }
     } catch(CoreException ex) {
       log.error("Exception while getting configuration attribute " + ATTR_PROFILES, ex);
@@ -495,27 +496,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     };
     sb.append(" -Dstyle.color=" + enableColor);
 
-    if(!goals.contains("-gs ")) { //$NON-NLS-1$
-      String globalSettings = launchSupport.getSettings();
-      if(globalSettings != null && !globalSettings.trim().isEmpty() && !new File(globalSettings.trim()).exists()) {
-        globalSettings = null;
-      }
-      if(globalSettings != null && !globalSettings.trim().isEmpty()) {
-        sb.append(" -gs ").append(quote(globalSettings)); //$NON-NLS-1$
-      }
-    }
+    this.appendFileSetting("global settings", "-gs ", sb, goals, false, mavenConfiguration::getGlobalSettingsFile); //$NON-NLS-1$
+    this.appendFileSetting("global settings", "-gs ", sb, goals, false, launchSupport::getSettings); //$NON-NLS-1$ //$NON-NLS-2$
+    this.appendFileSetting("global toolchains", "-gt ", sb, goals, false, mavenConfiguration::getGlobalToolchainsFile); //$NON-NLS-1$ //$NON-NLS-2$
 
-    String settings = configuration.getAttribute(MavenLaunchConstants.ATTR_USER_SETTINGS, (String) null);
-    settings = LaunchingUtils.substituteVar(settings);
-    if(settings == null || settings.trim().isEmpty()) {
-      settings = mavenConfiguration.getUserSettingsFile();
-      if(settings != null && !settings.trim().isEmpty() && !new File(settings.trim()).exists()) {
-        settings = null;
-      }
-    }
-    if(settings != null && !settings.trim().isEmpty()) {
-      sb.append(" -s ").append(quote(settings)); //$NON-NLS-1$
-    }
+    this.appendFileSetting("user settings", "-s ", sb, goals, false, //$NON-NLS-1$ //$NON-NLS-2$
+        () -> configuration.getAttribute(MavenLaunchConstants.ATTR_USER_SETTINGS, (String) null));
+    this.appendFileSetting("user settings", "-s ", sb, goals, false, mavenConfiguration::getUserSettingsFile); //$NON-NLS-1$ //$NON-NLS-2$
+    this.appendFileSetting("user toolchains", "-t ", sb, goals, false, mavenConfiguration::getUserToolchainsFile); //$NON-NLS-1$ //$NON-NLS-2$
 
     // boolean b = preferenceStore.getBoolean(MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION);
     // sb.append(" -D").append(MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION).append("=").append(b);
@@ -527,6 +515,39 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // if(s != null && s.trim().length() > 0) {
     //   sb.append(" -D").append(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY).append("=").append(s);
     // }
+  }
+
+  /**
+   * Appends file based configuration key if not laready set.
+   * 
+   * @param name THe name of the setting.
+   * @param arg The argument. Must not be <code>null</code>.
+   * @param sb The target. Must not be <code>null</code>.
+   * @param goals The configured goals. Used to override settings.
+   * @param substitute <code>true</code> , if variables in settings should be substituted.
+   * @param source Source for the settings. Must not be <code>null</code>.
+   * @throws CoreException If something went wrong.
+   * @throws IllegalArgumentException If the configured file does not exists.
+   */
+  private void appendFileSetting(String name, String arg, StringBuilder sb, String goals, boolean substitute,
+      ISupplier<String> source) throws CoreException, IllegalArgumentException {
+    if(!goals.contains(arg) && 0 >= sb.indexOf(arg)) {
+      String setting = source.get();
+
+      if(substitute && null != setting) {
+        setting = LaunchingUtils.substituteVar(setting);
+      }
+
+      if(null != setting && !setting.isBlank()) {
+        final File file = new File(setting.trim());
+        if(file.exists()) {
+          sb.append(" "); //$NON-NLS-1$
+          sb.append(arg).append(quote(file.getAbsolutePath()));
+        } else {
+          throw new IllegalArgumentException("invalid path for " + name + ": " + file.getAbsolutePath());
+        }
+      }
+    }
   }
 
   /**
