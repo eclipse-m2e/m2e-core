@@ -165,20 +165,21 @@ public class MavenExecutionContext implements IMavenExecutionContext {
           .orElseGet(workspaceConfiguration::getSettingsLocations);
       if(request == null) {
         //create a fresh one ....
-        request = createExecutionRequest(workspaceConfiguration, containerLookup, mavenSettingsLocations);
+        request = createExecutionRequest(workspaceConfiguration, containerLookup, mavenSettingsLocations,
+            multiModuleProjectDirectory);
         request.setBaseDirectory(basedir);
       } else {
         //update existing configuration, we might have copied from an outer context here, but if the multi-module directory is different, we need to update some things...
         Settings settings = MavenPlugin.getMaven().getSettings(mavenSettingsLocations);
         File requestLocalRepositoryPath = request.getLocalRepositoryPath();
-        File settingsLocalRepositoryPath = getLocalRepositoryPath(settings);
+        File settingsLocalRepositoryPath = getLocalRepositoryPath(settings, multiModuleProjectDirectory);
         if(!pathEquals(requestLocalRepositoryPath, settingsLocalRepositoryPath)) {
           updateLocalRepository(request, settingsLocalRepositoryPath, containerLookup);
         }
         //TODO maybe also need to update user properties?!?
         updateSettingsFiles(request, mavenSettingsLocations);
+        request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
       }
-      request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
     }
     return request;
   }
@@ -198,16 +199,14 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   }
 
   static MavenExecutionRequest createExecutionRequest(IMavenConfiguration mavenConfiguration, IComponentLookup lookup,
-      MavenSettingsLocations settingsLocations) throws CoreException {
+      MavenSettingsLocations settingsLocations, File multiModuleProjectDirectory) throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
     // this causes problems with unexpected "stale project configuration" error markers
     // need to think how to manage ${maven.build.timestamp} properly inside workspace
     //request.setStartTime( new Date() );
     Settings settings = MavenPlugin.getMaven().getSettings(settingsLocations);
     updateSettingsFiles(request, settingsLocations);
-
     //and settings are actually derived from IMavenConfiguration
-
     File userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
     if(mavenConfiguration.getUserToolchainsFile() != null) {
       userToolchainsFile = new File(mavenConfiguration.getUserToolchainsFile());
@@ -219,7 +218,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       throw new CoreException(Status.error(Messages.MavenImpl_error_no_exec_req, ex));
     }
 
-    updateLocalRepository(request, getLocalRepositoryPath(settings), lookup);
+    updateLocalRepository(request, getLocalRepositoryPath(settings, multiModuleProjectDirectory), lookup);
     request.setOffline(mavenConfiguration.isOffline());
 
     request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
@@ -231,6 +230,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.setCacheTransferError(true);
 
     request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
+    request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
     return request;
   }
 
@@ -259,12 +259,14 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     request.setLocalRepositoryPath(localRepository.getBasedir());
   }
 
-  private static File getLocalRepositoryPath(Settings settings) {
+  private static File getLocalRepositoryPath(Settings settings, File multiModuleProjectDirectory) {
     String localRepositoryPath = settings.getLocalRepository();
     if(localRepositoryPath == null) {
       return RepositorySystem.defaultUserLocalRepository;
     }
-    return new File(localRepositoryPath);
+      //Actually maven would resolve these against the current working directory, 
+      //as we have no such thing available the best we can use here is the root folder of the multimodule directory
+      return new File(multiModuleProjectDirectory, localRepositoryPath).getAbsoluteFile();
   }
 
   @Override
