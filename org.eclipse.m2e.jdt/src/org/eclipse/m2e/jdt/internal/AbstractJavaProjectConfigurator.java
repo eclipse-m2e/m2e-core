@@ -585,7 +585,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       boolean addTestFlag) {
     log.info("Adding resource folder " + resourceFolder);
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
-        new IPath[] {IPath.fromOSString("**")}, false /*optional*/);
+        new IPath[] {IPath.fromOSString("**/*.java")}, false /*optional*/);
     descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
     descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
   }
