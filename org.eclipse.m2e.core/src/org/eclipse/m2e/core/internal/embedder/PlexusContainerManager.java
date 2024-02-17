@@ -346,7 +346,8 @@ public class PlexusContainerManager {
       IMavenConfiguration workspaceConfiguration = IMavenConfiguration.getWorkspaceConfiguration();
       MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
           wrap(container), mavenProperties.map(mavenCfg -> mavenCfg.getSettingsLocations(workspaceConfiguration))
-              .orElseGet(workspaceConfiguration::getSettingsLocations));
+              .orElseGet(workspaceConfiguration::getSettingsLocations),
+          multiModuleProjectDirectory);
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
