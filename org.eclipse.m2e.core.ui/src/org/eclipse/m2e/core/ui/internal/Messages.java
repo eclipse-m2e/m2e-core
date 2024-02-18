@@ -557,15 +557,25 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_update_one;
 
-  public static String MavenSettingsPreferencePage_settingsBrowseButton_text;
+  public static String MavenSettingsPreferencePage_btnEdit_text;
 
-  public static String MavenSettingsPreferencePage_btnUpdate;
+  public static String MavenSettingsPreferencePage_btnEdit_tooltip;
+
+  public static String MavenSettingsPreferencePage_btnBrowse_text;
+
+  public static String MavenSettingsPreferencePage_btnBrowse_tooltip;
+
+  public static String MavenSettingsPreferencePage_btnUpdate_text;
 
   public static String MavenSettingsPreferencePage_error_globalSettingsMissing;
 
-  public static String MavenSettingsPreferencePage_error_userSettingsMissing;
-
   public static String MavenSettingsPreferencePage_error_globalSettingsParse;
+
+  public static String MavenSettingsPreferencePage_error_globalToolchainsMissing;
+
+  public static String MavenSettingsPreferencePage_error_globalToolchainsParse;
+
+  public static String MavenSettingsPreferencePage_error_userSettingsMissing;
 
   public static String MavenSettingsPreferencePage_error_userSettingsParse;
 
@@ -577,19 +587,21 @@ public class Messages extends NLS {
 
   public static String MavenSettingsPreferencePage_job_updating;
 
-  public static String MavenSettingsPreferencePage_lblLocal;
+  public static String MavenSettingsPreferencePage_localRepoLabel;
 
-  public static String MavenSettingsPreferencePage_userSettingslink_tooltip;
+  public static String MavenSettingsPreferencePage_mergedSettings;
 
-  public static String MavenSettingsPreferencePage_userSettingslink1;
+  public static String MavenSettingsPreferencePage_globalPreferences;
 
-  public static String MavenSettingsPreferencePage_userSettingslink2;
+  public static String MavenSettingsPreferencePage_globalSettingsLabel;
 
-  public static String MavenSettingsPreferencePage_globalSettingslink_tooltip;
+  public static String MavenSettingsPreferencePage_globalToolchainsLabel;
 
-  public static String MavenSettingsPreferencePage_globalSettingslink1;
+  public static String MavenSettingsPreferencePage_UserPreferences;
 
-  public static String MavenSettingsPreferencePage_globalSettingslink2;
+  public static String MavenSettingsPreferencePage_userSettingsLabel;
+
+  public static String MavenSettingsPreferencePage_userToolchainsLabel;
 
   public static String MavenSettingsPreferencePage_task_updating;
 
