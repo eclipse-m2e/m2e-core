@@ -12,6 +12,7 @@ package org.eclipse.m2e.editor.lemminx.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Set;
@@ -21,7 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.TextSelection;
@@ -36,7 +37,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
@@ -74,66 +74,57 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testGenericEditorHasMavenExtensionEnabled() throws Exception {
-		project = ResourcesPlugin.getWorkspace().getRoot().getProject("test" + System.currentTimeMillis());
-		project.create(null);
-		project.open(null);
+		project = createMavenProject("test" + System.currentTimeMillis(), "pom.xml");
 		IFile pomFile = project.getFile("pom.xml");
-		pomFile.create(getClass().getResourceAsStream("pom.xml"), true, null);
-		ITextEditor editorPart = (ITextEditor)IDE.openEditor(page, pomFile, GENERIC_EDITOR);
+
+		ITextEditor editorPart = (ITextEditor) IDE.openEditor(page, pomFile, GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
 		assertTrue("Missing diagnostic report", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
-				try {
-					return Arrays.stream(pomFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_ZERO)).anyMatch(marker ->
-						marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR &&
-						marker.getAttribute(IMarker.MESSAGE, "").contains("artifactId")
-					);
-				} catch (CoreException e) {
-					return false;
-				}
+			try {
+				project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+				return Arrays.stream(pomFile.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE))
+						.anyMatch(marker -> marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR
+								&& marker.getAttribute(IMarker.MESSAGE, "").contains("artifactId"));
+			} catch (CoreException e) {
+				return false;
 			}
-		));
-		int offset = editorPart.getDocumentProvider().getDocument(editorPart.getEditorInput()).get().indexOf("</scope>");
-		Set<Shell> beforeShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
+		}));
+		int offset = editorPart.getDocumentProvider().getDocument(editorPart.getEditorInput()).get()
+				.indexOf("</scope>");
+		Set<Shell> beforeShells = Arrays.stream(display.getShells()).filter(Shell::isVisible)
+				.collect(Collectors.toSet());
 		editorPart.getSelectionProvider().setSelection(new TextSelection(offset, 0));
 		editorPart.getAction(ITextEditorActionConstants.CONTENT_ASSIST).run();
 		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
-			Set<Shell> afterShells = Arrays.stream(display.getShells()).filter(Shell::isVisible).collect(Collectors.toSet());
+			Set<Shell> afterShells = Arrays.stream(display.getShells()).filter(Shell::isVisible)
+					.collect(Collectors.toSet());
 			afterShells.removeAll(beforeShells);
-			return afterShells.stream()
-				.flatMap(shell -> Arrays.stream(shell.getChildren()))
-				.filter(Table.class::isInstance)
-				.map(Table.class::cast)
-				.findFirst()
-				.map(table -> Boolean.valueOf(Arrays.stream(table.getItems()).map(TableItem::getText).anyMatch("compile"::equals)))
-				.orElse(Boolean.FALSE).booleanValue();
+			return afterShells.stream().flatMap(shell -> Arrays.stream(shell.getChildren()))
+					.filter(Table.class::isInstance).map(Table.class::cast).findFirst()
+					.map(table -> Arrays.stream(table.getItems()).map(TableItem::getText).anyMatch("compile"::equals))
+					.orElse(Boolean.FALSE).booleanValue();
 		}));
 	}
 
 	@Test
-	public void testEditorOpenOnSourcePage() throws CoreException {
+	public void testEditorOpenOnSourcePage() throws Exception {
 		IPreferenceStore preferenceStore = M2EUIPluginActivator.getDefault().getPreferenceStore();
 		preferenceStore.setValue(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE, true);
-		project = ResourcesPlugin.getWorkspace().getRoot().getProject("test" + System.currentTimeMillis());
-		project.create(null);
-		project.open(null);
+
+		project = createMavenProject("test" + System.currentTimeMillis(), "pom.xml");
 		IFile pomFile = project.getFile("pom.xml");
-		pomFile.create(getClass().getResourceAsStream("pom.xml"), true, null);
-		MavenPomEditor editor = (MavenPomEditor)page.openEditor(new FileEditorInput(pomFile), MavenPomEditor.EDITOR_ID);
+
+		MavenPomEditor editor = (MavenPomEditor) IDE.openEditor(page, pomFile, MavenPomEditor.EDITOR_ID);
 		Assert.assertNotNull(editor.getSourcePage());
 		Assert.assertEquals(editor.getSourcePage(), editor.getActiveEditor());
 	}
 
 	@Test
 	public void testOpenChildThenParentResolvesParent() throws Exception {
-		try (InputStream content = getClass().getResourceAsStream("pom-parent.xml")) {
-			createProject("parent", content);
-		}
-		IProject child = null;
-		try (InputStream content = getClass().getResourceAsStream("pom-child.xml")) {
-			child = createProject("child", content);
-		}
+		createMavenProject("parent", "pom-parent.xml");
+		IProject child = createMavenProject("child", "pom-child.xml");
 		IFile pomFile = child.getFile("pom.xml");
-		page.openEditor(new FileEditorInput(pomFile), GENERIC_EDITOR);
+		IDE.openEditor(page, pomFile, GENERIC_EDITOR);
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
 		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
 			try {
@@ -147,4 +138,11 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 			}
 		}));
 	}
+
+	private IProject createMavenProject(String projectName, String pomFileName) throws CoreException, IOException {
+		try (InputStream pomContent = getClass().getResourceAsStream(pomFileName)) {
+			return createProject(projectName, pomContent);
+		}
+	}
+
 }
