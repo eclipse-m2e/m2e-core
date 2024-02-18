@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.CoreException;
  * @author Georg Tsakumagos
  */
 @FunctionalInterface
-public interface ISupplier<T> {
+public interface CoreSupplier<T> {
 
   /**
    * Gets a result.

@@ -37,7 +37,7 @@ import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMInstallType;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.IBiConsumer;
+import org.eclipse.m2e.core.CoreBiConsumer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
@@ -229,7 +229,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 * @param relativePath Relative path for the file.  Must not be <code>null</code>.
 	 * @throws Exception Usually only on missed assertions. 
 	 */
-	private void assertMavenLaunchConfig(IBiConsumer<IMavenConfiguration, String> configSetter, String goal, IBiConsumer<MavenLaunchDelegate, ILaunchConfigurationWorkingCopy> verifier, String relativePath)
+	private void assertMavenLaunchConfig(CoreBiConsumer<IMavenConfiguration, String> configSetter, String goal, CoreBiConsumer<MavenLaunchDelegate, ILaunchConfigurationWorkingCopy> verifier, String relativePath)
 			throws Exception {
 
 		waitForJobsToComplete();
@@ -273,7 +273,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 * @param relativePath Relative path for the file.  Must not be <code>null</code>.
 	 * @throws Exception Usually only on missed assertions. 
 	 */
-	private void assertMavenLaunchFileSetting(IBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
+	private void assertMavenLaunchFileSetting(CoreBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
 			throws Exception {
 		this.assertMavenLaunchConfig(configSetter, null, (launcher, config) -> {
 			String programArguments = launcher.getProgramArguments(config);
@@ -296,7 +296,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 * @param relativePath Relative path for the file.  Must not be <code>null</code>.
 	 * @throws Exception Usually only on missed assertions. 
 	 */
-	private void assertMavenLaunchFileSettingGoalOverride(IBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
+	private void assertMavenLaunchFileSettingGoalOverride(CoreBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
 			throws Exception {
 		final String userDerivedPath = "./resources/settings/empty_settings/this_do_not_exists.xml";
 		final String goalConfig = "clean " + key + " " + userDerivedPath;
@@ -323,7 +323,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 * @param key Key of the configuration.  Must not be <code>null</code>.
 	 * @throws Exception Usually only on missed assertions. 
 	 */
-	private void assertMavenLaunchFileSettingPathInvalid(IBiConsumer<IMavenConfiguration, String> configSetter) throws Exception {
+	private void assertMavenLaunchFileSettingPathInvalid(CoreBiConsumer<IMavenConfiguration, String> configSetter) throws Exception {
 		final String path = "./resources/settings/empty_settings/this_do_not_exists.xml";
 		try {
 			this.assertMavenLaunchConfig(configSetter, null, (launcher, config) -> {}, path);

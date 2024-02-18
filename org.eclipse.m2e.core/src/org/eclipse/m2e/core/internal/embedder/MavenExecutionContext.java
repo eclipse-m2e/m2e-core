@@ -208,6 +208,9 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     updateSettingsFiles(request, settingsLocations);
     //and settings are actually derived from IMavenConfiguration
     File userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
+    if(mavenConfiguration.getGlobalToolchainsFile() != null) {
+      request.setGlobalToolchainsFile(new File(mavenConfiguration.getGlobalToolchainsFile()));
+    }
     if(mavenConfiguration.getUserToolchainsFile() != null) {
       userToolchainsFile = new File(mavenConfiguration.getUserToolchainsFile());
     }

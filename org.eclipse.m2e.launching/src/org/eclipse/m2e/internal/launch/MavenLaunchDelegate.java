@@ -64,7 +64,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.ISupplier;
+import org.eclipse.m2e.core.embedder.CoreSupplier;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -127,7 +127,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
    * @throws IllegalArgumentException If the configured file does not exists.
    */
   private void appendFileSetting(String name, String arg, StringBuilder sb, String goals, boolean substitute,
-      ISupplier<String> source) throws CoreException, IllegalArgumentException {
+      CoreSupplier<String> source) throws CoreException, IllegalArgumentException {
     if(!goals.contains(arg) && 0 >= sb.indexOf(arg)) {
       String setting = source.get();
 

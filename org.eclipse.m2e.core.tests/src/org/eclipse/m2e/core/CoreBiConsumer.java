@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.CoreException;
  * @author Georg Tsakumagos
  */
 @FunctionalInterface
-public interface IBiConsumer<T, U> {
+public interface CoreBiConsumer<T, U> {
 
     /**
      * Performs this operation on the given arguments.
