@@ -56,6 +56,8 @@ public class ResolverConfigurationIO {
    */
   private static final String P_RESOLVE_WORKSPACE_PROJECTS = "resolveWorkspaceProjects"; //$NON-NLS-1$
 
+  private static final boolean P_RESOLVE_WORKSPACE_PROJECTS_DEFAULT = false;
+
   private static final String P_AUTO_UPDATE_CONFIGURATION = MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION;
 
   /**
@@ -117,7 +119,8 @@ public class ResolverConfigurationIO {
       return new ResolverConfiguration(project);
     }
     ResolverConfiguration configuration = new ResolverConfiguration();
-    configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
+    configuration.setResolveWorkspaceProjects(
+        projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, P_RESOLVE_WORKSPACE_PROJECTS_DEFAULT));
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
     configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
@@ -137,6 +140,14 @@ public class ResolverConfigurationIO {
       preferences.putBoolean(P_AUTO_UPDATE_CONFIGURATION, isAutomaticallyUpdateConfiguration);
       savePreferences(preferences);
     }
+  }
+
+  public static boolean isResolveWorkspaceProjects(IProject project) {
+    IEclipsePreferences preferences = getMavenProjectPreferences(project);
+    if(preferences == null) {
+      return P_RESOLVE_WORKSPACE_PROJECTS_DEFAULT;
+    }
+    return preferences.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, P_RESOLVE_WORKSPACE_PROJECTS_DEFAULT);
   }
 
   private static IEclipsePreferences getMavenProjectPreferences(IProject project) {

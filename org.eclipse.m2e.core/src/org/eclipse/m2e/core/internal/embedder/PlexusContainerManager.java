@@ -35,8 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.cli.CommandLine;
-
 import com.google.inject.AbstractModule;
 
 import org.eclipse.core.resources.IResource;
@@ -72,7 +70,6 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -345,14 +342,17 @@ public class PlexusContainerManager {
       container.setLookupRealm(null);
       container.setLoggerManager(loggerManager);
       thread.setContextClassLoader(container.getContainerRealm());
+      Optional<MavenProperties> mavenProperties = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+      IMavenConfiguration workspaceConfiguration = IMavenConfiguration.getWorkspaceConfiguration();
       MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
-          wrap(container), MavenPluginActivator.getDefault().getMaven().getSettings());
+          wrap(container), mavenProperties.map(mavenCfg -> mavenCfg.getSettingsLocations(workspaceConfiguration))
+              .orElseGet(workspaceConfiguration::getSettingsLocations),
+          multiModuleProjectDirectory);
       container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
       request.setBaseDirectory(multiModuleProjectDirectory);
       request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
-      CommandLine commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
       Properties userProperties = request.getUserProperties();
-      MavenProperties.getCliProperties(commandLine, userProperties::setProperty);
+      mavenProperties.ifPresent(prop -> prop.getCliProperties(userProperties::setProperty));
       BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
       return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
     } finally {
