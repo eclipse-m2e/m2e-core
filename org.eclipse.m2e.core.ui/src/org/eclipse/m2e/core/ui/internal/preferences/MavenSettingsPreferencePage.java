@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -66,6 +67,9 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -75,13 +79,17 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * Maven installations preference page
  *
  * @author Eugene Kuleshov
+ * @author Georg Tsakumagos
  */
+@SuppressWarnings("restriction")
 public class MavenSettingsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenSettingsPreferencePage.class);
 
-  final IMavenConfiguration mavenConfiguration;
+  private final IMavenConfiguration mavenConfiguration;
 
-  final IMaven maven;
+  private final IMaven maven;
+
+  private final MavenRuntimeManagerImpl runtimeManager;
 
   private Text globalSettingsText;
 
@@ -96,10 +104,12 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   boolean dirty = false;
 
 
+
   public MavenSettingsPreferencePage() {
     setTitle(Messages.MavenSettingsPreferencePage_title);
 
     this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
+    this.runtimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
     this.maven = MavenPlugin.getMaven();
   }
 
@@ -112,6 +122,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     super.setVisible(visible);
     if(visible) {
       updateLocalRepository();
+      updateGlobalSettingsDefaultFiles();
     }
   }
 
@@ -125,6 +136,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     String globalToolchains = getGlobalToolchains();
 
     if(Objects.equals(globalSettings, mavenConfiguration.getGlobalSettingsFile())
+        && Objects.equals(globalToolchains, mavenConfiguration.getGlobalToolchainsFile())
         && Objects.equals(userSettings, mavenConfiguration.getUserSettingsFile())
         && Objects.equals(userToolchains, mavenConfiguration.getUserToolchainsFile())) {
       return; // current preferences  not changed 
@@ -200,11 +212,11 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
     this.globalSettingsText = this.createFileSelectionWidgets(composite,
         Messages.MavenSettingsPreferencePage_globalSettingsLabel, this.mavenConfiguration.getGlobalSettingsFile(),
-        new File("$M2_HOME/conf/settings.xml"));
+        this.getDefaultGlobalSettingsFile());
 
     this.globalToolchainsText = this.createFileSelectionWidgets(composite,
         Messages.MavenSettingsPreferencePage_globalToolchainsLabel, mavenConfiguration.getGlobalToolchainsFile(),
-        new File("$M2_HOME/conf/toolchains.xml"));
+        this.getDefaultGlobalToolchainsFile());
 
     createHeading(composite, Messages.MavenSettingsPreferencePage_UserPreferences, true);
 
@@ -317,6 +329,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     }
   }
 
+
   protected void checkSettings() {
     setErrorMessage(null);
     setMessage(null);
@@ -379,6 +392,29 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     }
   }
 
+  private File getDefaultGlobalSettingsFile() {
+    return this.getRuntimeBasedFile("conf/settings.xml");
+  }
+
+  private File getDefaultGlobalToolchainsFile() {
+    return this.getRuntimeBasedFile("conf/toolchains.xml");
+  }
+
+  /**
+   * Calcuate relative path of an file to the configured maven runtime.
+   * 
+   * @param relativePath the expected relative path.
+   * @return <code>null</code> if the runtime has no accessible location e.g. <em>EMBEDDED</em>.
+   */
+  private File getRuntimeBasedFile(String relativePath) {
+    final AbstractMavenRuntime runtime = this.runtimeManager.getRuntime(MavenRuntimeManagerImpl.DEFAULT);
+    final String location = runtime.getLocation();
+    if(null != location && !location.isBlank() && runtime.isEditable()) {
+      return new File(location, relativePath);
+    }
+    return null;
+  }
+
   private String getUserSettings() {
     return getSettings(userSettingsText);
   }
@@ -411,5 +447,13 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       updateLocalRepository();
       checkSettings();
     }
+  }
+
+  protected void updateGlobalSettingsDefaultFiles() {
+    this.globalSettingsText
+        .setMessage(Optional.ofNullable(this.getDefaultGlobalSettingsFile()).map(File::getAbsolutePath).orElse(""));
+
+    this.globalToolchainsText
+        .setMessage(Optional.ofNullable(this.getDefaultGlobalToolchainsFile()).map(File::getAbsolutePath).orElse(""));
   }
 }

@@ -114,6 +114,39 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     allowAdvancedSourcelookup();
   }
 
+  /**
+   * Appends file based configuration key if not already set.
+   * 
+   * @param name The name of the setting.
+   * @param arg The argument. Must not be <code>null</code>.
+   * @param sb The target. Must not be <code>null</code>.
+   * @param goals The configured goals. Used to override settings.
+   * @param substitute <code>true</code> , if variables in settings should be substituted.
+   * @param source Source for the settings. Must not be <code>null</code>.
+   * @throws CoreException If something went wrong.
+   * @throws IllegalArgumentException If the configured file does not exists.
+   */
+  private void appendFileSetting(String name, String arg, StringBuilder sb, String goals, boolean substitute,
+      ISupplier<String> source) throws CoreException, IllegalArgumentException {
+    if(!goals.contains(arg) && 0 >= sb.indexOf(arg)) {
+      String setting = source.get();
+
+      if(substitute && null != setting) {
+        setting = LaunchingUtils.substituteVar(setting);
+      }
+
+      if(null != setting && !setting.isBlank()) {
+        final File file = new File(setting.trim());
+        if(file.exists()) {
+          sb.append(" "); //$NON-NLS-1$
+          sb.append(arg).append(quote(file.getAbsolutePath()));
+        } else {
+          throw new IllegalArgumentException("invalid path for " + name + ": " + file.getAbsolutePath());
+        }
+      }
+    }
+  }
+
   @Override
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
@@ -515,39 +548,6 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // if(s != null && s.trim().length() > 0) {
     //   sb.append(" -D").append(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY).append("=").append(s);
     // }
-  }
-
-  /**
-   * Appends file based configuration key if not laready set.
-   * 
-   * @param name THe name of the setting.
-   * @param arg The argument. Must not be <code>null</code>.
-   * @param sb The target. Must not be <code>null</code>.
-   * @param goals The configured goals. Used to override settings.
-   * @param substitute <code>true</code> , if variables in settings should be substituted.
-   * @param source Source for the settings. Must not be <code>null</code>.
-   * @throws CoreException If something went wrong.
-   * @throws IllegalArgumentException If the configured file does not exists.
-   */
-  private void appendFileSetting(String name, String arg, StringBuilder sb, String goals, boolean substitute,
-      ISupplier<String> source) throws CoreException, IllegalArgumentException {
-    if(!goals.contains(arg) && 0 >= sb.indexOf(arg)) {
-      String setting = source.get();
-
-      if(substitute && null != setting) {
-        setting = LaunchingUtils.substituteVar(setting);
-      }
-
-      if(null != setting && !setting.isBlank()) {
-        final File file = new File(setting.trim());
-        if(file.exists()) {
-          sb.append(" "); //$NON-NLS-1$
-          sb.append(arg).append(quote(file.getAbsolutePath()));
-        } else {
-          throw new IllegalArgumentException("invalid path for " + name + ": " + file.getAbsolutePath());
-        }
-      }
-    }
   }
 
   /**
