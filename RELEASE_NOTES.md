@@ -25,6 +25,12 @@ which is useful for projects that require special workspace configuration that d
 
 ![grafik](https://github.com/eclipse-m2e/m2e-core/assets/44067969/7d27ceda-5d13-4f0e-97f0-ff34c94d7493)
 
+### Support of global and user settings in .mvn/maven.config
+
+The `.mvn/maven.config` allows to specify [global and user settings](https://maven.apache.org/settings.html#quick-overview), m2e now also takes these into account.
+
+This improvement was gently sponsored by <img src="https://www.sigasi.com/img/logoSquare.png"  width="16" height="16"> [Sigasi](https://www.sigasi.com/). 
+
 ## 2.5.0
 
 * 📅 Release Date: 27th November 2023
