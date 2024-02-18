@@ -18,8 +18,8 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ui.IFileEditorInput;
@@ -27,9 +27,9 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 
 
@@ -60,19 +60,11 @@ public class MavenPropertyTester extends PropertyTester {
   @Override
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
     if(WORKSPACE_RESULUTION_ENABLE.equals(property)) {
-      boolean enableWorkspaceResolution = true;
-      IAdaptable adaptable = (IAdaptable) receiver;
-
-      IProject projectAdapter = adaptable.getAdapter(IProject.class);
+      IProject projectAdapter = Adapters.adapt(receiver, IProject.class);
       if(projectAdapter != null) {
-        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-        IMavenProjectFacade projectFacade = projectManager.create(projectAdapter, new NullProgressMonitor());
-        if(projectFacade != null) {
-          IProjectConfiguration configuration = projectFacade.getConfiguration();
-          return !configuration.isResolveWorkspaceProjects();
-        }
+        return !ResolverConfigurationIO.isResolveWorkspaceProjects(projectAdapter);
       }
-      return enableWorkspaceResolution;
+      return true;
     }
 
     if(HAS_ARTIFACT_KEY.equals(property)) {

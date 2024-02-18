@@ -1,6 +1,6 @@
 # Eclipse m2e - Release notes
 
-## 2.5.1
+## 2.6.0
 
 * 📅 Release Date: _expected_ end February 2024
 
@@ -8,7 +8,16 @@
 
 Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Notes](https://maven.apache.org/docs/3.9.6/release-notes.html).
 
-### New project preference for automated Maven project configuration updates
+### Improved toolchain.xml handling
+
+In the Preferences under `Maven -> User Settings` the user `toolchain.xml` used in workspace builds can now be specified explicitly.
+At the same time the `maven-toolchains-plugin` is now disabled by default for workspace builds.
+
+### Improved resource linking
+
+Source or resource folders of Maven-projects outside of the project's base directory are now considered in the workspace and are added to the project as linked resources.
+
+### Project preference for automated Maven project configuration updates
 
 Automatic configuration updates for Maven projects can now be disabled the in the project preferences.
 This allows to disable these updates individually per project and to store the setting in a preference-file under version control,

@@ -52,6 +52,9 @@ import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.shared.utils.StringUtils;
 
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
+
 
 /**
  * Holds Maven Runtime version properties.
@@ -317,6 +320,30 @@ public class MavenProperties {
       return commandline.getOptionValue(CLIManager.ALTERNATE_USER_TOOLCHAINS);
     }
     return null;
+  }
+
+  public MavenSettingsLocations getSettingsLocations(IMavenConfiguration configuration) {
+    MavenSettingsLocations configurationLocations = configuration.getSettingsLocations();
+    String alternateGlobalSettingsFile = getAlternateGlobalSettingsFile();
+    String alternateUserSettingsFile = getAlternateUserSettingsFile();
+    if(alternateGlobalSettingsFile == null && alternateUserSettingsFile == null) {
+      return configurationLocations;
+    }
+    File global;
+    File user;
+    //actually maven uses "the current working directory" but this does not make much sense in the context of m2e so we choose the root directory of the maven.config
+    File baseDir = configFile.getParentFile().getParentFile();
+    if(alternateGlobalSettingsFile == null) {
+      global = configurationLocations.globalSettings();
+    } else {
+      global = new File(baseDir, alternateGlobalSettingsFile);
+    }
+    if(alternateUserSettingsFile == null) {
+      user = configurationLocations.userSettings();
+    } else {
+      user = new File(baseDir, alternateUserSettingsFile);
+    }
+    return new MavenSettingsLocations(global, user);
   }
 
   public static void getCliProperty(String property, BiConsumer<String, String> consumer) {
