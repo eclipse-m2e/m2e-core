@@ -58,13 +58,14 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.cli.CLIManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.CoreSupplier;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -118,7 +119,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
    * Appends file based configuration key if not already set.
    * 
    * @param name The name of the setting.
-   * @param arg The argument. Must not be <code>null</code>.
+   * @param arg The argument without dash. Must not be <code>null</code>.
    * @param sb The target. Must not be <code>null</code>.
    * @param goals The configured goals. Used to override settings.
    * @param substitute <code>true</code> , if variables in settings should be substituted.
@@ -128,7 +129,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
    */
   private void appendFileSetting(String name, String arg, StringBuilder sb, String goals, boolean substitute,
       CoreSupplier<String> source) throws CoreException, IllegalArgumentException {
-    if(!goals.contains(arg) && 0 >= sb.indexOf(arg)) {
+    final String key = "-" + arg + " ";
+    if(!goals.contains(key) && 0 >= sb.indexOf(key)) {
       String setting = source.get();
 
       if(substitute && null != setting) {
@@ -139,7 +141,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         final File file = new File(setting.trim());
         if(file.exists()) {
           sb.append(" "); //$NON-NLS-1$
-          sb.append(arg).append(quote(file.getAbsolutePath()));
+          sb.append(key).append(quote(file.getAbsolutePath()));
         } else {
           throw new IllegalArgumentException("invalid path for " + name + ": " + file.getAbsolutePath());
         }
@@ -528,15 +530,19 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
           "Unexpected value for" + MavenLaunchConstants.ATTR_COLOR + ": " + colors);
     };
     sb.append(" -Dstyle.color=" + enableColor);
+    this.appendFileSetting("global settings", CLIManager.ALTERNATE_GLOBAL_SETTINGS, sb, goals, false, //$NON-NLS-1$
+        mavenConfiguration::getGlobalSettingsFile);
+    this.appendFileSetting("global settings", CLIManager.ALTERNATE_GLOBAL_SETTINGS, sb, goals, false, //$NON-NLS-1$
+        launchSupport::getSettings); //$NON-NLS-2$
+    this.appendFileSetting("global toolchains", CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS, sb, goals, false, //$NON-NLS-1$
+        mavenConfiguration::getGlobalToolchainsFile); //$NON-NLS-2$
 
-    this.appendFileSetting("global settings", "-gs ", sb, goals, false, mavenConfiguration::getGlobalSettingsFile); //$NON-NLS-1$
-    this.appendFileSetting("global settings", "-gs ", sb, goals, false, launchSupport::getSettings); //$NON-NLS-1$ //$NON-NLS-2$
-    this.appendFileSetting("global toolchains", "-gt ", sb, goals, false, mavenConfiguration::getGlobalToolchainsFile); //$NON-NLS-1$ //$NON-NLS-2$
-
-    this.appendFileSetting("user settings", "-s ", sb, goals, false, //$NON-NLS-1$ //$NON-NLS-2$
+    this.appendFileSetting("user settings", String.valueOf(CLIManager.ALTERNATE_USER_SETTINGS), sb, goals, false, //$NON-NLS-1$ //$NON-NLS-2$
         () -> configuration.getAttribute(MavenLaunchConstants.ATTR_USER_SETTINGS, (String) null));
-    this.appendFileSetting("user settings", "-s ", sb, goals, false, mavenConfiguration::getUserSettingsFile); //$NON-NLS-1$ //$NON-NLS-2$
-    this.appendFileSetting("user toolchains", "-t ", sb, goals, false, mavenConfiguration::getUserToolchainsFile); //$NON-NLS-1$ //$NON-NLS-2$
+    this.appendFileSetting("user settings", String.valueOf(CLIManager.ALTERNATE_USER_SETTINGS), sb, goals, false, //$NON-NLS-1$
+        mavenConfiguration::getUserSettingsFile); //$NON-NLS-2$
+    this.appendFileSetting("user toolchains", String.valueOf(CLIManager.ALTERNATE_USER_TOOLCHAINS), sb, goals, false, //$NON-NLS-1$
+        mavenConfiguration::getUserToolchainsFile); //$NON-NLS-2$
 
     // boolean b = preferenceStore.getBoolean(MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION);
     // sb.append(" -D").append(MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION).append("=").append(b);

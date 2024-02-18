@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.cli.CLIManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -93,7 +94,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testGlobalSettings() throws Exception {
-		assertMavenLaunchFileSetting(IMavenConfiguration::setGlobalSettingsFile, "-gs", "./resources/settings/empty_settings/settings_empty.xml");
+		assertMavenLaunchFileSetting(IMavenConfiguration::setGlobalSettingsFile, CLIManager.ALTERNATE_GLOBAL_SETTINGS, "./resources/settings/empty_settings/settings_empty.xml");
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testGlobalSettings_GoalOverride() throws Exception {
-		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setGlobalSettingsFile, "-gs", "./resources/settings/empty_settings/settings_empty.xml");
+		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setGlobalSettingsFile, CLIManager.ALTERNATE_GLOBAL_SETTINGS, "./resources/settings/empty_settings/settings_empty.xml");
 	}
 	
 	/**
@@ -122,7 +123,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testGlobalToolchains() throws Exception {
-		assertMavenLaunchFileSetting(IMavenConfiguration::setGlobalToolchainsFile, "-gt", "./resources/settings/empty_settings/toolchains_empty.xml");
+		assertMavenLaunchFileSetting(IMavenConfiguration::setGlobalToolchainsFile, CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS, "./resources/settings/empty_settings/toolchains_empty.xml");
 	}
 
 	/**
@@ -132,7 +133,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testGlobalToolchains_GoalOverride() throws Exception {
-		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setGlobalToolchainsFile, "-gt", "./resources/settings/empty_settings/toolchains_empty.xml");
+		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setGlobalToolchainsFile, CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS, "./resources/settings/empty_settings/toolchains_empty.xml");
 	}
 	
 	/**
@@ -168,7 +169,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testUserSettings() throws Exception {
-		assertMavenLaunchFileSetting(IMavenConfiguration::setUserSettingsFile, "-s", "./resources/settings/empty_settings/settings_empty.xml");
+		assertMavenLaunchFileSetting(IMavenConfiguration::setUserSettingsFile, String.valueOf(CLIManager.ALTERNATE_USER_SETTINGS), "./resources/settings/empty_settings/settings_empty.xml");
 	}
 
 	/**
@@ -178,7 +179,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testUserSettings_GoalOverride() throws Exception {
-		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setUserSettingsFile, "-s", "./resources/settings/empty_settings/settings_empty.xml");
+		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setUserSettingsFile, String.valueOf(CLIManager.ALTERNATE_USER_SETTINGS), "./resources/settings/empty_settings/settings_empty.xml");
 	}
 
 	/**
@@ -198,7 +199,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testUserToolchains() throws Exception {
-		assertMavenLaunchFileSetting(IMavenConfiguration::setUserToolchainsFile, "-t", "./resources/settings/empty_settings/toolchains_empty.xml");
+		assertMavenLaunchFileSetting(IMavenConfiguration::setUserToolchainsFile, String.valueOf(CLIManager.ALTERNATE_USER_TOOLCHAINS), "./resources/settings/empty_settings/toolchains_empty.xml");
 	}
 
 	/**
@@ -208,7 +209,7 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	@Test
 	public void testUserToolchains_GoalOverride() throws Exception {
-		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setUserToolchainsFile, "-t", "./resources/settings/empty_settings/toolchains_empty.xml");
+		assertMavenLaunchFileSettingGoalOverride(IMavenConfiguration::setUserToolchainsFile, String.valueOf(CLIManager.ALTERNATE_USER_TOOLCHAINS), "./resources/settings/empty_settings/toolchains_empty.xml");
 	}
 
 	/**
@@ -275,12 +276,13 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	 */
 	private void assertMavenLaunchFileSetting(CoreBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
 			throws Exception {
+		final String param = "-" + key;
 		this.assertMavenLaunchConfig(configSetter, null, (launcher, config) -> {
 			String programArguments = launcher.getProgramArguments(config);
 			
 			// prepare assert
 			Matcher<String> allSettings = CoreMatchers.allOf(
-					CoreMatchers.containsString(key),
+					CoreMatchers.containsString(param),
 					CoreMatchers.containsString(new File(relativePath).getAbsolutePath())
 					);
 			
@@ -299,14 +301,15 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	private void assertMavenLaunchFileSettingGoalOverride(CoreBiConsumer<IMavenConfiguration, String> configSetter, String key, String relativePath)
 			throws Exception {
 		final String userDerivedPath = "./resources/settings/empty_settings/this_do_not_exists.xml";
-		final String goalConfig = "clean " + key + " " + userDerivedPath;
+		final String param = "-" + key;
+		final String goalConfig = "clean " + param + " " + userDerivedPath;
 		
 		this.assertMavenLaunchConfig(configSetter, goalConfig, (launcher, config) -> {
 			String programArguments = launcher.getProgramArguments(config);
 			
 			// prepare assert
 			Matcher<String> allSettings = CoreMatchers.allOf(
-					CoreMatchers.containsString(key),
+					CoreMatchers.containsString(param),
 					CoreMatchers.containsString(userDerivedPath),
 					CoreMatchers.not(CoreMatchers.containsString(relativePath))
 					);
