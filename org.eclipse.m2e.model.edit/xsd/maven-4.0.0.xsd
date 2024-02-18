@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements.  See the NOTICE file
@@ -122,9 +122,9 @@
           <xs:documentation source="version">3.0.0+</xs:documentation>
           <xs:documentation source="description">
             
-            The URL to the project's homepage.
+            The URL to the project&apos;s homepage.
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            project's &lt;code&gt;child.project.url.inherit.append.path="false"&lt;/code&gt;
+            project&apos;s &lt;code&gt;child.project.url.inherit.append.path=&quot;false&quot;&lt;/code&gt;
             
           </xs:documentation>
         </xs:annotation>
@@ -132,7 +132,7 @@
       <xs:element minOccurs="0" name="inceptionYear" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">3.0.0+</xs:documentation>
-          <xs:documentation source="description">The year of the project's inception, specified with 4 digits. This value is
+          <xs:documentation source="description">The year of the project&apos;s inception, specified with 4 digits. This value is
             used when generating copyright notices as well as being informational.</xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -190,7 +190,7 @@
       <xs:element minOccurs="0" name="mailingLists">
         <xs:annotation>
           <xs:documentation source="version">3.0.0+</xs:documentation>
-          <xs:documentation source="description">Contains information about a project's mailing lists.</xs:documentation>
+          <xs:documentation source="description">Contains information about a project&apos;s mailing lists.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
@@ -227,13 +227,13 @@
       <xs:element minOccurs="0" name="issueManagement" type="IssueManagement">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">The project's issue management system information.</xs:documentation>
+          <xs:documentation source="description">The project&apos;s issue management system information.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="ciManagement" type="CiManagement">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">The project's continuous integration information.</xs:documentation>
+          <xs:documentation source="description">The project&apos;s continuous integration information.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="distributionManagement" type="DistributionManagement">
@@ -280,7 +280,7 @@
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
-            See &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"&gt;the
+            See &lt;a href=&quot;https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html&quot;&gt;the
             dependency mechanism&lt;/a&gt; for more information.
             
           </xs:documentation>
@@ -367,7 +367,7 @@
         <xs:documentation source="version">4.0.0+</xs:documentation>
         <xs:documentation source="description">
             
-            When children inherit from project's url, append path or not? Note: While the type
+            When children inherit from project&apos;s url, append path or not? Note: While the type
             of this field is &lt;code&gt;String&lt;/code&gt; for technical reasons, the semantic type is actually
             &lt;code&gt;Boolean&lt;/code&gt;
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: &lt;code&gt;true&lt;/code&gt;
@@ -381,7 +381,7 @@
     <xs:annotation>
       <xs:documentation source="version">3.0.0+</xs:documentation>
       <xs:documentation source="description">Describes the licenses for this project. This is used to generate the license
-        page of the project's web site, as well as being taken into consideration in other reporting
+        page of the project&apos;s web site, as well as being taken into consideration in other reporting
         and validation. The licenses listed for the project are that of the project itself, and not
         of dependencies.</xs:documentation>
     </xs:annotation>
@@ -542,11 +542,11 @@
             The source control management system URL
             that describes the repository and how to connect to the
             repository. For more information, see the
-            &lt;a href="https://maven.apache.org/scm/scm-url-format.html"&gt;URL format&lt;/a&gt;
-            and &lt;a href="https://maven.apache.org/scm/scms-overview.html"&gt;list of supported SCMs&lt;/a&gt;.
+            &lt;a href=&quot;https://maven.apache.org/scm/scm-url-format.html&quot;&gt;URL format&lt;/a&gt;
+            and &lt;a href=&quot;https://maven.apache.org/scm/scms-overview.html&quot;&gt;list of supported SCMs&lt;/a&gt;.
             This connection is read-only.
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            scm's &lt;code&gt;child.scm.connection.inherit.append.path="false"&lt;/code&gt;
+            scm&apos;s &lt;code&gt;child.scm.connection.inherit.append.path=&quot;false&quot;&lt;/code&gt;
             
           </xs:documentation>
         </xs:annotation>
@@ -559,7 +559,7 @@
             Just like &lt;code&gt;connection&lt;/code&gt;, but for developers, i.e. this scm connection
             will not be read only.
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            scm's &lt;code&gt;child.scm.developerConnection.inherit.append.path="false"&lt;/code&gt;
+            scm&apos;s &lt;code&gt;child.scm.developerConnection.inherit.append.path=&quot;false&quot;&lt;/code&gt;
             
           </xs:documentation>
         </xs:annotation>
@@ -567,7 +567,7 @@
       <xs:element minOccurs="0" name="tag" type="xs:string" default="HEAD">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">The tag of current code. By default, it's set to HEAD during development.</xs:documentation>
+          <xs:documentation source="description">The tag of current code. By default, it&apos;s set to HEAD during development.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="url" type="xs:string">
@@ -575,9 +575,9 @@
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">
             
-            The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
+            The URL to the project&apos;s browsable SCM repository, such as ViewVC or Fisheye.
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            scm's &lt;code&gt;child.scm.url.inherit.append.path="false"&lt;/code&gt;
+            scm&apos;s &lt;code&gt;child.scm.url.inherit.append.path=&quot;false&quot;&lt;/code&gt;
             
           </xs:documentation>
         </xs:annotation>
@@ -658,7 +658,7 @@
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">The dependencies specified here are not used until they are referenced in a
-            POM within the group. This allows the specification of a "standard" version for a
+            POM within the group. This allows the specification of a &quot;standard&quot; version for a
             particular dependency.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -720,7 +720,7 @@
             
             The type of dependency, that will be mapped to a file extension, an optional classifier, and a few other attributes.
             Some examples are &lt;code&gt;jar&lt;/code&gt;, &lt;code&gt;war&lt;/code&gt;, &lt;code&gt;ejb-client&lt;/code&gt;
-            and &lt;code&gt;test-jar&lt;/code&gt;: see &lt;a href="../maven-core/artifact-handlers.html"&gt;default
+            and &lt;code&gt;test-jar&lt;/code&gt;: see &lt;a href=&quot;../maven-core/artifact-handlers.html&quot;&gt;default
             artifact handlers&lt;/a&gt; for a list. New types can be defined by extensions, so this is not a complete list.
             
           </xs:documentation>
@@ -735,7 +735,7 @@
             the filename after the version. This allows:
             &lt;ul&gt;
             &lt;li&gt;referring to attached artifact, for example &lt;code&gt;sources&lt;/code&gt; and &lt;code&gt;javadoc&lt;/code&gt;:
-            see &lt;a href="../maven-core/artifact-handlers.html"&gt;default artifact handlers&lt;/a&gt; for a list,&lt;/li&gt;
+            see &lt;a href=&quot;../maven-core/artifact-handlers.html&quot;&gt;default artifact handlers&lt;/a&gt; for a list,&lt;/li&gt;
             &lt;li&gt;distinguishing two artifacts
             that belong to the same POM but were built differently.
             For example, &lt;code&gt;jdk14&lt;/code&gt; and &lt;code&gt;jdk15&lt;/code&gt;.&lt;/li&gt;
@@ -754,7 +754,7 @@
             calculate the various classpaths used for compilation, testing, and so on.
             It also assists in determining which artifacts to include in a distribution of
             this project. For more information, see
-            &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"&gt;the
+            &lt;a href=&quot;https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html&quot;&gt;the
             dependency mechanism&lt;/a&gt;. The default scope is &lt;code&gt;compile&lt;/code&gt;.
             
           </xs:documentation>
@@ -778,7 +778,7 @@
       <xs:element minOccurs="0" name="exclusions">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">Lists a set of artifacts that should be excluded from this dependency's
+          <xs:documentation source="description">Lists a set of artifacts that should be excluded from this dependency&apos;s
             artifact list when it comes to calculating transitive dependencies.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -945,8 +945,8 @@
           <xs:documentation source="description">
             
               The timezone the contributor is in. Typically, this is a number in the range
-              &lt;a href="http://en.wikipedia.org/wiki/UTC%E2%88%9212:00"&gt;-12&lt;/a&gt; to &lt;a href="http://en.wikipedia.org/wiki/UTC%2B14:00"&gt;+14&lt;/a&gt;
-              or a valid time zone id like "America/Montreal" (UTC-05:00) or "Europe/Paris" (UTC+01:00).
+              &lt;a href=&quot;http://en.wikipedia.org/wiki/UTC%E2%88%9212:00&quot;&gt;-12&lt;/a&gt; to &lt;a href=&quot;http://en.wikipedia.org/wiki/UTC%2B14:00&quot;&gt;+14&lt;/a&gt;
+              or a valid time zone id like &quot;America/Montreal&quot; (UTC-05:00) or &quot;Europe/Paris&quot; (UTC+01:00).
             
           </xs:documentation>
         </xs:annotation>
@@ -1099,8 +1099,8 @@
           <xs:documentation source="description">
             
               The timezone the contributor is in. Typically, this is a number in the range
-              &lt;a href="http://en.wikipedia.org/wiki/UTC%E2%88%9212:00"&gt;-12&lt;/a&gt; to &lt;a href="http://en.wikipedia.org/wiki/UTC%2B14:00"&gt;+14&lt;/a&gt;
-              or a valid time zone id like "America/Montreal" (UTC-05:00) or "Europe/Paris" (UTC+01:00).
+              &lt;a href=&quot;http://en.wikipedia.org/wiki/UTC%E2%88%9212:00&quot;&gt;-12&lt;/a&gt; to &lt;a href=&quot;http://en.wikipedia.org/wiki/UTC%2B14:00&quot;&gt;+14&lt;/a&gt;
+              or a valid time zone id like &quot;America/Montreal&quot; (UTC-05:00) or &quot;Europe/Paris&quot; (UTC+01:00).
             
           </xs:documentation>
         </xs:annotation>
@@ -1133,7 +1133,7 @@
       <xs:element minOccurs="0" name="url" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">3.0.0+</xs:documentation>
-          <xs:documentation source="description">The URL to the organization's home page.</xs:documentation>
+          <xs:documentation source="description">The URL to the organization&apos;s home page.</xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:all>
@@ -1174,7 +1174,7 @@
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">
             
-            The URL of the project's download page. If not given users will be
+            The URL of the project&apos;s download page. If not given users will be
             referred to the homepage given by &lt;code&gt;url&lt;/code&gt;.
             This is given to assist in locating artifacts that are not in the repository due to
             licensing restrictions.
@@ -1304,7 +1304,7 @@
             &lt;code&gt;interval:XXX&lt;/code&gt;
             (in minutes) or
             &lt;code&gt;never&lt;/code&gt;
-            (only if it doesn't exist locally).
+            (only if it doesn&apos;t exist locally).
             
           </xs:documentation>
         </xs:annotation>
@@ -1390,7 +1390,7 @@
             
             The url of the location where website is deployed, in the form &lt;code&gt;protocol://hostname/path&lt;/code&gt;.
             &lt;br&gt;&lt;b&gt;Default value is&lt;/b&gt;: parent value [+ path adjustment] + (artifactId or project.directory property), or just parent value if
-            site's &lt;code&gt;child.site.url.inherit.append.path="false"&lt;/code&gt;
+            site&apos;s &lt;code&gt;child.site.url.inherit.append.path=&quot;false&quot;&lt;/code&gt;
             
           </xs:documentation>
         </xs:annotation>
@@ -1423,7 +1423,7 @@
           <xs:documentation source="description">
             
             If true, then the default reports are not included in the site generation.
-            This includes the reports in the "Project Info" menu. Note: While the type
+            This includes the reports in the &quot;Project Info&quot; menu. Note: While the type
             of this field is &lt;code&gt;String&lt;/code&gt; for technical reasons, the semantic type is actually
             &lt;code&gt;Boolean&lt;/code&gt;. Default value is &lt;code&gt;false&lt;/code&gt;.
             
@@ -1517,15 +1517,15 @@
             
             &lt;p&gt;The configuration as DOM object.&lt;/p&gt;
             &lt;p&gt;By default, every element content is trimmed, but starting with Maven 3.1.0, you can add
-            &lt;code&gt;xml:space="preserve"&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
+            &lt;code&gt;xml:space=&quot;preserve&quot;&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
             &lt;p&gt;You can control how child POMs inherit configuration from parent POMs by adding &lt;code&gt;combine.children&lt;/code&gt;
             or &lt;code&gt;combine.self&lt;/code&gt; attributes to the children of the configuration element:&lt;/p&gt;
             &lt;ul&gt;
             &lt;li&gt;&lt;code&gt;combine.children&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;append&lt;/code&gt;,&lt;/li&gt;
             &lt;li&gt;&lt;code&gt;combine.self&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;override&lt;/code&gt;.&lt;/li&gt;
             &lt;/ul&gt;
-            &lt;p&gt;See &lt;a href="https://maven.apache.org/pom.html#Plugins"&gt;POM Reference documentation&lt;/a&gt; and
-            &lt;a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html"&gt;Xpp3DomUtils&lt;/a&gt;
+            &lt;p&gt;See &lt;a href=&quot;https://maven.apache.org/pom.html#Plugins&quot;&gt;POM Reference documentation&lt;/a&gt; and
+            &lt;a href=&quot;https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html&quot;&gt;Xpp3DomUtils&lt;/a&gt;
             for more information.&lt;/p&gt;
             
           </xs:documentation>
@@ -1582,15 +1582,15 @@
             
             &lt;p&gt;The configuration as DOM object.&lt;/p&gt;
             &lt;p&gt;By default, every element content is trimmed, but starting with Maven 3.1.0, you can add
-            &lt;code&gt;xml:space="preserve"&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
+            &lt;code&gt;xml:space=&quot;preserve&quot;&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
             &lt;p&gt;You can control how child POMs inherit configuration from parent POMs by adding &lt;code&gt;combine.children&lt;/code&gt;
             or &lt;code&gt;combine.self&lt;/code&gt; attributes to the children of the configuration element:&lt;/p&gt;
             &lt;ul&gt;
             &lt;li&gt;&lt;code&gt;combine.children&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;append&lt;/code&gt;,&lt;/li&gt;
             &lt;li&gt;&lt;code&gt;combine.self&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;override&lt;/code&gt;.&lt;/li&gt;
             &lt;/ul&gt;
-            &lt;p&gt;See &lt;a href="https://maven.apache.org/pom.html#Plugins"&gt;POM Reference documentation&lt;/a&gt; and
-            &lt;a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html"&gt;Xpp3DomUtils&lt;/a&gt;
+            &lt;p&gt;See &lt;a href=&quot;https://maven.apache.org/pom.html#Plugins&quot;&gt;POM Reference documentation&lt;/a&gt; and
+            &lt;a href=&quot;https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html&quot;&gt;Xpp3DomUtils&lt;/a&gt;
             for more information.&lt;/p&gt;
             
           </xs:documentation>
@@ -1689,7 +1689,7 @@
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
-            See &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"&gt;the
+            See &lt;a href=&quot;https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html&quot;&gt;the
             dependency mechanism&lt;/a&gt; for more information.
             
           </xs:documentation>
@@ -1767,7 +1767,7 @@
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">If set to true, this profile will be active unless another profile in this
-            pom is activated using the command line -P option or by one of that profile's
+            pom is activated using the command line -P option or by one of that profile&apos;s
             activators.</xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -1832,7 +1832,7 @@
     <xs:annotation>
       <xs:documentation source="version">4.0.0+</xs:documentation>
       <xs:documentation source="description">This is the file specification used to activate the profile. The &lt;code&gt;missing&lt;/code&gt; value
-        is the location of a file that needs to exist, and if it doesn't, the profile will be
+        is the location of a file that needs to exist, and if it doesn&apos;t, the profile will be
         activated. On the other hand, &lt;code&gt;exists&lt;/code&gt; will test for the existence of the file and if it is
         there, the profile will be activated.&lt;br&gt;
         Variable interpolation for these file specifications is limited to &lt;code&gt;${basedir}&lt;/code&gt;,
@@ -1857,7 +1857,7 @@
   <xs:complexType name="ActivationOS">
     <xs:annotation>
       <xs:documentation source="version">4.0.0+</xs:documentation>
-      <xs:documentation source="description">This is an activator which will detect an operating system's attributes in order
+      <xs:documentation source="description">This is an activator which will detect an operating system&apos;s attributes in order
         to activate its profile.</xs:documentation>
     </xs:annotation>
     <xs:all>
@@ -1995,7 +1995,7 @@
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">
             This element describes all of the classpath resources such as properties
-            files associated with a project's unit tests.
+            files associated with a project&apos;s unit tests.
             The default value is &lt;code&gt;src/test/resources&lt;/code&gt;.
           </xs:documentation>
         </xs:annotation>
@@ -2043,7 +2043,7 @@
           <xs:documentation source="description">Default plugin information to be made available for reference by projects
             derived from this one. This plugin configuration will not be resolved or bound to the
             lifecycle unless referenced. Any local configuration for a given plugin will override
-            the plugin's entire definition here.</xs:documentation>
+            the plugin&apos;s entire definition here.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="plugins">
@@ -2115,7 +2115,7 @@
       <xs:element minOccurs="0" name="dependencies">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">Additional dependencies that this project needs to introduce to the plugin's
+          <xs:documentation source="description">Additional dependencies that this project needs to introduce to the plugin&apos;s
             classloader.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -2158,15 +2158,15 @@
             
             &lt;p&gt;The configuration as DOM object.&lt;/p&gt;
             &lt;p&gt;By default, every element content is trimmed, but starting with Maven 3.1.0, you can add
-            &lt;code&gt;xml:space="preserve"&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
+            &lt;code&gt;xml:space=&quot;preserve&quot;&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
             &lt;p&gt;You can control how child POMs inherit configuration from parent POMs by adding &lt;code&gt;combine.children&lt;/code&gt;
             or &lt;code&gt;combine.self&lt;/code&gt; attributes to the children of the configuration element:&lt;/p&gt;
             &lt;ul&gt;
             &lt;li&gt;&lt;code&gt;combine.children&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;append&lt;/code&gt;,&lt;/li&gt;
             &lt;li&gt;&lt;code&gt;combine.self&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;override&lt;/code&gt;.&lt;/li&gt;
             &lt;/ul&gt;
-            &lt;p&gt;See &lt;a href="https://maven.apache.org/pom.html#Plugins"&gt;POM Reference documentation&lt;/a&gt; and
-            &lt;a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html"&gt;Xpp3DomUtils&lt;/a&gt;
+            &lt;p&gt;See &lt;a href=&quot;https://maven.apache.org/pom.html#Plugins&quot;&gt;POM Reference documentation&lt;/a&gt; and
+            &lt;a href=&quot;https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html&quot;&gt;Xpp3DomUtils&lt;/a&gt;
             for more information.&lt;/p&gt;
             
           </xs:documentation>
@@ -2234,15 +2234,15 @@
             
             &lt;p&gt;The configuration as DOM object.&lt;/p&gt;
             &lt;p&gt;By default, every element content is trimmed, but starting with Maven 3.1.0, you can add
-            &lt;code&gt;xml:space="preserve"&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
+            &lt;code&gt;xml:space=&quot;preserve&quot;&lt;/code&gt; to elements you want to preserve whitespace.&lt;/p&gt;
             &lt;p&gt;You can control how child POMs inherit configuration from parent POMs by adding &lt;code&gt;combine.children&lt;/code&gt;
             or &lt;code&gt;combine.self&lt;/code&gt; attributes to the children of the configuration element:&lt;/p&gt;
             &lt;ul&gt;
             &lt;li&gt;&lt;code&gt;combine.children&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;append&lt;/code&gt;,&lt;/li&gt;
             &lt;li&gt;&lt;code&gt;combine.self&lt;/code&gt;: available values are &lt;code&gt;merge&lt;/code&gt; (default) and &lt;code&gt;override&lt;/code&gt;.&lt;/li&gt;
             &lt;/ul&gt;
-            &lt;p&gt;See &lt;a href="https://maven.apache.org/pom.html#Plugins"&gt;POM Reference documentation&lt;/a&gt; and
-            &lt;a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html"&gt;Xpp3DomUtils&lt;/a&gt;
+            &lt;p&gt;See &lt;a href=&quot;https://maven.apache.org/pom.html#Plugins&quot;&gt;POM Reference documentation&lt;/a&gt; and
+            &lt;a href=&quot;https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html&quot;&gt;Xpp3DomUtils&lt;/a&gt;
             for more information.&lt;/p&gt;
             
           </xs:documentation>
@@ -2472,7 +2472,7 @@
           <xs:documentation source="version">4.0.0+</xs:documentation>
           <xs:documentation source="description">
             This element describes all of the classpath resources such as properties
-            files associated with a project's unit tests.
+            files associated with a project&apos;s unit tests.
             The default value is &lt;code&gt;src/test/resources&lt;/code&gt;.
           </xs:documentation>
         </xs:annotation>
@@ -2520,7 +2520,7 @@
           <xs:documentation source="description">Default plugin information to be made available for reference by projects
             derived from this one. This plugin configuration will not be resolved or bound to the
             lifecycle unless referenced. Any local configuration for a given plugin will override
-            the plugin's entire definition here.</xs:documentation>
+            the plugin&apos;s entire definition here.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="plugins">
@@ -2545,7 +2545,7 @@
       <xs:element minOccurs="0" name="groupId" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">The group ID of the extension's artifact.</xs:documentation>
+          <xs:documentation source="description">The group ID of the extension&apos;s artifact.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="artifactId" type="xs:string">
