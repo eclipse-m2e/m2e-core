@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-
+import org.apache.commons.cli.CommandLine;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -71,7 +71,7 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 		addJarsFromBundle(FrameworkUtil.getBundle(org.apache.maven.Maven.class), "/jars/", mavenRuntimeJars);
 		// Libraries that are also required and not included in
 		// org.eclipse.m2e.maven.runtime
-		Stream.of(javax.inject.Inject.class, org.slf4j.Logger.class)//
+		Stream.of(javax.inject.Inject.class, org.slf4j.Logger.class, CommandLine.class)//
 				.map(FrameworkUtil::getBundle).map(FileLocator::getBundleFileLocation)//
 				.flatMap(Optional::stream).forEach(mavenRuntimeJars::add);
 		return mavenRuntimeJars;
