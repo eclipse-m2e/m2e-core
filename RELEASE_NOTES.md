@@ -2,7 +2,7 @@
 
 ## 2.6.0
 
-* 📅 Release Date: _expected_ end February 2024
+* 📅 Release Date: 21th February 2024
 
 ### Embedded and use Maven 3.9.6
 
