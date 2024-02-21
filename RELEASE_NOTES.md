@@ -1,29 +1,6 @@
 # Eclipse m2e - Release notes
 
-## 2.6.0
-
-* 📅 Release Date: _expected_ end February 2024
-
-### Embedded and use Maven 3.9.6
-
-Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Notes](https://maven.apache.org/docs/3.9.6/release-notes.html).
-
-### Improved toolchain.xml handling
-
-In the Preferences under `Maven -> User Settings` the user `toolchain.xml` used in workspace builds can now be specified explicitly.
-At the same time the `maven-toolchains-plugin` is now disabled by default for workspace builds.
-
-### Improved resource linking
-
-Source or resource folders of Maven-projects outside of the project's base directory are now considered in the workspace and are added to the project as linked resources.
-
-### Project preference for automated Maven project configuration updates
-
-Automatic configuration updates for Maven projects can now be disabled the in the project preferences.
-This allows to disable these updates individually per project and to store the setting in a preference-file under version control,
-which is useful for projects that require special workspace configuration that doesn't exactly match the configuration in the `pom.xml`.
-
-![grafik](https://github.com/eclipse-m2e/m2e-core/assets/44067969/7d27ceda-5d13-4f0e-97f0-ff34c94d7493)
+## 2.7.0
 
 ### Surefire/Failsafe plugin configuration propagated to Junit/TestNG launch configuration
 
@@ -47,6 +24,36 @@ groupId1:artifactId1:goal1[,groupIdX:artifactIdX:goalX]*
 Ex:
 <m2e.launch.configuration.prerequisites>org.apache.maven.plugins:maven-dependency-plugin:properties,org.codehaus.mojo:properties-maven-plugin:read-project-properties</m2e.launch.configuration.prerequisites>
 
+## 2.6.0
+
+* 📅 Release Date: 21th February 2024
+
+### Embedded and use Maven 3.9.6
+
+Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Notes](https://maven.apache.org/docs/3.9.6/release-notes.html).
+
+### Improved toolchain.xml handling
+
+In the Preferences under `Maven -> User Settings` the user `toolchain.xml` used in workspace builds can now be specified explicitly.
+At the same time the `maven-toolchains-plugin` is now disabled by default for workspace builds.
+
+### Improved resource linking
+
+Source or resource folders of Maven-projects outside of the project's base directory are now considered in the workspace and are added to the project as linked resources.
+
+### Project preference for automated Maven project configuration updates
+
+Automatic configuration updates for Maven projects can now be disabled the in the project preferences.
+This allows to disable these updates individually per project and to store the setting in a preference-file under version control,
+which is useful for projects that require special workspace configuration that doesn't exactly match the configuration in the `pom.xml`.
+
+![grafik](https://github.com/eclipse-m2e/m2e-core/assets/44067969/7d27ceda-5d13-4f0e-97f0-ff34c94d7493)
+
+### Support of global and user settings in .mvn/maven.config
+
+The `.mvn/maven.config` allows to specify [global and user settings](https://maven.apache.org/settings.html#quick-overview), m2e now also takes these into account.
+
+This improvement was gently sponsored by <img src="https://www.sigasi.com/img/logoSquare.png"  width="16" height="16"> [Sigasi](https://www.sigasi.com/). 
 
 ## 2.5.0
 

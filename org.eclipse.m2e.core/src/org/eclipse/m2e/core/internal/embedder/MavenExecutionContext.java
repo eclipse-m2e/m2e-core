@@ -264,9 +264,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     if(localRepositoryPath == null) {
       return RepositorySystem.defaultUserLocalRepository;
     }
-      //Actually maven would resolve these against the current working directory, 
-      //as we have no such thing available the best we can use here is the root folder of the multimodule directory
-      return new File(multiModuleProjectDirectory, localRepositoryPath).getAbsoluteFile();
+    File configuredPath = new File(localRepositoryPath);
+    if(configuredPath.isAbsolute()) {
+      return configuredPath;
+    }
+    //Actually maven would resolve these against the current working directory, 
+    //as we have no such thing available the best we can use here is the root folder of the multimodule directory
+    return new File(multiModuleProjectDirectory, localRepositoryPath).getAbsoluteFile();
   }
 
   @Override

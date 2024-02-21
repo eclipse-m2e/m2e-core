@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Christoph Läubrich and others.
+ * Copyright (c) 2022, 2023 Christoph Läubrich and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -73,15 +73,25 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 
 	@Test
 	public void testReloadExtensionAfterDeletion() throws Exception {
-		IProject project1 = importPomlessProject("pomless", "bundle/pom.xml");
+		IProject project = importPomlessProject("pomless", "bundle/pom.xml");
+
 		waitForJobsToComplete(monitor);
-		assertEquals("my.bundle", project1.getName());
+		assertEquals("my.bundle", project.getName());
 
 		WorkspaceHelpers.cleanWorkspace();
 
-		project1 = importPomlessProject("pomless", "bundle/pom.xml");
+		project = importPomlessProject("pomless", "bundle/pom.xml");
 		waitForJobsToComplete(monitor);
-		assertEquals("my.bundle", project1.getName());
+		assertEquals("my.bundle", project.getName());
+	}
+
+	@Test
+	public void testMavenConfigWithCoreExtension() throws Exception {
+		IProject project = importPomlessProject("mavenConfig", "bundle/pom.xml");
+
+		assertEquals("my.bundle3", project.getName());
+		assertTrue(project.hasNature("org.eclipse.m2e.core.maven2Nature"));
+		assertNoErrors(project);
 	}
 
 	@Test

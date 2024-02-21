@@ -336,12 +336,22 @@ public class MavenProperties {
     if(alternateGlobalSettingsFile == null) {
       global = configurationLocations.globalSettings();
     } else {
-      global = new File(baseDir, alternateGlobalSettingsFile);
+      File gs = new File(alternateGlobalSettingsFile);
+      if(gs.isAbsolute()) {
+        global = gs;
+      } else {
+        global = new File(baseDir, alternateGlobalSettingsFile);
+      }
     }
     if(alternateUserSettingsFile == null) {
       user = configurationLocations.userSettings();
     } else {
-      user = new File(baseDir, alternateUserSettingsFile);
+      File s = new File(alternateUserSettingsFile);
+      if(s.isAbsolute()) {
+        user = s;
+      } else {
+        user = new File(baseDir, alternateUserSettingsFile);
+      }
     }
     return new MavenSettingsLocations(global, user);
   }
