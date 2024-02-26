@@ -56,6 +56,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.unittest.ui.ConfigureViewerSupport;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
@@ -75,6 +76,10 @@ import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
  * @author Eugene Kuleshov
  */
 public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, ILaunchShortcut2 {
+
+  public static final ConfigureViewerSupport TEST_RESULT_LISTENER_CONFIGURER = new ConfigureViewerSupport(
+      "org.eclipse.m2e.launching.testViewSupport");
+
   private static final Logger log = LoggerFactory.getLogger(ExecutePomAction.class);
 
   private boolean showDialog = false;
@@ -212,7 +217,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, 
       workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
       workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_SCOPE, "${project}"); //$NON-NLS-1$
       workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_RECURSIVE, true);
-
       setProjectConfiguration(workingCopy, basedir);
 
       // TODO when launching Maven with debugger consider to add the following property
@@ -237,6 +241,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, 
         workingCopy.setAttribute(MavenLaunchConstants.ATTR_PROFILES, selectedProfiles);
       }
     }
+    TEST_RESULT_LISTENER_CONFIGURER.apply(workingCopy);
   }
 
   private ILaunchConfiguration getLaunchConfiguration(IContainer basedir, String mode) {

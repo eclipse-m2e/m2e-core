@@ -243,5 +243,12 @@
             class="org.eclipse.m2e.internal.launch.MavenConsoleLineTracker"
             processType="java"/>
    </extension>
+   <extension
+         point="org.eclipse.unittest.ui.unittestViewSupport">
+      <viewSupport
+            class="org.eclipse.m2e.internal.launch.testing.MavenTestViewSupport"
+            id="org.eclipse.m2e.launching.testViewSupport">
+      </viewSupport>
+   </extension>
 
 </plugin>
