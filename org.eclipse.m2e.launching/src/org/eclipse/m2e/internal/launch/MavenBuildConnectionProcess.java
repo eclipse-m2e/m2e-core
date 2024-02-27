@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
@@ -49,10 +50,13 @@ public class MavenBuildConnectionProcess implements IProcess {
 
   private List<MavenBuildListener> buildListeners = new CopyOnWriteArrayList<>();
 
+  private AtomicBoolean terminated = new AtomicBoolean();
+
   public MavenBuildConnectionProcess(ILaunch launch) {
     this.launch = launch;
     launch.addProcess(this);
     attributes.put(IProcess.ATTR_PROCESS_TYPE, "m2e-build-endpoint");
+    fireEvent(new DebugEvent(this, DebugEvent.CREATE));
   }
 
   public <T> T getAdapter(Class<T> adapter) {
@@ -60,21 +64,27 @@ public class MavenBuildConnectionProcess implements IProcess {
   }
 
   public boolean canTerminate() {
-    return true;
+    return !isTerminated();
   }
 
   public boolean isTerminated() {
-    return connection == null || connection.isReadCompleted();
+    return terminated.get() || connection == null;
   }
 
-  public void terminate() throws DebugException {
-    if(connection != null) {
-      try {
-        connection.close();
-      } catch(IOException ex) {
-        throw new DebugException(Status.error("Terminate failed", ex));
+  public void terminate() {
+    if(terminated.compareAndSet(false, true)) {
+      if(connection != null) {
+        try {
+          connection.close();
+        } catch(IOException ex) {
+        }
+        connection = null;
       }
-      connection = null;
+      for(MavenBuildListener mavenBuildListener : buildListeners) {
+        mavenBuildListener.close();
+      }
+      buildListeners.clear();
+      fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
     }
   }
 
@@ -93,6 +103,7 @@ public class MavenBuildConnectionProcess implements IProcess {
   @Override
   public void setAttribute(String key, String value) {
     attributes.put(key, value);
+    fireEvent(new DebugEvent(this, DebugEvent.CHANGE));
   }
 
   @Override
@@ -144,17 +155,20 @@ public class MavenBuildConnectionProcess implements IProcess {
           }
 
           public void close() {
-            for(MavenBuildListener mavenBuildListener : buildListeners) {
-              mavenBuildListener.close();
-            }
-            buildListeners.clear();
-            launch.removeProcess(MavenBuildConnectionProcess.this);
+            MavenBuildConnectionProcess.this.terminate();
           }
         });
   }
 
   String getMavenVMArguments() throws IOException {
     return connection.getMavenVMArguments();
+  }
+
+  private void fireEvent(DebugEvent event) {
+    DebugPlugin manager = DebugPlugin.getDefault();
+    if(manager != null) {
+      manager.fireDebugEventSet(new DebugEvent[] {event});
+    }
   }
 
 }

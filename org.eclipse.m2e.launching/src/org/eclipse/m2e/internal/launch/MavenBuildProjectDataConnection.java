@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener2;
@@ -36,23 +35,23 @@ public class MavenBuildProjectDataConnection {
   static {
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new ILaunchesListener2() {
       public void launchesRemoved(ILaunch[] launches) {
-        Arrays.stream(launches).flatMap(launch -> getConnection(launch).stream()).forEach(con -> {
-          try {
-            con.terminate();
-          } catch(DebugException ex) {
-            //ignore
-          }
-        });
+        cleanupConnections(launches);
       }
 
       public void launchesTerminated(ILaunch[] launches) {
-        launchesRemoved(launches);
+        cleanupConnections(launches);
       }
 
       public void launchesAdded(ILaunch[] launches) { // ignore
       }
 
       public void launchesChanged(ILaunch[] launches) { // ignore
+      }
+
+      private void cleanupConnections(ILaunch[] launches) {
+        Arrays.stream(launches).flatMap(launch -> getConnection(launch).stream()).forEach(con -> {
+          con.terminate();
+        });
       }
     });
   }
@@ -61,10 +60,7 @@ public class MavenBuildProjectDataConnection {
     try {
       if(MavenLaunchUtils.getMavenRuntime(launch.getLaunchConfiguration()) instanceof MavenEmbeddedRuntime) {
         getConnection(launch).ifPresent(existing -> {
-          try {
-            existing.terminate();
-          } catch(DebugException ex) {
-          }
+          existing.terminate();
           throw new IllegalStateException(
               "Maven bridge already created for launch of" + launch.getLaunchConfiguration().getName());
         });
