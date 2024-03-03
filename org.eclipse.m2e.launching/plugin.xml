@@ -243,5 +243,14 @@
             class="org.eclipse.m2e.internal.launch.MavenConsoleLineTracker"
             processType="java"/>
    </extension>
+   <extension
+         point="org.eclipse.m2e.launching.mavenLaunchParticipants">
+      <mavenLaunchParticipant
+            class="org.eclipse.m2e.internal.launch.MavenBuildConnectionLaunchParticipant"
+            id="org.eclipse.m2e.launching.buildevents"
+            modes="run,debug"
+            name="Maven Build Events">
+      </mavenLaunchParticipant>
+   </extension>
 
 </plugin>
