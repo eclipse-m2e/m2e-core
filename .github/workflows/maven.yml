@@ -20,11 +20,11 @@ jobs:
     timeout-minutes: 45
 
     steps:
-    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+    - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
       with:
         fetch-depth: 0
         submodules: true
-    - uses: actions/setup-java@9704b39bf258b59bc04b50fa2dd55e9ed76b47a8 # v4.1.0
+    - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -33,7 +33,7 @@ jobs:
       with:
         maven-version: 3.9.6
     - name: Cache local Maven repository
-      uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
+      uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
       with:
         path: ~/.m2/repository
         # re-cache on changes in the pom and target files
