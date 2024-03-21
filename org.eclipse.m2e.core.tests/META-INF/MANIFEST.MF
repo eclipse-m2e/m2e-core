@@ -13,6 +13,9 @@ Require-Bundle: org.eclipse.m2e.tests.common,
  org.eclipse.debug.core,
  org.eclipse.jdt.core
 Import-Package: org.apache.commons.io,
+ org.hamcrest;version="[2.2.0,3.0.0]",
+ org.hamcrest.collection;version="[2.2.0,3.0.0]",
+ org.hamcrest.core;version="[2.2.0,3.0.0]",
  org.junit,
  org.mockito,
  org.mockito.stubbing

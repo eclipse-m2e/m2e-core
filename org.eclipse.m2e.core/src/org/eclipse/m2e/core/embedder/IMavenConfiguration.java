@@ -51,6 +51,10 @@ public interface IMavenConfiguration {
   //settable for embedded maven
   void setGlobalSettingsFile(String absolutePath) throws CoreException;
 
+  String getGlobalToolchainsFile();
+
+  void setGlobalToolchainsFile(String absolutePath) throws CoreException;
+
   String getUserSettingsFile();
 
   void setUserSettingsFile(String absolutePath) throws CoreException;
