@@ -1,0 +1,11 @@
+<configuration>
+	<argLine>
+		--argLineItem=surefireArgLineValue
+	</argLine>
+	<systemPropertyVariables>
+		<surefireProp1>surefireProp1Value</surefireProp1>
+	</systemPropertyVariables>
+	<environmentVariables>
+		<surefireEnvironmentVariables1>surefireEnvironmentVariables1Value</surefireEnvironmentVariables1>
+	</environmentVariables>
+</configuration>

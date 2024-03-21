@@ -189,6 +189,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
 
     MavenJdtPlugin.getDefault().getBuildpathManager().updateClasspath(project, monitor);
+
+    UnitTestSupport.resetLaunchConfigurations(project);
   }
 
   @SuppressWarnings("unused")
