@@ -21,36 +21,26 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.eventspy.EventSpy;
-import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.ExecutionEvent.Type;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.execution.MavenSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This {@link EventSpy} listens to certain events within a Maven build JVM and
- * sends certain data (e.g. about projects being built) to the JVM of the
- * Eclipse IDE that launched the Maven build JVM.
- * 
- * @author Hannes Wellmann
- *
+ * Bridge between the remote running maven and the local m2e to exchange event
+ * messages and information.
  */
-@Named
+@Named("m2e")
 @Singleton
-public class M2EMavenBuildDataBridge implements EventSpy {
+public class M2EMavenBuildDataBridge extends AbstractMavenLifecycleParticipant {
 
 	private static final String SOCKET_FILE_PROPERTY_NAME = "m2e.build.project.data.socket.port";
 	private static final String DATA_SET_SEPARATOR = ";;";
@@ -60,7 +50,7 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 	private SocketChannel writeChannel;
 
 	@Override
-	public void init(Context context) throws IOException {
+	public void afterSessionStart(MavenSession session) throws MavenExecutionException {
 		String socketPort = System.getProperty(SOCKET_FILE_PROPERTY_NAME);
 		if (socketPort != null) {
 			try {
@@ -76,94 +66,51 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 	}
 
 	@Override
-	public void close() throws IOException {
-		writeChannel.close();
+	public void afterSessionEnd(MavenSession session) throws MavenExecutionException {
+		try {
+			writeChannel.close();
+		} catch (IOException e) {
+			// we can't do much here anyways...
+		}
 	}
 
-	@Override
-	public void onEvent(Object event) throws Exception {
-		if (writeChannel != null && event instanceof ExecutionEvent
-				&& ((ExecutionEvent) event).getType() == Type.ProjectStarted) {
+	boolean isActive() {
+		return writeChannel != null;
+	}
 
-			String message = serializeProjectData(((ExecutionEvent) event).getProject());
-
-			ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
-			synchronized (writeChannel) {
+	void sendMessage(String msg) {
+		SocketChannel channel = writeChannel;
+		if (channel != null) {
+			ByteBuffer buffer = ByteBuffer.wrap((msg + DATA_SET_SEPARATOR).getBytes());
+			synchronized (channel) {
 				while (buffer.hasRemaining()) {
-					writeChannel.write(buffer);
+					try {
+						channel.write(buffer);
+					} catch (IOException e) {
+						LOGGER.warn("Can't forward message to m2e: " + e);
+					}
 				}
 			}
 		}
 	}
 
-	private static String serializeProjectData(MavenProject project) {
-		StringJoiner data = new StringJoiner(",");
-		add(data, "groupId", project.getGroupId());
-		add(data, "artifactId", project.getArtifactId());
-		add(data, "version", project.getVersion());
-		add(data, "file", project.getFile());
-		add(data, "basedir", project.getBasedir());
-		add(data, "build.directory", project.getBuild().getDirectory());
-		return data.toString() + DATA_SET_SEPARATOR;
-	}
 
-	private static void add(StringJoiner data, String key, Object value) {
-		data.add(key + "=" + value);
-	}
 
-	/**
-	 * <p>
-	 * This method is supposed to be called from M2E within the Eclipse-IDE JVM.
-	 * </p>
-	 * 
-	 * @param dataSet the data-set to parse
-	 * @return the {@link MavenProjectBuildData} parsed from the given string
-	 */
-	private static MavenProjectBuildData parseMavenBuildProject(String dataSet) {
-		Map<String, String> data = new HashMap<>(8);
-		for (String entry : dataSet.split(",")) {
-			String[] keyValue = entry.split("=");
-			if (keyValue.length != 2) {
-				throw new IllegalStateException("Invalid data-set format" + dataSet);
-			}
-			data.put(keyValue[0], keyValue[1]);
-		}
-		return new MavenProjectBuildData(data);
-	}
 
-	public static final class MavenProjectBuildData {
-		public final String groupId;
-		public final String artifactId;
-		public final String version;
-		public final Path projectBasedir;
-		public final Path projectFile;
-		public final Path projectBuildDirectory;
 
-		MavenProjectBuildData(Map<String, String> data) {
-			if (data.size() != 6) {
-				throw new IllegalArgumentException();
-			}
-			this.groupId = Objects.requireNonNull(data.get("groupId"));
-			this.artifactId = Objects.requireNonNull(data.get("artifactId"));
-			this.version = Objects.requireNonNull(data.get("version"));
-			this.projectBasedir = Paths.get(data.get("basedir"));
-			this.projectFile = Paths.get(data.get("file"));
-			this.projectBuildDirectory = Paths.get(data.get("build.directory"));
-		}
-	}
 
 	/**
 	 * Prepares the connection to a {@code Maven build JVM} to be launched and is
 	 * intended to be called from the Eclipse IDE JVM.
 	 * 
 	 * @param label           the label of the listener thread
-	 * @param datasetListener the listener, which is notified whenever a new
+	 * @param buildListener the listener, which is notified whenever a new
 	 *                        {@link MavenProjectBuildData MavenProjectBuildDataSet}
 	 *                        has arived from the Maven VM in the Eclipse-IDE VM.
 	 * @return the preapre {@link MavenBuildConnection}
 	 * @throws IOException
 	 */
-	public static MavenBuildConnection prepareConnection(String label, Consumer<MavenProjectBuildData> datasetListener)
+	public static MavenBuildConnection prepareConnection(String label, MavenBuildListener buildListener)
 			throws IOException {
 
 //	    TODO: use UNIX domain socket once Java-17 is required by Maven
@@ -187,9 +134,21 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 					for (int terminatorIndex; (terminatorIndex = message.indexOf(DATA_SET_SEPARATOR)) >= 0;) {
 						String dataSet = message.substring(0, terminatorIndex);
 						message.delete(0, terminatorIndex + DATA_SET_SEPARATOR.length());
-
-						MavenProjectBuildData buildData = parseMavenBuildProject(dataSet);
-						datasetListener.accept(buildData);
+						if (dataSet.startsWith(M2eEventSpy.PROJECT_START_EVENT)) {
+							MavenProjectBuildData buildData = MavenProjectBuildData
+									.parseMavenBuildProject(
+									dataSet.substring(M2eEventSpy.PROJECT_START_EVENT.length()));
+							buildListener.projectStarted(buildData);
+						} else if (dataSet.startsWith(M2eMojoExecutionListener.TEST_START_EVENT)) {
+							String path = dataSet.substring(M2eMojoExecutionListener.TEST_START_EVENT.length());
+							buildListener.onTestEvent(new MavenTestEvent(Type.MojoStarted, Paths.get(path)));
+						} else if (dataSet.startsWith(M2eMojoExecutionListener.TEST_END_EVENT)) {
+							String path = dataSet.substring(M2eMojoExecutionListener.TEST_END_EVENT.length());
+							buildListener.onTestEvent(new MavenTestEvent(Type.MojoSucceeded, Paths.get(path)));
+						} else if (dataSet.startsWith(M2eMojoExecutionListener.TEST_END_FAILED_EVENT)) {
+							String path = dataSet.substring(M2eMojoExecutionListener.TEST_END_EVENT.length());
+							buildListener.onTestEvent(new MavenTestEvent(Type.MojoFailed, Paths.get(path)));
+						}
 					}
 					// Explicit cast for compatibility with covariant return type on JDK 9's
 					// ByteBuffer
@@ -198,6 +157,7 @@ public class M2EMavenBuildDataBridge implements EventSpy {
 			} catch (IOException ex) { // ignore, happens if Maven process is forcibly terminated
 			} finally {
 				connection.readCompleted.set(true);
+				buildListener.close();
 			}
 //	      try {
 //	        Files.deleteIfExists(socketFile);

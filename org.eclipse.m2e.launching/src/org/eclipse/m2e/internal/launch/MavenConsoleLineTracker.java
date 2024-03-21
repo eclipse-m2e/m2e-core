@@ -65,7 +65,7 @@ import org.eclipse.ui.ide.IDE;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IBuildProjectFileResolver;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenProjectBuildData;
+import org.eclipse.m2e.internal.maven.listener.MavenProjectBuildData;
 
 
 /**

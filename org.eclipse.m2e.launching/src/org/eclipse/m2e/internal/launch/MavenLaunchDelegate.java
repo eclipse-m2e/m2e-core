@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +123,15 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     this.programArguments = null;
 
     try {
+      Bundle bundle = Platform.getBundle("org.eclipse.unittest.ui");
+      if(bundle != null) {
+        try {
+          bundle.start();
+        } catch(BundleException ex) {
+          //we tried our best...
+        }
+      }
+      System.out.println(bundle);
       this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, monitor);
       this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
       this.preferencesService = Platform.getPreferencesService();
@@ -129,7 +140,6 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       log.info(" mvn {}", getProgramArguments(configuration)); //$NON-NLS-1$
 
       extensionsSupport.configureSourceLookup(configuration, launch, monitor);
-
       super.launch(configuration, mode, launch, monitor);
     } finally {
       this.launch = null;
