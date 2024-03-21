@@ -239,6 +239,18 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<!-- The Tycho baselinging does not yet work well on Windows. Temporarily skip it until it is fixed.-->
+				<tycho.baseline.skip>true</tycho.baseline.skip>
+			</properties>
+		</profile>
 	</profiles>
 
 	<developers>
