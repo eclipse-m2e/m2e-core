@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -65,7 +67,7 @@ import org.eclipse.ui.ide.IDE;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IBuildProjectFileResolver;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenProjectBuildData;
+import org.eclipse.m2e.internal.maven.listener.MavenProjectBuildData;
 
 
 /**
@@ -227,10 +229,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
           if(gaMatcher.matches()) {
             String groupId = gaMatcher.group(GROUP_ID);
             String artifactId = gaMatcher.group(ARTIFACT_ID);
-
-            mavenProject = getProject(groupId, artifactId, version);
-            if(mavenProject != null) {
-              addProjectLink(line3Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine3Locations);
+            try {
+              mavenProject = getProject(groupId, artifactId, version).join(); //TODO can we do this with future notification?
+              if(mavenProject != null) {
+                addProjectLink(line3Region, gaMatcher, GROUP_ID, ARTIFACT_ID, removedLine3Locations);
+              }
+            } catch(CancellationException e) {
+              mavenProject = null;
             }
           }
         }
@@ -265,18 +270,18 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     console.addLink(link, line.getOffset() + start, end - start);
   }
 
-  private ProjectReference getProject(String groupId, String artifactId, String version) {
-    MavenProjectBuildData buildProject = MavenBuildProjectDataConnection.getBuildProject(launch, groupId, artifactId,
-        version);
-    if(buildProject == null) {
-      return null;
-    }
-    IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-    URI basedirURI = buildProject.projectBasedir.toUri();
-    Optional<IProject> project = Arrays.stream(wsRoot.findContainersForLocationURI(basedirURI))
-        .filter(IProject.class::isInstance).map(IProject.class::cast).findFirst();
-    //if project is absent, the project build in Maven is not in the workspace
-    return project.isPresent() ? new ProjectReference(project.get(), buildProject) : null;
+  private CompletableFuture<ProjectReference> getProject(String groupId, String artifactId, String version) {
+    return MavenBuildConnectionProcess.get(launch).map(process -> process.getBuildProject(groupId, artifactId, version))
+        .map(pdf -> {
+          return pdf.thenApply(buildProject -> {
+            IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+            URI basedirURI = buildProject.projectBasedir.toUri();
+            Optional<IProject> project = Arrays.stream(wsRoot.findContainersForLocationURI(basedirURI))
+                .filter(IProject.class::isInstance).map(IProject.class::cast).findFirst();
+            //if project is absent, the project build in Maven is not in the workspace
+            return project.isPresent() ? new ProjectReference(project.get(), buildProject) : null;
+          });
+        }).orElseGet(() -> CompletableFuture.completedFuture(null));
   }
 
   @Override
