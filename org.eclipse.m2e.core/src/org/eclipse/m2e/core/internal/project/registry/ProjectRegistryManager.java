@@ -237,7 +237,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
       // XXX sensible handling
       return null;
     }
-    File baseDir = project.getLocation().toFile();
+    IPath location = project.getLocation();
+    if(location == null) {
+      return project.getFile(IMavenConstants.POM_FILE_NAME);
+    }
+    File baseDir = location.toFile();
     Optional<File> pom = IMavenToolbox.of(containerManager.getComponentLookup(baseDir)).locatePom(baseDir);
     return pom.map(pomFile -> {
       IFile file = project.getFile(pomFile.getName());
