@@ -155,6 +155,9 @@ public class PlexusContainerManager {
     if(basedir == null || !basedir.isAccessible()) {
       return aquire();
     }
+    if(basedir.getLocation() == null) {
+      return aquire();
+    }
     File file = basedir.getLocation().toFile();
     if(file == null) {
       return aquire();
