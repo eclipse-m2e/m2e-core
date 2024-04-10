@@ -125,14 +125,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       if(supportedExecutionEnvironmentTypes.stream().filter(type -> eeId.startsWith(type)).findAny().isEmpty()) {
         continue;
       }
-      var compliance = ee.getComplianceOptions().get(JavaCore.COMPILER_COMPLIANCE);
-      if(compliance != null) {
-        sources.add(compliance);
-        targets.add(compliance);
-        if(JavaCore.ENABLED.equals(ee.getComplianceOptions().get(JavaCore.COMPILER_RELEASE))) {
-          releases.add(compliance);
+      Map<String, String> complianceOptions = ee.getComplianceOptions();
+      if(complianceOptions != null) {
+        String compliance = complianceOptions.get(JavaCore.COMPILER_COMPLIANCE);
+        if(compliance != null) {
+          sources.add(compliance);
+          targets.add(compliance);
+          if(JavaCore.ENABLED.equals(complianceOptions.get(JavaCore.COMPILER_RELEASE))) {
+            releases.add(compliance);
+          }
+          ENVIRONMENTS.put(compliance, eeId);
         }
-        ENVIRONMENTS.put(compliance, eeId);
       }
     }
 
