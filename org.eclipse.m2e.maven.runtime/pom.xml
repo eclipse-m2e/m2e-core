@@ -33,7 +33,7 @@
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
 		<maven-resolver.version>1.9.18</maven-resolver.version>
-		<apache-commons-codec.version>1.16.0</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
+		<apache-commons-codec.version>1.16.1</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
