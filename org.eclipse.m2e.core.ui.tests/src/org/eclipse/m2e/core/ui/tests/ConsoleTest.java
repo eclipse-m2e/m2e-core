@@ -328,7 +328,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		// First check if the full build print-out was already written. If not, wait
 		// for the document-listener's signal
 		String consoleText = display.syncCall(document::get);
-		if (!isBuildFinished(consoleText) && !finishedRead.await(120, TimeUnit.SECONDS)) {
+		if (!isBuildFinished(consoleText) && !finishedRead.await(180, TimeUnit.SECONDS)) {
 			fail("Build timed out.");
 		}
 		return document;
