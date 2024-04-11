@@ -20,7 +20,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.600-SNAPSHOT</version>
+	<version>3.9.601-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -35,7 +35,7 @@
 		<maven-resolver.version>1.9.18</maven-resolver.version>
 		<apache-commons-codec.version>1.16.0</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
 		<!-- below are m2e-specific addons -->
-		<plexus-build-api.version>0.0.7</plexus-build-api.version>
+		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
 		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
@@ -73,7 +73,7 @@
 			<artifactId>org.eclipse.sisu.plexus</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.sonatype.plexus</groupId>
+			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-build-api</artifactId>
 			<version>${plexus-build-api.version}</version>
 		</dependency>
