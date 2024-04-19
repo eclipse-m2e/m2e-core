@@ -75,7 +75,7 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     waitForJobsToComplete();
     
     // At start, check all attributes are empty
-    IJavaProject javaProject = (IJavaProject) project.getNature(JavaCore.NATURE_ID);
+	IJavaProject javaProject = JavaCore.create(project);
     Map<String, String> jreAttributes = Utils.getJreContainerAttributes(javaProject);
     Map<String, String> m2eAttributes = Utils.getM2eContainerAttributes(javaProject);
     

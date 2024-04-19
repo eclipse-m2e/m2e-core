@@ -25,13 +25,21 @@
   <extension point="org.eclipse.wst.xml.core.catalogContributions">
     <catalogContribution>
       <system systemId="http://maven.apache.org/maven-v4_0_0.xsd"
-              uri="xsd/maven-v4_0_0.xsd"/>
+              uri="xsd/maven-4.0.0.xsd"/>
       <system systemId="http://maven.apache.org/xsd/maven-4.0.0.xsd"
-              uri="xsd/maven-v4_0_0.xsd"/>
+              uri="xsd/maven-4.0.0.xsd"/>
       <system systemId="http://maven.apache.org/xsd/settings-1.0.0.xsd"
-              uri="xsd/settings-v1_0_0.xsd"/>
+              uri="xsd/settings-1.0.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/settings-1.1.0.xsd"
+              uri="xsd/settings-1.1.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/settings-1.2.0.xsd"
+              uri="xsd/settings-1.2.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/toolchains-1.0.0.xsd"
+              uri="xsd/toolchains-1.0.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/toolchains-1.1.0.xsd"
+              uri="xsd/toolchains-1.1.0.xsd"/>
       <system systemId="http://maven.apache.org/xsd/profiles-1.0.0.xsd"
-              uri="xsd/profiles-v1_0_0.xsd"/>
+              uri="xsd/profiles-1.0.0.xsd"/>
       <system systemId="http://maven.apache.org/xsd/archetype-1.0.0.xsd"
               uri="xsd/archetype-1.0.0.xsd"/>
       <system systemId="http://maven.apache.org/xsd/archetype-catalog-1.0.0.xsd"

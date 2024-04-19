@@ -109,7 +109,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<>();
 
   static {
-    Set<String> supportedExecutionEnvironmentTypes = Set.of("JRE", "J2SE", "JavaSE");
+    Set<String> supportedExecutionEnvironmentTypes = Set.of("J2SE", "JavaSE");
 
     List<String> sources = new ArrayList<>();
 
@@ -120,19 +120,22 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     List<String> releases = new ArrayList<>(List.of("6", "7", "8"));
 
-    for(var ee : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-      var eeId = ee.getId();
-      if(supportedExecutionEnvironmentTypes.stream().filter(type -> eeId.startsWith(type)).findAny().isEmpty()) {
+    for(IExecutionEnvironment ee : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+      String eeId = ee.getId();
+      if(supportedExecutionEnvironmentTypes.stream().noneMatch(eeId::startsWith)) {
         continue;
       }
-      var compliance = ee.getComplianceOptions().get(JavaCore.COMPILER_COMPLIANCE);
-      if(compliance != null) {
-        sources.add(compliance);
-        targets.add(compliance);
-        if(JavaCore.ENABLED.equals(ee.getComplianceOptions().get(JavaCore.COMPILER_RELEASE))) {
-          releases.add(compliance);
+      Map<String, String> complianceOptions = ee.getComplianceOptions();
+      if(complianceOptions != null) {
+        String compliance = complianceOptions.get(JavaCore.COMPILER_COMPLIANCE);
+        if(compliance != null) {
+          sources.add(compliance);
+          targets.add(compliance);
+          if(JavaCore.ENABLED.equals(complianceOptions.get(JavaCore.COMPILER_RELEASE))) {
+            releases.add(compliance);
+          }
+          ENVIRONMENTS.put(compliance, eeId);
         }
-        ENVIRONMENTS.put(compliance, eeId);
       }
     }
 
