@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2024, 2024 ptreilhes and others
+ * Copyright (c) 2024, 2024 pascal treilhes and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   ptreilhes - initial API and implementation
+ *   pascal treilhes - initial API and implementation
  ********************************************************************************/
 
 package org.eclipse.m2e.jdt.internal;
@@ -501,14 +501,14 @@ public class UnitTestSupport {
 
       // get an instance of org.apache.maven.surefire.api.testset.TestListResolver directly from the plugin instance
       Optional<Object> testResolverInstance = Optional.of(mojo)
-          .map(o -> findMethod(o, GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD)).map(om -> om.orElseThrow()).map(m -> {
+          .map(o -> findMethod(o, GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD)).map(m -> {
             m.setAccessible(true);
             return m;
           }).map(m -> uncheckedInvoke(m, mojo));
 
       // check if the test is handled by the plugin
       Boolean isTestHandled = testResolverInstance.filter(Objects::nonNull)
-          .map(o -> findMethod(o, SHOULD_RUN_METHOD, String.class, String.class)).map(om -> om.orElseThrow()).map(m -> {
+          .map(o -> findMethod(o, SHOULD_RUN_METHOD, String.class, String.class)).map(m -> {
             m.setAccessible(true);
             return m;
           }).map(m -> uncheckedInvoke(m, testResolverInstance.get(), testFile, "")).map(Boolean.class::cast)
@@ -521,9 +521,9 @@ public class UnitTestSupport {
      * Lookup method in class and ancestors
      * 
      * @param instance the instance on which we search the method
-     * @return an optional method
+     * @return a method or null if not found
      */
-    private Optional<Method> findMethod(Object instance, String methodName, Class<?>... parameters) {
+    private Method findMethod(Object instance, String methodName, Class<?>... parameters) {
       Method method = null;
       Class<?> searchClass = instance.getClass();
 
@@ -536,7 +536,7 @@ public class UnitTestSupport {
         searchClass = searchClass.getSuperclass();
       }
 
-      return Optional.ofNullable(method);
+      return method;
     }
 
     /**
