@@ -31,6 +31,7 @@
 		<surefire.timeout>900</surefire.timeout>
 		<tycho.surefire.useUIHarness>true</tycho.surefire.useUIHarness>
 		<tycho.surefire.useUIThread>true</tycho.surefire.useUIThread>
+		<tycho.useJDK>SYSTEM</tycho.useJDK>
 		<jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
 		<tycho.scmUrl>scm:git:https://github.com/eclipse-m2e/m2e-core.git</tycho.scmUrl>
 		<trimStackTrace>false</trimStackTrace>
@@ -192,6 +193,9 @@
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho-version}</version>
+					<configuration>
+						<useJDK>${tycho.useJDK}</useJDK>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
@@ -202,6 +206,14 @@
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-p2-repository-plugin</artifactId>
 					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-surefire-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<useJDK>${tycho.useJDK}</useJDK>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -225,7 +237,6 @@
 						<plugin>
 							<groupId>org.eclipse.tycho</groupId>
 							<artifactId>tycho-surefire-plugin</artifactId>
-							<version>${tycho-version}</version>
 							<configuration>
 								<dependencies combine.children="append">
 									<!--this dependency is needed to detect and set the default VM correctly on Mac OS,
