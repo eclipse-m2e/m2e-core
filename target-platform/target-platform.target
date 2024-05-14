@@ -37,7 +37,7 @@
 			<repository location="https://download.eclipse.org/tm4e/releases/0.11.0/"/>
 			<repository location="https://download.eclipse.org/lsp4e/releases/0.26.0/"/>
 			<repository location="https://download.eclipse.org/lsp4j/updates/releases/0.22.0/"/>
-			<repository location="https://download.eclipse.org/mylyn/docs/releases/3.0.48/"/>
+			<repository location="https://download.eclipse.org/mylyn/updates/release/4.2.0/"/>
 			<unit id="org.eclipse.wildwebdeveloper.xml.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.lsp4e" version="0.0.0"/>
 		</location>
