@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -488,8 +489,10 @@ public class ProjectConfigurationManager
     MavenProject mavenProject = request.mavenProject();
     Properties mavenProperties = mavenProject.getProperties();
     String sourceEncoding = mavenProperties.getProperty("project.build.sourceEncoding");
-    log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
-    project.setDefaultCharset(sourceEncoding, monitor);
+    if(!Objects.equals(project.getDefaultCharset(), sourceEncoding)) {
+      log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
+      project.setDefaultCharset(sourceEncoding, monitor);
+    }
 
     IMavenExecutionContext executionContext = projectManager.createExecutionContext(mavenProjectFacade.getPom(),
         mavenProjectFacade.getConfiguration());
