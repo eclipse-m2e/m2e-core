@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
@@ -81,12 +82,15 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
       if(build != null) {
         String directory = build.getDirectory();
         if(directory != null) {
-          IContainer container = projectFacade.getProject().getFolder(projectFacade.getProjectRelativePath(directory));
-          if(container != null) {
-            if(!container.exists() && container instanceof IFolder folder) {
-              M2EUtils.createFolder(folder, true, monitor.newChild(1));
-            } else {
-              container.setDerived(true, monitor.newChild(1));
+          IPath targetPath = projectFacade.getProjectRelativePath(directory);
+          if (targetPath != null) {
+            IContainer container = projectFacade.getProject().getFolder(targetPath);
+            if(container != null) {
+              if(!container.exists() && container instanceof IFolder folder) {
+                M2EUtils.createFolder(folder, true, monitor.newChild(1));
+              } else {
+                container.setDerived(true, monitor.newChild(1));
+              }
             }
           }
         }
