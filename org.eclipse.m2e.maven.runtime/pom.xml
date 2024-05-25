@@ -20,19 +20,19 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.601-SNAPSHOT</version>
+	<version>3.9.700-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.6</maven-core.version>
+		<maven-core.version>3.9.7</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
 			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-		<maven-resolver.version>1.9.18</maven-resolver.version>
+		<maven-resolver.version>1.9.20</maven-resolver.version>
 		<apache-commons-codec.version>1.16.1</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
