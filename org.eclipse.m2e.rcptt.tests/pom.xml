@@ -25,7 +25,7 @@
 			<plugin>
 				<groupId>org.eclipse.rcptt</groupId>
 				<artifactId>rcptt-maven-plugin</artifactId>
-				<version>${rcptt-maven-version}</version>
+				<version>2.5.5-M3</version>
 				<extensions>true</extensions>
 				<configuration>
 					<aut>
