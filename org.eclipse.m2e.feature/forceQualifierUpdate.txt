@@ -1,2 +1,2 @@
 # To force a version qualifier update add the bug here
-Update build-qualifier because maven-runtime version update to Maven 3.9.6
+Update build-qualifier because maven-runtime version update to Maven 3.9.7
