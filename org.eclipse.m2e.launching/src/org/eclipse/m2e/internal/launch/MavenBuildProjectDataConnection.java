@@ -16,48 +16,30 @@ package org.eclipse.m2e.internal.launch;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener2;
+import org.eclipse.debug.core.model.IProcess;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
 import org.eclipse.m2e.internal.launch.MavenRuntimeLaunchSupport.VMArguments;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenBuildConnection;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenProjectBuildData;
+import org.eclipse.m2e.internal.maven.listener.MavenProjectBuildData;
 
 
 public class MavenBuildProjectDataConnection {
 
-  private static record MavenBuildConnectionData(Map<ArtifactKey, MavenProjectBuildData> projects,
-      MavenBuildConnection connection) {
-  }
-
-  private static final Map<ILaunch, MavenBuildConnectionData> LAUNCH_PROJECT_DATA = new ConcurrentHashMap<>();
-
   static {
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(new ILaunchesListener2() {
       public void launchesRemoved(ILaunch[] launches) {
-        closeServers(Arrays.stream(launches).map(LAUNCH_PROJECT_DATA::remove));
+        cleanupConnections(launches);
       }
 
       public void launchesTerminated(ILaunch[] launches) {
-        closeServers(Arrays.stream(launches).map(LAUNCH_PROJECT_DATA::get));
-      }
-
-      private static void closeServers(Stream<MavenBuildConnectionData> connectionData) {
-        connectionData.filter(Objects::nonNull).forEach(c -> {
-          try {
-            c.connection().close();
-          } catch(IOException ex) { // ignore
-          }
-        });
+        cleanupConnections(launches);
       }
 
       public void launchesAdded(ILaunch[] launches) { // ignore
@@ -65,39 +47,51 @@ public class MavenBuildProjectDataConnection {
 
       public void launchesChanged(ILaunch[] launches) { // ignore
       }
+
+      private void cleanupConnections(ILaunch[] launches) {
+        Arrays.stream(launches).flatMap(launch -> getConnection(launch).stream()).forEach(con -> {
+          con.terminate();
+        });
+      }
     });
   }
 
   static void openListenerConnection(ILaunch launch, VMArguments arguments) {
     try {
       if(MavenLaunchUtils.getMavenRuntime(launch.getLaunchConfiguration()) instanceof MavenEmbeddedRuntime) {
-
-        Map<ArtifactKey, MavenProjectBuildData> projects = new ConcurrentHashMap<>();
-
-        MavenBuildConnection connection = M2EMavenBuildDataBridge.prepareConnection(
-            launch.getLaunchConfiguration().getName(),
-            d -> projects.put(new ArtifactKey(d.groupId, d.artifactId, d.version, null), d));
-
-        if(LAUNCH_PROJECT_DATA.putIfAbsent(launch, new MavenBuildConnectionData(projects, connection)) != null) {
-          connection.close();
+        getConnection(launch).ifPresent(existing -> {
+          existing.terminate();
           throw new IllegalStateException(
               "Maven bridge already created for launch of" + launch.getLaunchConfiguration().getName());
-        }
-        arguments.append(connection.getMavenVMArguments());
+        });
+        MavenBuildConnectionProcess process = new MavenBuildConnectionProcess(launch);
+        process.connect();
+        arguments.append(process.getMavenVMArguments());
       }
     } catch(CoreException | IOException ex) { // ignore
     }
   }
 
+  public static Optional<MavenBuildConnectionProcess> getConnection(ILaunch launch) {
+    for(IProcess process : launch.getProcesses()) {
+      if(process instanceof MavenBuildConnectionProcess connection) {
+        return Optional.of(connection);
+      }
+    }
+    return Optional.empty();
+  }
+
   static MavenProjectBuildData getBuildProject(ILaunch launch, String groupId, String artifactId, String version) {
-    MavenBuildConnectionData build = LAUNCH_PROJECT_DATA.get(launch);
-    if(build == null) {
+    Optional<MavenBuildConnectionProcess> connection = getConnection(launch);
+    if(connection.isEmpty()) {
       return null;
     }
+    MavenBuildConnectionProcess process = connection.get();
+    Map<ArtifactKey, MavenProjectBuildData> projects = process.getProjects();
     ArtifactKey key = new ArtifactKey(groupId, artifactId, version, null);
     while(true) {
-      MavenProjectBuildData buildProject = build.projects().get(key);
-      if(buildProject != null || build.connection().isReadCompleted()) {
+      MavenProjectBuildData buildProject = projects.get(key);
+      if(buildProject != null || process.isTerminated()) {
         return buildProject;
       }
       Thread.onSpinWait(); // Await completion of project data read. It has to become available soon, since its GAV was printed on the console
