@@ -205,8 +205,8 @@
 								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
 								org.apache.commons.codec*
 							Require-Bundle: \
-								com.google.guava;bundle-version="32.2.1"
-
+								com.google.guava;bundle-version="32.2.1",
+								org.apache.maven.resolver.api;bundle-version="${maven-resolver.version}";visibility:=reexport
 							-failok: true
 							-nouses: true
 							-nodefaultversion: true
@@ -305,6 +305,7 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<outputDirectory>${project.basedir}/${jars.directory}</outputDirectory>
+							<excludeArtifactIds>maven-resolver-api</excludeArtifactIds>
 						</configuration>
 					</execution>
 					<execution>
