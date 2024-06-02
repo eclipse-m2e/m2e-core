@@ -14,7 +14,7 @@
 			<unit id="jakarta.annotation-api" version="1.3.5"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-03/"/>
+			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-06/"/>
 			<unit id="org.jdom2" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -22,7 +22,7 @@
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.37.0"/>
+			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.38.0"/>
 			<unit id="org.eclipse.emf.edit.ui.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.emf.ecore.edit.feature.group" version="0.0.0"/>
 		</location>
@@ -33,10 +33,10 @@
 			<unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/1.3.4/"/>
-			<repository location="https://download.eclipse.org/tm4e/releases/0.11.0/"/>
-			<repository location="https://download.eclipse.org/lsp4e/releases/0.26.0/"/>
-			<repository location="https://download.eclipse.org/lsp4j/updates/releases/0.22.0/"/>
+			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/1.3.6/"/>
+			<repository location="https://download.eclipse.org/tm4e/releases/0.12.0/"/>
+			<repository location="https://download.eclipse.org/lsp4e/releases/0.26.2/"/>
+			<repository location="https://download.eclipse.org/lsp4j/updates/releases/0.23.1/"/>
 			<repository location="https://download.eclipse.org/mylyn/updates/release/4.2.0/"/>
 			<unit id="org.eclipse.wildwebdeveloper.xml.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.lsp4e" version="0.0.0"/>
