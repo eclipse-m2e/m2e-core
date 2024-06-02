@@ -489,7 +489,7 @@ public class ProjectConfigurationManager
     MavenProject mavenProject = request.mavenProject();
     Properties mavenProperties = mavenProject.getProperties();
     String sourceEncoding = mavenProperties.getProperty("project.build.sourceEncoding");
-    if(!Objects.equals(project.getDefaultCharset(), sourceEncoding)) {
+    if(!Objects.equals(project.getDefaultCharset(false), sourceEncoding)) {
       log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
       project.setDefaultCharset(sourceEncoding, monitor);
     }
