@@ -20,7 +20,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.700-SNAPSHOT</version>
+	<version>3.9.701-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -201,7 +201,6 @@
 								org.apache.maven.*;provider=m2e;mandatory:=provider,\
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
-								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								org.apache.maven.wagon.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
@@ -214,7 +213,8 @@
 								org.apache.commons.codec*, \
 								org.apache.commons.lang3*
 							Require-Bundle: \
-								com.google.guava;bundle-version="32.0.1"
+								com.google.guava;bundle-version="32.0.1", \
+								org.apache.maven.resolver.api;bundle-version="${maven-resolver.version}";visibility:=reexport
 
 							-failok: true
 							-nouses: true
@@ -316,6 +316,7 @@
 						<phase>generate-resources</phase>
 						<configuration>
 							<outputDirectory>${project.basedir}/${jars.directory}</outputDirectory>
+							<excludeArtifactIds>maven-resolver-api</excludeArtifactIds>
 						</configuration>
 					</execution>
 					<execution>
