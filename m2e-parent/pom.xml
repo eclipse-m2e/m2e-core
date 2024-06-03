@@ -151,7 +151,7 @@
 					<ignoredPatterns>
 						<pattern>META-INF/ECLIPSE_.RSA</pattern>
 						<pattern>META-INF/ECLIPSE_.SF</pattern>
-						<pattern>**/org/fusesource/jansi/internal/native/Mac/*/libjansi.jnilib</pattern>
+						<pattern>**/jars/jansi-*.jar</pattern>
 						<pattern>org/eclipse/m2e/core/internal/lifecyclemapping/model/**/*.java</pattern>
 					</ignoredPatterns>
 				</configuration>
