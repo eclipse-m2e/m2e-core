@@ -2,7 +2,9 @@
 
 ## 2.6.1
 
-* 📅 Release Date: _expected_ beginning of June 2024
+* 📅 Release Date: 04th June 2024
+
+Various minor bug-fixes, enhancements and dependency updates.
 
 ### Embedded and use Maven 3.9.7
 
