@@ -20,14 +20,14 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.700-SNAPSHOT</version>
+	<version>3.9.800-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.7</maven-core.version>
+		<maven-core.version>3.9.8</maven-core.version>
 		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
 			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
 			bundle. So make sure the following variable has the value of the maven-resolver-* jars
@@ -147,11 +147,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
 			<scope>provided</scope>
@@ -214,7 +209,7 @@
 								org.apache.commons.codec*, \
 								org.apache.commons.lang3*
 							Require-Bundle: \
-								com.google.guava;bundle-version="32.0.1"
+								com.google.guava;bundle-version="32.2.1"
 
 							-failok: true
 							-nouses: true
