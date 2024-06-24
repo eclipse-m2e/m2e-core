@@ -206,8 +206,7 @@
 								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
 								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
-								org.apache.commons.codec*, \
-								org.apache.commons.lang3*
+								org.apache.commons.codec*
 							Require-Bundle: \
 								com.google.guava;bundle-version="32.2.1"
 
