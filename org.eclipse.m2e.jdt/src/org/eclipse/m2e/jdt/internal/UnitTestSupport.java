@@ -63,7 +63,8 @@ public class UnitTestSupport {
   /**
    * Feature flag to enable or disable the support
    */
-  public static boolean FEATURE_ENABLED = true;
+  public static final boolean FEATURE_ENABLED = Boolean
+      .parseBoolean(System.getProperty("m2e.process.test.configuration", "true"));
 
   /**
    * Logger
@@ -193,12 +194,7 @@ public class UnitTestSupport {
   /**
    * Supported launch types
    */
-  private static final Set<String> supportedTypes = new HashSet<>();
-
-  static {
-    supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
-    supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
-  }
+  private static final Set<String> CONSIDERED_LAUNCH_TYPES = Set.of(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST, MavenRuntimeClasspathProvider.JDT_TESTNG_TEST)
 
   /**
    * Reset all launch configurations for the project
@@ -237,7 +233,7 @@ public class UnitTestSupport {
    * @return true if supported
    */
   private static boolean isSupportedType(String id) {
-    return supportedTypes.contains(id);
+    return id!=null && CONSIDERED_LAUNCH_TYPES .contains(id);
   }
 
   /**
