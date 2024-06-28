@@ -358,24 +358,24 @@ public class UnitTestSupport {
 
       StringBuilder launchArguments = new StringBuilder();
 
-      if(args.isEnableAssertions()) {
+      if(args.enableAssertions()) {
         launchArguments.append("-ea").append("\n");
       }
 
-      if(args.getArgLine() != null) {
-        launchArguments.append(args.getArgLine()).append("\n");
+      if(args.argLine() != null) {
+        launchArguments.append(args.argLine()).append("\n");
       }
-      if(args.getSystemPropertyVariables() != null) {
-        args.getSystemPropertyVariables().entrySet().forEach(
+      if(args.systemPropertyVariables() != null) {
+        args.systemPropertyVariables().entrySet().forEach(
             e -> launchArguments.append("-D").append(e.getKey()).append("=").append(e.getValue()).append("\n"));
       }
 
       copy.setAttribute(LAUNCH_CONFIG_VM_ARGUMENTS, launchArguments.toString());
 
       try {
-        if(args.getWorkingDirectory() != null && !Files.isSameFile(project.getLocation().toPath().toAbsolutePath(),
-            args.getWorkingDirectory().toPath())) {
-          copy.setAttribute(LAUNCH_CONFIG_WORKING_DIRECTORY, args.getWorkingDirectory().getAbsolutePath());
+        if(args.workingDirectory() != null
+            && !Files.isSameFile(project.getLocation().toPath().toAbsolutePath(), args.workingDirectory().toPath())) {
+          copy.setAttribute(LAUNCH_CONFIG_WORKING_DIRECTORY, args.workingDirectory().getAbsolutePath());
         } else {
           copy.setAttribute(LAUNCH_CONFIG_WORKING_DIRECTORY, (String) null);
         }
@@ -383,8 +383,8 @@ public class UnitTestSupport {
         log.error(ex.getMessage(), ex);
       }
 
-      if(args.getEnvironmentVariables() != null) {
-        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, args.getEnvironmentVariables());
+      if(args.environmentVariables() != null) {
+        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, args.environmentVariables());
       }
 
       copy.doSave();
@@ -404,7 +404,7 @@ public class UnitTestSupport {
       // find test executions
       List<MojoExecution> executions = new ArrayList<>();
       for(ExecutionId id : TEST_EXECUTIONS) {
-        executions.addAll(facade.getMojoExecutions(id.getGroupId(), id.getArtifactId(), monitor, id.getGoal()));
+        executions.addAll(facade.getMojoExecutions(id.groupId(), id.artifactId(), monitor, id.goal()));
       }
 
       // find which plugin executions will launch the test
@@ -438,7 +438,7 @@ public class UnitTestSupport {
       List<MojoExecution> executions = new ArrayList<>();
       for(ExecutionId id : executionIds) {
         try {
-          executions.addAll(facade.getMojoExecutions(id.getGroupId(), id.getArtifactId(), monitor, id.getGoal()));
+          executions.addAll(facade.getMojoExecutions(id.groupId(), id.artifactId(), monitor, id.goal()));
         } catch(CoreException ex) {
           log.error(ex.getMessage(), ex);
         }
@@ -562,18 +562,12 @@ public class UnitTestSupport {
       IMaven maven = MavenPlugin.getMaven();
 
       try {
-        TestLaunchArguments arguments = new TestLaunchArguments();
-        arguments
-            .setArgLine(maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor));
-        arguments.setWorkingDirectory(
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor));
-        arguments.setEnableAssertions(
+        return new TestLaunchArguments(
+            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor),
+            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
+            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
+            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor),
             maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENABLE_ASSERTIONS, Boolean.class, monitor));
-        arguments.setEnvironmentVariables(
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor));
-        arguments.setSystemPropertyVariables(
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor));
-        return arguments;
       } catch(Exception e) {
         log.error(e.getMessage(), e);
       }
@@ -651,117 +645,14 @@ public class UnitTestSupport {
   /**
    * Holder for the surefire/failsafe launch arguments
    */
-  private static class TestLaunchArguments {
-    /**
-     * The argLine element
-     */
-    String argLine;
-
-    /**
-     * The systemPropertyVariables element
-     */
-    Map<String, String> systemPropertyVariables;
-
-    /**
-     * The environmentVariables element
-     */
-    Map<String, String> environmentVariables;
-
-    /**
-     * The workingDirectory element
-     */
-    File workingDirectory;
-
-    /**
-     * The enableAssertions element
-     */
-    boolean enableAssertions;
-
-    public String getArgLine() {
-      return this.argLine;
-    }
-
-    public void setArgLine(String argLine) {
-      this.argLine = argLine;
-    }
-
-    public Map<String, String> getEnvironmentVariables() {
-      return this.environmentVariables;
-    }
-
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
-      this.environmentVariables = environmentVariables;
-    }
-
-    public File getWorkingDirectory() {
-      return this.workingDirectory;
-    }
-
-    public void setWorkingDirectory(File workingDirectory) {
-      this.workingDirectory = workingDirectory;
-    }
-
-    public boolean isEnableAssertions() {
-      return this.enableAssertions;
-    }
-
-    public void setEnableAssertions(boolean enableAssertions) {
-      this.enableAssertions = enableAssertions;
-    }
-
-    public Map<String, String> getSystemPropertyVariables() {
-      return this.systemPropertyVariables;
-    }
-
-    public void setSystemPropertyVariables(Map<String, String> systemPropertyVariables) {
-      this.systemPropertyVariables = systemPropertyVariables;
-    }
-
+  private static record TestLaunchArguments(String argLine, Map<String, String> systemPropertyVariables,
+      Map<String, String> environmentVariables, File workingDirectory, boolean enableAssertions) {
   }
 
   /**
    * Holder for the execution id
    */
-  private static class ExecutionId {
-
-    String groupId;
-
-    String artifactId;
-
-    String goal;
-
-    /**
-     * @param groupId
-     * @param artifactId
-     * @param goal
-     */
-    public ExecutionId(String groupId, String artifactId, String goal) {
-      super();
-      this.groupId = groupId.trim();
-      this.artifactId = artifactId.trim();
-      this.goal = goal.trim();
-    }
-
-    /**
-     * @return the groupId
-     */
-    public String getGroupId() {
-      return this.groupId;
-    }
-
-    /**
-     * @return the artifactId
-     */
-    public String getArtifactId() {
-      return this.artifactId;
-    }
-
-    /**
-     * @return the goal
-     */
-    public String getGoal() {
-      return this.goal;
-    }
-
+  private static record ExecutionId(String groupId, String artifactId, String goal) {
   }
+
 }
