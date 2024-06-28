@@ -480,7 +480,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
 
       // Set folder encoding (null = platform/container default)
-      if(sourceFolder.exists()) {
+      if(sourceFolder.exists() && !Objects.equals(sourceFolder.getDefaultCharset(false), sourceEncoding)) {
         sourceFolder.setDefaultCharset(sourceEncoding, monitor);
       }
 
@@ -575,7 +575,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           addResourceFolder(classpath, path, outputPath, addTestFlag);
         }
         // Set folder encoding (null = platform default)
-        if(r.exists()) {
+        if(r.exists() && !Objects.equals(r.getDefaultCharset(false), resourceEncoding)) {
           r.setDefaultCharset(resourceEncoding, monitor);
         }
       } else {

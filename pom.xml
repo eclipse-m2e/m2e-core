@@ -25,7 +25,6 @@
 	<name>Maven Integration for Eclipse (root)</name>
 
 	<properties>
-		<rcptt-maven-version>2.5.4</rcptt-maven-version>
 		<tychoDefaultTestArgLine>-Xmx800m</tychoDefaultTestArgLine>
 		<tycho.testArgLine>${tychoDefaultTestArgLine}</tycho.testArgLine>
 		<surefire.timeout>900</surefire.timeout>
@@ -103,7 +102,7 @@
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>3.9.601-SNAPSHOT</version>
+			<version>3.9.800-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

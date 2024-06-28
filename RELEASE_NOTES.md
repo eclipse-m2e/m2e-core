@@ -13,16 +13,24 @@ The following arguments are supported: <br/>
 
 Configuration is propagated on unit test launch configuration creation and also when executing `maven > update project`
 
-By default and if found, the plugin maven-dependency-plugin (goal: properties) is executed before updating the launch configuration to load properties.
+## 2.6.2
 
-If properties set by other plugins are used in the failsafe/surefire plugin configuration it is possible to override the default loading behaviour by providing the list of plugins and goals to execute using the property named  `m2e.launch.configuration.prerequisites`
+* 📅 Release Date: _expected_ beginning of September 2024
 
-The expected format is as follow:
+### Embedded and use Maven 3.9.8
 
-groupId1:artifactId1:goal1[,groupIdX:artifactIdX:goalX]*
+Updated the embedded Maven from version 3.9.7 to 3.9.8; [Maven 3.9.8 Release Notes](https://maven.apache.org/docs/3.9.8/release-notes.html).
 
-Ex:
-<m2e.launch.configuration.prerequisites>org.apache.maven.plugins:maven-dependency-plugin:properties,org.codehaus.mojo:properties-maven-plugin:read-project-properties</m2e.launch.configuration.prerequisites>
+## 2.6.1
+
+* 📅 Release Date: 04th June 2024
+
+Various minor bug-fixes, enhancements and dependency updates.
+
+### Embedded and use Maven 3.9.7
+
+Updated the embedded Maven from version 3.9.6 to 3.9.7; [Maven 3.9.7 Release Notes](https://maven.apache.org/docs/3.9.7/release-notes.html).
+
 
 ## 2.6.0
 

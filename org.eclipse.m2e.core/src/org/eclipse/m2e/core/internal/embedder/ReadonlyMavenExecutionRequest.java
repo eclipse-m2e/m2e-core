@@ -14,6 +14,8 @@
 package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -519,7 +521,38 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
 
   @Override
   public MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyRepository) {
-    return request.setUseLegacyLocalRepository(useLegacyRepository);
+    throw new IllegalStateException();
+  }
+
+  private static final Method IS_IGNORE_TRANSITIVE_REPOSITORIES;
+  static {
+    Method method = null;
+    try { // Tycho somehow compiles against the oldest version making compilation fail if methods from new Maven methods are referenced.
+      method = MavenExecutionRequest.class.getMethod("isIgnoreTransitiveRepositories");
+    } catch(Exception e) {
+    }
+    IS_IGNORE_TRANSITIVE_REPOSITORIES = method;
+  }
+
+  /**
+   * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
+   */
+//  @Override
+  @Deprecated(since = "to maintain compatibility with Maven 3.8")
+  public boolean isIgnoreTransitiveRepositories() {
+    if(IS_IGNORE_TRANSITIVE_REPOSITORIES != null) {
+      try {
+        return (boolean) IS_IGNORE_TRANSITIVE_REPOSITORIES.invoke(request);
+      } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    throw new UnsupportedOperationException();
+  }
+
+//  @Override
+  public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
+    throw new IllegalStateException();
   }
 
   @Override
