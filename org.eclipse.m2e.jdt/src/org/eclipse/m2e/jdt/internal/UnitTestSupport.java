@@ -394,15 +394,6 @@ public class UnitTestSupport {
       return MavenPlugin.getMavenProjectRegistry().getProject(project.getProject());
     }
 
-    /**
-     * Get the launch arguments
-     * 
-     * @param configuration the configuration
-     * @param facade the maven project facade
-     * @param monitor the progress monitor
-     * @return the launch arguments
-     * @throws CoreException
-     */
     private TestLaunchArguments getTestLaunchArguments(ILaunchConfiguration configuration, IMavenProjectFacade facade,
         IProgressMonitor monitor) throws CoreException {
 
