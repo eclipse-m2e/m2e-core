@@ -43,8 +43,6 @@ import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -62,7 +60,7 @@ public class UnitTestSupport {
   /**
    * Feature flag to enable or disable the support
    */
-  public static final boolean FEATURE_ENABLED = Boolean
+  private static final boolean FEATURE_ENABLED = Boolean
       .parseBoolean(System.getProperty("m2e.process.test.configuration", "true"));
 
   /**
@@ -83,17 +81,12 @@ public class UnitTestSupport {
   /**
    * Launch configuration attribute for the main class
    */
-  public static final String LAUNCH_CONFIG_MAIN_CLASS = "org.eclipse.jdt.launching.MAIN_TYPE";
-
-  /**
-   * Launch configuration attribute for the test name
-   */
-  public static final String LAUNCH_CONFIG_TESTNAME = "org.eclipse.jdt.junit.TESTNAME";
+  private static final String LAUNCH_CONFIG_MAIN_CLASS = "org.eclipse.jdt.launching.MAIN_TYPE";
 
   /**
    * Launch configuration attribute for the project
    */
-  public static final String LAUNCH_CONFIG_PROJECT = "org.eclipse.jdt.launching.PROJECT_ATTR";
+  private static final String LAUNCH_CONFIG_PROJECT = "org.eclipse.jdt.launching.PROJECT_ATTR";
 
   /**
    * Launch configuration attribute for the VM arguments
@@ -108,7 +101,7 @@ public class UnitTestSupport {
   /**
    * Launch configuration attribute for the system properties
    */
-  public static final String LAUNCH_CONFIG_WORKING_DIRECTORY = "org.eclipse.jdt.launching.WORKING_DIRECTORY";
+  private static final String LAUNCH_CONFIG_WORKING_DIRECTORY = "org.eclipse.jdt.launching.WORKING_DIRECTORY";
 
   /**
    * Launch configuration attribute for the working directory
@@ -146,11 +139,6 @@ public class UnitTestSupport {
   private static final String GOAL_INTEGRATION_TEST = "integration-test";
 
   /**
-   * maven goal for the properties execution
-   */
-  private static final String GOAL_PROPERTIES = "properties";
-
-  /**
    * maven artifact id for the surefire plugin
    */
   private static final String SUREFIRE_PLUGIN_ARTIFACT_ID = "maven-surefire-plugin";
@@ -159,11 +147,6 @@ public class UnitTestSupport {
    * maven artifact id for the failsafe plugin
    */
   private static final String FAILSAFE_PLUGIN_ARTIFACT_ID = "maven-failsafe-plugin";
-
-  /**
-   * maven artifact id for the dependency plugin
-   */
-  private static final String DEPENDENCY_PLUGIN_ARTIFACT_ID = "maven-dependency-plugin";
 
   /**
    * maven group id for the maven plugins
@@ -176,19 +159,6 @@ public class UnitTestSupport {
   private static final List<ExecutionId> TEST_EXECUTIONS = List.of(
       new ExecutionId(MAVEN_PLUGIN_GROUP_ID, SUREFIRE_PLUGIN_ARTIFACT_ID, GOAL_TEST),
       new ExecutionId(MAVEN_PLUGIN_GROUP_ID, FAILSAFE_PLUGIN_ARTIFACT_ID, GOAL_INTEGRATION_TEST));
-
-  /**
-   * List of default prerequisite executions (needed to populate properties
-   */
-  private static final List<ExecutionId> PREREQ_EXECUTIONS = List
-      .of(new ExecutionId(MAVEN_PLUGIN_GROUP_ID, DEPENDENCY_PLUGIN_ARTIFACT_ID, GOAL_PROPERTIES));
-
-  /**
-   * property to set to define a list of mojo executions to be executed before the test launch configuration is updated
-   * The format is a list of execution gourpId:artifactId:goal separated by a comma<br/>
-   * Ex: grp1:art1:goal1,grp2:art2:goal2
-   */
-  public static final String PREREQ_CUSTOM_EXECUTIONS_PROPERTY = "m2e.launch.configuration.prerequisites";
 
   /**
    * Supported launch types
@@ -321,9 +291,7 @@ public class UnitTestSupport {
 
               log.info("Updating {} from maven configuration", configuration.getName());
 
-              IMavenProjectFacade facade = getMavenProjectFacade(javaProject);
-
-              loadPrerequisites(configuration, facade, null);
+              IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
 
               TestLaunchArguments args = getTestLaunchArguments(configuration, facade, null);
 
@@ -386,10 +354,6 @@ public class UnitTestSupport {
       copy.doSave();
     }
 
-    private static IMavenProjectFacade getMavenProjectFacade(IJavaProject project) {
-      return MavenPlugin.getMavenProjectRegistry().getProject(project.getProject());
-    }
-
     private TestLaunchArguments getTestLaunchArguments(ILaunchConfiguration configuration, IMavenProjectFacade facade,
         IProgressMonitor monitor) throws CoreException {
 
@@ -413,60 +377,6 @@ public class UnitTestSupport {
       }
 
       return null;
-    }
-
-    /**
-     * Execute the prerequisites mojos
-     * 
-     * @param configuration the configuration
-     * @param facade the maven project facade
-     * @param monitor the progress monitor
-     */
-    private void loadPrerequisites(ILaunchConfiguration configuration, IMavenProjectFacade facade,
-        IProgressMonitor monitor) {
-
-      String customExecutions = facade.getMavenProject().getProperties().getProperty(PREREQ_CUSTOM_EXECUTIONS_PROPERTY);
-
-      List<ExecutionId> executionIds = customExecutions != null ? parseExecutionIds(customExecutions)
-          : PREREQ_EXECUTIONS;
-
-      // find prereq executions
-      List<MojoExecution> executions = new ArrayList<>();
-      for(ExecutionId id : executionIds) {
-        try {
-          executions.addAll(facade.getMojoExecutions(id.groupId(), id.artifactId(), monitor, id.goal()));
-        } catch(CoreException ex) {
-          log.error(ex.getMessage(), ex);
-        }
-      }
-
-      // executing prerequisites mojo (mainly for properties)
-      for(MojoExecution execution : executions) {
-        try {
-          cache.executeMojo(facade, execution, monitor);
-        } catch(MojoExecutionException | MojoFailureException ex) {
-          log.error(ex.getMessage(), ex);
-        }
-      }
-
-    }
-
-    /**
-     * Parse the custom execution ids
-     * 
-     * @param customExecutions the custom executions
-     * @return the list of execution ids
-     */
-    private List<ExecutionId> parseExecutionIds(String customExecutions) {
-      List<ExecutionId> executionIds = new ArrayList<>();
-      String[] customExecutionsArray = customExecutions.split(",");
-      for(String customExecution : customExecutionsArray) {
-        String[] customExecutionArray = customExecution.split(":");
-        if(customExecutionArray.length == 3) {
-          executionIds.add(new ExecutionId(customExecutionArray[0], customExecutionArray[1], customExecutionArray[2]));
-        }
-      }
-      return executionIds;
     }
 
     /**
@@ -581,30 +491,6 @@ public class UnitTestSupport {
      * Cache for the mojos
      */
     Map<MojoExecution, Mojo> mojoCache = new HashMap<>();
-
-    /**
-     * List of executed mojos
-     */
-    List<Mojo> executed = new ArrayList<>();
-
-    /**
-     * Execute a mojo if not already executed
-     * 
-     * @param facade the maven project facade
-     * @param mojoExecution the mojo execution
-     * @param monitor the progress monitor
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
-     */
-    public void executeMojo(IMavenProjectFacade facade, MojoExecution mojoExecution, IProgressMonitor monitor)
-        throws MojoExecutionException, MojoFailureException {
-      Mojo mojo = getMojoInstance(facade, mojoExecution, monitor);
-
-      if(mojo != null && !executed.contains(mojo)) {
-        mojo.execute();
-        executed.add(mojo);
-      }
-    }
 
     /**
      * Get a configured mojo instance

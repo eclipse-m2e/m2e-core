@@ -262,33 +262,6 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		assertTrue(argLine.contains("-DfailsafeProp1=failsafeProp1Value"));
 	}
 
-	@Test
-	public void properties_plugin_must_be_executed_before_launch_configuration_update()
-			throws CoreException, IOException, InterruptedException {
-		// Get launch type
-		ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(testType);
-
-		assumeTrue(testType + " support not available", type != null);
-
-		File pomFile = getTestFile("prerequisitesAreLoaded/pom.xml");
-
-		IProject project = importProject(pomFile.getAbsolutePath());
-		waitForJobsToComplete();
-
-		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTest");
-
-		ILaunchConfiguration[] updatedConfigurations = launchManager.getLaunchConfigurations(type);
-		assertTrue(updatedConfigurations.length == 1);
-
-		ILaunchConfiguration config = updatedConfigurations[0];
-
-		// check argLine
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
-		assertTrue(argLine.contains("--argLineItem=somevalue"));// somevalue is from the properties file
-
-	}
-
 	private void updateProject(IProject project) throws CoreException, InterruptedException {
 		MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
 		waitForJobsToComplete();
