@@ -1,0 +1,11 @@
+<configuration>
+	<argLine>
+		--argLineItem=failsafeArgLineValue
+	</argLine>
+	<systemPropertyVariables>
+		<failsafeProp1>failsafeProp1Value</failsafeProp1>
+	</systemPropertyVariables>
+	<environmentVariables>
+		<failsafeEnvironmentVariables1>failsafeEnvironmentVariables1Value</failsafeEnvironmentVariables1>
+	</environmentVariables>
+</configuration>

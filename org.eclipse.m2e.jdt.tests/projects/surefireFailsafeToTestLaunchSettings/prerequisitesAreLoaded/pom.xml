@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>foo.bar</groupId>
+	<artifactId>demo-test-config</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<m2e.launch.configuration.prerequisites>
+			org.codehaus.mojo:properties-maven-plugin:read-project-properties</m2e.launch.configuration.prerequisites>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<files>
+						<file>props_to_load.properties</file>
+					</files>
+				</configuration>
+				<executions>
+					<execution>
+						<id>read-project-properties</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<argLine>
+							--argLineItem=${property.to.load}
+						</argLine>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
