@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -194,7 +193,8 @@ public class UnitTestSupport {
   /**
    * Supported launch types
    */
-  private static final Set<String> CONSIDERED_LAUNCH_TYPES = Set.of(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST, MavenRuntimeClasspathProvider.JDT_TESTNG_TEST)
+  private static final Set<String> CONSIDERED_LAUNCH_TYPES = Set.of(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST,
+      MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
 
   /**
    * Reset all launch configurations for the project
@@ -233,7 +233,7 @@ public class UnitTestSupport {
    * @return true if supported
    */
   private static boolean isSupportedType(String id) {
-    return id!=null && CONSIDERED_LAUNCH_TYPES .contains(id);
+    return id != null && CONSIDERED_LAUNCH_TYPES.contains(id);
   }
 
   /**
@@ -258,7 +258,7 @@ public class UnitTestSupport {
         // Get the launch manager
         ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 
-        for(String launchTypeId : supportedTypes) {
+        for(String launchTypeId : CONSIDERED_LAUNCH_TYPES) {
           try {
             // Get launch type
             ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(launchTypeId);
