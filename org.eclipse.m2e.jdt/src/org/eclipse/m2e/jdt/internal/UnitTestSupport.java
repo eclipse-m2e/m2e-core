@@ -194,12 +194,7 @@ public class UnitTestSupport {
   /**
    * Supported launch types
    */
-  private static final Set<String> supportedTypes = new HashSet<>();
-
-  static {
-    supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
-    supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
-  }
+  private static final Set<String> CONSIDERED_LAUNCH_TYPES = Set.of(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST, MavenRuntimeClasspathProvider.JDT_TESTNG_TEST)
 
   /**
    * Reset all launch configurations for the project
