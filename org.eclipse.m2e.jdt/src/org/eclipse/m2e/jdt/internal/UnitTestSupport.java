@@ -233,7 +233,7 @@ public class UnitTestSupport {
    * @return true if supported
    */
   private static boolean isSupportedType(String id) {
-    return supportedTypes.contains(id);
+    return id!=null && CONSIDERED_LAUNCH_TYPES .contains(id);
   }
 
   /**
