@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (c) 2024, 2024 pascal treilhes and others
+ * Copyright (c) 2024, 2024 Pascal Treilhes and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   pascal treilhes - initial API and implementation
+ *   Pascal Treilhes - initial API and implementation
  ********************************************************************************/
 
 package org.eclipse.m2e.jdt.internal;
