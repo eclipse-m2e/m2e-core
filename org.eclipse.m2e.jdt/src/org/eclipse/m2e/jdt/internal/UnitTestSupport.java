@@ -63,7 +63,8 @@ public class UnitTestSupport {
   /**
    * Feature flag to enable or disable the support
    */
-  public static boolean FEATURE_ENABLED = true;
+  public static final boolean FEATURE_ENABLED = Boolean
+      .parseBoolean(System.getProperty("m2e.process.test.configuration", "true"));
 
   /**
    * Logger
