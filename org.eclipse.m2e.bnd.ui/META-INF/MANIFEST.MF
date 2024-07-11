@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: bnd-maven-plugin integration
+Bundle-SymbolicName: org.eclipse.m2e.bnd.ui
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Eclipse
+Automatic-Module-Name: org.eclipse.m2e.bnd.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-21
