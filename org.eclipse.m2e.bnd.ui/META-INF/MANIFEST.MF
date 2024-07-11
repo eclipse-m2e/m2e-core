@@ -3,6 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Name: bnd-maven-plugin integration
 Bundle-SymbolicName: org.eclipse.m2e.bnd.ui
 Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.equinox.common,
+ org.eclipse.core.resources,
+ biz.aQute.bndlib,
+ org.eclipse.m2e.core,
+ org.eclipse.m2e.maven.runtime
+Service-Component: OSGI-INF/org.eclipse.m2e.bnd.ui.BndPluginAdapter.xml
 Bundle-Vendor: Eclipse
 Automatic-Module-Name: org.eclipse.m2e.bnd.ui
+Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
