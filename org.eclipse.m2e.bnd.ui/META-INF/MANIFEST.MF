@@ -3,9 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: bnd-maven-plugin integration
 Bundle-SymbolicName: org.eclipse.m2e.bnd.ui
 Bundle-Version: 1.0.0.qualifier
+Import-Package: aQute.bnd.build;version="[4.5.0,5.0.0)",
+ aQute.bnd.maven.lib.configuration;version="1.2.0",
+ aQute.bnd.osgi;version="[7.0.0,8.0.0)"
 Require-Bundle: org.eclipse.equinox.common,
  org.eclipse.core.resources,
- biz.aQute.bndlib,
  org.eclipse.m2e.core,
  org.eclipse.m2e.maven.runtime
 Service-Component: OSGI-INF/org.eclipse.m2e.bnd.ui.BndPluginAdapter.xml
