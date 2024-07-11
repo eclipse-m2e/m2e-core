@@ -65,6 +65,8 @@
 		<module>org.eclipse.m2e.apt.core</module>
 		<module>org.eclipse.m2e.apt.ui</module>
 		<module>org.eclipse.m2e.mavenarchiver</module>
+		<module>org.eclipse.m2e.bnd.ui</module>
+		<module>org.eclipse.m2e.lemminx.bnd</module>
 
 		<!-- common test helpers -->
 		<module>org.eclipse.m2e.tests.common</module>
