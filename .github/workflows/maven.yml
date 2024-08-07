@@ -47,7 +47,7 @@ jobs:
       with:
        run: mvn clean verify --batch-mode -Pits -Dtycho.p2.baselineMode=failCommon -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true
     - name: Upload Test Results
-      uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
       with:
         name: test-results-${{ matrix.os }}
         if-no-files-found: warn
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Upload
-      uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+      uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
       with:
         name: Event File
         path: ${{ github.event_path }}
