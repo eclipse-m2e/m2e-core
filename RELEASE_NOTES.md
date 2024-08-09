@@ -1,5 +1,18 @@
 # Eclipse m2e - Release notes
 
+## 2.7.0
+
+### Surefire/Failsafe plugin configuration propagated to Junit/TestNG launch configuration
+
+The following arguments are supported: <br/>
+`<argLine>`, <br/>
+`<environmentVariables>`, <br/>
+`<systemPropertyVariables>`, <br/>
+`<workingDirectory>`,<br/>
+`<enableAssertions>`,<br/>
+
+Configuration is propagated on unit test launch configuration creation and also when executing `maven > update project`
+
 ## 2.6.2
 
 * 📅 Release Date: _expected_ beginning of September 2024
@@ -17,6 +30,7 @@ Various minor bug-fixes, enhancements and dependency updates.
 ### Embedded and use Maven 3.9.7
 
 Updated the embedded Maven from version 3.9.6 to 3.9.7; [Maven 3.9.7 Release Notes](https://maven.apache.org/docs/3.9.7/release-notes.html).
+
 
 ## 2.6.0
 
