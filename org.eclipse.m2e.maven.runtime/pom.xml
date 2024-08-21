@@ -8,7 +8,8 @@
 
 	SPDX-License-Identifier: EPL-2.0
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +29,6 @@
 	<properties>
 		<!-- maven core version -->
 		<maven-core.version>3.9.9</maven-core.version>
-		<!-- NOTE: When maven-core.version changes, this may impact the versions of the maven-resolver-*
-			jars that export the org.eclipse.aether.* packages in the org.eclipse.m2e.maven.runtime
-			bundle. So make sure the following variable has the value of the maven-resolver-* jars
-			https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-		<maven-resolver.version>1.9.22</maven-resolver.version>
-		<apache-commons-codec.version>1.16.1</apache-commons-codec.version><!-- Keep in sync with what maven includes-->
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
@@ -42,12 +37,14 @@
 		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
 	<dependencies>
+		<!-- Excluded dependencies (or those that are 'provided' to effectivly remove
+		them from the bundle) are fulfilled via the OSGi requirements specified below
+		as Import-Package/Require-Bundle and therefore don't have to be
+		embedded. Or they are not required. -->
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
 			<exclusions>
-				<!-- Excluded dependencies are fulfilled via the OSGi requirements specified below as Import-Package/Require-Bundle and
-					therefore don't have to be embedded. Or they are not required. -->
 				<exclusion>
 					<groupId>org.checkerframework</groupId>
 					<artifactId>checker-compat-qual</artifactId>
@@ -96,6 +93,12 @@
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-transport-http</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.wagon</groupId>
@@ -137,13 +140,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.7</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${apache-commons-codec.version}</version>
+			<version>2.0.16</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -196,10 +193,10 @@
 								org.apache.maven.*;provider=m2e;mandatory:=provider,\
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
 								org.sonatype.plexus.*;provider=m2e;mandatory:=provider,\
-								org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version},\
+								org.eclipse.aether.*;provider=m2e;mandatory:=provider,\
 								com.google.inject.*;provider=m2e;mandatory:=provider,\
 								org.apache.maven.wagon.*;provider=m2e;mandatory:=provider,\
-								org.eclipse.sisu.*;provider=m2e;mandatory:=provider;version=${maven-resolver.version}
+								org.eclipse.sisu.*;provider=m2e;mandatory:=provider
 							Import-Package: \
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
