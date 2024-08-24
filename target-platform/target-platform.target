@@ -14,11 +14,11 @@
 			<unit id="jakarta.annotation-api" version="1.3.5"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-06/"/>
+			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-09/"/>
 			<unit id="org.jdom2" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/egit/updates-6.9/"/>
+			<repository location="https://download.eclipse.org/egit/updates-6.10/"/>
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -35,7 +35,7 @@
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/wildwebdeveloper/releases/1.3.6/"/>
 			<repository location="https://download.eclipse.org/tm4e/releases/0.12.0/"/>
-			<repository location="https://download.eclipse.org/lsp4e/releases/0.26.2/"/>
+			<repository location="https://download.eclipse.org/lsp4e/releases/0.26.4/"/>
 			<repository location="https://download.eclipse.org/lsp4j/updates/releases/0.23.1/"/>
 			<repository location="https://download.eclipse.org/mylyn/updates/release/4.3.0/"/>
 			<unit id="org.eclipse.wildwebdeveloper.xml.feature.feature.group" version="0.0.0"/>
@@ -50,7 +50,7 @@
 				<dependency>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
-					<version>1.5.6</version>
+					<version>1.5.7</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -78,25 +78,25 @@
 				<dependency>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
-					<version>33.2.0-jre</version>
+					<version>33.3.0-jre</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>commons-cli</groupId>
 					<artifactId>commons-cli</artifactId>
-					<version>1.8.0</version>
+					<version>1.9.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
-					<version>1.17.0</version>
+					<version>1.17.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-lang3</artifactId>
-					<version>3.14.0</version>
+					<version>3.16.0</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
