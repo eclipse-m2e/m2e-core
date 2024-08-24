@@ -29,7 +29,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -52,6 +51,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -178,7 +178,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		assertLinkTextAndOpenedEditor(0, "org.eclipse.m2e.tests:" + TYCHO_TEST_PROJECT, //
 				ManifestEditor.class, TYCHO_TEST_PROJECT, document);
 
-		assertLinkTextAndOpenedEditor(3, TYCHO_TEST_PROJECT, //
+		assertLinkTextAndOpenedEditor(-2, TYCHO_TEST_PROJECT, //
 				ManifestEditor.class, TYCHO_TEST_PROJECT, document);
 
 		assertDebugeePrintOutAndDebuggerLaunch(document, TYCHO_TEST_PROJECT, "8000");
@@ -188,7 +188,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 			String expectedEditorTitle, IDocument document) throws Exception {
 
 		Position[] positions = document.getPositions(ConsoleHyperlinkPosition.HYPER_LINK_CATEGORY);
-		ConsoleHyperlinkPosition link = (ConsoleHyperlinkPosition) positions[index];
+		int i = index < 0 ? positions.length + index : index;
+		ConsoleHyperlinkPosition link = (ConsoleHyperlinkPosition) positions[i];
 
 		assertEquals(expectedLinkText, document.get(link.getOffset(), link.getLength()));
 
@@ -218,10 +219,11 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 				.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""));
 		assertEquals(ILaunchManager.DEBUG_MODE, debugLaunch.getLaunchMode());
 		long startTime = System.currentTimeMillis();
-		while (!debugLaunch.isTerminated() && System.currentTimeMillis() - startTime < 10000 ) {
+		while (!debugLaunch.isTerminated() && System.currentTimeMillis() - startTime < 10000) {
 			Thread.onSpinWait();
 		}
-		assertTrue("Debug launch " + debugLaunch.getLaunchConfiguration().getName() + " is not terminated yet after waiting for 10 seconds", debugLaunch.isTerminated());
+		assertTrue("Debug launch " + debugLaunch.getLaunchConfiguration().getName()
+				+ " is not terminated yet after waiting for 10 seconds", debugLaunch.isTerminated());
 	}
 
 	// --- common utility methods ---
@@ -251,11 +253,9 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 			Path tempProjectFolder = copyTestProjectIntoWorkspace(containerPath);
 			Path projectPath = tempProjectFolder.resolve(testProjectName);
-			try (InputStream input = Files.newInputStream(projectPath.resolve(".project"))) {
-				IProjectDescription description = workspace.loadProjectDescription(input);
-				description.setLocationURI(projectPath.toUri());
-				project.create(description, null);
-			}
+			IPath projectFile = IPath.fromPath(projectPath.resolve(".project"));
+			IProjectDescription description = workspace.loadProjectDescription(projectFile);
+			project.create(description, null);
 			project.open(monitor);
 			// build project to make it available in the PluginRegistryManager
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -264,7 +264,6 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		}
 		return Path.of(project.getLocationURI()).getParent();
 	}
-
 
 	private static Path copyTestProjectIntoWorkspace(String projectName) throws IOException, URISyntaxException {
 		String projectPath = "/resources/projects/" + projectName;
@@ -335,11 +334,9 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 	}
 
 	private static boolean isBuildFinished(String text) {
-		return lines(text)
-				.anyMatch(l -> l.startsWith("[INFO] Finished at: ")
-						|| l.startsWith("[\u001B[1;34mINFO\u001B[m] Finished at: "));
+		return lines(text).anyMatch(
+				l -> l.startsWith("[INFO] Finished at: ") || l.startsWith("[\u001B[1;34mINFO\u001B[m] Finished at: "));
 	}
-
 
 	private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
 
