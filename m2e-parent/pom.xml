@@ -163,7 +163,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.4.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
@@ -202,7 +202,7 @@
 				<plugin>
 					<groupId>org.eclipse.cbi.maven.plugins</groupId>
 					<artifactId>eclipse-jarsigner-plugin</artifactId>
-					<version>1.3.4</version>
+					<version>1.5.0</version>
 					<configuration>
 						<excludeInnerJars>true</excludeInnerJars>
 						<resigningStrategy>DO_NOT_RESIGN</resigningStrategy>
