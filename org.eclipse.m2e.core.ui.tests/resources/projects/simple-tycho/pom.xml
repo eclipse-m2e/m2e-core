@@ -9,7 +9,7 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>3.0.0</tycho.version>
+		<tycho.version>4.0.8</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -37,18 +37,18 @@
 				<version>${tycho.version}</version>
 				<configuration>
 					<target>
-						<artifact>
-							<groupId>org.eclipse.m2e.tests</groupId>
-							<artifactId>simple.target</artifactId>
-							<version>1.0.0-SNAPSHOT</version>
-						</artifact>
+						<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
+							<repository location="https://download.eclipse.org/eclipse/updates/4.32/"/>
+							<unit id="org.eclipse.equinox.launcher" version="0.0.0"/>
+							<unit id="org.eclipse.core.runtime" version="0.0.0"/>
+							<unit id="org.junit" version="0.0.0"/>
+						</location>
 					</target>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 	<modules>
-		<module>simple.target</module>
 		<module>simple.tests</module>
 	</modules>
 </project>
