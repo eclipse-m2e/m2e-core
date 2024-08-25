@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
     <setAttribute key="additional_plugins">
-        <setEntry value="ch.qos.logback.classic:1.4.11:default:true:default:true"/>
+        <setEntry value="ch.qos.logback.classic:1.5.7:default:true:default:true"/>
         <setEntry value="org.apache.aries.spifly.dynamic.bundle:1.3.7:default:true:2:true"/>
-        <setEntry value="org.apache.felix.scr:2.2.6:default:true:2:true"/>
-        <setEntry value="org.eclipse.core.runtime:3.29.0.v20230726-0617:default:true:default:true"/>
-        <setEntry value="org.eclipse.equinox.common:3.18.100.v20230730-1117:default:true:2:true"/>
-        <setEntry value="org.eclipse.equinox.event:1.6.200.v20230120-0604:default:true:2:true"/>
-        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.4.300.v20230630-1506:default:true:1:true"/>
+        <setEntry value="org.apache.felix.scr:2.2.12:default:true:2:true"/>
+        <setEntry value="org.eclipse.core.runtime:3.31.100.v20240524-2010:default:true:default:true"/>
+        <setEntry value="org.eclipse.equinox.common:3.19.100.v20240524-2011:default:true:2:true"/>
+        <setEntry value="org.eclipse.equinox.event:1.7.100.v20240321-1445:default:true:2:true"/>
+        <setEntry value="org.eclipse.equinox.simpleconfigurator:1.5.300.v20240424-1301:default:true:1:true"/>
     </setAttribute>
     <booleanAttribute key="append.args" value="true"/>
     <booleanAttribute key="askclear" value="true"/>
@@ -28,7 +28,7 @@
     <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
-    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dorg.eclipse.swt.graphics.Resource.reportNonDisposed=true --add-modules=ALL-SYSTEM --illegal-access=permit --add-opens java.base/java.lang=ALL-UNNAMED -Djava.security.manager=allow -Dfile.encoding=UTF-8"/>
