@@ -95,7 +95,7 @@
 		<module>products</module>
 
 		<!-- UI/Integration tests -->
-		<module>org.eclipse.m2e.rcptt.tests</module>
+		<module>org.eclipse.m2e.swtbot.tests</module>
 	</modules>
 
 	<dependencies>
