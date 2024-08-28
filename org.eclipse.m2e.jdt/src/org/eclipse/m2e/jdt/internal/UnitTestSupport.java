@@ -38,7 +38,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.plugin.Mojo;
@@ -47,7 +46,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 
@@ -232,12 +230,7 @@ public class UnitTestSupport {
         }
         IProject project = JavaRuntime.getJavaProject(configuration).getProject();
 
-        // maven project if project has a maven classpath
-        boolean isMavenProject = configuration
-            .getAttribute(IJavaLaunchConfigurationConstants.ATTR_CLASSPATH_PROVIDER, "")
-            .equals(MavenRuntimeClasspathProvider.MAVEN_CLASSPATH_PROVIDER);
-
-        if(project != null && project.hasNature(IMavenConstants.NATURE_ID) && isMavenProject) {
+        if(MavenPlugin.isMavenProject(project)) {
 
           switch(configuration.getType().getIdentifier()) {
             case MavenRuntimeClasspathProvider.JDT_TESTNG_TEST:
