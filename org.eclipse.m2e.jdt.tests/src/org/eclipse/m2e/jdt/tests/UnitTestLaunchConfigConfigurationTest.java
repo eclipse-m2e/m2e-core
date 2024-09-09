@@ -279,6 +279,32 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		assertTrue(argLine.contains("-DfailsafeProp1=failsafeProp1Value"));
 	}
 
+	@Test
+	public void test_deferred_variable_are_resolved() throws CoreException, IOException, InterruptedException {
+		// Get launch type
+		ILaunchConfigurationType type = LAUNCH_MANAGER.getLaunchConfigurationType(testType);
+
+		assumeTrue(testType + " support not available", type != null);
+
+		File pomFile = getTestFile("deferredVariables/pom.xml");
+
+		IProject project = importProject(pomFile.getAbsolutePath());
+
+		// create basic unit test
+		createDefaultTest(project, type, "test.SomeTest");
+
+		updateProject(project);
+		waitForJobsToComplete();
+
+		ILaunchConfiguration[] updatedConfigurations = LAUNCH_MANAGER.getLaunchConfigurations(type);
+		assertTrue(updatedConfigurations.length == 1);
+
+		ILaunchConfiguration config = updatedConfigurations[0];
+		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		assertTrue(argLine.contains("-javaagent")); // resolved jacoco agent
+		assertTrue(argLine.contains("@{titi.tata}")); // unresolved property is unchanged as in CLI
+	}
+
 	private void updateProject(IProject project) throws CoreException, InterruptedException {
 		MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
 		waitForJobsToComplete();
