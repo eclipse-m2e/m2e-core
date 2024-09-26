@@ -131,7 +131,7 @@ public class WorkingSetGroup {
           ImageDescriptor imageDescriptor = workingSet.getImageDescriptor();
           if(imageDescriptor != null) {
             try {
-              return (Image) images.create(imageDescriptor);
+              return images.create(imageDescriptor);
             } catch(DeviceResourceException ex) {
               return null;
             }
