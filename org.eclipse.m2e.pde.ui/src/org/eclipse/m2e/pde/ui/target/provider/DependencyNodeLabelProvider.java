@@ -79,24 +79,24 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 			MavenTargetLocation location = getTargetLocation(node);
 			if (location != null) {
 				if (location.isExcluded(node.getArtifact())) {
-					return resourceManager.createImage(disabledDescriptor);
+					return resourceManager.create(disabledDescriptor);
 				} else if (location.isIgnored(node.getArtifact())) {
-					return resourceManager.createImage(jarDescriptor);
+					return resourceManager.create(jarDescriptor);
 				} else if (location.isFailed(node.getArtifact())) {
-					return resourceManager.createImage(errorDescriptor);
+					return resourceManager.create(errorDescriptor);
 				}
 				MavenTargetBundle targetBundle = location.getMavenTargetBundle(node.getArtifact());
 				if (targetBundle != null && targetBundle.isWrapped()) {
 					BNDInstructions instructions = location.getInstructions(node.getArtifact());
 					if (instructions.isEmpty()) {
-						return resourceManager.createImage(inheritedJarDefaultDescriptor);
+						return resourceManager.create(inheritedJarDefaultDescriptor);
 					} else {
-						return resourceManager.createImage(inheritedJarDescriptor);
+						return resourceManager.create(inheritedJarDescriptor);
 					}
 
 				}
 			}
-			return resourceManager.createImage(inheritedDescriptor);
+			return resourceManager.create(inheritedDescriptor);
 		}
 		return null;
 	}
