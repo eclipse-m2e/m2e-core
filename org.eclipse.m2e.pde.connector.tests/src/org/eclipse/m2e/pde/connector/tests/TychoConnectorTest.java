@@ -45,7 +45,9 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.pde.internal.core.natures.PDE;
+import org.eclipse.pde.core.project.IBundleProjectDescription;
+import org.eclipse.pde.internal.core.natures.FeatureProject;
+import org.eclipse.pde.internal.core.natures.PluginProject;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,13 +55,13 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 
-	static final Set<String> PLUGIN_NATURES = Set.of(PDE.PLUGIN_NATURE, JavaCore.NATURE_ID, IMavenConstants.NATURE_ID);
-	static final Set<String> PLUGIN_BUILDERS = Set.of(PDE.MANIFEST_BUILDER_ID, PDE.SCHEMA_BUILDER_ID,
+	static final Set<String> PLUGIN_NATURES = Set.of(IBundleProjectDescription.PLUGIN_NATURE, JavaCore.NATURE_ID, IMavenConstants.NATURE_ID);
+	static final Set<String> PLUGIN_BUILDERS = Set.of(PluginProject.MANIFEST_BUILDER_ID, PluginProject.SCHEMA_BUILDER_ID,
 			JavaCore.BUILDER_ID, IMavenConstants.BUILDER_ID);
-	static final Set<String> PLUGIN_WITH_DS_BUILDERS = Set.of(PDE.MANIFEST_BUILDER_ID, PDE.SCHEMA_BUILDER_ID,
+	static final Set<String> PLUGIN_WITH_DS_BUILDERS = Set.of(PluginProject.MANIFEST_BUILDER_ID, PluginProject.SCHEMA_BUILDER_ID,
 			"org.eclipse.pde.ds.core.builder", JavaCore.BUILDER_ID, IMavenConstants.BUILDER_ID);
-	static final Set<String> FEATURE_NATURES = Set.of(PDE.FEATURE_NATURE, IMavenConstants.NATURE_ID);
-	static final Set<String> FEATURE_BUILDERS = Set.of(PDE.FEATURE_BUILDER_ID, IMavenConstants.BUILDER_ID);
+	static final Set<String> FEATURE_NATURES = Set.of(FeatureProject.NATURE, IMavenConstants.NATURE_ID);
+	static final Set<String> FEATURE_BUILDERS = Set.of(FeatureProject.BUILDER_ID, IMavenConstants.BUILDER_ID);
 
 	// FIXME: requires the osgi.compatibility fragment.
 
