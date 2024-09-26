@@ -153,8 +153,8 @@ public class MavenDiscovery {
       }
       // To ensure we can delete the temporary file we need to prevent caching, see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4386865
       URLConnection conn = url.openConnection();
-      if(conn instanceof JarURLConnection) {
-        ((JarURLConnection) conn).setDefaultUseCaches(false);
+      if(conn instanceof JarURLConnection jarConn) {
+        jarConn.setDefaultUseCaches(false);
       }
       try (InputStream is = conn.getInputStream()) {
         return LifecycleMappingFactory.createLifecycleMappingMetadataSource(is);
