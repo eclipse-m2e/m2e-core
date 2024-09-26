@@ -114,11 +114,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     List<String> sources = new ArrayList<>();
 
     List<String> targets = new ArrayList<>();
-    //Special case
-    targets.add("jsr14"); //$NON-NLS-1$
-    ENVIRONMENTS.put("jsr14", "J2SE-1.5"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    List<String> releases = new ArrayList<>(List.of("6", "7", "8"));
+    List<String> releases = new ArrayList<>(List.of("8"));
 
     for(IExecutionEnvironment ee : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
       String eeId = ee.getId();
@@ -144,7 +141,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     RELEASES = Collections.unmodifiableList(releases);
   }
 
-  protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
+  protected static final String DEFAULT_COMPILER_LEVEL = "1.8"; //$NON-NLS-1$
 
   private static final QualifiedName LINKED_MAVEN_RESOURCE = new QualifiedName(MavenJdtPlugin.PLUGIN_ID,
       "linkedSource");

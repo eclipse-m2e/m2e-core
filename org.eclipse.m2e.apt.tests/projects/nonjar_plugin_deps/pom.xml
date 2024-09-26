@@ -26,10 +26,9 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
+					<version>3.13.0</version>
 					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
+						<release>11</release>
 					</configuration>
 					<dependencies>
 						<!-- Dummy dependency to trigger bug -->
