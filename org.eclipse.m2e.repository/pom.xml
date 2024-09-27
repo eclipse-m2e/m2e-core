@@ -88,6 +88,7 @@
 								<configuration>
 								    <signer>bc</signer>
 									<skipIfJarsigned>true</skipIfJarsigned>
+									<keyname>011C526F29B2CE79</keyname>
 								</configuration>
 							</execution>
 						</executions>
