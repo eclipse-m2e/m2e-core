@@ -46,11 +46,11 @@ import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
-import org.eclipse.pde.internal.core.natures.FeatureProject;
 
 public class PDEProjectHelper {
 
 	private static final String PDE_PLUGIN_NATURE = IBundleProjectDescription.PLUGIN_NATURE;
+	private static final String PDE_FEATURE_NATURE = "org.eclipse.pde.FeatureNature";
 
 	private static AtomicBoolean isListeningForPluginModelChanges = new AtomicBoolean(false);
 
@@ -115,8 +115,8 @@ public class PDEProjectHelper {
 		if (project != null) {
 			// see
 			// org.eclipse.pde.internal.ui.wizards.feature.AbstractCreateFeatureOperation
-			if (!project.hasNature(FeatureProject.NATURE)) {
-				AbstractProjectConfigurator.addNature(project, FeatureProject.NATURE, monitor);
+			if (!project.hasNature(PDE_FEATURE_NATURE)) {
+				AbstractProjectConfigurator.addNature(project, PDE_FEATURE_NATURE, monitor);
 			}
 		}
 	}
