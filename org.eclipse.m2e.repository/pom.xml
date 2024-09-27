@@ -86,6 +86,7 @@
 									<goal>sign-p2-artifacts</goal>
 								</goals>
 								<configuration>
+								    <signer>bc</signer>
 									<skipIfJarsigned>true</skipIfJarsigned>
 								</configuration>
 							</execution>
