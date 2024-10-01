@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: m2e-apt Tests Plug-in
 Bundle-SymbolicName: org.eclipse.m2e.apt.tests
 Bundle-Version: 2.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.eclipse.m2e.tests.common,
  org.junit,
  org.eclipse.jdt.core,
