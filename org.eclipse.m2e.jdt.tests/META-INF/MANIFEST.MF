@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.jdt.tests;singleton:=true
-Bundle-Version: 2.0.1.qualifier
+Bundle-Version: 2.1.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.jobs,
  org.eclipse.jdt.core,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.ui.tests.harness,
  org.eclipse.ui
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: Eclipse.org - m2e
 Automatic-Module-Name: org.eclipse.m2e.jdt.tests
 Bundle-Name: M2E JDT Integration Tests

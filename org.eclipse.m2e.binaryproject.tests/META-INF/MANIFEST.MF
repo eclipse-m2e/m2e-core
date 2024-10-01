@@ -13,5 +13,5 @@ Require-Bundle: org.eclipse.m2e.core,
  org.eclipse.m2e.jdt,
  org.eclipse.jdt.core,
  org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: org.eclipse.m2e.binaryproject.tests
