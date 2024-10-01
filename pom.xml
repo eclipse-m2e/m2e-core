@@ -91,9 +91,6 @@
 		<module>org.eclipse.m2e.pde.connector.tests</module>
 		<module>org.eclipse.m2e.pde.target.tests</module>
 
-		<!-- products -->
-		<module>products</module>
-
 		<!-- UI/Integration tests -->
 		<module>org.eclipse.m2e.rcptt.tests</module>
 	</modules>
