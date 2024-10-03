@@ -18,20 +18,35 @@ pipeline {
 				sh 'git submodule update --init --recursive --remote'
 			}
 		}
+		stage('initialize PGP') {
+			when {
+				anyOf{
+					branch 'master';
+					branch pattern: 'm2e-[0-9]+\\.[0-9]+\\.x', comparator: "REGEXP"
+				}
+			}
+			steps {
+				withCredentials([file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING')]) {
+					sh 'gpg --batch --import "${KEYRING}"'
+					sh '''
+						for fpr in $(gpg --list-keys --with-colons | awk -F: \'/fpr:/ {print $10}\' | sort -u)
+						do
+							echo -e "5\ny\n" | gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust
+						done
+					'''
+				}
+			}
+		}
 		stage('Build') {
 			steps {
-				withCredentials([
-					file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING'),
-					string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')
-				]) {
+				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
 				xvnc(useXauthority: true) {
 					sh '''#!/bin/bash -x
 						mavenArgs="clean verify --batch-mode -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
-							mvn ${mavenArgs} -Peclipse-sign,its -DDtycho.pgp.signer.bc.secretKeys="${KEYRING}" -Dgpg.passphrase="${KEYRING_PASSPHRASE}"
+							mvn ${mavenArgs} -Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"
 						else
-							# Clear signing environment variables for PRs
-							export KEYRING='EMPTY'
+							# Clear KEYRING_PASSPHRASE environment variable
 							export KEYRING_PASSPHRASE='EMPTY'
 							mvn ${mavenArgs} -Pits
 						fi
