@@ -25,7 +25,7 @@ pipeline {
 					string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')
 				]) {
 				xvnc(useXauthority: true) {
-					sh '''
+					sh '''#!/bin/bash -x
 						mavenArgs="clean verify --batch-mode -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
 							mvn ${mavenArgs} -Peclipse-sign,its -DDtycho.pgp.signer.bc.secretKeys="${KEYRING}" -Dgpg.passphrase="${KEYRING_PASSPHRASE}"
@@ -54,7 +54,7 @@ pipeline {
 			}
 			steps {
 				sshagent(['projects-storage.eclipse.org-bot-ssh']) {
-					sh '''#!/bin/bash
+					sh '''#!/bin/bash -x
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}
