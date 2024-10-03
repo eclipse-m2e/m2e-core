@@ -46,9 +46,9 @@ jobs:
       uses: coactions/setup-xvfb@b6b4fcfb9f5a895edadc3bc76318fae0ac17c8b3 # v1.0.1
       with:
        run: >-
-           mvn clean verify --batch-mode -Pits
+           mvn clean verify --batch-mode --threads 1C -Pits
            -Dtycho.p2.baselineMode=failCommon
-           -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true
+           -Dmaven.test.failure.ignore=true
            -Dtycho.surefire.deleteWorkDir=true
     - name: Upload Test Results
       uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
