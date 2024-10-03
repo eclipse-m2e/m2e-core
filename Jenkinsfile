@@ -55,6 +55,7 @@ pipeline {
 			steps {
 				sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
 					sh '''
+						#!/bin/bash
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}
