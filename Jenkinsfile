@@ -44,7 +44,6 @@ pipeline {
 						*/target/work/data/.metadata/.log,\
 						m2e-core-tests/*/target/work/data/.metadata/.log,\
 						**/target/artifactcomparison/*'
-					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
 			}
