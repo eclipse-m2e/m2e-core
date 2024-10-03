@@ -6,7 +6,7 @@ pipeline {
 		timestamps()
 	}
 	agent {
-		label "ubuntu-latest"
+		label 'ubuntu-latest'
 	}
 	tools {
 		maven 'apache-maven-3.9.9'
@@ -53,9 +53,8 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-					sh '''
-						#!/bin/bash
+				sshagent(['projects-storage.eclipse.org-bot-ssh']) {
+					sh '''#!/bin/bash
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}
