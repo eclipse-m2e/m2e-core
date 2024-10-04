@@ -51,12 +51,4 @@
          id="org.eclipse.m2e.pde.feature.source"
          version="0.0.0"/>
 
-   <plugin
-         id="org.eclipse.m2e.tests.common"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.m2e.tests.common.source"
-         version="0.0.0"/>
-
 </feature>
