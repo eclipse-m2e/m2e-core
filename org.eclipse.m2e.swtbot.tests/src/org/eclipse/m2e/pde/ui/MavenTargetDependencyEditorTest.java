@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2024 Patrick Ziegler and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * https://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Patrick Ziegler - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.m2e.pde.ui;
 
 import static org.junit.Assert.assertEquals;
@@ -224,8 +236,8 @@ public class MavenTargetDependencyEditorTest {
 
 		assertFalse(robot.button("Update").isEnabled());
 		assertFalse(robot.button("Finish").isEnabled());
-		// There is no elegant way to select the cell editor,
-		// but we know that opening it focuses the text widget
+		// There is no elegant way to select the cell editor, but we
+		// know that it will be the first text widget in the dialog.
 		table.click(19, 0);
 		robot.text(0).setText("org.apache.commons");
 		table.click(19, 1);
@@ -400,7 +412,7 @@ public class MavenTargetDependencyEditorTest {
 		table.header("Artifact Id").click();
 		assertEquals(table.cell(0, 1), "caffeine");
 
-		// Sort by Artifact Id
+		// Sort by Group Id
 		table.header("Group Id").click();
 		assertEquals(table.cell(0, 1), "jackson-annotations");
 
