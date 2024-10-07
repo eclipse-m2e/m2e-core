@@ -35,7 +35,7 @@ jobs:
       with:
         maven-version: 3.9.9
     - name: Cache local Maven repository
-      uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+      uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
       with:
         path: ~/.m2/repository
         # re-cache on changes in the pom and target files
