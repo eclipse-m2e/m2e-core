@@ -13,9 +13,10 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
-// import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
@@ -28,10 +29,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class MavenPropertyDialog extends Dialog {
+
+  private static final String DIALOG_SETTINGS = MavenPropertyDialog.class.getName();
 
   private final String title;
 
@@ -64,6 +68,8 @@ public class MavenPropertyDialog extends Dialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite comp = new Composite(parent, SWT.NONE);
+    comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
     GridLayout gridLayout = new GridLayout(2, false);
     gridLayout.marginTop = 7;
     gridLayout.marginWidth = 12;
@@ -186,4 +192,21 @@ public class MavenPropertyDialog extends Dialog {
     super.create();
     updateButtons();
   }
+
+  @Override
+  protected boolean isResizable() {
+    return true;
+  }
+
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    IDialogSettings pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
+    IDialogSettings dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS);
+    if(dialogSettings == null) {
+      dialogSettings = new DialogSettings(DIALOG_SETTINGS);
+      pluginSettings.addSection(dialogSettings);
+    }
+    return dialogSettings;
+  }
+
 }
