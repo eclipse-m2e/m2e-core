@@ -412,8 +412,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     runtimeSelector = new MavenRuntimeSelector(mainComposite);
     runtimeSelector.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
     runtimeSelector.addSelectionChangedListener(event -> entriesChanged());
-
-    goalsText.setFocus();
   }
 
   protected Shell getShell() {
