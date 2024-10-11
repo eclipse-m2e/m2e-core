@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,7 +279,9 @@ public class UnitTestSupport {
         launchArguments.add(args.argLine());
       }
       if(args.systemPropertyVariables() != null) {
-        args.systemPropertyVariables().forEach((key, value) -> launchArguments.add("-D" + key + "=" + value));
+        args.systemPropertyVariables().entrySet().stream() //
+            .filter(e -> e.getKey() != null && e.getValue() != null)
+            .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + e.getValue()));
       }
       copy.setAttribute(LAUNCH_CONFIG_VM_ARGUMENTS, launchArguments.toString());
 
@@ -294,7 +297,10 @@ public class UnitTestSupport {
       }
 
       if(args.environmentVariables() != null) {
-        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, args.environmentVariables());
+        Map<String, String> filteredMap = args.environmentVariables().entrySet().stream()
+            .filter(entry -> entry.getKey() != null && entry.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, filteredMap);
       }
 
       copy.doSave();

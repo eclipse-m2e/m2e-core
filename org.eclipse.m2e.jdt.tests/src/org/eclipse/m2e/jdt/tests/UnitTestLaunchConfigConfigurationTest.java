@@ -56,26 +56,30 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	private static final String SUREFIRE_ARGS_SET = """
 			<configuration>
 				<argLine>
-					--argLineItem=surefireArgLineValue
+					--argLineItem=surefireArgLineValue --undefinedArgLineItem=${undefinedProperty}
 				</argLine>
 				<systemPropertyVariables>
 					<surefireProp1>surefireProp1Value</surefireProp1>
+					<surefireEmptyProp>${undefinedProperty}</surefireEmptyProp>
 				</systemPropertyVariables>
 				<environmentVariables>
 					<surefireEnvironmentVariables1>surefireEnvironmentVariables1Value</surefireEnvironmentVariables1>
+					<surefireEmptyEnvironmentVariables1>${undefinedProperty}</surefireEmptyEnvironmentVariables1>
 				</environmentVariables>
 			</configuration>
 			""";
 	private static final String FAILSAFE_ARGS_SET = """
 			<configuration>
 				<argLine>
-					--argLineItem=failsafeArgLineValue
+					--argLineItem=failsafeArgLineValue --undefinedArgLineItem=${undefinedProperty}
 				</argLine>
 				<systemPropertyVariables>
 					<failsafeProp1>failsafeProp1Value</failsafeProp1>
+					<failsafeEmptyProp>${undefiniedProperty}</failsafeEmptyProp>
 				</systemPropertyVariables>
 				<environmentVariables>
 					<failsafeEnvironmentVariables1>failsafeEnvironmentVariables1Value</failsafeEnvironmentVariables1>
+					<failsafeEmptyEnvironmentVariables1>${undefinedProperty}</failsafeEmptyEnvironmentVariables1>
 				</environmentVariables>
 			</configuration>
 			""";
@@ -144,6 +148,10 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check systemPropertyVariables
 		assertTrue(argLine.contains("-DsurefireProp1=surefireProp1Value"));
+
+		// check systemPropertyVariables with null value aren't set
+		assertTrue(!argLine.contains("-DsurefireEmptyProp="));
+
 	}
 
 	@Test
@@ -193,6 +201,9 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check systemPropertyVariables
 		assertTrue(argLine.contains("-DfailsafeProp1=failsafeProp1Value"));
+
+		// check systemPropertyVariables with null value aren't set
+		assertTrue(!argLine.contains("-DfailsafeEmptyProp="));
 	}
 
 	@Test
