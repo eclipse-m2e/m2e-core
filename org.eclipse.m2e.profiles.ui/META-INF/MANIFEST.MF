@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.profiles.ui;singleton:=true
-Bundle-Version: 2.0.302.qualifier
+Bundle-Version: 2.1.0.qualifier
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.core.contexts;bundle-version="1.9.100",
  org.eclipse.e4.core.di;bundle-version="1.8.100"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.m2e.profiles.ui.internal;x-internal:=true,
  org.eclipse.m2e.profiles.ui.internal.actions;x-internal:=true,

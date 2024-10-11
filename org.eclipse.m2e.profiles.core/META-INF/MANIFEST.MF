@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E Maven Profiles Management
 Bundle-SymbolicName: org.eclipse.m2e.profiles.core;singleton:=true
-Bundle-Version: 2.1.202.qualifier
+Bundle-Version: 2.2.0.qualifier
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.core.resources;bundle-version="3.6.0",
  org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: Eclipse.org - m2e
 Export-Package: org.eclipse.m2e.profiles.core.internal;x-friends:="org.eclipse.m2e.profiles.ui",
  org.eclipse.m2e.profiles.core.internal.management;x-internal:=true

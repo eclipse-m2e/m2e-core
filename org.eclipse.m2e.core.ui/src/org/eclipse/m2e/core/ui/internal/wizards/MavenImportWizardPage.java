@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -250,7 +251,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         if(element instanceof List) {
           @SuppressWarnings("unchecked")
           List<MavenProjectInfo> projects = (List<MavenProjectInfo>) element;
-          return projects.toArray(new MavenProjectInfo[projects.size()]);
+          return sorted(projects);
         }
         return EMPTY;
       }
@@ -260,12 +261,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         if(parentElement instanceof List) {
           @SuppressWarnings("unchecked")
           List<MavenProjectInfo> projects = (List<MavenProjectInfo>) parentElement;
-          return projects.toArray(new MavenProjectInfo[projects.size()]);
+          return sorted(projects);
         } else if(parentElement instanceof MavenProjectInfo mavenProjectInfo) {
           Collection<MavenProjectInfo> projects = mavenProjectInfo.getProjects();
-          return projects.toArray(new MavenProjectInfo[projects.size()]);
+          return sorted(projects);
         }
         return EMPTY;
+      }
+
+      private MavenProjectInfo[] sorted(Collection<MavenProjectInfo> projects) {
+        List<MavenProjectInfo> sortedProjects = new ArrayList<>(projects);
+        sortedProjects.sort(Comparator.comparing(MavenProjectInfo::getLabel));
+        return sortedProjects.toArray(MavenProjectInfo[]::new);
       }
 
       @Override

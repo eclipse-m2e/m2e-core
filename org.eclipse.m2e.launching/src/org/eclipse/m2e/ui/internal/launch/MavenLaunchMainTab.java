@@ -32,6 +32,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -355,17 +357,23 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
 
     this.propsTable = tableViewer.getTable();
+
+    TableLayout tableLayout = new TableLayout();
+    ColumnWeightData weightData = new ColumnWeightData(20, true);
+    tableLayout.addColumnData(weightData);
+    weightData = new ColumnWeightData(80, true);
+    tableLayout.addColumnData(weightData);
+    this.propsTable.setLayout(tableLayout);
+
     //this.tProps.setItemCount(10);
     this.propsTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 3));
     this.propsTable.setLinesVisible(true);
     this.propsTable.setHeaderVisible(true);
 
     final TableColumn propColumn = new TableColumn(this.propsTable, SWT.NONE, 0);
-    propColumn.setWidth(120);
     propColumn.setText(Messages.launchPropName);
 
     final TableColumn valueColumn = new TableColumn(this.propsTable, SWT.NONE, 1);
-    valueColumn.setWidth(200);
     valueColumn.setText(Messages.launchPropValue);
 
     final Button addPropButton = new Button(mainComposite, SWT.NONE);
@@ -404,8 +412,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     runtimeSelector = new MavenRuntimeSelector(mainComposite);
     runtimeSelector.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
     runtimeSelector.addSelectionChangedListener(event -> entriesChanged());
-
-    goalsText.setFocus();
   }
 
   protected Shell getShell() {

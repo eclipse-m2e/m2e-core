@@ -30,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetLocationFactory;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.w3c.dom.Document;
@@ -44,7 +43,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 	private static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 
 	@Override
-	public ITargetLocation getTargetLocation(String type, String serializedXML) throws CoreException {
+	public MavenTargetLocation getTargetLocation(String type, String serializedXML) throws CoreException {
 		try {
 			Element location = parseXMLDocument(serializedXML).getDocumentElement();
 

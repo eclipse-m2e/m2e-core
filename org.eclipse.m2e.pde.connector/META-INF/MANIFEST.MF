@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E PDE Connector
 Bundle-SymbolicName: org.eclipse.m2e.pde.connector;singleton:=true
-Bundle-Version: 2.1.601.qualifier
+Bundle-Version: 2.2.0.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde.connector
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: Eclipse.org - m2e
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
  org.eclipse.core.runtime;bundle-version="[3.27.0,4.0.0)",
  org.eclipse.core.resources;bundle-version="3.16.0",
  org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
- org.eclipse.pde.core,
+ org.eclipse.pde.core;bundle-version="3.19.0",
  org.eclipse.jdt.core,
  org.eclipse.pde.ds.annotations
 Service-Component: OSGI-INF/org.eclipse.m2e.pde.connector.PDEBuildProjectFileResolver.xml

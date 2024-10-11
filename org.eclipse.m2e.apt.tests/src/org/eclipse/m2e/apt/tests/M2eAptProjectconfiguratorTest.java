@@ -54,7 +54,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 	public void testMavenCompilerPluginSupport() throws Exception {
 		// Note: this is the old default, in new plugin versions it is
 		// "target/generated-test-sources/test-annotations"
-		defaultTest("p1", COMPILER_OUTPUT_DIR, "target/generated-sources/test-annotations");
+		defaultTest("p1", COMPILER_OUTPUT_DIR, "target/generated-test-sources/test-annotations");
 	}
 
 	@Test

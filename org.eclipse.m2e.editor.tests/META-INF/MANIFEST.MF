@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.m2e.editor.tests
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Automatic-Module-Name: org.eclipse.m2e.editor.tests
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.eclipse.m2e.editor,
  org.eclipse.m2e.tests.common,
  org.junit,

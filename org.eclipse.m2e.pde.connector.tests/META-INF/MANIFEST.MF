@@ -10,4 +10,4 @@ Require-Bundle: org.eclipse.m2e.tests.common,
  org.eclipse.pde.ds.core,
  org.osgi.service.component.annotations
 Automatic-Module-Name: org.eclipse.m2e.pde.connector.tests
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21

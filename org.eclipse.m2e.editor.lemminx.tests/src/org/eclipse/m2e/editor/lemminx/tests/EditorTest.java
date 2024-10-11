@@ -14,9 +14,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -26,18 +25,19 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.lsp4e.operations.completion.LSContentAssistProcessor;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.wildwebdeveloper.xml.internal.Activator;
@@ -91,19 +91,13 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		}));
 		int offset = editorPart.getDocumentProvider().getDocument(editorPart.getEditorInput()).get()
 				.indexOf("</scope>");
-		Set<Shell> beforeShells = Arrays.stream(display.getShells()).filter(Shell::isVisible)
-				.collect(Collectors.toSet());
 		editorPart.getSelectionProvider().setSelection(new TextSelection(offset, 0));
 		editorPart.getAction(ITextEditorActionConstants.CONTENT_ASSIST).run();
-		assertTrue("Missing completion proposals", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
-			Set<Shell> afterShells = Arrays.stream(display.getShells()).filter(Shell::isVisible)
-					.collect(Collectors.toSet());
-			afterShells.removeAll(beforeShells);
-			return afterShells.stream().flatMap(shell -> Arrays.stream(shell.getChildren()))
-					.filter(Table.class::isInstance).map(Table.class::cast).findFirst()
-					.map(table -> Arrays.stream(table.getItems()).map(TableItem::getText).anyMatch("compile"::equals))
-					.orElse(Boolean.FALSE).booleanValue();
-		}));
+		LSContentAssistProcessor contentAssistProcessor = new LSContentAssistProcessor();
+		ICompletionProposal[] proposals = contentAssistProcessor
+				.computeCompletionProposals(getSourceViewer(editorPart), offset);
+		assertTrue("Missing completion proposals",
+				Arrays.stream(proposals).map(ICompletionProposal::getDisplayString).anyMatch("compile"::equals));
 	}
 
 	@Test
@@ -143,6 +137,17 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		try (InputStream pomContent = getClass().getResourceAsStream(pomFileName)) {
 			return createProject(projectName, pomContent);
 		}
+	}
+
+	private static ISourceViewer getSourceViewer(ITextEditor editor) {
+		try {
+			Method method = AbstractTextEditor.class.getDeclaredMethod("getSourceViewer");
+			method.setAccessible(true);
+			return (ISourceViewer) method.invoke(editor);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

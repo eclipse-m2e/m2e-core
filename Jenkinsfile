@@ -1,16 +1,16 @@
 pipeline {
 	options {
 		timeout(time: 45, unit: 'MINUTES')
-		buildDiscarder(logRotator(numToKeepStr:'10'))
+		buildDiscarder(logRotator(numToKeepStr:'5', artifactNumToKeepStr: 'master'.equals(env.BRANCH_NAME) ? '5' : '1' ))
 		disableConcurrentBuilds(abortPrevious: true)
 		timestamps()
 	}
 	agent {
-		label "centos-latest"
+		label 'ubuntu-latest'
 	}
 	tools {
-		maven 'apache-maven-3.9.6'
-		jdk 'openjdk-jdk21-latest'
+		maven 'apache-maven-3.9.9'
+		jdk 'temurin-jdk21-latest'
 	}
 	stages {
 		stage('get m2e-core-tests') {
@@ -18,35 +18,20 @@ pipeline {
 				sh 'git submodule update --init --recursive --remote'
 			}
 		}
-		stage('initialize PGP') {
-			when {
-				anyOf{
-					branch 'master';
-					branch pattern: 'm2e-[0-9]+\\.[0-9]+\\.x', comparator: "REGEXP"
-				}
-			}
-			steps {
-				withCredentials([file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING')]) {
-					sh 'gpg --batch --import "${KEYRING}"'
-					sh '''
-						for fpr in $(gpg --list-keys --with-colons | awk -F: \'/fpr:/ {print $10}\' | sort -u)
-						do
-							echo -e "5\ny\n" | gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust
-						done
-					'''
-				}
-			}
-		}
 		stage('Build') {
 			steps {
-				withCredentials([string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')]) {
+				withCredentials([
+					file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING'),
+					string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')
+				]) {
 				xvnc(useXauthority: true) {
-					sh '''
-						mavenArgs="clean verify --batch-mode -Dmaven.test.error.ignore=true -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
+					sh '''#!/bin/bash -x
+						mavenArgs="clean verify --batch-mode -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
-							mvn ${mavenArgs} -Peclipse-sign,its -Dgpg.passphrase="${KEYRING_PASSPHRASE}" -Dgpg.keyname="011C526F29B2CE79"
+							mvn ${mavenArgs} -Peclipse-sign,its -Dtycho.pgp.signer.bc.secretKeys="${KEYRING}" -Dgpg.passphrase="${KEYRING_PASSPHRASE}"
 						else
-							# Clear KEYRING_PASSPHRASE environment variable
+							# Clear signing environment variables for PRs
+							export KEYRING='EMPTY'
 							export KEYRING_PASSPHRASE='EMPTY'
 							mvn ${mavenArgs} -Pits
 						fi
@@ -59,7 +44,6 @@ pipeline {
 						*/target/work/data/.metadata/.log,\
 						m2e-core-tests/*/target/work/data/.metadata/.log,\
 						**/target/artifactcomparison/*'
-					archiveArtifacts (artifacts: '**/target/products/*.zip,**/target/products/*.tar.gz', onlyIfSuccessful: true)
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
 			}
@@ -69,8 +53,8 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-					sh '''
+				sshagent(['projects-storage.eclipse.org-bot-ssh']) {
+					sh '''#!/bin/bash -x
 						deployM2ERepository()
 						{
 							echo Deploy m2e repo to ${1}

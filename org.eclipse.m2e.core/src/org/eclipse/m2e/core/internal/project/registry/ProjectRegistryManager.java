@@ -974,7 +974,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
-      IFile pom, IProjectConfiguration resolverConfiguration) throws CoreException {
+      IFile pom, IProjectConfiguration resolverConfiguration) {
     if(pom != null) {
       request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
     }
