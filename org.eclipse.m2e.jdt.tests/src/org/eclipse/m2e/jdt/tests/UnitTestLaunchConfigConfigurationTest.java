@@ -56,26 +56,30 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	private static final String SUREFIRE_ARGS_SET = """
 			<configuration>
 				<argLine>
-					--argLineItem=surefireArgLineValue
+					--argLineItem=surefireArgLineValue --undefinedArgLineItem=${undefinedProperty}
 				</argLine>
 				<systemPropertyVariables>
 					<surefireProp1>surefireProp1Value</surefireProp1>
+					<surefireEmptyProp>${undefinedProperty}</surefireEmptyProp>
 				</systemPropertyVariables>
 				<environmentVariables>
 					<surefireEnvironmentVariables1>surefireEnvironmentVariables1Value</surefireEnvironmentVariables1>
+					<surefireEmptyEnvironmentVariables1>${undefinedProperty}</surefireEmptyEnvironmentVariables1>
 				</environmentVariables>
 			</configuration>
 			""";
 	private static final String FAILSAFE_ARGS_SET = """
 			<configuration>
 				<argLine>
-					--argLineItem=failsafeArgLineValue
+					--argLineItem=failsafeArgLineValue --undefinedArgLineItem=${undefinedProperty}
 				</argLine>
 				<systemPropertyVariables>
 					<failsafeProp1>failsafeProp1Value</failsafeProp1>
+					<failsafeEmptyProp>${undefiniedProperty}</failsafeEmptyProp>
 				</systemPropertyVariables>
 				<environmentVariables>
 					<failsafeEnvironmentVariables1>failsafeEnvironmentVariables1Value</failsafeEnvironmentVariables1>
+					<failsafeEmptyEnvironmentVariables1>${undefinedProperty}</failsafeEmptyEnvironmentVariables1>
 				</environmentVariables>
 			</configuration>
 			""";
@@ -144,6 +148,10 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check systemPropertyVariables
 		assertTrue(argLine.contains("-DsurefireProp1=surefireProp1Value"));
+
+		// check systemPropertyVariables with null value aren't set
+		assertTrue(!argLine.contains("-DsurefireEmptyProp="));
+
 	}
 
 	@Test
@@ -193,6 +201,9 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check systemPropertyVariables
 		assertTrue(argLine.contains("-DfailsafeProp1=failsafeProp1Value"));
+
+		// check systemPropertyVariables with null value aren't set
+		assertTrue(!argLine.contains("-DfailsafeEmptyProp="));
 	}
 
 	@Test
@@ -277,6 +288,33 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check systemPropertyVariables
 		assertTrue(argLine.contains("-DfailsafeProp1=failsafeProp1Value"));
+	}
+
+	@Test
+	public void test_deferred_variable_are_resolved() throws CoreException, IOException, InterruptedException {
+		// Get launch type
+		ILaunchConfigurationType type = LAUNCH_MANAGER.getLaunchConfigurationType(testType);
+
+		assumeTrue(testType + " support not available", type != null);
+
+		File pomFile = getTestFile("deferredVariables/pom.xml");
+
+		IProject project = importProject(pomFile.getAbsolutePath());
+
+		// create basic unit test
+		createDefaultTest(project, type, "test.SomeTest");
+
+		updateProject(project);
+		waitForJobsToComplete();
+
+		ILaunchConfiguration[] updatedConfigurations = LAUNCH_MANAGER.getLaunchConfigurations(type);
+		assertTrue(updatedConfigurations.length == 1);
+
+		ILaunchConfiguration config = updatedConfigurations[0];
+		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		assertTrue(argLine.contains("-javaagent")); // resolved jacoco agent
+		assertTrue(argLine.contains("@{titi.tata}")); // unresolved property, maybe removing the placeholder would be
+														// better
 	}
 
 	private void updateProject(IProject project) throws CoreException, InterruptedException {
