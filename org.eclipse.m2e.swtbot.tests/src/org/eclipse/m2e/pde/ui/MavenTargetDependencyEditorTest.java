@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2024 Patrick Ziegler and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * https://www.eclipse.org/legal/epl-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Patrick Ziegler - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.m2e.pde.ui;
 
 import static org.junit.Assert.assertEquals;
@@ -222,10 +234,10 @@ public class MavenTargetDependencyEditorTest {
 		assertEquals(table.cell(19, 3), "");
 		assertEquals(table.cell(19, 4), "jar");
 
-		assertFalse(robot.button("Update").isEnabled());
-		assertFalse(robot.button("Finish").isEnabled());
-		// There is no elegant way to select the cell editor,
-		// but we know that opening it focuses the text widget
+		assertFalse("Expected \"Update\" button to be disabled", robot.button("Update").isEnabled());
+		assertFalse("Expected \"Finish\" button to be disabled", robot.button("Finish").isEnabled());
+		// There is no elegant way to select the cell editor, but we
+		// know that it will be the first text widget in the dialog.
 		table.click(19, 0);
 		robot.text(0).setText("org.apache.commons");
 		table.click(19, 1);
@@ -234,14 +246,14 @@ public class MavenTargetDependencyEditorTest {
 		robot.text(0).setText("3.12.0");
 		table.click(19, 3); // Close cell editor
 
-		assertTrue(robot.button("Update").isEnabled());
-		assertTrue(robot.button("Finish").isEnabled());
-
 		assertEquals(table.cell(19, 0), "org.apache.commons");
 		assertEquals(table.cell(19, 1), "commons-lang3");
 		assertEquals(table.cell(19, 2), "3.12.0");
 		assertEquals(table.cell(19, 3), "");
 		assertEquals(table.cell(19, 4), "jar");
+
+		assertTrue("Expected \"Update\" button to be enabled", robot.button("Update").isEnabled());
+		assertTrue("Expected \"Finished\" button to be enabled", robot.button("Finish").isEnabled());
 	}
 
 	/**
@@ -400,7 +412,7 @@ public class MavenTargetDependencyEditorTest {
 		table.header("Artifact Id").click();
 		assertEquals(table.cell(0, 1), "caffeine");
 
-		// Sort by Artifact Id
+		// Sort by Group Id
 		table.header("Group Id").click();
 		assertEquals(table.cell(0, 1), "jackson-annotations");
 
