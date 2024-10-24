@@ -24,8 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +146,11 @@ public class UnitTestSupport {
    * maven artifact id for the failsafe plugin
    */
   private static final String FAILSAFE_PLUGIN_ARTIFACT_ID = "maven-failsafe-plugin";
+
+  /**
+   * deffered variable pattern
+   */
+  private static final Pattern DEFERRED_VAR_PATTERN = Pattern.compile("@\\{(.*?)\\}");
 
   /**
    * maven group id for the maven plugins
@@ -271,7 +280,9 @@ public class UnitTestSupport {
         launchArguments.add(args.argLine());
       }
       if(args.systemPropertyVariables() != null) {
-        args.systemPropertyVariables().forEach((key, value) -> launchArguments.add("-D" + key + "=" + value));
+        args.systemPropertyVariables().entrySet().stream().filter(e -> e.getKey() != null)
+            .filter(e -> e.getValue() != null)
+            .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + e.getValue()));
       }
       copy.setAttribute(LAUNCH_CONFIG_VM_ARGUMENTS, launchArguments.toString());
 
@@ -287,7 +298,10 @@ public class UnitTestSupport {
       }
 
       if(args.environmentVariables() != null) {
-        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, args.environmentVariables());
+        Map<String, String> filteredMap = args.environmentVariables().entrySet().stream()
+            .filter(entry -> entry.getKey() != null && entry.getValue() != null)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, filteredMap);
       }
 
       copy.doSave();
@@ -398,8 +412,11 @@ public class UnitTestSupport {
         IProgressMonitor monitor) {
       try {
         IMaven maven = MavenPlugin.getMaven();
-        return new TestLaunchArguments(
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor),
+
+        String argLine = maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor);
+        argLine = resolveDeferredVariables(mavenProject, argLine);
+
+        return new TestLaunchArguments(argLine,
             maven.getMojoParameterValue(mavenProject, execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
             maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
             maven.getMojoParameterValue(mavenProject, execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor),
@@ -410,6 +427,33 @@ public class UnitTestSupport {
       return null;
     }
 
+  }
+
+  /**
+   * This method is used to resolve deferred variables introduced by failsafe/surefire plugins in a given string value.
+   * Deferred variables are placeholders in the string that are replaced with actual values from the Maven project's
+   * properties. The placeholders are in the format @{...}, where ... is the key of the property. If a placeholder's
+   * corresponding property does not exist, the placeholder is left as is.
+   *
+   * @param mavenProject the Maven project from which to retrieve the properties
+   * @param value the string containing the placeholders to be replaced
+   * @return the string with all resolvable placeholders replaced with their corresponding property values
+   */
+  private static String resolveDeferredVariables(MavenProject mavenProject, String value) {
+    Properties properties = mavenProject.getProperties();
+    Matcher matcher = DEFERRED_VAR_PATTERN.matcher(value);
+
+    while(matcher.find()) {
+      String match = matcher.group();
+      String key = matcher.group(1);
+      String replacement = properties.getProperty(key);
+
+      if(replacement != null) {
+        value = value.replace(match, replacement);
+      }
+    }
+
+    return value;
   }
 
   /**
