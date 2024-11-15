@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.4.0" name="org.eclipse.m2e.bnd.ui.BndPluginAdapter">
+   <property name="adaptableClass" type="String" value="org.eclipse.core.resources.IProject"/>
+   <property name="adapterNames" type="String" value="aQute.bnd.build.Project"/>
+   <service>
+      <provide interface="org.eclipse.core.runtime.IAdapterFactory"/>
+   </service>
+   <implementation class="org.eclipse.m2e.bnd.ui.BndPluginAdapter"/>
+</scr:component>
