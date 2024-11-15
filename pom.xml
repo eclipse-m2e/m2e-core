@@ -58,6 +58,7 @@
 		<module>org.eclipse.m2e.sourcelookup</module>
 		<module>org.eclipse.m2e.sourcelookup.ui</module>
 		<module>org.eclipse.m2e.editor.lemminx</module>
+		<module>org.eclipse.m2e.editor.lemminx.bnd</module>
 		<module>org.eclipse.m2e.pde.target</module>
 		<module>org.eclipse.m2e.pde.ui</module>
 		<module>org.eclipse.m2e.pde.connector</module>
@@ -258,6 +259,43 @@
 			<modules>
 				<module>m2e-core-tests</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>modello</id>
+			<activation>
+				<file>
+					<exists>mdo/lifecycle-mapping-metadata-model.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.modello</groupId>
+						<artifactId>modello-maven-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<?m2e execute?>
+								<id>generate-modello-java-sources</id>
+								<goals>
+									<goal>java</goal>
+									<goal>xpp3-reader</goal>
+									<goal>xpp3-writer</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.basedir}/src-gen</outputDirectory>
+									<version>1.0.0</version>
+									<useJava5>true</useJava5>
+									<models>
+										<model>
+											mdo/lifecycle-mapping-metadata-model.xml</model>
+									</models>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>

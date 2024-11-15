@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.wildwebdeveloper.xml.lemminxExtension">
+      <classpathExtensionProvider
+            provider="org.eclipse.m2e.editor.lemminx.bnd.BndClasspathExtensionProvider">
+      </classpathExtensionProvider>
+   </extension>
+
+</plugin>

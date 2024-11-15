@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.lemminx.feature"
       label="%featureName"
-      version="2.0.800.qualifier"
+      version="2.6.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -18,6 +18,10 @@
 
    <plugin
          id="org.eclipse.m2e.editor.lemminx"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.m2e.editor.lemminx.bnd"
          version="0.0.0"/>
 
 </feature>

@@ -1,5 +1,18 @@
 # Eclipse m2e - Release notes
 
+## 2.8.0
+
+### Auto-Completion support for `bnd-maven-plugin` and `felix-bundle-plugin` with lemminx editor
+
+The bnd-maven and felix-bundle plugin provide a way to use
+bnd-instructions to build OSGi bundles. As this is a complex (and extensible) syntax that
+can not be expressed as regular maven-mojo configuration lemminx-maven
+can not supply any useful completions.
+
+m2e now contains a new lemminx-extension that provides such completions in a
+basic way to support people writing such bnd instructions in pom xml configurations.
+
+
 ## 2.7.0
 
 * 📅 Release Date: 26th November 2024
