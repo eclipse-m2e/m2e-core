@@ -10,14 +10,14 @@ Updated the embedded Maven from version 3.9.7 to 3.9.9; [Maven 3.9.9 Release Not
 
 ### Surefire/Failsafe plugin configuration propagated to Junit/TestNG launch configuration
 
-The following arguments are supported: <br/>
-`<argLine>`, <br/>
-`<environmentVariables>`, <br/>
-`<systemPropertyVariables>`, <br/>
-`<workingDirectory>`,<br/>
-`<enableAssertions>`,<br/>
+The following arguments are supported:
+* `<argLine>`
+* `<environmentVariables>`
+* `<systemPropertyVariables>`
+* `<workingDirectory>`
+* `<enableAssertions>`
 
-Configuration is propagated on unit test launch configuration creation and also when executing `maven > update project`
+Configuration is propagated on unit test launch configuration creation and also when executing `Maven > Update Project`.
 
 ## 2.6.1
 
@@ -39,7 +39,7 @@ Updated the embedded Maven from version 3.9.5 to 3.9.6; [Maven 3.9.6 Release Not
 
 ### Improved toolchain.xml handling
 
-In the Preferences under `Maven -> User Settings` the user `toolchain.xml` used in workspace builds can now be specified explicitly.
+In the Preferences under `Maven > User Settings` the user `toolchain.xml` used in workspace builds can now be specified explicitly.
 At the same time the `maven-toolchains-plugin` is now disabled by default for workspace builds.
 
 ### Improved resource linking
@@ -48,8 +48,8 @@ Source or resource folders of Maven-projects outside of the project's base direc
 
 ### Project preference for automated Maven project configuration updates
 
-Automatic configuration updates for Maven projects can now be disabled the in the project preferences.
-This allows to disable these updates individually per project and to store the setting in a preference-file under version control,
+Automatic configuration updates for Maven projects can now be disabled in the project preferences.
+This allows to disable these updates individually per project and to store the setting in a preference file under version control,
 which is useful for projects that require special workspace configuration that doesn't exactly match the configuration in the `pom.xml`.
 
 ![grafik](https://github.com/eclipse-m2e/m2e-core/assets/44067969/7d27ceda-5d13-4f0e-97f0-ff34c94d7493)
@@ -132,7 +132,7 @@ Furthermore the processing has been enhanced to support future Java versions as 
 ### Enhanced M2E Maven Target support
 
 * OSGi metadata generated for artifacts that don't contain a OSGi compliant MANIFEST.MF have been enhanced to also contain version ranges for `Import-Package` headers by default.
-* Source Bundles of excluded artifacts are now excluded too
+* Source Bundles of excluded artifacts are now excluded too.
 
 ## 2.2.1
 
@@ -155,6 +155,7 @@ Previously, to participate in the incremental maven build it was necessary to
 This often leads to a poor user experience and we think that users are adding mojos on purpose because they perform valuable tasks.
 
 Because of this, M2E now automatically enables the execution of mojos if there is no mapping configured. In case you want to change this there is a new configuration option to control the behavior:
+
 ![grafik](https://user-images.githubusercontent.com/1331477/211298610-0fa92418-246a-4377-913a-60d02d63013b.png)
 
 ### Updated Dependency Editor
@@ -254,9 +255,11 @@ In general, MojoExecutions should be set up within the scope of `MavenExecutionC
 ### Improved support for Maven archetypes
 
 Maven archetypes can use Groovy scripts for the processing of input parameters since Maven 3, which is now also supported via m2e. In addition, validation of parameters with regular expressions is now also supported:
+
 ![archetype parameter validation](https://user-images.githubusercontent.com/17798/189828315-2deb2fd4-c310-4e75-a83b-9603acfb4198.png)
 
 Any additional inputs required by the Groovy script are handled in the Eclipse console:
+
 ![archetype in Eclipse console](https://user-images.githubusercontent.com/17798/189828638-2bb545b8-bbaf-4d72-a8fb-ba798df9894f.png)
 
 This feature was sponsored by [Faktor Zehn](https://faktorzehn.org)
@@ -362,9 +365,10 @@ The new editor brings more powerful pom.xml understanding and edition features; 
 #### the m2e-pde editor now supports adding more than one dependency per target location:
 
 ![grafik](https://user-images.githubusercontent.com/1331477/126075863-ee075afb-c4e1-423d-acc0-8174905378dd.png)
+
 ![grafik](https://user-images.githubusercontent.com/1331477/126106751-892626dc-46d5-45a5-841b-beff82085de0.png)
 
-```
+```xml
 <target name="multipleElements">
 <locations>
 	<location includeDependencyScope="compile" includeSource="true" missingManifest="generate" type="Maven">
@@ -391,7 +395,7 @@ Old target formats are automatically converted.
 
 ![grafik](https://user-images.githubusercontent.com/1331477/126276711-8e42165c-01bd-4d79-a28b-441bbc7c9fc7.png)
 
-```
+```xml
 <target name="extraRepository">
 	<locations>
 		<location includeDependencyScope="compile" includeSource="true" missingManifest="generate" type="Maven">
@@ -419,9 +423,9 @@ With the upgrade to the newer LemMinX-Maven, the edition of pom.xml with the Gen
 
 #### One way synchronization for jpms directives from maven compiler arguments to .classpath file
 
-Extract jpms arguments (--add-exports,--add-opens,--add-reads,--patch-module) from the maven-compiler-plugin compiler arguments if any.
+Extract jpms arguments (`--add-exports`, `--add-opens`, `--add-reads`, `--patch-module`) from the `maven-compiler-plugin` compiler arguments if any.
 Dispatch the arguments in the right container (if the target module is part of JRE then in JreContainer else in M2eContainer) and
-transform them into eclipse classpath attributes (add-exports, add-opens, add-reads, patch-module)
+transform them into eclipse classpath attributes (`add-exports`, `add-opens`, `add-reads`, `patch-module`)
 
 #### Improved m2e development workflow
 
