@@ -22,17 +22,17 @@ pipeline {
 			steps {
 				withCredentials([
 					file(credentialsId: 'secret-subkeys.asc', variable: 'KEYRING'),
-					string(credentialsId: 'gpg-passphrase', variable: 'KEYRING_PASSPHRASE')
+					string(credentialsId: 'gpg-passphrase', variable: 'MAVEN_GPG_PASSPHRASE')
 				]) {
 				xvnc(useXauthority: true) {
 					sh '''#!/bin/bash -x
 						mavenArgs="clean verify --batch-mode -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
 						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
-							mvn ${mavenArgs} -Peclipse-sign,its -Dtycho.pgp.signer.bc.secretKeys="${KEYRING}" -Dgpg.passphrase="${KEYRING_PASSPHRASE}"
+							mvn ${mavenArgs} -Peclipse-sign,its -Dtycho.pgp.signer.bc.secretKeys="${KEYRING}"
 						else
 							# Clear signing environment variables for PRs
 							export KEYRING='EMPTY'
-							export KEYRING_PASSPHRASE='EMPTY'
+							export MAVEN_GPG_PASSPHRASE='EMPTY'
 							mvn ${mavenArgs} -Pits
 						fi
 					'''
