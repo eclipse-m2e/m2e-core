@@ -1,5 +1,15 @@
 # Eclipse m2e - Release notes
 
+## 2.7.0
+
+* 📅 Release Date: 26th November 2024
+
+Various minor bug-fixes, enhancements and dependency updates.
+
+### Require Java 21 or above
+
+Running m2e now requires a Java-21 (or higher) compliant JRE.
+
 ## 2.6.2
 
 * 📅 Release Date: 04th September 2024
