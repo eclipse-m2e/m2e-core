@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021, 2022 Christoph Läubrich and others
+ * Copyright (c) 2021, 2025 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -30,10 +30,14 @@ public class MavenTargetDependencyEditor {
 
 	public MavenTargetDependencyEditor(Composite parent, MavenTargetLocation targetLocation,
 			MavenTargetDependency selectedRoot) {
+		this(parent, new TargetDependencyModel(targetLocation, selectedRoot));
+	}
+
+	/* package */ MavenTargetDependencyEditor(Composite parent, TargetDependencyModel model) {
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new BorderLayout());
 
-		model = new TargetDependencyModel(targetLocation, selectedRoot);
+		this.model = model;
 
 		new DependencyTable(composite, model);
 	}

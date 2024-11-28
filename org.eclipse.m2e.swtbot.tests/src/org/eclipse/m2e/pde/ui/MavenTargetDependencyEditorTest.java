@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 Patrick Ziegler and others.
+ * Copyright (c) 2024, 2025 Patrick Ziegler and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui;
 
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.widgetIsEnabled;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -192,11 +193,6 @@ public class MavenTargetDependencyEditorTest {
 			workbench.getDisplay().syncExec(wizardDialog::close);
 		}
 	}
-	
-	private void readAndDispatch() {
-		Display display = workbench.getDisplay();
-		display.syncExec(display::readAndDispatch);
-	}
 
 	/**
 	 * Checks whether the initial "enablement" state of all buttons in the Maven
@@ -316,7 +312,7 @@ public class MavenTargetDependencyEditorTest {
 
 		table.select(12);
 		robot.button("Update").click();
-		readAndDispatch();
+		robot.waitUntil(widgetIsEnabled(table));
 
 		assertEquals(table.cell(12, 1), "kotlin-stdlib-common");
 		assertNotEquals(table.cell(12, 2), "1.7.22");
@@ -329,7 +325,7 @@ public class MavenTargetDependencyEditorTest {
 
 		table.select(13, 15);
 		robot.button("Update").click();
-		readAndDispatch();
+		robot.waitUntil(widgetIsEnabled(table));
 
 		assertEquals(table.cell(13, 1), "kotlin-stdlib-jdk7");
 		assertNotEquals(table.cell(13, 2), "1.7.22");
