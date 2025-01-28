@@ -181,6 +181,28 @@
 					<version>${tycho-version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.eclipse.tycho.extras</groupId>
+					<artifactId>tycho-version-bump-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<executions>
+						<execution>
+							<id>update-target</id>
+							<configuration>
+								<updateEmptyVersion>false</updateEmptyVersion>
+								<allowMajorUpdates>false</allowMajorUpdates>
+<!--								<mavenRulesUri>${project.basedir}/update-rules.xml</mavenRulesUri>-->
+								<updateSiteDiscovery>
+									<strategy>parent</strategy>
+									<strategy>versionPattern:releases/(\d+)\.(\d+).(\d+)</strategy>
+									<strategy>versionPattern:updates/(\d+)\.(\d+)/</strategy>
+									<strategy>versionPattern:updates-(\d+)\.(\d+)/</strategy>
+									<strategy>datePattern</strategy>
+								</updateSiteDiscovery>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho-version}</version>
