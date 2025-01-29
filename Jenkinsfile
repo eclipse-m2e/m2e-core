@@ -1,7 +1,7 @@
 pipeline {
 	options {
 		timeout(time: 45, unit: 'MINUTES')
-		buildDiscarder(logRotator(numToKeepStr:'5', artifactNumToKeepStr: 'master'.equals(env.BRANCH_NAME) ? '5' : '1' ))
+		buildDiscarder(logRotator(numToKeepStr:'5', artifactNumToKeepStr: 'main'.equals(env.BRANCH_NAME) ? '5' : '1' ))
 		disableConcurrentBuilds(abortPrevious: true)
 		timestamps()
 	}
@@ -27,7 +27,7 @@ pipeline {
 				xvnc(useXauthority: true) {
 					sh '''#!/bin/bash -x
 						mavenArgs="clean verify --batch-mode -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
-						if [[ ${BRANCH_NAME} == master ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
+						if [[ ${BRANCH_NAME} == main ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
 							mvn ${mavenArgs} -Peclipse-sign,its -Dtycho.pgp.signer.bc.secretKeys="${KEYRING}"
 						else
 							# Clear signing environment variables for PRs
@@ -50,7 +50,7 @@ pipeline {
 		}
 		stage('Deploy Snapshot') {
 			when {
-				branch 'master'
+				branch 'main'
 			}
 			steps {
 				sshagent(['projects-storage.eclipse.org-bot-ssh']) {

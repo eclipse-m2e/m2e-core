@@ -20,7 +20,7 @@
       source="http://www.eclipse.org/oomph/setup/BrandingInfo">
     <detail
         key="imageURI">
-      <value>https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.core/m2eclipse.gif</value>
+      <value>https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/org.eclipse.m2e.core/m2eclipse.gif</value>
     </detail>
     <detail
         key="siteURI">
@@ -120,7 +120,7 @@
   <setupTask
       xsi:type="setup:EclipseIniTask"
       option="-Doomph.redirection.m2e.core"
-      value="=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2e.setup->${git.clone.m2e.core.location|uri}/setup/m2e.setup"
+      value="=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/setup/m2e.setup->${git.clone.m2e.core.location|uri}/setup/m2e.setup"
       vm="true">
     <description>Set an Oomph redirection system property to redirect the logical location of this setup to its physical location in the Git clone.</description>
   </setupTask>
@@ -189,8 +189,8 @@
       xsi:type="projects:ProjectsBuildTask"
       refresh="true"
       clean="true"/>
-  <stream name="master"
-      label="master"/>
+  <stream name="main"
+      label="main"/>
   <logicalProjectContainer
       xsi:type="setup:ProjectCatalog"
       href="index:/org.eclipse.setup#//@projectCatalogs[name='org.eclipse']"/>
