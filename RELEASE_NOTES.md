@@ -216,9 +216,9 @@ The connector for the `bnd-maven-plugin` and `maven-bundle-plugin`, which is inc
 The M2E Maven-Console now also supports tracking of so called _polyglot_ Maven-projects. Those are projects that don't have a standard `pom.xml` and whose Maven-model is instead created from another source. One prominent example in the Eclipse world are Eclipse-PDE projects that are build with Tycho(-pomless).
 
 Due to this new support, polyglot Maven projects now also benefit from the
-[Improved links to JUnit test-reports and project file in the Console](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#improved-links-to-junit-test-reports-and-project-pomxml-in-the-console-of-a-maven-build)
+[Improved links to JUnit test-reports and project file in the Console](https://github.com/eclipse-m2e/m2e-core/blob/main/RELEASE_NOTES.md#improved-links-to-junit-test-reports-and-project-pomxml-in-the-console-of-a-maven-build)
 as well as the capability to
-[Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger](https://github.com/eclipse-m2e/m2e-core/blob/master/RELEASE_NOTES.md#automatically-launch-and-attach-remote-application-debugger-when-maven-plug-in-starts-a-forked-jvm-that-waits-for-a-debugger) introduced in previous releases.
+[Automatically launch and attach Remote-Application-Debugger when Maven plug-in starts a forked JVM that waits for a debugger](https://github.com/eclipse-m2e/m2e-core/blob/main/RELEASE_NOTES.md#automatically-launch-and-attach-remote-application-debugger-when-maven-plug-in-starts-a-forked-jvm-that-waits-for-a-debugger) introduced in previous releases.
 
 ## 2.0.2
 

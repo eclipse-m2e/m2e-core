@@ -8,7 +8,7 @@
       source="http://www.eclipse.org/oomph/setup/BrandingInfo">
     <detail
         key="imageURI">
-      <value>https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.core/m2eclipse.gif</value>
+      <value>https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/org.eclipse.m2e.core/m2eclipse.gif</value>
     </detail>
     <detail
         key="siteURI">
@@ -26,7 +26,7 @@
       name="m2e.development.environment.workspace"
       label="m2e Development Environment Workspace">
     <stream
-        href="index:/org.eclipse.setup#//@projectCatalogs[name='org.eclipse']/@projects[name='m2e']/@streams[name='master']"/>
+        href="index:/org.eclipse.setup#//@projectCatalogs[name='org.eclipse']/@projects[name='m2e']/@streams[name='main']"/>
     <description>The m2e development environment workspace includes m2e-core and m2e-core-tests</description>
   </workspace>
   <description>

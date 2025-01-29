@@ -5,11 +5,11 @@ name: License vetting status check
 on:
   push:
     branches: 
-      - 'master'
+      - 'main'
       - 'm2e-*'
   pull_request:
     branches: 
-     - 'master'
+     - 'main'
      - 'm2e-*'
   issue_comment:
     types: [created]

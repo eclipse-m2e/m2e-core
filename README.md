@@ -3,9 +3,9 @@
 [![Build m2e-core](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml/badge.svg)](https://github.com/eclipse-m2e/m2e-core/actions/workflows/maven.yml)
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/eclipse-m2e/m2e-core?label=Version&sort=semver)
-[![GitHub license](https://img.shields.io/github/license/eclipse-m2e/m2e-core?label=License)](https://github.com/eclipse-m2e/m2e-core/blob/master/LICENSE)
-[![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmaster%2F&label=Build)](https://ci.eclipse.org/m2e/job/m2e/)
-![Jenkins tests](https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmaster%2F&label=Tests)
+[![GitHub license](https://img.shields.io/github/license/eclipse-m2e/m2e-core?label=License)](https://github.com/eclipse-m2e/m2e-core/blob/main/LICENSE)
+[![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmain%2F&label=Build)](https://ci.eclipse.org/m2e/job/m2e/)
+![Jenkins tests](https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fm2e%2Fjob%2Fm2e%2Fjob%2Fmain%2F&label=Tests)
 
 M2Eclipse provides tight integration for Apache Maven into the Eclipse IDE with the following features:
 * Rich editor for pom.xml files leveraging
@@ -51,7 +51,7 @@ The variable `<version-under-development>` has to be replaced by the current ver
 See [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
 ## ⌨️ Contributing
-[![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
+[![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
 &nbsp;&nbsp;&nbsp;or just&nbsp;&nbsp;&nbsp;
 [![Clone to Eclipse IDE](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png)](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html)
 
