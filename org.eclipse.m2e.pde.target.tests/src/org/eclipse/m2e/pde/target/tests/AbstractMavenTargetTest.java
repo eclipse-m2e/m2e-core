@@ -32,7 +32,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IStatus;
@@ -160,6 +162,17 @@ public abstract class AbstractMavenTargetTest {
 		File file = URIUtil.toFile(bundleInfo.getLocation());
 		try (var jar = new JarFile(file)) {
 			return jar.getManifest().getMainAttributes();
+		}
+	}
+
+	static void assertValidSignature(TargetBundle targetBundle) throws IOException {
+		try (JarInputStream stream = new JarInputStream(
+				targetBundle.getBundleInfo().getLocation().toURL().openStream())) {
+			for (JarEntry entry = stream.getNextJarEntry(); entry != null; entry = stream.getNextJarEntry()) {
+				for (byte[] drain = new byte[4096]; stream.read(drain, 0, drain.length) != -1;) {
+					// nothing we just want to trigger the signature verification
+				}
+			}
 		}
 	}
 

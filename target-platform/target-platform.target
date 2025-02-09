@@ -116,7 +116,7 @@
 				</dependency>
 			</dependencies>
 		</location>
-		<location includeDependencyDepth="none" includeDependencyScopes="compile" label="LemMinX" includeSource="true" missingManifest="error" type="Maven">
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" label="LemMinX" includeSource="false" missingManifest="error" type="Maven">
 			<dependencies>
 				<dependency>
 					<groupId>org.eclipse.lemminx</groupId>
