@@ -707,10 +707,11 @@ public class LifecycleMappingFactory {
 
   private static boolean hasMatchingParameterValue(MavenProject mavenProject, MojoExecution execution,
       PluginExecutionMetadata metadata, IMaven maven, IProgressMonitor monitor) throws CoreException {
-    Map<String, Object> parameters = metadata.getFilter().getParameters();
-    for(Entry<String, Object> entry : parameters.entrySet()) {
+    Map<Object, String> parameters = metadata.getFilter().getParameters();
+    for(Entry<Object, String> entry : parameters.entrySet()) {
       MojoExecution setupExecution = maven.setupMojoExecution(mavenProject, execution, monitor);
-      String value = maven.getMojoParameterValue(mavenProject, setupExecution, entry.getKey(), String.class, monitor);
+      String value = maven.getMojoParameterValue(mavenProject, setupExecution, (String) entry.getKey(), String.class,
+          monitor);
       if(!Objects.equals(entry.getValue(), value)) {
         return false;
       }

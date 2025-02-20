@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<model xmlns="http://modello.codehaus.org/MODELLO/1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.1 http://modello.codehaus.org/xsd/modello-1.4.1.xsd">
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd">
   
   <id>lifecycle-mapping-metadata-model</id>
   <name>LifecycleMappingMetadataSource</name>
@@ -70,13 +70,15 @@
     <class xml.tagName="lifecycleMapping" xml.standaloneRead="true">
       <name>LifecycleMappingMetadata</name>
       <fields>
-        <field required="true">
+        <field>
           <name>packagingType</name>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true">
+        <field>
           <name>lifecycleMappingId</name>
           <type>String</type>
+          <required>true</required>
         </field>
         <field>
           <name>lifecycleMappingVersionRange</name>
@@ -109,25 +111,29 @@
     <class xml.tagName="pluginExecutionFilter" xml.standaloneRead="true" java.clone="deep">
       <name>PluginExecutionFilter</name>
       <fields>
-        <field required="true">
+        <field>
           <name>groupId</name>
           <identifier>true</identifier>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true">
+        <field>
           <name>artifactId</name>
           <identifier>true</identifier>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true" java.setter="false">
+        <field java.setter="false">
           <name>versionRange</name>
           <identifier>true</identifier>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true">
+        <field>
           <name>goals</name>
           <identifier>true</identifier>
           <type>Set</type>
+          <required>true</required>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -213,28 +219,32 @@
     <class xml.tagName="lifecycleMappingFilter" xml.standaloneRead="true" java.clone="deep">
       <name>LifecycleMappingFilter</name>
       <fields>
-        <field required="true">
+        <field>
           <name>symbolicName</name>
           <identifier>true</identifier>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true" java.setter="false">
+        <field java.setter="false">
           <name>versionRange</name>
           <identifier>true</identifier>
           <type>String</type>
+          <required>true</required>
         </field>
-        <field required="true">
+        <field>
           <name>pluginExecutions</name>
           <identifier>true</identifier>
+          <required>true</required>
           <type>Set</type>
           <association>
             <type>PluginExecutionFilter</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field required="true">
+        <field>
           <name>packagingTypes</name>
           <identifier>true</identifier>
+          <required>true</required>
           <type>Set</type>
           <association>
             <type>String</type>
@@ -281,20 +291,23 @@
         <interface>org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata</interface>
       </interfaces>
       <fields>
-        <field required="true" xml.tagName="pluginExecutionFilter">
+        <field xml.tagName="pluginExecutionFilter">
           <name>filter</name>
+          <required>true</required>
           <association>
             <type>PluginExecutionFilter</type>
             <multiplicity>1</multiplicity>
           </association>
         </field>
-        <field required="true" xml.tagName="action">
+        <field xml.tagName="action">
           <name>actionDom</name>
           <type>DOM</type>
+          <required>true</required>
         </field>
-        <field required="false" xml.tagName="comment">
+        <field xml.tagName="comment">
           <name>comment</name>
           <type>String</type>
+          <required>true</required>
           <description>
              Arbitrary comment that describes the mapping. The comment is not interpreted by m2e in any way.
              @since 1.2
