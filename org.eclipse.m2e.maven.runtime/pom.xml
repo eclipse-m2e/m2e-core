@@ -235,7 +235,6 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.8.0</version>
 					<configuration>
 						<overWriteIfNewer>true</overWriteIfNewer>
 						<includeScope>runtime</includeScope> <!-- only include runtime and compile time dependencies, not test or provided! -->
