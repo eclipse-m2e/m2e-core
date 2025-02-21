@@ -13,6 +13,7 @@
 package org.eclipse.m2e.pde.ui.target.provider;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -48,6 +49,13 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 			MavenTargetLocation location = getTargetLocation(node);
 			String baseLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + " (" + artifact.getVersion()
 					+ ")";
+			Dependency dependency = node.getDependency();
+			if (dependency != null) {
+				String scope = dependency.getScope();
+				if (scope != null && !scope.isBlank()) {
+					baseLabel += " [" + scope + "]";
+				}
+			}
 			if (location != null) {
 				if (location.isExcluded(artifact)) {
 					return "(excluded) " + baseLabel;
