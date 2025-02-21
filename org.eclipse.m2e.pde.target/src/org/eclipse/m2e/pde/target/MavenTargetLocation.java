@@ -241,6 +241,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 		if (artifact != null) {
 			DependencyDepth depth = dependencyDepth;
+			if (isClassified(artifact)) {
+				// a classified artifact can not have any dependencies and will actually include
+				// the ones from the main artifact.
+				// if the user really wants this it is possible to include the pom typed
+				// artifact or the main artifact in the list
+				depth = DependencyDepth.NONE;
+			}
 			if (isPomType(artifact) && depth == DependencyDepth.NONE) {
 				// fetching only the pom but no dependencies does not makes much sense...
 				depth = DependencyDepth.DIRECT;
@@ -271,6 +278,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 
 		return artifact;
+	}
+
+	private boolean isClassified(Artifact artifact) {
+		String classifier = artifact.getClassifier();
+		return classifier != null && !classifier.isEmpty();
 	}
 
 	private boolean isPomType(Artifact artifact) {

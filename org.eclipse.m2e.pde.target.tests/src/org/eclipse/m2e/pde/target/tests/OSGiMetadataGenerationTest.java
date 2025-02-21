@@ -91,7 +91,6 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 			ITargetLocation target = resolveMavenTarget(targetXML.replace("%depth%", deepth));
 			assertStatusOk(getTargetStatus(target));
 			TargetBundle[] bundles = target.getBundles();
-			// TODO check bundle and possible transtive dependencies!
 			for (TargetBundle targetBundle : bundles) {
 				URI location = targetBundle.getBundleInfo().getLocation();
 				assertTrue(
