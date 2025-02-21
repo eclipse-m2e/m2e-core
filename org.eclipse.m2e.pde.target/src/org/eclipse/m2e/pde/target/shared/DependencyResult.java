@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Christoph Läubrich and others
+ * Copyright (c) 2025 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -10,8 +10,13 @@
  * Contributors:
  *   Christoph Läubrich - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.pde.target;
+package org.eclipse.m2e.pde.target.shared;
 
-public enum DependencyDepth {
-	NONE, DIRECT, INFINITE;
+import java.util.List;
+
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.DependencyNode;
+
+public record DependencyResult(List<Artifact> artifacts, DependencyNode root, List<DependencyNode> nodes) {
+
 }

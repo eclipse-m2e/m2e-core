@@ -18,46 +18,35 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.aether.RepositoryException;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.pde.target.shared.DependencyDepth;
+import org.eclipse.m2e.pde.target.shared.DependencyResult;
+import org.eclipse.m2e.pde.target.shared.MavenDependencyCollector;
 
 final class DependencyNodeGenerator {
 	private DependencyNodeGenerator() {
 	}
 
-	static ICallable<PreorderNodeListGenerator> create(MavenTargetDependency root, Artifact artifact,
-			DependencyDepth dependencyDepth, Collection<String> dependencyScopes, List<ArtifactRepository> repositories,
+	static ICallable<DependencyResult> create(MavenTargetDependency root, Artifact artifact,
+			DependencyDepth dependencyDepth, Collection<String> dependencyScopes,
+			@SuppressWarnings("deprecation") List<ArtifactRepository> repositories,
 			MavenTargetLocation parent) {
-
-		return (IMavenExecutionContext context, IProgressMonitor monitor) -> {
+		return (context, monitor) -> {
 			try {
-				CollectRequest collectRequest = new CollectRequest();
-				collectRequest.setRoot(new Dependency(artifact, null));
-				collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
-
-				RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-				DependencyNode node = repoSystem.collectDependencies(context.getRepositorySession(), collectRequest)
-						.getRoot();
+				MavenDependencyCollector collector = new MavenDependencyCollector(
+						MavenPluginActivator.getDefault().getRepositorySystem(), context.getRepositorySession(),
+						RepositoryUtils.toRepos(repositories), dependencyDepth, dependencyScopes);
+				DependencyResult result = collector.collect(new Dependency(artifact, null));
+				DependencyNode node = result.root();
 				node.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parent);
 				node.setData(MavenTargetLocation.DEPENDENCYNODE_ROOT, root);
-				DependencyRequest dependencyRequest = new DependencyRequest();
-				dependencyRequest.setRoot(node);
-				dependencyRequest.setFilter(new MavenTargetDependencyFilter(dependencyDepth, dependencyScopes));
-				repoSystem.resolveDependencies(context.getRepositorySession(), dependencyRequest);
-				PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-				node.accept(nlg);
-				return nlg;
+				return result;
 			} catch (RepositoryException e) {
 				throw new CoreException(Status.error("Resolving dependencies failed", e));
 			} catch (RuntimeException e) {
@@ -65,4 +54,5 @@ final class DependencyNodeGenerator {
 			}
 		};
 	}
+
 }

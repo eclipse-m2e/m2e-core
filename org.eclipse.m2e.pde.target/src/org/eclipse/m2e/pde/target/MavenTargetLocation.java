@@ -51,7 +51,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
@@ -69,6 +68,8 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.pde.target.shared.DependencyDepth;
+import org.eclipse.m2e.pde.target.shared.DependencyResult;
 import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
@@ -254,15 +255,15 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 			SubMonitor split = subMonitor.split(20);
 			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
-				ICallable<PreorderNodeListGenerator> callable = DependencyNodeGenerator.create(root, artifact, depth,
+				ICallable<DependencyResult> callable = DependencyNodeGenerator.create(root, artifact, depth,
 						dependencyScopes, repositories, this);
-				PreorderNodeListGenerator dependecies;
+				DependencyResult dependecies;
 				if (workspaceProject == null) {
 					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
 				} else {
 					dependecies = registry.execute(workspaceProject, callable, subMonitor);
 				}
-				List<Artifact> artifacts = dependecies.getArtifacts(true);
+				List<Artifact> artifacts = dependecies.artifacts();
 				split.setWorkRemaining(artifacts.size());
 				for (Artifact a : artifacts) {
 					if (a.getFile() == null) {
@@ -271,7 +272,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}
 					addBundleForArtifact(a, cacheManager, maven, targetBundles, split.split(1));
 				}
-				targetBundles.dependencyNodes.put(root, dependecies.getNodes());
+				targetBundles.dependencyNodes.put(root, dependecies.nodes());
 			} else {
 				addBundleForArtifact(artifact, cacheManager, maven, targetBundles, split);
 			}
