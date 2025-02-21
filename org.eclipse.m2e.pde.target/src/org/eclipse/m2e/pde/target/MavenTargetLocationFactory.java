@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.m2e.pde.target.shared.DependencyDepth;
 import org.eclipse.pde.core.target.ITargetLocationFactory;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.w3c.dom.Document;

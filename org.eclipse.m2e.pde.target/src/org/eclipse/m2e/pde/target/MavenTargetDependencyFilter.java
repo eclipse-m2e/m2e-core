@@ -21,9 +21,11 @@ import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.m2e.pde.target.shared.DependencyDepth;
 
 public class MavenTargetDependencyFilter implements DependencyFilter {
 
@@ -43,7 +45,15 @@ public class MavenTargetDependencyFilter implements DependencyFilter {
 			// only for a valid extension...
 			if (valid.equalsIgnoreCase(extension) && (dependencyDepth == DependencyDepth.INFINITE
 					|| (dependencyDepth == DependencyDepth.DIRECT && parents.size() <= 1))) {
-				return isValidScope(node.getDependency());
+				Dependency dependency = node.getDependency();
+				if (dependency == null) {
+					Artifact artifact = node.getArtifact();
+					if (artifact == null) {
+						return false;
+					}
+					dependency = new Dependency(artifact, null);
+				}
+				return isValidScope(dependency);
 			}
 		}
 		return false;
