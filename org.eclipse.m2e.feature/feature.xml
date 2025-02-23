@@ -35,10 +35,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.m2e.archetype.maven-artifact-transfer"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.m2e.model.edit"
          version="0.0.0"/>
 
