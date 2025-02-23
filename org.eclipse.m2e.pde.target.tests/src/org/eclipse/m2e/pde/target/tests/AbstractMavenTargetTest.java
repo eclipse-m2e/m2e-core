@@ -127,7 +127,7 @@ public abstract class AbstractMavenTargetTest {
 			return false;
 		}
 		URI location = getLocation.apply(unit);
-		String expectedPathSuffix = "/" + String.join("/", ".m2", "repository", key.groupId().replace('.', '/'),
+		String expectedPathSuffix = "/" + String.join("/", "repository", key.groupId().replace('.', '/'),
 				key.artifactId(), key.version(), key.artifactId() + "-" + key.version() + ".jar");
 		return location.toASCIIString().endsWith(expectedPathSuffix);
 	}
