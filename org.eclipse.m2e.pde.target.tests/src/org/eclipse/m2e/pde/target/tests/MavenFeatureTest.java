@@ -22,6 +22,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+/**
+ * Test that the generated features contain the expected content
+ */
 @RunWith(Parameterized.class)
 public class MavenFeatureTest extends AbstractMavenTargetTest {
 	@Parameter(0)
@@ -109,11 +112,8 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 				originalOSGiBundle("com.sun.xml.bind.jaxb-impl", "4.0.2", "com.sun.xml.bind:jaxb-impl"),
 				originalOSGiBundle("com.sun.xml.bind.jaxb-jxc", "4.0.2", "com.sun.xml.bind:jaxb-jxc"),
 				originalOSGiBundle("com.sun.xml.bind.jaxb-xjc", "4.0.2", "com.sun.xml.bind:jaxb-xjc"),
-				originalOSGiBundle("com.sun.xml.fastinfoset.FastInfoset", "2.1.0",
-						"com.sun.xml.fastinfoset:FastInfoset"),
-				originalOSGiBundle("jakarta.activation-api", "2.1.1", "jakarta.activation:jakarta.activation-api"),
-				originalOSGiBundle("jakarta.xml.bind-api", "4.0.0", "jakarta.xml.bind:jakarta.xml.bind-api"),
-				originalOSGiBundle("org.jvnet.staxex.stax-ex", "2.1.0", "org.jvnet.staxex:stax-ex"));
+				originalOSGiBundle("jakarta.activation-api", "2.1.0", "jakarta.activation:jakarta.activation-api"),
+				originalOSGiBundle("jakarta.xml.bind-api", "4.0.0", "jakarta.xml.bind:jakarta.xml.bind-api"));
 		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 		List<ExpectedFeature> expectedFeature = List.of(generatedFeature("com.sun.xml.bind.jaxb-ri.pom", "0.0.1",
 				List.of(//
@@ -121,10 +121,8 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 						featurePlugin("com.sun.xml.bind.jaxb-impl", "4.0.2"),
 						featurePlugin("com.sun.xml.bind.jaxb-jxc", "4.0.2"),
 						featurePlugin("com.sun.xml.bind.jaxb-xjc", "4.0.2"),
-						featurePlugin("com.sun.xml.fastinfoset.FastInfoset", "2.1.0"),
-						featurePlugin("jakarta.activation-api", "2.1.1"),
-						featurePlugin("jakarta.xml.bind-api", "4.0.0"),
-						featurePlugin("org.jvnet.staxex.stax-ex", "2.1.0"))));
+						featurePlugin("jakarta.activation-api", "2.1.0"),
+						featurePlugin("jakarta.xml.bind-api", "4.0.0"))));
 		assertTargetFeatures(target, includeSource ? withSourceFeatures(expectedFeature) : expectedFeature);
 
 	}

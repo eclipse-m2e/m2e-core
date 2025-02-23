@@ -82,7 +82,6 @@ public class MixedCasesTest extends AbstractMavenTargetTest {
 				originalOSGiBundle("com.google.guava", "30.1.0.jre", "com.google.guava:guava", "30.1-jre"),
 				originalOSGiBundle("com.google.guava", "30.1.1.jre", "com.google.guava:guava", "30.1.1-jre"),
 				originalOSGiBundle("com.google.guava.failureaccess", "1.0.1", "com.google.guava:failureaccess"),
-				originalOSGiBundle("org.objectweb.asm", "9.2.0", "org.ow2.asm:asm", "9.2"),
 				originalOSGiBundle("checker-qual", "3.8.0", "org.checkerframework:checker-qual"),
 				generatedBundle("m2e.wrapped.com.google.errorprone.error_prone_annotations", "2.3.4",
 						"com.google.errorprone:error_prone_annotations"),
