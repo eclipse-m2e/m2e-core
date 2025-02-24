@@ -42,6 +42,7 @@ import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -68,8 +69,12 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.pde.target.shared.AdditionalRepository;
 import org.eclipse.m2e.pde.target.shared.DependencyDepth;
 import org.eclipse.m2e.pde.target.shared.DependencyResult;
+import org.eclipse.m2e.pde.target.shared.MavenDependencyCollector;
+import org.eclipse.m2e.pde.target.shared.MavenRootDependency;
+import org.eclipse.m2e.pde.target.shared.RepositoryArtifact;
 import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.TargetBundle;
@@ -228,7 +233,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	private Artifact resolveDependency(MavenTargetDependency root, IMaven maven, List<ArtifactRepository> repositories,
 			TargetBundles targetBundles, CacheManager cacheManager, IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 100); 
 		IMavenProjectRegistry registry = MavenPlugin.getMavenProjectRegistry();
 		IMavenProjectFacade workspaceProject = registry.getMavenProject(root.getGroupId(), root.getArtifactId(),
 				root.getVersion());
@@ -241,36 +246,33 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					root.getVersion(), root.getType(), root.getClassifier(), repositories, subMonitor.split(80)));
 		}
 		if (artifact != null) {
-			DependencyDepth depth = dependencyDepth;
-			if (isClassified(artifact)) {
-				// a classified artifact can not have any dependencies and will actually include
-				// the ones from the main artifact.
-				// if the user really wants this it is possible to include the pom typed
-				// artifact or the main artifact in the list
-				depth = DependencyDepth.NONE;
-			}
-			if (isPomType(artifact) && depth == DependencyDepth.NONE) {
-				// fetching only the pom but no dependencies does not makes much sense...
-				depth = DependencyDepth.DIRECT;
-			}
+			MavenRootDependency dependency = new MavenRootDependency(artifact.getGroupId(), artifact.getArtifactId(),
+					artifact.getVersion(), artifact.getClassifier(), artifact.getExtension());
+			DependencyDepth depth = MavenDependencyCollector.getEffectiveDepth(dependency,
+					dependencyDepth);
 			SubMonitor split = subMonitor.split(20);
 			if (depth == DependencyDepth.DIRECT || depth == DependencyDepth.INFINITE) {
-				ICallable<DependencyResult> callable = DependencyNodeGenerator.create(root, artifact, depth,
-						dependencyScopes, repositories, this);
+				// We should resolve the main artifact from the collector, but because this
+				// is currently separate we already have the additional repos added. see
+				// org.eclipse.tycho.core.resolver.MavenTargetDefinitionContent.resolveRoot(MavenDependencyCollector,
+				// MavenDependency)
+				Collection<AdditionalRepository> extra = new ArrayList<>();
+				ICallable<DependencyResult> callable = create(root, dependency, dependencyDepth, dependencyScopes,
+						repositories, this, extra);
 				DependencyResult dependecies;
 				if (workspaceProject == null) {
 					dependecies = maven.createExecutionContext().execute(callable, subMonitor);
 				} else {
 					dependecies = registry.execute(workspaceProject, callable, subMonitor);
 				}
-				List<Artifact> artifacts = dependecies.artifacts();
+				List<RepositoryArtifact> artifacts = dependecies.artifacts();
 				split.setWorkRemaining(artifacts.size());
-				for (Artifact a : artifacts) {
-					if (a.getFile() == null) {
+				for (RepositoryArtifact a : artifacts) {
+					if (a.artifact().getFile() == null) {
 						// this is a filtered dependency
 						continue;
 					}
-					addBundleForArtifact(a, cacheManager, maven, targetBundles, split.split(1));
+					addBundleForArtifact(a.artifact(), cacheManager, maven, targetBundles, split.split(1));
 				}
 				targetBundles.dependencyNodes.put(root, dependecies.nodes());
 			} else {
@@ -281,9 +283,26 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return artifact;
 	}
 
-	private boolean isClassified(Artifact artifact) {
-		String classifier = artifact.getClassifier();
-		return classifier != null && !classifier.isEmpty();
+	static ICallable<DependencyResult> create(MavenTargetDependency root, MavenRootDependency dependency,
+			DependencyDepth dependencyDepth, Collection<String> dependencyScopes,
+			@SuppressWarnings("deprecation") List<ArtifactRepository> repositories, MavenTargetLocation parent,
+			Collection<AdditionalRepository> extra) {
+		return (context, monitor) -> {
+			try {
+				MavenDependencyCollector collector = new MavenDependencyCollector(
+						MavenPluginActivator.getDefault().getRepositorySystem(), context.getRepositorySession(),
+						RepositoryUtils.toRepos(repositories), extra, dependencyDepth, dependencyScopes);
+				DependencyResult result = collector.collect(dependency);
+				DependencyNode node = result.root();
+				node.setData(MavenTargetLocation.DEPENDENCYNODE_PARENT, parent);
+				node.setData(MavenTargetLocation.DEPENDENCYNODE_ROOT, root);
+				return result;
+			} catch (RepositoryException e) {
+				throw new CoreException(Status.error("Resolving dependencies failed", e));
+			} catch (RuntimeException e) {
+				throw new CoreException(Status.error("Internal error", e));
+			}
+		};
 	}
 
 	private boolean isPomType(Artifact artifact) {

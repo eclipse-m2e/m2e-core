@@ -66,10 +66,14 @@ class TargetBundles {
 	}
 
 	public void addBundle(Artifact artifact, TargetBundle bundle) {
-		bundles.put(artifact, bundle);
+
 		File file = artifact.getFile();
-		if (file != null) {
-			artifacts.put(file, artifact);
+		if (file == null) {
+			bundles.put(artifact, bundle);
+		} else {
+			if (artifacts.put(file, artifact) == null) {
+				bundles.put(artifact, bundle);
+			}
 		}
 	}
 
@@ -84,4 +88,5 @@ class TargetBundles {
 	public Optional<Artifact> getArtifact(File file) {
 		return Optional.ofNullable(artifacts.get(file));
 	}
+
 }
