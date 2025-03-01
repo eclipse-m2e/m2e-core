@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.900-SNAPSHOT</version>
+	<version>3.9.901-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -202,8 +202,10 @@
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
 								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
-								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
-								org.apache.commons.codec*
+								org.apache.commons.cli;version="[1.4.0,2.0.0)",\
+								org.apache.commons.codec*,\
+								org.osgi.*,\
+							
 							Require-Bundle: \
 								com.google.guava;bundle-version="32.2.1"
 

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -34,6 +35,8 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 
 import org.eclipse.aether.repository.RemoteRepository;
@@ -42,6 +45,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.BundleClassSpace;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.SpaceModule;
+import org.eclipse.sisu.wire.WireModule;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -54,6 +62,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
+import org.apache.maven.archetype.common.DefaultArchetypeArtifactManager;
+import org.apache.maven.archetype.downloader.Downloader;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
@@ -117,7 +127,19 @@ public class ArchetypePlugin {
         .setAutoWiring(true) //
         .setJSR250Lifecycle(true) //
         .setName("plexus"); //$NON-NLS-1$
+
+    ClassSpace space = new BundleClassSpace(FrameworkUtil.getBundle(ArchetypeArtifactManager.class));
+    Injector injector = Guice.createInjector(logginModule,
+        new WireModule(new SpaceModule(space, BeanScanning.INDEX, false)));
+    ArchetypeArtifactManager mgr1 = injector.getInstance(DefaultArchetypeArtifactManager.class);
+    try {
+      ArchetypeArtifactManager mgr2 = injector.getInstance(ArchetypeArtifactManager.class);
+    } catch(Exception ex) {
+      //TODO: doesn't work? 
+    }
     container = new DefaultPlexusContainer(cc, logginModule);
+    Downloader downloader = container.lookup(Downloader.class);
+    //TODO: a Downloader can be created, but isn't injected into the fields of a created  archetypeArtifactManager
     archetypeArtifactManager = container.lookup(ArchetypeArtifactManager.class);
     archetypeDataSourceMap = container.lookupMap(ArchetypeDataSource.class);
     addArchetypeCatalogFactory(
