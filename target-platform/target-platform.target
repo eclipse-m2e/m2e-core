@@ -168,7 +168,7 @@ Eclipse-ExtensibleAPI: true
 Require-Bundle:        \
                        org.eclipse.m2e.maven.runtime;bundle-version="[3.8.0,4.0.0)", \
                        com.ibm.icu
-Import-Package:        org.jdom2*
+Import-Package:        org.jdom2*,javax.inject
 Export-Package:        \
                        META-INF.sisu;-noimport:=true;x-internal:=true, \
                        org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui", \

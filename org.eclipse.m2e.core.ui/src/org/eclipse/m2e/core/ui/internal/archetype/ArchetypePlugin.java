@@ -39,6 +39,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -51,24 +52,16 @@ import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
-import org.apache.maven.archetype.common.DefaultArchetypeArtifactManager;
-import org.apache.maven.archetype.downloader.Downloader;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
-import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
+import org.apache.maven.archetype.source.InternalCatalogArchetypeDataSource;
+import org.apache.maven.archetype.source.LocalCatalogArchetypeDataSource;
+import org.apache.maven.archetype.source.RemoteCatalogArchetypeDataSource;
 
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -87,6 +80,10 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
 @Component(service = ArchetypePlugin.class)
 public class ArchetypePlugin {
 
+  private static final InternalCatalogArchetypeDataSource INTERNAL_CATALOG_ARCHETYPE_DATA_SOURCE = new InternalCatalogArchetypeDataSource();
+
+  private static final LocalCatalogArchetypeDataSource LOCAL_CATALOG = new LocalCatalogArchetypeDataSource();
+
   public static final String ARCHETYPE_PREFIX = "archetype";
 
   private final Map<String, ArchetypeCatalogFactory> catalogs = new LinkedHashMap<>();
@@ -103,10 +100,6 @@ public class ArchetypePlugin {
 
   private ArchetypeArtifactManager archetypeArtifactManager;
 
-  private Map<String, ArchetypeDataSource> archetypeDataSourceMap;
-
-  private DefaultPlexusContainer container;
-
   public ArchetypePlugin() {
     this.configFile = new File(MavenPluginActivator.getDefault().getStateLocation().toFile(),
         M2EUIPluginActivator.PREFS_ARCHETYPES);
@@ -114,38 +107,30 @@ public class ArchetypePlugin {
   }
 
   @Activate
-  void activate() throws PlexusContainerException, ComponentLookupException {
+  void activate() {
     final Module logginModule = new AbstractModule() {
       @Override
       protected void configure() {
         bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
       }
     };
-    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld("plexus.core", ArchetypeArtifactManager.class.getClassLoader())) //$NON-NLS-1$
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setJSR250Lifecycle(true) //
-        .setName("plexus"); //$NON-NLS-1$
-
     ClassSpace space = new BundleClassSpace(FrameworkUtil.getBundle(ArchetypeArtifactManager.class));
-    Injector injector = Guice.createInjector(logginModule,
-        new WireModule(new SpaceModule(space, BeanScanning.INDEX, false)));
-    ArchetypeArtifactManager mgr1 = injector.getInstance(DefaultArchetypeArtifactManager.class);
-    try {
-      ArchetypeArtifactManager mgr2 = injector.getInstance(ArchetypeArtifactManager.class);
-    } catch(Exception ex) {
-      //TODO: doesn't work? 
-    }
-    container = new DefaultPlexusContainer(cc, logginModule);
-    Downloader downloader = container.lookup(Downloader.class);
-    //TODO: a Downloader can be created, but isn't injected into the fields of a created  archetypeArtifactManager
-    archetypeArtifactManager = container.lookup(ArchetypeArtifactManager.class);
-    archetypeDataSourceMap = container.lookupMap(ArchetypeDataSource.class);
+    final Module repositorySystemModule = new AbstractModule() {
+      @Override
+      protected void configure() {
+        try {
+          bind(RepositorySystem.class).toInstance(MavenPluginActivator.getDefault().getRepositorySystem());
+        } catch(CoreException ex) {
+          ex.printStackTrace();
+        }
+      }
+    };
+    Injector injector = Guice.createInjector(
+        new WireModule(logginModule, repositorySystemModule, new SpaceModule(space, BeanScanning.INDEX, false)));
+    archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
     addArchetypeCatalogFactory(
-        new ArchetypeCatalogFactory.InternalCatalogFactory(archetypeDataSourceMap.get("internal-catalog")));
-    addArchetypeCatalogFactory(
-        new ArchetypeCatalogFactory.DefaultLocalCatalogFactory(maven, archetypeDataSourceMap.get("catalog")));
+        new ArchetypeCatalogFactory.InternalCatalogFactory(INTERNAL_CATALOG_ARCHETYPE_DATA_SOURCE));
+    addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory(maven, LOCAL_CATALOG));
     for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions(this)) {
       addArchetypeCatalogFactory(archetypeCatalogFactory);
     }
@@ -159,18 +144,16 @@ public class ArchetypePlugin {
   @Deactivate
   void shutdown() throws IOException {
     saveCatalogs();
-    container.dispose();
   }
 
   public LocalCatalogFactory newLocalCatalogFactory(String path, String description, boolean editable,
       boolean enabled) {
-    return new LocalCatalogFactory(path, description, editable, enabled, maven, archetypeDataSourceMap.get("catalog"));
+    return new LocalCatalogFactory(path, description, editable, enabled, maven, LOCAL_CATALOG);
   }
 
   public RemoteCatalogFactory newRemoteCatalogFactory(String url, String description, boolean editable,
       boolean enabled) {
-    return new RemoteCatalogFactory(url, description, editable, enabled, maven,
-        archetypeDataSourceMap.get("remote-catalog"));
+    return new RemoteCatalogFactory(url, description, editable, enabled, maven, new RemoteCatalogArchetypeDataSource());
   }
 
   public ArchetypeGenerator getGenerator() {
@@ -261,8 +244,7 @@ public class ArchetypePlugin {
   public void updateLocalCatalog(Archetype archetype) throws CoreException {
     maven.createExecutionContext().execute((ctx, m) -> {
       try {
-        ArchetypeDataSource source = archetypeDataSourceMap.get("catalog");
-        source.updateCatalog(ctx.getRepositorySession(), archetype);
+        LOCAL_CATALOG.updateCatalog(ctx.getRepositorySession(), archetype);
       } catch(ArchetypeDataSourceException e) {
       }
       return null;
