@@ -83,11 +83,6 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
 @Component(service = ArchetypePlugin.class)
 public class ArchetypePlugin {
 
-  /**
-   * 
-   */
-  private static final RemoteCatalogArchetypeDataSource REMOTE_CATALOG = new RemoteCatalogArchetypeDataSource();
-
   private static final InternalCatalogArchetypeDataSource INTERNAL_CATALOG = new InternalCatalogArchetypeDataSource();
 
   private static final LocalCatalogArchetypeDataSource LOCAL_CATALOG = new LocalCatalogArchetypeDataSource();
@@ -108,6 +103,8 @@ public class ArchetypePlugin {
 
   private ArchetypeArtifactManager archetypeArtifactManager;
 
+  private RemoteCatalogArchetypeDataSource remoteCatalog;
+
   public ArchetypePlugin() {
     this.configFile = new File(MavenPluginActivator.getDefault().getStateLocation().toFile(),
         M2EUIPluginActivator.PREFS_ARCHETYPES);
@@ -123,7 +120,6 @@ public class ArchetypePlugin {
       }
     };
     Slf4jLogger logger = new Slf4jLogger(LoggerFactory.getILoggerFactory().getLogger("catalog"));
-    REMOTE_CATALOG.enableLogging(logger);
     INTERNAL_CATALOG.enableLogging(logger);
     LOCAL_CATALOG.enableLogging(logger);
     ClassSpace space = new BundleClassSpace(FrameworkUtil.getBundle(ArchetypeArtifactManager.class));
@@ -141,6 +137,10 @@ public class ArchetypePlugin {
         new WireModule(logginModule, repositorySystemModule, new SpaceModule(space, BeanScanning.INDEX)));
     archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
     if(archetypeArtifactManager instanceof LogEnabled le) {
+      le.enableLogging(logger);
+    }
+    this.remoteCatalog = injector.getInstance(RemoteCatalogArchetypeDataSource.class);
+    if(remoteCatalog instanceof LogEnabled le) {
       le.enableLogging(logger);
     }
     addArchetypeCatalogFactory(
@@ -168,7 +168,7 @@ public class ArchetypePlugin {
 
   public RemoteCatalogFactory newRemoteCatalogFactory(String url, String description, boolean editable,
       boolean enabled) {
-    return new RemoteCatalogFactory(url, description, editable, enabled, maven, REMOTE_CATALOG);
+    return new RemoteCatalogFactory(url, description, editable, enabled, maven, remoteCatalog);
   }
 
   public ArchetypeGenerator getGenerator() {
