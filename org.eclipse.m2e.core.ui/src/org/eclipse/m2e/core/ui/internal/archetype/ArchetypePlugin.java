@@ -126,7 +126,7 @@ public class ArchetypePlugin {
       }
     };
     Injector injector = Guice.createInjector(
-        new WireModule(logginModule, repositorySystemModule, new SpaceModule(space, BeanScanning.INDEX, false)));
+        new WireModule(logginModule, repositorySystemModule, new SpaceModule(space, BeanScanning.INDEX)));
     archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
     addArchetypeCatalogFactory(
         new ArchetypeCatalogFactory.InternalCatalogFactory(INTERNAL_CATALOG_ARCHETYPE_DATA_SOURCE));
