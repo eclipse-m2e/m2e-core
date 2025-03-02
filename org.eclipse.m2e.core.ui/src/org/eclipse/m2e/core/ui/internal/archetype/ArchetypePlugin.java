@@ -52,6 +52,8 @@ import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 
+import org.codehaus.plexus.logging.LogEnabled;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
@@ -62,6 +64,7 @@ import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 import org.apache.maven.archetype.source.InternalCatalogArchetypeDataSource;
 import org.apache.maven.archetype.source.LocalCatalogArchetypeDataSource;
 import org.apache.maven.archetype.source.RemoteCatalogArchetypeDataSource;
+import org.apache.maven.cli.logging.Slf4jLogger;
 
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -80,7 +83,12 @@ import org.eclipse.m2e.core.ui.internal.archetype.ArchetypeCatalogFactory.Remote
 @Component(service = ArchetypePlugin.class)
 public class ArchetypePlugin {
 
-  private static final InternalCatalogArchetypeDataSource INTERNAL_CATALOG_ARCHETYPE_DATA_SOURCE = new InternalCatalogArchetypeDataSource();
+  /**
+   * 
+   */
+  private static final RemoteCatalogArchetypeDataSource REMOTE_CATALOG = new RemoteCatalogArchetypeDataSource();
+
+  private static final InternalCatalogArchetypeDataSource INTERNAL_CATALOG = new InternalCatalogArchetypeDataSource();
 
   private static final LocalCatalogArchetypeDataSource LOCAL_CATALOG = new LocalCatalogArchetypeDataSource();
 
@@ -114,6 +122,10 @@ public class ArchetypePlugin {
         bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
       }
     };
+    Slf4jLogger logger = new Slf4jLogger(LoggerFactory.getILoggerFactory().getLogger("catalog"));
+    REMOTE_CATALOG.enableLogging(logger);
+    INTERNAL_CATALOG.enableLogging(logger);
+    LOCAL_CATALOG.enableLogging(logger);
     ClassSpace space = new BundleClassSpace(FrameworkUtil.getBundle(ArchetypeArtifactManager.class));
     final Module repositorySystemModule = new AbstractModule() {
       @Override
@@ -128,8 +140,11 @@ public class ArchetypePlugin {
     Injector injector = Guice.createInjector(
         new WireModule(logginModule, repositorySystemModule, new SpaceModule(space, BeanScanning.INDEX)));
     archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
+    if(archetypeArtifactManager instanceof LogEnabled le) {
+      le.enableLogging(logger);
+    }
     addArchetypeCatalogFactory(
-        new ArchetypeCatalogFactory.InternalCatalogFactory(INTERNAL_CATALOG_ARCHETYPE_DATA_SOURCE));
+        new ArchetypeCatalogFactory.InternalCatalogFactory(INTERNAL_CATALOG));
     addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory(maven, LOCAL_CATALOG));
     for(ArchetypeCatalogFactory archetypeCatalogFactory : ExtensionReader.readArchetypeExtensions(this)) {
       addArchetypeCatalogFactory(archetypeCatalogFactory);
@@ -153,7 +168,7 @@ public class ArchetypePlugin {
 
   public RemoteCatalogFactory newRemoteCatalogFactory(String url, String description, boolean editable,
       boolean enabled) {
-    return new RemoteCatalogFactory(url, description, editable, enabled, maven, new RemoteCatalogArchetypeDataSource());
+    return new RemoteCatalogFactory(url, description, editable, enabled, maven, REMOTE_CATALOG);
   }
 
   public ArchetypeGenerator getGenerator() {
