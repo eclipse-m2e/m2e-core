@@ -223,6 +223,7 @@
 								org.apache.commons.cli*, \
 								org.apache.commons.codec*;version="[1.21,2)",\
 								org.objectweb.asm,\
+								org.osgi.*,\
 							
 							Require-Bundle: \
 								com.google.guava;bundle-version="33.6"
