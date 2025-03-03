@@ -2,6 +2,8 @@
 
 ## 2.8.0
 
+* 📅 Release Date: 03rd March 2025
+
 ### Auto-Completion support for `bnd-maven-plugin` and `felix-bundle-plugin` with lemminx editor
 
 The bnd-maven and felix-bundle plugin provide a way to use
