@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.internal.launch;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -20,15 +21,15 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchesListener2;
 
+import org.codehaus.plexus.build.connect.TcpBuildConnection;
+import org.codehaus.plexus.build.connect.TcpBuildConnection.ServerConnection;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
 import org.eclipse.m2e.internal.launch.MavenRuntimeLaunchSupport.VMArguments;
-import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge;
 import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenBuildConnection;
 import org.eclipse.m2e.internal.maven.listener.M2EMavenBuildDataBridge.MavenProjectBuildData;
 
@@ -70,23 +71,50 @@ public class MavenBuildProjectDataConnection {
 
   static void openListenerConnection(ILaunch launch, VMArguments arguments) {
     try {
-      if(MavenLaunchUtils.getMavenRuntime(launch.getLaunchConfiguration()) instanceof MavenEmbeddedRuntime) {
-
-        Map<ArtifactKey, MavenProjectBuildData> projects = new ConcurrentHashMap<>();
-
-        MavenBuildConnection connection = M2EMavenBuildDataBridge.prepareConnection(
-            launch.getLaunchConfiguration().getName(),
-            d -> projects.put(new ArtifactKey(d.groupId, d.artifactId, d.version, null), d));
-
-        if(LAUNCH_PROJECT_DATA.putIfAbsent(launch, new MavenBuildConnectionData(projects, connection)) != null) {
-          connection.close();
-          throw new IllegalStateException(
-              "Maven bridge already created for launch of" + launch.getLaunchConfiguration().getName());
-        }
-        arguments.append(connection.getMavenVMArguments());
+//      if(MavenLaunchUtils.getMavenRuntime(launch.getLaunchConfiguration()) instanceof MavenEmbeddedRuntime) {
+//
+//        Map<ArtifactKey, MavenProjectBuildData> projects = new ConcurrentHashMap<>();
+//
+//        MavenBuildConnection connection = M2EMavenBuildDataBridge.prepareConnection(
+//            launch.getLaunchConfiguration().getName(),
+//            d -> projects.put(new ArtifactKey(d.groupId, d.artifactId, d.version, null), d));
+//
+//        if(LAUNCH_PROJECT_DATA.putIfAbsent(launch, new MavenBuildConnectionData(projects, connection)) != null) {
+//          connection.close();
+//          throw new IllegalStateException(
+//              "Maven bridge already created for launch of" + launch.getLaunchConfiguration().getName());
+//        }
+//
+//        arguments.append(connection.getMavenVMArguments());
+//      } else {
+      MavenRunState state = new MavenRunState();
+      ServerConnection con = TcpBuildConnection.createServer(msg -> {
+        System.out.println(msg);
+        return state.handleMessage(msg);
+      });
+      state.getProject(new ArtifactKey("test", "me", "0.0.1-SNAPSHOT", null)).thenAccept(rp -> rp.onStart(() -> {
+        System.out.println("project is started!!");
+      }));
+      File location = getJarLocation();
+      if(location != null) {
+        //TODO see bug https://issues.apache.org/jira/browse/MNG-8112
+        arguments.appendProperty("maven.ext.class.path", location.getAbsolutePath());
       }
-    } catch(CoreException | IOException ex) { // ignore
+      con.setupProcess(arguments::appendProperty);
+//      }
+    } catch(Exception ex) { // ignore
+      ex.printStackTrace();
     }
+  }
+
+  private static File getJarLocation() {
+    try {
+      return new File(TcpBuildConnection.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+    } catch(Exception e) {
+    }
+    //TODO better way to find it?!?
+    //Maybe just consume as a (wrapped) bundle as we only need it to start the server not on the maven classpath!
+    return null;
   }
 
   static MavenProjectBuildData getBuildProject(ILaunch launch, String groupId, String artifactId, String version) {
