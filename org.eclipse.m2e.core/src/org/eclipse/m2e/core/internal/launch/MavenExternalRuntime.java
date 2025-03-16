@@ -146,11 +146,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
       }
     };
 
-    Properties properties = new Properties();
-    copyProperties(properties, System.getProperties());
-    properties.put(PROPERTY_MAVEN_HOME, getLocation());
-
-    ConfigurationParser parser = new ConfigurationParser(handler, properties);
+    ConfigurationParser parser = new ConfigurationParser(handler, getConfigParserProperties());
 
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
       parser.parse(is);
@@ -261,12 +257,8 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
     VersionHandler handler = new VersionHandler();
 
-    Properties properties = new Properties();
-    copyProperties(properties, System.getProperties());
-    properties.put(PROPERTY_MAVEN_HOME, getLocation());
-
     try (FileInputStream is = new FileInputStream(getLauncherConfigurationFile())) {
-      new ConfigurationParser(handler, properties).parse(is);
+      new ConfigurationParser(handler, getConfigParserProperties()).parse(is);
     }
     if(handler.mavenCore != null) {
       return handler.mavenCore;
@@ -275,4 +267,13 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     }
     return null;
   }
+
+  private Properties getConfigParserProperties() {
+    Properties properties = new Properties();
+    copyProperties(properties, System.getProperties());
+    properties.put(PROPERTY_MAVEN_HOME, getLocation());
+    properties.put("maven.mainClass", "org.apache.maven.cling.MavenCling"); //required for maven 4
+    return properties;
+  }
+
 }
