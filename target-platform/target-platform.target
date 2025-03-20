@@ -4,7 +4,7 @@
 	<targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
 	<locations>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/eclipse/updates/4.34/"/>
+			<repository location="https://download.eclipse.org/eclipse/updates/4.35/R-4.35-202502280140"/>
 			<unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="0.0.0"/>
 			<unit id="org.eclipse.ui.tests.harness" version="0.0.0"/>
@@ -14,11 +14,11 @@
 			<unit id="jakarta.annotation-api" version="1.3.5"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2025-03/"/>
+			<repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2025-06/"/>
 			<unit id="org.jdom2" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/egit/updates-7.1/"/>
+			<repository location="https://download.eclipse.org/egit/updates-7.2"/>
 			<unit id="org.eclipse.jgit" version="0.0.0"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
@@ -54,7 +54,7 @@
 				<dependency>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
-					<version>1.5.17</version>
+					<version>1.5.18</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -76,13 +76,13 @@
 				<dependency>
 					<groupId>com.google.guava</groupId>
 					<artifactId>failureaccess</artifactId>
-					<version>1.0.2</version>
+					<version>1.0.3</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
-					<version>33.4.0-jre</version>
+					<version>33.4.5-jre</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -138,7 +138,7 @@
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-common</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.1</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -161,13 +161,13 @@ Import-Package:        org.jdom2*
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-descriptor</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
