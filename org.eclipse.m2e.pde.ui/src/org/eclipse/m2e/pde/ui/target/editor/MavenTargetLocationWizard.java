@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2023 Christoph Läubrich and others
+ * Copyright (c) 2018, 2025 Christoph Läubrich and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -41,6 +41,7 @@ import org.eclipse.m2e.pde.target.MavenTargetRepository;
 import org.eclipse.m2e.pde.target.MissingMetadataMode;
 import org.eclipse.m2e.pde.target.TemplateFeatureModel;
 import org.eclipse.m2e.pde.target.shared.DependencyDepth;
+import org.eclipse.m2e.pde.ui.target.editor.internal.TargetDependencyModel;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
@@ -86,6 +87,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
+		setNeedsProgressMonitor(true);
 		if (targetLocation != null) {
 			for (MavenTargetRepository mavenTargetRepository : targetLocation.getExtraRepositories()) {
 				repositoryList.add(mavenTargetRepository.copy());
@@ -105,7 +107,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				setControl(composite);
 				composite.setLayout(new GridLayout(2, false));
 				createRepositoryLink(composite);
-				dependencyEditor = new MavenTargetDependencyEditor(composite, targetLocation, selectedRoot);
+				TargetDependencyModel dependencyModel = new TargetDependencyModel(targetLocation, selectedRoot);
+				dependencyModel.setContext(getContainer());
+				dependencyEditor = new MavenTargetDependencyEditor(composite, dependencyModel);
 				dependencyEditor.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_14);
