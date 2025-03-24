@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.pde.core.plugin.IPluginBase;
@@ -40,21 +40,21 @@ import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
 import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.ui.IHelpContextIds;
 import org.eclipse.pde.internal.ui.PDEPlugin;
-import org.eclipse.pde.internal.ui.shared.CachedCheckboxTreeViewer;
+import org.eclipse.pde.internal.ui.shared.CachedCheckboxTableViewer;
 import org.eclipse.pde.internal.ui.wizards.ListUtil;
 import org.eclipse.pde.internal.ui.wizards.feature.BasePluginListPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 
 //derived from org.eclipse.pde.internal.ui.wizards.feature.PluginListPage
 @SuppressWarnings("restriction")
 public class PluginListPage extends BasePluginListPage {
 
-	class PluginContentProvider implements ITreeContentProvider {
+	class PluginContentProvider implements IStructuredContentProvider {
 		@Override
 		public Object[] getElements(Object parent) {
 			return getModels();
@@ -81,24 +81,9 @@ public class PluginListPage extends BasePluginListPage {
 				}
 			}
 		}
-
-		@Override
-		public Object[] getChildren(Object parentElement) {
-			return new Object[0];
-		}
-
-		@Override
-		public Object getParent(Object element) {
-			return null;
-		}
-
-		@Override
-		public boolean hasChildren(Object element) {
-			return false;
-		}
 	}
 
-	private CheckboxTreeViewer pluginViewer;
+	private CheckboxTableViewer pluginViewer;
 	private MavenTargetLocation targetLocation;
 	private Map<String, String> id2version = new HashMap<>();
 
@@ -118,34 +103,34 @@ public class PluginListPage extends BasePluginListPage {
 		container.setLayout(layout);
 		GridData gd;
 
-		treePart.createControl(container, 4, true);
-		pluginViewer = treePart.getTreeViewer();
+		tablePart.createControl(container, 4, true);
+		pluginViewer = tablePart.getTableViewer();
 		PluginContentProvider provider = new PluginContentProvider();
 		pluginViewer.setContentProvider(provider);
 		pluginViewer.setLabelProvider(PDEPlugin.getDefault().getLabelProvider());
 		pluginViewer.setComparator(ListUtil.PLUGIN_COMPARATOR);
-		gd = (GridData) treePart.getControl().getLayoutData();
+		gd = (GridData) tablePart.getControl().getLayoutData();
 		gd.horizontalIndent = 0;
 		gd.heightHint = 250;
 		gd.widthHint = 300;
 		pluginViewer.setInput(PDECore.getDefault().getModelManager());
-		treePart.setSelection(new Object[0]);
+		tablePart.setSelection(new Object[0]);
 		setControl(container);
 		Dialog.applyDialogFont(container);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(container, IHelpContextIds.NEW_FEATURE_REFERENCED_PLUGINS);
 		pluginViewer.addDoubleClickListener(event -> {
-			TreeItem firstTI = pluginViewer.getTree().getSelection()[0];
-			treePart.getTreeViewer().setChecked(firstTI.getData(), !firstTI.getChecked());
-			treePart.updateCounterLabel();
+			TableItem firstTI = pluginViewer.getTable().getSelection()[0];
+			tablePart.getTableViewer().setChecked(firstTI.getData(), !firstTI.getChecked());
+			tablePart.updateCounterLabel();
 		});
 		if (targetLocation != null) {
 			IFeature featureTemplate = targetLocation.getFeatureTemplate();
 			if (featureTemplate != null) {
 				Map<String, List<IFeaturePlugin>> map = Arrays.stream(featureTemplate.getPlugins())
 						.collect(Collectors.groupingBy(IFeaturePlugin::getId));
-				TreeItem[] items = pluginViewer.getTree().getItems();
-				CachedCheckboxTreeViewer treeViewer = treePart.getTreeViewer();
-				for (TreeItem item : items) {
+				TableItem[] items = pluginViewer.getTable().getItems();
+				CachedCheckboxTableViewer treeViewer = tablePart.getTableViewer();
+				for (TableItem item : items) {
 					IPluginModelBase model = (IPluginModelBase) item.getData();
 					String id = model.getPluginBase().getId();
 					List<IFeaturePlugin> list = map.getOrDefault(id, Collections.emptyList());
@@ -166,7 +151,7 @@ public class PluginListPage extends BasePluginListPage {
 	// org.eclipse.pde.internal.ui.wizards.feature.CreateFeatureProjectOperation.configureFeature(IFeature,
 	// WorkspaceFeatureModel)
 	public void update(IFeatureModel featureModel) throws CoreException {
-		Object[] selected = treePart.getTreeViewer().getCheckedLeafElements();
+		Object[] selected = tablePart.getTableViewer().getAllCheckedElements();
 		IFeaturePlugin[] added = new IFeaturePlugin[selected.length];
 		for (int i = 0; i < selected.length; i++) {
 			IPluginBase plugin = ((IPluginModelBase) selected[i]).getPluginBase();
