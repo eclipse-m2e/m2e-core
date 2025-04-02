@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Patrick Ziegler and others.
+ * Copyright (c) 2023, 2025 Patrick Ziegler and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.target.editor.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +27,15 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.m2e.pde.ui.target.editor.ClipboardParser;
+import org.eclipse.m2e.pde.ui.target.editor.Messages;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 
 /**
  * This class represents the data model used by the dependency editor. It keeps
@@ -67,6 +73,10 @@ public class TargetDependencyModel {
 	 * Each dependency must contain a valid group id, artifact id, version and type.
 	 */
 	private final IObservableValue<Boolean> hasErrors = new WritableValue<>();
+	/**
+	 * The context in which all long-running operations are executed in.
+	 */
+	private IRunnableContext context;
 
 	public TargetDependencyModel(MavenTargetLocation targetLocation, MavenTargetDependency selectedRoot) {
 		this.history = new OperationHistoryFacade(this);
@@ -215,27 +225,38 @@ public class TargetDependencyModel {
 		List<MavenTargetDependency> newTargetDependencies = new ArrayList<>(oldTargetDependencies);
 
 		try {
-			int updated = 0;
+			getContext().run(true, true, monitor -> {
+				int updated = 0;
 
-			for (MavenTargetDependency dependency : oldCurrentSelection) {
-				int index = oldTargetDependencies.indexOf(dependency);
-
-				MavenTargetDependency newDependency = targetLocation.update(dependency, null);
-
-				if (!dependency.matches(newDependency)) {
-					updated++;
+				SubMonitor subMonitor = SubMonitor.convert(monitor, oldCurrentSelection.size());
+				for (MavenTargetDependency dependency : oldCurrentSelection) {
+					int index = oldTargetDependencies.indexOf(dependency);
+		
+					subMonitor.subTask(Messages.bind(Messages.TargetDependencyModel_1, dependency.getKey()));
+					MavenTargetDependency newDependency;
+					try {
+						newDependency = targetLocation.update(dependency, subMonitor.split(1, SubMonitor.SUPPRESS_ALL_LABELS));
+					} catch (CoreException unwrapped) {
+						throw new InvocationTargetException(unwrapped);
+					}
+		
+					if (!dependency.matches(newDependency)) {
+						updated++;
+					}
+		
+					newTargetDependencies.set(index, newDependency);
+					newCurrentSelection.add(newDependency);
 				}
-
-				newTargetDependencies.set(index, newDependency);
-				newCurrentSelection.add(newDependency);
-			}
-
-			// An "empty" update should not show up on the command stack...
-			if (updated > 0) {
-				history.modelChange(newTargetDependencies, newCurrentSelection);
-			}
-		} catch (CoreException e) {
-			LOGGER.error(e.getMessage(), e);
+		
+				// An "empty" update should not show up on the command stack...
+				if (updated > 0) {
+					history.getRealm().asyncExec(() -> history.modelChange(newTargetDependencies, newCurrentSelection));
+				}
+			});
+		} catch (InvocationTargetException wrapped) {
+			LOGGER.error(wrapped.getMessage(), wrapped);
+		} catch (InterruptedException ignored) {
+			// operation cancelled by user
 		}
 	}
 
@@ -299,6 +320,21 @@ public class TargetDependencyModel {
 			downStream.accept(dependency.getType());
 		});
 		hasErrors.setValue(allFields.anyMatch(StringUtils::isBlank));
+	}
+
+	/**
+	 * Sets the UI context used for executing long-running operations such as
+	 * updating Maven dependencies. If {@code null} is passed as an argument, the
+	 * {@link IProgressService} is used.
+	 * 
+	 * @param context The UI context. May be {@code null}.
+	 */
+	public void setContext(IRunnableContext context) {
+		this.context = context;
+	}
+	
+	private IRunnableContext getContext() {
+		return context != null ? context : PlatformUI.getWorkbench().getProgressService();
 	}
 
 	private static List<MavenTargetDependency> deepClone(List<MavenTargetDependency> dependencies) {
