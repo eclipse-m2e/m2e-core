@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.jdt;singleton:=true
-Bundle-Version: 2.4.0.qualifier
+Bundle-Version: 2.4.1.qualifier
 Bundle-Localization: plugin
 Export-Package: org.eclipse.m2e.jdt,
  org.eclipse.m2e.jdt.internal;x-friends:="org.eclipse.m2e.jdt.ui",
