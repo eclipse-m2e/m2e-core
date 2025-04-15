@@ -25,6 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho.p2.baselineMode>warn</tycho.p2.baselineMode>
 		<scmConnectionRaw>scm:git:https://github.com/eclipse-m2e/m2e-core.git</scmConnectionRaw>
+		<compileLogDir>${project.build.directory}/compilelogs</compileLogDir>
 	</properties>
 
 	<organization>
@@ -154,6 +155,8 @@
 						<pattern>**/jars/jansi-*.jar</pattern>
 						<pattern>org/eclipse/m2e/core/internal/lifecyclemapping/model/**/*.java</pattern>
 					</ignoredPatterns>
+					<enhanceLogs>true</enhanceLogs>
+					<logDirectory>${compileLogDir}</logDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -233,7 +236,6 @@
 					<plugin>
 						<groupId>org.eclipse.tycho</groupId>
 						<artifactId>tycho-p2-plugin</artifactId>
-						<version>${tycho-version}</version>
 						<configuration>
 							<baselineMode>warn</baselineMode>
 						</configuration>
