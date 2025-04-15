@@ -169,6 +169,14 @@
 					<version>${tycho-version}</version>
 					<configuration>
 						<useJDK>${tycho.useJDK}</useJDK>
+						<log>xml</log>
+						<logDirectory>${compileLogDir}</logDirectory>
+						<showWarnings>true</showWarnings>
+						<showDeprecation>true</showDeprecation>
+						<compilerArgs>
+							<arg>-enableJavadoc</arg>
+							<arg>-verbose</arg>
+						</compilerArgs>
 					</configuration>
 				</plugin>
 				<plugin>
