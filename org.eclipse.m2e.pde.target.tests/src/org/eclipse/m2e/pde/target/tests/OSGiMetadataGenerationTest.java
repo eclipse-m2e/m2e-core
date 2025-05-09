@@ -33,6 +33,7 @@ import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.osgi.util.ManifestElement;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.TargetBundle;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
@@ -106,6 +107,7 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
+	@Ignore("see https://gitlab.eclipse.org/eclipsefdn/helpdesk/-/issues/5987")
 	public void testSourceWithSignature() throws Exception {
 		ITargetLocation target = resolveMavenTarget(
 				"""
