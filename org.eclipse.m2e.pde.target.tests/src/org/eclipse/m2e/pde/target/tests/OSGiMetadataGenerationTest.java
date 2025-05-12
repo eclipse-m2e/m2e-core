@@ -244,6 +244,29 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 	}
 
 	@Test
+	public void testNonOSGiArtifact_scopeTestIssue() throws Exception {
+		ITargetLocation target = resolveMavenTarget("""
+				<location includeDependencyDepth="infinite" includeDependencyScopes="compile,test,runtime" includeSource="true" missingManifest="generate" type="Maven" label="MavenDependencies">
+					<dependencies>
+					<dependency>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>poi</artifactId>
+						<version>4.1.2</version>
+						<type>jar</type>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>poi-ooxml</artifactId>
+						<version>4.1.2</version>
+						<type>jar</type>
+					</dependency>
+					</dependencies>
+				</location>
+				""");
+		assertStatusOk(getTargetStatus(target));
+	}
+
+	@Test
 	public void testNonOSGiArtifact_missingArtifactGenerate_defaultInstructions() throws Exception {
 		ITargetLocation target = resolveMavenTarget("""
 				<location includeDependencyDepth="none" includeSource="true" missingManifest="generate" type="Maven">
