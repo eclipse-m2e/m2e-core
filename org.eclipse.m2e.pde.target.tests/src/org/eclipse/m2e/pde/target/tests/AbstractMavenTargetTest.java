@@ -126,6 +126,9 @@ public abstract class AbstractMavenTargetTest {
 		if (key == null) {
 			return false;
 		}
+		if (key.groupId().equals("-")) {
+			return true;
+		}
 		URI location = getLocation.apply(unit);
 		String expectedPathSuffix = "/" + String.join("/", "repository", key.groupId().replace('.', '/'),
 				key.artifactId(), key.version(), key.artifactId() + "-" + key.version() + ".jar");
@@ -133,6 +136,10 @@ public abstract class AbstractMavenTargetTest {
 	}
 
 	// --- assertion utilities for Bundles in target ---
+
+	static ExpectedBundle bundle(String bsn, String version) {
+		return new ExpectedBundle(bsn, version, false, true, new ArtifactKey("-", bsn, version, ""));
+	}
 
 	static ExpectedBundle originalOSGiBundle(String bsn, String version, String groupArtifact) {
 		return originalOSGiBundle(bsn, version, groupArtifact, version);
