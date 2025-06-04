@@ -1,5 +1,11 @@
 # Eclipse m2e - Release notes
 
+## 2.9.0
+
+* 📅 Release Date: 05th June 2025
+
+Various minor bug-fixes, enhancements and dependency updates.
+
 ## 2.8.0
 
 * 📅 Release Date: 03rd March 2025
