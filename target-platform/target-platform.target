@@ -138,7 +138,7 @@
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-common</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.0</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -161,13 +161,13 @@ Import-Package:        org.jdom2*
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-descriptor</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
