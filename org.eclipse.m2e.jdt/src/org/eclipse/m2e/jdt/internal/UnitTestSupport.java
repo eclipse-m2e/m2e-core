@@ -281,7 +281,7 @@ public class UnitTestSupport {
       if(args.systemPropertyVariables() != null) {
         args.systemPropertyVariables().entrySet().stream() //
             .filter(e -> e.getKey() != null && e.getValue() != null)
-            .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + e.getValue()));
+            .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + escapeValue(e.getValue())));
       }
       copy.setAttribute(LAUNCH_CONFIG_VM_ARGUMENTS, launchArguments.toString());
 
@@ -304,6 +304,13 @@ public class UnitTestSupport {
       }
 
       copy.doSave();
+    }
+
+    private static String escapeValue(String raw) {
+      if(raw.contains(" ") || raw.contains("\t") || raw.contains("\r") || raw.contains("\n")) {
+        return "\"" + raw + "\"";
+      }
+      return raw;
     }
 
     private TestLaunchArguments getTestLaunchArguments(ILaunchConfiguration configuration, IMavenProjectFacade facade,
