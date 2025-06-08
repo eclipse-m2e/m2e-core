@@ -468,6 +468,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
             if(!allProcessedPoms.contains(newFacade.getPom())) {
               // facade from workspace state that has not been refreshed yet
               newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, context, monitor).get(pom);
+              if ( newFacade == null ) {
+                // https://github.com/eclipse-m2e/m2e-core/issues/1605
+                // projects that fail even minimal validation, e.g. unresolvable parent pom, cannot be read
+                continue;
+              }
             } else {
               // recreate facade instance to trigger project changed event
               // this is only necessary for facades that are refreshed because their dependencies changed
