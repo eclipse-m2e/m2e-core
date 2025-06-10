@@ -30,48 +30,48 @@ public class MavenImages {
   private static final Logger log = LoggerFactory.getLogger(MavenImages.class);
 
   // descriptors
-  public static final ImageDescriptor M2 = createDescriptor("m2.png"); //$NON-NLS-1$
+  public static final ImageDescriptor M2 = createDescriptor("m2.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor DEBUG = createDescriptor("debug.png"); //$NON-NLS-1$
+  public static final ImageDescriptor DEBUG = createDescriptor("debug.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor ADD_INDEX = createDescriptor("add_index.png"); //$NON-NLS-1$
+  public static final ImageDescriptor ADD_INDEX = createDescriptor("add_index.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor NEW_POM = createDescriptor("new_m2_pom.png"); //$NON-NLS-1$
+  public static final ImageDescriptor NEW_POM = createDescriptor("new_m2_pom.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor REFRESH = createDescriptor("refresh.png"); //$NON-NLS-1$
+  public static final ImageDescriptor REFRESH = createDescriptor("refresh.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor UPD_INDEX = createDescriptor("update_index.png"); //$NON-NLS-1$
+  public static final ImageDescriptor UPD_INDEX = createDescriptor("update_index.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor REBUILD_INDEX = createDescriptor("rebuild_index.png"); //$NON-NLS-1$
+  public static final ImageDescriptor REBUILD_INDEX = createDescriptor("rebuild_index.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor POM = createDescriptor("pom_obj.png"); //$NON-NLS-1$
+  public static final ImageDescriptor POM = createDescriptor("pom_obj.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor SHOW_CONSOLE_ERR = createDescriptor("stderr.png"); //$NON-NLS-1$
+  public static final ImageDescriptor SHOW_CONSOLE_ERR = createDescriptor("stderr.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor SHOW_CONSOLE_OUT = createDescriptor("stdout.png"); //$NON-NLS-1$
+  public static final ImageDescriptor SHOW_CONSOLE_OUT = createDescriptor("stdout.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor MAVEN_OVERLAY = createDescriptor("mlabel.png"); //$NON-NLS-1$
+  public static final ImageDescriptor MAVEN_OVERLAY = createDescriptor("mlabel.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor OUT_OF_DATE_OVERLAY = createDescriptor("dirty.png"); //$NON-NLS-1$
+  public static final ImageDescriptor OUT_OF_DATE_OVERLAY = createDescriptor("dirty.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor EXPANDALL = createDescriptor("expandall.png"); //$NON-NLS-1$
+  public static final ImageDescriptor EXPANDALL = createDescriptor("expandall.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor COLLAPSEALL = createDescriptor("collapseall.png"); //$NON-NLS-1$
+  public static final ImageDescriptor COLLAPSEALL = createDescriptor("collapseall.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor SUSPEND = createDescriptor("suspend.png"); //$NON-NLS-1$
+  public static final ImageDescriptor SUSPEND = createDescriptor("suspend.svg"); //$NON-NLS-1$
 
-  public static final ImageDescriptor CLEAR = createDescriptor("clear.png"); //$NON-NLS-1$
+  public static final ImageDescriptor CLEAR = createDescriptor("clear.svg"); //$NON-NLS-1$
 
   // object images
-  public static final String PATH_JAR = "jar_obj.png"; //$NON-NLS-1$
+  public static final String PATH_JAR = "jar_obj.svg"; //$NON-NLS-1$
 
-  public static final String PATH_PROJECT = "project_obj.png"; //$NON-NLS-1$
+  public static final String PATH_PROJECT = "project_obj.svg"; //$NON-NLS-1$
 
-  public static final String PATH_LOCK = "lock_ovr.png"; //$NON-NLS-1$
+  public static final String PATH_LOCK = "lock_ovr.svg"; //$NON-NLS-1$
 
-  public static final String PATH_VERSION = "jar_version.png"; //$NON-NLS-1$
+  public static final String PATH_VERSION = "jar_version.svg"; //$NON-NLS-1$
 
-  public static final String PATH_VERSION_SRC = "jar_src_version.png"; //$NON-NLS-1$
+  public static final String PATH_VERSION_SRC = "jar_src_version.svg"; //$NON-NLS-1$
 
   public static final Image IMG_JAR = createImage(PATH_JAR);
 
@@ -79,22 +79,22 @@ public class MavenImages {
 
   public static final Image IMG_VERSION_SRC = createImage(PATH_VERSION_SRC);
 
-  public static final Image IMG_LAUNCH_MAIN = createImage("main_tab.png"); //$NON-NLS-1$
+  public static final Image IMG_LAUNCH_MAIN = createImage("main_tab.svg"); //$NON-NLS-1$
 
-  public static final Image IMG_INDEX = createImage("maven_index.png"); //$NON-NLS-1$
+  public static final Image IMG_INDEX = createImage("maven_index.svg"); //$NON-NLS-1$
 
-  public static final Image IMG_INDEXES = createImage("maven_indexes.png"); //$NON-NLS-1$
+  public static final Image IMG_INDEXES = createImage("maven_indexes.svg"); //$NON-NLS-1$
 
-  public static final Image IMG_PASSED = createImage("passed.png"); //$NON-NLS-1$
+  public static final Image IMG_PASSED = createImage("passed.svg"); //$NON-NLS-1$
 
-  public static final Image IMG_INFO_AUTO = createImage("quick_fix_info_obj.png"); //$NON-NLS-1$
+  public static final Image IMG_INFO_AUTO = createImage("quick_fix_info_obj.svg"); //$NON-NLS-1$
 
   public static final Image IMG_POM = POM.createImage();
 
-  public static final Image IMG_ERROR = createImage("error_st_obj.png"); //$NON-NLS-1$
+  public static final Image IMG_ERROR = createImage("error_st_obj.svg"); //$NON-NLS-1$
 
   // wizard images
-  public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.png"); //$NON-NLS-1$
+  public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.svg"); //$NON-NLS-1$
 
   public static final ImageDescriptor WIZ_NEW_MAVEN_PROJECT = createDescriptor("banner_new_project.png"); //$NON-NLS-1$
 
