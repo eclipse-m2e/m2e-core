@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
@@ -185,6 +187,10 @@ public class MavenBundleWrapper {
 		Jar jar;
 		try {
 			jar = new Jar(originalFile);
+			// Workaround for https://github.com/bndtools/bnd/pull/6388
+			if (jar.getDirectories().getOrDefault("META-INF/services", Collections.emptyMap()) == null) {
+				jar.getDirectories().put("META-INF/services", new TreeMap<>());
+			}
 		} catch (IOException e) {
 			visited.put(node,
 					wrappedNode = new WrappedBundle(node, List.of(), null, null, null,
