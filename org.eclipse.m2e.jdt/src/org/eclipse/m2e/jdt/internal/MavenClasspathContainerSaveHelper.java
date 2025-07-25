@@ -183,12 +183,18 @@ public class MavenClasspathContainerSaveHelper {
 
     private final int kind;
 
+    private final boolean ignoreIfBetter;
+
     AccessRuleReplace(IAccessRule accessRule) {
       pattern = accessRule.getPattern();
       kind = accessRule.getKind();
+      ignoreIfBetter = accessRule.ignoreIfBetter();
     }
 
     IAccessRule getAccessRule() {
+      if(ignoreIfBetter) {
+        return JavaCore.newAccessRule(pattern, kind | IAccessRule.IGNORE_IF_BETTER);
+      }
       return JavaCore.newAccessRule(pattern, kind);
     }
   }
