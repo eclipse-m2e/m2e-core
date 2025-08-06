@@ -746,4 +746,15 @@
 			</enablement>
 	    </commonWizard>
 	 </extension>
+  <extension
+        point="org.eclipse.ui.trace.traceComponents">
+     <component
+           id="org.eclipse.m2e.core.ui.component1"
+           label="M2E Maven Integration for Eclipse">
+        <bundle
+              consumed="true"
+              name="org.eclipse.m2e.*">
+        </bundle>
+     </component>
+  </extension>
 </plugin>
