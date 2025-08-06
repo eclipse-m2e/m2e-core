@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Christoph Läubrich and others.
+ * Copyright (c) 2020, 2025 Christoph Läubrich and others.
  * This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLConstants;
@@ -40,6 +48,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.debug.DebugOptionsListener;
+import org.eclipse.osgi.service.debug.DebugTrace;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -50,18 +61,43 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
 @Component(service = URLStreamHandlerService.class, property = URLConstants.URL_HANDLER_PROTOCOL + "=mvn")
-public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
+public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService implements DebugOptionsListener {
 
-  @Reference
-  IMaven maven;
+  private static final String ID = "org.eclipse.m2e.core";
+
+  private static final String OPTION = "/mvnProtocolHandler";
+
+  private final IMaven maven;
+
+  private volatile DebugTrace debugTrace;
+
+  private final ServiceRegistration<DebugOptionsListener> serviceRegistration;
+
+  @Activate
+  public MvnProtocolHandlerService(@Reference IMaven maven, BundleContext bundleContext) {
+    this.maven = maven;
+    //We need to register this manually here to we are lazy as otherwise it would activate this component immediately 
+    Hashtable<String, Object> hashtable = new Hashtable<>();
+    hashtable.put(DebugOptions.LISTENER_SYMBOLICNAME, ID);
+    serviceRegistration = bundleContext.registerService(DebugOptionsListener.class, this, hashtable);
+  }
+
+  @Deactivate
+  void shutdown() {
+    serviceRegistration.unregister();
+  }
+  @Override
+  public void optionsChanged(DebugOptions options) {
+    if(options.getBooleanOption(ID + OPTION, false)) {
+      this.debugTrace = options.newDebugTrace(ID, MvnProtocolHandlerService.class);
+    } else {
+      this.debugTrace = null;
+    }
+  }
 
   @Override
   public URLConnection openConnection(URL url) {
-    //TODO replace reference with IMaven maven = MavenPlugin.getMaven();
-    //this is required to make the component active even if m2e itself is not running at the moment
-    //that will make the m2e protocol available from the start of eclipse
-    //See https://github.com/eclipse-equinox/equinox/pull/290
-    return new MavenURLConnection(url, maven);
+    return new MavenURLConnection(url, maven, debugTrace);
   }
 
   private static final class MavenURLConnection extends URLConnection {
@@ -70,11 +106,14 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
 
     private ArtifactResult artifactResult;
 
-    private IMaven maven;
+    private final IMaven maven;
 
-    protected MavenURLConnection(URL url, IMaven maven) {
+    private final DebugTrace debugTrace;
+
+    protected MavenURLConnection(URL url, IMaven maven, DebugTrace debugTrace) {
       super(url);
       this.maven = maven;
+      this.debugTrace = debugTrace;
     }
 
     @Override
@@ -85,6 +124,9 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       String path = url.getPath();
       if(path == null) {
         throw new IOException("maven coordinates are missing");
+      }
+      if(debugTrace != null) {
+        debugTrace.trace(OPTION, "connect to " + url);
       }
       int subPathIndex = path.indexOf('/');
 
@@ -104,8 +146,18 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       try {
         RepositorySystem repoSystem = maven.lookup(RepositorySystem.class);
         IMavenExecutionContext context = maven.createExecutionContext();
+        boolean isSnapshot = artifact.getBaseVersion().endsWith("-SNAPSHOT");
+        if(isSnapshot && !context.getExecutionRequest().isUpdateSnapshots()) {
+          //if a snapshot version is requested, always force an update!
+          context.getExecutionRequest().setUpdateSnapshots(true);
+        }
         List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
         List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
+        if(debugTrace != null) {
+          debugTrace.trace(OPTION, "Fetching artifact " + artifact + " using "
+              + remoteRepositories.stream().map(rp -> rp.getUrl()).collect(Collectors.joining(", "))
+              + " with update snapshots = " + context.getExecutionRequest().isUpdateSnapshots());
+        }
         artifactResult = context.execute(new ICallable<ArtifactResult>() {
 
           @Override
@@ -115,6 +167,9 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
             try {
               return repoSystem.resolveArtifact(session, artifactRequest);
             } catch(ArtifactResolutionException e) {
+              if(debugTrace != null) {
+                debugTrace.trace(OPTION, "resolving of artifact " + artifact + " failed!", e);
+              }
               throw new CoreException(Status.error("Resolving artifact failed", e));
             }
           }
@@ -132,17 +187,27 @@ public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
       }
       File location = artifactResult.getArtifact().getFile();
       if(subPath == null) {
+        if(debugTrace != null) {
+          debugTrace.trace(OPTION, "Open stream to artifact file " + location);
+        }
         return new FileInputStream(location);
       }
       String urlSpec = "jar:" + location.toURI() + "!" + subPath;
-      return new URL(urlSpec).openStream();
+      try {
+        if(debugTrace != null) {
+          debugTrace.trace(OPTION, "Open stream to subpath in artifact file " + urlSpec);
+        }
+        return new URI(urlSpec).toURL().openStream();
+      } catch(URISyntaxException ex) {
+        throw new IOException(ex);
+      }
     }
 
     @Override
     public long getLastModified() {
       try {
         connect();
-      } catch (IOException e) {
+      } catch(IOException e) {
         return 0;
       }
       if(artifactResult == null || artifactResult.isMissing()) {
