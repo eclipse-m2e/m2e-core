@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.Arrays;
 
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
@@ -167,7 +169,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     String executionEnvironmentId = getExecutionEnvironmentId(options);
     addJREClasspathContainer(classpath, executionEnvironmentId);
 
-    addMavenClasspathContainer(classpath);
+    addMavenClasspathContainer(javaProject, classpath);
 
     addCustomClasspathEntries(javaProject, classpath);
 
@@ -259,8 +261,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         environmentId);
     return null;
   }
-
-  protected void addMavenClasspathContainer(IClasspathDescriptor classpath) {
+  
+  protected void addMavenClasspathContainer(IJavaProject javaProject, IClasspathDescriptor classpath) {
     List<IClasspathEntryDescriptor> descriptors = classpath.getEntryDescriptors();
     List<IAccessRule> accessRules = new ArrayList<>();
     boolean isExported = false;
@@ -278,7 +280,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // ensure the external annotation path is kept
     IClasspathAttribute[] externalAnnotations = readExternalAnnotationAttributes(classpath,
         p -> MavenClasspathHelpers.MAVEN_CLASSPATH_CONTAINER_PATH.equals(p.getPath()));
-    IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry(externalAnnotations);
+    
+    // Add module attribute if project has module-info.java
+    IClasspathAttribute[] attributes = externalAnnotations;
+    if (ModuleSupport.getModuleInfo(javaProject, new NullProgressMonitor()) != null) {
+      attributes = Arrays.copyOf(externalAnnotations, externalAnnotations.length + 1);
+      attributes[externalAnnotations.length] = JavaCore.newClasspathAttribute(IClasspathAttribute.MODULE, "true");
+    }
+    
+    IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry(attributes);
 
     // add new entry without removing existing entries first, see bug398121
     IClasspathEntryDescriptor entryDescriptor = classpath.addEntry(cpe);
@@ -287,6 +297,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       entryDescriptor.addAccessRule(accessRule);
     }
   }
+
+
 
   private static IClasspathAttribute[] readExternalAnnotationAttributes(IClasspathDescriptor classpath,
       Predicate<IClasspathEntryDescriptor> annotationSourceEntry) {
