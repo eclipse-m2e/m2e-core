@@ -189,6 +189,16 @@ Export-Package:        org.apache.maven.*;-noimport:=true;provider=m2e;mandatory
 Import-Package:        !*
 ]]></instructions>
 		</location>
+		<location includeDependencyDepth="none" includeSource="true" label="Maven Resolver" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.maven.resolver</groupId>
+					<artifactId>maven-resolver-api</artifactId>
+					<version>1.9.20</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</location>
 		<location type="Target" uri="file:${project_loc:/m2e-core}/target-platform/m2e-runtimes.target"/>
 	</locations>
 </target>
