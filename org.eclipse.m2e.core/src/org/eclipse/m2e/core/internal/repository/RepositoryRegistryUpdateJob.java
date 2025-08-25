@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.internal.jobs.MavenJob;
 
@@ -50,6 +51,11 @@ public class RepositoryRegistryUpdateJob extends MavenJob implements IBackground
       registry.updateRegistry(monitor);
     } catch(CoreException ex) {
       return ex.getStatus();
+    } catch (IllegalStateException ex) {
+      // Ignore failures on shutdown https://github.com/eclipse-m2e/m2e-core/issues/2025
+      if (MavenPluginActivator.getDefault() != null) {
+        throw ex;
+      }
     }
     return Status.OK_STATUS;
   }
