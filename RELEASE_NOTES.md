@@ -6,7 +6,7 @@
 
 ### Embedded and use Maven 3.9.11
 
-Updated the embedded Maven from version 3.9.9 to 3.9.3.9.11; [Maven 3.9.3.9.11 Release Notes](https://maven.apache.org/docs/3.9.11/release-notes.html).
+Updated the embedded Maven from version 3.9.9 to 3.9.11; [Maven 3.9.11 Release Notes](https://maven.apache.org/docs/3.9.11/release-notes.html).
 
 ## 2.9.0
 
