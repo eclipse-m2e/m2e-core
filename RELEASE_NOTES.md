@@ -2,7 +2,7 @@
 
 ## 2.9.1
 
-* 📅 Release Date: _expected_ beginning of September 2025
+* 📅 Release Date: 02nd September 2025
 
 ### Embedded and use Maven 3.9.11
 
