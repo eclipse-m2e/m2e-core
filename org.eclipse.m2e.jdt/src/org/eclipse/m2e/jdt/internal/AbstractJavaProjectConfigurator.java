@@ -505,13 +505,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   /**
    * Adds multi-release source folders for executions that have multiReleaseOutput enabled.
-   * These folders are added with the appropriate Java version attribute for Eclipse JDT.
+   * These folders are configured to output to META-INF/versions/{version}/ for multi-release JARs.
    * 
    * @param classpath the classpath descriptor
    * @param project the Eclipse project
    * @param mavenProject the Maven project
    * @param executions the compiler plugin executions
-   * @param outputPath the output path for compiled classes
+   * @param outputPath the base output path for compiled classes
    * @param sourceEncoding the source encoding
    * @param monitor the progress monitor
    * @throws CoreException if an error occurs
@@ -537,7 +537,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
       
       // Sanitize the Java version
-      release = sanitizeJavaVersion(release);
+      String sanitizedRelease = sanitizeJavaVersion(release);
       
       // Get the compile source roots for this execution
       @SuppressWarnings("unchecked")
@@ -548,7 +548,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         continue;
       }
       
-      // Add each source folder with the appropriate version attribute
+      // For multi-release JARs, versioned classes go to META-INF/versions/{version}/
+      IPath versionedOutputPath = outputPath.append("META-INF").append("versions").append(release);
+      
+      // Add each source folder with the versioned output path
       for(String sourceRoot : compileSourceRoots) {
         IContainer sourceFolder = getFolder(project, sourceRoot);
         
@@ -569,15 +572,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         
         IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
         if(enclosing == null || getEntryDescriptor(classpath, sourceFolder.getFullPath()) != null) {
-          log.info("Adding multi-release source folder " + sourceFolder.getFullPath() + " for Java " + release);
+          log.info("Adding multi-release source folder " + sourceFolder.getFullPath() + " for Java " + release
+              + " with output " + versionedOutputPath);
           
-          // Create source entry with appropriate attributes for multi-release
-          IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
-              new IPath[0], new IPath[0], true /*generated*/);
+          // Create source entry with versioned output path for multi-release JAR
+          IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(),
+              versionedOutputPath, new IPath[0], new IPath[0], true /*generated*/);
           
-          // Set the Java version attribute for this source folder
-          // This tells Eclipse JDT that this source folder is specific to a Java version
-          descriptor.setClasspathAttribute("maven.compiler.release", release);
+          // Mark as optional to avoid errors if the folder doesn't exist yet
+          descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true");
+          
+          // Store the release version as an attribute for reference
+          descriptor.setClasspathAttribute("maven.compiler.release", sanitizedRelease);
         }
       }
     }

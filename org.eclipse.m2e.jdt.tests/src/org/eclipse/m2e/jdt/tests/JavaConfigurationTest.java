@@ -200,20 +200,35 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		assertTrue("Should contain src/main/java-11", srcEntryPaths.stream().anyMatch(p -> p.contains("src/main/java-11")));
 		assertTrue("Should contain src/main/java-17", srcEntryPaths.stream().anyMatch(p -> p.contains("src/main/java-17")));
 		
-		// Verify the Java 11 and 17 source folders have the appropriate release attribute
+		// Verify the Java 11 and 17 source folders have the appropriate output paths and attributes
 		for(IClasspathEntry entry : project.getRawClasspath()) {
-			if(entry.getPath().toString().contains("java-11")) {
-				String releaseAttr = Arrays.stream(entry.getExtraAttributes())
-						.filter(attr -> "maven.compiler.release".equals(attr.getName()))
-						.map(IClasspathAttribute::getValue)
-						.findFirst().orElse(null);
-				assertEquals("Java 11 source folder should have release 11", "11", releaseAttr);
-			} else if(entry.getPath().toString().contains("java-17")) {
-				String releaseAttr = Arrays.stream(entry.getExtraAttributes())
-						.filter(attr -> "maven.compiler.release".equals(attr.getName()))
-						.map(IClasspathAttribute::getValue)
-						.findFirst().orElse(null);
-				assertEquals("Java 17 source folder should have release 17", "17", releaseAttr);
+			if(entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+				String path = entry.getPath().toString();
+				if(path.contains("java-11")) {
+					// Check output path for Java 11 sources
+					IPath outputLocation = entry.getOutputLocation();
+					assertTrue("Java 11 source folder should output to META-INF/versions/11",
+							outputLocation != null && outputLocation.toString().contains("META-INF/versions/11"));
+					
+					// Check release attribute
+					String releaseAttr = Arrays.stream(entry.getExtraAttributes())
+							.filter(attr -> "maven.compiler.release".equals(attr.getName()))
+							.map(IClasspathAttribute::getValue)
+							.findFirst().orElse(null);
+					assertEquals("Java 11 source folder should have release 11", "11", releaseAttr);
+				} else if(path.contains("java-17")) {
+					// Check output path for Java 17 sources
+					IPath outputLocation = entry.getOutputLocation();
+					assertTrue("Java 17 source folder should output to META-INF/versions/17",
+							outputLocation != null && outputLocation.toString().contains("META-INF/versions/17"));
+					
+					// Check release attribute
+					String releaseAttr = Arrays.stream(entry.getExtraAttributes())
+							.filter(attr -> "maven.compiler.release".equals(attr.getName()))
+							.map(IClasspathAttribute::getValue)
+							.findFirst().orElse(null);
+					assertEquals("Java 17 source folder should have release 17", "17", releaseAttr);
+				}
 			}
 		}
 	}
