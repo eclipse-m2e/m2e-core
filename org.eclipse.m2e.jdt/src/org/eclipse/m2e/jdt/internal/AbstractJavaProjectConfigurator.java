@@ -397,6 +397,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getResources(), classes.getFullPath(),
           mainResourcesEncoding, mon.newChild(1), false);
 
+      // Handle multi-release JAR source folders
+      addMultiReleaseSourceFolders(classpath, project, mavenProject, executions, classes.getFullPath(), 
+          mainSourceEncoding, mon.newChild(1));
+
       //If the project properties contain m2e.disableTestClasspathFlag=true, then the test flag must not be set
       boolean addTestFlag = !MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
       if(isTestCompilationSkipped.isEmpty() || !isTestCompilationSkipped.stream().allMatch(Boolean.TRUE::equals)) {
@@ -497,6 +501,86 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
 
+  }
+
+  /**
+   * Adds multi-release source folders for executions that have multiReleaseOutput enabled.
+   * These folders are added with the appropriate Java version attribute for Eclipse JDT.
+   * 
+   * @param classpath the classpath descriptor
+   * @param project the Eclipse project
+   * @param mavenProject the Maven project
+   * @param executions the compiler plugin executions
+   * @param outputPath the output path for compiled classes
+   * @param sourceEncoding the source encoding
+   * @param monitor the progress monitor
+   * @throws CoreException if an error occurs
+   */
+  protected void addMultiReleaseSourceFolders(IClasspathDescriptor classpath, IProject project,
+      MavenProject mavenProject, List<MojoExecution> executions, IPath outputPath, String sourceEncoding,
+      IProgressMonitor monitor) throws CoreException {
+    
+    for(MojoExecution execution : executions) {
+      // Check if this execution has multiReleaseOutput enabled
+      Boolean multiReleaseOutput = maven.getMojoParameterValue(mavenProject, execution, "multiReleaseOutput",
+          Boolean.class, monitor);
+      
+      if(!Boolean.TRUE.equals(multiReleaseOutput)) {
+        continue;
+      }
+      
+      // Get the release version for this execution
+      String release = maven.getMojoParameterValue(mavenProject, execution, "release", String.class, monitor);
+      if(release == null) {
+        log.warn("Multi-release execution " + execution.getExecutionId() + " has no release version configured");
+        continue;
+      }
+      
+      // Sanitize the Java version
+      release = sanitizeJavaVersion(release);
+      
+      // Get the compile source roots for this execution
+      @SuppressWarnings("unchecked")
+      List<String> compileSourceRoots = maven.getMojoParameterValue(mavenProject, execution, "compileSourceRoots",
+          List.class, monitor);
+      
+      if(compileSourceRoots == null || compileSourceRoots.isEmpty()) {
+        continue;
+      }
+      
+      // Add each source folder with the appropriate version attribute
+      for(String sourceRoot : compileSourceRoots) {
+        IContainer sourceFolder = getFolder(project, sourceRoot);
+        
+        if(sourceFolder == null) {
+          continue;
+        }
+        
+        sourceFolder.refreshLocal(IResource.DEPTH_ZERO, monitor);
+        
+        if(sourceFolder.exists() && !sourceFolder.getProject().equals(project)) {
+          continue;
+        }
+        
+        // Set folder encoding
+        if(sourceFolder.exists() && !Objects.equals(sourceFolder.getDefaultCharset(false), sourceEncoding)) {
+          sourceFolder.setDefaultCharset(sourceEncoding, monitor);
+        }
+        
+        IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
+        if(enclosing == null || getEntryDescriptor(classpath, sourceFolder.getFullPath()) != null) {
+          log.info("Adding multi-release source folder " + sourceFolder.getFullPath() + " for Java " + release);
+          
+          // Create source entry with appropriate attributes for multi-release
+          IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
+              new IPath[0], new IPath[0], true /*generated*/);
+          
+          // Set the Java version attribute for this source folder
+          // This tells Eclipse JDT that this source folder is specific to a Java version
+          descriptor.setClasspathAttribute("maven.compiler.release", release);
+        }
+      }
+    }
   }
 
   private void cleanLinkedSourceDirs(IProject project, IProgressMonitor monitor) throws CoreException {

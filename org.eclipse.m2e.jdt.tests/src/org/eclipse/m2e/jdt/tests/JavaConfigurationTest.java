@@ -186,6 +186,38 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 				Set.copyOf(testEntryPaths));
 	}
 
+	@Test
+	public void testMultiReleaseJar() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/multirelease/pom.xml");
+		
+		// Check that all source folders are present
+		List<String> srcEntryPaths = Arrays.stream(project.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		
+		// Should have base Java 8 source folder plus Java 11 and Java 17 specific folders
+		assertTrue("Should contain src/main/java", srcEntryPaths.stream().anyMatch(p -> p.contains("src/main/java")));
+		assertTrue("Should contain src/main/java-11", srcEntryPaths.stream().anyMatch(p -> p.contains("src/main/java-11")));
+		assertTrue("Should contain src/main/java-17", srcEntryPaths.stream().anyMatch(p -> p.contains("src/main/java-17")));
+		
+		// Verify the Java 11 and 17 source folders have the appropriate release attribute
+		for(IClasspathEntry entry : project.getRawClasspath()) {
+			if(entry.getPath().toString().contains("java-11")) {
+				String releaseAttr = Arrays.stream(entry.getExtraAttributes())
+						.filter(attr -> "maven.compiler.release".equals(attr.getName()))
+						.map(IClasspathAttribute::getValue)
+						.findFirst().orElse(null);
+				assertEquals("Java 11 source folder should have release 11", "11", releaseAttr);
+			} else if(entry.getPath().toString().contains("java-17")) {
+				String releaseAttr = Arrays.stream(entry.getExtraAttributes())
+						.filter(attr -> "maven.compiler.release".equals(attr.getName()))
+						.map(IClasspathAttribute::getValue)
+						.findFirst().orElse(null);
+				assertEquals("Java 17 source folder should have release 17", "17", releaseAttr);
+			}
+		}
+	}
+
 	// --- utility methods ---
 
 	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()
