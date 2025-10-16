@@ -304,7 +304,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, Map<String, String> options,
       ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    SubMonitor mon = SubMonitor.convert(monitor, 6);
+    SubMonitor mon = SubMonitor.convert(monitor, 7);
     try {
       IProject project = request.mavenProjectFacade().getProject();
       MavenProject mavenProject = request.mavenProject();
