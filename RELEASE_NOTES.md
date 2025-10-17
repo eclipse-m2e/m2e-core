@@ -4,7 +4,7 @@
 
 * 📅 Release Date: TBD
 
-### Embedded and use Maven 4.0.0-rc-4
+### Embed and use Maven 4.0.0-rc-4
 
 Updated the embedded Maven from version 3.9.11 to 4.0.0-rc-4, the first Maven 4 release candidate.
 Maven 4 includes the maven-compat module for backward compatibility with Maven 3 APIs.
