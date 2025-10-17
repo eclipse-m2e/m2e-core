@@ -1,5 +1,22 @@
 # Eclipse m2e - Release notes
 
+## 2.10.0 (Planned)
+
+* 📅 Release Date: TBD
+
+### Embedded and use Maven 4.0.0-rc-4
+
+Updated the embedded Maven from version 3.9.11 to 4.0.0-rc-4, the first Maven 4 release candidate.
+Maven 4 includes the maven-compat module for backward compatibility with Maven 3 APIs.
+See [MAVEN4_UPGRADE_NOTES.md](MAVEN4_UPGRADE_NOTES.md) for detailed upgrade information.
+
+Key changes:
+- New Maven 4 API modules (maven-api-core, maven-api-model, etc.)
+- New maven-logging module replaces maven-slf4j-provider
+- Maven Resolver updated to version 2.0.9
+- New JDK-based HTTP transport (maven-resolver-transport-jdk)
+- Backward compatibility maintained through maven-compat module
+
 ## 2.9.1
 
 * 📅 Release Date: 02nd September 2025
