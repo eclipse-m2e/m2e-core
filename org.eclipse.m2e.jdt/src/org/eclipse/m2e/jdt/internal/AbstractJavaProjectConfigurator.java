@@ -638,6 +638,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     boolean enablePreviewFeatures = false;
 
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
+      String id = execution.getExecutionId();
+      if(!"default-compile".equals(id)) {
+        //Maven can have many but JDT only supports one config!
+        continue;
+      }
       release = getCompilerLevel(request.mavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
       source = getCompilerLevel(request.mavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
