@@ -35,6 +35,19 @@
              categoryId="org.eclipse.debug.ui.category.run"/>
   </extension>
 
+  <extension point="org.eclipse.ui.handlers">
+    <handler commandId="org.eclipse.m2e.core.pomFileAction.run"
+             class="org.eclipse.m2e.actions.MavenLaunchShortcutHandler"/>
+    <handler commandId="org.eclipse.m2e.actions.LifeCycleInstall.run"
+             class="org.eclipse.m2e.actions.MavenLaunchShortcutHandler:install"/>
+    <handler commandId="org.eclipse.m2e.actions.LifeCycleClean.run"
+             class="org.eclipse.m2e.actions.MavenLaunchShortcutHandler:clean"/>
+    <handler commandId="org.eclipse.m2e.actions.LifeCycleTest.run"
+             class="org.eclipse.m2e.actions.MavenLaunchShortcutHandler:test"/>
+    <handler commandId="org.eclipse.m2e.actions.LifeCycleGenerateSources.run"
+             class="org.eclipse.m2e.actions.MavenLaunchShortcutHandler:generate-sources"/>
+  </extension>
+
   <extension point="org.eclipse.ui.bindings">
     <key sequence="M3+M2+X M"
          contextId="org.eclipse.ui.contexts.window"
