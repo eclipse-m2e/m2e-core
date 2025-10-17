@@ -29,6 +29,9 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 
   private static final ILog ECLIPSE_LOG = Platform.getLog(EclipseLogAppender.class);
 
+  // ANSI escape code pattern: matches ESC followed by [ and various control sequences
+  private static final java.util.regex.Pattern ANSI_PATTERN = java.util.regex.Pattern.compile("\u001B\\[[;\\d]*m");
+
   @Override
   protected void append(ILoggingEvent logEvent) {
     int severity = switch(logEvent.getLevel().levelInt) {
@@ -38,7 +41,8 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
       default -> -1;
     };
     if(severity != -1) {
-      IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage().strip(), getThrowable(logEvent));
+      IStatus status = new Status(severity, BUNDLE_ID, removeAnsiCodes(logEvent.getFormattedMessage()).strip(),
+          getThrowable(logEvent));
       ECLIPSE_LOG.log(status);
     }
   }
@@ -49,5 +53,18 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
     }
     Object[] args = logEvent.getArgumentArray();
     return args != null && args.length > 0 && args[args.length - 1] instanceof Throwable throwable ? throwable : null;
+  }
+
+  /**
+   * Removes ANSI escape codes from the given string.
+   * 
+   * @param text the text that may contain ANSI codes
+   * @return the text with all ANSI codes removed, or null if input is null
+   */
+  private static String removeAnsiCodes(String text) {
+    if(text == null) {
+      return null;
+    }
+    return ANSI_PATTERN.matcher(text).replaceAll("");
   }
 }
