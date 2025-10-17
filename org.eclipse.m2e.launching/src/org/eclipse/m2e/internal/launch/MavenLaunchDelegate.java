@@ -307,8 +307,11 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       VersionRange versionRange = VersionRange.createFromVersionSpec(requiredVersion);
       // find all matching JVMs (sorted by version)
       List<IVMInstall> matchingJREs = getAllMatchingJREs(versionRange);
+      if(matchingJREs.isEmpty()) {
+        return null;
+      }
 
-      // for ranges with only lower bound or just a recommended version pick newest version having equal major version
+      // for ranges with only lower bound or just a recommended version:
       ArtifactVersion mainVersion;
       if(versionRange.getRecommendedVersion() != null) {
         mainVersion = versionRange.getRecommendedVersion();
@@ -319,11 +322,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         mainVersion = null;
       }
       if(mainVersion != null) {
-        return matchingJREs.stream()
-            .filter(jre -> getJREVersion(jre).getMajorVersion() == mainVersion.getMajorVersion()).findFirst()
-            .orElse(null);
+        // pick nearest major version
+        int nearestMajorVersion = getJREVersion(matchingJREs.getLast()).getMajorVersion();
+        // with highest minor/patch version
+        return matchingJREs.stream().filter(jre -> getJREVersion(jre).getMajorVersion() == nearestMajorVersion)
+            .findFirst().orElse(null);
       }
-      return !matchingJREs.isEmpty() ? matchingJREs.get(0) : null;
+      // otherwise use highest matching version
+      return matchingJREs.getFirst();
     } catch(InvalidVersionSpecificationException ex) {
       log.warn("Invalid version range", ex);
     }

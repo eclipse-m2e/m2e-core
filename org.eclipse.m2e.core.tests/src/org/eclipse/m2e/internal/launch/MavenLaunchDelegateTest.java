@@ -76,6 +76,13 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	}
 
 	@Test
+	public void testGetBestMatchingVM_versionRangeWithNoMajorVersionMatch() {
+		try (var mock = mockJavaRuntime()) {
+			assertEquals("13.0.5", MavenLaunchDelegate.getBestMatchingVM("[12,)").getId());
+		}
+	}
+
+	@Test
 	public void testRequiredJavaVersionFromEnforcerRule_Version() throws Exception {
 		IProject project = importProject("resources/projects/enforcerSettingsWithVersion/pom.xml");
 		assertRequiredJavaBuildVersion(project, "13.0.3", "13.0.5");
