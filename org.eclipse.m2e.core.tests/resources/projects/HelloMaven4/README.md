@@ -22,7 +22,7 @@ This project demonstrates the following Maven 4 features from [What's New in Mav
 
 ### 1. ✅ New Model Version 4.1.0
 - **Feature**: Maven 4 introduces a new POM model version `4.1.0`
-- **Usage**: All POMs use `xmlns="http://maven.apache.org/POM/4.1.0"` and the corresponding XSD
+- **Usage**: All POMs use `<modelVersion>4.1.0</modelVersion>` and `xmlns="http://maven.apache.org/POM/4.1.0"` namespace
 - **Location**: All `pom.xml` files
 - **Status**: Demonstrated
 
@@ -51,7 +51,7 @@ This project demonstrates the following Maven 4 features from [What's New in Mav
 
 ## Testing with Maven 4
 
-This project is designed to be built with **Maven 4.0.0-rc-2** or later.
+This project is designed to be built with **Maven 4.0.0-rc-2** or later (Preview release).
 
 To verify Maven 4 compatibility:
 ```bash
