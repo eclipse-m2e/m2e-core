@@ -15,8 +15,8 @@ package org.eclipse.m2e.internal.maven.compat;
 
 import java.io.File;
 
+import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.cli.internal.ExtensionResolutionException;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.codehaus.plexus.PlexusContainerException;
 
 /**

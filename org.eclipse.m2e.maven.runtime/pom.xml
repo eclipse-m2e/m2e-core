@@ -69,6 +69,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.sisu</groupId>
+			<artifactId>org.eclipse.sisu.inject</artifactId>
+			<version>0.9.0.M4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>5.1.0</version>
+			<classifier>classes</classifier>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.sisu</groupId>
 			<artifactId>org.eclipse.sisu.plexus</artifactId>
 		</dependency>
 		<dependency>
