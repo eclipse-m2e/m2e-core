@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>org.eclipse.m2e</groupId>
 			<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-			<version>3.9.1100-SNAPSHOT</version>
+			<version>4.0.004-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

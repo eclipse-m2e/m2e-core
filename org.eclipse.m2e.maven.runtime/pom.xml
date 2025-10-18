@@ -21,14 +21,16 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1100-SNAPSHOT</version>
+	<version>4.0.004-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.11</maven-core.version>
+		<maven-core.version>4.0.0-rc-4</maven-core.version>
+		<!-- Maven 4 uses resolver 2.0.9 -->
+		<resolver.version>2.0.9</resolver.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
@@ -77,22 +79,27 @@
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-impl</artifactId>
+			<version>${resolver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-connector-basic</artifactId>
+			<version>${resolver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-transport-wagon</artifactId>
+			<version>${resolver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
 			<artifactId>maven-resolver-transport-file</artifactId>
+			<version>${resolver.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
-			<artifactId>maven-resolver-transport-http</artifactId>
+			<artifactId>maven-resolver-transport-jdk</artifactId>
+			<version>${resolver.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
@@ -109,14 +116,14 @@
 			<artifactId>wagon-file</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.fusesource.jansi</groupId>
-			<artifactId>jansi</artifactId>
+			<groupId>org.jline</groupId>
+			<artifactId>jansi-core</artifactId>
 		</dependency>
 		<dependency>
 			<!-- SLF4J-binding only used by a launched Maven-runtime.
 				Keep the BND-instructions below in sync with this jar's name. -->
 			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-slf4j-provider</artifactId>
+			<artifactId>maven-logging</artifactId>
 		</dependency>
 		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
 		<dependency>
@@ -135,6 +142,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>failureaccess</artifactId>
+			<version>1.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -181,7 +189,7 @@
 							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding
 							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible
 							# for OSGi, by simply NOT placing the binding's jar on the Bundle-ClassPath.
-							slf4jBinding=maven-slf4j-provider-${maven-core.version}.jar
+							slf4jBinding=maven-logging-${maven-core.version}.jar
 							M2E-SLF4JBinding=jars/${slf4jBinding}
 							-includeresource: \
 								jars/=${jars.directory}/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
