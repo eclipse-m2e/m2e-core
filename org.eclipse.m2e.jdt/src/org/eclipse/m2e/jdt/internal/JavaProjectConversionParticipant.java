@@ -116,8 +116,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Map<String, String> options = javaProject.getOptions(true);
     String source = options.get(JavaCore.COMPILER_SOURCE);
     String target = options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM);
-    boolean emptySource = source == null || source.isEmpty();
-    boolean emptyTarget = target == null || target.isEmpty();
+    boolean emptySource = source == null || source.isBlank();
+    boolean emptyTarget = target == null || target.isBlank();
 
     if(emptySource && emptyTarget) {
       return;

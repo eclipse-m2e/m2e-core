@@ -26,6 +26,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputLocationTracker;
 import org.apache.maven.model.InputSource;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelProblem;

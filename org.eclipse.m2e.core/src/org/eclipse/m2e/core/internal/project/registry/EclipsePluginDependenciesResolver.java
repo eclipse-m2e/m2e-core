@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.eclipse.aether.RepositorySystemSession;
@@ -22,14 +23,27 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.DependencyResult;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 
 
 @Singleton
-public class EclipsePluginDependenciesResolver extends DefaultPluginDependenciesResolver {
+public class EclipsePluginDependenciesResolver implements PluginDependenciesResolver {
+
+  private DefaultPluginDependenciesResolver delegate;
+
+  /**
+   * FIXME move to compat layer, we only need EclipseWorkspaceArtifactRepository.setDisabled() be accessible from
+   * there..
+   */
+  @Inject
+  public EclipsePluginDependenciesResolver(DefaultPluginDependenciesResolver delegate) {
+    this.delegate = delegate;
+  }
 
   /*
    * Plugin realms are cached and there is currently no way to purge cached
@@ -44,7 +58,7 @@ public class EclipsePluginDependenciesResolver extends DefaultPluginDependencies
   public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
       throws PluginResolutionException {
     try (var d = EclipseWorkspaceArtifactRepository.setDisabled()) {
-      return super.resolve(plugin, repositories, session);
+      return delegate.resolve(plugin, repositories, session);
     }
   }
 
@@ -52,8 +66,15 @@ public class EclipsePluginDependenciesResolver extends DefaultPluginDependencies
   public DependencyNode resolve(Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
       List<RemoteRepository> repositories, RepositorySystemSession session) throws PluginResolutionException {
     try (var d = EclipseWorkspaceArtifactRepository.setDisabled()) {
-      return super.resolve(plugin, pluginArtifact, dependencyFilter, repositories, session);
+      return delegate.resolve(plugin, pluginArtifact, dependencyFilter, repositories, session);
     }
+  }
+
+  @Override
+  public DependencyResult resolvePlugin(Plugin plugin, Artifact artifact, DependencyFilter dependencyFilter,
+      List<RemoteRepository> remotePluginRepositories, RepositorySystemSession repositorySession)
+      throws PluginResolutionException {
+    return delegate.resolvePlugin(plugin, artifact, dependencyFilter, remotePluginRepositories, repositorySession);
   }
 
 }
