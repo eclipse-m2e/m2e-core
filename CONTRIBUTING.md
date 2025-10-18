@@ -115,7 +115,7 @@ m2e tries to use OSGi Semantic Version (to properly expose its API contracts and
 
 The delta for version bumps are:
 
-* `+0.0.1` (next micro) for a bugfix, or an internal change that doesn't surface to APIs
+* `+0.0.100` (next micro) for a bugfix, or an internal change that doesn't surface to APIs (we increment by 100 in order to allow maintanance release to increase by just 1, if they are necessary at some time)
 * `+0.1.0` (next minor) for an API addition
 * `+1.0.0` (next major) for an API breakage (needs to be discussed on the mailing-list first)
 * If some "smaller" bump already took place, you can replace it with your "bigger one". Eg, if last release has org.eclipse.m2e.editor 1.16.1; and someone already bumped version to 1.16.2 (for an internal change) and you're adding a new API, then you need to change version to 1.17.0

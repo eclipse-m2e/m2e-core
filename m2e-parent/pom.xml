@@ -121,6 +121,7 @@
 								<ignore>jars/*.jar</ignore>
 								<ignore>Eclipse-SourceReferences</ignore>
 							</ignores>
+							<increment>100</increment>
 							<extensions>true</extensions>
 						</configuration>
 					</execution>
