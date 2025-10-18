@@ -203,6 +203,11 @@
 					</dependencies>
 				</plugin>
 				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-versions-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>3.8.1</version>

@@ -2,7 +2,7 @@ name: Publish Version Check Results
 
 on:
   workflow_run:
-    workflows: [ 'Build M2Eclipse' ]
+    workflows: [ 'Pull-Request Checks' ]
     types: [ completed ]
 
 jobs:
