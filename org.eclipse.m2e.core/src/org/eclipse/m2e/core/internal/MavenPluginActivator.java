@@ -32,8 +32,6 @@ import org.eclipse.core.runtime.Plugin;
 
 import org.codehaus.plexus.PlexusContainer;
 
-import org.apache.maven.project.DefaultProjectBuilder;
-
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -101,7 +99,8 @@ public class MavenPluginActivator extends Plugin {
     }
 
     // Workaround MNG-6530
-    System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
+    //TODO is this still working for maven4?
+    System.setProperty("maven.defaultProjectBuilder.disableGlobalModelCache", Boolean.toString(true));
     URLConnectionCaches.disable();
     // For static access, this also enables any of the services and keep them running forever...
     this.bundleContext = context;

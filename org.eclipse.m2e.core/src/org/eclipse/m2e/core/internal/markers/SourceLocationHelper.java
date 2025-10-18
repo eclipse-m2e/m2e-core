@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IPath;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelProblem;
@@ -124,7 +125,12 @@ public class SourceLocationHelper {
 
     // Plugin/execution is specified in some parent pom
     SourceLocation causeLocation = getSourceLocation(inputLocation, elementName);
-    inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
+    Parent mavenParent = mavenProject.getModel().getParent();
+    if(mavenParent == null) {
+      // parent location cannot be determined for participant-added parents
+      return new SourceLocation(1, 1, 1, causeLocation);
+    }
+    inputLocation = mavenParent.getLocation(SELF);
     if(inputLocation == null) {
       // parent location cannot be determined for participant-added parents
       return new SourceLocation(1, 1, 1, causeLocation);

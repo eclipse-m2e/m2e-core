@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.core.ui;singleton:=true
-Bundle-Version: 2.4.101.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
@@ -28,11 +28,11 @@ Export-Package: org.eclipse.m2e.core.ui.internal;x-friends:="org.eclipse.m2e.edi
  org.eclipse.m2e.core.ui.internal.wizards;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.scm"
 Bundle-Activator: org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[3,4)",
  org.eclipse.core.resources;bundle-version="3.5.2",
  org.eclipse.core.runtime;bundle-version="3.5.0",
- org.eclipse.m2e.model.edit;bundle-version="[2.0.0,3.0.0)";visibility:=reexport,
- org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
+ org.eclipse.m2e.model.edit;bundle-version="[3,4)";visibility:=reexport,
+ org.eclipse.m2e.maven.runtime;bundle-version="[3.9,5)",
  org.eclipse.ui.console;bundle-version="3.4.0",
  org.eclipse.ui.ide;bundle-version="3.18.0",
  org.eclipse.core.filesystem;bundle-version="1.2.1",

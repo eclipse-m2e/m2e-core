@@ -48,6 +48,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
+import org.codehaus.plexus.util.StringUtils;
+
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
 
