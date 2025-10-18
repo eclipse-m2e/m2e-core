@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Maven 4 Subproject - demonstrates inheritance of groupId and version
+    
+    Note: In Maven 4, child projects can omit groupId and version
+    when they inherit from parent, making the POM cleaner
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+
+    <parent>
+        <groupId>org.eclipse.m2e.tests.demo</groupId>
+        <artifactId>hello-maven4-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>hello-core</artifactId>
+    
+    <name>Hello Maven 4 Core</name>
+    <description>Core library module demonstrating Maven 4 features</description>
+</project>

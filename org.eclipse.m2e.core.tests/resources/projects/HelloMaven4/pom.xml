@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Maven 4 Test Project for m2e
+    
+    This project demonstrates Maven 4 features including:
+    - Model version 4.1.0
+    - Subprojects instead of modules
+    - Inheritance of groupId and version from parent
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+
+    <groupId>org.eclipse.m2e.tests.demo</groupId>
+    <artifactId>hello-maven4-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    <name>Hello Maven 4 Parent</name>
+    <description>A simple Maven 4 demo project for testing m2e support</description>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
+    </properties>
+    
+    <subprojects>
+        <subproject>hello-core</subproject>
+        <subproject>hello-app</subproject>
+    </subprojects>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
