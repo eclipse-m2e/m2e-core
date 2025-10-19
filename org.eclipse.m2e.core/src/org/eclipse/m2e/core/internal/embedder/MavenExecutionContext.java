@@ -78,6 +78,8 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.internal.maven.compat.ReadonlyMavenExecutionRequest;
+
 
 
 /**

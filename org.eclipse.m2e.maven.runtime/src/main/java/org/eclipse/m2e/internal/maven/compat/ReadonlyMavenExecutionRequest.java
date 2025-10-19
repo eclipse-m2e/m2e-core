@@ -11,7 +11,7 @@
  *      Igor Fedorenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.embedder;
+package org.eclipse.m2e.internal.maven.compat;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -21,10 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.eclipse.aether.RepositoryCache;
-import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.transfer.TransferListener;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -36,6 +32,9 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.toolchain.model.ToolchainModel;
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.transfer.TransferListener;
 
 
 /**
@@ -43,7 +42,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
  *
  * @since 1.4
  */
-class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
+public class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
 
   private final MavenExecutionRequest request;
 
@@ -537,8 +536,8 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
   /**
    * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
    */
-//  @Override
-  @Deprecated(since = "to maintain compatibility with Maven 3.8")
+	@Override
+	@Deprecated()
   public boolean isIgnoreTransitiveRepositories() {
     if(IS_IGNORE_TRANSITIVE_REPOSITORIES != null) {
       try {
@@ -551,7 +550,8 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
   }
 
 //  @Override
-  public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
+  @Override
+public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
     throw new IllegalStateException();
   }
 

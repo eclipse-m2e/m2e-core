@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1100-SNAPSHOT</version>
+	<version>3.9.1101-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -189,6 +189,7 @@
 							-exportcontents: \
 								META-INF.plexus;-noimport:=true;x-internal:=true,\
 								META-INF.sisu;-noimport:=true;x-internal:=true,\
+								org.eclipse.m2e.internal.maven.compat;x-friends:="org.eclipse.m2e.core",\
 								org.eclipse.m2e.internal.maven.listener;x-friends:="org.eclipse.m2e.launching",\
 								org.apache.maven.*;provider=m2e;mandatory:=provider,\
 								org.codehaus.plexus.*;provider=m2e;mandatory:=provider,\
