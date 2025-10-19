@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.IPath;
 
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
-import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
@@ -169,7 +168,7 @@ public class MavenProperties {
     if(rev != null || timestamp != null) {
       msg += " (";
       msg += (rev != null ? rev : "");
-      if(StringUtils.isNotBlank(timestamp)) {
+      if(timestamp != null && !timestamp.isBlank()) {
         String ts = formatTimestamp(Long.parseLong(timestamp));
         msg += (rev != null ? "; " : "") + ts;
       }
