@@ -27,6 +27,9 @@ public class LifecycleExecutionPlanCalculatorFacade {
   private final LifecycleExecutionPlanCalculator delegate;
 
   public LifecycleExecutionPlanCalculatorFacade(LifecycleExecutionPlanCalculator delegate) {
+    if(delegate == null) {
+      throw new IllegalArgumentException("delegate cannot be null");
+    }
     this.delegate = delegate;
   }
 
