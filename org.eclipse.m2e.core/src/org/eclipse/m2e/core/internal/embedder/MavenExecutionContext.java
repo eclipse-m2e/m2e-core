@@ -60,6 +60,7 @@ import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -395,7 +396,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     MojoExecution clone = cloneMojoExecution(execution);
     try {
       MavenProject currentProject = session.getCurrentProject();
-      LifecycleExecutionPlanCalculator executionPlanCalculator = lookup.lookup(LifecycleExecutionPlanCalculator.class);
+      LifecycleExecutionPlanCalculatorFacade executionPlanCalculator = new LifecycleExecutionPlanCalculatorFacade(
+          lookup.lookup(LifecycleExecutionPlanCalculator.class));
       executionPlanCalculator.setupMojoExecution(session, currentProject, clone);
       MojoExecutor mojoExecutor = lookup.lookup(MojoExecutor.class);
       DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session, List.of(clone));

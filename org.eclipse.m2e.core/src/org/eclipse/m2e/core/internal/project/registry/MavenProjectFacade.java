@@ -47,6 +47,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
@@ -541,8 +542,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
     clone.setLifecyclePhase(mojoExecution.getLifecyclePhase());
     createExecutionContext().execute(mavenProject, (ctx, mon) -> {
-      LifecycleExecutionPlanCalculator executionPlanCalculator = ctx.getComponentLookup()
-          .lookup(LifecycleExecutionPlanCalculator.class);
+      LifecycleExecutionPlanCalculatorFacade executionPlanCalculator = new LifecycleExecutionPlanCalculatorFacade(
+          ctx.getComponentLookup().lookup(LifecycleExecutionPlanCalculator.class));
       try {
         executionPlanCalculator.setupMojoExecution(ctx.getSession(), mavenProject, clone);
       } catch(Exception ex) {

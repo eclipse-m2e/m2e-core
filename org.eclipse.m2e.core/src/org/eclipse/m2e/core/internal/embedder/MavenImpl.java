@@ -85,6 +85,7 @@ import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.ConfigurationContainer;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
@@ -238,7 +239,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       clone.setConfiguration(new Xpp3Dom(execution.getConfiguration()));
     }
     clone.setLifecyclePhase(execution.getLifecyclePhase());
-    LifecycleExecutionPlanCalculator executionPlanCalculator = lookup(LifecycleExecutionPlanCalculator.class);
+    LifecycleExecutionPlanCalculatorFacade executionPlanCalculator = new LifecycleExecutionPlanCalculatorFacade(
+        lookup(LifecycleExecutionPlanCalculator.class));
     try {
       executionPlanCalculator.setupMojoExecution(session, project, clone);
     } catch(Exception ex) {
