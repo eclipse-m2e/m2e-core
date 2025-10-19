@@ -50,7 +50,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -264,11 +263,9 @@ public class ProfileManager implements IProfileManager {
       return null;
     }
 
-    String relativePath;
-    if(StringUtils.isEmpty(model.getParent().getRelativePath())) {
+    String relativePath = model.getParent().getRelativePath();
+    if(relativePath == null || relativePath.isEmpty()) {
       relativePath = ".." + File.separator + "pom.xml";
-    } else {
-      relativePath = model.getParent().getRelativePath();
     }
     String relativeFileSystemPathToParentPom = ".." + File.separator + relativePath;
 

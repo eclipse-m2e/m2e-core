@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -266,7 +265,7 @@ public class TargetDependencyModel {
 			downStream.accept(dependency.getVersion());
 		});
 
-		return allFields.noneMatch(StringUtils::isBlank) && !currentSelection.isEmpty();
+		return allFields.noneMatch(s -> s == null || s.isBlank()) && !currentSelection.isEmpty();
 	}
 
 	public boolean hasErrors() {
@@ -298,7 +297,7 @@ public class TargetDependencyModel {
 			downStream.accept(dependency.getVersion());
 			downStream.accept(dependency.getType());
 		});
-		hasErrors.setValue(allFields.anyMatch(StringUtils::isBlank));
+		hasErrors.setValue(allFields.anyMatch(s -> s == null || s.isBlank()));
 	}
 
 	private static List<MavenTargetDependency> deepClone(List<MavenTargetDependency> dependencies) {

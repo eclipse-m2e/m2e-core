@@ -13,8 +13,6 @@
 
 package org.eclipse.m2e.jdt.internal;
 
-import static org.apache.maven.shared.utils.StringUtils.isEmpty;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -118,8 +116,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Map<String, String> options = javaProject.getOptions(true);
     String source = options.get(JavaCore.COMPILER_SOURCE);
     String target = options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM);
-    boolean emptySource = isEmpty(source);
-    boolean emptyTarget = isEmpty(target);
+    boolean emptySource = source == null || source.isEmpty();
+    boolean emptyTarget = target == null || target.isEmpty();
 
     if(emptySource && emptyTarget) {
       return;
