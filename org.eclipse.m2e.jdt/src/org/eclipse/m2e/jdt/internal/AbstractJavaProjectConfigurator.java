@@ -83,7 +83,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   /**
      * 
      */
-    private static final String MULTI_RELEASE_OUTPUT = "multiReleaseOutput";
+  private static final String MULTI_RELEASE_OUTPUT = "multiReleaseOutput";
 
   private static final IPath[] DEFAULT_INCLUSIONS = new IPath[0];
 
@@ -1005,11 +1005,73 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
       String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
       IFolder folder = project.getFolder(linkName);
-      folder.createLink(folderPath.toUri(), IResource.REPLACE, null);
+      createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
       return folder;
     }
     return project.getFolder(relativePath);
+  }
+
+  /**
+   * Creates a linked resource with retry logic to handle intermittent failures on Windows. The parent resource may not
+   * be accessible immediately after project creation.
+   * 
+   * @param folder the folder to create the link for
+   * @param target the target URI for the link
+   * @throws CoreException if all retry attempts fail
+   */
+  private void createLinkWithRetry(IFolder folder, java.net.URI target) throws CoreException {
+    int maxAttempts = 10;
+    long initialDelay = 100; // milliseconds
+
+    for(int attempt = 1; attempt <= maxAttempts; attempt++ ) {
+      try {
+        // Ensure the parent project is accessible before attempting to create the link
+        IProject project = folder.getProject();
+        if(project != null && !project.isAccessible()) {
+          if(attempt < maxAttempts) {
+            log.debug("Project {} is not accessible, waiting before retry...", project.getName());
+            sleepWithExponentialBackoff(initialDelay, attempt, folder.getFullPath().toString());
+            continue;
+          }
+        }
+
+        folder.createLink(target, IResource.REPLACE, null);
+        if(attempt > 1) {
+          log.info("Successfully created linked resource for {} after {} attempts", folder.getFullPath(), attempt);
+        }
+        return; // Success
+      } catch(CoreException e) {
+        // Check if this is the specific error we want to retry
+        if(attempt < maxAttempts) {
+          log.warn("Failed to create linked resource for {} (attempt {}/{}): {}. Retrying...", folder.getFullPath(),
+              attempt, maxAttempts, e.getMessage());
+          sleepWithExponentialBackoff(initialDelay, attempt, folder.getFullPath().toString());
+        } else {
+          throw e;
+        }
+      }
+    }
+  }
+
+  /**
+   * Sleeps for a duration calculated using exponential backoff.
+   * 
+   * @param initialDelay the initial delay in milliseconds
+   * @param attempt the current attempt number (1-based)
+   * @param context context information for error messages
+   * @throws CoreException if interrupted during sleep
+   */
+  private void sleepWithExponentialBackoff(long initialDelay, int attempt, String context) throws CoreException {
+    long delay = initialDelay * (1L << (attempt - 1)); // exponential backoff: initialDelay * 2^(attempt-1)
+    try {
+      Thread.sleep(delay);
+    } catch(InterruptedException ie) {
+      Thread.currentThread().interrupt();
+      throw new CoreException(org.eclipse.core.runtime.Status.error(
+          "Interrupted while waiting for project resource to become accessible during linked resource creation for "
+              + context));
+    }
   }
 
   private static IPath getProjectRelativePath(IProject project, Path absolutePath) {
