@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.codehaus.plexus.PlexusContainer;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
+import org.eclipse.m2e.internal.maven.compat.PlexusContainerFacade;
 
 
 /**
@@ -24,9 +25,9 @@ import org.eclipse.m2e.core.embedder.IComponentLookup;
  */
 public interface IMavenPlexusContainer {
 
-  static final String MVN_FOLDER = ".mvn";
+  static final String MVN_FOLDER = PlexusContainerFacade.MVN_FOLDER;
 
-  static final String EXTENSIONS_FILENAME = MVN_FOLDER + "/extensions.xml";
+  static final String EXTENSIONS_FILENAME = PlexusContainerFacade.EXTENSIONS_FILENAME;
 
   /**
    * Maven allows to use a magic {@value #MVN_FOLDER} folder where one can configure several aspects of the maven run
