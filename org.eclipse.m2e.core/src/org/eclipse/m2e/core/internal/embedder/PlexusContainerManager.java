@@ -15,11 +15,8 @@
 package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,21 +53,17 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
 
-import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
 import org.apache.maven.cli.internal.ExtensionResolutionException;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
-import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.session.scope.internal.SessionScopeModule;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.internal.maven.compat.ExtensionResolutionExceptionFacade;
+import org.eclipse.m2e.internal.maven.compat.PlexusContainerFacade;
 
 
 /**
@@ -81,8 +74,6 @@ import org.eclipse.m2e.internal.maven.compat.ExtensionResolutionExceptionFacade;
 @Component(service = PlexusContainerManager.class)
 public class PlexusContainerManager {
   private static final ILog LOG = Platform.getLog(PlexusContainerManager.class);
-
-  private static final String CONTAINER_CONFIGURATION_NAME = "maven";
 
   private static final String MAVEN_EXTENSION_REALM_PREFIX = "maven.ext.";
 
@@ -180,8 +171,7 @@ public class PlexusContainerManager {
           containerMap.put(canonicalDirectory, plexusContainer);
         } catch(ExtensionResolutionException e) {
           //TODO how can we create an error marker on the extension file?
-          File file = new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME);
-          new ExtensionResolutionExceptionFacade(e).throwForFile(file);
+          ExtensionResolutionExceptionFacade.throwForFile(e, new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME));
         }
       }
       return plexusContainer;
@@ -215,15 +205,27 @@ public class PlexusContainerManager {
         multiModuleProjectDirectory);
     ClassRealm coreRealm = classWorld.getRealm(PLEXUS_CORE_REALM);
     CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom(coreRealm);
-
-    List<CoreExtensionEntry> extensions = loadCoreExtensions(coreRealm, coreEntry, multiModuleProjectDirectory,
-        loggerManager, mavenConfiguration);
+    List<CoreExtensionEntry> extensions = PlexusContainerFacade.loadCoreExtensions(coreRealm, coreEntry,
+        multiModuleProjectDirectory, loggerManager, container -> {
+          Optional<MavenProperties> mavenProperties = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+          IMavenConfiguration workspaceConfiguration = IMavenConfiguration.getWorkspaceConfiguration();
+          MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
+              wrap(container), mavenProperties.map(mavenCfg -> mavenCfg.getSettingsLocations(workspaceConfiguration))
+                  .orElseGet(workspaceConfiguration::getSettingsLocations),
+              multiModuleProjectDirectory);
+          container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
+          request.setBaseDirectory(multiModuleProjectDirectory);
+          request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
+          Properties userProperties = request.getUserProperties();
+          mavenProperties.ifPresent(prop -> prop.getCliProperties(userProperties::setProperty));
+          return request;
+        });
     List<File> extClassPath = List.of(); //TODO should we allow to set an ext-class path for m2e?
     ClassRealm containerRealm = setupContainerRealm(coreRealm, extClassPath, extensions);
 
     ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(classWorld).setRealm(containerRealm)
         .setClassPathScanning(PlexusConstants.SCANNING_INDEX).setAutoWiring(true).setJSR250Lifecycle(true)
-        .setName(CONTAINER_CONFIGURATION_NAME);
+        .setName(PlexusContainerFacade.CONTAINER_CONFIGURATION_NAME);
 
     Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
     Set<String> exportedPackages = new HashSet<>(coreEntry.getExportedPackages());
@@ -241,6 +243,7 @@ public class PlexusContainerManager {
         bind(CoreExports.class).toInstance(exports);
       }
     }, new ExtensionModule());
+    PlexusContainerFacade facade = new PlexusContainerFacade(container);
     classWorld.addListener(new LifecycleManagerDisposer(container));
     container.setLookupRealm(null);
     Thread thread = Thread.currentThread();
@@ -249,8 +252,7 @@ public class PlexusContainerManager {
       thread.setContextClassLoader(container.getContainerRealm());
       container.setLoggerManager(loggerManager);
       for(CoreExtensionEntry extension : extensions) {
-        container.discoverComponents(extension.getClassRealm(), new SessionScopeModule(container),
-            new MojoExecutionScopeModule(container));
+        facade.loadExtension(extension);
       }
     } finally {
       thread.setContextClassLoader(ccl);
@@ -302,60 +304,6 @@ public class PlexusContainerManager {
     }
 
     return extRealm;
-  }
-
-  private static List<CoreExtensionEntry> loadCoreExtensions(ClassRealm coreRealm, CoreExtensionEntry coreEntry,
-      File multiModuleProjectDirectory, LoggerManager loggerManager, IMavenConfiguration mavenConfiguration)
-      throws Exception {
-    if(multiModuleProjectDirectory == null) {
-      return Collections.emptyList();
-    }
-    File extensionsXml = new File(multiModuleProjectDirectory, IMavenPlexusContainer.EXTENSIONS_FILENAME);
-    if(!extensionsXml.isFile()) {
-      return Collections.emptyList();
-    }
-    List<CoreExtension> extensions;
-    try (InputStream is = new FileInputStream(extensionsXml)) {
-      extensions = new CoreExtensionsXpp3Reader().read(is).getExtensions();
-    }
-    if(extensions.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(coreRealm.getWorld())
-        .setRealm(coreRealm).setClassPathScanning(PlexusConstants.SCANNING_INDEX).setAutoWiring(true)
-        .setJSR250Lifecycle(true).setName(CONTAINER_CONFIGURATION_NAME);
-
-    DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
-      }
-    });
-
-    Thread thread = Thread.currentThread();
-    ClassLoader ccl = thread.getContextClassLoader();
-    try {
-      container.setLookupRealm(null);
-      container.setLoggerManager(loggerManager);
-      thread.setContextClassLoader(container.getContainerRealm());
-      Optional<MavenProperties> mavenProperties = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
-      IMavenConfiguration workspaceConfiguration = IMavenConfiguration.getWorkspaceConfiguration();
-      MavenExecutionRequest request = MavenExecutionContext.createExecutionRequest(mavenConfiguration,
-          wrap(container), mavenProperties.map(mavenCfg -> mavenCfg.getSettingsLocations(workspaceConfiguration))
-              .orElseGet(workspaceConfiguration::getSettingsLocations),
-          multiModuleProjectDirectory);
-      container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
-      request.setBaseDirectory(multiModuleProjectDirectory);
-      request.setMultiModuleProjectDirectory(multiModuleProjectDirectory);
-      Properties userProperties = request.getUserProperties();
-      mavenProperties.ifPresent(prop -> prop.getCliProperties(userProperties::setProperty));
-      BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
-      return resolver.loadCoreExtensions(request, coreEntry.getExportedArtifacts(), extensions);
-    } finally {
-      thread.setContextClassLoader(ccl);
-      container.dispose();
-    }
   }
 
   private static final class M2EClassWorld extends ClassWorld {
