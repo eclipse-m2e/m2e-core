@@ -49,7 +49,6 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -71,6 +70,7 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.internal.maven.compat.ExtensionResolutionExceptionFacade;
 
 
 /**
@@ -180,14 +180,8 @@ public class PlexusContainerManager {
           containerMap.put(canonicalDirectory, plexusContainer);
         } catch(ExtensionResolutionException e) {
           //TODO how can we create an error marker on the extension file?
-          CoreExtension extension = e.getExtension();
           File file = new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME);
-          throw new PlexusContainerException(
-              "can't create plexus container for basedir = " + basedir.getAbsolutePath() + " because the extension "
-                  + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion()
-                  + " can't be loaded (defined in "
-                  + file.getAbsolutePath() + ").",
-              e);
+          new ExtensionResolutionExceptionFacade(e).throwForFile(file);
         }
       }
       return plexusContainer;
