@@ -1,5 +1,14 @@
 # Eclipse m2e - Release notes
 
+## 3.0.0 (Planned)
+
+* 📅 Release Date: TBD
+
+### Embed and use Maven 4.0.0
+
+Updated the embedded Maven from version 3.9.11 to 4.0.0, the first Maven 4 release.
+Maven 4 includes the maven-compat module for backward compatibility with Maven 3 builds.
+
 ## 2.9.2
 
 ### Multi-Release-Jar support
