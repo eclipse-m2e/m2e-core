@@ -12,6 +12,7 @@ package org.eclipse.m2e.jdt.tests;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -150,7 +151,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
-		assertTrue(argLine.contains("--argLineItem=surefireArgLineValue"));
+		assertThat(argLine, Matchers.containsString("--argLineItem=surefireArgLineValue --undefinedArgLineItem="));
+		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -209,7 +211,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
-		assertTrue(argLine.contains("--argLineItem=failsafeArgLineValue"));
+		assertThat(argLine, Matchers.containsString("--argLineItem=failsafeArgLineValue --undefinedArgLineItem="));
+		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -261,7 +264,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
-		assertTrue(argLine.contains("--argLineItem=surefireArgLineValue"));
+		assertThat(argLine, Matchers.containsString("--argLineItem=surefireArgLineValue --undefinedArgLineItem="));
+		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -310,7 +314,8 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
-		assertTrue(argLine.contains("--argLineItem=failsafeArgLineValue"));
+		assertThat(argLine, Matchers.containsString("--argLineItem=failsafeArgLineValue --undefinedArgLineItem="));
+		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -355,7 +360,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		ILaunchConfiguration config = updatedConfigurations[0];
 		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("-javaagent")); // resolved jacoco agent
-		assertTrue(argLine.contains("@{titi.tata}")); // unresolved property is unchanged as in CLI
+		assertFalse(argLine.contains("@{titi.tata}")); // unresolved property is removed
 	}
 
 	private void updateProject(IProject project) throws CoreException, InterruptedException {
