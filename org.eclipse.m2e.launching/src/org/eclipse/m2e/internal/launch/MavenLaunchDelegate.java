@@ -31,7 +31,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -64,8 +63,6 @@ import org.eclipse.m2e.jdt.MavenExecutionJre;
 
 public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaunchConstants {
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchDelegate.class);
-
-  private static final ILog ECLIPSE_LOG = Platform.getLog(MavenLaunchDelegate.class);
 
   private static final String LAUNCHER_TYPE = "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
 
