@@ -108,9 +108,10 @@ public class MavenExecutionJre {
   }
 
   /**
-   * The returned ID can be used e.g. as value for {@link IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH}.
+   * The returned container path can be used as value for
+   * {@link IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH}.
    * 
-   * @return the best matching JRE ID, or empty if no matching JRE could be found
+   * @return the best matching JRE container path, or empty if no matching JRE could be found
    */
   public Optional<String> getBestMatchingJreContainerPath() {
     return getBestMatchingVM().map(vm -> JavaRuntime.newJREContainerPath(vm).toPortableString());
