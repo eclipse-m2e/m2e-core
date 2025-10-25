@@ -19,6 +19,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -56,6 +58,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
@@ -74,7 +77,8 @@ import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
  */
-public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, ILaunchShortcut2 {
+public class ExecutePomAction extends AbstractHandler
+    implements ILaunchShortcut, IExecutableExtension, ILaunchShortcut2 {
   private static final Logger log = LoggerFactory.getLogger(ExecutePomAction.class);
 
   private boolean showDialog = false;
@@ -87,6 +91,12 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension, 
     } else {
       this.goalName = (String) data;
     }
+  }
+
+  public Object execute(ExecutionEvent event) {
+    ISelection selection = HandlerUtil.getCurrentSelection(event);
+    launch(findPomXmlBasedir(selection), ILaunchManager.RUN_MODE);
+    return null;
   }
 
   public void launch(IEditorPart editor, String mode) {
