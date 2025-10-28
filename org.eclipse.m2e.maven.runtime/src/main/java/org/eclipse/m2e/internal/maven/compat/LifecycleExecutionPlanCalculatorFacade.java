@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.internal.maven.compat;
 
+import java.util.HashSet;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.plugin.MojoExecution;
@@ -43,6 +45,6 @@ public class LifecycleExecutionPlanCalculatorFacade {
    */
   public void setupMojoExecution(MavenSession session, MavenProject project, MojoExecution mojoExecution)
       throws Exception {
-    delegate.setupMojoExecution(session, project, mojoExecution);
+		delegate.setupMojoExecution(session, project, mojoExecution, new HashSet<>());
   }
 }

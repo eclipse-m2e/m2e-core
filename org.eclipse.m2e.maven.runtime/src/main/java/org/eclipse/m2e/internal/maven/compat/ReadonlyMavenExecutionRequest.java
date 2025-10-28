@@ -16,6 +16,8 @@ package org.eclipse.m2e.internal.maven.compat;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
@@ -629,5 +633,105 @@ public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTrans
   public MavenExecutionRequest setToolchains(Map<String, List<ToolchainModel>> toolchains) {
     throw new IllegalStateException();
   }
+
+	@Override
+	public MavenExecutionRequest setStartInstant(Instant start) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public Instant getStartInstant() {
+		return request.getStartInstant();
+	}
+
+	@Override
+	public MavenExecutionRequest setResume(boolean resume) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public boolean isResume() {
+		return request.isResume();
+	}
+
+	@Override
+	public boolean isIgnoreMissingArtifactDescriptor() {
+		return request.isIgnoreMissingArtifactDescriptor();
+	}
+
+	@Override
+	public MavenExecutionRequest setIgnoreMissingArtifactDescriptor(boolean ignoreMissing) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public boolean isIgnoreInvalidArtifactDescriptor() {
+		return request.isIgnoreInvalidArtifactDescriptor();
+	}
+
+	@Override
+	public MavenExecutionRequest setIgnoreInvalidArtifactDescriptor(boolean ignoreInvalid) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public ProjectActivation getProjectActivation() {
+		return request.getProjectActivation();
+	}
+
+	@Override
+	public ProfileActivation getProfileActivation() {
+		return request.getProfileActivation();
+	}
+
+	@Override
+	public File getProjectSettingsFile() {
+		return request.getProjectSettingsFile();
+	}
+
+	@Override
+	public MavenExecutionRequest setProjectSettingsFile(File projectSettingsFile) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public File getInstallationSettingsFile() {
+		return request.getInstallationSettingsFile();
+	}
+
+	@Override
+	public MavenExecutionRequest setInstallationSettingsFile(File installationSettingsFile) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public File getInstallationToolchainsFile() {
+		return request.getInstallationToolchainsFile();
+	}
+
+	@Override
+	public MavenExecutionRequest setInstallationToolchainsFile(File installationToolchainsFile) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public MavenExecutionRequest setTopDirectory(Path topDirectory) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public Path getTopDirectory() {
+		return request.getTopDirectory();
+	}
+
+	@Override
+	public MavenExecutionRequest setRootDirectory(Path rootDirectory) {
+		throw new IllegalStateException();
+	}
+
+	@Override
+	public Path getRootDirectory() {
+		return request.getRootDirectory();
+	}
 
 }

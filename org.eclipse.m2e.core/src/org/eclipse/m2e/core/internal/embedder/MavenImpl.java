@@ -66,7 +66,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.RepositoryUtils;
@@ -110,7 +109,6 @@ import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -962,7 +960,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     try {
       ProjectSorter rm = new ProjectSorter(projects);
       return rm.getSortedProjects();
-    } catch(CycleDetectedException | DuplicateProjectException ex) {
+    } catch(Exception ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_sort, ex));
     }
   }
