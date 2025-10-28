@@ -149,7 +149,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		ILaunchConfiguration config = updatedConfigurations[0];
 
 		// check argLine
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("--argLineItem=surefireArgLineValue"));
 
 		// check environmentVariables
@@ -208,7 +208,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		ILaunchConfiguration config = updatedConfigurations[0];
 
 		// check argLine
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("--argLineItem=failsafeArgLineValue"));
 
 		// check environmentVariables
@@ -260,7 +260,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		ILaunchConfiguration config = updatedConfigurations[0];
 
 		// check argLine
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("--argLineItem=surefireArgLineValue"));
 
 		// check environmentVariables
@@ -309,7 +309,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		ILaunchConfiguration config = updatedConfigurations[0];
 
 		// check argLine
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("--argLineItem=failsafeArgLineValue"));
 
 		// check environmentVariables
@@ -353,7 +353,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		assertTrue(updatedConfigurations.length == 1);
 
 		ILaunchConfiguration config = updatedConfigurations[0];
-		String argLine = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_VM_ARGUMENTS, "");
+		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
 		assertTrue(argLine.contains("-javaagent")); // resolved jacoco agent
 		assertTrue(argLine.contains("@{titi.tata}")); // unresolved property is unchanged as in CLI
 	}
