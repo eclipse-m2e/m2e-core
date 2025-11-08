@@ -59,7 +59,6 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 import org.apache.maven.building.Problem;
-import org.apache.maven.cli.MavenCli;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
@@ -69,6 +68,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.embedder.MavenCLICompat;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -210,9 +210,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
     userToolchainsLink = createLink(composite, Messages.MavenSettingsPreferencePage_userToolchainslink2,
         Messages.MavenSettingsPreferencePage_userToolchainslink_tooltip, this::getUserToolchains,
-        MavenCli.DEFAULT_USER_TOOLCHAINS_FILE);
+        MavenCLICompat.DEFAULT_USER_TOOLCHAINS_FILE);
     userToolchainsText = createFileSelectionWidgets(composite, mavenConfiguration.getUserToolchainsFile(),
-        MavenCli.DEFAULT_USER_TOOLCHAINS_FILE);
+        MavenCLICompat.DEFAULT_USER_TOOLCHAINS_FILE);
 
     Button updateSettings = new Button(composite, SWT.NONE);
     updateSettings.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -310,7 +310,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
         Messages.MavenSettingsPreferencePage_userSettingslink2, Messages.MavenSettingsPreferencePage_userSettingslink1);
 
     String userToolchains = getUserToolchains();
-    updateLink(userToolchainsLink, userToolchains, MavenCli.DEFAULT_USER_TOOLCHAINS_FILE,
+    updateLink(userToolchainsLink, userToolchains, MavenCLICompat.DEFAULT_USER_TOOLCHAINS_FILE,
         Messages.MavenSettingsPreferencePage_userToolchainslink2,
         Messages.MavenSettingsPreferencePage_userToolchainslink1);
 
