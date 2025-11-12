@@ -129,9 +129,14 @@ public class UnitTestSupport {
   private static final String FAILSAFE_PLUGIN_ARTIFACT_ID = "maven-failsafe-plugin";
 
   /**
-   * deffered variable pattern
+   * deferred variable pattern
    */
   private static final Pattern DEFERRED_VAR_PATTERN = Pattern.compile("@\\{(.*?)\\}");
+
+  /**
+   * standard variable pattern
+   */
+  private static final Pattern STANDARD_VAR_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
 
   /**
    * maven group id for the maven plugins
@@ -263,7 +268,8 @@ public class UnitTestSupport {
       }
       if(args.systemPropertyVariables() != null) {
         args.systemPropertyVariables().entrySet().stream() //
-            .filter(e -> e.getKey() != null && e.getValue() != null)
+            .filter(e -> e.getKey() != null && e.getValue() != null
+                && !removeStandardVariablePlaceholders(e.getValue()).isEmpty())
             .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + escapeValue(e.getValue())));
       }
       copy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, launchArguments.toString());
@@ -282,7 +288,8 @@ public class UnitTestSupport {
 
       if(args.environmentVariables() != null) {
         Map<String, String> filteredMap = args.environmentVariables().entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getValue() != null)
+            .filter(entry -> entry.getKey() != null && entry.getValue() != null
+                && !removeStandardVariablePlaceholders(entry.getValue()).isEmpty())
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, filteredMap);
       }
@@ -410,6 +417,8 @@ public class UnitTestSupport {
 
         String argLine = maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor);
         argLine = resolveDeferredVariables(mavenProject, argLine);
+        // resolve all placeholders which were not resolved previously by the empty string
+        argLine = removeStandardVariablePlaceholders(argLine);
 
         return new TestLaunchArguments(argLine,
             maven.getMojoParameterValue(mavenProject, execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
@@ -422,29 +431,43 @@ public class UnitTestSupport {
       return null;
     }
 
-  }
-
-  /**
-   * This method is used to resolve deferred variables introduced by failsafe/surefire plugins in a given string value.
-   * Deferred variables are placeholders in the string that are replaced with actual values from the Maven project's
-   * properties. The placeholders are in the format @{...}, where ... is the key of the property. If a placeholder's
-   * corresponding property does not exist, the placeholder is left as is.
-   *
-   * @param mavenProject the Maven project from which to retrieve the properties
-   * @param value the string containing the placeholders to be replaced
-   * @return the string with all resolvable placeholders replaced with their corresponding property values
-   */
-  private static String resolveDeferredVariables(MavenProject mavenProject, String value) {
-    Properties properties = mavenProject.getProperties();
-    if(properties.isEmpty() || value == null) {
-      return value;
+    /**
+     * This method is used to resolve deferred variables introduced by failsafe/surefire plugins in a given string
+     * value. Deferred variables are placeholders in the string that are replaced with actual values from the Maven
+     * project's properties. The placeholders are in the format @{...}, where ... is the key of the property. If a
+     * placeholder's corresponding property does not exist the full placeholder is replaced by the empty string.
+     *
+     * @param mavenProject the Maven project from which to retrieve the properties
+     * @param value the string containing the placeholders to be replaced
+     * @return the string with all resolvable placeholders replaced with their corresponding property values (or empty
+     *         strings)
+     */
+    private static String resolveDeferredVariables(MavenProject mavenProject, String value) {
+      Properties properties = mavenProject.getProperties();
+      if(properties.isEmpty() || value == null) {
+        return "";
+      }
+      return DEFERRED_VAR_PATTERN.matcher(value).replaceAll(match -> {
+        String key = match.group(1);
+        String replacement = properties.getProperty(key);
+        return replacement != null ? replacement : "";
+      });
     }
-    return DEFERRED_VAR_PATTERN.matcher(value).replaceAll(match -> {
-      String placeholder = match.group();
-      String key = match.group(1);
-      String replacement = properties.getProperty(key);
-      return replacement != null ? replacement : placeholder;
-    });
+
+    /**
+     * This method is used to remove all standard variable placeholders in the format ${...} from a given string value.
+     * All placeholders are replaced with empty strings.
+     *
+     * @param value the string containing the placeholders to be removed
+     * @return the string with all placeholders removed
+     */
+    private static String removeStandardVariablePlaceholders(String value) {
+      if(value == null) {
+        return value;
+      }
+      return STANDARD_VAR_PATTERN.matcher(value).replaceAll("");
+    }
+
   }
 
   /**
