@@ -2,6 +2,12 @@
 
 ## 2.9.2
 
+### Maven Execution JRE used for Tests
+
+Similar to what is done for the Maven Launch Actions the JRE for tests (TestNG, JUnit) is now also derived from
+the Maven execution JRE. Previously this was by default set to the project's JRE (derived from the `maven-compiler-plugin`s target/release configuration).
+The Maven execution JRE is determined from the `maven-enforcer-plugin`s `requireJavaVersion` rule by selecting the best matching installed JRE for the [configured Java version range](https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html).
+
 ### Multi-Release-Jar support
 
 JDT added support for native [https://openjdk.org/jeps/238](Multi-Release) compilation support recently.
