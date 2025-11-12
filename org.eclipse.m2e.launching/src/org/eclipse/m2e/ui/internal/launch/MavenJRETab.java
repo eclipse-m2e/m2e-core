@@ -14,10 +14,14 @@
 package org.eclipse.m2e.ui.internal.launch;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -33,12 +37,16 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.internal.launch.MavenLaunchDelegate;
 import org.eclipse.m2e.internal.launch.Messages;
+import org.eclipse.m2e.jdt.MavenExecutionJre;
 
 
 @SuppressWarnings("restriction")
 public class MavenJRETab extends JavaJRETab {
+
+  private static final org.slf4j.Logger LOGGER = org.slf4j.LoggerFactory.getLogger(MavenJRETab.class);
 
   private final VMArgumentsBlock vmArgumentsBlock = new VMArgumentsBlock();
 
@@ -70,19 +78,33 @@ public class MavenJRETab extends JavaJRETab {
   @Override
   protected JREDescriptor getDefaultJREDescriptor() {
     File pomDirectory = MavenLaunchDelegate.getPomDirectory(getLaunchConfiguration());
-    String version = MavenLaunchDelegate.readEnforcedJavaVersion(pomDirectory, null);
-    IVMInstall mavenJre = version != null ? MavenLaunchDelegate.getBestMatchingVM(version) : null;
-    String details;
-    if(mavenJre != null) { // add link
-      details = NLS.bind(Messages.MavenJRETab_lblDefaultDetailsRequiredJavaVersion, mavenJre.getName(), version);
-    } else {
+    IProgressMonitor monitor = new NullProgressMonitor();
+    String details = null;
+    Optional<IMavenProjectFacade> mavenProjectFacade = MavenLaunchDelegate.getMavenProject(pomDirectory, monitor);
+    if(mavenProjectFacade.isPresent()) {
+      Optional<MavenExecutionJre> mavenExecutionJre;
+      try {
+        mavenExecutionJre = MavenExecutionJre.forProject(mavenProjectFacade.get(), monitor);
+        Optional<IVMInstall> mavenJre = mavenExecutionJre.flatMap(jre -> jre.getBestMatchingVM());
+
+        if(mavenJre.isPresent()) { // add link
+          details = NLS.bind(Messages.MavenJRETab_lblDefaultDetailsRequiredJavaVersion, mavenJre.get().getName(),
+              mavenExecutionJre.get().getExecutionJreVersionRange());
+        }
+      } catch(CoreException ex) {
+        LOGGER.warn("Unable to determine Maven JRE for project " + mavenProjectFacade.get().getProject().getName(), ex);
+      }
+
+    }
+    if(details == null) {
       // TODO: add logic for getting the underlying project then fall back to default
       details = super.getDefaultJREDescriptor().getDescription();
     }
+    String finalDetails = details;
     return new JREDescriptor() {
       @Override
       public String getDescription() {
-        return NLS.bind(Messages.MavenJRETab_lblDefault, details);
+        return NLS.bind(Messages.MavenJRETab_lblDefault, finalDetails);
       }
     };
   }

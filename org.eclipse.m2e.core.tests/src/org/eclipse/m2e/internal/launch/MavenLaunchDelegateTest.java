@@ -17,10 +17,8 @@ package org.eclipse.m2e.internal.launch;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.List;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -47,67 +45,29 @@ public class MavenLaunchDelegateTest extends AbstractMavenProjectTestCase {
 	private static final String DEFAULT_VM = "defaultVM";
 	private static final List<String> AVAILABLE_VM_VERSIONS = List.of("17.0.4", "11.0.7", "13.0.5", "11.0.1", "1.8.0");
 
-	@Test
-	public void testGetBestMatchingVM_majorOnly() throws InvalidVersionSpecificationException {
-		try (var mock = mockJavaRuntime()) {
-			assertEquals("11.0.7", MavenLaunchDelegate.getBestMatchingVM("11").getId());
-		}
-	}
-
-	@Test
-	public void testGetBestMatchingVM_rangeWithOnlyMajorLowerBound() throws InvalidVersionSpecificationException {
-		try (var mock = mockJavaRuntime()) {
-			assertEquals("11.0.7", MavenLaunchDelegate.getBestMatchingVM("[11,)").getId());
-		}
-	}
-
-	@Test
-	public void testGetBestMatchingVM_9versionRange() throws InvalidVersionSpecificationException {
-		try (var mock = mockJavaRuntime()) {
-			assertEquals("17.0.4", MavenLaunchDelegate.getBestMatchingVM("[11,18)").getId());
-		}
-	}
-
-	@Test
-	public void testGetBestMatchingVM_1XversionRange() throws InvalidVersionSpecificationException {
-		try (var mock = mockJavaRuntime()) {
-			assertEquals("1.8.0", MavenLaunchDelegate.getBestMatchingVM("[1.8,9)").getId());
-		}
-	}
-
-	@Test
-	public void testGetBestMatchingVM_versionRangeWithNoMajorVersionMatch() {
-		try (var mock = mockJavaRuntime()) {
-			assertEquals("13.0.5", MavenLaunchDelegate.getBestMatchingVM("[12,)").getId());
-		}
-	}
 
 	@Test
 	public void testRequiredJavaVersionFromEnforcerRule_Version() throws Exception {
 		IProject project = importProject("resources/projects/enforcerSettingsWithVersion/pom.xml");
-		assertRequiredJavaBuildVersion(project, "13.0.3", "13.0.5");
+		assertRequiredJavaBuildVersion(project, "13.0.5");
 	}
 
 	@Test
 	public void testRequiredJavaVersionFromEnforcerRule_VersionRange() throws Exception {
 		IProject project = importProject("resources/projects/enforcerSettingsWithVersionRange/pom.xml");
-		assertRequiredJavaBuildVersion(project, "[11.0.6,13)", "11.0.7");
+		assertRequiredJavaBuildVersion(project, "11.0.7");
 	}
 
 	@Test
 	public void testRequiredJavaVersionFromEnforcerRule_NoVersionRange() throws Exception {
 		IProject project = importProject("resources/projects/enforcerSettingsWithoutRequiredJavaVersion/pom.xml");
-		assertRequiredJavaBuildVersion(project, null, DEFAULT_VM);
+		assertRequiredJavaBuildVersion(project, DEFAULT_VM);
 	}
 
-	private void assertRequiredJavaBuildVersion(IProject project, String expectedVersionRange, String expectedVMVersion)
+	private void assertRequiredJavaBuildVersion(IProject project, String expectedVMVersion)
 			throws Exception {
 
 		waitForJobsToComplete();
-
-		File pomFile = project.getLocation().toFile();
-
-		assertEquals(expectedVersionRange, MavenLaunchDelegate.readEnforcedJavaVersion(pomFile, monitor));
 
 		String pomDir = "${workspace_loc:/" + project.getName() + "}";
 

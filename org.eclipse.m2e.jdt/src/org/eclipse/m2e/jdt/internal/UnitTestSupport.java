@@ -41,6 +41,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.plugin.Mojo;
@@ -50,6 +51,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.jdt.MavenExecutionJre;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 
 
@@ -77,29 +79,9 @@ public class UnitTestSupport {
   private static final String GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD = "getIncludedAndExcludedTests";
 
   /**
-   * Launch configuration attribute for the main class
-   */
-  private static final String LAUNCH_CONFIG_MAIN_CLASS = "org.eclipse.jdt.launching.MAIN_TYPE";
-
-  /**
-   * Launch configuration attribute for the project
-   */
-  private static final String LAUNCH_CONFIG_PROJECT = "org.eclipse.jdt.launching.PROJECT_ATTR";
-
-  /**
-   * Launch configuration attribute for the VM arguments
-   */
-  public static final String LAUNCH_CONFIG_VM_ARGUMENTS = "org.eclipse.jdt.launching.VM_ARGUMENTS";
-
-  /**
    * Launch configuration attribute for the environment variables
    */
   public static final String LAUNCH_CONFIG_ENVIRONMENT_VARIABLES = "org.eclipse.debug.core.environmentVariables";
-
-  /**
-   * Launch configuration attribute for the system properties
-   */
-  private static final String LAUNCH_CONFIG_WORKING_DIRECTORY = "org.eclipse.jdt.launching.WORKING_DIRECTORY";
 
   /**
    * Launch configuration attribute for the working directory
@@ -219,7 +201,8 @@ public class UnitTestSupport {
             ILaunchConfiguration[] configurations = launchManager.getLaunchConfigurations(type);
             for(ILaunchConfiguration configuration : configurations) {
               // Check if the configuration is associated with the desired project and type 
-              String configurationProjectName = configuration.getAttribute(LAUNCH_CONFIG_PROJECT, "");
+              String configurationProjectName = configuration
+                  .getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
               if(project.getName().equals(configurationProjectName)) {
                 LOG.info("Reset launch configuration name: {}", configuration.getName());
                 setupLaunchConfiguration(configuration);
@@ -257,7 +240,7 @@ public class UnitTestSupport {
 
               // update the configuration only if arg extraction was successfull
               if(args != null) {
-                defineConfigurationValues(project, configuration, args);
+                defineConfigurationValues(project, configuration, args, MavenExecutionJre.forProject(facade, null));
               }
 
             }
@@ -272,7 +255,7 @@ public class UnitTestSupport {
      * Define the configuration values
      */
     private void defineConfigurationValues(IProject project, ILaunchConfiguration configuration,
-        TestLaunchArguments args) throws CoreException {
+        TestLaunchArguments args, Optional<MavenExecutionJre> mavenExecutionJre) throws CoreException {
 
       ILaunchConfigurationWorkingCopy copy = configuration.getWorkingCopy();
 
@@ -289,14 +272,15 @@ public class UnitTestSupport {
                 && !removeStandardVariablePlaceholders(e.getValue()).isEmpty())
             .forEach(e -> launchArguments.add("-D" + e.getKey() + "=" + escapeValue(e.getValue())));
       }
-      copy.setAttribute(LAUNCH_CONFIG_VM_ARGUMENTS, launchArguments.toString());
+      copy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, launchArguments.toString());
 
       try {
         if(args.workingDirectory() != null
             && !Files.isSameFile(project.getLocation().toPath().toAbsolutePath(), args.workingDirectory().toPath())) {
-          copy.setAttribute(LAUNCH_CONFIG_WORKING_DIRECTORY, args.workingDirectory().getAbsolutePath());
+          copy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY,
+              args.workingDirectory().getAbsolutePath());
         } else {
-          copy.setAttribute(LAUNCH_CONFIG_WORKING_DIRECTORY, (String) null);
+          copy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY, (String) null);
         }
       } catch(IOException ex) {
         LOG.error(ex.getMessage(), ex);
@@ -310,6 +294,11 @@ public class UnitTestSupport {
         copy.setAttribute(LAUNCH_CONFIG_ENVIRONMENT_VARIABLES, filteredMap);
       }
 
+      // set the execution JRE if any
+      mavenExecutionJre.ifPresent(jre -> {
+        jre.getBestMatchingJreContainerPath()
+            .ifPresent(jreId -> copy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, jreId));
+      });
       copy.doSave();
     }
 
@@ -323,7 +312,7 @@ public class UnitTestSupport {
     private TestLaunchArguments getTestLaunchArguments(ILaunchConfiguration configuration, IMavenProjectFacade facade,
         IProgressMonitor monitor) throws CoreException {
 
-      String testClass = configuration.getAttribute(LAUNCH_CONFIG_MAIN_CLASS, "");
+      String testClass = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, "");
       MavenProject mavenProject = facade.getMavenProject();
 
       // find test executions
