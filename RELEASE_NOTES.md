@@ -10,8 +10,8 @@ The Maven execution JRE is determined from the `maven-enforcer-plugin`s `require
 
 ### Multi-Release-Jar support
 
-JDT added support for native [https://openjdk.org/jeps/238](Multi-Release) compilation support recently.
-With that present, m2e can now automatically support the [maven-compiler-plugin](https://maven.apache.org/plugins/maven-compiler-plugin/) option [https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#multiReleaseOutput](`multiReleaseOutput`)
+JDT added support for native [Multi-Release](https://openjdk.org/jeps/238) compilation support recently.
+With that present, m2e can now automatically support the [maven-compiler-plugin](https://maven.apache.org/plugins/maven-compiler-plugin/) option [`multiReleaseOutput`](https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#multiReleaseOutput)
 and configure such projects accordingly.
 
 ## 2.9.1
