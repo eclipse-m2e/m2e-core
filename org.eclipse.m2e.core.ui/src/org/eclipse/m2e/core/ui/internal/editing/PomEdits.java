@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 Sonatype, Inc.
+ * Copyright (c) 2008-2025 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -27,13 +27,18 @@ import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.text.DocumentRewriteSession;
 import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.wst.sse.core.StructuredModelManager;
+import org.eclipse.wst.sse.core.internal.IExecutionDelegate;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
+import org.eclipse.wst.sse.core.internal.text.IExecutionDelegatable;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
@@ -460,12 +465,29 @@ public class PomEdits {
           if(domModel == null) {
             domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(
                 (IStructuredDocument) tuple.getDocument());
+            if(domModel.getStructuredDocument() instanceof IExecutionDelegatable) {
+              ((IExecutionDelegatable) domModel.getStructuredDocument())
+                  .setExecutionDelegate(new ExecutionDelegate());
+            }
           }
         } else {
-          domModel = tuple.getModel() != null ? tuple.getModel()
-              : (tuple.getFile() != null ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(
-                  tuple.getFile()) : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(
-                  tuple.getDocument())); //existing shall be ok here..
+          if(tuple.getModel() != null) {
+            domModel = tuple.getModel();
+          } else if(tuple.getFile() != null) {
+            domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile());
+            if(domModel.getStructuredDocument() instanceof IExecutionDelegatable) {
+              ((IExecutionDelegatable) domModel.getStructuredDocument())
+                  .setExecutionDelegate(new ExecutionDelegate());
+            }
+
+          } else {
+            domModel = (IDOMModel) StructuredModelManager.getModelManager()
+                .getExistingModelForEdit(tuple.getDocument());
+            if(domModel.getStructuredDocument() instanceof IExecutionDelegatable) {
+              ((IExecutionDelegatable) domModel.getStructuredDocument())
+                  .setExecutionDelegate(new ExecutionDelegate());
+            }
+          }
 
           //let the model know we make changes
           domModel.aboutToChangeModel();
@@ -514,6 +536,9 @@ public class PomEdits {
         }
       } finally {
         if(domModel != null) {
+          if(domModel.getStructuredDocument() instanceof IExecutionDelegatable) {
+            ((IExecutionDelegatable) domModel.getStructuredDocument()).setExecutionDelegate(null);
+          }
           if(tuple.isReadOnly()) {
             domModel.releaseFromRead();
           } else if(domModel.getId() != null) { // id will be null for files outside of workspace
@@ -661,6 +686,26 @@ public class PomEdits {
     public void process(Document document) {
       for(Operation oper : operations) {
         oper.process(document);
+      }
+    }
+  }
+
+  /**
+   * Ensure that document operations and the resulting event notifications happen on the UI thread
+   */
+  static class ExecutionDelegate implements IExecutionDelegate {
+    public ExecutionDelegate() {
+    }
+
+    @Override
+    public void execute(ISafeRunnable runnable) {
+      final Display display = Display.getDefault();
+      if(display.getThread() == Thread.currentThread()) {
+        SafeRunner.run(runnable);
+      } else {
+        display.syncExec(() -> {
+          SafeRunner.run(runnable);
+        });
       }
     }
   }
