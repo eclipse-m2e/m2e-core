@@ -27,7 +27,9 @@
 	<properties>
 		<tychoDefaultTestArgLine>-Xmx800m</tychoDefaultTestArgLine>
 		<tycho.testArgLine>${tychoDefaultTestArgLine}</tycho.testArgLine>
-		<surefire.timeout>900</surefire.timeout>
+		<!-- timeout for ITs in seconds, applies to all ITs executed within a single forked process, 
+		     https://tycho.eclipseprojects.io/doc/latest/tycho-surefire-plugin/plugin-test-mojo.html#forkedProcessTimeoutInSeconds -->
+		<surefire.timeout>1500</surefire.timeout>
 		<tycho.surefire.useUIHarness>true</tycho.surefire.useUIHarness>
 		<tycho.surefire.useUIThread>true</tycho.surefire.useUIThread>
 		<tycho.useJDK>SYSTEM</tycho.useJDK>
