@@ -133,60 +133,53 @@
 				</repository>
 			</repositories>
 		</location>
-		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-archetype Common" missingManifest="generate" type="Maven">
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.maven.archetype</groupId>
-					<artifactId>archetype-common</artifactId>
-					<version>3.2.1</version>
-					<type>jar</type>
-				</dependency>
-			</dependencies>
-			<instructions><![CDATA[
-Bundle-Name:           M2Eclipse's ${mvnArtifactId}
-version:               ${version_cleanup;${mvnVersion}}
-Bundle-SymbolicName:   org.eclipse.m2e.archetype.common
-# Change the following value to '${version}' once the next minor version of archetype is availble
-Bundle-Version:        ${versionmask;==;${version}}.104
-Bundle-Vendor: 	       Eclipse.org - m2e
-Eclipse-ExtensibleAPI: true
-Export-Package:        META-INF.plexus;-noimport:=true;x-internal:=true, \
-                       org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
-Require-Bundle:        org.eclipse.m2e.maven.runtime;bundle-version="[3.8.0,4.0.0)",com.ibm.icu
-Import-Package:        org.jdom2*
-]]></instructions>
-		</location>
 		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-archetype" missingManifest="generate" type="Maven">
 			<dependencies>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
+					<artifactId>archetype-common</artifactId>
+					<version>3.3.1</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
+					<version>3.3.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-descriptor</artifactId>
-					<version>3.2.1</version>
-					<type>jar</type>
-				</dependency>
-				<dependency>
-					<groupId>org.apache.maven.shared</groupId>
-					<artifactId>maven-artifact-transfer</artifactId>
-					<version>0.13.1</version>
+					<version>3.3.1</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
 			<instructions><![CDATA[
-Bundle-Name:           M2Eclipse's ${mvnArtifactId}
+# Create OSGi metadata with only the use-cases of m2e in mind, potentially preventing other use-cases due to reduced dependencies.
+isHostBundle:          ${is;${mvnArtifactId};archetype-common}
 version:               ${version_cleanup;${mvnVersion}}
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
 Bundle-SymbolicName:   org.eclipse.m2e.archetype.${replacestring;${mvnArtifactId};archetype-}
-# Change the following value to '${version}' once the next minor version of archetype is availble
-Bundle-Version:        ${version}.2
+Bundle-Version:        ${version}
 Bundle-Vendor: 	       Eclipse.org - m2e
-Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="${range;[===,+);3.2.104}"
-Export-Package:        org.apache.maven.*;-noimport:=true;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
-Import-Package:        !*
+Fragment-Host:         org.eclipse.m2e.archetype.common;bundle-version="${range;[===,===];${version}}"
+-removeheaders ${if;${isHostBundle};Fragment-Host;}
+Eclipse-ExtensibleAPI: true
+Require-Bundle:        \
+                       org.eclipse.m2e.maven.runtime;bundle-version="[3.8.0,4.0.0)", \
+                       com.ibm.icu
+Import-Package:        \
+                       !groovy.*, \
+                       !*.velocity*, \
+                       !org.apache.commons.collections, \
+                       !org.apache.maven.shared.invoker, \
+                       org.apache.maven.*;provider=m2e, \
+                       org.eclipse.aether.*;provider=m2e, \
+                       org.codehaus.plexus.*;provider=m2e, \
+                       *
+Export-Package:        \
+                       META-INF.sisu;-noimport:=true;x-internal:=true, \
+                       org.apache.maven.archetype.*;-noimport:=true;provider=m2e;mandatory:=provider;version="${version}";x-friends:="org.eclipse.m2e.core.ui"
 ]]></instructions>
 		</location>
 		<location type="Target" uri="file:${project_loc:/m2e-core}/target-platform/m2e-runtimes.target"/>
