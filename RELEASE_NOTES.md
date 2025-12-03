@@ -1,6 +1,10 @@
 # Eclipse m2e - Release notes
 
-## 2.9.2
+## 2.10.0
+
+* 📅 Release Date: 03rd December 2025
+
+Various minor bug-fixes, enhancements and dependency updates.
 
 ### Maven Execution JRE used for Tests
 
