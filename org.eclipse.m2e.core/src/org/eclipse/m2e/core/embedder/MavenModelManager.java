@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -71,9 +69,10 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.FileModelSource;
-import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
 
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -106,13 +105,26 @@ public class MavenModelManager {
   }
 
   /**
-   * Read the model from the provided pom file (might not exits) pointer
+   * Shortcut for {@link #readMavenModel(File, IProgressMonitor) with 2nd argument being {@code null}.
    * 
-   * @param pomFile the file pointer
-   * @return a maven model, or <code>null</code> if the pointer do not point to any valid maven directory
+   * @deprecated Use {@link #readMavenModel(File, IProgressMonitor)} instead.
+   */
+  @Deprecated
+  public org.apache.maven.model.Model readMavenModel(File pomFile) throws CoreException {
+    return readMavenModel(pomFile, null);
+  }
+
+  /**
+   * Read the (effective) model from the provided POM file
+   * 
+   * @param pomFile either the path to the directory containing a pom.xml or the path to the pom.xml itself
+   * @param progressMonitor the progress monitor, may be {@code null}
+   * @return the effective maven model, or <code>null</code> if the pomFile does not point to an existing pom.file or
+   *         container directory
    * @throws CoreException if the file points to a valid maven directory but the pom could not be read
    */
-  public org.apache.maven.model.Model readMavenModel(File pomFile) throws CoreException {
+  public org.apache.maven.model.Model readMavenModel(File pomFile, IProgressMonitor progressMonitor)
+      throws CoreException {
     File baseDir = pomFile.isDirectory() ? pomFile : pomFile.getParentFile();
     Objects.requireNonNull(baseDir, "not a directory and not a parent, invalid file?");
     IComponentLookup lookup = containerManager.getComponentLookup(baseDir);
@@ -121,17 +133,20 @@ public class MavenModelManager {
     if(locatePom.isEmpty()) {
       return null;
     }
-    ModelProcessor modelProcessor = lookup.lookup(ModelProcessor.class);
 
     File pom = locatePom.get();
-    Model model;
-    try {
-      model = modelProcessor.read(pom, new HashMap<>(Map.of(ModelProcessor.SOURCE, new FileModelSource(pom))));
-    } catch(IOException ex) {
-      throw new CoreException(Status.error(ex.getMessage(), ex));
-    }
-    model.setPomFile(pom);
-    return model;
+    IMavenExecutionContext context = maven.createExecutionContext();
+    return context.execute((IMavenExecutionContext innerContext, IProgressMonitor monitor) -> {
+      ProjectBuilder projectBuilder = lookup.lookup(ProjectBuilder.class);
+
+      try {
+        ProjectBuildingResult result = projectBuilder.build(pom, innerContext.getExecutionRequest()
+            .getProjectBuildingRequest().setRepositorySession(innerContext.getRepositorySession()));
+        return result.getProject().getModel();
+      } catch(ProjectBuildingException ex) {
+        throw new CoreException(Status.error(ex.getMessage(), ex));
+      }
+    }, progressMonitor);
   }
 
   public org.apache.maven.model.Model readMavenModel(IFile pomFile) throws CoreException {
