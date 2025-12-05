@@ -496,7 +496,7 @@ public abstract class AbstractMavenProjectTestCase {
     final List<MavenProjectInfo> projectInfos = new ArrayList<>();
     for(String pomName : pomNames) {
       File pomFile = new File(dst, pomName);
-      Model model = mavenModelManager.readMavenModel(pomFile);
+      Model model = mavenModelManager.readMavenModel(pomFile, null);
       MavenProjectInfo projectInfo = new MavenProjectInfo(pomName, pomFile, model, null);
       setBasedirRename(projectInfo);
       projectInfos.add(projectInfo);
@@ -562,7 +562,7 @@ public abstract class AbstractMavenProjectTestCase {
     copyDir(new File(projectLocation), dir);
 
     File pomFile = new File(dir, IMavenConstants.POM_FILE_NAME);
-    Model model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
+    Model model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile, null);
     final MavenProjectInfo projectInfo = new MavenProjectInfo(projectName, pomFile, model, null);
     setBasedirRename(projectInfo);
 

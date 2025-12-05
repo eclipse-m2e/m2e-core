@@ -91,7 +91,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       return;
     }
 
-    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null);
+    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null, m);
     if(projectInfo != null) {
       addProject(projectInfo);
       monitor.done();
@@ -114,7 +114,8 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     }
   }
 
-  private MavenProjectInfo readMavenProjectInfo(File baseDir, String modulePath, MavenProjectInfo parentInfo) {
+  private MavenProjectInfo readMavenProjectInfo(File baseDir, String modulePath, MavenProjectInfo parentInfo,
+      IProgressMonitor progressMonitor) {
     try {
       baseDir = baseDir.getCanonicalFile();
 
@@ -122,7 +123,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         return null; // we already know this project
         //mkleint: well, if the project is first scanned standalone and later scanned via parent reference, the parent ref gets thrown away??
       }
-      Model model = modelManager.readMavenModel(new File(baseDir, IMavenConstants.POM_FILE_NAME));
+      Model model = modelManager.readMavenModel(new File(baseDir, IMavenConstants.POM_FILE_NAME), progressMonitor);
       if(model == null) {
         return null;
       }
@@ -164,7 +165,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         Set<String> profiles = e.getValue();
 
         File moduleBaseDir = new File(baseDir, module);
-        MavenProjectInfo moduleInfo = readMavenProjectInfo(moduleBaseDir, module, projectInfo);
+        MavenProjectInfo moduleInfo = readMavenProjectInfo(moduleBaseDir, module, projectInfo, progressMonitor);
         if(moduleInfo != null) {
           moduleInfo.addProfiles(profiles);
           projectInfo.add(moduleInfo);
