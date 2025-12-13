@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,7 +60,6 @@ import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
@@ -79,7 +78,9 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.eclipse.m2e.internal.maven.compat.ReadonlyMavenExecutionRequest;
+import org.eclipse.m2e.internal.maven.compat.RepositorySessionUtil;
 
 
 
@@ -593,8 +594,9 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   static FilterRepositorySystemSession createRepositorySession(MavenExecutionRequest request,
       IMavenConfiguration configuration, IComponentLookup lookup) throws CoreException {
-    DefaultRepositorySystemSession session = (DefaultRepositorySystemSession) ((DefaultMaven) lookup
+    RepositorySystemSession baseSession = ((DefaultMaven) lookup
         .lookup(Maven.class)).newRepositorySession(request);
+    RepositorySystemSession session = RepositorySessionUtil.newSession(baseSession);
     String updatePolicy = configuration.getGlobalUpdatePolicy();
     return new FilterRepositorySystemSession(session, request.isUpdateSnapshots() ? null : updatePolicy);
   }

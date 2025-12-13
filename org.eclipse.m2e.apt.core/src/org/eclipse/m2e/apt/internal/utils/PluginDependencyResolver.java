@@ -23,8 +23,8 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -56,6 +56,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.internal.maven.compat.RepositorySessionUtil;
 
 
 @SuppressWarnings("restriction")
@@ -76,11 +77,11 @@ public class PluginDependencyResolver {
 
     IMaven maven = MavenPlugin.getMaven();
 
-    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(mavenSession.getRepositorySession());
+    RepositorySystemSession session = RepositorySessionUtil.newSession(mavenSession.getRepositorySession());
 
     DependencyGraphTransformer transformer = new ConflictResolver(new NearestVersionSelector(), new JavaScopeSelector(),
         new SimpleOptionalitySelector(), new JavaScopeDeriver());
-    session.setDependencyGraphTransformer(
+    RepositorySessionUtil.setDependencyGraphTransformer(session,
         new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner()));
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();

@@ -44,7 +44,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
@@ -81,6 +80,7 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.internal.maven.compat.RepositorySessionUtil;
 
 
 /**
@@ -213,16 +213,16 @@ public class MavenModelManager {
 
   DependencyNode readDependencyTree(RepositorySystemSession repositorySession, MavenProject mavenProject, String scope)
       throws CoreException {
-    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(repositorySession);
+    RepositorySystemSession session = RepositorySessionUtil.newSession(repositorySession);
 
     //
     // Taken from MavenRepositorySystemSession.newSession()
     //
     ConflictResolver transformer = new ConflictResolver(new NearestVersionSelector(), new JavaScopeSelector(),
         new SimpleOptionalitySelector(), new JavaScopeDeriver());
-    session.setDependencyGraphTransformer(transformer);
-    session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, Boolean.toString(true));
-    session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
+    RepositorySessionUtil.setDependencyGraphTransformer(session, transformer);
+    RepositorySessionUtil.setConfigProperty(session, ConflictResolver.CONFIG_PROP_VERBOSE, Boolean.toString(true));
+    RepositorySessionUtil.setConfigProperty(session, DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     try {

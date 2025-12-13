@@ -13,9 +13,11 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
-import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.SessionData;
 import org.eclipse.aether.transfer.TransferListener;
+
+import org.eclipse.m2e.internal.maven.compat.RepositorySessionUtil;
 
 
 /**
@@ -27,9 +29,9 @@ class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardin
 
   private final String updatePolicy;
 
-  private final DefaultRepositorySystemSession session;
+  private final RepositorySystemSession session;
 
-  public FilterRepositorySystemSession(DefaultRepositorySystemSession session, String updatePolicy) {
+  public FilterRepositorySystemSession(RepositorySystemSession session, String updatePolicy) {
     this.session = session;
     this.updatePolicy = updatePolicy;
   }
@@ -40,21 +42,15 @@ class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardin
   }
 
   public TransferListener setTransferListener(TransferListener transferListener) {
-    DefaultRepositorySystemSession session = getSession();
-    TransferListener origTransferListener = session.getTransferListener();
-    session.setTransferListener(transferListener);
-    return origTransferListener;
+    return RepositorySessionUtil.setTransferListener(getSession(), transferListener);
   }
 
   public SessionData setData(SessionData data) {
-    DefaultRepositorySystemSession session = getSession();
-    SessionData origSessionData = session.getData();
-    session.setData(data);
-    return origSessionData;
+    return RepositorySessionUtil.setData(getSession(), data);
   }
 
   @Override
-  protected DefaultRepositorySystemSession getSession() {
+  protected RepositorySystemSession getSession() {
     return this.session;
   }
 }
