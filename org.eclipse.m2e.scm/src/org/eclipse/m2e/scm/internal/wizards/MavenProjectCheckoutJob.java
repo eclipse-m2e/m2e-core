@@ -125,7 +125,7 @@ public abstract class MavenProjectCheckoutJob extends MavenWorkspaceJob {
         for(MavenProjectInfo projectInfo : projects) {
           Model model = projectInfo.getModel();
           if(model == null) {
-            model = modelManager.readMavenModel(projectInfo.getPomFile());
+            model = modelManager.readMavenModel(projectInfo.getPomFile(), null);
             projectInfo.setModel(model);
           }
 
