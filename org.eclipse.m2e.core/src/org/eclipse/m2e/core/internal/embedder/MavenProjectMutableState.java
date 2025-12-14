@@ -70,17 +70,25 @@ public class MavenProjectMutableState {
     setElements(project.getTestResources(), testResources);
 
     if(properties != null) {
-      project.getProperties().clear();
-      project.getProperties().putAll(properties);
+      try {
+        project.getProperties().clear();
+        project.getProperties().putAll(properties);
+      } catch(UnsupportedOperationException e) {
+        //if the collection itself is immutable then we do not need to restore a snapshot because it can not be altered anyways!
+      }
     }
 
     project.setContextValue(CTX_SNAPSHOT, null);
   }
 
   private <T> void setElements(List<T> collection, List<T> elements) {
-    if(elements != null) {
-      collection.clear();
-      collection.addAll(elements);
+    try {
+      if(elements != null) {
+        collection.clear();
+        collection.addAll(elements);
+      }
+    } catch(UnsupportedOperationException e) {
+      //if the collection itself is immutable then we do not need to restore a snapshot because it can not be altered anyways!
     }
   }
 
