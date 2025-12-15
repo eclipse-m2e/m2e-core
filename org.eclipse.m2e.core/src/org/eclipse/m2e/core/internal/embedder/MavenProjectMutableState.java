@@ -75,6 +75,8 @@ public class MavenProjectMutableState {
         project.getProperties().putAll(properties);
       } catch(UnsupportedOperationException e) {
         //if the collection itself is immutable then we do not need to restore a snapshot because it can not be altered anyways!
+      } catch(NullPointerException e) {
+        //see https://github.com/apache/maven/issues/11552
       }
     }
 
