@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.sdk.feature"
       label="%featureName"
-      version="2.10.101.qualifier"
+      version="3.0.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -24,15 +24,7 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.m2e.feature.source"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.m2e.lemminx.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.m2e.lemminx.feature.source"
          version="0.0.0"/>
 
    <includes
@@ -40,23 +32,11 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.m2e.logback.feature.source"
-         version="0.0.0"/>
-
-   <includes
          id="org.eclipse.m2e.pde.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="org.eclipse.m2e.pde.feature.source"
          version="0.0.0"/>
 
    <plugin
          id="org.eclipse.m2e.tests.common"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.m2e.tests.common.source"
          version="0.0.0"/>
 
 </feature>
