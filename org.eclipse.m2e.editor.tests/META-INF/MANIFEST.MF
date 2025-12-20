@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests for m2e multi-page editor
 Bundle-SymbolicName: org.eclipse.m2e.editor.tests
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Automatic-Module-Name: org.eclipse.m2e.editor.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-21

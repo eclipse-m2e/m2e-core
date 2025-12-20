@@ -17,11 +17,14 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
-import org.apache.maven.cli.internal.extension.model.CoreExtension;
-import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
+import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
@@ -64,7 +67,8 @@ public class PlexusContainerFacade {
 		}
 		List<CoreExtension> extensions;
 		try (InputStream is = new FileInputStream(extensionsXml)) {
-			extensions = new CoreExtensionsXpp3Reader().read(is).getExtensions();
+			extensions = new CoreExtensionsStaxReader().read(is, true, new InputSource(extensionsXml.toString()))
+					.getExtensions();
 		}
 		if (extensions.isEmpty()) {
 			return Collections.emptyList();
@@ -89,8 +93,9 @@ public class PlexusContainerFacade {
 			thread.setContextClassLoader(container.getContainerRealm());
 
 			BootstrapCoreExtensionManager resolver = container.lookup(BootstrapCoreExtensionManager.class);
-			return resolver.loadCoreExtensions(requestFactory.createFor(container), coreEntry.getExportedArtifacts(),
-					extensions);
+			MavenExecutionRequest request = requestFactory.createFor(container);
+			Set<String> exportedArtifacts = coreEntry.getExportedArtifacts();
+			return resolver.loadCoreExtensions(request, exportedArtifacts, extensions);
 		} finally {
 			thread.setContextClassLoader(ccl);
 			container.dispose();
@@ -103,9 +108,8 @@ public class PlexusContainerFacade {
 
 	public void loadExtension(CoreExtensionEntry extension) throws ComponentLookupException {
 		if (container instanceof DefaultPlexusContainer) {
-			((DefaultPlexusContainer) container).discoverComponents(extension.getClassRealm(),
-					new SessionScopeModule(container),
-				new MojoExecutionScopeModule(container));
+			((DefaultPlexusContainer) container).discoverComponents(extension.getClassRealm(), new SessionScopeModule(),
+					new MojoExecutionScopeModule(new MojoExecutionScope()));
 		}
 	}
 
