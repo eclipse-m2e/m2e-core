@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -228,6 +229,36 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 		}
 	}
 
+	@Test
+	public void testNonDefaultCompile() throws CoreException, IOException, InterruptedException {
+		File baseDir = new File(FileLocator
+				.toFileURL(JavaConfigurationTest.class.getResource("/projects/nonedefaultcompile/pom.xml")).getFile())
+				.getParentFile().getParentFile();
+		waitForJobsToComplete();
+		IProject project = importProjects(
+				baseDir.getAbsolutePath(), new String[] { "nonedefaultcompile/pom.xml",
+						"nonedefaultcompile/core/pom.xml", "nonedefaultcompile/app/pom.xml" },
+				new ResolverConfiguration())[0];
+		waitForJobsToComplete();
+		project = ResourcesPlugin.getWorkspace().getRoot().getProject("core");
+		IJavaProject javaProject = JavaCore.create(project);
+		assertEquals("17", javaProject.getOption(JavaCore.COMPILER_SOURCE, false));
+		assertEquals("17", javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false));
+		assertEquals("17", javaProject.getOption(JavaCore.COMPILER_COMPLIANCE, false));
+		assertEquals(JavaCore.ENABLED, javaProject.getOption(JavaCore.COMPILER_RELEASE, false));
+
+		List<String> srcEntryPaths = Arrays.stream(javaProject.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind()).filter(cp -> !cp.isTest())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		assertEquals(Set.of("/core/src/main/java", "/core/src/main/resources"),
+				Set.copyOf(srcEntryPaths));
+		List<String> testEntryPaths = Arrays.stream(javaProject.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind()).filter(cp -> cp.isTest())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		assertEquals(Set.of("/core/src/test/java", "/core/src/test/resources",
+				"/core/.._app_src_main_java"),
+				Set.copyOf(testEntryPaths));
+	}
 	// --- utility methods ---
 
 	private static final Predicate<IClasspathEntry> TEST_SOURCES = cp -> cp.isTest()
