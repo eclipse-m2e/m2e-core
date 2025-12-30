@@ -88,28 +88,17 @@ public class MavenTargetBundle extends TargetBundle {
 	public MavenTargetBundle(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor) {
 		this.artifact = artifact;
 		File file = artifact.getFile();
-		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
+		bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
 		try {
-			bundle = new TargetBundle(file);
+      bundle = new TargetBundle(file, location.getMetadataMode() == MissingMetadataMode.GENERATE_REWRITE);
 		} catch (Exception ex) {
 			MissingMetadataMode metadataMode = location.getMetadataMode();
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = Status.error(artifact + " is not a bundle", ex);
 				LOGGER.log(status);
-			} else if (metadataMode == MissingMetadataMode.GENERATE) {
-				try {
-					bundle = getWrappedArtifact(artifact, location, monitor);
-					isWrapped = true;
-				} catch (Exception e) {
-					// not possible then
-					String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
-					if (e.getMessage() != null) {
-						message += " (" + e.getMessage() + ")";
-					}
-					status = Status.error(message, e);
-					LOGGER.log(status);
-				}
+      } else if (metadataMode == MissingMetadataMode.GENERATE || metadataMode == MissingMetadataMode.GENERATE_REWRITE) {
+        generateOrRewriteManifest(artifact, location, monitor, metadataMode == MissingMetadataMode.GENERATE_REWRITE);
 			} else {
 				status = Status.CANCEL_STATUS;
 				LOGGER.log(status);
@@ -117,12 +106,29 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
+  private void generateOrRewriteManifest(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor, boolean rewriteManifest) {
+    try {
+      bundle = getWrappedArtifact(artifact, location, monitor, rewriteManifest);
+    	isWrapped = true;
+    } catch (Exception e) {
+    	// not possible then
+    	String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
+    	if (e.getMessage() != null) {
+    		message += " (" + e.getMessage() + ")";
+    	}
+    	status = Status.error(message, e);
+    	LOGGER.log(status);
+    }
+  }
+
 	public Artifact getArtifact() {
 		return artifact;
 	}
 
 	private static TargetBundle getWrappedArtifact(Artifact artifact, MavenTargetLocation location,
-			IProgressMonitor monitor) throws Exception {
+      IProgressMonitor monitor,
+      boolean rewriteManifest)
+      throws Exception {
 		IMaven maven = MavenPlugin.getMaven();
 		List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
 		Function<DependencyNode, Properties> instructionsLookup = node -> {
@@ -139,7 +145,7 @@ public class MavenTargetBundle extends TargetBundle {
 			RepositorySystemSession repositorySession = context.getRepositorySession();
 			try {
 				WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories,
-						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class));
+                                                                   repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class), rewriteManifest);
 				List<ProcessingMessage> directErrors = wrap.messages(false)
 						.filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
 				if (directErrors.isEmpty()) {

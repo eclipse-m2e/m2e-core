@@ -90,24 +90,24 @@ public class MavenBundleWrapper {
 	}
 
 	/**
-	 * Wraps an artifact (and possible its dependents if required) to produce a
-	 * manifest with OSGi metadata.
-	 * 
-	 * @param artifact           the artifact to wrap
-	 * @param instructionsLookup a lookup for bnd instructions
-	 * @param repositories       the repositories that should be used to resolve
-	 *                           dependencies
-	 * @param repoSystem         the repository system for lookup dependent items
-	 * @param repositorySession  the session to use
-	 * @param syncContextFactory the sync context factory to acquire exclusive
-	 *                           access to the wrapped artifact and its dependencies
-	 * @return the wrapped artifact
-	 * @throws Exception if wrapping the artifact fails for any reason
-	 */
+   * Wraps an artifact (and possible its dependents if required) to produce a manifest with OSGi metadata.
+   *
+   * @param artifact the artifact to wrap
+   * @param instructionsLookup a lookup for bnd instructions
+   * @param repositories the repositories that should be used to resolve dependencies
+   * @param repoSystem the repository system for lookup dependent items
+   * @param repositorySession the session to use
+   * @param syncContextFactory the sync context factory to acquire exclusive access to the wrapped artifact and its dependencies
+   * @param rewriteManifest if true, the manifest file is forced to be rewritten
+   * @return the wrapped artifact
+   * @throws Exception if wrapping the artifact fails for any reason
+   */
 	public static WrappedBundle getWrappedArtifact(Artifact artifact,
 			Function<DependencyNode, Properties> instructionsLookup, List<RemoteRepository> repositories,
 			RepositorySystem repoSystem, RepositorySystemSession repositorySession,
-			SyncContextFactory syncContextFactory) throws Exception {
+      SyncContextFactory syncContextFactory,
+      boolean rewriteManifest)
+      throws Exception {
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setRoot(new Dependency(artifact, null));
 		collectRequest.setRepositories(repositories);
@@ -150,7 +150,7 @@ public class MavenBundleWrapper {
 			});
 			syncContext.acquire(lockList, null);
 			Map<DependencyNode, WrappedBundle> visited = new HashMap<>();
-			WrappedBundle wrappedNode = getWrappedNode(node, instructionsLookup, visited);
+      WrappedBundle wrappedNode = getWrappedNode(node, instructionsLookup, visited, rewriteManifest);
 			for (WrappedBundle wrap : visited.values()) {
 				wrap.getJar().ifPresent(jar -> jar.close());
 			}
@@ -159,7 +159,9 @@ public class MavenBundleWrapper {
 	}
 
 	private static WrappedBundle getWrappedNode(DependencyNode node,
-			Function<DependencyNode, Properties> instructionsLookup, Map<DependencyNode, WrappedBundle> visited)
+      Function<DependencyNode, Properties> instructionsLookup,
+      Map<DependencyNode, WrappedBundle> visited,
+      boolean rewriteManifest)
 			throws Exception {
 		WrappedBundle wrappedNode = visited.get(node);
 		if (wrappedNode != null) {
@@ -198,7 +200,7 @@ public class MavenBundleWrapper {
 									"Artifact " + node.getArtifact() + " can not be read as a jar file"))));
 			return wrappedNode;
 		}
-		if (isValidOSGi(jar.getManifest())) {
+    if (!rewriteManifest && isValidOSGi(jar.getManifest())) {
 			// already a bundle!
 			visited.put(node,
 					wrappedNode = new WrappedBundle(node, List.of(), null, originalFile.toPath(), jar, List.of()));
@@ -207,7 +209,7 @@ public class MavenBundleWrapper {
 		List<DependencyNode> children = node.getChildren();
 		List<WrappedBundle> depends = new ArrayList<>();
 		for (DependencyNode child : children) {
-			depends.add(getWrappedNode(child, instructionsLookup, visited));
+      depends.add(getWrappedNode(child, instructionsLookup, visited, rewriteManifest));
 		}
 		WrappedBundle wrappedNodeAfterVisit = visited.get(node);
 		if (wrappedNodeAfterVisit != null) {
