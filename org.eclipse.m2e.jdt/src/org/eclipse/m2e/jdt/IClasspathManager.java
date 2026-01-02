@@ -16,6 +16,7 @@ package org.eclipse.m2e.jdt;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 
@@ -75,8 +76,10 @@ public interface IClasspathManager {
    * org.eclipse.jdt.core.IClasspathAttribute.TEST, copied here to allow running with older jdt.core version.
    *
    * @since 1.9
+   * @deprecated use {@link org.eclipse.jdt.core.IClasspathAttribute#TEST} instead
    */
-  String TEST_ATTRIBUTE = "test";
+  @Deprecated
+  String TEST_ATTRIBUTE = IClasspathAttribute.TEST;
 
   /**
    * Name of IClasspathEntry attribute that is to limit the imported code of project by jdt.core. Same as
@@ -84,8 +87,10 @@ public interface IClasspathManager {
    * version.
    *
    * @since 1.9
+   * @deprecated use {@link org.eclipse.jdt.core.IClasspathAttribute#WITHOUT_TEST_CODE} instead
    */
-  String WITHOUT_TEST_CODE = "without_test_code";
+  @Deprecated
+  String WITHOUT_TEST_CODE = IClasspathAttribute.WITHOUT_TEST_CODE;
 
   /**
    * Maven dependency resolution scope constant indicating test scope.
