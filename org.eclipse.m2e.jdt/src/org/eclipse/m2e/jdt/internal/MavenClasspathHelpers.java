@@ -70,7 +70,7 @@ public class MavenClasspathHelpers {
   }
 
   public static boolean isTestSource(IClasspathEntry entry) {
-    return "true".equals(getAttribute(entry, IClasspathManager.TEST_ATTRIBUTE));
+    return "true".equals(getAttribute(entry, IClasspathAttribute.TEST));
   }
 
   public static String getAttribute(IClasspathEntry entry, String key) {

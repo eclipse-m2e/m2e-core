@@ -66,7 +66,6 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
-import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 import org.eclipse.m2e.jdt.JreSystemVersion;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
@@ -528,7 +527,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         // all source entries are marked as generated (a.k.a. optional)
         IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
             inclusion, exclusion, true /*generated*/);
-        descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
+        descriptor.setClasspathAttribute(IClasspathAttribute.TEST, addTestFlag ? "true" : null);
       } else {
         log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
             + enclosing.getPath());
@@ -682,7 +681,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     log.info("Adding resource folder " + resourceFolder);
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
         new IPath[] {IPath.fromOSString("**")}, false /*optional*/);
-    descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
+    descriptor.setClasspathAttribute(IClasspathAttribute.TEST, addTestFlag ? "true" : null);
     descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
   }
 
