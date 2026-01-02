@@ -20,6 +20,7 @@ import static org.junit.Assume.assumeTrue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +36,15 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.jdt.internal.UnitTestSupport;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.hamcrest.Description;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +59,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	private static final String REPLACED_SUREFIRE_POM_STRING = "<!-- surefireArgs: replacedByArgsSets -->";
 	private static final String REPLACED_FAILSAFE_POM_STRING = "<!-- failsafeArgs: replacedByArgsSets -->";
 	private static final String ROOT_PATH = "/projects/surefireFailsafeToTestLaunchSettings";
-	private static ILaunchManager LAUNCH_MANAGER = DebugPlugin.getDefault().getLaunchManager();
+	private static final ILaunchManager LAUNCH_MANAGER = DebugPlugin.getDefault().getLaunchManager();
 
 	/*
 	 * XML allows encoding set of control characters: space (U+0020), carriage
@@ -102,7 +106,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 			""";
 
 	// Define the parameters to be used in the test
-	@Parameters
+	@Parameters(name = "{0}")
 	public static Collection<Object> data() {
 		return List.of(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST, MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
 	}
@@ -364,6 +368,64 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		assertFalse(argLine.contains("@{titi.tata}")); // unresolved property is removed
 	}
 
+	@Test
+	public void testJUnit4TestWithJUnit5Dependency() throws CoreException, IOException, InterruptedException {
+		assumeTrue("Only relevant for JUnit", MavenRuntimeClasspathProvider.JDT_JUNIT_TEST.equals(testType));
+
+		// Get launch type
+		ILaunchConfigurationType type = LAUNCH_MANAGER.getLaunchConfigurationType(testType);
+
+		assumeTrue(testType + " support not available", type != null);
+
+		File pomFile = getTestFile("junit5TestProject/pom.xml");
+
+		IProject project = importProject(pomFile.getAbsolutePath());
+
+		// create basic unit test
+		createDefaultTest(project, type, "testMvn.JUnit4Test");
+
+		updateProject(project);
+		waitForJobsToComplete();
+
+		ILaunchConfiguration[] updatedConfigurations = LAUNCH_MANAGER.getLaunchConfigurations(type);
+		assertTrue(updatedConfigurations.length == 1);
+
+		ILaunchConfiguration config = updatedConfigurations[0];
+		MavenRuntimeClasspathProvider provider = new MavenRuntimeClasspathProvider();
+		IRuntimeClasspathEntry[] classpathEntries = provider.computeUnresolvedClasspath(config); // to trigger classpath
+																									// computation
+		IRuntimeClasspathEntry[] resolvedClasspathEntries = provider.resolveClasspath(classpathEntries, config);
+		// make sure that vintage engine is on the classpath (as being part of the
+		// m-surefire-p classpath)
+		assertThat(Arrays.asList(resolvedClasspathEntries),
+				Matchers.hasItem(new IRuntimeClasspathEntryMatcherByFilename("junit-vintage-engine-5.14.1.jar")));
+	}
+
+	static final class IRuntimeClasspathEntryMatcherByFilename extends TypeSafeMatcher<IRuntimeClasspathEntry> {
+
+		private final String filename;
+
+		public IRuntimeClasspathEntryMatcherByFilename(String filename) {
+			this.filename = filename;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("IRuntimeClasspathEntry with location ending with ").appendValue(filename);
+		}
+
+		@Override
+		protected void describeMismatchSafely(IRuntimeClasspathEntry item, Description mismatchDescription) {
+			mismatchDescription.appendText("was IRuntimeClasspathEntry ").appendValue(item)
+					.appendText(" with location ").appendValue(item.getLocation());
+		}
+
+		@Override
+		protected boolean matchesSafely(IRuntimeClasspathEntry item) {
+			return item.getLocation() != null && item.getLocation().endsWith(filename);
+		}
+	}
+
 	private void updateProject(IProject project) throws CoreException, InterruptedException {
 		MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
 		waitForJobsToComplete();
@@ -402,4 +464,5 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	private File getTestFile(String filename) throws IOException {
 		return new File(FileLocator.toFileURL(getClass().getResource(ROOT_PATH + "/" + filename)).getFile());
 	}
+
 }
