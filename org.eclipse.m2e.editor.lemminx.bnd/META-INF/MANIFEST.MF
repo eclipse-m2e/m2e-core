@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.editor.lemminx.bnd;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Require-Bundle: org.eclipse.wildwebdeveloper.xml
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor

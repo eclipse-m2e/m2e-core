@@ -47,7 +47,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
@@ -65,6 +64,7 @@ import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 
 
 public class MavenProjectFacade implements IMavenProjectFacade, Serializable {

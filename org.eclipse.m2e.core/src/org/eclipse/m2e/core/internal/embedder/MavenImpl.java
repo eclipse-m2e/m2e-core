@@ -66,7 +66,6 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.RepositoryUtils;
@@ -98,11 +97,8 @@ import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
-import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -111,7 +107,6 @@ import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -216,8 +211,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       } finally {
         scope.exit();
       }
-    } catch(PluginManagerException | PluginConfigurationException | ClassCastException | PluginResolutionException
-        | MojoExecutionException ex) {
+    } catch(Exception ex) {
+      if(ex instanceof CoreException core) {
+        throw core;
+      }
       throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_mojo, mojoExecution), ex));
     }
   }
@@ -974,7 +971,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     try {
       ProjectSorter rm = new ProjectSorter(projects);
       return rm.getSortedProjects();
-    } catch(CycleDetectedException | DuplicateProjectException ex) {
+    } catch(Exception ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_sort, ex));
     }
   }
