@@ -733,9 +733,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     boolean enablePreviewFeatures = false;
 
+    boolean hasDefaultCompile = getCompilerMojoExecutions(request, monitor).stream()
+        .filter(e -> "default-compile".equals(e.getExecutionId())).findAny().isPresent();
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
       String id = execution.getExecutionId();
-      if(!"default-compile".equals(id)) {
+      if(hasDefaultCompile && !"default-compile".equals(id)) {
         //Maven can have many but JDT only supports one config!
         continue;
       }
@@ -990,7 +992,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected IContainer getFolder(IProject project, String path) throws CoreException {
     Path projectLocation = project.getLocation().toPath().toAbsolutePath();
-    Path folderPath = Path.of(path);
+    Path folderPath = Path.of(path).normalize();
     if(projectLocation.equals(folderPath)) {
       return project;
     }
@@ -1001,15 +1003,16 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       folderPath = projectLocation.resolve(path);
       relativePath = IPath.fromOSString(path);
     }
-    if(!project.exists(relativePath) && Files.exists(folderPath)
+    IFolder folder = project.getFolder(relativePath);
+    if((!project.exists(relativePath) || !folder.getProject().equals(project)) && Files.exists(folderPath)
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
       String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
-      IFolder folder = project.getFolder(linkName);
+      folder = project.getFolder(linkName);
       createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
       return folder;
     }
-    return project.getFolder(relativePath);
+    return folder;
   }
 
   /**
