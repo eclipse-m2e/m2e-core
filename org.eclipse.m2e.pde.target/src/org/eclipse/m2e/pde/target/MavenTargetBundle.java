@@ -44,163 +44,173 @@ import org.eclipse.pde.core.target.TargetBundle;
 
 public class MavenTargetBundle extends TargetBundle {
 
-	private static final ILog LOGGER = Platform.getLog(MavenTargetBundle.class);
-	private TargetBundle bundle;
-	private IStatus status;
-	private final BundleInfo bundleInfo;
-	private boolean isWrapped;
-	private Artifact artifact;
+  private static final ILog LOGGER = Platform.getLog(MavenTargetBundle.class);
 
-	@Override
-	public BundleInfo getBundleInfo() {
-		if (bundle == null) {
-			return bundleInfo;
-		}
-		return bundle.getBundleInfo();
-	}
+  private TargetBundle bundle;
 
-	@Override
-	public boolean isSourceBundle() {
-		return bundle != null && bundle.isSourceBundle();
-	}
+  private IStatus status;
 
-	@Override
-	public BundleInfo getSourceTarget() {
-		if (bundle == null) {
-			return null;
-		}
-		return bundle.getSourceTarget();
-	}
+  private final BundleInfo bundleInfo;
 
-	@Override
-	public boolean isFragment() {
-		return bundle != null && bundle.isFragment();
-	}
+  private boolean isWrapped;
 
-	@Override
-	public String getSourcePath() {
-		if (bundle == null) {
-			return null;
-		}
-		return bundle.getSourcePath();
-	}
+  private Artifact artifact;
 
-	public MavenTargetBundle(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor) {
-		this.artifact = artifact;
-		File file = artifact.getFile();
-		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
-				file != null ? file.toURI() : null, -1, false);
-		try {
-			bundle = new TargetBundle(file);
-		} catch (Exception ex) {
-			MissingMetadataMode metadataMode = location.getMetadataMode();
-			if (metadataMode == MissingMetadataMode.ERROR) {
-				status = Status.error(artifact + " is not a bundle", ex);
-				LOGGER.log(status);
-			} else if (metadataMode == MissingMetadataMode.GENERATE) {
-				try {
-					bundle = getWrappedArtifact(artifact, location, monitor);
-					isWrapped = true;
-				} catch (Exception e) {
-					// not possible then
-					String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
-					if (e.getMessage() != null) {
-						message += " (" + e.getMessage() + ")";
-					}
-					status = Status.error(message, e);
-					LOGGER.log(status);
-				}
-			} else {
-				status = Status.CANCEL_STATUS;
-				LOGGER.log(status);
-			}
-		}
-	}
+  @Override
+  public BundleInfo getBundleInfo() {
+    if (bundle == null) {
+      return bundleInfo;
+    }
+    return bundle.getBundleInfo();
+  }
 
-	public Artifact getArtifact() {
-		return artifact;
-	}
+  @Override
+  public boolean isSourceBundle() {
+    return bundle != null && bundle.isSourceBundle();
+  }
 
-	private static TargetBundle getWrappedArtifact(Artifact artifact, MavenTargetLocation location,
-			IProgressMonitor monitor) throws Exception {
-		IMaven maven = MavenPlugin.getMaven();
-		List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
-		Function<DependencyNode, Properties> instructionsLookup = node -> {
-			BNDInstructions instructions = location.getInstructionsForArtifact(node.getArtifact());
-			return instructions == null ? BNDInstructions.getDefaultInstructionProperties()
-					: instructions.asProperties();
-		};
-		IMavenExecutionContext exeContext = IMavenExecutionContext.getThreadContext()
-				.orElseGet(maven::createExecutionContext);
-		MultiStatus bundleStatus = new MultiStatus(MavenTargetBundle.class, 0,
-				"Some problems where detected while wrapping " + artifact);
-		Path wrappedBundle = exeContext.execute((context, monitor1) -> {
-			RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
-			RepositorySystemSession repositorySession = context.getRepositorySession();
-			try {
-				WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories,
-						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class));
-				List<ProcessingMessage> directErrors = wrap.messages(false)
-						.filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
-				if (directErrors.isEmpty()) {
-					// treat all items as warnings....
-					wrap.messages(true).map(ProcessingMessage::message).distinct().forEach(msg -> {
-						bundleStatus.add(Status.warning(msg));
-					});
-					return wrap.getFile().get();
-				}
-				if (directErrors.size() == 1) {
-					throw new CoreException(Status.error(directErrors.get(0).message()));
-				}
-				MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR,
-						"wrapping artifact " + artifact.getArtifactId() + " failed!");
-				for (ProcessingMessage message : directErrors) {
-					multiStatus.add(Status.error(message.message()));
-				}
-				throw new CoreException(multiStatus);
-			} catch (CoreException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new CoreException(Status.error("Can't collect dependencies!", e));
-			}
-		}, monitor);
-		TargetBundle bundle = new TargetBundle(wrappedBundle.toFile()) {
-			@Override
-			public IStatus getStatus() {
-				if (!bundleStatus.isOK()) {
-					// TODO see https://github.com/eclipse-pde/eclipse.pde/issues/656
-					// return bundleStatus;
-				}
-				return super.getStatus();
-			}
-		};
-		return bundle;
+  @Override
+  public BundleInfo getSourceTarget() {
+    if (bundle == null) {
+      return null;
+    }
+    return bundle.getSourceTarget();
+  }
 
-	}
+  @Override
+  public boolean isFragment() {
+    return bundle != null && bundle.isFragment();
+  }
 
-	public boolean isWrapped() {
-		return isWrapped;
-	}
+  @Override
+  public String getSourcePath() {
+    if (bundle == null) {
+      return null;
+    }
+    return bundle.getSourcePath();
+  }
 
-	@Override
-	public IStatus getStatus() {
-		if (bundle == null) {
-			if (status == null) {
-				return Status.OK_STATUS;
-			}
-			return status;
-		}
-		return bundle.getStatus();
-	}
+  public MavenTargetBundle(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor) {
+    this.artifact = artifact;
+    File file = artifact.getFile();
+    bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(), file != null ? file.toURI()
+                                                                                                                            : null, -1, false);
+    MissingMetadataMode missingMetadataMode = location.getMetadataMode();
 
-	@Override
-	public int hashCode() {
-		return getBundleInfo().hashCode();
-	}
+    if (missingMetadataMode == MissingMetadataMode.GENERATE) {
+      generateOrRewriteManifest(artifact, location, monitor, false);
+    } else if (missingMetadataMode == MissingMetadataMode.GENERATE_REWRITE) {
+      generateOrRewriteManifest(artifact, location, monitor, true);
+    } else {
+      try {
+        bundle = new TargetBundle(file);
+      } catch (Exception ex) {
+        MissingMetadataMode metadataMode = location.getMetadataMode();
+        if (metadataMode == MissingMetadataMode.ERROR) {
+          status = Status.error(artifact + " is not a bundle", ex);
+          LOGGER.log(status);
+        } else {
+          status = Status.CANCEL_STATUS;
+          LOGGER.log(status);
+        }
+      }
+    }
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof MavenTargetBundle other && getBundleInfo().equals(other.getBundleInfo());
-	}
+  private void generateOrRewriteManifest(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor, boolean rewriteManifest) {
+    try {
+      bundle = getWrappedArtifact(artifact, location, monitor, rewriteManifest);
+      isWrapped = true;
+    } catch (Exception e) {
+      // not possible then
+      String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
+      if (e.getMessage() != null) {
+        message += " (" + e.getMessage() + ")";
+      }
+      status = Status.error(message, e);
+      LOGGER.log(status);
+    }
+  }
+
+  public Artifact getArtifact() {
+    return artifact;
+  }
+
+  private static TargetBundle getWrappedArtifact(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor, boolean rewriteManifest)
+      throws Exception {
+    IMaven maven = MavenPlugin.getMaven();
+    List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
+    Function<DependencyNode, Properties> instructionsLookup = node -> {
+      BNDInstructions instructions = location.getInstructionsForArtifact(node.getArtifact());
+      return instructions == null ? BNDInstructions.getDefaultInstructionProperties() : instructions.asProperties();
+    };
+    IMavenExecutionContext exeContext = IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext);
+    MultiStatus bundleStatus = new MultiStatus(MavenTargetBundle.class, 0, "Some problems where detected while wrapping " + artifact);
+    Path wrappedBundle = exeContext.execute((context, monitor1) -> {
+      RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+      RepositorySystemSession repositorySession = context.getRepositorySession();
+      try {
+        WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories, repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class), rewriteManifest);
+        List<ProcessingMessage> directErrors = wrap.messages(false).filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
+        if (directErrors.isEmpty()) {
+          // treat all items as warnings....
+          wrap.messages(true).map(ProcessingMessage::message).distinct().forEach(msg -> {
+            bundleStatus.add(Status.warning(msg));
+          });
+          return wrap.getFile().get();
+        }
+        if (directErrors.size() == 1) {
+          throw new CoreException(Status.error(directErrors.get(0).message()));
+        }
+        MultiStatus multiStatus = new MultiStatus(MavenTargetBundle.class, IStatus.ERROR, "wrapping artifact " + artifact.getArtifactId()
+                                                                                          + " failed!");
+        for (ProcessingMessage message : directErrors) {
+          multiStatus.add(Status.error(message.message()));
+        }
+        throw new CoreException(multiStatus);
+      } catch (CoreException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new CoreException(Status.error("Can't collect dependencies!", e));
+      }
+    }, monitor);
+    TargetBundle bundle = new TargetBundle(wrappedBundle.toFile()) {
+      @Override
+      public IStatus getStatus() {
+        if (!bundleStatus.isOK()) {
+          // TODO see https://github.com/eclipse-pde/eclipse.pde/issues/656
+          // return bundleStatus;
+        }
+        return super.getStatus();
+      }
+    };
+    return bundle;
+
+  }
+
+  public boolean isWrapped() {
+    return isWrapped;
+  }
+
+  @Override
+  public IStatus getStatus() {
+    if (bundle == null) {
+      if (status == null) {
+        return Status.OK_STATUS;
+      }
+      return status;
+    }
+    return bundle.getStatus();
+  }
+
+  @Override
+  public int hashCode() {
+    return getBundleInfo().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof MavenTargetBundle other && getBundleInfo().equals(other.getBundleInfo());
+  }
 
 }
