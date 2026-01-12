@@ -331,7 +331,7 @@
 						<configuration>
 							<outputDirectory>${outputDirectory.sources}</outputDirectory>
 							<classifier>sources</classifier>
-							<excludes>**/*.java</excludes>
+							<excludes>**/*.java,**/org/fusesource/jansi/internal/native/**/*.jnilib</excludes>
 							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
 						</configuration>
 					</execution>
