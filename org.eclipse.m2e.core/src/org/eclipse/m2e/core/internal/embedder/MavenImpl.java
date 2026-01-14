@@ -208,12 +208,24 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       // getPluginRealm creates plugin realm and populates pluginDescriptor.classRealm field
       lookup(BuildPluginManager.class).getPluginRealm(session, mojoDescriptor.getPluginDescriptor());
       
-      // Enter and seed SessionScope to ensure it's available when configuring the mojo
-      // This is necessary because plugin realm creation may use a different SessionScope instance
-      // that is not automatically seeded (see https://github.com/eclipse-m2e/m2e-core/issues/2084)
+      // When a project has a .mvn folder, PlexusContainerManager creates a separate container for that
+      // multi-module project directory (see PlexusContainerManager.aquire(File)). Each container has its
+      // own ClassWorld and thus its own Guice injector with separate SessionScope instances.
+      // After getPluginRealm() loads the plugin, we may be using a different SessionScope instance than
+      // the one seeded in MavenExecutionContext.execute(). We need to ensure this SessionScope is also
+      // entered and seeded. We check first to avoid double-entering if already in scope.
+      // See: https://github.com/eclipse-m2e/m2e-core/issues/2084
       SessionScope sessionScope = lookup(SessionScope.class);
-      sessionScope.enter();
-      sessionScope.seed(MavenSession.class, session);
+      boolean sessionScopeEntered = false;
+      try {
+        // Check if SessionScope is already active by attempting to get its state
+        sessionScope.getScopeState();
+      } catch(com.google.inject.OutOfScopeException e) {
+        // SessionScope is not active, we need to enter and seed it
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, session);
+        sessionScopeEntered = true;
+      }
       
       try {
         MojoExecutionScope mojoScope = lookup(MojoExecutionScope.class);
@@ -227,7 +239,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           mojoScope.exit();
         }
       } finally {
-        sessionScope.exit();
+        if(sessionScopeEntered) {
+          sessionScope.exit();
+        }
       }
     } catch(PluginManagerException | PluginConfigurationException | ClassCastException | PluginResolutionException
         | MojoExecutionException ex) {

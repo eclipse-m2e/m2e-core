@@ -28,6 +28,11 @@ import org.junit.Test;
  * Tests for SessionScope handling in Maven embedder, particularly for issue #2084.
  * This test verifies that getConfiguredMojo properly enters and seeds SessionScope
  * when working with projects that have a .mvn folder.
+ * 
+ * Background: When a project has a .mvn folder, PlexusContainerManager creates a 
+ * separate container for that multi-module project directory. Each container has its
+ * own ClassWorld and Guice injector with separate SessionScope instances. This can
+ * cause OutOfScopeException if the SessionScope is not properly managed.
  */
 public class SessionScopeTest extends AbstractMavenProjectTestCase {
 
@@ -35,6 +40,9 @@ public class SessionScopeTest extends AbstractMavenProjectTestCase {
    * Test that getConfiguredMojo works with projects containing .mvn folder.
    * This reproduces the OutOfScopeException issue where plugin realm creation
    * may use a different SessionScope instance that needs explicit seeding.
+   * 
+   * The .mvn folder triggers PlexusContainerManager to create a separate container
+   * for the multi-module project directory, which has its own SessionScope instance.
    * 
    * See: https://github.com/eclipse-m2e/m2e-core/issues/2084
    */
