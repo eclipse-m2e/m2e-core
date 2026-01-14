@@ -381,7 +381,7 @@ public class UnitTestSupport {
       IJavaProject javaProject = JavaCore.create(facade.getProject());
       IClasspathEntry classpathEntry = javaProject.findContainingClasspathEntry(javaTestSourceFile);
       if(classpathEntry == null) {
-        LOG.debug("Cannot find classpath entry for file: {}", javaTestSourceFile.getFullPath());
+        LOG.warn("Cannot find classpath entry for file: {}", javaTestSourceFile.getFullPath());
         return false;
       }
 
