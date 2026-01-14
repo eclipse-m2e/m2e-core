@@ -321,6 +321,7 @@ public class UnitTestSupport {
 
       IResource[] resources = configuration.getMappedResources();
       if(resources == null || resources.length == 0) {
+        LOG.debug("No mapped resources for launch configuration: {}", configuration.getName());
         return null;
       }
       // only the first resource is considered
@@ -333,37 +334,39 @@ public class UnitTestSupport {
         executions.addAll(facade.getMojoExecutions(id.groupId(), id.artifactId(), monitor, id.goal()));
       }
 
-      // find which plugin execution is the most relevant for the tested resource
+      // find which mojo execution is the most relevant for the tested resource
       Optional<MojoExecution> mostRelevantExecution = executions.stream()
-          .filter(e -> isResourceHandledByPlugin(facade, monitor, e, resource)).findFirst()
+          .filter(e -> isResourceHandledByMojoExecution(facade, monitor, e, resource)).findFirst()
           .or(() -> Optional.ofNullable(executions.isEmpty() ? null : executions.getFirst()));
 
       if(mostRelevantExecution.isEmpty()) {
         LOG.debug("No surefire/failsafe execution found for resource: {}", resource.getFullPath());
         return null;
       }
+      LOG.debug("Using mojo execution {} to populate test launch arguments",
+          mostRelevantExecution.get().getExecutionId());
       return getTestLaunchArguments(mavenProject, mostRelevantExecution.get(), monitor);
     }
 
     /**
-     * Checks if the resource (class file, folder, project) is handled by the given plugin execution
+     * Checks if the resource (source file, folder, project) is handled by the given failsafe/surefire execution
      * 
      * @return true if the mojo execution (potentially) covers the resource
      * @throws CoreException
      */
-    private boolean isResourceHandledByPlugin(IMavenProjectFacade facade, IProgressMonitor monitor,
+    private boolean isResourceHandledByMojoExecution(IMavenProjectFacade facade, IProgressMonitor monitor,
         MojoExecution execution, IResource resource) {
 
       switch(resource.getType()) {
         case IResource.FILE:
-          return isFileHandledByPlugin(facade, monitor, execution, Adapters.adapt(resource, IFile.class));
+          return isFileHandledByMojoExecution(facade, monitor, execution, Adapters.adapt(resource, IFile.class));
         case IResource.FOLDER:
           // just check the first class file found in the folder
           IFolder folder = Adapters.adapt(resource, IFolder.class);
           try {
             return Arrays.stream(folder.members())
                 .filter(r -> r.getType() == IResource.FILE && r.getName().endsWith(".java")).findFirst()
-                .map(f -> isFileHandledByPlugin(facade, monitor, execution, Adapters.adapt(f, IFile.class)))
+                .map(f -> isFileHandledByMojoExecution(facade, monitor, execution, Adapters.adapt(f, IFile.class)))
                 .orElse(false);
           } catch(CoreException ex) {
             LOG.warn("Unable to read folder members: {}", folder.getFullPath(), ex);
@@ -373,24 +376,24 @@ public class UnitTestSupport {
       return true;
     }
 
-    private boolean isFileHandledByPlugin(IMavenProjectFacade facade, IProgressMonitor monitor, MojoExecution execution,
-        IFile file) {
+    private boolean isFileHandledByMojoExecution(IMavenProjectFacade facade, IProgressMonitor monitor,
+        MojoExecution execution, IFile javaTestSourceFile) {
       IJavaProject javaProject = JavaCore.create(facade.getProject());
-      IClasspathEntry classpathEntry = javaProject.findContainingClasspathEntry(file);
+      IClasspathEntry classpathEntry = javaProject.findContainingClasspathEntry(javaTestSourceFile);
       if(classpathEntry == null) {
-        LOG.debug("Cannot find classpath entry for file: {}", file.getFullPath());
+        LOG.debug("Cannot find classpath entry for file: {}", javaTestSourceFile.getFullPath());
         return false;
       }
 
       // convert from file system path to package relative path with extension
       // format must be e.g. "my/package/MyTest.class" including class extension
-      String testClassFile = file.getFullPath().makeRelativeTo(classpathEntry.getPath()).toString().replace(".java",
-          ".class");
-      // get a configured mojo instance 
+      String testClassFile = javaTestSourceFile.getFullPath().makeRelativeTo(classpathEntry.getPath()).toString()
+          .replace(".java", ".class");
+      // get a configured mojo instance for failsafe/surefire
       Optional<Mojo> mojo = getMojoInstance(facade, execution, monitor);
-      // get an instance of org.apache.maven.surefire.api.testset.TestListResolver directly from the plugin instance
+      // get an instance of org.apache.maven.surefire.api.testset.TestListResolver directly from the mojo
       Optional<Object> testResolverInstance = mojo.map(o -> uncheckedInvoke(o, GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD));
-      // check if the test is handled by the plugin
+      // check if the test is handled by the mojo
       Boolean isTestHandled = testResolverInstance.map(o -> uncheckedInvoke(o, SHOULD_RUN_METHOD, testClassFile, ""))
           .map(Boolean.class::cast).orElse(false);
       return isTestHandled;
