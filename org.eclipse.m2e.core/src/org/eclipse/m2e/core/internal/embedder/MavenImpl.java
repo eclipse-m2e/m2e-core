@@ -213,15 +213,15 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       // own ClassWorld and thus its own Guice injector with separate SessionScope instances.
       // After getPluginRealm() loads the plugin, we may be using a different SessionScope instance than
       // the one seeded in MavenExecutionContext.execute(). We need to ensure this SessionScope is also
-      // entered and seeded. We check first to avoid double-entering if already in scope.
+      // entered and seeded. We try to seed first; if that fails with OutOfScopeException, we enter and seed.
       // See: https://github.com/eclipse-m2e/m2e-core/issues/2084
       SessionScope sessionScope = lookup(SessionScope.class);
       boolean sessionScopeEntered = false;
       try {
-        // Check if SessionScope is already active by attempting to get its state
-        sessionScope.getScopeState();
+        // Try to seed the session - this will fail if the scope is not entered
+        sessionScope.seed(MavenSession.class, session);
       } catch(com.google.inject.OutOfScopeException e) {
-        // SessionScope is not active, we need to enter and seed it
+        // SessionScope is not entered, we need to enter it first and then seed
         sessionScope.enter();
         sessionScope.seed(MavenSession.class, session);
         sessionScopeEntered = true;
