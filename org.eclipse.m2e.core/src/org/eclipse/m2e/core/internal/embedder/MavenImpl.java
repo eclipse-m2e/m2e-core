@@ -83,6 +83,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.ConfigurationContainer;
@@ -206,15 +207,41 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
       // getPluginRealm creates plugin realm and populates pluginDescriptor.classRealm field
       lookup(BuildPluginManager.class).getPluginRealm(session, mojoDescriptor.getPluginDescriptor());
-      MojoExecutionScope scope = lookup(MojoExecutionScope.class);
+      
+      // When a project has a .mvn folder, PlexusContainerManager creates a separate container for that
+      // multi-module project directory (see PlexusContainerManager.aquire(File)). Each container has its
+      // own ClassWorld and thus its own Guice injector with separate SessionScope instances.
+      // After getPluginRealm() loads the plugin, we may be using a different SessionScope instance than
+      // the one seeded in MavenExecutionContext.execute(). We need to ensure this SessionScope is also
+      // entered and seeded. We try to seed first; if that fails with OutOfScopeException, we enter and seed.
+      // See: https://github.com/eclipse-m2e/m2e-core/issues/2084
+      SessionScope sessionScope = lookup(SessionScope.class);
+      boolean sessionScopeEntered = false;
       try {
-        // Initialize MojoExecutionScope (for mojo's leveraging Sisu with JSR330 annotations, this is otherwise done by org.apache.maven.plugin.DefaultBuildPluginManager)
-        scope.enter();
-        scope.seed(MavenProject.class, session.getCurrentProject());
-        scope.seed(MojoExecution.class, mojoExecution);
-        return clazz.cast(lookup(MavenPluginManager.class).getConfiguredMojo(Mojo.class, session, mojoExecution));
+        // Try to seed the session - this will fail if the scope is not entered
+        sessionScope.seed(MavenSession.class, session);
+      } catch(com.google.inject.OutOfScopeException e) {
+        // SessionScope is not entered, we need to enter it first and then seed
+        sessionScope.enter();
+        sessionScope.seed(MavenSession.class, session);
+        sessionScopeEntered = true;
+      }
+      
+      try {
+        MojoExecutionScope mojoScope = lookup(MojoExecutionScope.class);
+        try {
+          // Initialize MojoExecutionScope (for mojo's leveraging Sisu with JSR330 annotations, this is otherwise done by org.apache.maven.plugin.DefaultBuildPluginManager)
+          mojoScope.enter();
+          mojoScope.seed(MavenProject.class, session.getCurrentProject());
+          mojoScope.seed(MojoExecution.class, mojoExecution);
+          return clazz.cast(lookup(MavenPluginManager.class).getConfiguredMojo(Mojo.class, session, mojoExecution));
+        } finally {
+          mojoScope.exit();
+        }
       } finally {
-        scope.exit();
+        if(sessionScopeEntered) {
+          sessionScope.exit();
+        }
       }
     } catch(PluginManagerException | PluginConfigurationException | ClassCastException | PluginResolutionException
         | MojoExecutionException ex) {
