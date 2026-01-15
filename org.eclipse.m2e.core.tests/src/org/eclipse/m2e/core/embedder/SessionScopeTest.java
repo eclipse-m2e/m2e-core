@@ -69,9 +69,9 @@ public class SessionScopeTest extends AbstractMavenProjectTestCase {
       MavenSession session = ctx.getSession();
       assertNotNull("Session should exist", session);
       
-      // Get the execution plan for the package phase which includes jar:jar goal
-      MavenExecutionPlan plan = maven.calculateExecutionPlan(facade.getMavenProject(), 
-          java.util.List.of("package"), false, monitor);
+      // Use setupExecutionPlan which properly initializes MojoDescriptor
+      // (unlike calculateExecutionPlan which doesn't)
+      MavenExecutionPlan plan = facade.setupExecutionPlan(java.util.List.of("package"), monitor);
       assertNotNull("Execution plan should exist", plan);
       
       // Find the jar:jar mojo execution
