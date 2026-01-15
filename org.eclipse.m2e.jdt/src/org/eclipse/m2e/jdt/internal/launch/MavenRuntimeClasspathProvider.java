@@ -289,12 +289,12 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       try {
         Version version = new GenericVersionScheme().parseVersion(mojoExecution.getPlugin().getVersion());
         if(version.compareTo(MIN_SUREFIRE_VERSION) < 0) {
-          log.debug(
+          log.error(
               "Skipping adding Maven Surefire Plugin dependencies for MojoExecution id {} of plugin {} as its version {} is below 2.22.1",
               mojoExecution.getExecutionId(), mojoExecution.getPlugin().getId(),
               mojoExecution.getPlugin().getVersion());
         } else {
-          log.debug("Adding Maven Surefire Plugin dependencies for MojoExecution id {} of plugin {}",
+          log.error("Adding Maven Surefire Plugin dependencies for MojoExecution id {} of plugin {}",
               mojoExecution.getExecutionId(), mojoExecution.getPlugin().getId());
           addMavenSurefirePluginProviderDependencies(resolved, mojoExecution, context, monitor);
           surefireDependenciesAdded = true;
@@ -310,7 +310,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     // use legacy mechanism to add junit5 dependencies for junit5 launches when surefire plugin is not used or below 2.22.1
     if(!surefireDependenciesAdded && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5
         .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
-      log.debug(
+      log.error(
           "Adding missing JUnit5 execution dependencies for JUnit5 launch configuration via legacy method as no suitable Maven Surefire Plugin execution was found");
       addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
     }
