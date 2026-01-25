@@ -70,7 +70,7 @@ pipeline {
 							scp -r org.eclipse.m2e.repository/target/repository/* genie.m2e@projects-storage.eclipse.org:${1}
 						}
 						# Read M2E branding version
-						version=$(xmllint --xpath 'string(/feature/@version)' org.eclipse.m2e.sdk.feature/feature.xml)
+						version=$(xmllint --xpath 'string(/project/version)' pom.xml)
 						if [[ $version =~ ([0-9]+\\.[0-9]+\\.[0-9]+)\\.qualifier ]] # backslash itself has to be escaped in Jenkinsfile
 						then
 							M2E_VERSION="${BASH_REMATCH[1]}"
