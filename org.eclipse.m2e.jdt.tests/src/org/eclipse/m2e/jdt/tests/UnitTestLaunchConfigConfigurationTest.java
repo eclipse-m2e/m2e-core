@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.debug.core.DebugPlugin;
@@ -132,7 +133,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		IProject project = importProject(pomFile.getAbsolutePath());
 
 		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTest");
+		createDefaultTest(project, type, "src/test/java/test/SomeTest.java");
 
 		updateProject(project);
 		waitForJobsToComplete();
@@ -193,7 +194,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		// waitForJobsToComplete();
 
 		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTestIT");
+		createDefaultTest(project, type, "src/test/java/test/SomeTestIT.java");
 
 		updateProject(project);
 		waitForJobsToComplete();
@@ -255,7 +256,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		waitForJobsToComplete();
 
 		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTest");
+		createDefaultTest(project, type, "src/test/java/test/SomeTest.java");
 
 		ILaunchConfiguration[] updatedConfigurations = LAUNCH_MANAGER.getLaunchConfigurations(type);
 		assertTrue(updatedConfigurations.length == 1);
@@ -305,7 +306,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		waitForJobsToComplete();
 
 		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTestIT");
+		createDefaultTest(project, type, "src/test/java/test/SomeTestIT.java");
 
 		ILaunchConfiguration[] updatedConfigurations = LAUNCH_MANAGER.getLaunchConfigurations(type);
 		assertTrue(updatedConfigurations.length == 1);
@@ -349,7 +350,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		IProject project = importProject(pomFile.getAbsolutePath());
 
 		// create basic unit test
-		createDefaultTest(project, type, "test.SomeTest");
+		createDefaultTest(project, type, "src/test/java/test/SomeTest.java");
 
 		updateProject(project);
 		waitForJobsToComplete();
@@ -369,12 +370,13 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 	}
 
 	// Create a default test
-	private void createDefaultTest(IProject project, ILaunchConfigurationType type, String testClassName)
+	private void createDefaultTest(IProject project, ILaunchConfigurationType type, String testClassSourceFileName)
 			throws CoreException {
 		// create basic unit test
 		ILaunchConfigurationWorkingCopy launchConfig = type.newInstance(project, "sampleTest");
 		launchConfig.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getName());
-		launchConfig.setAttribute(IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, testClassName);
+		IResource testSourceFile = project.getFile(testClassSourceFileName);
+		launchConfig.setMappedResources(new IResource[] { testSourceFile });
 		launchConfig.setAttribute(DebugPlugin.ATTR_WORKING_DIRECTORY, project.getLocation().toString());
 		launchConfig.doSave();
 	}
