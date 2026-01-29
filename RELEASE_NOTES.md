@@ -1,6 +1,6 @@
 # Eclipse m2e - Release notes
 
-## 2.10.1
+## 2.11.0
 
 * 📅 Release Date: _expected_ beginning of March 2026
 

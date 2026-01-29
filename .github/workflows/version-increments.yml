@@ -10,5 +10,6 @@ jobs:
     uses: eclipse-platform/eclipse.platform.releng.aggregator/.github/workflows/publishVersionCheckResults.yml@master
     with:
       botGithubId: eclipse-m2e-bot
+      stream-version-property: project.version
     secrets:
       githubBotPAT: ${{ secrets.M2E_BOT_PAT }}
