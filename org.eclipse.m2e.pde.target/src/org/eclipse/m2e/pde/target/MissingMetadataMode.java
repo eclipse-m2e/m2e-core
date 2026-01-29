@@ -13,5 +13,8 @@
 package org.eclipse.m2e.pde.target;
 
 public enum MissingMetadataMode {
-	IGNORE, ERROR, GENERATE;
+  IGNORE,
+  ERROR,
+  GENERATE,
+  GENERATE_REWRITE;
 }
