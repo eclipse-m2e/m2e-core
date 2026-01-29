@@ -22,7 +22,7 @@ For more information, please see the Eclipse Committer Handbook:
 
 ## 💬 Get in touch with the community
 
-Eclipse m2e use mainly 2 channels for strategical and technical discussions
+Eclipse m2e use mainly 2 channels for strategic and technical discussions
 
 * 🐞 View and report issues through uses GitHub Issues at https://github.com/eclipse-m2e/m2e-core/issues. _📜 Migration to GitHub tracker took place in March 2021, for older tickets, see https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e 📜_
 * 📧 Join the m2e-dev@eclipse.org mailing-list to get in touch with other contributors about project organization and planning, and browse archive at 📜 [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
@@ -56,7 +56,7 @@ Step by Step guide:
     2. By choosing *Show all variables* at the bottom of the page, you are able to change other values as well but you do not have to.
     3. Click *Next* .
 7. Press *Finish* on the *Confirmation* page will start the installation process. 
-8. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclispe started, the progress bar in the status bar shows the progress of the overall setup.
+8. The installer will download the selected Eclipse version, starts Eclipse and will perform all the additional steps (cloning the git repos, etc...). When the downloaded Eclipse started, the progress bar in the status bar shows the progress of the overall setup.
 9. Once the *Executing startup task* job is finished you should have all the *m2-core* and *m2-core-tests* projects imported into three working sets called *m2-core*  and *m2-core-tests*.
 10. Remaining errors are resolved after a restart of Eclipse.
 11. Happy coding!
@@ -64,7 +64,7 @@ Step by Step guide:
 ### ⌨️ Setting up the Development Environment manually
 
 * Clone this repository <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a> for m2e-core.
-Some tests are in a separate repository which is referenced as a Git submodule in the `m2e-core-tests` folder. You can use typical Git submodules comment to initialie the content of this folder.
+Some tests are in a separate repository which is referenced as a Git submodule in the `m2e-core-tests` folder. You can use typical Git submodules comment to initialize the content of this folder.
 
 * Run a build via command-line as mentioned below, since m2e relies on some code-generation that's not well integrated in the Eclipse IDE.
 * Use latest release of the Eclipse SDK or Eclipse IDE with the Plugin Development Environment installed.
@@ -105,7 +105,7 @@ If are going to modify the Maven runtime components in `m2e-maven-runtime` folde
 
 ### ⬆️ Version bump
 
-m2e tries to use OSGi Semantic Version (to properly expose its API contracts and breakage) and Reproducible Version Qualifiers (to minimize the avoid producing multiple equivalent artifacts for identical source). This requires the developer to manually bump version from time to time. Somes rules are that:
+m2e tries to use OSGi Semantic Version (to properly expose its API contracts and breakage) and Reproducible Version Qualifiers (to minimize the avoid producing multiple equivalent artifacts for identical source). This requires the developer to manually bump version from time to time. Some rules are that:
 
 * Versions are bumped on a __per module grain__ (bump version of individual bundles/features one by one when necessary), __DON'T bump version of parent pom, nor of other modules you don't change__
 * __Versions are bumped maximum once per release__ (don't bump versions that were already bumped since last release)
@@ -115,7 +115,7 @@ m2e tries to use OSGi Semantic Version (to properly expose its API contracts and
 
 The delta for version bumps are:
 
-* `+0.0.100` (next micro) for a bugfix, or an internal change that doesn't surface to APIs (we increment by 100 in order to allow maintanance release to increase by just 1, if they are necessary at some time)
+* `+0.0.100` (next micro) for a bugfix, or an internal change that doesn't surface to APIs (we increment by 100 in order to allow maintenance release to increase by just 1, if they are necessary at some time)
 * `+0.1.0` (next minor) for an API addition
 * `+1.0.0` (next major) for an API breakage (needs to be discussed on the mailing-list first)
 * If some "smaller" bump already took place, you can replace it with your "bigger one". Eg, if last release has org.eclipse.m2e.editor 1.16.1; and someone already bumped version to 1.16.2 (for an internal change) and you're adding a new API, then you need to change version to 1.17.0
