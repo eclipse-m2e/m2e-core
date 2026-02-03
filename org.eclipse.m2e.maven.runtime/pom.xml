@@ -21,14 +21,14 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1101-SNAPSHOT</version>
+	<version>3.9.1200-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.11</maven-core.version>
+		<maven-core.version>3.9.12</maven-core.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
@@ -331,7 +331,7 @@
 						<configuration>
 							<outputDirectory>${outputDirectory.sources}</outputDirectory>
 							<classifier>sources</classifier>
-							<excludes>**/*.java</excludes>
+							<excludes>**/*.java,**/org/fusesource/jansi/internal/native/**/*.jnilib</excludes>
 							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
 						</configuration>
 					</execution>
