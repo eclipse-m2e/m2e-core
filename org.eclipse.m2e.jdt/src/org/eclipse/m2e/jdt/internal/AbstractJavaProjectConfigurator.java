@@ -665,7 +665,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           // skip adding resource folders that are included by other resource folders
           log.info("Skipping resource folder " + path + " since it's contained by another resource folder");
         } else {
-          addResourceFolder(classpath, path, outputPath, addTestFlag);
+          addResourceFolder(classpath, path, outputPath, addTestFlag, resource);
         }
         // Set folder encoding (null = platform default)
         if(r.exists() && !Objects.equals(r.getDefaultCharset(false), resourceEncoding)) {
@@ -678,12 +678,24 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addResourceFolder(IClasspathDescriptor classpath, IPath resourceFolder, IPath outputPath,
-      boolean addTestFlag) {
+      boolean addTestFlag, Resource resource) {
     log.info("Adding resource folder " + resourceFolder);
-    IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
-        new IPath[] {IPath.fromOSString("**")}, false /*optional*/);
+    IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, 
+      toIPathList(resource.getIncludes(), null),
+      toIPathList(resource.getExcludes(), null), false /*optional*/);
     descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
     descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
+  }
+
+  private IPath[] toIPathList(final List<String> fileNames, final String defaultPattern) {
+    if (fileNames == null) {
+      return defaultPattern != null ? new IPath[] {IPath.fromOSString(defaultPattern)} : DEFAULT_INCLUSIONS;
+    }
+    final List<IPath> retList = new ArrayList<>();
+    for (final String files : fileNames) {
+      retList.add(IPath.fromOSString(files));
+    }
+    return retList.toArray(DEFAULT_INCLUSIONS);
   }
 
   private void configureOverlapWithSource(IClasspathDescriptor classpath, IClasspathEntryDescriptor enclosing,
