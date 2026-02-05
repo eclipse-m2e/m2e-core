@@ -1,53 +1,31 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2023 Christoph Läubrich and others
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * https://www.eclipse.org/legal/epl-2.0.
+ * Copyright (c) 2020, 2022 Christoph Läubrich
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
  *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
- *   Christoph Läubrich - initial API and implementation
+ *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/
 package org.eclipse.m2e.pde.target;
 
 import java.io.File;
-import java.util.Objects;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
-import org.eclipse.m2e.pde.target.shared.MavenBundleWrapper;
 import org.eclipse.pde.core.target.TargetBundle;
 
 public class MavenSourceBundle extends TargetBundle {
 
-	public MavenSourceBundle(BundleInfo sourceTarget, Artifact artifact, CacheManager cacheManager) throws Exception {
+	public MavenSourceBundle(BundleInfo sourceTarget, Artifact artifact) throws Exception {
 		this.fSourceTarget = sourceTarget;
-		String symbolicName = sourceTarget.getSymbolicName();
-		String version = sourceTarget.getVersion();
-		fInfo.setSymbolicName(MavenBundleWrapper.getSourceBundleName(symbolicName));
-		fInfo.setVersion(version);
-		Manifest manifest;
+		fInfo.setSymbolicName(sourceTarget.getSymbolicName() + ".source");
+		fInfo.setVersion(sourceTarget.getVersion());
 		File sourceFile = artifact.getFile();
-		try (JarFile jar = new JarFile(sourceFile)) {
-			manifest = Objects.requireNonNullElseGet(jar.getManifest(), Manifest::new);
-		}
-		if (MavenBundleWrapper.isValidSourceManifest(manifest)) {
-			fInfo.setLocation(sourceFile.toURI());
-		} else {
-			File generatedSourceBundle = cacheManager.accessArtifactFile(artifact, file -> {
-				if (CacheManager.isOutdated(file, sourceFile)) {
-					MavenBundleWrapper.addSourceBundleMetadata(manifest, symbolicName, version);
-					MavenBundleWrapper.transferJarEntries(sourceFile, manifest, file);
-				}
-				return file;
-			});
-			fInfo.setLocation(generatedSourceBundle.toURI());
-		}
+		fInfo.setLocation(sourceFile.toURI());
 	}
-
 
 }
