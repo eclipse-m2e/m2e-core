@@ -46,7 +46,7 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 				return true;
 			}
 			// it must use generate mode
-			if (location.getMetadataMode() == MissingMetadataMode.GENERATE) {
+      if (location.getMetadataMode() == MissingMetadataMode.GENERATE || location.getMetadataMode() == MissingMetadataMode.GENERATE_REWRITE) {
 				// and the selected child must be a dependency node
 				if (lastSegment instanceof DependencyNode node) {
 					MavenTargetBundle bundle = location.getMavenTargetBundle(node.getArtifact());

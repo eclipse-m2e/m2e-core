@@ -231,7 +231,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 			private void updateUI() {
 				editInstructionsButton.setVisible(
-						metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE);
+                                          metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE
+                                          || metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE_REWRITE);
 				if (include.getStructuredSelection().getFirstElement() == DependencyDepth.NONE) {
 					for (Button button : scopes) {
 						button.setEnabled(false);
@@ -287,7 +288,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 	@Override
 	public void setTarget(ITargetDefinition target) {
-		this.targetDefinition = target;
+    targetDefinition = target;
 	}
 
 	@Override
