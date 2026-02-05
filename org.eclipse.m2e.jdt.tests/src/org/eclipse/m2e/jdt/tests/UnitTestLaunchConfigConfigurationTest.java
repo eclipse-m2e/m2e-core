@@ -102,7 +102,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 			""";
 
 	// Define the parameters to be used in the test
-	@Parameters
+	@Parameters(name = "{0}")
 	public static Collection<Object> data() {
 		return List.of(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST, MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
 	}

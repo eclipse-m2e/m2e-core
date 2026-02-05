@@ -23,6 +23,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathAttribute;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -48,6 +49,7 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
  * @author igor
  */
 public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegate {
+
   private final IProjectConfigurationManager configurationManager;
 
   private final IMavenProjectRegistry projectManager;
@@ -139,7 +141,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
         File artifactFile = a.getFile();
         if(artifactFile != null /*&& artifactFile.canRead()*/) {
           entry = classpath.addLibraryEntry(IPath.fromOSString(artifactFile.getAbsolutePath()));
-          entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
+          entry.setClasspathAttribute(IClasspathAttribute.TEST, addTestFlag ? "true" : null);
         }
       }
 
@@ -158,8 +160,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     projectTestAttributes.forEach((entryPath, testAttributes) -> {
       //the classpath definitely has an entry matching the path
       IClasspathEntryDescriptor descriptor = findClasspathDescriptor(classpath, entryPath);
-      descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, (testAttributes.isTest) ? "true" : null);
-      descriptor.setClasspathAttribute(IClasspathManager.WITHOUT_TEST_CODE,
+      descriptor.setClasspathAttribute(IClasspathAttribute.TEST, (testAttributes.isTest) ? "true" : null);
+      descriptor.setClasspathAttribute(IClasspathAttribute.WITHOUT_TEST_CODE,
           (testAttributes.excludeTestSources) ? "true" : null);
     });
   }
