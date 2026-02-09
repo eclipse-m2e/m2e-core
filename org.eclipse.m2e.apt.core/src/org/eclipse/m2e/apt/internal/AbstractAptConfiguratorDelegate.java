@@ -238,6 +238,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   @Override
   public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
 
+    removeStaled(classpath);
     AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
 
     if((configuration == null) || !configuration.isAnnotationProcessingEnabled()) {
@@ -258,6 +259,10 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     if(generatedTestSourcesDirectory != null) {
       File outputFolder = new File(mavenProject.getBuild().getTestOutputDirectory());
       addToClassPath(eclipseProject, generatedTestSourcesDirectory, outputFolder, classpath, true);
+    }
+    if (generatedSourcesDirectory != null || generatedTestSourcesDirectory != null) {
+      IJavaProject javaProject = JavaCore.create(eclipseProject);
+      javaProject.setRawClasspath(classpath.getEntries(), monitor);
     }
   }
 
@@ -283,11 +288,9 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IPath[] includes = new IPath[] {};
     IPath[] excludes = new IPath[] {};
 
-    // If the source folder is non-nested, add it
+    // If the source folder doesn't exist, add it
     if((generatedSourcesFolder != null) && generatedSourcesFolder.getProject().equals(project)) {
-      IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath,
-          generatedSourcesFolder.getFullPath());
-      if((enclosing == null) || (getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null)) {
+      if(getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) == null) {
         IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath,
             includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
@@ -331,20 +334,25 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     return null;
   }
 
-  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+  private void removeStaled(IClasspathDescriptor classpath) {
     List<IPath> stalePaths = new ArrayList<>();
-    IClasspathEntryDescriptor matchingDescriptor = null;
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
-      if(cped.getPath().equals(fullPath)) {
-        matchingDescriptor = cped;
-      } else if(Boolean.parseBoolean(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
+      if(Boolean.parseBoolean(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
         stalePaths.add(cped.getPath());
       }
     }
     for(IPath stalePath : stalePaths) {
       classpath.removeEntry(stalePath);
     }
-    return matchingDescriptor;
+  }
+
+  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+    for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
+      if(cped.getPath().equals(fullPath)) {
+        return cped;
+      }
+    }
+    return null;
   }
 
   protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
