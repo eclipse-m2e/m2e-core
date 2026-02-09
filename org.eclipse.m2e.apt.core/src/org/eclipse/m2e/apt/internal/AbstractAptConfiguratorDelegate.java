@@ -21,6 +21,7 @@ import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.getProjectArtifact
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -35,6 +36,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
@@ -236,6 +238,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   @Override
   public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
 
+    removeStaled(classpath);
     AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
 
     if((configuration == null) || !configuration.isAnnotationProcessingEnabled()) {
@@ -281,11 +284,10 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IPath[] includes = new IPath[] {};
     IPath[] excludes = new IPath[] {};
 
-    // If the source folder is non-nested, add it
+    // If the source folder doesn't exist, add it
     if((generatedSourcesFolder != null) && generatedSourcesFolder.getProject().equals(project)) {
-      IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath,
-          generatedSourcesFolder.getFullPath());
-      if((enclosing == null) || (getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null)) {
+      if(getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) == null) {
+        configureOverlap(classpath, project,  generatedSourcesRelativeDirectoryPath);
         IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath,
             includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
@@ -311,38 +313,55 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
   }
 
-  /**
-   * Returns the {@link IClasspathEntryDescriptor} in the specified {@link IClasspathDescriptor} that is a prefix of the
-   * specified {@link IPath}.
-   *
-   * @param classpath the {@link IClasspathDescriptor} to be searched for a matching {@link IClasspathEntryDescriptor}
-   * @param path the {@link IPath} to find a matching {@link IClasspathEntryDescriptor} for
-   * @return the {@link IClasspathEntryDescriptor} in the specified {@link IClasspathDescriptor} that is a prefix of the
-   *         specified {@link IPath}
-   */
-  private static IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath path) {
-    for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
-      if(cped.getPath().isPrefixOf(path)) {
-        return cped;
+  private void configureOverlap(IClasspathDescriptor classpath, IProject project, String generatedSourcesRelativeDirectoryPath) {
+    if (generatedSourcesRelativeDirectoryPath == null || generatedSourcesRelativeDirectoryPath.isEmpty()) {
+        return;
+    }
+    IPath targetPath = null;
+    for(IClasspathEntryDescriptor entry : classpath.getEntryDescriptors()) {
+      if(entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+        IPath relPath = entry.getPath().makeRelativeTo(project.getFullPath());
+        if (targetPath == null) {
+          targetPath = new Path(generatedSourcesRelativeDirectoryPath);
+        }
+        if(relPath.isPrefixOf(targetPath)) {
+          IPath exclusion = targetPath
+              .removeFirstSegments(relPath.segmentCount())
+              .makeRelative()
+              .addTrailingSeparator();
+          IPath[] oldExclusions = entry.getExclusionPatterns();
+          IPath[] newExclusions;
+          if(oldExclusions == null) {
+            newExclusions = new IPath[] { exclusion };
+          } else {
+            newExclusions = Arrays.copyOf(oldExclusions, oldExclusions.length + 1);
+            newExclusions[newExclusions.length - 1] = exclusion;
+          }
+          entry.setExclusionPatterns(newExclusions);
+        }
       }
     }
-    return null;
   }
 
-  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+  private void removeStaled(IClasspathDescriptor classpath) {
     List<IPath> stalePaths = new ArrayList<>();
-    IClasspathEntryDescriptor matchingDescriptor = null;
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
-      if(cped.getPath().equals(fullPath)) {
-        matchingDescriptor = cped;
-      } else if(Boolean.parseBoolean(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
+      if(Boolean.parseBoolean(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
         stalePaths.add(cped.getPath());
       }
     }
     for(IPath stalePath : stalePaths) {
       classpath.removeEntry(stalePath);
     }
-    return matchingDescriptor;
+  }
+
+  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+    for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
+      if(cped.getPath().equals(fullPath)) {
+        return cped;
+      }
+    }
+    return null;
   }
 
   protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
