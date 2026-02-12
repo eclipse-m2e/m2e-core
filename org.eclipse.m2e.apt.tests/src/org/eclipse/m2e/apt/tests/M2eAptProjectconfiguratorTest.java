@@ -444,4 +444,13 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		assertNotNull(javaProject);
 		assertNoErrors(p);
 	}
+
+	@Test
+	public void testNestedSourceFolders() throws Exception {
+		IProject project = importProject("projects/nested/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(project);
+		assertNotNull(javaProject);
+		assertNoErrors(project);
+	}
 }
