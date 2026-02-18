@@ -79,7 +79,12 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
   private AnnotationMappingMetadataSource(MavenProject project, List<PI> pis) {
     this.project = project;
     this.pis = pis;
-    projectId = project.getModel().getLocation(SELF).getSource().getModelId();
+    InputLocation selfLocation = project.getModel().getLocation(SELF);
+    if(selfLocation != null && selfLocation.getSource() != null) {
+      projectId = selfLocation.getSource().getModelId();
+    } else {
+      projectId = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+    }
   }
 
   @Override
@@ -171,7 +176,14 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
   }
 
   private static List<PI> parsePIs(MavenProject project) {
-    InputSource source = project.getModel().getLocation(SELF).getSource();
+    InputLocation selfLocation = project.getModel().getLocation(SELF);
+    if(selfLocation == null) {
+      return List.of();
+    }
+    InputSource source = selfLocation.getSource();
+    if(source == null) {
+      return List.of();
+    }
     File pom = project.getFile();
     if((pom == null || !pom.isFile()) && source.getLocation() != null) {
       pom = new File(source.getLocation());

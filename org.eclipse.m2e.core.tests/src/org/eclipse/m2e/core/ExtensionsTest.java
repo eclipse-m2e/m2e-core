@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -20,8 +21,10 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -102,6 +105,25 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 		IFile file = project.getFile("target/classes/file.txt");
 		assertTrue(file.exists());
 		assertEquals("foo-bar-content", new String(file.getContents().readAllBytes()));
+	}
+
+	@Test
+	public void testGitVersioningExtension() throws Exception {
+		// Pre-initialize git repo in workspace (required by the extension to activate)
+		File projectDir = new File(ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile(),
+				"gitVersioningExtension");
+		copyDir(new File("resources/projects/gitVersioningExtension"), projectDir);
+		assertEquals(0, new ProcessBuilder("git", "init").directory(projectDir).start().waitFor());
+		assertEquals(0, new ProcessBuilder("git", "add", ".").directory(projectDir).start().waitFor());
+		assertEquals(0,
+				new ProcessBuilder("git", "-c", "user.email=test@test.com", "-c", "user.name=Test", "commit", "-m",
+						"init").directory(projectDir).start().waitFor());
+		// Import project - the extension modifies the model, stripping InputLocation metadata
+		IProject project = importProject("resources/projects/gitVersioningExtension/pom.xml");
+		waitForJobsToComplete(new NullProgressMonitor());
+		// Without the fix, Model.getLocation("") returns null causing NPE in
+		// AnnotationMappingMetadataSource and SourceLocationHelper
+		assertNoErrors(project);
 	}
 
 	private IProject importPomlessProject(String rootProject, String... poms) throws IOException, CoreException {
