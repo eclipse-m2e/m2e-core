@@ -14,8 +14,11 @@
 package org.eclipse.m2e.jdt.internal.launch;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -26,6 +29,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -49,6 +55,8 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.StandardClasspathProvider;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -101,12 +109,30 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   private static final String PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES = "m2e.disableAddMissingJUnit5ExecutionDependencies";
 
+  private static final String GROUP_ID_SUREFIRE_PLUGIN = "org.apache.maven.plugins"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_ID_SUREFIRE_PLUGIN = "maven-surefire-plugin"; //$NON-NLS-1$
+
+  /**
+   * Minimum Surefire version to support adding provider dependencies
+   * (https://issues.apache.org/jira/browse/SUREFIRE-1564)
+   */
+  private static final Version MIN_SUREFIRE_VERSION; //$NON-NLS-1$
+
+  private static final String GOAL_TEST = "test"; //$NON-NLS-1$
+
   private static final Set<String> supportedTypes = new HashSet<>();
   static {
     // not exactly nice, but works with eclipse 3.2, 3.3 and 3.4M3
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JAVA_APPLICATION);
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
+
+    try {
+      MIN_SUREFIRE_VERSION = new GenericVersionScheme().parseVersion("2.22.1");
+    } catch(InvalidVersionSpecificationException ex) {
+      throw new IllegalArgumentException("Could not parse hardcoded version 2.22.1", ex);
+    }
   }
 
   IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
@@ -167,11 +193,11 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     } else {
       context = projectFacade.createExecutionContext();
     }
-    return context.execute((ctx, monitor1) -> resolveClasspath0(entries, configuration, monitor1), monitor);
+    return context.execute((ctx, monitor1) -> resolveClasspath0(entries, configuration, monitor1, ctx), monitor);
   }
 
   IRuntimeClasspathEntry[] resolveClasspath0(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor, IMavenExecutionContext context) throws CoreException {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
 
     boolean isModularConfiguration = JavaRuntime.isModularConfiguration(configuration);
@@ -184,7 +210,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     for(IRuntimeClasspathEntry entry : entries) {
       if(entry.getType() == IRuntimeClasspathEntry.CONTAINER
           && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
-        addMavenClasspathEntries(all, entry, configuration, scope, monitor, isModularConfiguration);
+        addMavenClasspathEntries(all, entry, configuration, scope, monitor, isModularConfiguration, context);
       } else if(entry.getType() == IRuntimeClasspathEntry.PROJECT) {
         if(javaProject.getPath().equals(entry.getPath())) {
           addProjectEntries(all, entry.getPath(), scope, THIS_PROJECT_CLASSIFIER, configuration, monitor,
@@ -207,7 +233,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   private void addMavenClasspathEntries(Set<IRuntimeClasspathEntry> resolved,
       IRuntimeClasspathEntry runtimeClasspathEntry, ILaunchConfiguration configuration, int scope,
-      IProgressMonitor monitor, boolean isModularConfiguration) throws CoreException {
+      IProgressMonitor monitor, boolean isModularConfiguration, IMavenExecutionContext context) throws CoreException {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
     MavenJdtPlugin plugin = MavenJdtPlugin.getDefault();
     IClasspathManager buildpathManager = plugin.getBuildpathManager();
@@ -229,10 +255,126 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       }
     }
 
-    if(scope == IClasspathManager.CLASSPATH_TEST && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5
+    if(scope == IClasspathManager.CLASSPATH_TEST) {
+      // TODO: distinguish between junit and testng?
+      addMavenSurefirePluginProviderDependencies(resolved, configuration, monitor, context, javaProject);
+    }
+  }
+
+  /**
+   * Add Maven Surefire Plugin dependencies to the classpath which are required for the selected provider
+   * 
+   * @param classpath
+   * @param facade
+   * @param maven
+   * @param monitor
+   * @throws CoreException
+   */
+  private void addMavenSurefirePluginProviderDependencies(Set<IRuntimeClasspathEntry> resolved,
+      ILaunchConfiguration configuration, IProgressMonitor monitor, IMavenExecutionContext context,
+      IJavaProject javaProject) throws CoreException {
+
+    IMavenProjectFacade projectFacade = projectManager.create(javaProject.getProject(), monitor);
+    if(Boolean.parseBoolean(projectFacade.getMavenProject().getProperties()
+        .getProperty(PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES, "false"))) { //$NON-NLS-1$
+      log.debug("Skipping adding Maven Surefire Plugin dependencies as property {} is set to true",
+          PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES);
+      return;
+    }
+
+    boolean surefireDependenciesAdded = false;
+    for(MojoExecution mojoExecution : projectFacade.getMojoExecutions(GROUP_ID_SUREFIRE_PLUGIN,
+        ARTIFACT_ID_SUREFIRE_PLUGIN, monitor, GOAL_TEST)) {
+      // only add dependencies if the surefire plugin version is above 2.22.1 (https://issues.apache.org/jira/browse/SUREFIRE-1564)
+      try {
+        Version version = new GenericVersionScheme().parseVersion(mojoExecution.getPlugin().getVersion());
+        if(version.compareTo(MIN_SUREFIRE_VERSION) < 0) {
+          log.error(
+              "Skipping adding Maven Surefire Plugin dependencies for MojoExecution id {} of plugin {} as its version {} is below 2.22.1",
+              mojoExecution.getExecutionId(), mojoExecution.getPlugin().getId(),
+              mojoExecution.getPlugin().getVersion());
+        } else {
+          log.error("Adding Maven Surefire Plugin dependencies for MojoExecution id {} of plugin {}",
+              mojoExecution.getExecutionId(), mojoExecution.getPlugin().getId());
+          addMavenSurefirePluginProviderDependencies(resolved, mojoExecution, context, monitor);
+          surefireDependenciesAdded = true;
+        }
+      } catch(InvalidVersionSpecificationException ex) {
+        log.warn("Could not parse Maven Surefire Plugin version " + mojoExecution.getPlugin().getVersion()
+            + " for MojoExecution id " + mojoExecution.getExecutionId() + ", skipping adding its provider dependencies",
+            ex);
+      }
+
+    }
+
+    // use legacy mechanism to add junit5 dependencies for junit5 launches when surefire plugin is not used or below 2.22.1
+    if(!surefireDependenciesAdded && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5
         .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
+      log.error(
+          "Adding missing JUnit5 execution dependencies for JUnit5 launch configuration via legacy method as no suitable Maven Surefire Plugin execution was found");
       addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  Boolean addMavenSurefirePluginProviderDependencies(Set<IRuntimeClasspathEntry> resolved, MojoExecution mojoExecution,
+      IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+    Mojo mojo = MavenPlugin.getMaven().getConfiguredMojo(context.getSession(), mojoExecution, Mojo.class);
+    final Class<?> abstractSurefireMojoClass;
+    try {
+      abstractSurefireMojoClass = Class.forName("org.apache.maven.plugin.surefire.AbstractSurefireMojo", false,
+          mojoExecution.getMojoDescriptor().getRealm());
+    } catch(ClassNotFoundException ex) {
+      throw new IllegalStateException("Could not load AbstractSurefireMojo class from surefire plugin realm", ex);
+    }
+    Boolean isClasspathModified = false;
+    try {
+      // look for surefire test classpath: https://github.com/apache/maven-surefire/blob/18f0c9f9dd850f98377032693fa5ec460f42b65b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/AbstractSurefireMojo.java#L1156C34-L1156C49
+      Object testClassPath;
+      try {
+        // available since Surefire 2.22.1 (https://github.com/apache/maven-surefire/commit/242c0e8a70be5a2a839ab00062c645f0d7b81137)
+        Method generateTestClasspathMethod = abstractSurefireMojoClass.getDeclaredMethod("generateTestClasspath");
+        generateTestClasspathMethod.setAccessible(true);
+        testClassPath = generateTestClasspathMethod.invoke(mojo);
+      } catch(NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException e) {
+        log.warn("Could not access generateTestClasspath() method on AbstractSurefireMojo", e);
+        return false;
+      }
+      // and determine the providers used by this project with the given test classpath: https://github.com/apache/maven-surefire/blob/18f0c9f9dd850f98377032693fa5ec460f42b65b/maven-surefire-common/src/main/java/org/apache/maven/plugin/surefire/AbstractSurefireMojo.java#L1156
+      try {
+        Class<?> providerInfoClass = Class.forName("org.apache.maven.surefire.providerapi.ProviderInfo", false,
+            mojoExecution.getMojoDescriptor().getRealm());
+        Class<?> testClassPathClass = Class.forName("org.apache.maven.plugin.surefire.TestClassPath", false,
+            mojoExecution.getMojoDescriptor().getRealm());
+        Method getProviderNameMethod = providerInfoClass.getDeclaredMethod("getProviderName");
+        Method getProviderClasspathMethod = providerInfoClass.getDeclaredMethod("getProviderClasspath");
+        Method createProvidersMethod = abstractSurefireMojoClass.getDeclaredMethod("createProviders",
+            testClassPathClass);
+        createProvidersMethod.setAccessible(true);
+        Collection<?> providerInfos = (Collection<?>) createProvidersMethod.invoke(mojo, testClassPath);
+        for(Object providerInfo : providerInfos) {
+          String providerName = (String) getProviderNameMethod.invoke(providerInfo);
+          log.debug("Adding Surefire dependencies for provider: {}", providerName);
+          for(Artifact artifact : ((Collection<Artifact>) getProviderClasspathMethod.invoke(providerInfo))) {
+            // all returned artifacts are already resolved via the call to "getProviderClasspath()"
+            File artifactFile = artifact.getFile();
+            resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(IPath.fromOSString(artifactFile.getAbsolutePath()),
+                IRuntimeClasspathEntry.USER_CLASSES));
+            log.debug("Added Surefire provider dependency: {}:{}:{} for provider {}", artifact.getGroupId(),
+                artifact.getArtifactId(), artifact.getVersion(), providerName);
+            isClasspathModified = true;
+          }
+        }
+      } catch(NoSuchMethodException | SecurityException | IllegalAccessException | InvocationTargetException
+          | ClassNotFoundException e) {
+        log.warn(
+            "Could not access createProviders(org.apache.maven.plugin.surefire.TestClassPath) method on AbstractSurefireMojo",
+            e);
+      }
+    } finally {
+      MavenPlugin.getMaven().releaseMojo(mojo, mojoExecution);
+    }
+    return isClasspathModified;
   }
 
   private void addMissingJUnit5ExecutionDependencies(Set<IRuntimeClasspathEntry> resolved, IProgressMonitor monitor,
