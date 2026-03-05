@@ -101,6 +101,12 @@
 					<version>3.20.0</version>
 					<type>jar</type>
 				</dependency>
+				<dependency>
+					<groupId>biz.aQute.bnd</groupId>
+					<artifactId>biz.aQute.bnd.maven</artifactId>
+					<version>7.0.0</version>
+					<type>jar</type>
+				</dependency>
 			</dependencies>
 		</location>
 		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="false" label="M2E Workspace CLI" missingManifest="error" type="Maven">
