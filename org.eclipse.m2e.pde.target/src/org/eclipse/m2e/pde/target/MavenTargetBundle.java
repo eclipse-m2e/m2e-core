@@ -92,15 +92,30 @@ public class MavenTargetBundle extends TargetBundle {
 				file != null ? file.toURI() : null, -1, false);
 		try {
 			bundle = new TargetBundle(file);
+			if (location.isManifestOverride()) {
+				String overrideError = OverridePreconditionChecker.checkOverridePreconditions(
+						bundle.getBundleInfo().getSymbolicName(), location.getRoots(), location.getInstructions(),
+						location.getDependencyDepth());
+				if (overrideError != null) {
+					throw new CoreException(Status.error(overrideError));
+
+				}
+				generateOrOverrideManifest(artifact, location, monitor, true);
+			}
 		} catch (Exception ex) {
+			if (bundle != null && location.isManifestOverride()) {
+				bundle = null;
+				status = Status.error(artifact + " cannot be overridden: " + ex.getMessage(), ex);
+				LOGGER.log(status);
+				return;
+			}
 			MissingMetadataMode metadataMode = location.getMetadataMode();
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = Status.error(artifact + " is not a bundle", ex);
 				LOGGER.log(status);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
-					bundle = getWrappedArtifact(artifact, location, monitor);
-					isWrapped = true;
+					generateOrOverrideManifest(artifact, location, monitor, false);
 				} catch (Exception e) {
 					// not possible then
 					String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
@@ -117,12 +132,18 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
+	private void generateOrOverrideManifest(Artifact artifact, MavenTargetLocation location, IProgressMonitor monitor,
+			boolean manifestOverride) throws Exception {
+		bundle = getWrappedArtifact(artifact, location, monitor, manifestOverride);
+		isWrapped = true;
+	}
+
 	public Artifact getArtifact() {
 		return artifact;
 	}
 
 	private static TargetBundle getWrappedArtifact(Artifact artifact, MavenTargetLocation location,
-			IProgressMonitor monitor) throws Exception {
+			IProgressMonitor monitor, boolean manifestOverride) throws Exception {
 		IMaven maven = MavenPlugin.getMaven();
 		List<RemoteRepository> repositories = RepositoryUtils.toRepos(location.getAvailableArtifactRepositories(maven));
 		Function<DependencyNode, Properties> instructionsLookup = node -> {
@@ -139,7 +160,8 @@ public class MavenTargetBundle extends TargetBundle {
 			RepositorySystemSession repositorySession = context.getRepositorySession();
 			try {
 				WrappedBundle wrap = MavenBundleWrapper.getWrappedArtifact(artifact, instructionsLookup, repositories,
-						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class));
+						repoSystem, repositorySession, context.getComponentLookup().lookup(SyncContextFactory.class),
+						manifestOverride);
 				List<ProcessingMessage> directErrors = wrap.messages(false)
 						.filter(msg -> msg.type() == ProcessingMessage.Type.ERROR).toList();
 				if (directErrors.isEmpty()) {

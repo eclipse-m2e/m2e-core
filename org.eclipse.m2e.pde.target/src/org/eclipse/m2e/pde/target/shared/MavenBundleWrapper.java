@@ -101,13 +101,15 @@ public class MavenBundleWrapper {
 	 * @param repositorySession  the session to use
 	 * @param syncContextFactory the sync context factory to acquire exclusive
 	 *                           access to the wrapped artifact and its dependencies
+	 * @param manifestOverride   if true, the manifest file is forced to be
+	 *                           overridden
 	 * @return the wrapped artifact
 	 * @throws Exception if wrapping the artifact fails for any reason
 	 */
 	public static WrappedBundle getWrappedArtifact(Artifact artifact,
 			Function<DependencyNode, Properties> instructionsLookup, List<RemoteRepository> repositories,
 			RepositorySystem repoSystem, RepositorySystemSession repositorySession,
-			SyncContextFactory syncContextFactory) throws Exception {
+			SyncContextFactory syncContextFactory, boolean manifestOverride) throws Exception {
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setRoot(new Dependency(artifact, null));
 		collectRequest.setRepositories(repositories);
@@ -150,7 +152,7 @@ public class MavenBundleWrapper {
 			});
 			syncContext.acquire(lockList, null);
 			Map<DependencyNode, WrappedBundle> visited = new HashMap<>();
-			WrappedBundle wrappedNode = getWrappedNode(node, instructionsLookup, visited);
+			WrappedBundle wrappedNode = getWrappedNode(node, instructionsLookup, visited, manifestOverride);
 			for (WrappedBundle wrap : visited.values()) {
 				wrap.getJar().ifPresent(jar -> jar.close());
 			}
@@ -159,8 +161,8 @@ public class MavenBundleWrapper {
 	}
 
 	private static WrappedBundle getWrappedNode(DependencyNode node,
-			Function<DependencyNode, Properties> instructionsLookup, Map<DependencyNode, WrappedBundle> visited)
-			throws Exception {
+			Function<DependencyNode, Properties> instructionsLookup, Map<DependencyNode, WrappedBundle> visited,
+			boolean manifestOverride) throws Exception {
 		WrappedBundle wrappedNode = visited.get(node);
 		if (wrappedNode != null) {
 			return wrappedNode;
@@ -198,7 +200,8 @@ public class MavenBundleWrapper {
 									"Artifact " + node.getArtifact() + " can not be read as a jar file"))));
 			return wrappedNode;
 		}
-		if (isValidOSGi(jar.getManifest())) {
+		boolean isValidOSGi = isValidOSGi(jar.getManifest());
+		if (!manifestOverride && isValidOSGi) {
 			// already a bundle!
 			visited.put(node,
 					wrappedNode = new WrappedBundle(node, List.of(), null, originalFile.toPath(), jar, List.of()));
@@ -207,7 +210,7 @@ public class MavenBundleWrapper {
 		List<DependencyNode> children = node.getChildren();
 		List<WrappedBundle> depends = new ArrayList<>();
 		for (DependencyNode child : children) {
-			depends.add(getWrappedNode(child, instructionsLookup, visited));
+			depends.add(getWrappedNode(child, instructionsLookup, visited, manifestOverride));
 		}
 		WrappedBundle wrappedNodeAfterVisit = visited.get(node);
 		if (wrappedNodeAfterVisit != null) {
@@ -392,4 +395,40 @@ public class MavenBundleWrapper {
 	public static boolean isValidSourceManifest(Manifest manifest) {
 		return manifest != null && manifest.getMainAttributes().getValue(ECLIPSE_SOURCE_BUNDLE_HEADER) != null;
 	}
+
+  /**
+   * Creates or returns a cached Eclipse source bundle from a source JAR file. The resulting bundle will have proper Eclipse-SourceBundle manifest
+   * headers. The cached file is stored alongside the original source file, named using the source bundle symbolic name and version (e.g.,
+   * {@code com.example.bundle.source_1.0.0.jar}) to support caching different wrappings of the same source file with different BSN/version
+   * combinations.
+   *
+   * @param sourceFile    the original source JAR file (e.g., xyz-source.jar)
+   * @param manifest      the manifest to use (will be modified with source bundle metadata)
+   * @param symbolicName  the bundle symbolic name of the host bundle
+   * @param bundleVersion the version of the host bundle
+   * @return the cached eclipse source bundle file
+   * @throws IOException if reading/writing files fails
+   */
+  public static File getEclipseSourceBundle(File sourceFile, Manifest manifest, String symbolicName, String bundleVersion) throws IOException {
+    // Create the cached file name based on the actual BSN and version to handle
+    // cases where the same source jar is wrapped with different BSN/version
+    String eclipseSourceName = getSourceBundleName(symbolicName) + "_" + bundleVersion + ".jar";
+    File eclipseSourceFile = new File(sourceFile.getParentFile(), eclipseSourceName);
+    Path eclipseSourcePath = eclipseSourceFile.toPath();
+    Path sourceFilePath = sourceFile.toPath();
+
+    // Check if cached file exists and is up-to-date
+    if (!isOutdated(eclipseSourcePath, sourceFilePath)) {
+      return eclipseSourceFile;
+    }
+
+    // Generate new eclipse source bundle
+    addSourceBundleMetadata(manifest, symbolicName, bundleVersion);
+    transferJarEntries(sourceFile, manifest, eclipseSourceFile);
+
+    // Set the last modified time to match source file for cache validation
+    Files.setLastModifiedTime(eclipseSourcePath, Files.getLastModifiedTime(sourceFilePath));
+
+    return eclipseSourceFile;
+  }
 }

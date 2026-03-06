@@ -81,8 +81,10 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String label = location.getAttribute(MavenTargetLocation.ATTRIBUTE_LABEL);
 			boolean includeSource = Boolean
 					.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE));
+			boolean manifestOverride = Boolean
+					.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_MANIFEST_OVERRIDE));
 			return new MavenTargetLocation(label, dependencies, repositories, mode, dependencyDepth, locationScopes,
-					includeSource, instructions, excludes, templateFeature);
+					includeSource, manifestOverride, instructions, excludes, templateFeature);
 		} catch (Exception e) {
 			throw new CoreException(Status.error(e.getMessage(), e));
 		}

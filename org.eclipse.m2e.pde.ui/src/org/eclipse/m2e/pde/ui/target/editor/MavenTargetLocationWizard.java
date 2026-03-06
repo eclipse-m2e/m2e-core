@@ -69,6 +69,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private ITargetDefinition targetDefinition;
 	private BNDInstructions bndInstructions;
 	private Button includeSource;
+	private Button manifestOverride;
 	private MavenTargetDependencyEditor dependencyEditor;
 	private List<MavenTargetRepository> repositoryList = new ArrayList<>();
 	private Button createFeature;
@@ -128,6 +129,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				scopeLabel.setText(Messages.MavenTargetLocationWizard_10);
 				createScopes(composite);
 				includeSource = createCheckBox(composite, Messages.MavenTargetLocationWizard_8);
+				manifestOverride = createCheckBox(composite, Messages.MavenTargetLocationWizard_24);
+				manifestOverride.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> updateUI()));
 				createFeature = createCheckBox(composite, Messages.MavenTargetLocationWizard_13);
 				createFeature.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> updateUI()));
 				if (targetLocation != null) {
@@ -141,6 +144,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					include.setSelection(new StructuredSelection(targetLocation.getDependencyDepth()));
 					bndInstructions = targetLocation.getInstructions(null);
 					includeSource.setSelection(targetLocation.isIncludeSource());
+					manifestOverride.setSelection(targetLocation.isManifestOverride());
 					var template = targetLocation.getFeatureTemplate();
 					createFeature.setSelection(template != null);
 					locationLabel.setText(Objects.requireNonNullElse(targetLocation.getLabel(), ""));
@@ -230,8 +234,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			}
 
 			private void updateUI() {
-				editInstructionsButton.setVisible(
-						metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE);
+				editInstructionsButton
+						.setVisible(metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE
+								|| manifestOverride.getSelection());
 				if (include.getStructuredSelection().getFirstElement() == DependencyDepth.NONE) {
 					for (Button button : scopes) {
 						button.setEnabled(false);
@@ -348,7 +353,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		DependencyDepth depth = (DependencyDepth) include.getStructuredSelection().getFirstElement();
 		MavenTargetLocation location = new MavenTargetLocation(locationLabel.getText(), dependencyEditor.getRoots(),
 				repositoryList, (MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), depth,
-				selectedScopes, includeSource.getSelection(), list, excludes, f);
+				selectedScopes, includeSource.getSelection(), manifestOverride.getSelection(), list, excludes, f);
 		if (iscreate) {
 			targetLocation = location;
 		} else {
