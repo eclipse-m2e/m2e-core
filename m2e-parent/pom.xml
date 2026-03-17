@@ -26,6 +26,7 @@
 		<tycho.p2.baselineMode>warn</tycho.p2.baselineMode>
 		<scmConnectionRaw>scm:git:https://github.com/eclipse-m2e/m2e-core.git</scmConnectionRaw>
 		<compileLogDir>${project.build.directory}/compilelogs</compileLogDir>
+		<tycho.baseline.increment>100</tycho.baseline.increment><!--Enabled overwrites in subprojects-->
 	</properties>
 
 	<organization>
@@ -110,7 +111,6 @@
 								<ignore>jars/*.jar</ignore>
 								<ignore>Eclipse-SourceReferences</ignore>
 							</ignores>
-							<increment>100</increment>
 							<extensions>true</extensions>
 						</configuration>
 					</execution>
