@@ -35,13 +35,14 @@ public class MavenSourceBundle extends TargetBundle {
 		try (JarFile jar = new JarFile(sourceFile)) {
 			manifest = Objects.requireNonNullElseGet(jar.getManifest(), Manifest::new);
 		}
+		File sourceBundleFile = MavenBundleWrapper.getEclipseSourceBundle(sourceFile, manifest, symbolicName, version);
 		if (MavenBundleWrapper.isValidSourceManifest(manifest)) {
-			fInfo.setLocation(sourceFile.toURI());
+			fInfo.setLocation(sourceBundleFile.toURI());
 		} else {
 			File generatedSourceBundle = cacheManager.accessArtifactFile(artifact, file -> {
-				if (CacheManager.isOutdated(file, sourceFile)) {
+				if (CacheManager.isOutdated(file, sourceBundleFile)) {
 					MavenBundleWrapper.addSourceBundleMetadata(manifest, symbolicName, version);
-					MavenBundleWrapper.transferJarEntries(sourceFile, manifest, file);
+					MavenBundleWrapper.transferJarEntries(sourceBundleFile, manifest, file);
 				}
 				return file;
 			});

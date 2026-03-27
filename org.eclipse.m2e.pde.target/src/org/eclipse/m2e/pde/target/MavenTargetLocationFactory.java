@@ -81,8 +81,10 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String label = location.getAttribute(MavenTargetLocation.ATTRIBUTE_LABEL);
 			boolean includeSource = Boolean
 					.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE));
+			boolean ignoreExistingMetadata = Boolean
+					.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_IGNORE_EXISTING_METADATA));
 			return new MavenTargetLocation(label, dependencies, repositories, mode, dependencyDepth, locationScopes,
-					includeSource, instructions, excludes, templateFeature);
+					includeSource, ignoreExistingMetadata, instructions, excludes, templateFeature);
 		} catch (Exception e) {
 			throw new CoreException(Status.error(e.getMessage(), e));
 		}
