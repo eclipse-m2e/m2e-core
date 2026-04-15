@@ -1003,7 +1003,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
     if(!project.exists(relativePath) && Files.exists(folderPath)
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
-      String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
+      Path relativized = projectLocation.relativize(folderPath);
+      if(relativized.startsWith("..")) {
+        // Resource directory is outside (ancestor or sibling of) the project.
+        // Cannot create a valid linked folder for paths that escape the project tree.
+        // Return the project itself so the caller skips this resource directory.
+        return project;
+      }
+      String linkName = relativized.toString().replace("/", "_");
       IFolder folder = project.getFolder(linkName);
       createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
