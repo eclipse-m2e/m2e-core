@@ -25,7 +25,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
+import org.eclipse.jdt.internal.core.util.Util;
 
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
@@ -148,6 +151,59 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
       }
     }
 
+    // check nested source entries
+    List<IClasspathEntry> toRemove = null;
+    List<IClasspathEntry> toAdd = null;
+    for(IClasspathEntry entry : result) {
+      int kind = entry.getEntryKind();
+      IPath entryPath = entry.getPath();
+      if(kind == IClasspathEntry.CPE_SOURCE) {
+        for(IClasspathEntry otherEntry : result) {
+          int otherKind = otherEntry.getEntryKind();
+          if(otherKind != IClasspathEntry.CPE_SOURCE)
+            continue;
+          if(entry != otherEntry) {
+            IPath otherPath = otherEntry.getPath();
+            char[][] inclusionPatterns, exclusionPatterns;
+            if(otherPath.isPrefixOf(entryPath) && !otherPath.equals(entryPath)
+                && !Util.isExcluded(entryPath.append("*"), //$NON-NLS-1$
+                    inclusionPatterns = ((ClasspathEntry) otherEntry).fullInclusionPatternChars(),
+                    exclusionPatterns = ((ClasspathEntry) otherEntry).fullExclusionPatternChars(), false)) {
+              String exclusionPattern = entryPath.removeFirstSegments(otherPath.segmentCount()).segment(0);
+              if(!Util.isExcluded(entryPath, inclusionPatterns, exclusionPatterns, false)) {
+                IPath[] newExclusions;
+                IPath[] oldExclusions = otherEntry.getExclusionPatterns();
+                if(otherEntry.getExclusionPatterns() == null)
+                  newExclusions = new IPath[2];
+                else {
+                  newExclusions = new IPath[oldExclusions.length + 2];
+                  System.arraycopy(oldExclusions, 0, newExclusions, 0, oldExclusions.length);
+                }
+                IPath path = entryPath.removeFirstSegments(otherPath.segmentCount()).addTrailingSeparator();
+                IPath projectRelativePath = entryPath.removeFirstSegments(1).addTrailingSeparator();
+                newExclusions[newExclusions.length - 1] = projectRelativePath;
+                newExclusions[newExclusions.length - 2] = path;
+                if(toRemove == null || toAdd == null) {
+                  toRemove = new ArrayList<>();
+                  toAdd = new ArrayList<>();
+                }
+                IClasspathEntry newOtherEntry = JavaCore.newSourceEntry(otherEntry.getPath(),
+                    otherEntry.getInclusionPatterns(), newExclusions, otherEntry.getOutputLocation(),
+                    otherEntry.getExtraAttributes());
+                toRemove.add(otherEntry);
+                toAdd.add(newOtherEntry);
+              }
+            }
+          }
+        }
+      }
+    }
+    if(toRemove != null) {
+      toRemove.stream().forEach(e -> result.remove(e));
+    }
+    if(toAdd != null) {
+      toAdd.stream().forEach(e -> result.add(e));
+    }
     return result.toArray(new IClasspathEntry[result.size()]);
   }
 
