@@ -117,13 +117,16 @@ public class SourceLocationHelper {
     }
 
     File pomFile = mavenProject.getFile();
-    if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
+    if(inputLocation.getSource() != null && pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
       // Plugin/execution is specified in current pom
       return getSourceLocation(inputLocation, elementName);
     }
 
     // Plugin/execution is specified in some parent pom
     SourceLocation causeLocation = getSourceLocation(inputLocation, elementName);
+    if(mavenProject.getModel().getParent() == null) {
+      return new SourceLocation(1, 1, 1, causeLocation);
+    }
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
     if(inputLocation == null) {
       // parent location cannot be determined for participant-added parents
@@ -156,8 +159,10 @@ public class SourceLocationHelper {
         if(found != null) {
 
           // missing transitive managed dependency
-          String projectId = mavenProject.getModel().getLocation(SELF).getSource().getModelId();
-          String depId = found.getLocation(SELF).getSource().getModelId();
+          InputLocation projectSelfLoc = mavenProject.getModel().getLocation(SELF);
+          InputLocation depSelfLoc = found.getLocation(SELF);
+          String projectId = projectSelfLoc != null && projectSelfLoc.getSource() != null ? projectSelfLoc.getSource().getModelId() : null;
+          String depId = depSelfLoc != null && depSelfLoc.getSource() != null ? depSelfLoc.getSource().getModelId() : null;
 
           if(!projectId.equals(depId)) {
             // let's see if it comes from a directly imported pom
@@ -224,32 +229,44 @@ public class SourceLocationHelper {
     if(inputLocation == null) {
       // Should never happen
       inputLocation = mavenProject.getModel().getLocation(SELF);
+      if(inputLocation == null) {
+        return new SourceLocation(1, 1, 1);
+      }
       return new SourceLocation(inputLocation.getLineNumber(), 1, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
     File pomFile = mavenProject.getFile();
-    if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
+    if(inputLocation.getSource() != null && pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
       // Dependency is specified in current pom
       return getSourceLocation(inputLocation, DEPENDENCY);
     }
 
-    // Plugin/execution is specified in some parent pom
+    // Dependency is specified in some parent pom
     SourceLocation causeLocation = getSourceLocation(inputLocation, DEPENDENCY);
+    if(mavenProject.getModel().getParent() == null) {
+      return new SourceLocation(1, 1, 1, causeLocation);
+    }
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
     return getSourceLocation(inputLocation, PARENT, causeLocation);
   }
 
   private static SourceLocation getSourceLocation(InputLocation inputLocation, String elementName) {
+    if(inputLocation == null) {
+      return new SourceLocation(1, 1, 1);
+    }
     InputSource source = inputLocation.getSource();
     return new SourceLocation( //
         source != null ? source.getLocation() : null, source != null ? source.getModelId() : null,
-        inputLocation.getLineNumber(), //  
+        inputLocation.getLineNumber(), //
         inputLocation.getColumnNumber() - elementName.length() - COLUMN_START_OFFSET,
         inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
   }
 
   private static SourceLocation getSourceLocation(InputLocation inputLocation, String elementName,
       SourceLocation causeLocation) {
+    if(inputLocation == null) {
+      return new SourceLocation(1, 1, 1, causeLocation);
+    }
     return new SourceLocation(inputLocation.getLineNumber(),
         inputLocation.getColumnNumber() - elementName.length() - COLUMN_START_OFFSET,
         inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
