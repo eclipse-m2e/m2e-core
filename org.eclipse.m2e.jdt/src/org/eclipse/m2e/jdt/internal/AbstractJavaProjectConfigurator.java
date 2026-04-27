@@ -1011,7 +1011,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           return null;
         }
       }
-      String linkName = relativized.toString().replace("/", "_");
+      String linkName = relativized.toString().replace("\\", "_").replace("/", "_");
       IFolder folder = project.getFolder(linkName);
       createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
