@@ -81,7 +81,6 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.internal.console.ConsoleHyperlinkPosition;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -142,7 +141,6 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
 	}
 
-	@Ignore("Flaky: ANSI escape codes interfere with hyperlink position tracking")
 	@Test
 	public void testConsole_debuggerAttachmentAndLinkAlignmentAndBehavior_withColoredPrintout() throws Exception {
 
