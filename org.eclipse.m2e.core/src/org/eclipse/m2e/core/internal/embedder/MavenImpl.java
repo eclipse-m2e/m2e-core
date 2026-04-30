@@ -83,7 +83,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.ConfigurationContainer;
@@ -120,6 +119,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -705,6 +705,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, List<String> parameterPath,
       Class<T> asType) throws CoreException {
+    if(mojoExecution == null) {
+      return null;
+    }
     Xpp3Dom dom = mojoExecution.getConfiguration();
     if(dom == null) {
       return null;
@@ -742,6 +745,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
+    if(mojoExecution == null) {
+      return null;
+    }
     return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, List.of(parameter), asType),
         monitor);

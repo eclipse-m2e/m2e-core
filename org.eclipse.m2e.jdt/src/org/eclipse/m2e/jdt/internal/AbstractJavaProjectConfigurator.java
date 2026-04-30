@@ -724,34 +724,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    String source = null, target = null;
+    MojoExecution execution = getDefaultCompileExecution(getCompilerMojoExecutions(request, monitor));
+    String release = getCompilerLevel(request.mavenProject(), execution, "release", null, RELEASES, monitor);
+    //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
+    String source = getCompilerLevel(request.mavenProject(), execution, "source", null, SOURCES, monitor); //$NON-NLS-1$
+    String target = getCompilerLevel(request.mavenProject(), execution, "target", null, TARGETS, monitor); //$NON-NLS-1$
+    boolean generateParameters = isGenerateParameters(request.mavenProject(), execution, monitor);
+    boolean enablePreviewFeatures = isEnablePreviewFeatures(request.mavenProject(), execution, monitor);
 
-    //New release flag in JDK 9. See http://mail.openjdk.java.net/pipermail/jdk9-dev/2015-July/002414.html
-    String release = null;
-
-    boolean generateParameters = false;
-
-    boolean enablePreviewFeatures = false;
-
-    boolean hasDefaultCompile = getCompilerMojoExecutions(request, monitor).stream()
-        .filter(e -> "default-compile".equals(e.getExecutionId())).findAny().isPresent();
-    for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
-      String id = execution.getExecutionId();
-      if(hasDefaultCompile && !"default-compile".equals(id)) {
-        //Maven can have many but JDT only supports one config!
-        continue;
-      }
-      release = getCompilerLevel(request.mavenProject(), execution, "release", release, RELEASES, monitor);
-      //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
-      source = getCompilerLevel(request.mavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
-      target = getCompilerLevel(request.mavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
-      generateParameters = generateParameters || isGenerateParameters(request.mavenProject(), execution, monitor);
-      enablePreviewFeatures = enablePreviewFeatures
-          || isEnablePreviewFeatures(request.mavenProject(), execution, monitor);
-
-      // process -err:+deprecation , -warn:-serial ...
-      for(Object o : maven.getMojoParameterValue(request.mavenProject(), execution, "compilerArgs", List.class,
-          monitor)) {
+    // process -err:+deprecation , -warn:-serial ...
+    List<?> value = maven.getMojoParameterValue(request.mavenProject(), execution, "compilerArgs", List.class, monitor);
+    if(value != null) {
+      for(Object o : value) {
         if(o instanceof String compilerArg) {
           boolean err = false/*, warn = false*/;
           String[] settings = new String[0];
@@ -817,6 +801,21 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       options.put(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
     }
 
+  }
+
+  private MojoExecution getDefaultCompileExecution(List<MojoExecution> executions) {
+    if(executions.isEmpty()) {
+      return null;
+    }
+    for(MojoExecution execution : executions) {
+      String id = execution.getExecutionId();
+      if("default-compile".equals(id)) {
+        //Maven can have many but JDT only supports one config so we prefer the default one
+        return execution;
+      }
+    }
+    //If no default is found
+    return executions.get(0);
   }
 
   /**
