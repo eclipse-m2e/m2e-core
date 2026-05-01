@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -102,6 +103,24 @@ public class ExtensionsTest extends AbstractMavenProjectTestCase {
 		IFile file = project.getFile("target/classes/file.txt");
 		assertTrue(file.exists());
 		assertEquals("foo-bar-content", new String(file.getContents().readAllBytes()));
+	}
+
+	@Test
+	public void testGitVersioningExtension() throws Exception {
+		// Pre-initialize git repo in workspace (required by the extension to activate)
+		File projectDir = new File(workspace.getRoot().getLocation().toFile(), "gitVersioningExtension");
+		copyDir(new File("resources/projects/gitVersioningExtension"), projectDir);
+		assertEquals(0, new ProcessBuilder("git", "init").directory(projectDir).start().waitFor());
+		assertEquals(0, new ProcessBuilder("git", "add", ".").directory(projectDir).start().waitFor());
+		assertEquals(0,
+				new ProcessBuilder("git", "-c", "user.email=test@test.com", "-c", "user.name=Test", "commit", "-m",
+						"init").directory(projectDir).start().waitFor());
+		// Import project - the extension modifies the model, stripping InputLocation metadata
+		IProject project = importProject("resources/projects/gitVersioningExtension/pom.xml");
+		waitForJobsToComplete(monitor);
+		// Without the fix, Model.getLocation("") returns null causing NPE in
+		// AnnotationMappingMetadataSource and SourceLocationHelper
+		assertNoErrors(project);
 	}
 
 	private IProject importPomlessProject(String rootProject, String... poms) throws IOException, CoreException {
