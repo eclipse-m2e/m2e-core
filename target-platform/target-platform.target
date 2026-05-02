@@ -68,7 +68,7 @@
 				<dependency>
 					<groupId>com.google.code.gson</groupId>
 					<artifactId>gson</artifactId>
-					<version>2.13.2</version>
+					<version>2.14.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -80,7 +80,7 @@
 				<dependency>
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
-					<version>33.5.0-jre</version>
+					<version>33.6.0-jre</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -92,7 +92,7 @@
 				<dependency>
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
-					<version>1.21.0</version>
+					<version>1.22.0</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -136,7 +136,7 @@
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-common</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -159,13 +159,13 @@ Import-Package:        org.jdom2*
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-descriptor</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
