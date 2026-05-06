@@ -1005,7 +1005,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IFolder folder = project.getFolder(relativePath);
     if((!project.exists(relativePath) || !folder.getProject().equals(project)) && Files.exists(folderPath)
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
-      String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
+      Path relativized = projectLocation.relativize(folderPath);
+      if(relativized.startsWith("..")) {
+        Path normalizedFolder = folderPath.normalize();
+        if(projectLocation.normalize().startsWith(normalizedFolder)) {
+          // Target is an ancestor of the project — linking would create circular containment.
+          return null;
+        }
+      }
+      String linkName = relativized.toString().replace("\\", "_").replace("/", "_");
       folder = project.getFolder(linkName);
       createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
