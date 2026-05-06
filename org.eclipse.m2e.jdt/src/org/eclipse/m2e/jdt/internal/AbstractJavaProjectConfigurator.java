@@ -1007,10 +1007,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
       Path relativized = projectLocation.relativize(folderPath);
       if(relativized.startsWith("..")) {
-        // Resource directory is outside (ancestor or sibling of) the project.
-        // Cannot create a valid linked folder for paths that escape the project tree.
-        // Return the project itself so the caller skips this resource directory.
-        return project;
+        Path normalizedFolder = folderPath.normalize();
+        if(projectLocation.normalize().startsWith(normalizedFolder)) {
+          // Target is an ancestor of the project — linking would create circular containment.
+          return null;
+        }
       }
       String linkName = relativized.toString().replace("\\", "_").replace("/", "_");
       folder = project.getFolder(linkName);
