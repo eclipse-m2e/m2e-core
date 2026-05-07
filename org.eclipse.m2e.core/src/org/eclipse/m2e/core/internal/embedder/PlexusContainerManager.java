@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.AbstractModule;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
@@ -88,9 +87,6 @@ public class PlexusContainerManager {
 
   @Reference
   private IMavenConfiguration mavenConfiguration;
-
-  @Reference
-  private IWorkspace workspace;
 
   @Deactivate
   void dispose() {
