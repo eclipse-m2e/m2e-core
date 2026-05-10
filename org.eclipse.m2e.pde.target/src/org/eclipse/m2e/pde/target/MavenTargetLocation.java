@@ -97,6 +97,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_GROUP_ID = "groupId";
 	public static final String ELEMENT_INSTRUCTIONS = "instructions";
 	public static final String ELEMENT_EXCLUDED = "exclude";
+	public static final String ELEMENT_EXCLUSIONS = "exclusions";
+	public static final String ELEMENT_EXCLUSION = "exclusion";
 	public static final String ELEMENT_DEPENDENCY = "dependency";
 	public static final String ELEMENT_DEPENDENCIES = "dependencies";
 	public static final String ELEMENT_REPOSITORY = "repository";
@@ -272,10 +274,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 				List<RepositoryArtifact> artifacts = dependecies.artifacts();
 				split.setWorkRemaining(artifacts.size());
+				List<org.apache.maven.model.Exclusion> depExclusions = root.getExclusions();
 				for (RepositoryArtifact a : artifacts) {
 					if (a.artifact().getFile() == null) {
 						// this is a filtered dependency
 						continue;
+					}
+					if (matchesExclusion(a.artifact(), depExclusions)) {
+						setExcluded(a.artifact(), true);
 					}
 					addBundleForArtifact(a.artifact(), cacheManager, maven, targetBundles, split.split(1));
 				}
@@ -525,6 +531,26 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
 	}
 
+	private static boolean matchesExclusion(Artifact artifact,
+			List<org.apache.maven.model.Exclusion> exclusions) {
+		if (exclusions.isEmpty()) {
+			return false;
+		}
+		String groupId = artifact.getGroupId();
+		String artifactId = artifact.getArtifactId();
+		for (org.apache.maven.model.Exclusion exclusion : exclusions) {
+			if (matchesPattern(exclusion.getGroupId(), groupId)
+					&& matchesPattern(exclusion.getArtifactId(), artifactId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean matchesPattern(String pattern, String value) {
+		return "*".equals(pattern) || pattern.equals(value);
+	}
+
 	List<DependencyNode> getDependencyNodes(MavenTargetDependency dependency) {
 		TargetBundles bundles = targetBundles;
 		if (bundles == null) {
@@ -600,6 +626,17 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				element(xml, ELEMENT_VERSION, dependency.getVersion());
 				element(xml, ELEMENT_TYPE, dependency.getType());
 				element(xml, ELEMENT_CLASSIFIER, dependency.getClassifier());
+				List<org.apache.maven.model.Exclusion> depExclusions = dependency.getExclusions();
+				if (!depExclusions.isEmpty()) {
+					xml.append("<" + ELEMENT_EXCLUSIONS + ">");
+					depExclusions.forEach(ex -> {
+						xml.append("<" + ELEMENT_EXCLUSION + ">");
+						element(xml, ELEMENT_GROUP_ID, ex.getGroupId());
+						element(xml, ELEMENT_ARTIFACT_ID, ex.getArtifactId());
+						xml.append("</" + ELEMENT_EXCLUSION + ">");
+					});
+					xml.append("</" + ELEMENT_EXCLUSIONS + ">");
+				}
 				xml.append("</" + ELEMENT_DEPENDENCY + ">");
 			});
 			xml.append("</" + ELEMENT_DEPENDENCIES + ">");
