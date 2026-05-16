@@ -76,12 +76,12 @@ class MavenPomFeatureModel extends AbstractFeatureModel {
 			Model model = IMavenToolbox.of(MavenPlugin.getMaven()).readModel(stream);
 
 			IFeature f = getFeature();
-			String id = model.getGroupId() + "." + model.getArtifactId() + "." + model.getPackaging();
+			String id = artifact.getGroupId() + "." + artifact.getArtifactId() + "." + artifact.getExtension();
 			if (isSourceFeature) {
 				id += ".source";
 			}
 			f.setId(id);
-			f.setVersion(MavenBundleWrapper.createOSGiVersion(model.getVersion()).toString());
+			f.setVersion(MavenBundleWrapper.createOSGiVersion(artifact).toString());
 			String name = model.getName();
 			if (isSourceFeature) {
 				name += " (Source)";

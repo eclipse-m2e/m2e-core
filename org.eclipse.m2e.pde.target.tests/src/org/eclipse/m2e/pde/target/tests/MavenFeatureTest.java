@@ -115,7 +115,7 @@ public class MavenFeatureTest extends AbstractMavenTargetTest {
 				originalOSGiBundle("jakarta.activation-api", "2.1.0", "jakarta.activation:jakarta.activation-api"),
 				originalOSGiBundle("jakarta.xml.bind-api", "4.0.0", "jakarta.xml.bind:jakarta.xml.bind-api"));
 		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
-		List<ExpectedFeature> expectedFeature = List.of(generatedFeature("com.sun.xml.bind.jaxb-ri.pom", "0.0.1",
+		List<ExpectedFeature> expectedFeature = List.of(generatedFeature("com.sun.xml.bind.jaxb-ri.pom", "4.0.2",
 				List.of(//
 						featurePlugin("com.sun.xml.bind.jaxb-core", "4.0.2"),
 						featurePlugin("com.sun.xml.bind.jaxb-impl", "4.0.2"),
