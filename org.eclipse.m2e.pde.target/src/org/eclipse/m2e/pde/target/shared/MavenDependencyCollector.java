@@ -49,6 +49,8 @@ public class MavenDependencyCollector {
 
 	private static final String TYPE_POM = "pom";
 
+	private static final String SCOPE_IMPORT = "import";
+
 	private static final Set<String> VALID_EXTENSIONS = Set.of("jar", TYPE_POM);
 
 	private final RepositorySystem repoSystem;
@@ -103,6 +105,11 @@ public class MavenDependencyCollector {
 			for (Dependency dependency : rootDescriptor.dependencies()) {
 				readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
 			}
+			if (dependencyScopes.contains(SCOPE_IMPORT) && isPomArtifact(rootDescriptor.node())) {
+				for (Dependency dependency : rootDescriptor.managedDependencies()) {
+					readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
+				}
+			}
 			return new DependencyResult(depth, artifacts, rootDescriptor.node(), nodes);
 		}
 		// Add all dependencies with BFS method
@@ -112,23 +119,9 @@ public class MavenDependencyCollector {
 		queue.add(rootDescriptor);
 		while (!queue.isEmpty()) {
 			ArtifactDescriptor current = queue.poll();
-			for (Dependency dependency : current.dependencies()) {
-				if (isValidDependency(dependency) && isValidScope(dependency)) {
-					if (isVersionRanged(dependency)) {
-						ArtifactDescriptor dependencyDescriptor = resolveHighestVersion(dependency, current.node(),
-								artifacts, nodes);
-						if (dependencyDescriptor != null
-								&& collected.add(getId(dependencyDescriptor.node().getDependency()))) {
-							queue.add(dependencyDescriptor);
-						}
-					} else if (collected.add(getId(dependency))) {
-						ArtifactDescriptor dependencyDescriptor = readArtifactDescriptor(dependency, current.node(),
-								artifacts, nodes);
-						if (dependencyDescriptor != null) {
-							queue.add(dependencyDescriptor);
-						}
-					}
-				}
+			enqueueDependencies(current.dependencies(), current.node(), artifacts, nodes, collected, queue);
+			if (dependencyScopes.contains(SCOPE_IMPORT) && isPomArtifact(current.node())) {
+				enqueueDependencies(current.managedDependencies(), current.node(), artifacts, nodes, collected, queue);
 			}
 		}
 		return new DependencyResult(depth, artifacts, rootDescriptor.node(), nodes);
@@ -164,7 +157,7 @@ public class MavenDependencyCollector {
 	 */
 	private ArtifactDescriptor readArtifactDescriptor(Dependency dependency, DependencyNode parent,
 			Collection<RepositoryArtifact> artifacts, List<DependencyNode> nodes) throws RepositoryException {
-		if (isValidScope(dependency) && isValidDependency(dependency)) {
+		if (isValid(dependency)) {
 			ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
 			descriptorRequest.setArtifact(dependency.getArtifact());
 			descriptorRequest.setRepositories(repositories);
@@ -186,6 +179,37 @@ public class MavenDependencyCollector {
 		return null;
 	}
 
+	private void enqueueDependencies(List<Dependency> dependencies, DependencyNode parent,
+			Collection<RepositoryArtifact> artifacts, List<DependencyNode> nodes, Set<String> collected,
+			Queue<ArtifactDescriptor> queue) throws RepositoryException {
+		for (Dependency dependency : dependencies) {
+			if (isValid(dependency)) {
+				if (isVersionRanged(dependency)) {
+					// Pre-check collected before resolving to avoid downloading artifacts that will
+					// ultimately be skipped due to GA-based deduplication.
+					if (!collected.contains(getId(dependency))) {
+						ArtifactDescriptor dependencyDescriptor = resolveHighestVersion(dependency, parent, artifacts,
+								nodes);
+						if (dependencyDescriptor != null
+								&& collected.add(getId(dependencyDescriptor.node().getDependency()))) {
+							queue.add(dependencyDescriptor);
+						}
+					}
+				} else if (collected.add(getId(dependency))) {
+					ArtifactDescriptor dependencyDescriptor = readArtifactDescriptor(dependency, parent, artifacts,
+							nodes);
+					if (dependencyDescriptor != null) {
+						queue.add(dependencyDescriptor);
+					}
+				}
+			}
+		}
+	}
+
+	private boolean isValid(Dependency dependency) {
+		return isValidDependency(dependency) && isValidScope(dependency);
+	}
+
 	private boolean isValidDependency(Dependency dependency) {
 		if (dependency.isOptional()) {
 			// optional in maven means do not include in transitive dependency chains see
@@ -202,6 +226,10 @@ public class MavenDependencyCollector {
 
 		}
 		return dependencyScopes.contains(scope);
+	}
+
+	private static boolean isPomArtifact(DependencyNode node) {
+		return TYPE_POM.equalsIgnoreCase(node.getDependency().getArtifact().getExtension());
 	}
 
 	public static DependencyDepth getEffectiveDepth(MavenRootDependency root, DependencyDepth dependencyDepth) {
