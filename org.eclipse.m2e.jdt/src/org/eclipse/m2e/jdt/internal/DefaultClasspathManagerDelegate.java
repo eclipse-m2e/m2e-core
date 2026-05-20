@@ -141,18 +141,17 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
           try {
             MavenProject dependencyMavenProject = dependency.getMavenProject(monitor);
             if(dependencyMavenProject != null) {
-              String testOutputDirectory = dependencyMavenProject.getBuild().getTestOutputDirectory();
-              IPath testClassesPath = dependency.getProject().getFullPath()
-                  .append(dependency.getProjectRelativePath(testOutputDirectory));
+              // Use Maven's standard target/test-classes path
+              IPath testClassesPath = dependency.getProject().getFullPath().append("target/test-classes");
               IClasspathEntryDescriptor testClassesEntry = classpath.addLibraryEntry(testClassesPath);
               testClassesEntry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
+
               // Set source attachment to test source folder for debugging
               IPath testSourcePath = dependency.getProject().getFullPath().append("src/test/java");
               testClassesEntry.setSourceAttachment(testSourcePath, null);
             }
           } catch(CoreException e) {
-            // If we can't get the test output directory, fall back to WITHOUT_TEST_CODE attribute
-            // which may not work as expected but is the existing behavior
+            // If we can't get the test output directory, fall back to existing behavior
           }
         }
 
