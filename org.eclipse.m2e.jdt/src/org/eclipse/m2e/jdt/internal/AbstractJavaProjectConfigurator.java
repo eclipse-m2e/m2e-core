@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -1030,11 +1031,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       try {
         // Ensure the parent project is accessible before attempting to create the link
         IProject project = folder.getProject();
-        if(project != null && !project.isAccessible()) {
-          if(attempt < maxAttempts) {
-            log.debug("Project {} is not accessible, waiting before retry...", project.getName());
-            sleepWithExponentialBackoff(initialDelay, attempt, folder.getFullPath().toString());
-            continue;
+        if(project != null) {
+          if(!project.isOpen()) {
+            throw new CoreException(Status
+                .error("The project " + project + " of folder " + folder + " to link with " + target + " is not open"));
+          }
+          if(!project.isAccessible()) {
+            throw new CoreException(Status.error(
+                "The project " + project + " of folder " + folder + " to link with " + target + " is not accessible"));
           }
         }
 
