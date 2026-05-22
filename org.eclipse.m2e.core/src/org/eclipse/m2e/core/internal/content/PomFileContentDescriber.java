@@ -30,10 +30,10 @@ import org.eclipse.m2e.core.internal.Messages;
 /**
  * A content describer for POM files.
  *
- * @see org.eclipse.ant.internal.core.contentDescriber.AntBuildfileContentDescriber
  * @author Herve Boutemy
  * @since 0.9.6
  */
+// Similar to org.eclipse.ant.internal.core.contentDescriber.AntBuildfileContentDescriber
 public final class PomFileContentDescriber extends XMLContentDescriber {
   /**
    * Determines the validation status for the given contents.
