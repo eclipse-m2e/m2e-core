@@ -4,9 +4,9 @@
 
 * 📅 Release Date: _expected_ beginning of June 2026
 
-### Embedded and use Maven 3.9.15
+### Embedded and use Maven 3.9.16
 
-Updated the embedded Maven from version 3.9.11 to 3.9.15; [Maven 3.9.15 Release Notes](https://maven.apache.org/docs/3.9.15/release-notes.html).
+Updated the embedded Maven from version 3.9.11 to 3.9.16; [Maven 3.9.16 Release Notes](https://maven.apache.org/docs/3.9.16/release-notes.html).
 
 ## 2.11.0
 
