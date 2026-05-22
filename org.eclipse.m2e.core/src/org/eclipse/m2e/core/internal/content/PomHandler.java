@@ -33,10 +33,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * An xml event handler for detecting the project top-level element in a POM file. Also records whether a default
  * attribute is present for the project and if any typical Maven elements are present.
  *
- * @see org.eclipse.ant.internal.core.contentDescriber.AntHandler
  * @author Herve Boutemy
  * @since 0.9.6
  */
+//Similar to org.eclipse.ant.internal.core.contentDescriber.AntHandler
 public final class PomHandler extends DefaultHandler {
   /**
    * An exception indicating that the parsing should stop.
