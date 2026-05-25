@@ -636,6 +636,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       } catch(IOException ex) {
         resourceDirectory = new File(directory).getAbsoluteFile();
       }
+      Path projectLocation = project.getLocation().toPath().toAbsolutePath().normalize();
+      Path resourcePath = resourceDirectory.toPath().toAbsolutePath().normalize();
+      if(projectLocation.startsWith(resourcePath) && !projectLocation.equals(resourcePath)) {
+        log.error("Skipping resource folder " + resourceDirectory);
+        continue;
+      }
       IContainer r = getFolder(project, resourceDirectory.getPath());
       if(r == project) {
         /*
@@ -990,7 +996,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected IContainer getFolder(IProject project, String path) throws CoreException {
-    Path projectLocation = project.getLocation().toPath().toAbsolutePath();
+    Path projectLocation = project.getLocation().toPath().toAbsolutePath().normalize();
     Path folderPath = Path.of(path).normalize();
     if(projectLocation.equals(folderPath)) {
       return project;
@@ -999,13 +1005,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(folderPath.isAbsolute()) {
       relativePath = getProjectRelativePath(project, folderPath);
     } else {
-      folderPath = projectLocation.resolve(path);
+      folderPath = projectLocation.resolve(path).normalize();
       relativePath = IPath.fromOSString(path);
     }
     IFolder folder = project.getFolder(relativePath);
     if((!project.exists(relativePath) || !folder.getProject().equals(project)) && Files.exists(folderPath)
         && !ResourcesPlugin.getWorkspace().getRoot().getLocation().toPath().equals(folderPath)) {
-      String linkName = projectLocation.relativize(folderPath).toString().replace("/", "_");
+      Path relativized = projectLocation.relativize(folderPath);
+      String linkName = relativized.toString().replace("\\", "_").replace("/", "_");
       folder = project.getFolder(linkName);
       createLinkWithRetry(folder, folderPath.toUri());
       folder.setPersistentProperty(LINKED_MAVEN_RESOURCE, "true");
