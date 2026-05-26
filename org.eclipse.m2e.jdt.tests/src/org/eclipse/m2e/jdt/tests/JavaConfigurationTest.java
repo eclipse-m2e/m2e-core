@@ -163,6 +163,15 @@ public class JavaConfigurationTest extends AbstractMavenProjectTestCase {
 	}
 
 	@Test
+	public void testAncestorResourceDoesNotSkipLaterResources() throws CoreException, IOException, InterruptedException {
+		IJavaProject project = importResourceProject("/projects/ancestor-resource-with-sibling/pom.xml");
+		List<String> srcEntryPaths = Arrays.stream(project.getRawClasspath())
+				.filter(cp -> IClasspathEntry.CPE_SOURCE == cp.getEntryKind()).filter(cp -> !cp.isTest())
+				.map(IClasspathEntry::getPath).map(IPath::toString).toList();
+		assertTrue(srcEntryPaths.contains("/ancestor-resource-with-sibling/src/main/resources"));
+	}
+
+	@Test
 	public void testAddSourceResource() throws CoreException, IOException, InterruptedException {
 		File baseDir = new File(FileLocator
 				.toFileURL(JavaConfigurationTest.class.getResource("/projects/add-source-resource/submoduleA/pom.xml"))
