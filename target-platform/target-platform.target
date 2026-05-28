@@ -22,7 +22,7 @@
 			<unit id="org.eclipse.jgit"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.45.0"/>
+			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.46.0"/>
 			<unit id="org.eclipse.emf.edit.ui.feature.group"/>
 			<unit id="org.eclipse.emf.ecore.edit.feature.group"/>
 		</location>
@@ -52,7 +52,7 @@
 				<dependency>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
-					<version>1.5.32</version>
+					<version>1.5.33</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
@@ -136,7 +136,7 @@
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-common</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -159,13 +159,13 @@ Import-Package:        org.jdom2*
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-catalog</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
 					<groupId>org.apache.maven.archetype</groupId>
 					<artifactId>archetype-descriptor</artifactId>
-					<version>3.2.1</version>
+					<version>3.4.1</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
