@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24"
+   height="24"
+   id="svg2"
+   version="1.1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="provider-bg-6">
+      <stop
+         style="stop-color:#85a2cd;stop-opacity:1;"
+         offset="0"
+         id="stop4923" />
+      <stop
+         style="stop-color:#d3dce9;stop-opacity:1;"
+         offset="1"
+         id="stop4925" />
+    </linearGradient>
+    <linearGradient
+       id="provider-stroke-7">
+      <stop
+         style="stop-color:#4e6b9b;stop-opacity:1"
+         offset="0"
+         id="stop4915" />
+      <stop
+         style="stop-color:#6783b1;stop-opacity:1"
+         offset="1"
+         id="stop4917" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#provider-stroke-7"
+       id="linearGradient4919"
+       x1="1.860189"
+       y1="1051.5892"
+       x2="1.860189"
+       y2="1046.8492"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0234842,0,0,1.0234842,-17.402505,-25.185931)" />
+    <linearGradient
+       xlink:href="#provider-bg-6"
+       id="linearGradient4927"
+       x1="1.860189"
+       y1="1051.5892"
+       x2="1.860189"
+       y2="1046.8492"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0234842,0,0,1.0234842,-17.402505,-25.185931)" />
+    <linearGradient
+       id="arrow-bg-3">
+      <stop
+         style="stop-color:#4e8fbd;stop-opacity:1;"
+         offset="0"
+         id="stop4791" />
+      <stop
+         style="stop-color:#8dacc3;stop-opacity:1"
+         offset="1"
+         id="stop4793" />
+    </linearGradient>
+    <linearGradient
+       y2="1049.5981"
+       x2="-2.2873085"
+       y1="1044.6919"
+       x1="-2.2873085"
+       gradientTransform="matrix(1.0493833,1.0493833,1.0493833,-1.0493833,-1079.5505,2143.7383)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient3924"
+       xlink:href="#arrow-bg-3" />
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     style="display:inline"
+     transform="translate(0,-1036.3622)">
+    <g
+       id="provider"
+       transform="matrix(1.45,0,0,1.45,26.607637,-466.10093)">
+      <title
+         id="title3210">provider</title>
+      <path
+         style="fill:url(#linearGradient4927);fill-opacity:1;stroke:url(#linearGradient4919);stroke-width:0.716439;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m -17.306554,1043.8942 v 7.1004 h 7.132406 7.1324058 v -7.1004 H -6.048227 v 2.015 h 0.9275325 v 3.0704 h -5.0534535 -5.053453 v -3.0704 h 0.927532 v -2.015 z"
+         id="path4143" />
+    </g>
+    <path
+       style="display:inline;fill:url(#linearGradient3924);fill-opacity:1;stroke:none;stroke-width:1.45"
+       d="m 7.4007052,1050.8732 0.950721,0.9506 9.1130538,-9.113 1.901441,1.9014 0.486902,-5.078 -5.078184,0.4403 1.785501,1.7857 z"
+       id="arrow">
+      <title
+         id="title3208">arrow</title>
+    </path>
+  </g>
+</svg>

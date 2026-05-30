@@ -13,14 +13,22 @@
 
 package org.eclipse.m2e.core.ui.internal.util;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
+import org.eclipse.aether.version.Version;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -29,6 +37,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.preferences.ruleset.model.IgnoreVersion;
+import org.eclipse.m2e.core.ui.internal.preferences.ruleset.model.RuleSet;
+import org.eclipse.m2e.core.ui.internal.preferences.ruleset.IgnoreVersionMatcher;
+import org.eclipse.m2e.core.ui.internal.preferences.ruleset.RuleService;
+import org.eclipse.m2e.core.ui.internal.preferences.ruleset.RuleSetParser;
 
 
 /**
@@ -37,6 +52,7 @@ import org.eclipse.m2e.core.internal.M2EUtils;
  * @author dyocum
  */
 public class M2EUIUtils {
+  private static final ILog LOG = Platform.getLog(M2EUIUtils.class);
 
   public static Font deriveFont(Font f, int style, int height) {
     FontData[] fd = f.getFontData();
@@ -86,5 +102,36 @@ public class M2EUIUtils {
     ControlDecoration controlDecoration = new ControlDecoration(control, SWT.LEFT | SWT.CENTER);
     controlDecoration.setDescriptionText(fieldDecoration.getDescription());
     controlDecoration.setImage(fieldDecoration.getImage());
+  }
+
+  /**
+   * Returns the version rule-set used for updating Maven artifacts to their latest version.
+   */
+  public static RuleSet getCurrentRuleSet() throws CoreException {
+    IPreferenceStore preferenceStore = M2EUIPluginActivator.getDefault().getPreferenceStore();
+    String ruleSetString = preferenceStore.getString(MavenPreferenceConstants.P_MAVEN_VERSION_RULESET);
+    if(ruleSetString.isEmpty()) {
+      return new RuleSet();
+    }
+    return RuleSetParser.fromXMLString(ruleSetString);
+  }
+
+  /**
+   * Returns a checker used to verify whether the a given version should be ignored based on the current rule-set.
+   */
+  public static Predicate<Version> getIgnoreVersionMatcher(String groupId, String artifactId) {
+    RuleSet ruleSet = null;
+
+    try {
+      ruleSet = getCurrentRuleSet();
+    } catch(CoreException e) {
+      LOG.log(Status.error(e.getMessage(), e));
+      ruleSet = new RuleSet();
+    }
+
+    RuleService ruleService = new RuleService(ruleSet);
+    List<IgnoreVersion> ignoreVersions = ruleService.getIgnoredVersions(groupId, artifactId);
+
+    return new IgnoreVersionMatcher(ignoreVersions);
   }
 }
