@@ -62,6 +62,10 @@ public class MavenImages {
 
   public static final ImageDescriptor CLEAR = createDescriptor("clear.svg"); //$NON-NLS-1$
 
+  public static final ImageDescriptor IMPORT = createDescriptor("import_wiz.svg"); //$NON-NLS-1$
+
+  public static final ImageDescriptor EXPORT = createDescriptor("export_wiz.svg"); //$NON-NLS-1$
+
   // object images
   public static final String PATH_JAR = "jar_obj.svg"; //$NON-NLS-1$
 
@@ -92,6 +96,10 @@ public class MavenImages {
   public static final Image IMG_POM = POM.createImage();
 
   public static final Image IMG_ERROR = createImage("error_st_obj.svg"); //$NON-NLS-1$
+
+  public static final Image IMG_IMPORT = createImage("import_wiz.svg"); //$NON-NLS-1$
+
+  public static final Image IMG_EXPORT = createImage("export_wiz.svg"); //$NON-NLS-1$
 
   // wizard images
   public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.svg"); //$NON-NLS-1$

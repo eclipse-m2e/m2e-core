@@ -557,6 +557,20 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_update_one;
 
+  public static String MavenRuleSetPreferencePage_Artifact;
+
+  public static String MavenRuleSetPreferencePage_Export;
+
+  public static String MavenRuleSetPreferencePage_IgnoredVersions;
+
+  public static String MavenRuleSetPreferencePage_Import;
+
+  public static String MavenRuleSetPreferencePage_Rules;
+
+  public static String MavenRuleSetPreferencePage_Type;
+
+  public static String MavenRuleSetPreferencePage_Value;
+
   public static String MavenSettingsPreferencePage_settingsBrowseButton_text;
 
   public static String MavenSettingsPreferencePage_btnUpdate;

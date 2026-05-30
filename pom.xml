@@ -307,5 +307,42 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>ruleset</id>
+			<activation>
+				<file>
+					<exists>xsd/rule-3.0.0.xsd</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>jaxb2-maven-plugin</artifactId>
+						<version>4.1.0</version>
+						<executions>
+							<execution>
+								<?m2e execute?>
+								<id>xjc</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>xjc</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<sources>
+								<source>xsd/rule-3.0.0.xsd</source>
+							</sources>
+							<noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+							<noPackageLevelAnnotations>true</noPackageLevelAnnotations>
+							<packageName>org.eclipse.m2e.core.ui.internal.preferences.ruleset.model</packageName>
+							<outputDirectory>${project.basedir}/src-gen</outputDirectory>
+							<clearOutputDir>false</clearOutputDir>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>

@@ -478,6 +478,15 @@
             name="%page.lifecyclemapping.name">
          <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
+      <page
+            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+            class="org.eclipse.m2e.core.ui.internal.preferences.MavenRuleSetPreferencePage"
+            id="org.eclipse.m2e.core.ui.ruleSetPreferencePage"
+            name="%page.ruleset.name">
+         <keywordReference
+               id="org.eclipse.m2e.core.maven">
+         </keywordReference>
+      </page>
    </extension>
 
    <extension point="org.eclipse.ui.newWizards">

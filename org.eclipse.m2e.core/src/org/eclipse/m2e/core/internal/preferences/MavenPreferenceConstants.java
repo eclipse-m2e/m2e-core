@@ -178,4 +178,11 @@ public interface MavenPreferenceConstants {
    */
   String P_ENABLE_SNAPSHOT_ARCHETYPES = "enableSnapshotArchetypes";
 
+  /**
+   * XML-encoded rule set.
+   * 
+   * @since 2.7.800
+   * @see <a href="https://www.mojohaus.org/versions/versions-model/rule.html">Rule</a>
+   */
+  String P_MAVEN_VERSION_RULESET = "versionRuleSet";
 }

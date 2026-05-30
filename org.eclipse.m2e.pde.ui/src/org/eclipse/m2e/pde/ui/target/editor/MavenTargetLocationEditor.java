@@ -14,15 +14,18 @@ package org.eclipse.m2e.pde.ui.target.editor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.pde.target.BNDInstructions;
 import org.eclipse.m2e.pde.target.MavenTargetBundle;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
@@ -138,7 +141,9 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			Object segment = treePath.getFirstSegment();
 			if (segment instanceof MavenTargetLocation targetLocation) {
 				try {
-					MavenTargetLocation update = targetLocation.update(monitor);
+					BiPredicate<MavenTargetDependency, Version> versionChecker = (dependency, version) -> M2EUIUtils
+							.getIgnoreVersionMatcher(dependency.getGroupId(), dependency.getArtifactId()).test(version);
+					MavenTargetLocation update = targetLocation.update(versionChecker, monitor);
 					if (update == null) {
 						continue;
 					}
