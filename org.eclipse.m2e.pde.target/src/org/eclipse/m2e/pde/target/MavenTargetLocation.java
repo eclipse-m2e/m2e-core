@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -431,12 +432,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return bndInstructions;
 	}
 
-	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
+	public MavenTargetLocation update(BiPredicate<MavenTargetDependency, Version> versionChecker,
+			IProgressMonitor monitor) throws CoreException {
 
 		List<MavenTargetDependency> latest = new ArrayList<>();
 		int updated = 0;
 		for (MavenTargetDependency dependency : roots) {
-			MavenTargetDependency result = update(dependency, monitor);
+			MavenTargetDependency result = update(dependency, version -> versionChecker.test(dependency, version),
+					monitor);
 			latest.add(result);
 			if (!dependency.matches(result)) {
 				updated++;
@@ -451,7 +454,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				featureTemplate);
 	}
 
-	public MavenTargetDependency update(MavenTargetDependency source, IProgressMonitor monitor) throws CoreException {
+	public MavenTargetDependency update(MavenTargetDependency source, Predicate<Version> versionChecker,
+			IProgressMonitor monitor) throws CoreException {
 		Artifact artifact = new DefaultArtifact(source.getGroupId() + ":" + source.getArtifactId() + ":(0,]");
 		IMaven maven = MavenPlugin.getMaven();
 		RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
@@ -471,7 +475,15 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 			}
 		}, monitor);
-		Version highestVersion = result.getHighestVersion();
+		Version highestVersion = null;
+		List<Version> versions = result.getVersions();
+		for (int i = versions.size() - 1; i >= 0; --i) {
+			Version version = versions.get(i);
+			if (!versionChecker.test(version)) {
+				highestVersion = version;
+				break;
+			}
+		}
 		if (highestVersion == null || highestVersion.toString().equals(source.getVersion())) {
 			return source.copy();
 		} else {

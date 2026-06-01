@@ -17,8 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.databinding.observable.sideeffect.ISideEffectFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -27,6 +29,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
+import org.eclipse.m2e.pde.target.versions.RuleSetMatcher;
 import org.eclipse.m2e.pde.ui.target.editor.ClipboardParser;
 import org.eclipse.swt.widgets.Display;
 
@@ -216,10 +219,13 @@ public class TargetDependencyModel {
 		try {
 			int updated = 0;
 
+			RuleSetMatcher ruleSetMatcher = RuleSetMatcher.getMatcherFromPreferences();
 			for (MavenTargetDependency dependency : oldCurrentSelection) {
 				int index = oldTargetDependencies.indexOf(dependency);
 
-				MavenTargetDependency newDependency = targetLocation.update(dependency, null);
+				Predicate<Version> versionChecker = ruleSetMatcher.getIgnoreVersionMatcher(dependency.getGroupId(),
+						dependency.getArtifactId());
+				MavenTargetDependency newDependency = targetLocation.update(dependency, versionChecker, null);
 
 				if (!dependency.matches(newDependency)) {
 					updated++;
