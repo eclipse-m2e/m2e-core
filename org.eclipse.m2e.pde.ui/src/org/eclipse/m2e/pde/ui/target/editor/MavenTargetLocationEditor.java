@@ -14,9 +14,11 @@ package org.eclipse.m2e.pde.ui.target.editor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +30,7 @@ import org.eclipse.m2e.pde.target.MavenTargetBundle;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.m2e.pde.target.MissingMetadataMode;
+import org.eclipse.m2e.pde.target.versions.RuleSetMatcher;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationHandler;
@@ -138,7 +141,10 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			Object segment = treePath.getFirstSegment();
 			if (segment instanceof MavenTargetLocation targetLocation) {
 				try {
-					MavenTargetLocation update = targetLocation.update(monitor);
+					RuleSetMatcher ruleSetMatcher = RuleSetMatcher.getMatcherFromPreferences();
+					BiPredicate<MavenTargetDependency, Version> versionChecker = (dependency, version) -> ruleSetMatcher
+							.getIgnoreVersionMatcher(dependency.getGroupId(), dependency.getArtifactId()).test(version);
+					MavenTargetLocation update = targetLocation.update(versionChecker, monitor);
 					if (update == null) {
 						continue;
 					}

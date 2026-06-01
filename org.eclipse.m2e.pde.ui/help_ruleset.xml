@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contexts>
+	<context id="ruleset">
+		<description>
+			The Rule-Set describes a set of rules for how versions of artifacts should be handled.
+		</description>
+		<topic
+			label="Rule-Set"
+			href="https://www.mojohaus.org/versions/versions-model/rule.html"/>
+	</context>
+</contexts>

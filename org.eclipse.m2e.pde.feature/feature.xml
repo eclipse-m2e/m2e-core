@@ -23,6 +23,9 @@
       <import plugin="org.eclipse.m2e.maven.runtime"/>
       <import plugin="org.eclipse.m2e.core"/>
       <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.m2e.versions.api"/>
+      <import plugin="org.eclipse.m2e.versions.common"/>
+      <import plugin="org.eclipse.m2e.versions.model"/>
    </requires>
 
    <plugin

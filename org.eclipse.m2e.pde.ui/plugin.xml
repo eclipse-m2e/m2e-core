@@ -23,4 +23,21 @@
 	      </newWizardShortcut>
 	   </perspectiveExtension>
 	</extension>
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+            class="org.eclipse.m2e.pde.ui.target.preferences.MavenRuleSetPreferencePage"
+            id="org.eclipse.m2e.pde.ui.ruleSetPreferencePage"
+            name="%ruleset.page.name">
+         <keywordReference
+               id="org.eclipse.m2e.core.maven">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="help_ruleset.xml">
+      </contexts>
+   </extension>
 </plugin>

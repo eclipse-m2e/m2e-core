@@ -97,8 +97,20 @@
 				</dependency>
 				<dependency>
 					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-collections4</artifactId>
+					<version>4.5.0</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-lang3</artifactId>
 					<version>3.20.0</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>org.codehaus.woodstox</groupId>
+					<artifactId>stax2-api</artifactId>
+					<version>4.3.0</version>
 					<type>jar</type>
 				</dependency>
 			</dependencies>
@@ -188,5 +200,67 @@ Import-Package:        !*
 ]]></instructions>
 		</location>
 		<location type="Target" uri="file:${project_loc:/m2e-core}/target-platform/m2e-runtimes.target"/>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-versions Common" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.codehaus.mojo.versions</groupId>
+					<artifactId>versions-common</artifactId>
+					<version>2.21.0</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions><![CDATA[
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
+version:               ${version_cleanup;${mvnVersion}}
+Bundle-SymbolicName:   org.eclipse.m2e.versions.common
+Bundle-Version:        ${version}
+Import-Package:        javax.inject;version="[1.0.5,2.0.0)", \
+                       org.apache.commons.collections4.map;version="[4.5.0,5.0.0)", \
+                       org.apache.commons.lang3;version="[3.20.0,4.0.0)", \
+                       org.apache.commons.lang3.builder;version="[3.20.0,4.0.0)", \
+                       org.apache.commons.lang3.function;version="[3.20.0,4.0.0)", \
+                       org.apache.commons.lang3.tuple;version="[3.20.0,4.0.0)", \
+                       org.codehaus.stax2;version="[4.3.0,5.0.0)", \
+                       org.codehaus.stax2.util;version="[4.3.0,5.0.0)"
+Export-Package:        *;version="${version}";-noimport:=true;x-friends:="org.eclipse.m2e.pde.target"
+Require-Bundle:        org.eclipse.m2e.maven.runtime;bundle-version="[3.6.3,4.0.0)", \
+                       org.eclipse.m2e.versions.api;bundle-version="[2.21.0,3.0.0)", \
+                       org.eclipse.m2e.versions.model;bundle-version="[2.21.0,3.0.0)"
+]]></instructions>
+		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-versions Model" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.codehaus.mojo.versions</groupId>
+					<artifactId>versions-model</artifactId>
+					<version>2.21.0</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions><![CDATA[
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
+version:               ${version_cleanup;${mvnVersion}}
+Bundle-SymbolicName:   org.eclipse.m2e.versions.model
+Bundle-Version:        ${version}
+Export-Package:        *;version="${version}";-noimport:=true;x-friends:="org.eclipse.m2e.pde.target,org.eclipse.m2e.pde.ui"
+]]></instructions>
+		</location>
+		<location includeDependencyDepth="none" includeDependencyScopes="compile" includeSource="true" label="Maven-versions API" missingManifest="generate" type="Maven">
+			<dependencies>
+				<dependency>
+					<groupId>org.codehaus.mojo.versions</groupId>
+					<artifactId>versions-api</artifactId>
+					<version>2.21.0</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			<instructions><![CDATA[
+Bundle-Name:           M2Eclipse's ${mvnArtifactId}
+version:               ${version_cleanup;${mvnVersion}}
+Bundle-SymbolicName:   org.eclipse.m2e.versions.api
+Bundle-Version:        ${version}
+Export-Package:        *;version="${version}";-noimport:=true;x-friends:="org.eclipse.m2e.pde.target"
+]]></instructions>
+		</location>
 	</locations>
 </target>

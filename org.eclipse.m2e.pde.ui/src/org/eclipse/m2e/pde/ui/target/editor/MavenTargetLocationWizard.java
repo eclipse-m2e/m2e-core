@@ -384,7 +384,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 								"org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage",
 								"org.eclipse.m2e.core.ui.preferences.UserInterfacePreferencePage",
 								"org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage",
-								"org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag" },
+								"org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePage",
+								"org.eclipse.m2e.pde.ui.target.preferences.MavenRuleSetPreferencePage" },
 						null);
 				dialog.open();
 			} else if ("#configure".equals(e.text)) {
