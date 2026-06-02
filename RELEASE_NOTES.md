@@ -2,7 +2,9 @@
 
 ## 2.11.1
 
-* 📅 Release Date: _expected_ beginning of June 2026
+* 📅 Release Date: 02nd June 2026
+
+Various bug-fixes, enhancements and dependency updates.
 
 ### Embedded and use Maven 3.9.16
 
