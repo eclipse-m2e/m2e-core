@@ -167,6 +167,29 @@ public class TestJarWorkspaceResolutionTest extends AbstractMavenProjectTestCase
     assertNull("WITHOUT_TEST_CODE must not be set on test-jar project entry", withoutTestCode);
   }
 
+  @Test
+  public void testTestJarProducerTestDepsNotFlaggedAsTest() throws Exception {
+    // A project that auto-produces a test-jar should also have its own test-scope deps
+    // NOT marked test=true (so test code can compile against them), same as with the explicit flag.
+    IProject moduleA = importProject("projects/testJarWorkspace/module-a/pom.xml");
+    waitForJobsToComplete();
+    moduleA.build(IncrementalProjectBuilder.FULL_BUILD, null);
+    waitForJobsToComplete();
+
+    IClasspathContainer containerA = BuildPathManager.getMaven2ClasspathContainer(JavaCore.create(moduleA));
+    assertNotNull("Maven container must exist for module-a", containerA);
+
+    // junit is a test-scope dep of module-a; because module-a produces a test-jar,
+    // hasTestFlagDisabled returns true and junit must NOT have test=true
+    Optional<IClasspathEntry> junitEntry = Arrays.stream(containerA.getClasspathEntries())
+        .filter(e -> e.getEntryKind() == IClasspathEntry.CPE_LIBRARY
+            && e.getPath().lastSegment().startsWith("junit"))
+        .findFirst();
+    assertTrue("Module-A should have junit on classpath", junitEntry.isPresent());
+    IClasspathAttribute testAttr = getClasspathAttribute(junitEntry.get(), IClasspathManager.TEST_ATTRIBUTE);
+    assertNull("Test-scope dep of a test-jar producer must NOT have test=true (auto-detection)", testAttr);
+  }
+
   private static IClasspathAttribute getClasspathAttribute(IClasspathEntry entry, String name) {
     for(IClasspathAttribute attr : entry.getExtraAttributes()) {
       if(name.equals(attr.getName())) {
