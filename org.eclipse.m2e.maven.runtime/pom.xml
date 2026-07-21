@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1600-SNAPSHOT</version>
+	<version>3.9.1601-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -173,7 +173,7 @@
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
-					<version>7.1.0</version>
+					<version>7.3.0</version>
 					<extensions>true</extensions>
 					<configuration>
 						<bnd><![CDATA[
@@ -227,7 +227,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.13.0</version>
+					<version>3.15.0</version>
 					<configuration>
 						<release>8</release>
 						<proc>none</proc>
@@ -244,7 +244,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
-					<version>3.3.1</version>
+					<version>3.5.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
@@ -262,7 +262,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>animal-sniffer-maven-plugin</artifactId>
-				<version>1.24</version>
+				<version>1.27</version>
 				<executions>
 					<execution>
 						<goals>
@@ -352,7 +352,7 @@
 			<plugin>
 				<groupId>org.eclipse.sisu</groupId>
 				<artifactId>sisu-maven-plugin</artifactId>
-				<version>0.3.5</version>
+				<version>1.0.1</version>
 				<executions>
 					<execution>
 						<?m2e execute onIncremental?>
@@ -367,7 +367,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.4.2</version>
+				<version>3.5.0</version>
 				<configuration>
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -378,7 +378,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.6.0</version>
 				<executions>
 					<execution>
 						<?m2e ignore?>
@@ -400,7 +399,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.4.0</version>
 				<executions>
 					<execution>
 						<?m2e ignore?>
@@ -452,7 +451,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.2.0</version>
 						<executions>
 							<execution>
 								<?m2e ignore?>
