@@ -798,7 +798,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // 360962 keep forbidden_reference severity set by the user
     IJavaProject jp = JavaCore.create(request.mavenProjectFacade().getProject());
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
-      options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.WARNING);
+      options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.ERROR);
     }
     options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES,
         enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
