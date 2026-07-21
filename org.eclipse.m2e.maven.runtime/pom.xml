@@ -21,14 +21,14 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1601-SNAPSHOT</version>
+	<version>3.10.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.9.16</maven-core.version>
+		<maven-core.version>3.10.0-rc-1</maven-core.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
@@ -37,7 +37,12 @@
 		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
 	<dependencies>
-		<!-- Excluded dependencies (or those that are 'provided' to effectivly remove
+		<!-- In general the goal is to replicate the jar files of a standard
+		Maven installation of the same version.
+		I.e. the jars in the 'target/jars' folder of this project should be the same as
+		in the 'lib' folder of a corresponding installation, with a few exceptions of
+		additions for m2e specific use-cases and for exclusions:
+		Excluded dependencies (or those that are 'provided' to effectively remove
 		them from the bundle) are fulfilled via the OSGi requirements specified below
 		as Import-Package/Require-Bundle and therefore don't have to be
 		embedded. Or they are not required. -->
@@ -92,7 +97,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
-			<artifactId>maven-resolver-transport-http</artifactId>
+			<artifactId>maven-resolver-transport-apache</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-codec</groupId>
@@ -109,8 +114,12 @@
 			<artifactId>wagon-file</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.fusesource.jansi</groupId>
-			<artifactId>jansi</artifactId>
+			<groupId>org.jline</groupId>
+			<artifactId>jansi-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jline</groupId>
+			<artifactId>jline-terminal-ffm</artifactId>
 		</dependency>
 		<dependency>
 			<!-- SLF4J-binding only used by a launched Maven-runtime.
@@ -140,13 +149,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.18</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>2.0.18</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>
@@ -204,8 +207,8 @@
 								org.apache.maven.wagon.*;provider=m2e;mandatory:=provider,\
 								org.eclipse.sisu.*;provider=m2e;mandatory:=provider
 							Import-Package: \
-								org.slf4j;version="[1.7.31,3.0.0)",\
-								org.slf4j.*;version="[1.7.31,3.0.0)",\
+								org.slf4j;version="[2.0.0,3.0.0)",\
+								org.slf4j.*;version="[2.0.0,3.0.0)",\
 								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
 								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
@@ -226,6 +229,7 @@
 							gitCommitId = ${system;git log -n 1 --pretty=format:%H .}
 							gitRelativePath = ${system;git rev-parse --show-prefix};
 							Eclipse-SourceReferences: ${scmConnectionRaw};path="${gitRelativePath}";commitId=${gitCommitId}
+							Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 						]]></bnd>
 					</configuration>
 				</plugin>
@@ -336,7 +340,7 @@
 						<configuration>
 							<outputDirectory>${outputDirectory.sources}</outputDirectory>
 							<classifier>sources</classifier>
-							<excludes>**/*.java,**/org/fusesource/jansi/internal/native/**/*.jnilib</excludes>
+							<excludes>**/*.java,**/org/jline/nativ/**/*.jnilib</excludes>
 							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
 						</configuration>
 					</execution>

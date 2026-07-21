@@ -4,7 +4,11 @@
 	<locations>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/technology/m2e/releases/2.2.1/"/>
-			<unit id="org.eclipse.m2e.maven.runtime" version="3.8.701.20230209-1606"/>
+			<unit id="org.eclipse.m2e.maven.runtime" version="[3.8,3.9)"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+			<repository location="https://download.eclipse.org/technology/m2e/releases/2.11.1/"/>
+			<unit id="org.eclipse.m2e.maven.runtime" version="[3.9,3.10)"/>
 		</location>
 	</locations>
 </target>
