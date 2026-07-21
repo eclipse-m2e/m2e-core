@@ -14,8 +14,6 @@
 package org.eclipse.m2e.internal.maven.compat;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -36,12 +34,12 @@ import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
-
 /**
  * Read-only MavenExecutionRequest that throws IllegalStateException from all modifiers.
  *
  * @since 1.4
  */
+@SuppressWarnings("deprecation")
 public class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
 
   private final MavenExecutionRequest request;
@@ -523,35 +521,17 @@ public class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
     throw new IllegalStateException();
   }
 
-  private static final Method IS_IGNORE_TRANSITIVE_REPOSITORIES;
-  static {
-    Method method = null;
-    try { // Tycho somehow compiles against the oldest version making compilation fail if methods from new Maven methods are referenced.
-      method = MavenExecutionRequest.class.getMethod("isIgnoreTransitiveRepositories");
-    } catch(Exception e) {
-    }
-    IS_IGNORE_TRANSITIVE_REPOSITORIES = method;
-  }
-
   /**
    * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
    */
-	@Override
-	@Deprecated()
+  @Override
+  @Deprecated()
   public boolean isIgnoreTransitiveRepositories() {
-    if(IS_IGNORE_TRANSITIVE_REPOSITORIES != null) {
-      try {
-        return (boolean) IS_IGNORE_TRANSITIVE_REPOSITORIES.invoke(request);
-      } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new IllegalStateException(e);
-      }
-    }
-    throw new UnsupportedOperationException();
+    return request.isIgnoreTransitiveRepositories();
   }
 
-//  @Override
   @Override
-public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
+  public MavenExecutionRequest setIgnoreTransitiveRepositories(boolean ignoreTransitiveRepositories) {
     throw new IllegalStateException();
   }
 
