@@ -33,7 +33,7 @@
 			<unit id="org.eclipse.wst.xsd.core"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/lsp4e/releases/0.30.5"/>
+			<repository location="https://download.eclipse.org/lsp4e/releases/0.30.6"/>
 			<repository location="https://download.eclipse.org/tm4e/releases/0.17.2"/>
 			<repository location="https://download.eclipse.org/wildwebdeveloper/updates/release/1.4.0"/>
 			<unit id="org.eclipse.lsp4e"/>
@@ -52,7 +52,7 @@
 				<dependency>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
-					<version>1.5.35</version>
+					<version>1.5.38</version>
 					<type>jar</type>
 				</dependency>
 				<dependency>
