@@ -14,6 +14,7 @@
 package org.eclipse.m2e.internal.maven.compat;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -607,6 +608,62 @@ public class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
 
   @Override
   public MavenExecutionRequest setToolchains(Map<String, List<ToolchainModel>> toolchains) {
+    throw new IllegalStateException();
+  }
+
+  /**
+   * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
+   */
+  @Override
+  @Deprecated()
+  public String getArtifactsUpdatePolicy() {
+    return request.getArtifactsUpdatePolicy();
+  }
+
+  @Override
+  public MavenExecutionRequest setArtifactsUpdatePolicy(String policy) {
+    throw new IllegalStateException();
+  }
+
+  /**
+   * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
+   */
+  @Override
+  @Deprecated()
+  public String getMetadataUpdatePolicy() {
+    return request.getMetadataUpdatePolicy();
+  }
+
+  @Override
+  public MavenExecutionRequest setMetadataUpdatePolicy(String policy) {
+    throw new IllegalStateException();
+  }
+
+  /**
+   * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
+   */
+  @Override
+  @Deprecated()
+  public Path getTopDirectory() {
+    return request.getTopDirectory();
+  }
+
+  @Override
+  public MavenExecutionRequest setTopDirectory(Path topDirectory) {
+    throw new IllegalStateException();
+  }
+
+  /**
+   * @deprecated DO NOT CALL to maintain Maven 3.8 compatibility
+   */
+  @Override
+  @Deprecated()
+  public Path getRootDirectory() {
+    return request.getRootDirectory();
+  }
+
+  @Override
+  public MavenExecutionRequest setRootDirectory(Path rootDirectory) {
     throw new IllegalStateException();
   }
 

@@ -45,7 +45,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
@@ -62,6 +61,7 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 
 
 /**
@@ -93,7 +93,7 @@ public interface IMavenToolbox {
     MavenExecutionResult result = new DefaultMavenExecutionResult();
     IComponentLookup componentLookup = getComponentLookup().orElseThrow(ERROR_NO_LOOKUP);
     try {
-      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      MavenImpl.setMinimalValidationLevel(configuration);
       ProjectBuildingResult projectBuildingResult = componentLookup.lookup(ProjectBuilder.class).build(pomFile,
           configuration);
       MavenProject project = projectBuildingResult.getProject();
@@ -121,7 +121,7 @@ public interface IMavenToolbox {
     List<ProjectBuildingResult> projectBuildingResults = new ArrayList<>();
     Map<File, MavenExecutionResult> result = new LinkedHashMap<>(pomFiles.size(), 1.f);
     try {
-      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      MavenImpl.setMinimalValidationLevel(configuration);
       projectBuildingResults
           .addAll(componentLookup.lookup(ProjectBuilder.class).build(new ArrayList<>(pomFiles), false, configuration));
     } catch(ProjectBuildingException ex) {
