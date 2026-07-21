@@ -9,7 +9,7 @@ pipeline {
 		label 'ubuntu-latest'
 	}
 	tools {
-		maven 'apache-maven-3.9.11'
+		maven 'apache-maven-3.9.16'
 		jdk 'temurin-jdk21-latest'
 	}
 	stages {
