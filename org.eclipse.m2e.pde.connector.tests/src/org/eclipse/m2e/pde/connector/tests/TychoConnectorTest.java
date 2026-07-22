@@ -29,8 +29,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -92,6 +94,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	public void importTychoPluginWithDS() throws Exception {
 		IProject project = importTychoProject("pde.tycho.plugin.with.ds/pom.xml");
 		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_WITH_DS_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.plugin.with.ds");
@@ -139,7 +142,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	private static void assertNaturesAndBuilders(IProject project, Set<String> expectedNatures,
 			Set<String> expectedBuilders) throws CoreException {
 		assertEquals(expectedNatures, Set.of(project.getDescription().getNatureIds()));
-		var actualBuilders = Arrays.stream(project.getDescription().getBuildSpec()).map(s -> s.getBuilderName());
+		var actualBuilders = Arrays.stream(project.getDescription().getBuildSpec()).map(ICommand::getBuilderName);
 		assertEquals(expectedBuilders, actualBuilders.collect(Collectors.toSet()));
 	}
 
