@@ -218,6 +218,8 @@ public class LifecycleMappingFactory {
   private static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
       MavenProject mavenProject, List<MojoExecution> mojoExecutions, IProgressMonitor monitor) throws CoreException {
 
+    List<MojoExecution> interestingMojoExecutions = filterInterestingMojoExecutions(mojoExecutions);
+
     String packagingType = mavenProject.getPackaging();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
       log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", mavenProject); //$NON-NLS-1$
@@ -247,9 +249,9 @@ public class LifecycleMappingFactory {
     } else {
       try {
         Map<String, List<MappingMetadataSource>> projectSources = getProjectMetadataSourcesMap(mavenProject,
-            getBundleMetadataSources(), mojoExecutions, true, monitor);
-        calculateEffectiveLifecycleMappingMetadata(result, asList(projectSources), mavenProject, mojoExecutions, true,
-            monitor);
+            getBundleMetadataSources(), interestingMojoExecutions, true, monitor);
+        calculateEffectiveLifecycleMappingMetadata(result, asList(projectSources), mavenProject,
+            interestingMojoExecutions, true, monitor);
       } catch(LifecycleMappingConfigurationException e) {
         // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
         // record the problem and return
@@ -412,6 +414,9 @@ public class LifecycleMappingFactory {
     MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
 
     for(MojoExecution execution : mojoExecutions) {
+      if(!isInterestingPhase(execution.getLifecyclePhase())) {
+        continue;
+      }
       Artifact artifact;
       // 422135 disable workspace resolution for plugin artifacts
       try (var d = EclipseWorkspaceArtifactRepository.setDisabled()) {
@@ -592,6 +597,9 @@ public class LifecycleMappingFactory {
       Map<String, IConfigurationElement> elements = getProjectConfiguratorExtensions();
 
       for(MojoExecution execution : mojoExecutions) {
+        if(!isInterestingPhase(execution.getLifecyclePhase())) {
+          continue;
+        }
         MojoExecutionKey executionKey = new MojoExecutionKey(execution);
         MojoExecutionFilter goalFilter = new MojoExecutionFilter(metadataSources, executionKey);
 
@@ -680,8 +688,7 @@ public class LifecycleMappingFactory {
             }
           }
         }
-        if(defaultMojoExecutionAction != PluginExecutionAction.warn && executionMetadatas.isEmpty()
-            && isInterestingPhase(execution.getLifecyclePhase())) {
+        if(defaultMojoExecutionAction != PluginExecutionAction.warn && executionMetadatas.isEmpty()) {
           executionMetadatas.add(new DefaultPluginExecutionMetadata(execution, defaultMojoExecutionAction));
         }
         executionMapping.put(executionKey, executionMetadatas);
@@ -1451,6 +1458,19 @@ public class LifecycleMappingFactory {
 
   public static boolean isInterestingPhase(String phase) {
     return INTERESTING_PHASES.contains(phase);
+  }
+
+  private static List<MojoExecution> filterInterestingMojoExecutions(List<MojoExecution> mojoExecutions) {
+    if(mojoExecutions == null || mojoExecutions.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<MojoExecution> filtered = new ArrayList<>(mojoExecutions.size());
+    for(MojoExecution mojoExecution : mojoExecutions) {
+      if(isInterestingPhase(mojoExecution.getLifecyclePhase())) {
+        filtered.add(mojoExecution);
+      }
+    }
+    return filtered;
   }
 
   /**

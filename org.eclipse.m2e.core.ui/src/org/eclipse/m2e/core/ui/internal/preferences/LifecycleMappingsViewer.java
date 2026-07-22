@@ -449,8 +449,8 @@ public class LifecycleMappingsViewer {
   }
 
   boolean isIgnoreMapping(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
-    if(mappings == null || mappings.isEmpty()) {
-      return !LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase());
+    if(!LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
+      return true;
     }
     for(IPluginExecutionMetadata mapping : mappings) {
       if(PluginExecutionAction.ignore != mapping.getAction()) {
@@ -461,11 +461,11 @@ public class LifecycleMappingsViewer {
   }
 
   String toString(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
-    if(mappings != null && !mappings.isEmpty()) {
-      return mappings.stream().map(IPluginExecutionMetadata::getAction).map(PluginExecutionAction::toString).distinct()
-          .collect(Collectors.joining(", ")); //$NON-NLS-1$
-    }
     if(LifecycleMappingFactory.isInterestingPhase(execution.lifecyclePhase())) {
+      if(mappings != null && !mappings.isEmpty()) {
+        return mappings.stream().map(IPluginExecutionMetadata::getAction).map(PluginExecutionAction::toString)
+            .distinct().collect(Collectors.joining(", ")); //$NON-NLS-1$
+      }
       return PluginExecutionAction.error.toString();
     }
     return PluginExecutionAction.ignore.toString();
