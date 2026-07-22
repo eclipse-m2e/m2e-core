@@ -25,16 +25,21 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -63,8 +68,6 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	static final Set<String> FEATURE_NATURES = Set.of(FeatureProject.NATURE, IMavenConstants.NATURE_ID);
 	static final Set<String> FEATURE_BUILDERS = Set.of(FeatureProject.BUILDER_ID, IMavenConstants.BUILDER_ID);
 
-	// FIXME: requires the osgi.compatibility fragment.
-
 	private IProject importTychoProject(String name) throws IOException, CoreException {
 		return importProjects("projects/tycho", new String[] { name }, new ResolverConfiguration(), false, null)[0];
 	}
@@ -91,7 +94,26 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void importTychoPluginWithDS() throws Exception {
 		IProject project = importTychoProject("pde.tycho.plugin.with.ds/pom.xml");
+
+		// Build project to run the DS annotation processor, which also updates the
+		// project build commends
+		CountDownLatch projectFileUpdated = new CountDownLatch(1);
+		IPath projectFile = IPath.fromOSString("pde.tycho.plugin.with.ds/.project");
+		IResourceChangeListener listener = event -> {
+			if (event.getDelta().findMember(projectFile) != null) {
+				projectFileUpdated.countDown();
+			}
+		};
+		project.getWorkspace().addResourceChangeListener(listener);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		for (int i = 0; !projectFileUpdated.await(200, TimeUnit.MILLISECONDS) && i < 5; i++) {
+			// For an unknown reason the
+			// org.eclipse.pde.ds.internal.annotations.AnnotationProcessor does not always
+			// participate on the first build.
+			System.out.println("importTychoPluginWithDS rebuild: " + i);
+			project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		}
+		project.getWorkspace().removeResourceChangeListener(listener);
 		
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_WITH_DS_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.plugin.with.ds");
@@ -139,7 +161,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	private static void assertNaturesAndBuilders(IProject project, Set<String> expectedNatures,
 			Set<String> expectedBuilders) throws CoreException {
 		assertEquals(expectedNatures, Set.of(project.getDescription().getNatureIds()));
-		var actualBuilders = Arrays.stream(project.getDescription().getBuildSpec()).map(s -> s.getBuilderName());
+		var actualBuilders = Arrays.stream(project.getDescription().getBuildSpec()).map(ICommand::getBuilderName);
 		assertEquals(expectedBuilders, actualBuilders.collect(Collectors.toSet()));
 	}
 
