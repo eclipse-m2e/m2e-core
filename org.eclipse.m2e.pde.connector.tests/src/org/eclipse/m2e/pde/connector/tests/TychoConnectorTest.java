@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -33,10 +34,12 @@ import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -80,7 +83,7 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	}
 
 	@Test
-	@Ignore("This test currently only fails on the Jenkins CI")
+	@Ignore("This test currently only fails on the Jenkins CI") // TODO: Fix it?
 	public void importPomlessTychoPlugin() throws IOException, CoreException {
 		// TODO why .polyglot.META-INF ? Actually this should work without and m2e
 		// generates the file automatically!
@@ -93,8 +96,26 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 	@Test
 	public void importTychoPluginWithDS() throws Exception {
 		IProject project = importTychoProject("pde.tycho.plugin.with.ds/pom.xml");
+		CountDownLatch projectFileUpdated = new CountDownLatch(1);
+		IPath projectFilePath = IPath.fromPortableString("pde.tycho.plugin.with.ds/.project");
+		IResourceChangeListener listener = event -> {
+			if (event.getDelta().findMember(projectFilePath) != null) {
+				projectFileUpdated.countDown();
+			}
+		};
+		project.getWorkspace().addResourceChangeListener(listener);
 		project.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+		for (int i = 0; i < 0; i++) {
+			Thread.sleep(200);
+			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		}
+		projectFileUpdated.await();
+		project.getWorkspace().removeResourceChangeListener(listener);
+
+		// TODO: What exactly is setting the builders??!
+		// Maybe the TychoDSConfigurator should add it too? I assume currently something
+		// in PDE does it when the preference is set? (and runs concurrently)
 		
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_WITH_DS_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.plugin.with.ds");

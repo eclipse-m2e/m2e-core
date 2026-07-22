@@ -41,8 +41,11 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 
 	@Override
 	public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+		System.out.println("Run TychoDSConfigurator isDsEnabled: " + request.mavenProjectFacade().getFinalName());
 		List<MojoExecution> mojoExecutions = getTychoDsPluginMojoExecutions(request.mavenProjectFacade(), monitor);
 		if (mojoExecutions.isEmpty()) {
+			System.out.println("Skip TychoDSConfigurator (because mojoExecutions is empty) for "
+					+ request.mavenProjectFacade().getFinalName());
 			return;
 		}
 		MojoExecution mojoExecution = mojoExecutions.get(0); // first mojo execution is relevant
@@ -55,6 +58,7 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 		// apply PDE configuration for DS
 		MavenProject project = request.mavenProject();
 		boolean isDsEnabled = maven.getMojoParameterValue(project, mojoExecution, "enabled", Boolean.class, monitor);
+		System.out.println("In TychoDSConfigurator isDsEnabled: " + isDsEnabled);
 		if (isDsEnabled) {
 			IEclipsePreferences prefs = new ProjectScope(request.mavenProjectFacade().getProject())
 					.getNode(org.eclipse.pde.ds.internal.annotations.Activator.PLUGIN_ID);
