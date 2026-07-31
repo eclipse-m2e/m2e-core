@@ -26,9 +26,18 @@
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
 
+	<repositories>
+		<repository>
+			<id>maven-snapshots</id>
+			<url>https://repository.apache.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>3.10.0</maven-core.version>
+		<maven-core.version>3.10.0-20260730.204707-104</maven-core.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
@@ -189,7 +198,7 @@
 							# However when the this Maven runtime is used within the Eclipse-IDE(-JVM) we don't want it to use the embedded SLF4J-binding
 							# but instead use the SLF4J-binding provided by the Eclipse runtime. This is achived by making the embedded SLF4J-binding invisible
 							# for OSGi, by simply NOT placing the binding's jar on the Bundle-ClassPath.
-							slf4jBinding=maven-slf4j-provider-${maven-core.version}.jar
+							slf4jBinding=maven-slf4j-provider-3.10.0-SNAPSHOT.jar
 							M2E-SLF4JBinding=jars/${slf4jBinding}
 							-includeresource: \
 								jars/=${jars.directory}/;recursive:=false;lib:=true;filter:=!${slf4jBinding},\
