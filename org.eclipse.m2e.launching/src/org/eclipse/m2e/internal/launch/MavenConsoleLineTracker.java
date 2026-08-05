@@ -58,6 +58,7 @@ import org.eclipse.debug.ui.console.IConsoleLineTracker;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IHyperlink;
@@ -329,7 +330,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getName());
     }
 
-    DebugUITools.launch(workingCopy, ILaunchManager.DEBUG_MODE); //$NON-NLS-1$
+    Display.getDefault().asyncExec(() -> DebugUITools.launch(workingCopy, ILaunchManager.DEBUG_MODE)); //$NON-NLS-1$
   }
 
   /**
