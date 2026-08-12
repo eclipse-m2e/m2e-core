@@ -102,12 +102,17 @@ public class MavenDependencyCollector {
 			return new DependencyResult(depth, artifacts, rootDescriptor.node(), nodes);
 		}
 		if (depth == DependencyDepth.DIRECT) {
+			Set<String> seen = new HashSet<>();
 			for (Dependency dependency : rootDescriptor.dependencies()) {
-				readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
+				if (isValid(dependency) && seen.add(getId(dependency))) {
+					readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
+				}
 			}
 			if (dependencyScopes.contains(SCOPE_IMPORT) && isPomArtifact(rootDescriptor.node())) {
 				for (Dependency dependency : rootDescriptor.managedDependencies()) {
-					readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
+					if (isValid(dependency) && seen.add(getId(dependency))) {
+						readArtifactDescriptor(dependency, rootDescriptor.node(), artifacts, nodes);
+					}
 				}
 			}
 			return new DependencyResult(depth, artifacts, rootDescriptor.node(), nodes);

@@ -82,7 +82,16 @@ public class MavenClasspathHelpers {
   }
 
   public static boolean hasTestFlagDisabled(MavenProject mavenProject) {
-    return mavenProject != null
-        && Boolean.valueOf(mavenProject.getProperties().getProperty("m2e.disableTestClasspathFlag", "false"));
+    if(mavenProject == null) {
+      return false;
+    }
+    if(Boolean.parseBoolean(mavenProject.getProperties().getProperty("m2e.disableTestClasspathFlag", "false"))) {
+      return true;
+    }
+    // Auto-detect: if the project produces a test-jar via maven-jar-plugin, treat as if flag is set.
+    // This avoids requiring producers to add m2e.disableTestClasspathFlag to their pom.xml.
+    var jarPlugin = mavenProject.getBuild().getPluginsAsMap().get("org.apache.maven.plugins:maven-jar-plugin");
+    return jarPlugin != null && jarPlugin.getExecutions().stream()
+        .anyMatch(e -> e.getGoals().contains("test-jar"));
   }
 }
