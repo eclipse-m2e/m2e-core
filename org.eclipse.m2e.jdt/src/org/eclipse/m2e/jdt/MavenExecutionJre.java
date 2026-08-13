@@ -32,7 +32,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -71,8 +70,7 @@ public class MavenExecutionJre {
     List<MojoExecution> mojoExecutions = project.getMojoExecutions(ENFORCER_PLUGIN_GROUP_ID,
         ENFORCER_PLUGIN_ARTIFACT_ID, monitor, GOAL_ENFORCE);
     for(MojoExecution mojoExecution : mojoExecutions) {
-      Optional<String> version = getRequiredJavaVersionFromEnforcerRule(project.getMavenProject(monitor), mojoExecution,
-          monitor);
+      Optional<String> version = getRequiredJavaVersionFromEnforcerRule(project, mojoExecution, monitor);
       if(version.isPresent()) {
         return version;
       }
@@ -82,13 +80,13 @@ public class MavenExecutionJre {
     return Optional.empty();
   }
 
-  private static Optional<String> getRequiredJavaVersionFromEnforcerRule(MavenProject mavenProject,
+  private static Optional<String> getRequiredJavaVersionFromEnforcerRule(IMavenProjectFacade projectFacade,
       MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
     // https://maven.apache.org/enforcer/enforcer-rules/requireJavaVersion.html
     List<String> parameter = List.of("rules", "requireJavaVersion", "version");
     @SuppressWarnings("restriction")
-    String version = ((org.eclipse.m2e.core.internal.embedder.MavenImpl) MavenPlugin.getMaven())
-        .getMojoParameterValue(mavenProject, mojoExecution, parameter, String.class, monitor);
+    String version = ((org.eclipse.m2e.core.internal.embedder.MavenImpl) MavenPlugin.getMaven()).getMojoParameterValue(
+        projectFacade.getMavenProject(monitor), mojoExecution, parameter, String.class, monitor);
     if(version == null) {
       return Optional.empty();
     }

@@ -56,7 +56,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.MavenExecutionJre;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
@@ -345,7 +344,7 @@ public class UnitTestSupport {
       }
       LOG.debug("Using mojo execution {} to populate test launch arguments",
           mostRelevantExecution.get().getExecutionId());
-      return getTestLaunchArguments(mavenProject, mostRelevantExecution.get(), monitor);
+      return getTestLaunchArguments(facade, mavenProject, mostRelevantExecution.get(), monitor);
     }
 
     /**
@@ -457,21 +456,19 @@ public class UnitTestSupport {
      * @return the arguments
      */
     @SuppressWarnings("unchecked")
-    private TestLaunchArguments getTestLaunchArguments(MavenProject mavenProject, MojoExecution execution,
-        IProgressMonitor monitor) {
+    private TestLaunchArguments getTestLaunchArguments(IMavenProjectFacade facade, MavenProject mavenProject,
+        MojoExecution execution, IProgressMonitor monitor) {
       try {
-        IMaven maven = MavenPlugin.getMaven();
-
-        String argLine = maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ARGLINE, String.class, monitor);
+        String argLine = facade.getMojoParameterValue(execution, PLUGIN_ARGLINE, String.class, monitor);
         argLine = resolveDeferredVariables(mavenProject, argLine);
         // resolve all placeholders which were not resolved previously by the empty string
         argLine = removeStandardVariablePlaceholders(argLine);
 
         return new TestLaunchArguments(argLine,
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor),
-            maven.getMojoParameterValue(mavenProject, execution, PLUGIN_ENABLE_ASSERTIONS, Boolean.class, monitor));
+            facade.getMojoParameterValue(execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
+            facade.getMojoParameterValue(execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
+            facade.getMojoParameterValue(execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor),
+            facade.getMojoParameterValue(execution, PLUGIN_ENABLE_ASSERTIONS, Boolean.class, monitor));
       } catch(Exception e) {
         LOG.error(e.getMessage(), e);
       }

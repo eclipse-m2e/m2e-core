@@ -35,7 +35,6 @@ import org.eclipse.osgi.util.NLS;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.apt.internal.AbstractAptConfiguratorDelegate;
 import org.eclipse.m2e.apt.internal.AnnotationProcessorConfiguration;
@@ -45,8 +44,6 @@ import org.eclipse.m2e.apt.internal.Messages;
 import org.eclipse.m2e.apt.internal.processor.MavenProcessorJdtAptDelegate;
 import org.eclipse.m2e.apt.internal.utils.PluginDependencyResolver;
 import org.eclipse.m2e.apt.internal.utils.ProjectUtils;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
@@ -118,34 +115,32 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
   @Override
   protected AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
       throws CoreException {
-    IMaven maven = MavenPlugin.getMaven();
     markerManager.deleteMarkers(mavenFacade.getProject(), true, IMavenAptConstants.INVALID_ARGUMENT_MARKER_ID);
-    MavenProject mavenProject = mavenFacade.getMavenProject(monitor);
     File generatedTestOutputDirectory = null;
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
         COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_TEST_COMPILE)) {
-      generatedTestOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
+      generatedTestOutputDirectory = mavenFacade.getMojoParameterValue(mojoExecution,
           TEST_OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
     }
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
         COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE)) {
-      File generatedOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
+      File generatedOutputDirectory = mavenFacade.getMojoParameterValue(mojoExecution,
           OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
 
       Map<String, String> options = new HashMap<>();
 
       @SuppressWarnings("unchecked")
-      Map<String, String> compilerArguments = maven.getMojoParameterValue(mavenProject, mojoExecution,
+      Map<String, String> compilerArguments = mavenFacade.getMojoParameterValue(mojoExecution,
           "compilerArguments", Map.class, monitor);
       options.putAll(extractProcessorOptions(compilerArguments));
 
       // the single compiler argument takes precedence in maven-compiler-plugin
-      String compilerArgument = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgument",
+      String compilerArgument = mavenFacade.getMojoParameterValue(mojoExecution, "compilerArgument",
           String.class, monitor);
       options.putAll(parseProcessorOptions(compilerArgument));
 
       @SuppressWarnings("unchecked")
-      List<String> compilerArgs = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgs", List.class,
+      List<String> compilerArgs = mavenFacade.getMojoParameterValue(mojoExecution, "compilerArgs", List.class,
           monitor);
       options.putAll(ProjectUtils.parseProcessorOptions(compilerArgs));
 
@@ -153,11 +148,11 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
 
       boolean isAnnotationProcessingEnabled = (compilerArgument == null) || !compilerArgument.contains("-proc:none");
       if(isAnnotationProcessingEnabled) {
-        String proc = maven.getMojoParameterValue(mavenProject, mojoExecution, "proc", String.class, monitor);
+        String proc = mavenFacade.getMojoParameterValue(mojoExecution, "proc", String.class, monitor);
         isAnnotationProcessingEnabled = !"none".equals(proc);
       }
 
-      Dependency[] annotationProcessorPaths = maven.getMojoParameterValue(mavenProject, mojoExecution,
+      Dependency[] annotationProcessorPaths = mavenFacade.getMojoParameterValue(mojoExecution,
           "annotationProcessorPaths", Dependency[].class, monitor);
 
       boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
