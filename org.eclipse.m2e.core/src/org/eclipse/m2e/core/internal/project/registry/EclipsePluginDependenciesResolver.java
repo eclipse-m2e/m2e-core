@@ -77,4 +77,17 @@ public class EclipsePluginDependenciesResolver implements PluginDependenciesReso
     return delegate.resolvePlugin(plugin, artifact, dependencyFilter, remotePluginRepositories, repositorySession);
   }
 
+  @Override
+  public DependencyResult resolveCoreExtensionAndFlatten(Plugin plugin, DependencyFilter dependencyFilter,
+      List<RemoteRepository> repositories, RepositorySystemSession session) throws PluginResolutionException {
+    return delegate.resolveCoreExtensionAndFlatten(plugin, dependencyFilter, repositories, session);
+  }
+
+  @Override
+  public DependencyResult resolvePluginAndFlatten(Plugin plugin, Artifact pluginArtifact,
+      DependencyFilter dependencyFilter, List<RemoteRepository> repositories, RepositorySystemSession session)
+      throws PluginResolutionException {
+    return delegate.resolvePluginAndFlatten(plugin, pluginArtifact, dependencyFilter, repositories, session);
+  }
+
 }

@@ -28,9 +28,9 @@
 
 	<properties>
 		<!-- maven core version -->
-		<maven-core.version>4.0.0-rc-5</maven-core.version>
+		<maven-core.version>4.0.0-rc-6</maven-core.version>
 		<!-- Maven 4 uses resolver 2.0.13 -->
-		<resolver.version>2.0.13</resolver.version>
+		<resolver.version>2.0.21</resolver.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
 		<jars.directory>target/jars</jars.directory>
