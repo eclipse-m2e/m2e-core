@@ -83,8 +83,8 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
 
   protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    return new File[] {
-        getParameterValue(request.mavenProject(), getOutputFolderParameterName(), File.class, mojoExecution, monitor)};
+    return new File[] {getParameterValue(request.mavenProjectFacade(), getOutputFolderParameterName(), File.class,
+        mojoExecution, monitor)};
   }
 
   protected String getOutputFolderParameterName() {

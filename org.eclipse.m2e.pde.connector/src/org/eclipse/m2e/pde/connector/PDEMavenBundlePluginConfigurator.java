@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -43,9 +42,7 @@ import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -96,8 +93,7 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			Plugin plugin = execution.getPlugin();
 			if (isFelix(plugin)) {
 				if (isFelixManifestGoal(execution)) {
-					IMaven maven = MavenPlugin.getMaven();
-					Boolean supportIncremental = maven.getMojoParameterValue(request.mavenProject(), execution,
+					Boolean supportIncremental = request.mavenProjectFacade().getMojoParameterValue(execution,
 							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
 					if (supportIncremental == null || !supportIncremental.booleanValue()) {
 						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
@@ -162,14 +158,12 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 
 	private IPath getMetainfPath(IMavenProjectFacade facade, List<MojoExecution> executions, IProgressMonitor monitor)
 			throws CoreException {
-		IMaven maven = MavenPlugin.getMaven();
 		// TODO: warn on multiple executions and prefer the one without classifier (i.e.
 		// the main artifact or the one for the bnd-process/jar goal??
 		for (MojoExecution execution : executions) {
 			Plugin plugin = execution.getPlugin();
-			MavenProject project = facade.getMavenProject(monitor);
 			String manifestParameter = isBND(plugin) ? BND_PARAM_MANIFESTLOCATION : FELIX_PARAM_MANIFESTLOCATION;
-			File location = maven.getMojoParameterValue(project, execution, manifestParameter, File.class, monitor);
+			File location = facade.getMojoParameterValue(execution, manifestParameter, File.class, monitor);
 			if (location != null) {
 				return facade.getProjectRelativePath(location.getAbsolutePath());
 			}

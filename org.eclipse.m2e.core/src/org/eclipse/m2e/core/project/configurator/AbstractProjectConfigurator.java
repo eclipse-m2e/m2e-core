@@ -178,12 +178,26 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   /**
    * @since 1.4
+   * @deprecated use {@link #getParameterValue(IMavenProjectFacade, String, Class, MojoExecution, IProgressMonitor)}
+   *             instead to avoid a direct dependency on {@link MavenProject}
    */
+  @Deprecated
   protected <T> T getParameterValue(MavenProject project, String parameter, Class<T> asType,
       MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
     PluginExecution execution = new PluginExecution();
     execution.setConfiguration(mojoExecution.getConfiguration());
     return maven.getMojoParameterValue(project, parameter, asType, mojoExecution.getPlugin(), execution,
+        mojoExecution.getGoal(), monitor);
+  }
+
+  /**
+   * @since 2.8
+   */
+  protected <T> T getParameterValue(IMavenProjectFacade projectFacade, String parameter, Class<T> asType,
+      MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
+    PluginExecution execution = new PluginExecution();
+    execution.setConfiguration(mojoExecution.getConfiguration());
+    return projectFacade.getMojoParameterValue(parameter, asType, mojoExecution.getPlugin(), execution,
         mojoExecution.getGoal(), monitor);
   }
 

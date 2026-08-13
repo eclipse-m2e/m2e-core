@@ -170,13 +170,21 @@ public interface IMaven extends IComponentLookup {
    * @return the parameter value or {@code null} if the parameter with the given name was not found
    * @throws CoreException
    * @since 1.4
+   * @deprecated use
+   *             {@link IMavenProjectFacade#getMojoParameterValue(MojoExecution, String, Class, IProgressMonitor)}
+   *             instead to avoid a direct dependency on {@link MavenProject}
    */
+  @Deprecated
   <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.4
+   * @deprecated use
+   *             {@link IMavenProjectFacade#getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String, IProgressMonitor)}
+   *             instead to avoid a direct dependency on {@link MavenProject}
    */
+  @Deprecated
   <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException;
 

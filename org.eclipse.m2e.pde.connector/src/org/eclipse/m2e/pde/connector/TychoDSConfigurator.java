@@ -15,7 +15,6 @@ package org.eclipse.m2e.pde.connector;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ILog;
@@ -53,15 +52,16 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 			createWarningMarker(request, mojoExecution, "executions", message);
 		}
 		// apply PDE configuration for DS
-		MavenProject project = request.mavenProject();
-		boolean isDsEnabled = maven.getMojoParameterValue(project, mojoExecution, "enabled", Boolean.class, monitor);
+		boolean isDsEnabled = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "enabled",
+				Boolean.class, monitor);
 		if (isDsEnabled) {
 			IEclipsePreferences prefs = new ProjectScope(request.mavenProjectFacade().getProject())
 					.getNode(org.eclipse.pde.ds.internal.annotations.Activator.PLUGIN_ID);
 
 			prefs.putBoolean(org.eclipse.pde.ds.internal.annotations.Activator.PREF_ENABLED, isDsEnabled);
 
-			String dsVersion = maven.getMojoParameterValue(project, mojoExecution, "dsVersion", String.class, monitor);
+			String dsVersion = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "dsVersion",
+					String.class, monitor);
 			DSAnnotationVersion version = parseVersion(dsVersion);
 			if (version != null) {
 				prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
@@ -69,7 +69,8 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 				String message = "Unsupported DS spec version " + dsVersion + " found, using default instead";
 				createWarningMarker(request, mojoExecution, SourceLocationHelper.CONFIGURATION, message);
 			}
-			String path = maven.getMojoParameterValue(project, mojoExecution, "path", String.class, monitor);
+			String path = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "path",
+					String.class, monitor);
 			prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_PATH, path);
 			try {
 				prefs.flush();
