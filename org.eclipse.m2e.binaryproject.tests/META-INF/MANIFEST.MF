@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E Binary Project Core Tests
 Bundle-SymbolicName: org.eclipse.m2e.binaryproject.tests;singleton:=true
-Bundle-Version: 2.0.1.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: Eclipse.org - m2e
 Require-Bundle: org.eclipse.m2e.core,
  org.eclipse.m2e.maven.runtime,

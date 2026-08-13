@@ -69,8 +69,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -82,7 +80,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -848,7 +845,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
       //sort project according to their declared dependencies...
       ProjectSorter sorter = new ProjectSorter(projects);
       return sorter.getSortedProjects();
-    } catch(CycleDetectedException | DuplicateProjectException ex) {
+    } catch(Exception ex) {
       return projects;
     }
   }

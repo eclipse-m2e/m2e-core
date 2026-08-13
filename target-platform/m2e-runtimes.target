@@ -3,8 +3,12 @@
 <target name="m2e-runtimes">
 	<locations>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
-			<repository location="https://download.eclipse.org/technology/m2e/releases/2.2.1/"/>
+			<repository location="https://archive.eclipse.org/technology/m2e/releases/2.2.1/"/>
 			<unit id="org.eclipse.m2e.maven.runtime" version="3.8.701.20230209-1606"/>
+		</location>
+		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="false" type="InstallableUnit">
+			<repository location="https://download.eclipse.org/technology/m2e/releases/2.9.1"/>
+			<unit id="org.eclipse.m2e.maven.runtime" version="3.9.1100.20250811-2018"/>
 		</location>
 	</locations>
 </target>

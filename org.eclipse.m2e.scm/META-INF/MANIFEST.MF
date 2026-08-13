@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.scm;singleton:=true
-Bundle-Version: 2.1.100.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
@@ -12,11 +12,11 @@ Export-Package: org.eclipse.m2e.scm;x-internal:=true,
  org.eclipse.m2e.scm.internal.wizards;x-internal:=true,
  org.eclipse.m2e.scm.spi;x-internal:=true
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.2",
- org.eclipse.m2e.core;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.m2e.core;bundle-version="[3,4)",
  org.eclipse.core.runtime;bundle-version="3.5.0",
  org.eclipse.jface;bundle-version="3.5.2",
- org.eclipse.m2e.maven.runtime;bundle-version="[3.8.6,4.0.0)",
- org.eclipse.m2e.core.ui;bundle-version="[2.0.0,3.0.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[3.9,5)",
+ org.eclipse.m2e.core.ui;bundle-version="[3,4)",
  org.eclipse.ui.workbench;bundle-version="3.5.2",
  org.eclipse.ui.ide;bundle-version="3.5.1"
 Import-Package: org.slf4j;version="[1.7.0,3.0.0)"
