@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.ds.internal.annotations.DSAnnotationVersion;
@@ -51,17 +52,16 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 					TYCHO_GROUP_ID, TYCHO_DS_PLUGIN_ARTIFACT_ID, GOAL_DECLARATIVE_SERVICES);
 			createWarningMarker(request, mojoExecution, "executions", message);
 		}
+		IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(request.mavenProjectFacade(), mojoExecution);
 		// apply PDE configuration for DS
-		boolean isDsEnabled = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "enabled",
-				Boolean.class, monitor);
+		boolean isDsEnabled = executionFacade.getMojoParameterValue("enabled", Boolean.class, monitor);
 		if (isDsEnabled) {
 			IEclipsePreferences prefs = new ProjectScope(request.mavenProjectFacade().getProject())
 					.getNode(org.eclipse.pde.ds.internal.annotations.Activator.PLUGIN_ID);
 
 			prefs.putBoolean(org.eclipse.pde.ds.internal.annotations.Activator.PREF_ENABLED, isDsEnabled);
 
-			String dsVersion = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "dsVersion",
-					String.class, monitor);
+			String dsVersion = executionFacade.getMojoParameterValue("dsVersion", String.class, monitor);
 			DSAnnotationVersion version = parseVersion(dsVersion);
 			if (version != null) {
 				prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_SPEC_VERSION, version.name());
@@ -69,8 +69,7 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 				String message = "Unsupported DS spec version " + dsVersion + " found, using default instead";
 				createWarningMarker(request, mojoExecution, SourceLocationHelper.CONFIGURATION, message);
 			}
-			String path = request.mavenProjectFacade().getMojoParameterValue(mojoExecution, "path",
-					String.class, monitor);
+			String path = executionFacade.getMojoParameterValue("path", String.class, monitor);
 			prefs.put(org.eclipse.pde.ds.internal.annotations.Activator.PREF_PATH, path);
 			try {
 				prefs.flush();

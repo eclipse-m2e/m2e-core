@@ -52,6 +52,7 @@ import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
@@ -93,7 +94,9 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 			Plugin plugin = execution.getPlugin();
 			if (isFelix(plugin)) {
 				if (isFelixManifestGoal(execution)) {
-					Boolean supportIncremental = request.mavenProjectFacade().getMojoParameterValue(execution,
+					IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(request.mavenProjectFacade(),
+							execution);
+					Boolean supportIncremental = executionFacade.getMojoParameterValue(
 							FELIX_PARAM_SUPPORTINCREMENTALBUILD, Boolean.class, monitor);
 					if (supportIncremental == null || !supportIncremental.booleanValue()) {
 						createWarningMarker(request, execution, SourceLocationHelper.CONFIGURATION,
@@ -163,7 +166,8 @@ public class PDEMavenBundlePluginConfigurator extends AbstractProjectConfigurato
 		for (MojoExecution execution : executions) {
 			Plugin plugin = execution.getPlugin();
 			String manifestParameter = isBND(plugin) ? BND_PARAM_MANIFESTLOCATION : FELIX_PARAM_MANIFESTLOCATION;
-			File location = facade.getMojoParameterValue(execution, manifestParameter, File.class, monitor);
+			IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(facade, execution);
+			File location = executionFacade.getMojoParameterValue(manifestParameter, File.class, monitor);
 			if (location != null) {
 				return facade.getProjectRelativePath(location.getAbsolutePath());
 			}

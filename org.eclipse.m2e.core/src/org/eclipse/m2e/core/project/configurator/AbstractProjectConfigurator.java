@@ -48,6 +48,7 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
@@ -195,7 +196,8 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   protected <T> T getParameterValue(IMavenProjectFacade projectFacade, String parameter, Class<T> asType,
       MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
-    return projectFacade.getMojoParameterValue(mojoExecution, parameter, asType, monitor);
+    IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(projectFacade, mojoExecution);
+    return executionFacade == null ? null : executionFacade.getMojoParameterValue(parameter, asType, monitor);
   }
 
   protected void assertHasNature(IProject project, String natureId) throws CoreException {
