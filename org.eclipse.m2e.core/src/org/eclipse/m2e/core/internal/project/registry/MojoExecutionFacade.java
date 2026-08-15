@@ -62,6 +62,13 @@ public class MojoExecutionFacade implements IMojoExecutionFacade {
   }
 
   @Override
+  public <T> T getConfiguredMojo(Class<T> mojoInterface, IProgressMonitor monitor) throws CoreException {
+    return projectFacade.createExecutionContext().execute(projectFacade.getMavenProject(monitor),
+        (context, pm) -> MavenPlugin.getMaven().getConfiguredMojo(context.getSession(), mojoExecution, mojoInterface),
+        monitor);
+  }
+
+  @Override
   public String toString() {
     return key.toString();
   }

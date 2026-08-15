@@ -66,6 +66,19 @@ public interface IMojoExecutionFacade {
       throws CoreException;
 
   /**
+   * Returns a new mojo instance configured according to the wrapped mojo execution. This allows introspection of the
+   * mojo's configuration parameters (e.g. via its getters), it is not intended to execute the mojo.
+   *
+   * @param <T> the mojo interface/type
+   * @param mojoInterface the mojo interface/type to cast the configured mojo instance to
+   * @param monitor the progress monitor
+   * @return a new, configured mojo instance
+   * @throws CoreException
+   * @since 2.9
+   */
+  <T> T getConfiguredMojo(Class<T> mojoInterface, IProgressMonitor monitor) throws CoreException;
+
+  /**
    * Wraps a raw {@link MojoExecution} into an {@link IMojoExecutionFacade} bound to the given project facade.
    * <p>
    * This is intended as a transitional helper for client code that still acquires or receives (e.g. through a
