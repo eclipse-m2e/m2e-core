@@ -181,7 +181,7 @@ public interface IMaven extends IComponentLookup {
   /**
    * @since 1.4
    * @deprecated use
-   *             {@link IMavenProjectFacade#getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String, IProgressMonitor)}
+   *             {@link IMavenProjectFacade#getMojoParameterValue(MojoExecution, String, Class, IProgressMonitor)}
    *             instead to avoid a direct dependency on {@link MavenProject}
    */
   @Deprecated

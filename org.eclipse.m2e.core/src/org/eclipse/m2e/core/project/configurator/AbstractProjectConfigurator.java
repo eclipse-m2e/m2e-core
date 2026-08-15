@@ -195,10 +195,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   protected <T> T getParameterValue(IMavenProjectFacade projectFacade, String parameter, Class<T> asType,
       MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
-    PluginExecution execution = new PluginExecution();
-    execution.setConfiguration(mojoExecution.getConfiguration());
-    return projectFacade.getMojoParameterValue(parameter, asType, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal(), monitor);
+    return projectFacade.getMojoParameterValue(mojoExecution, parameter, asType, monitor);
   }
 
   protected void assertHasNature(IProject project, String natureId) throws CoreException {

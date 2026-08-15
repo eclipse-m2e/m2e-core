@@ -26,8 +26,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -191,24 +189,6 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
    */
   <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * Resolves a configuration parameter for the given {@code plugin}/{@code goal} combination. It coerces from String to
-   * the given type and considers expressions and default values.
-   *
-   * @param <T>
-   * @param parameter the name of the parameter (may be nested with separating {@code .})
-   * @param type the type to coerce to
-   * @param plugin the plugin declaring the parameter
-   * @param configuration the configuration to look up the parameter value in
-   * @param goal the goal of the plugin execution
-   * @param monitor the progress monitor
-   * @return the parameter value or {@code null} if the parameter with the given name was not found
-   * @throws CoreException
-   * @since 2.8
-   */
-  <T> T getMojoParameterValue(String parameter, Class<T> type, Plugin plugin, ConfigurationContainer configuration,
-      String goal, IProgressMonitor monitor) throws CoreException;
 
   // lifecycle mapping
 
