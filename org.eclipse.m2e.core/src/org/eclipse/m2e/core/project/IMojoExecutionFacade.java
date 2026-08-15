@@ -10,6 +10,8 @@
 
 package org.eclipse.m2e.core.project;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -46,6 +48,22 @@ public interface IMojoExecutionFacade {
    * @throws CoreException
    */
   <T> T getMojoParameterValue(String parameter, Class<T> asType, IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Resolves a nested configuration parameter from the wrapped mojo execution. It coerces from String to the given
+   * type and considers expressions and default values.
+   *
+   * @param <T>
+   * @param parameterPath the path of the parameter to look up, the first item is the name of the element directly
+   *          below {@code <configuration>} and the last one is the element containing the actual value
+   * @param asType the type to coerce to
+   * @param monitor the progress monitor
+   * @return the parameter value or {@code null} if the parameter with the given name was not found
+   * @throws CoreException
+   * @since 2.9
+   */
+  <T> T getMojoParameterValue(List<String> parameterPath, Class<T> asType, IProgressMonitor monitor)
+      throws CoreException;
 
   /**
    * Wraps a raw {@link MojoExecution} into an {@link IMojoExecutionFacade} bound to the given project facade.

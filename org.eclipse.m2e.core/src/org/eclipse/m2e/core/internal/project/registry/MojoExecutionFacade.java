@@ -10,11 +10,15 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -48,6 +52,13 @@ public class MojoExecutionFacade implements IMojoExecutionFacade {
   public <T> T getMojoParameterValue(String parameter, Class<T> asType, IProgressMonitor monitor)
       throws CoreException {
     return projectFacade.getMojoParameterValue(mojoExecution, parameter, asType, monitor);
+  }
+
+  @Override
+  public <T> T getMojoParameterValue(List<String> parameterPath, Class<T> asType, IProgressMonitor monitor)
+      throws CoreException {
+    return ((MavenImpl) MavenPlugin.getMaven()).getMojoParameterValue(projectFacade.getMavenProject(monitor),
+        mojoExecution, parameterPath, asType, monitor);
   }
 
   @Override
