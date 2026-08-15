@@ -37,6 +37,12 @@ public interface IMojoExecutionFacade {
   MojoExecutionKey getKey();
 
   /**
+   * @return a facade for the plugin that provides the wrapped mojo execution
+   * @since 2.9
+   */
+  IPluginFacade getPlugin();
+
+  /**
    * Resolves a configuration parameter from the wrapped mojo execution. It coerces from String to the given type and
    * considers expressions and default values.
    *

@@ -21,6 +21,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMojoExecutionFacade;
+import org.eclipse.m2e.core.project.IPluginFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -46,6 +47,11 @@ public class MojoExecutionFacade implements IMojoExecutionFacade {
   @Override
   public MojoExecutionKey getKey() {
     return key;
+  }
+
+  @Override
+  public IPluginFacade getPlugin() {
+    return IPluginFacade.wrap(mojoExecution.getPlugin());
   }
 
   @Override

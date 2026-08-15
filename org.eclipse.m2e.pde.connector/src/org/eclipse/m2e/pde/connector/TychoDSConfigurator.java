@@ -25,6 +25,7 @@ import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.pde.ds.internal.annotations.DSAnnotationVersion;
 import org.osgi.framework.Version;
@@ -105,7 +106,7 @@ public class TychoDSConfigurator extends AbstractProjectConfigurator {
 
 	private void createWarningMarker(ProjectConfigurationRequest request, MojoExecution execution, String attribute,
 			String message) {
-		PDEMavenBundlePluginConfigurator.createWarningMarker(projectManager, markerManager, request, execution,
-				attribute, message);
+		PDEMavenBundlePluginConfigurator.createWarningMarker(projectManager, markerManager, request,
+				new MojoExecutionKey(execution), attribute, message);
 	}
 }
