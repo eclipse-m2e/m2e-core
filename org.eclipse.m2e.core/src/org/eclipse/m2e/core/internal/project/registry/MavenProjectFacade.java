@@ -43,8 +43,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -591,14 +589,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException {
     return manager.maven.getMojoParameterValue(getMavenProject(monitor), mojoExecution, parameter, asType, monitor);
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T> T getMojoParameterValue(String parameter, Class<T> type, Plugin plugin,
-      ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException {
-    return manager.maven.getMojoParameterValue(getMavenProject(monitor), parameter, type, plugin, configuration, goal,
-        monitor);
   }
 
   /**

@@ -47,7 +47,6 @@ import org.eclipse.jdt.core.JavaCore;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -348,10 +347,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
   protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
       throws CoreException {
-    PluginExecution execution = new PluginExecution();
-    execution.setConfiguration(mojoExecution.getConfiguration());
-    return mavenFacade.getMojoParameterValue(parameter, asType, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal(), null);
+    return mavenFacade.getMojoParameterValue(mojoExecution, parameter, asType, null);
   }
 
 }
