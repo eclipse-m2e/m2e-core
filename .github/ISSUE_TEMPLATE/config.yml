@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & general discussion
+    url: https://github.com/eclipse-m2e/m2e-core/discussions
+    about: Use Discussions for questions, ideas, and anything that isn't a concrete bug or feature request.
+  - name: m2e-dev mailing list
+    url: https://accounts.eclipse.org/mailing-list/m2e-dev
+    about: Get in touch with other contributors about project organization and planning.
+  - name: Contributing guide (incl. AI/GenAI usage policy)
+    url: https://github.com/eclipse-m2e/m2e-core/blob/main/CONTRIBUTING.md#using-ai--genai-tools-to-contribute
+    about: Read this before opening an issue, especially if an AI agent is helping you draft it.
