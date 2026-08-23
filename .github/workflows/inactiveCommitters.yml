@@ -1,0 +1,23 @@
+# This workflow lists the activity of all committers in the Github organization in the specified list of Eclipse projects
+# and summaries inactive committers.
+
+name: List inactive committers
+
+on:
+  workflow_dispatch:
+    inputs:
+      activity-period:
+        description: 'Period in which committers should be active'
+        type: string
+        default: '2 years'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  list-inactive-committers:
+    uses: eclipse-platform/eclipse.platform.releng.aggregator/.github/workflows/inactiveCommitters.yml@master
+    with:
+      activity-period: ${{ inputs.activity-period }}
+      projects: '["technology.m2e"]'
