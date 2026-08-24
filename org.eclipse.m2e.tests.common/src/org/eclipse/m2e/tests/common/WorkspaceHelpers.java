@@ -177,33 +177,6 @@ public class WorkspaceHelpers {
     return assertMarker(type, IMarker.SEVERITY_WARNING, message, lineNumber, resourceRelativePath, project);
   }
 
-  private static IMarker findMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
-      List<IMarker> markers) throws Exception {
-    for(IMarker marker : markers) {
-      if(type != null && !type.equals(marker.getType())) {
-        continue;
-      }
-      if(message != null && !marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
-        continue;
-      }
-      if(lineNumber != null && !lineNumber.equals(marker.getAttribute(IMarker.LINE_NUMBER))) {
-        continue;
-      }
-      if(type != null && type.startsWith(IMavenConstants.MARKER_ID)) {
-        Assert.assertEquals("Marker not persistent:" + toString(marker), false, marker.getAttribute(IMarker.TRANSIENT));
-      }
-
-      if(resourceRelativePath == null) {
-        resourceRelativePath = "";
-      }
-      Assert.assertEquals("Marker not on the expected resource:" + toString(marker), resourceRelativePath,
-          marker.getResource().getProjectRelativePath().toString());
-
-      return marker;
-    }
-    return null;
-  }
-
   public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
       throws Exception {
     return assertMarker(type, IMarker.SEVERITY_ERROR, message, lineNumber, "pom.xml", project);
@@ -216,15 +189,47 @@ public class WorkspaceHelpers {
 
   public static IMarker assertMarker(String type, int severity, String message, Integer lineNumber,
       String resourceRelativePath, IProject project) throws Exception {
-    List<IMarker> markers = findMarkers(project, severity);
-    IMarker marker = findMarker(type, message, lineNumber, resourceRelativePath, markers);
-    if(marker == null) {
-      Assert.fail(
-          "Expected marker not found. Found " + (markers.isEmpty() ? "no markers" : "markers :") + toString(markers));
+    List<IMarker> markers = List.of();
+    for(int attempt = 0; attempt < 2; attempt++ ) {
+      markers = findMarkers(project, severity);
+      boolean retry = false;
+      for(IMarker marker : markers) {
+        try {
+          if(type != null && !type.equals(marker.getType())) {
+            continue;
+          }
+          if(message != null && !marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
+            continue;
+          }
+          if(lineNumber != null && !lineNumber.equals(marker.getAttribute(IMarker.LINE_NUMBER))) {
+            continue;
+          }
+          if(type != null && type.startsWith(IMavenConstants.MARKER_ID)) {
+            Assert.assertEquals("Marker not persistent:" + toString(marker), false,
+                marker.getAttribute(IMarker.TRANSIENT));
+          }
+
+          String expectedResourcePath = resourceRelativePath == null ? "" : resourceRelativePath;
+          Assert.assertEquals("Marker not on the expected resource:" + toString(marker), expectedResourcePath,
+              marker.getResource().getProjectRelativePath().toString());
+          Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
+              marker.isSubtypeOf(IMarker.PROBLEM));
+          return marker;
+        } catch(CoreException ex) {
+          if(attempt == 0 && !marker.exists()) {
+            retry = true;
+            break;
+          }
+          throw ex;
+        }
+      }
+      if(!retry) {
+        break;
+      }
     }
-    Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
-        marker.isSubtypeOf(IMarker.PROBLEM));
-    return marker;
+    Assert.fail(
+        "Expected marker not found. Found " + (markers.isEmpty() ? "no markers" : "markers :") + toString(markers));
+    return null;
   }
 
   public static void assertLifecycleIdErrorMarkerAttributes(IProject project, String lifecycleId) throws CoreException {
