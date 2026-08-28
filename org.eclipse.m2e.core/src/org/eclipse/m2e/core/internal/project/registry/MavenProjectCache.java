@@ -14,15 +14,22 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.common.cache.CacheBuilder;
@@ -58,6 +65,12 @@ public class MavenProjectCache {
 
   private static final int MAX_CACHE_SIZE = Integer.getInteger("m2e.project.cache.size", 50);
 
+  private static final boolean INITIAL_BUILD_RETENTION_ENABLED = Boolean.getBoolean("m2e.project.cache.initialBuildRetention");
+
+  private static final long INITIAL_BUILD_RETENTION_MAX_AGE_MILLIS = Long.getLong(
+    "m2e.project.cache.initialBuildRetention.maxAgeMillis",
+    TimeUnit.MINUTES.toMillis(30));
+
   private static final String CTX_MAVENPROJECTS = MavenProjectCache.class.getName() + "/mavenProjects";
 
   @Reference
@@ -65,18 +78,41 @@ public class MavenProjectCache {
 
   private LoadingCache<CacheKey, CacheLine> loadingCache;
 
+  private ScheduledFuture<?> retentionCleanup;
+
+  private final ConcurrentMap<RetainedProjectKey, RetainedProject> initialBuildRetentions = new ConcurrentHashMap<>();
+
+  private final ScheduledExecutorService retentionCleanupExecutor;
+
+  private final Object retentionCleanupLock = new Object();
 
   public MavenProjectCache() {
+    this.retentionCleanupExecutor = INITIAL_BUILD_RETENTION_ENABLED
+        ? Executors.newSingleThreadScheduledExecutor(runnable -> {
+          Thread thread = new Thread(runnable, "m2e-initial-build-retention-cleanup");
+          thread.setDaemon(true);
+          return thread;
+        })
+        : null;
     this.loadingCache = CacheBuilder.newBuilder() //
         .maximumSize(MAX_CACHE_SIZE) //
         .removalListener((RemovalNotification<CacheKey, CacheLine> removed) -> {
           Map<IMavenProjectFacade, MavenProject> contextProjects = getContextProjectMap();
-          removed.getValue().projects.values().forEach(mavenProject -> {
-            if(!contextProjects.containsValue(mavenProject)) {
+          removed.getValue().projects.forEach((pom, mavenProject) -> {
+            RetainedProject retained = initialBuildRetentions.get(retainedProjectKey(removed.getKey(), pom));
+            if(!(retained != null && retained.mavenProject() == mavenProject)
+                && !contextProjects.containsValue(mavenProject)) {
               flushMavenCaches(mavenProject.getFile(), removed.getKey().artifactKey(), false);
             }
           });
         }).build(CacheLoader.from(CacheLine::new));
+  }
+
+  @Deactivate
+  void deactivate() {
+    if(retentionCleanupExecutor != null) {
+      retentionCleanupExecutor.shutdownNow();
+    }
   }
 
   /**
@@ -85,7 +121,9 @@ public class MavenProjectCache {
    * @param facade the facade to invalidate
    */
   public void invalidateProjectFacade(IMavenProjectFacade facade) {
-    CacheLine cacheLine = loadingCache.getIfPresent(new CacheKey(facade.getArtifactKey(), facade.getConfiguration()));
+    CacheKey cacheKey = cacheKey(facade);
+    initialBuildRetentions.remove(retainedProjectKey(cacheKey, facade.getPomFile()));
+    CacheLine cacheLine = loadingCache.getIfPresent(cacheKey);
     if(cacheLine != null) {
       cacheLine.remove(facade.getPomFile());
     }
@@ -100,8 +138,21 @@ public class MavenProjectCache {
    * @return the project or null
    */
   public MavenProject getMavenProject(IMavenProjectFacade facade, Function<IMavenProjectFacade, MavenProject> projectLoader) {
-    ArtifactKey artifactKey = facade.getArtifactKey();
-    CacheLine cacheLine = loadingCache.getUnchecked(new CacheKey(artifactKey, facade.getConfiguration()));
+    CacheKey cacheKey = cacheKey(facade);
+    CacheLine cacheLine = loadingCache.getUnchecked(cacheKey);
+    File pomFile = facade.getPomFile();
+    MavenProject cachedProject = cacheLine.peekProject(pomFile);
+
+    if(INITIAL_BUILD_RETENTION_ENABLED) {
+      RetainedProject retained = initialBuildRetentions.get(retainedProjectKey(cacheKey, pomFile));
+      if(retained != null) {
+        MavenProject retainedProject = retained.mavenProject();
+        if(cachedProject != retainedProject) {
+          cacheLine.updateProject(facade, retainedProject);
+        }
+        return retainedProject;
+      }
+    }
     return cacheLine.getProject(facade, projectLoader);
   }
 
@@ -116,9 +167,96 @@ public class MavenProjectCache {
       invalidateProjectFacade(facade);
       return;
     }
-    ArtifactKey artifactKey = facade.getArtifactKey();
-    CacheLine cacheLine = loadingCache.getUnchecked(new CacheKey(artifactKey, facade.getConfiguration()));
+    CacheKey cacheKey = cacheKey(facade);
+    if(INITIAL_BUILD_RETENTION_ENABLED) {
+      synchronized(retentionCleanupLock) {
+        long retainedAt = System.currentTimeMillis();
+        initialBuildRetentions.put(
+          retainedProjectKey(cacheKey, facade.getPomFile()),
+          new RetainedProject(mavenProject, retainedAt)
+        );
+        scheduleRetentionCleanupAt(retainedAt + INITIAL_BUILD_RETENTION_MAX_AGE_MILLIS);
+      }
+    }
+    CacheLine cacheLine = loadingCache.getUnchecked(cacheKey);
     cacheLine.updateProject(facade, mavenProject);
+  }
+
+  /**
+   * Releases a project that was temporarily retained for its first relevant builder invocation.
+   *
+   * @param facade the facade for which a project should be released
+   * @param relevant whether the completed builder invocation performed Maven-relevant work and therefore consumes the
+   *          initial-build retention
+   */
+  public void releaseInitialBuildRetention(IMavenProjectFacade facade, boolean relevant) {
+    if(!INITIAL_BUILD_RETENTION_ENABLED || !relevant) {
+      return;
+    }
+    CacheKey cacheKey = cacheKey(facade);
+    RetainedProjectKey retainedKey = retainedProjectKey(cacheKey, facade.getPomFile());
+    RetainedProject retained = initialBuildRetentions.remove(retainedKey);
+    if(retained == null) {
+      return;
+    }
+    onInitialBuildRetentionReleased(retainedKey, retained);
+  }
+
+  private void scheduleRetentionCleanupAt(long cleanupAtMillis) {
+    if(retentionCleanupExecutor == null || cleanupAtMillis == Long.MAX_VALUE) {
+      return;
+    }
+    synchronized(retentionCleanupLock) {
+      if(retentionCleanup == null || retentionCleanup.isDone()) {
+        retentionCleanup = retentionCleanupExecutor.schedule(
+          this::runRetentionCleanup,
+          Math.max(0, cleanupAtMillis - System.currentTimeMillis()),
+          TimeUnit.MILLISECONDS
+        );
+      }
+    }
+  }
+
+  private void runRetentionCleanup() {
+    Map<RetainedProjectKey, RetainedProject> expired = new HashMap<>();
+    synchronized(retentionCleanupLock) {
+      retentionCleanup = null;
+      long now = System.currentTimeMillis();
+      long nextCleanupAt = Long.MAX_VALUE;
+      for(Map.Entry<RetainedProjectKey, RetainedProject> entry : initialBuildRetentions.entrySet()) {
+        RetainedProjectKey key = entry.getKey();
+        RetainedProject retained = entry.getValue();
+        long cleanupAt = retained.retainedAt() + INITIAL_BUILD_RETENTION_MAX_AGE_MILLIS;
+        if(cleanupAt <= now) {
+          if(initialBuildRetentions.remove(key, retained)) {
+            expired.put(key, retained);
+          }
+        } else {
+          nextCleanupAt = Math.min(nextCleanupAt, cleanupAt);
+        }
+      }
+      scheduleRetentionCleanupAt(nextCleanupAt);
+    }
+    expired.forEach(this::onInitialBuildRetentionReleased);
+  }
+
+  /**
+   * Handles removal of an initial-build retention by flushing Maven core caches only when the normal
+   * {@link #loadingCache} no longer contains the same {@link MavenProject} instance.
+   */
+  private void onInitialBuildRetentionReleased(RetainedProjectKey retainedKey, RetainedProject retained) {
+    CacheLine cacheLine = loadingCache.getIfPresent(retainedKey.cacheKey());
+    if(cacheLine == null || cacheLine.peekProject(retainedKey.pomFile()) != retained.mavenProject()) {
+      flushMavenCaches(retained.mavenProject().getFile(), retainedKey.cacheKey().artifactKey(), false);
+    }
+  }
+
+  private static CacheKey cacheKey(IMavenProjectFacade facade) {
+    return new CacheKey(facade.getArtifactKey(), facade.getConfiguration());
+  }
+
+  private static RetainedProjectKey retainedProjectKey(CacheKey cacheKey, File pomFile) {
+    return new RetainedProjectKey(cacheKey, pomFile.getAbsoluteFile());
   }
 
   /**
@@ -174,6 +312,10 @@ public class MavenProjectCache {
       projects.remove(pomFile);
     }
 
+    MavenProject peekProject(File pomFile) {
+      return projects.get(pomFile);
+    }
+
     void updateProject(IMavenProjectFacade facade, MavenProject mavenProject) {
       File pomFile = facade.getPomFile();
       projects.compute(pomFile, (key, current) -> {
@@ -221,6 +363,12 @@ public class MavenProjectCache {
   }
   
   private static final record CacheKey(ArtifactKey artifactKey, IProjectConfiguration configuration) {
+  }
+
+  private static final record RetainedProjectKey(CacheKey cacheKey, File pomFile) {
+  }
+
+  private static final record RetainedProject(MavenProject mavenProject, long retainedAt) {
   }
 
 }
