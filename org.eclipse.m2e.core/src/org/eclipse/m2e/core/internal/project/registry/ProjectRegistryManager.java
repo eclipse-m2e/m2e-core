@@ -1140,6 +1140,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
     }
   }
 
+  public void releaseInitialBuildRetention(IMavenProjectFacade facade, boolean relevant) {
+    mavenProjectCache.releaseInitialBuildRetention(facade, relevant);
+  }
+
   private Set<IFile> flushCaches(IMavenProjectFacade facade, boolean forceDependencyUpdate) {
     if(facade != null) {
       ArtifactKey key = facade.getArtifactKey();
