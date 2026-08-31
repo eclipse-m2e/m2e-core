@@ -137,7 +137,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
 
       } else {
         File artifactFile = a.getFile();
-        if(artifactFile != null /*&& artifactFile.canRead()*/) {
+        if(artifactFile != null && artifactFile.exists()) {
           entry = classpath.addLibraryEntry(IPath.fromOSString(artifactFile.getAbsolutePath()));
           entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
         }
