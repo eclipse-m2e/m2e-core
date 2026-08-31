@@ -64,6 +64,10 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
 
   private List<String> userInactiveProfiles;
 
+  private String globalSettingsFile;
+
+  private String userSettingsFile;
+
   public ResolverConfiguration() {
   }
 
@@ -77,9 +81,9 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
   public ResolverConfiguration(IProjectConfiguration resolverConfiguration) {
     setLifecycleMappingId(resolverConfiguration.getLifecycleMappingId());
     setMultiModuleProjectDirectory(resolverConfiguration.getMultiModuleProjectDirectory());
-    Properties properties2 = new Properties();
-    properties2.putAll(resolverConfiguration.getConfigurationProperties());
-    setProperties(properties2);
+    Properties properties = new Properties();
+    properties.putAll(resolverConfiguration.getConfigurationProperties());
+    setProperties(properties);
     setResolveWorkspaceProjects(resolverConfiguration.isResolveWorkspaceProjects());
     setSelectedProfiles(resolverConfiguration.getSelectedProfiles());
   }
@@ -193,6 +197,16 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     return multiModuleProjectDirectory;
   }
 
+  @Override
+  public String getGlobalSettingsFile() {
+    return globalSettingsFile;
+  }
+
+  @Override
+  public String getUserSettingsFile() {
+    return userSettingsFile;
+  }
+
   /**
    * @param multiModuleProjectDirectory The multiModuleProjectDirectory to set.
    */
@@ -200,15 +214,15 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     if(!Objects.equals(this.multiModuleProjectDirectory, multiModuleProjectDirectory)) {
       this.multiModuleProjectDirectory = multiModuleProjectDirectory;
       try {
-        Optional<MavenProperties> mavenProps = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
+        Optional<MavenProperties> commandLine = MavenProperties.getMavenArgs(multiModuleProjectDirectory);
         Map<String, String> props = new LinkedHashMap<>();
+        commandLine.ifPresent(p -> p.getCliProperties(props::put));
+        userProperties = Collections.unmodifiableMap(props);
         userActiveProfiles = new ArrayList<>();
         userInactiveProfiles = new ArrayList<>();
-        mavenProps.ifPresent(args -> {
-          args.getCliProperties(props::put);
-          args.getProfiles(userActiveProfiles::add, userInactiveProfiles::add);
-        });
-        userProperties = Collections.unmodifiableMap(props);
+        commandLine.ifPresent(p -> p.getProfiles(userActiveProfiles::add, userInactiveProfiles::add));
+        globalSettingsFile = commandLine.map(p -> p.getAlternateGlobalToolchainsFile()).orElse(null);
+        userSettingsFile = commandLine.map(p -> p.getAlternateUserToolchainsFile()).orElse(null);
       } catch(IOException ex) {
         //can't use it then... :-(
         MavenPluginActivator.getDefault().getLog().error("can't read maven args from " + multiModuleProjectDirectory,
