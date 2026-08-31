@@ -653,7 +653,10 @@ public class ProjectConfigurationManager
   }
 
   private boolean isMavenBuilderCommand(ICommand command) {
-    return IMavenConstants.BUILDER_ID.equals(command.getBuilderName());
+    final String name = command.getBuilderName();
+    return IMavenConstants.BUILDER_ID.equals(name) 
+      || "org.eclipse.ui.externaltools.ExternalToolBuilder".equals(name)
+        && command.getArguments().toString().contains("LaunchConfigHandle=<project>/.externalToolBuilders/org.eclipse.m2e.core.maven2Builder");
   }
 
   // project creation
