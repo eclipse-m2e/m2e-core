@@ -755,8 +755,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   /**
    * Resolves a nested configuration parameter from the given {@code mojoExecution}. It coerces from String to the given
-   * type and considers expressions and default values. Deliberately no public API yet as probably refactored in the
-   * near future.
+   * type and considers expressions and default values.
+   * <p>
+   * Package-internal helper backing {@link IMojoExecutionFacade#getMojoParameterValue(List, Class, IProgressMonitor)};
+   * consumers should acquire an {@link IMojoExecutionFacade} instead of calling this directly.
+   * </p>
    *
    * @param <T>
    * @param project the Maven project

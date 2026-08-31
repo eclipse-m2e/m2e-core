@@ -52,6 +52,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.apt.internal.utils.ProjectUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
@@ -347,7 +348,8 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
   protected <T> T getParameterValue(String parameter, Class<T> asType, MojoExecution mojoExecution)
       throws CoreException {
-    return mavenFacade.getMojoParameterValue(mojoExecution, parameter, asType, null);
+    IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(mavenFacade, mojoExecution);
+    return executionFacade == null ? null : executionFacade.getMojoParameterValue(parameter, asType, null);
   }
 
 }

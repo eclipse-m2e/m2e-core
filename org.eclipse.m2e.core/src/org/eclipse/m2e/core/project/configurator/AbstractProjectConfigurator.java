@@ -48,6 +48,7 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
@@ -195,7 +196,8 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   protected <T> T getParameterValue(IMavenProjectFacade projectFacade, String parameter, Class<T> asType,
       MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
-    return projectFacade.getMojoParameterValue(mojoExecution, parameter, asType, monitor);
+    IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(projectFacade, mojoExecution);
+    return executionFacade == null ? null : executionFacade.getMojoParameterValue(parameter, asType, monitor);
   }
 
   protected void assertHasNature(IProject project, String natureId) throws CoreException {
@@ -246,7 +248,11 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   /**
    * Returns list of MojoExecutions this configurator is enabled for.
+   *
+   * @deprecated use {@link #getMojoExecutionFacades(ProjectConfigurationRequest, IProgressMonitor)} instead to avoid
+   *             a direct dependency on {@link MojoExecution}
    */
+  @Deprecated
   protected List<MojoExecution> getMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
     IMavenProjectFacade projectFacade = request.mavenProjectFacade();
@@ -259,6 +265,29 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     if(executionKeys != null) {
       for(MojoExecutionKey key : executionKeys) {
         executions.add(projectFacade.getMojoExecution(key, monitor));
+      }
+    }
+
+    return executions;
+  }
+
+  /**
+   * Returns list of {@link IMojoExecutionFacade}s this configurator is enabled for.
+   *
+   * @since 2.9
+   */
+  protected List<IMojoExecutionFacade> getMojoExecutionFacades(ProjectConfigurationRequest request,
+      IProgressMonitor monitor) throws CoreException {
+    IMavenProjectFacade projectFacade = request.mavenProjectFacade();
+
+    Map<String, Set<MojoExecutionKey>> configuratorExecutions = getConfiguratorExecutions(projectFacade);
+
+    ArrayList<IMojoExecutionFacade> executions = new ArrayList<>();
+
+    Set<MojoExecutionKey> executionKeys = configuratorExecutions.get(id);
+    if(executionKeys != null) {
+      for(MojoExecutionKey key : executionKeys) {
+        executions.add(projectFacade.getMojoExecutionFacade(key, monitor));
       }
     }
 
