@@ -15,20 +15,19 @@ package org.eclipse.m2e.pde.ui.target.preferences;
 import org.codehaus.mojo.versions.model.IgnoreVersion;
 import org.codehaus.mojo.versions.model.Rule;
 import org.codehaus.mojo.versions.model.RuleSet;
-import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 
 /**
  * Read-only viewer for showing the ignored versions and the rules for a given
@@ -37,31 +36,54 @@ import org.eclipse.swt.widgets.Group;
  */
 public class RuleSetViewer {
 	private static final Object[] NO_CHILDREN = new Object[0];
-	private TableViewer ignoreVersionsViewer;
-	private TreeViewer rulesViewer;
+	private RulesetTreeViewer ignoreVersionsViewer;
+	private RulesetTreeViewer rulesViewer;
 
 	public RuleSetViewer(Composite parent) {
-		createIgnoreVersionContents(parent);
-		createRuleContents(parent);
+		final TabFolder tabFolder = new TabFolder(parent, SWT.NONE);
+		tabFolder.setLayout(new FillLayout());
+		createIgnoreVersionContents(tabFolder);
+		createRuleContents(tabFolder);
+		final TabItem tabItem1 = new TabItem(tabFolder, SWT.NONE);
+		tabItem1.setText(Messages.RuleSetViewer_GlobalRules);
+		tabItem1.setControl(ignoreVersionsViewer);
+		final TabItem tabItem2 = new TabItem(tabFolder, SWT.NONE);
+		tabItem2.setText(Messages.RuleSetViewer_ArtifactRules);
+		tabItem2.setControl(rulesViewer);
+		tabFolder.setSelection(0);
 	}
 
 	public void setInput(RuleSet ruleSet) {
-		ignoreVersionsViewer.setInput(ruleSet.getIgnoreVersions());
-		rulesViewer.setInput(ruleSet.getRules());
+		ignoreVersionsViewer.getViewer().setInput(ruleSet.getIgnoreVersions());
+		rulesViewer.getViewer().setInput(ruleSet.getRules());
 	}
 
-	private Control createIgnoreVersionContents(Composite parent) {
-		TableColumnLayout layout = new TableColumnLayout();
+	private void createIgnoreVersionContents(Composite parent) {
+		ignoreVersionsViewer = new RulesetTreeViewer(parent, true);
+		ignoreVersionsViewer.getViewer().getTree().setHeaderVisible(true);
+		ignoreVersionsViewer.getViewer().setContentProvider(new ITreeContentProvider() {
+			@Override
+			public Object[] getElements(Object inputElement) {
+				return ArrayContentProvider.getInstance().getElements(inputElement);
+			}
 
-		Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.RuleSetViewer_IgnoredVersions);
-		group.setLayout(layout);
+			@Override
+			public Object[] getChildren(Object parentElement) {
+				return NO_CHILDREN;
+			}
 
-		ignoreVersionsViewer = new TableViewer(group);
-		ignoreVersionsViewer.setUseHashlookup(true);
-		ignoreVersionsViewer.setContentProvider(ArrayContentProvider.getInstance());
-		ignoreVersionsViewer.getTable().setHeaderVisible(true);
-		TableViewerColumn viewerColumn1 = new TableViewerColumn(ignoreVersionsViewer, SWT.NONE);
+			@Override
+			public Object getParent(Object element) {
+				return null;
+			}
+
+			@Override
+			public boolean hasChildren(Object element) {
+				return false;
+			}
+			
+		});
+		TreeViewerColumn viewerColumn1 = new TreeViewerColumn(ignoreVersionsViewer.getViewer(), SWT.NONE);
 		viewerColumn1.getColumn().setText(Messages.RuleSetViewer_Type);
 		viewerColumn1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -69,7 +91,7 @@ public class RuleSetViewer {
 				return ((IgnoreVersion) o).getType();
 			}
 		});
-		TableViewerColumn viewerColumn2 = new TableViewerColumn(ignoreVersionsViewer, SWT.NONE);
+		TreeViewerColumn viewerColumn2 = new TreeViewerColumn(ignoreVersionsViewer.getViewer(), SWT.NONE);
 		viewerColumn2.getColumn().setText(Messages.RuleSetViewer_Value);
 		viewerColumn2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -78,22 +100,14 @@ public class RuleSetViewer {
 			}
 		});
 
-		layout.setColumnData(viewerColumn1.getColumn(), new ColumnWeightData(20));
-		layout.setColumnData(viewerColumn2.getColumn(), new ColumnWeightData(80));
-
-		return group;
+		ignoreVersionsViewer.getTreeLayout().setColumnData(viewerColumn1.getColumn(), new ColumnWeightData(20));
+		ignoreVersionsViewer.getTreeLayout().setColumnData(viewerColumn2.getColumn(), new ColumnWeightData(80));
 	}
 
-	private Control createRuleContents(Composite parent) {
-		TreeColumnLayout layout = new TreeColumnLayout();
-
-		Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.RuleSetViewer_Rules);
-		group.setLayout(layout);
-
-		rulesViewer = new TreeViewer(group);
-		rulesViewer.getTree().setHeaderVisible(true);
-		rulesViewer.setContentProvider(new ITreeContentProvider() {
+	private void createRuleContents(Composite parent) {
+		rulesViewer = new RulesetTreeViewer(parent, false);
+		rulesViewer.getViewer().getTree().setHeaderVisible(true);
+		rulesViewer.getViewer().setContentProvider(new ITreeContentProvider() {
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return ArrayContentProvider.getInstance().getElements(inputElement);
@@ -101,8 +115,8 @@ public class RuleSetViewer {
 
 			@Override
 			public Object[] getChildren(Object parentElement) {
-				if (parentElement instanceof Rule rule) {
-					return rule.getIgnoreVersions().toArray();
+				if (hasChildren(parentElement)) {
+					return ((Rule) parentElement).getIgnoreVersions().toArray();
 				}
 				return NO_CHILDREN;
 			}
@@ -114,12 +128,12 @@ public class RuleSetViewer {
 
 			@Override
 			public boolean hasChildren(Object element) {
-				return element instanceof Rule;
+				return element instanceof Rule rule && rule.getIgnoreVersions().size() > 1;
 			}
 
 		});
 
-		TreeViewerColumn viewerColumn1 = new TreeViewerColumn(rulesViewer, SWT.NONE);
+		TreeViewerColumn viewerColumn1 = new TreeViewerColumn(rulesViewer.getViewer(), SWT.NONE);
 		viewerColumn1.getColumn().setText(Messages.RuleSetViewer_Artifact);
 		viewerColumn1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -130,22 +144,28 @@ public class RuleSetViewer {
 				return null;
 			}
 		});
-		TreeViewerColumn viewerColumn2 = new TreeViewerColumn(rulesViewer, SWT.NONE);
+		TreeViewerColumn viewerColumn2 = new TreeViewerColumn(rulesViewer.getViewer(), SWT.NONE);
 		viewerColumn2.getColumn().setText(Messages.RuleSetViewer_Type);
 		viewerColumn2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object o) {
+				if (o instanceof Rule rule && rule.getIgnoreVersions().size() == 1) {
+					return rule.getIgnoreVersions().get(0).getType();
+				}
 				if (o instanceof IgnoreVersion version) {
 					return version.getType();
 				}
 				return null;
 			}
 		});
-		TreeViewerColumn viewerColumn3 = new TreeViewerColumn(rulesViewer, SWT.NONE);
+		TreeViewerColumn viewerColumn3 = new TreeViewerColumn(rulesViewer.getViewer(), SWT.NONE);
 		viewerColumn3.getColumn().setText(Messages.RuleSetViewer_Value);
 		viewerColumn3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object o) {
+				if (o instanceof Rule rule && rule.getIgnoreVersions().size() == 1) {
+					return rule.getIgnoreVersions().get(0).getVersion();
+				}
 				if (o instanceof IgnoreVersion version) {
 					return version.getVersion();
 				}
@@ -153,10 +173,22 @@ public class RuleSetViewer {
 			}
 		});
 
-		layout.setColumnData(viewerColumn1.getColumn(), new ColumnWeightData(60));
-		layout.setColumnData(viewerColumn2.getColumn(), new ColumnWeightData(20));
-		layout.setColumnData(viewerColumn3.getColumn(), new ColumnWeightData(20));
-
-		return group;
+		rulesViewer.getTreeLayout().setColumnData(viewerColumn1.getColumn(), new ColumnWeightData(60));
+		rulesViewer.getTreeLayout().setColumnData(viewerColumn2.getColumn(), new ColumnWeightData(20));
+		rulesViewer.getTreeLayout().setColumnData(viewerColumn3.getColumn(), new ColumnWeightData(20));
+	}
+	
+	private static class RulesetTreeViewer extends FilteredTree {
+		private final TreeColumnLayout layout;
+		
+		public RulesetTreeViewer(Composite parent, boolean useHashLookup) {
+			super(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.FULL_SELECTION | SWT.SINGLE, new PatternFilter(), true, useHashLookup);
+			this.layout = new TreeColumnLayout();
+			this.treeComposite.setLayout(layout);
+		}
+		
+		public TreeColumnLayout getTreeLayout() {
+			return layout;
+		}
 	}
 }
