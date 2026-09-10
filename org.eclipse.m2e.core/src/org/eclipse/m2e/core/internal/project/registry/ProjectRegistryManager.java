@@ -445,6 +445,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
     context.forcePomFiles(allProcessedPoms);
 
     // phase 2: resolve project dependencies
+    Set<IFile> phase2Visited = new HashSet<>();
     ProjectProcessingTracker tracker = new ProjectProcessingTracker(context);
     do {
       while(!context.isEmpty()) {
@@ -458,6 +459,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
         IFile pom = context.pop();
         if(tracker.shouldProcess(pom)) {
+
+          boolean firstVisit = phase2Visited.add(pom);
 
           MavenProjectFacade newFacade = null;
           if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
@@ -489,11 +492,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
             IProjectConfiguration resolverConfiguration = facade.getConfiguration();
             createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
                 (executionContext, pm) -> {
-                  refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade, pm);
+                  refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade,
+                      firstVisit, pm);
                   return null;
                 }, monitor);
           } else {
-            refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
+            refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade,
+                firstVisit, monitor);
           }
           monitor.worked(1);
         }
@@ -558,7 +563,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
 
   void refreshPhase2(MutableProjectRegistry newState, DependencyResolutionContext context,
       Map<IFile, Set<Capability>> originalCapabilities, Map<IFile, Set<RequiredCapability>> originalRequirements,
-      IFile pom, MavenProjectFacade newFacade, IProgressMonitor monitor) throws CoreException {
+      IFile pom, MavenProjectFacade newFacade, boolean firstVisit, IProgressMonitor monitor) throws CoreException {
     Set<Capability> capabilities = null;
     Set<RequiredCapability> requirements = null;
     if(newFacade != null) {
@@ -610,10 +615,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
     }
 
-    Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-    if(originalCapabilities.containsKey(pom)) {
-      oldCapabilities = originalCapabilities.get(pom);
-    }
+    Set<Capability> previousCapabilities = newState.setCapabilities(pom, capabilities);
+    Set<Capability> oldCapabilities = firstVisit ? originalCapabilities.getOrDefault(pom, previousCapabilities)
+        : previousCapabilities;
     // if our capabilities changed, recalculate everyone who depends on new/changed/removed capabilities
     Set<Capability> changedCapabilities = diff(oldCapabilities, capabilities);
 
