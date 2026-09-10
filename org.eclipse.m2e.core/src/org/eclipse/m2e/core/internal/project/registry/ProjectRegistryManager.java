@@ -634,10 +634,10 @@ public class ProjectRegistryManager implements ISaveParticipant {
           : newState.getDependents(capability, true));
     }
 
-    Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-    if(originalRequirements.containsKey(pom)) {
-      oldRequirements = originalRequirements.get(pom);
-    }
+    Set<RequiredCapability> previousRequirements = newState.setRequirements(pom, requirements);
+    Set<RequiredCapability> oldRequirements = firstVisit
+        ? originalRequirements.getOrDefault(pom, previousRequirements)
+        : previousRequirements;
     // if our dependencies changed, recalculate everyone who depends on us
     // this is needed to deal with transitive dependency resolution in maven
     if(oldCapabilities != null && hasDiff(oldRequirements, requirements)) {
