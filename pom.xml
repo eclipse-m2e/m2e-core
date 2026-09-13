@@ -237,27 +237,6 @@
 				<!-- SWT on Mac OS needs to be started on main thread -->
 				<tycho.testArgLine>-XstartOnFirstThread ${tychoDefaultTestArgLine}</tycho.testArgLine>
 			</properties>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>tycho-surefire-plugin</artifactId>
-							<configuration>
-								<dependencies combine.children="append">
-									<!--this dependency is needed to detect and set the default VM correctly on Mac OS,
-									 https://github.com/eclipse-jdt/eclipse.jdt.debug/tree/master/org.eclipse.jdt.launching.macosx -->
-									<dependency>
-										<artifactId>org.eclipse.jdt.launching.macosx</artifactId>
-										<type>eclipse-plugin</type>
-										<version>0.0.0</version>
-									</dependency>
-								</dependencies>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 		<profile>
 			<id>its</id>
