@@ -23,7 +23,7 @@
    <extension-point id="incrementalBuildFrameworks" name="%extension-point.incrementalBuildFrameworks.name" schema="schema/incrementalBuildFrameworks.exsd"/>
    <extension-point id="workspaceClassifierResolvers" name="%extension-point.workspaceClassifierResolvers.name" schema="schema/workspaceClassifierResolvers.exsd"/>
 
-   <extension point="org.eclipse.core.runtime.contentTypes">
+   <extension point="org.eclipse.core.contenttype.contentTypes">
      <content-type id="pomFile" name="%content-type.name"
           base-type="org.eclipse.core.runtime.xml"
           priority="high"
