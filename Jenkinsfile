@@ -1,7 +1,10 @@
+// This is the Jenkinsfile of the m2e-2.x branch: only builds of this exact branch (not PRs/topic branches against it) are signed/released
+def isReleaseBranch = 'm2e-2.x'.equals(env.BRANCH_NAME)
+
 pipeline {
 	options {
 		timeout(time: 45, unit: 'MINUTES')
-		buildDiscarder(logRotator(numToKeepStr: 'main'.equals(env.BRANCH_NAME) ? '20' : '5', artifactNumToKeepStr: 'main'.equals(env.BRANCH_NAME) ? '5' : '1' ))
+		buildDiscarder(logRotator(numToKeepStr: isReleaseBranch ? '20' : '5', artifactNumToKeepStr: isReleaseBranch ? '5' : '1' ))
 		disableConcurrentBuilds(abortPrevious: true)
 		timestamps()
 	}
@@ -27,7 +30,7 @@ pipeline {
 				xvnc(useXauthority: true) {
 					sh '''#!/bin/bash -x
 						mavenArgs="clean verify --batch-mode -Dmaven.test.failure.ignore=true -Dtycho.p2.baselineMode=failCommon"
-						if [[ ${BRANCH_NAME} == main ]] || [[ ${BRANCH_NAME} =~ m2e-[0-9]+\\.[0-9]+\\.x ]]; then
+						if [[ ${BRANCH_NAME} == m2e-2.x ]]; then
 							mvn ${mavenArgs} -Peclipse-sign,its -Dtycho.pgp.signer.bc.secretKeys="${KEYRING}"
 						else
 							# Clear signing environment variables for PRs
@@ -45,7 +48,7 @@ pipeline {
 						m2e-core-tests/*/target/work/data/.metadata/.log,\
 						**/target/artifactcomparison/*'
 					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
-					discoverGitReferenceBuild referenceJob: 'm2e/main'
+					discoverGitReferenceBuild referenceJob: 'm2e/m2e-2.x'
 					recordIssues enabledForFailure: true, publishAllIssues: true, ignoreQualityGate: true, tools: [
 							eclipse(name: 'Compiler', pattern: '**/target/compilelogs/*.xml'),
 							mavenConsole(),
@@ -56,7 +59,7 @@ pipeline {
 		}
 		stage('Deploy Snapshot') {
 			when {
-				branch 'main'
+				branch 'm2e-2.x'
 			}
 			steps {
 				sshagent(['projects-storage.eclipse.org-bot-ssh']) {
@@ -78,8 +81,8 @@ pipeline {
 							echo Failed to read M2E_VERSION. Abort deployment.
 							exit 1
 						fi
+						# m2e-2.x is a maintenance branch: keep its own versioned snapshot path, don't touch the "latest" pointer (that's main's)
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
-						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 					'''
 				}
 			}

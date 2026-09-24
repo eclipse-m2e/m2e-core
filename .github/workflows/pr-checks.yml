@@ -7,7 +7,7 @@ concurrency:
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ m2e-2.x ]
 
 jobs:
   check-merge-commits:

@@ -4,10 +4,10 @@ name: Build M2Eclipse
 on:
   push:
     branches: 
-      - 'main'
+      - 'm2e-2.x'
   pull_request:
     branches: 
-     - 'main'
+     - 'm2e-2.x'
 
 jobs:
   build:
