@@ -10,7 +10,7 @@ on:
     - cron:  '0 0 * * *'
   push:
     branches:
-      - main
+      - m2e-2.x
     paths:
       - '**.target'
 
