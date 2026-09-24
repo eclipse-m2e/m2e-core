@@ -1,0 +1,11 @@
+{
+  "repoOwner": "eclipse-m2e",
+  "repoName": "m2e-core",
+  "targetBranchChoices": ["m2e-2.x"],
+  "branchLabelMapping": {
+    "^backport-to-2\\.x$": "m2e-2.x"
+  },
+  "autoMerge": true,
+  "autoMergeMethod": "rebase",
+  "multipleCommits": true
+}
