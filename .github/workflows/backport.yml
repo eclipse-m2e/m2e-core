@@ -1,0 +1,36 @@
+on:
+  pull_request_target:
+    types: ["labeled", "closed"]
+
+permissions:
+  contents: read
+
+jobs:
+  backport:
+    name: Backport PR
+    runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.merged == true
+      && contains(github.event.pull_request.labels.*.name, 'backport-to-2.x')
+      && (
+        (github.event.action == 'labeled' && github.event.label.name == 'backport-to-2.x')
+        || (github.event.action == 'closed')
+      )
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Backport Action
+        uses: sqren/backport-github-action@8a6c0381851f43f9f1fddc7303f0e9015eb57b62 # v12.0.4
+        with:
+          github_token: ${{ secrets.M2E_BOT_PAT }}
+          auto_backport_label_prefix: backport-to-
+          add_original_reviewers: true
+
+      - name: Info log
+        if: ${{ success() }}
+        run: cat ~/.backport/backport.info.log
+
+      - name: Debug log
+        if: ${{ failure() }}
+        run: cat ~/.backport/backport.debug.log
