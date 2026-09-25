@@ -159,8 +159,21 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   /**
    * Returns fully setup MojoExecution instance bound to project build lifecycle that matches provided mojoExecutionKey.
    * Returns null if no such mojo execution.
+   *
+   * @deprecated use {@link #getMojoExecutionFacade(MojoExecutionKey, IProgressMonitor)} instead to avoid a direct
+   *             dependency on {@link MojoExecution}
    */
+  @Deprecated
   MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+      throws CoreException;
+
+  /**
+   * Returns a fully setup {@link IMojoExecutionFacade} bound to project build lifecycle that matches provided
+   * mojoExecutionKey. Returns {@code null} if no such mojo execution.
+   *
+   * @since 2.9
+   */
+  IMojoExecutionFacade getMojoExecutionFacade(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException;
 
   MavenExecutionPlan calculateExecutionPlan(Collection<String> tasks, IProgressMonitor monitor);
@@ -170,8 +183,21 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   /**
    * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided groupId,
    * artifactId and (vararg) goals. Returns empty list if no such mojo executions.
+   *
+   * @deprecated use {@link #getMojoExecutionFacades(String, String, IProgressMonitor, String...)} instead to avoid a
+   *             direct dependency on {@link MojoExecution}
    */
+  @Deprecated
   List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
+      String... goals) throws CoreException;
+
+  /**
+   * Returns list of fully setup {@link IMojoExecutionFacade}s bound to project build lifecycle that match provided
+   * groupId, artifactId and (vararg) goals. Returns empty list if no such mojo executions.
+   *
+   * @since 2.9
+   */
+  List<IMojoExecutionFacade> getMojoExecutionFacades(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException;
 
   /**
@@ -186,7 +212,12 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
    * @return the parameter value or {@code null} if the parameter with the given name was not found
    * @throws CoreException
    * @since 2.8
+   * @deprecated use {@link IMojoExecutionFacade#getMojoParameterValue(String, Class, IProgressMonitor)} instead, by
+   *             first acquiring an {@link IMojoExecutionFacade} through
+   *             {@link #getMojoExecutionFacade(MojoExecutionKey, IProgressMonitor)} or
+   *             {@link #getMojoExecutionFacades(String, String, IProgressMonitor, String...)}
    */
+  @Deprecated
   <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException;
 

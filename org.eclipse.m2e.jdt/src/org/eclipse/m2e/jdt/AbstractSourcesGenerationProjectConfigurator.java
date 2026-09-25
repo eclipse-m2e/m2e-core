@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -61,7 +62,7 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
 
     assertHasNature(request.mavenProjectFacade().getProject(), JavaCore.NATURE_ID);
 
-    for(MojoExecution mojoExecution : getMojoExecutions(request, monitor)) {
+    for(IMojoExecutionFacade mojoExecution : getMojoExecutionFacades(request, monitor)) {
       File[] sources = getSourceFolders(request, mojoExecution, monitor);
 
       for(File source : sources) {
@@ -81,10 +82,15 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
     return project.getFullPath().append(path);
   }
 
+  @Deprecated
   protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    return new File[] {getParameterValue(request.mavenProjectFacade(), getOutputFolderParameterName(), File.class,
-        mojoExecution, monitor)};
+    return getSourceFolders(request, IMojoExecutionFacade.wrap(request.mavenProjectFacade(), mojoExecution), monitor);
+  }
+
+  protected File[] getSourceFolders(ProjectConfigurationRequest request, IMojoExecutionFacade mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
+    return new File[] {mojoExecution.getMojoParameterValue(getOutputFolderParameterName(), File.class, monitor)};
   }
 
   protected String getOutputFolderParameterName() {
