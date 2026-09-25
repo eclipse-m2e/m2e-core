@@ -21,27 +21,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-
 
 public interface IMavenDiscovery {
-
-  /**
-   * <p>
-   * Calculates possibly empty list of discovery proposals. Multiple proposals per mapping configuration element
-   * represent alternative possible changes.
-   * </p>
-   * <p>
-   * To support incremental collection of user choices in the GUI, optional <code>preselected</code>
-   * requirements/proposals map is used to eliminate new proposals that conflict with already selected choices. Result
-   * is expected to include preselected proposals as-is. Implementation is expected to eliminate proposals that conflict
-   * with already installed Eclipse bundles and preselected proposals.
-   * </p>
-   */
-  Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
-      throws CoreException;
 
   /**
    * <p>

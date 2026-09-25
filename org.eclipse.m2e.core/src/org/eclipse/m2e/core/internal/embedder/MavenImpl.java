@@ -78,7 +78,6 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
@@ -141,7 +140,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 
 
 @Component(service = {IMaven.class, IMavenConfigurationChangeListener.class})
@@ -240,31 +238,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   @Override
   public void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
-  }
-
-  private MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
-      throws CoreException {
-    MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
-    clone.setMojoDescriptor(execution.getMojoDescriptor());
-    if(execution.getConfiguration() != null) {
-      clone.setConfiguration(new Xpp3Dom(execution.getConfiguration()));
-    }
-    clone.setLifecyclePhase(execution.getLifecyclePhase());
-    LifecycleExecutionPlanCalculatorFacade executionPlanCalculator = new LifecycleExecutionPlanCalculatorFacade(
-        lookup(LifecycleExecutionPlanCalculator.class));
-    try {
-      executionPlanCalculator.setupMojoExecution(session, project, clone);
-    } catch(Exception ex) {
-      throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
-    }
-    return clone;
-  }
-
-  @Override
-  public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
-      throws CoreException {
-    return getExecutionContext().execute(project,
-        (context, pm) -> setupMojoExecution(context.getSession(), project, execution), monitor);
   }
 
   @Override

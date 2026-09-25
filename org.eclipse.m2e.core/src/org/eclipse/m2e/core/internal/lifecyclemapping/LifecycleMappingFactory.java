@@ -82,7 +82,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -182,9 +181,10 @@ public class LifecycleMappingFactory {
   private LifecycleMappingFactory() {
   }
 
-  public static LifecycleMappingResult calculateLifecycleMapping(MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor) {
+  public static LifecycleMappingResult calculateLifecycleMapping(IMavenProjectFacade facade,
+      List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor) throws CoreException {
     long start = System.currentTimeMillis();
+    MavenProject mavenProject = facade.getMavenProject(monitor);
     log.debug("Loading lifecycle mapping for {}.", mavenProject); //$NON-NLS-1$
 
     LifecycleMappingResult result = new LifecycleMappingResult();
@@ -194,7 +194,7 @@ public class LifecycleMappingFactory {
         instantiateLifecycleMapping(result, mavenProject, lifecycleMappingId);
       }
 
-      calculateEffectiveLifecycleMappingMetadata(result, mavenProject, mojoExecutions, monitor);
+      calculateEffectiveLifecycleMappingMetadata(result, facade, mavenProject, mojoExecutions, monitor);
 
       if(result.getLifecycleMapping() == null) {
         lifecycleMappingId = result.getLifecycleMappingId();
@@ -216,7 +216,8 @@ public class LifecycleMappingFactory {
   }
 
   private static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenProject mavenProject, List<MojoExecution> mojoExecutions, IProgressMonitor monitor) throws CoreException {
+      IMavenProjectFacade facade, MavenProject mavenProject, List<MojoExecution> mojoExecutions,
+      IProgressMonitor monitor) throws CoreException {
 
     String packagingType = mavenProject.getPackaging();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
@@ -248,8 +249,8 @@ public class LifecycleMappingFactory {
       try {
         Map<String, List<MappingMetadataSource>> projectSources = getProjectMetadataSourcesMap(mavenProject,
             getBundleMetadataSources(), mojoExecutions, true, monitor);
-        calculateEffectiveLifecycleMappingMetadata(result, asList(projectSources), mavenProject, mojoExecutions, true,
-            monitor);
+        calculateEffectiveLifecycleMappingMetadata(result, asList(projectSources), facade, mavenProject,
+            mojoExecutions, true, monitor);
       } catch(LifecycleMappingConfigurationException e) {
         // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
         // record the problem and return
@@ -540,9 +541,9 @@ public class LifecycleMappingFactory {
     workspaceMetadataSource = metadata;
   }
 
-  public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      List<MappingMetadataSource> metadataSources, MavenProject mavenProject, List<MojoExecution> mojoExecutions,
-      boolean applyDefaultStrategy, IProgressMonitor monitor) {
+  private static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
+      List<MappingMetadataSource> metadataSources, IMavenProjectFacade facade, MavenProject mavenProject,
+      List<MojoExecution> mojoExecutions, boolean applyDefaultStrategy, IProgressMonitor monitor) {
 
     //
     // PHASE 1. Look for lifecycle mapping for packaging type
@@ -603,7 +604,7 @@ public class LifecycleMappingFactory {
         for(MappingMetadataSource source : metadataSources) {
           try {
             List<PluginExecutionMetadata> metadatas = applyParametersFilter(
-                source.getPluginExecutionMetadata(executionKey), mavenProject, execution, monitor);
+                source.getPluginExecutionMetadata(executionKey), facade, execution, monitor);
             metadatasPerSource.put(source, metadatas);
             for(PluginExecutionMetadata executionMetadata : metadatas) {
               if(isConfigurator(executionMetadata)) {
@@ -694,24 +695,25 @@ public class LifecycleMappingFactory {
   }
 
   private static List<PluginExecutionMetadata> applyParametersFilter(List<PluginExecutionMetadata> metadatas,
-      MavenProject mavenProject, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
-    IMaven maven = MavenPlugin.getMaven();
+      IMavenProjectFacade facade, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
     List<PluginExecutionMetadata> result = new ArrayList<>();
     for(PluginExecutionMetadata metadata : metadatas) {
-      if(hasMatchingParameterValue(mavenProject, execution, metadata, maven, monitor)) {
+      if(hasMatchingParameterValue(facade, execution, metadata, monitor)) {
         result.add(metadata);
       }
     }
     return result;
   }
 
-  private static boolean hasMatchingParameterValue(MavenProject mavenProject, MojoExecution execution,
-      PluginExecutionMetadata metadata, IMaven maven, IProgressMonitor monitor) throws CoreException {
+  private static boolean hasMatchingParameterValue(IMavenProjectFacade facade, MojoExecution execution,
+      PluginExecutionMetadata metadata, IProgressMonitor monitor) throws CoreException {
     Map<Object, String> parameters = metadata.getFilter().getParameters();
+    if(parameters.isEmpty()) {
+      return true;
+    }
+    MojoExecution setupExecution = facade.getMojoExecution(new MojoExecutionKey(execution), monitor);
     for(Entry<Object, String> entry : parameters.entrySet()) {
-      MojoExecution setupExecution = maven.setupMojoExecution(mavenProject, execution, monitor);
-      String value = maven.getMojoParameterValue(mavenProject, setupExecution, (String) entry.getKey(), String.class,
-          monitor);
+      String value = facade.getMojoParameterValue(setupExecution, (String) entry.getKey(), String.class, monitor);
       if(!Objects.equals(entry.getValue(), value)) {
         return false;
       }

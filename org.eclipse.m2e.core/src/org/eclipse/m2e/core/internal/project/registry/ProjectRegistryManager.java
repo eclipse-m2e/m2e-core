@@ -644,7 +644,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   private void setupLifecycleMapping(IProgressMonitor monitor, MavenProjectFacade newFacade) throws CoreException {
-    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(getMavenProject(newFacade),
+    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(newFacade,
         newFacade.getMojoExecutions(), newFacade.getConfiguration().getLifecycleMappingId(), monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());

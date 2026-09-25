@@ -39,7 +39,6 @@ import org.eclipse.osgi.util.NLS;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -47,11 +46,9 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
@@ -65,6 +62,7 @@ import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.m2e.internal.maven.compat.LifecycleExecutionPlanCalculatorFacade;
 
 
 public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
@@ -593,9 +591,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   /**
    * Returns cached list of MojoExecutions bound to project's clean, default and site lifecycles. Returned
-   * MojoExecutions are not fully setup and {@link IMaven#setupMojoExecution(MavenSession, MavenProject, MojoExecution)}
-   * is required to execute and/or query mojo parameters. Similarly to {@link #getMavenProject()}, return value is null
-   * after workspace restart.
+   * MojoExecutions are not fully setup. Similarly to {@link #getMavenProject()}, return value is null after workspace
+   * restart.
    */
   public List<MojoExecution> getMojoExecutions() {
     try {
@@ -607,8 +604,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   /**
    * Returns list of MojoExecutions bound to project's clean, default and site lifecycles. Returned MojoExecutions are
-   * not fully setup and {@link IMaven#setupMojoExecution(MavenSession, MavenProject, MojoExecution)} is required to
-   * execute and/or query mojo parameters.
+   * not fully setup.
    */
   public List<MojoExecution> getMojoExecutions(IProgressMonitor monitor) throws CoreException {
     Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);

@@ -89,14 +89,6 @@ public interface IMaven extends IComponentLookup {
   MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
 
   /**
-   * @since 1.4
-   * @deprecated only used internally
-   */
-  @Deprecated(forRemoval = true)
-  MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
-      throws CoreException;
-
-  /**
    * Resolves a configuration parameter from the given {@code mojoExecution}. It coerces from String to the given type
    * and considers expressions and default values.
    * 
