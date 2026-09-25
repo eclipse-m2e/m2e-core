@@ -30,7 +30,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -51,28 +50,16 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
-import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecyclemapping.SimpleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.LifecycleStrategyMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
-import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
@@ -131,19 +118,6 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   public MavenDiscoveryService(boolean factory) {
   }
 
-  public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(final MavenProject mavenProject,
-      final List<MojoExecution> mojoExecutions, final List<IMavenDiscoveryProposal> preselected,
-      final IProgressMonitor monitor) throws CoreException {
-
-    initializeCatalog(monitor);
-    if(items == null) {
-      return Collections.emptyMap();
-    }
-
-    return MavenPlugin.getMaven()
-        .execute((context, monitor1) -> discover0(mavenProject, mojoExecutions, preselected, monitor1), monitor);
-  }
-
   private void initializeCatalog(final IProgressMonitor monitor) {
     synchronized(itemsLock) {
       if(items == null) {
@@ -175,101 +149,6 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     }
   }
 
-  /*package*/Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover0(MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
-      throws CoreException {
-    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<>();
-
-    Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
-    List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
-
-    Map<String, List<MappingMetadataSource>> metadataSourcesMap = LifecycleMappingFactory
-        .getProjectMetadataSourcesMap(mavenProject, null, mojoExecutions, false, monitor);
-
-    for(CatalogItemCacheEntry itemEntry : items) {
-      CatalogItem item = itemEntry.getItem();
-      LifecycleMappingMetadataSource src = itemEntry.getMetadataSource();
-
-      boolean preselectItem = false;
-      for(CatalogItem selectedItem : selectedItems) {
-        if(selectedItem.getSiteUrl().equals(item.getSiteUrl())
-            && selectedItem.getInstallableUnits().equals(item.getInstallableUnits())) {
-          preselectItem = true;
-          break;
-        }
-      }
-
-      if(src != null) {
-        log.debug("Considering catalog item '{}' for project {}", item.getName(), mavenProject.getName()); //$NON-NLS-1$
-
-        src.setSource(item);
-
-        LifecycleMappingResult mappingResult = new LifecycleMappingResult();
-
-        List<LifecycleMappingMetadataSource> sources = new ArrayList<>(selectedSources);
-        if(!preselectItem) {
-          sources.add(src);
-        }
-
-        metadataSourcesMap.put("bundleMetadataSources",
-            Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(sources)));
-
-        List<MappingMetadataSource> metadataSources = LifecycleMappingFactory.asList(metadataSourcesMap);
-        LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, metadataSources, mavenProject,
-            mojoExecutions, false, monitor);
-
-        LifecycleMappingMetadata lifecycleMappingMetadata = mappingResult.getLifecycleMappingMetadata();
-        if(lifecycleMappingMetadata != null) {
-          IMavenDiscoveryProposal proposal = getProposal(lifecycleMappingMetadata.getSource());
-          if(proposal != null) {
-            put(proposals,
-                new PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement(mavenProject.getPackaging()),
-                proposal);
-          } else if(!LifecycleMappingFactory.getLifecycleMappingExtensions()
-              .containsKey(lifecycleMappingMetadata.getLifecycleMappingId())) {
-            if(itemEntry.getMappingStrategies().contains(lifecycleMappingMetadata.getLifecycleMappingId())) {
-              put(proposals,
-                  new PackagingTypeMappingConfiguration.LifecycleStrategyMappingRequirement(
-                      lifecycleMappingMetadata.getPackagingType(), lifecycleMappingMetadata.getLifecycleMappingId()),
-                  new InstallCatalogItemMavenDiscoveryProposal(item));
-            }
-          }
-        }
-
-        for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappingResult.getMojoExecutionMapping()
-            .entrySet()) {
-          if(entry.getValue() != null) {
-            for(IPluginExecutionMetadata executionMapping : entry.getValue()) {
-              log.debug("mapping proposal {} => {}", entry.getKey(), executionMapping.getAction());
-              IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata) executionMapping).getSource());
-              if(proposal != null) {
-                // assumes installation of mapping proposal installs all required project configurators
-                put(proposals, new MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement(entry.getKey()),
-                    proposal);
-              } else if(executionMapping.getAction() == PluginExecutionAction.configurator) {
-                // we have <configurator/> mapping from pom.xml
-                String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMapping);
-                if(!LifecycleMappingFactory.getProjectConfiguratorExtensions().containsKey(configuratorId)) {
-                  // User Story.
-                  // Project pom.xml explicitly specifies lifecycle mapping strategy implementation,
-                  // but the implementation is not currently installed. As a user I expect m2e to search
-                  // marketplace for the implementation and offer installation if available
-
-                  if(itemEntry.getProjectConfigurators().contains(configuratorId)) {
-                    put(proposals, new MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement(
-                        entry.getKey(), configuratorId), new InstallCatalogItemMavenDiscoveryProposal(item));
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return proposals;
-  }
-
   /**
    * Returns true if all IUs specified in the catalog item are installed in the profile
    */
@@ -296,29 +175,6 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       items = new ArrayList<>();
     }
     items.add(new CatalogItemCacheEntry(item, metadataSource, projectConfigurators, mappingStrategies));
-  }
-
-  private IMavenDiscoveryProposal getProposal(LifecycleMappingMetadataSource src) {
-    if(src == null) {
-      return null;
-    }
-    if(src.getSource() instanceof CatalogItem item) {
-      return new InstallCatalogItemMavenDiscoveryProposal(item);
-    }
-    return null;
-  }
-
-  private List<LifecycleMappingMetadataSource> toMetadataSources(List<IMavenDiscoveryProposal> proposals) {
-    List<LifecycleMappingMetadataSource> sources = new ArrayList<>();
-    for(IMavenDiscoveryProposal proposal : proposals) {
-      if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal installProposal) {
-        CatalogItem catalogItem = installProposal.getCatalogItem();
-        LifecycleMappingMetadataSource source = MavenDiscovery.getLifecycleMappingMetadataSource(catalogItem);
-        source.setSource(catalogItem);
-        sources.add(source);
-      }
-    }
-    return sources;
   }
 
   private void put(Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allproposals,
