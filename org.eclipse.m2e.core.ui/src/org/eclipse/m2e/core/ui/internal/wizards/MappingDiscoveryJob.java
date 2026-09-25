@@ -45,11 +45,6 @@ public class MappingDiscoveryJob extends MavenWorkspaceJob {
 
   private boolean skipOnEmpty;
 
-  @Deprecated
-  public MappingDiscoveryJob(Collection<IProject> projects) {
-    this(projects, false);
-  }
-
   /**
    * Creates a new discovery job for the given set of projects
    * 

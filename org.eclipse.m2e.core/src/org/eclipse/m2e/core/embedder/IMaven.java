@@ -16,11 +16,7 @@
 package org.eclipse.m2e.core.embedder;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,10 +25,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -42,8 +34,6 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
-import org.eclipse.m2e.core.internal.IMavenToolbox;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -58,20 +48,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMaven extends IComponentLookup {
-
-  // POM Model read/write operations
-
-  /**
-   * @deprecated use the {@link MavenModelManager} instead
-   */
-  @Deprecated(forRemoval = true)
-  default Model readModel(InputStream in) throws CoreException {
-    return IMavenToolbox.of(this).readModel(in);
-  }
-
-  default void writeModel(Model model, OutputStream out) throws CoreException {
-    IMavenToolbox.of(this).writeModel(model, out);
-  }
 
   // artifact resolution
 
@@ -113,43 +89,6 @@ public interface IMaven extends IComponentLookup {
   MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
 
   /**
-   * @since 1.10
-   * @deprecated this method should never have been API and is prone to errors, if you still need this method please
-   *             contact the m2e team to provide better alternatives for your use-case
-   */
-  @Deprecated(forRemoval = true)
-  Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
-      ProjectBuildingRequest configuration)
-      throws CoreException;
-
-  /**
-   * this method is a noop now
-   */
-  @Deprecated(forRemoval = true)
-  void detachFromSession(MavenProject project) throws CoreException;
-
-  // execution
-
-  /**
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
-   * @since 1.4
-   */
-  @Deprecated(forRemoval = true)
-  default void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
-    IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(project, execution,
-        monitor);
-  }
-
-  /**
-   * @since 1.4
-   * @Deprecated use {@link IMavenProjectFacade#calculateExecutionPlan(Collection, IProgressMonitor)} or
-   *             {@link IMavenProjectFacade#setupExecutionPlan(Collection, IProgressMonitor)} instead
-   */
-  @Deprecated(forRemoval = true)
-  MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
-      IProgressMonitor monitor) throws CoreException;
-
-  /**
    * @since 1.4
    * @deprecated only used internally
    */
@@ -177,16 +116,6 @@ public interface IMaven extends IComponentLookup {
   @Deprecated
   <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException;
-
-  /**
-   * @since 1.4
-   * @deprecated use
-   *             {@link IMavenProjectFacade#getMojoParameterValue(MojoExecution, String, Class, IProgressMonitor)}
-   *             instead to avoid a direct dependency on {@link MavenProject}
-   */
-  @Deprecated
-  <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
-      ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException;
 
   // configuration
 
@@ -219,14 +148,6 @@ public interface IMaven extends IComponentLookup {
 
   List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException;
 
-  /**
-   * @deprecated use {@link #getSettings(MavenSettingsLocations)} instead
-   */
-  @Deprecated(forRemoval = true)
-  Settings buildSettings(String globalSettings, String userSettings) throws CoreException;
-
-  void writeSettings(Settings settings, OutputStream out) throws CoreException;
-
   List<SettingsProblem> validateSettings(String settings);
 
   List<Mirror> getMirrors() throws CoreException;
@@ -255,7 +176,7 @@ public interface IMaven extends IComponentLookup {
   /**
    * Returns new mojo instances configured according to provided mojoExecution. Caller must release returned mojo with
    * {@link #releaseMojo(Object, MojoExecution)}. This method is intended to allow introspection of mojo configuration
-   * parameters, use {@link #execute(MavenSession, MojoExecution, IProgressMonitor)} to execute mojo.
+   * parameters
    */
   <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
       throws CoreException;
@@ -275,27 +196,7 @@ public interface IMaven extends IComponentLookup {
    */
   @Deprecated(forRemoval = true)
   ClassLoader getProjectRealm(MavenProject project);
-
-  /**
-   * This is convenience method fully equivalent to
-   *
-   * <pre>
-   * IMavenExecutionContext context = createExecutionContext();
-   * context.getExecutionRequest().setOffline(offline);
-   * context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
-   * return context.execute(callable, monitor);
-   * </pre>
-   *
-   * @deprecated should be replaced with the fully equivalent code mentioned in this javadoc, e.g. inside a private util
-   *             method
-   * @since 1.4
-   */
-  @Deprecated(forRemoval = true)
-  default <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
-      throws CoreException {
-    return MavenImpl.execute(this, offline, forceDependencyUpdate, callable, monitor);
-  }
-
+  
   /**
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.

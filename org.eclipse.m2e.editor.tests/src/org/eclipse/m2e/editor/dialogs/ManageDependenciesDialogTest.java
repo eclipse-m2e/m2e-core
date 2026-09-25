@@ -34,30 +34,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
-import org.w3c.dom.Element;
-
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
-
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.wst.sse.core.StructuredModelManager;
+import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
+import org.junit.Test;
+import org.w3c.dom.Element;
 
 
 public class ManageDependenciesDialogTest extends AbstractMavenProjectTestCase {
@@ -90,9 +85,6 @@ public class ManageDependenciesDialogTest extends AbstractMavenProjectTestCase {
 
     Display.getDefault().syncExec(() -> foreground = provider.getForeground(project));
     assertNull(foreground);
-
-    IMaven maven = MavenPlugin.getMaven();
-    maven.detachFromSession(project);
 
     final MavenProject project2 = project.getParent();
     assertNotNull(project2);

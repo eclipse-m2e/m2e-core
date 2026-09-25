@@ -68,6 +68,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenSettingsLocations;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -282,7 +283,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     String globalSettings = getGlobalSettings();
     String userSettings = getUserSettings();
     try {
-      Settings settings = maven.buildSettings(globalSettings, userSettings);
+      Settings settings = maven
+          .getSettings(new MavenSettingsLocations(new File(globalSettings), new File(userSettings)));
       String localRepository = settings.getLocalRepository();
       if(localRepository == null) {
         localRepository = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();

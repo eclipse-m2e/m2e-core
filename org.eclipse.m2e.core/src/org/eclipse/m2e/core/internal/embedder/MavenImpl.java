@@ -22,13 +22,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +56,6 @@ import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.converters.ConfigurationConverter;
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
 import org.codehaus.plexus.component.configurator.converters.lookup.DefaultConverterLookup;
@@ -73,7 +70,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -82,10 +78,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.model.ConfigurationContainer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
@@ -94,16 +87,12 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -136,7 +125,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.embedder.ICallable;
@@ -254,22 +242,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
 
-  private MavenExecutionPlan calculateExecutionPlan(MavenSession session, List<String> goals, boolean setup)
-      throws CoreException {
-    try {
-      return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, setup, goals.toArray(String[]::new));
-    } catch(Exception ex) {
-      throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
-    }
-  }
-
-  @Override
-  public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
-      IProgressMonitor monitor) throws CoreException {
-    return getExecutionContext().execute(project,
-        (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup), monitor);
-  }
-
   private MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
       throws CoreException {
     MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
@@ -318,28 +290,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public Settings getSettings(MavenSettingsLocations locations) throws CoreException {
     MavenSettings cache = settingsCacheMap.computeIfAbsent(locations, key -> new MavenSettings(key, MavenImpl.this));
     return cache.getSettings();
-  }
-
-  @Override
-  public Settings buildSettings(String globalSettings, String userSettings) throws CoreException {
-    SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-    request.setGlobalSettingsFile(globalSettings != null ? new File(globalSettings) : null);
-    request.setUserSettingsFile(
-        userSettings != null ? new File(userSettings) : SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE);
-    try {
-      return lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
-    } catch(SettingsBuildingException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_read_settings, ex));
-    }
-  }
-
-  @Override
-  public void writeSettings(Settings settings, OutputStream out) throws CoreException {
-    try {
-      lookup(SettingsWriter.class).write(out, null, settings);
-    } catch(IOException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_write_settings, ex));
-    }
   }
 
   @Override
@@ -443,46 +393,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       log.debug("Read Maven project: {} in {} ms", pomFile.getAbsoluteFile(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }
     return result;
-  }
-
-  @Override
-  public Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
-      ProjectBuildingRequest configuration) throws CoreException {
-    long start = System.currentTimeMillis();
-
-    log.debug("Reading {} Maven project(s): {}", pomFiles.size(), pomFiles); //$NON-NLS-1$
-
-    List<ProjectBuildingResult> projectBuildingResults = null;
-    Map<File, MavenExecutionResult> result = new LinkedHashMap<>(pomFiles.size(), 1.f);
-    try {
-      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
-      projectBuildingResults = lookup(ProjectBuilder.class).build(new ArrayList<>(pomFiles), false, configuration);
-    } catch(ProjectBuildingException ex) {
-      if(ex.getResults() != null) {
-        projectBuildingResults = ex.getResults();
-      }
-    } finally {
-      log.debug("Read {} Maven project(s) in {} ms", pomFiles.size(), System.currentTimeMillis() - start); //$NON-NLS-1$
-    }
-    if(projectBuildingResults != null) {
-      for(ProjectBuildingResult projectBuildingResult : projectBuildingResults) {
-        MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
-        mavenExecutionResult.setProject(projectBuildingResult.getProject());
-        mavenExecutionResult.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
-        if(!projectBuildingResult.getProblems().isEmpty()) {
-          mavenExecutionResult
-              .addException(new ProjectBuildingException(Collections.singletonList(projectBuildingResult)));
-        }
-        result.put(projectBuildingResult.getPomFile(), mavenExecutionResult);
-      }
-    }
-    return result;
-  }
-
-  @Deprecated
-  @Override
-  public void detachFromSession(MavenProject project) {
-    //noop now
   }
 
   private MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,
@@ -773,59 +683,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       Class<T> asType, IProgressMonitor monitor) throws CoreException {
     return getExecutionContext().execute(project,
         (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameterPath, asType), monitor);
-  }
-
-  private <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
-      ConfigurationContainer configuration, String goal) throws CoreException {
-    Xpp3Dom config = (Xpp3Dom) configuration.getConfiguration();
-    config = (config != null) ? config.getChild(parameter) : null;
-
-    PlexusConfiguration paramConfig = null;
-
-    if(config == null) {
-      MojoDescriptor mojoDescriptor;
-
-      try {
-        mojoDescriptor = lookup(BuildPluginManager.class).getMojoDescriptor(plugin, goal,
-            session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
-      } catch(PluginNotFoundException | PluginResolutionException | PluginDescriptorParsingException
-          | MojoNotFoundException | InvalidPluginDescriptorException ex) {
-        throw new CoreException(Status.error(Messages.MavenImpl_error_param, ex));
-      }
-
-      PlexusConfiguration defaultConfig = mojoDescriptor.getMojoConfiguration();
-      if(defaultConfig != null) {
-        paramConfig = defaultConfig.getChild(parameter, false);
-      }
-    } else {
-      paramConfig = new XmlPlexusConfiguration(config);
-    }
-
-    if(paramConfig == null) {
-      return null;
-    }
-
-    try {
-      MojoExecution mojoExecution = new MojoExecution(plugin, goal, "default"); //$NON-NLS-1$
-
-      ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
-
-      ConfigurationConverter typeConverter = converterLookup.lookupConverterForType(type);
-
-      Object value = typeConverter.fromConfiguration(converterLookup, paramConfig, type, Object.class,
-          getPlexusContainer().getContainerRealm(), expressionEvaluator, null);
-      return type.cast(value);
-    } catch(ComponentConfigurationException | ClassCastException ex) {
-      throw new CoreException(Status.error(Messages.MavenImpl_error_param, ex));
-    }
-  }
-
-  @Override
-  public <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
-      ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException {
-    return getExecutionContext().execute(project,
-        (context, pm) -> getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal),
-        monitor);
   }
 
   @Override
