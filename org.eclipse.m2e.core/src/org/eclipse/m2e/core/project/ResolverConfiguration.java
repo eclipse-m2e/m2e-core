@@ -119,14 +119,6 @@ public class ResolverConfiguration implements Serializable, IProjectConfiguratio
     this.properties = properties;
   }
 
-  /**
-   * @deprecated use {@link #isResolveWorkspaceProjects()}
-   */
-  @Deprecated(forRemoval = true)
-  public boolean shouldResolveWorkspaceProjects() {
-    return isResolveWorkspaceProjects();
-  }
-
   @Override
   public boolean isResolveWorkspaceProjects() {
     return this.resolveWorkspaceProjects;

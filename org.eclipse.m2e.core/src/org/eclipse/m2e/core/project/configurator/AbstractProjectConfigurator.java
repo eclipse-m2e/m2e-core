@@ -34,9 +34,7 @@ import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -174,20 +172,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       description.setNatureIds(newNatures);
       project.setDescription(description, updateFlags, monitor);
     }
-  }
-
-  /**
-   * @since 1.4
-   * @deprecated use {@link #getParameterValue(IMavenProjectFacade, String, Class, MojoExecution, IProgressMonitor)}
-   *             instead to avoid a direct dependency on {@link MavenProject}
-   */
-  @Deprecated
-  protected <T> T getParameterValue(MavenProject project, String parameter, Class<T> asType,
-      MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
-    PluginExecution execution = new PluginExecution();
-    execution.setConfiguration(mojoExecution.getConfiguration());
-    return maven.getMojoParameterValue(project, parameter, asType, mojoExecution.getPlugin(), execution,
-        mojoExecution.getGoal(), monitor);
   }
 
   /**
