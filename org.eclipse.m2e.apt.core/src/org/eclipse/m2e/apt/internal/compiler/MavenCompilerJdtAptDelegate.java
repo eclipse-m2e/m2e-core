@@ -20,7 +20,6 @@ import static org.eclipse.m2e.apt.internal.utils.ProjectUtils.parseProcessorOpti
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +32,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.apt.internal.AbstractAptConfiguratorDelegate;
@@ -116,6 +114,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
   protected AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
       throws CoreException {
     markerManager.deleteMarkers(mavenFacade.getProject(), true, IMavenAptConstants.INVALID_ARGUMENT_MARKER_ID);
+    markerManager.deleteMarkers(mavenFacade.getProject(), true, IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID);
     File generatedTestOutputDirectory = null;
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
         COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_TEST_COMPILE)) {
@@ -157,12 +156,10 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
 
       boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
 
-      PluginDependencyResolver dependencyResolver = new PluginDependencyResolver() {
-        @Override
-        protected Collection<Dependency> getDependencies(Plugin plugin) {
-          return hasAnnotationProcessorPaths ? Arrays.asList(annotationProcessorPaths) : super.getDependencies(plugin);
-        }
-      };
+      PluginDependencyResolver dependencyResolver = hasAnnotationProcessorPaths
+          ? new WorkspaceAnnotationProcessorResolver(Arrays.asList(annotationProcessorPaths),
+              mavenFacade.getProject(), markerManager)
+          : new PluginDependencyResolver();
 
       List<File> dependencies = dependencyResolver.getResolvedPluginDependencies(mavenSession,
           mavenFacade.getMavenProject(), mojoExecution.getPlugin(), monitor);
