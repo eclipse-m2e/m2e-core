@@ -55,6 +55,7 @@ import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -583,10 +584,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException {
-    return manager.maven.getMojoParameterValue(getMavenProject(monitor), mojoExecution, parameter, asType, monitor);
+    return ((MavenImpl) manager.maven).getMojoParameterValue(getMavenProject(monitor), mojoExecution, parameter, asType,
+        monitor);
   }
 
   /**
