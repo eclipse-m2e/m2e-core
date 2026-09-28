@@ -158,17 +158,6 @@ public interface IMaven extends IComponentLookup {
   void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException;
 
   /**
-   * Gets class realm of the specified project.
-   * 
-   * @deprecated this method do not return the projects realm (what could be accessed by
-   *             {@link MavenProject#getClassRealm()}. Use {@link IMavenProjectFacade#createExecutionContext()} if you
-   *             want to execute/lookup components inside the projects realm!
-   * @return The class realm of the specified project.
-   */
-  @Deprecated(forRemoval = true)
-  ClassLoader getProjectRealm(MavenProject project);
-  
-  /**
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.
    *
