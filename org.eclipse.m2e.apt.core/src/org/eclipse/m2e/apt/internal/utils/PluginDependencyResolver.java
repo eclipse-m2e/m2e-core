@@ -53,9 +53,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 
 
 @SuppressWarnings("restriction")
@@ -74,8 +74,6 @@ public class PluginDependencyResolver {
 
     monitor.setTaskName("Resolve plugin dependency");
 
-    IMaven maven = MavenPlugin.getMaven();
-
     DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(mavenSession.getRepositorySession());
 
     DependencyGraphTransformer transformer = new ConflictResolver(new NearestVersionSelector(), new JavaScopeSelector(),
@@ -86,7 +84,7 @@ public class PluginDependencyResolver {
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     List<File> files = new ArrayList<>();
     try {
-      Thread.currentThread().setContextClassLoader(maven.getProjectRealm(mavenProject));
+      Thread.currentThread().setContextClassLoader(getProjectRealm(mavenProject));
 
       ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
@@ -133,6 +131,19 @@ public class PluginDependencyResolver {
       Thread.currentThread().setContextClassLoader(oldClassLoader);
     }
     return files;
+  }
+
+  private ClassLoader getProjectRealm(MavenProject project) throws CoreException {
+    Objects.requireNonNull(project);
+    ClassLoader classLoader = project.getClassRealm();
+    if(classLoader == null) {
+      try {
+        return MavenPlugin.getMaven().lookup(PlexusContainerManager.class).aquire(project.getBasedir()).getContainer().getContainerRealm();
+      } catch(Exception ex) {
+        throw new CoreException(Status.error("Can't acquire container manager and project class realm is null", ex));
+      }
+    }
+    return classLoader;
   }
 
   protected Collection<Dependency> getDependencies(Plugin plugin) {

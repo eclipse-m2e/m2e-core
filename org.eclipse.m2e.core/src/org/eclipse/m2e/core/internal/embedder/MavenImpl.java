@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -886,20 +885,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     } finally {
       Thread.currentThread().setContextClassLoader(ccl);
     }
-  }
-
-  @Override
-  public ClassLoader getProjectRealm(MavenProject project) {
-    Objects.requireNonNull(project);
-    ClassLoader classLoader = project.getClassRealm();
-    if(classLoader == null) {
-      try {
-        return containerManager.aquire(project.getBasedir()).getContainer().getContainerRealm();
-      } catch(Exception ex) {
-        throw new RuntimeException(ex);
-      }
-    }
-    return classLoader;
   }
 
   public void interpolateModel(MavenProject project, Model model) throws CoreException {
