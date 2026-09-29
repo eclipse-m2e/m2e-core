@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 
 
@@ -59,11 +60,11 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
 
     //TODO check delta / scan source for *.java
     IMavenProjectFacade mavenProjectFacade = getMavenProjectFacade();
-    String compilerArgument = mavenProjectFacade.getMojoParameterValue(mojoExecution, "compilerArgument",
-        String.class, null);
+    IMojoExecutionFacade executionFacade = IMojoExecutionFacade.wrap(mavenProjectFacade, mojoExecution);
+    String compilerArgument = executionFacade.getMojoParameterValue("compilerArgument", String.class, null);
     boolean isAnnotationProcessingEnabled = (compilerArgument == null) || !compilerArgument.contains("-proc:none");
     if(isAnnotationProcessingEnabled) {
-      String proc = mavenProjectFacade.getMojoParameterValue(mojoExecution, PROC, String.class, null);
+      String proc = executionFacade.getMojoParameterValue(PROC, String.class, null);
       isAnnotationProcessingEnabled = !"none".equals(proc);
     }
     if(!isAnnotationProcessingEnabled) {
@@ -107,7 +108,7 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
     }
 
     // tell m2e builder to refresh generated files
-    File generated = mavenProjectFacade.getMojoParameterValue(getMojoExecution(),
+    File generated = executionFacade.getMojoParameterValue(
         MavenCompilerJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, File.class, null);
     if(generated != null) {
       buildContext.refresh(generated);

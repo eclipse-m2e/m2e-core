@@ -59,6 +59,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -531,6 +532,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return execution;
   }
 
+  @Override
+  public IMojoExecutionFacade getMojoExecutionFacade(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+      throws CoreException {
+    return IMojoExecutionFacade.wrap(this, getMojoExecution(mojoExecutionKey, monitor));
+  }
+
   private MojoExecution setupMojoExecution(MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = getMavenProject(monitor);
     MojoExecution clone = new MojoExecution(mojoExecution.getPlugin(), mojoExecution.getGoal(),
@@ -588,6 +595,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       IProgressMonitor monitor) throws CoreException {
     return ((MavenImpl) manager.maven).getMojoParameterValue(getMavenProject(monitor), mojoExecution, parameter, asType,
         monitor);
+  }
+
+  @Override
+  public List<IMojoExecutionFacade> getMojoExecutionFacades(String groupId, String artifactId,
+      IProgressMonitor monitor, String... goals) throws CoreException {
+    return getMojoExecutions(groupId, artifactId, monitor, goals).stream()
+        .map(mojoExecution -> IMojoExecutionFacade.wrap(this, mojoExecution)).toList();
   }
 
   /**

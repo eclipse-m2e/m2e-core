@@ -54,12 +54,12 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -206,14 +206,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   private int getHighestMultiReleaseOption(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
     int highest = -1;
-    for(MojoExecution compile : getCompilerMojoExecutions(request, monitor)) {
-      Boolean multiReleaseOutput = request.mavenProjectFacade().getMojoParameterValue(compile,
-          MULTI_RELEASE_OUTPUT, Boolean.class, monitor);
+    for(IMojoExecutionFacade compile : getCompilerMojoExecutions(request, monitor)) {
+      Boolean multiReleaseOutput = compile.getMojoParameterValue(MULTI_RELEASE_OUTPUT, Boolean.class, monitor);
       if(!Boolean.TRUE.equals(multiReleaseOutput)) {
         continue;
       }
-      String release = request.mavenProjectFacade().getMojoParameterValue(compile, "release", String.class,
-          monitor);
+      String release = compile.getMojoParameterValue("release", String.class, monitor);
       if(release == null) {
         continue;
       }
@@ -343,7 +341,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     try {
       IProject project = request.mavenProjectFacade().getProject();
       MavenProject mavenProject = request.mavenProject();
-      IMavenProjectFacade projectFacade = request.mavenProjectFacade();
 
       IContainer classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
       IContainer testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
@@ -366,60 +363,54 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       List<Boolean> isTestCompilationSkipped = new ArrayList<>();
       List<Boolean> isTestResourcesSkipped = new ArrayList<>();
 
-      List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
-      for(MojoExecution compile : executions) {
-        if(isCompileExecution(compile, projectFacade, options, monitor)) {
-          mainSourceEncoding = projectFacade.getMojoParameterValue(compile, "encoding", String.class, monitor); //$NON-NLS-1$
+      List<IMojoExecutionFacade> executions = getCompilerMojoExecutions(request, mon.newChild(1));
+      for(IMojoExecutionFacade compile : executions) {
+        if(isCompileExecution(compile, options, monitor)) {
+          mainSourceEncoding = compile.getMojoParameterValue("encoding", String.class, monitor); //$NON-NLS-1$
           try {
-            inclusion = toPaths(
-                projectFacade.getMojoParameterValue(compile, "includes", String[].class, monitor)); //$NON-NLS-1$
+            inclusion = toPaths(compile.getMojoParameterValue("includes", String[].class, monitor)); //$NON-NLS-1$
           } catch(CoreException ex) {
             log.error("Failed to determine compiler inclusions, assuming defaults", ex);
           }
           try {
-            exclusion = toPaths(
-                projectFacade.getMojoParameterValue(compile, "excludes", String[].class, monitor)); //$NON-NLS-1$
+            exclusion = toPaths(compile.getMojoParameterValue("excludes", String[].class, monitor)); //$NON-NLS-1$
           } catch(CoreException ex) {
             log.error("Failed to determine compiler exclusions, assuming defaults", ex);
           }
         }
       }
 
-      for(MojoExecution compile : executions) {
-        if(isTestCompileExecution(compile, projectFacade, options, monitor)) {
-          testSourceEncoding = projectFacade.getMojoParameterValue(compile, "encoding", String.class, monitor); //$NON-NLS-1$
+      for(IMojoExecutionFacade compile : executions) {
+        if(isTestCompileExecution(compile, options, monitor)) {
+          testSourceEncoding = compile.getMojoParameterValue("encoding", String.class, monitor); //$NON-NLS-1$
           try {
-            inclusionTest = toPaths(
-                projectFacade.getMojoParameterValue(compile, "testIncludes", String[].class, monitor)); //$NON-NLS-1$
+            inclusionTest = toPaths(compile.getMojoParameterValue("testIncludes", String[].class, monitor)); //$NON-NLS-1$
           } catch(CoreException ex) {
             log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
           }
           try {
-            exclusionTest = toPaths(
-                projectFacade.getMojoParameterValue(compile, "testExcludes", String[].class, monitor)); //$NON-NLS-1$
+            exclusionTest = toPaths(compile.getMojoParameterValue("testExcludes", String[].class, monitor)); //$NON-NLS-1$
           } catch(CoreException ex) {
             log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
           }
           try {
-            isTestCompilationSkipped
-                .add(projectFacade.getMojoParameterValue(compile, "skip", Boolean.class, monitor));
+            isTestCompilationSkipped.add(compile.getMojoParameterValue("skip", Boolean.class, monitor));
           } catch(Exception ex) {
             isTestCompilationSkipped.add(Boolean.FALSE);
           }
         }
       }
 
-      for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
-          RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_RESOURCES)) {
-        mainResourcesEncoding = projectFacade.getMojoParameterValue(resources, "encoding", String.class, monitor); //$NON-NLS-1$
+      for(IMojoExecutionFacade resources : request.mavenProjectFacade().getMojoExecutionFacades(
+          RESOURCES_PLUGIN_GROUP_ID, RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_RESOURCES)) {
+        mainResourcesEncoding = resources.getMojoParameterValue("encoding", String.class, monitor); //$NON-NLS-1$
       }
 
-      for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
-          RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
-        testResourcesEncoding = projectFacade.getMojoParameterValue(resources, "encoding", String.class, monitor); //$NON-NLS-1$
+      for(IMojoExecutionFacade resources : request.mavenProjectFacade().getMojoExecutionFacades(
+          RESOURCES_PLUGIN_GROUP_ID, RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
+        testResourcesEncoding = resources.getMojoParameterValue("encoding", String.class, monitor); //$NON-NLS-1$
         try {
-          isTestResourcesSkipped
-              .add(projectFacade.getMojoParameterValue(resources, "skip", Boolean.class, monitor));
+          isTestResourcesSkipped.add(resources.getMojoParameterValue("skip", Boolean.class, monitor));
         } catch(Exception ex) {
           isTestResourcesSkipped.add(Boolean.FALSE);
         }
@@ -433,8 +424,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           mainResourcesEncoding, mon.newChild(1), false);
 
       // Handle multi-release JAR source folders
-      addMultiReleaseSourceFolders(classpath, project, projectFacade, executions, classes.getFullPath(),
-          mainSourceEncoding, mon.newChild(1));
+      addMultiReleaseSourceFolders(classpath, project, executions, classes.getFullPath(), mainSourceEncoding,
+          mon.newChild(1));
 
       //If the project properties contain m2e.disableTestClasspathFlag=true, then the test flag must not be set
       boolean addTestFlag = !MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
@@ -451,28 +442,28 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  protected boolean isTestCompileExecution(MojoExecution execution, IMavenProjectFacade projectFacade,
-      Map<String, String> options, IProgressMonitor monitor) throws CoreException {
-    return GOAL_TESTCOMPILE.equals(execution.getGoal()) && isCompliant(execution, projectFacade, options, monitor);
-  }
-
-  protected boolean isCompileExecution(MojoExecution execution, IMavenProjectFacade projectFacade,
-      Map<String, String> options, IProgressMonitor monitor) throws CoreException {
-    return GOAL_COMPILE.equals(execution.getGoal()) && isCompliant(execution, projectFacade, options, monitor);
-  }
-
-  private boolean isCompliant(MojoExecution execution, IMavenProjectFacade projectFacade, Map<String, String> options,
+  protected boolean isTestCompileExecution(IMojoExecutionFacade execution, Map<String, String> options,
       IProgressMonitor monitor) throws CoreException {
-    String release = projectFacade.getMojoParameterValue(execution, "release", String.class, monitor); //$NON-NLS-1$
+    return GOAL_TESTCOMPILE.equals(execution.getKey().goal()) && isCompliant(execution, options, monitor);
+  }
+
+  protected boolean isCompileExecution(IMojoExecutionFacade execution,
+      Map<String, String> options, IProgressMonitor monitor) throws CoreException {
+    return GOAL_COMPILE.equals(execution.getKey().goal()) && isCompliant(execution, options, monitor);
+  }
+
+  private boolean isCompliant(IMojoExecutionFacade execution, Map<String, String> options,
+      IProgressMonitor monitor) throws CoreException {
+    String release = execution.getMojoParameterValue("release", String.class, monitor); //$NON-NLS-1$
     if(release != null && !sanitizeJavaVersion(release).equals(options.get(JavaCore.COMPILER_COMPLIANCE))) {
       return false;
     }
     if(release == null) {
-      String source = projectFacade.getMojoParameterValue(execution, "source", String.class, monitor); //$NON-NLS-1$
+      String source = execution.getMojoParameterValue("source", String.class, monitor); //$NON-NLS-1$
       if(source != null && !sanitizeJavaVersion(source).equals(options.get(JavaCore.COMPILER_SOURCE))) {
         return false;
       }
-      String target = projectFacade.getMojoParameterValue(execution, "target", String.class, monitor); //$NON-NLS-1$
+      String target = execution.getMojoParameterValue("target", String.class, monitor); //$NON-NLS-1$
       if(target != null
           && !sanitizeJavaVersion(target).equals(options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM))) {
         return false;
@@ -544,7 +535,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * 
    * @param classpath the classpath descriptor
    * @param project the Eclipse project
-   * @param projectFacade the Maven project facade
    * @param executions the compiler plugin executions
    * @param outputPath the base output path for compiled classes
    * @param sourceEncoding the source encoding
@@ -552,24 +542,22 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
    * @throws CoreException if an error occurs
    */
   protected void addMultiReleaseSourceFolders(IClasspathDescriptor classpath, IProject project,
-      IMavenProjectFacade projectFacade, List<MojoExecution> executions, IPath outputPath, String sourceEncoding,
+      List<IMojoExecutionFacade> executions, IPath outputPath, String sourceEncoding,
       IProgressMonitor monitor) throws CoreException {
 
-    for(MojoExecution execution : executions) {
+    for(IMojoExecutionFacade execution : executions) {
       // Check if this execution has multiReleaseOutput enabled
-      Boolean multiReleaseOutput = projectFacade.getMojoParameterValue(execution, MULTI_RELEASE_OUTPUT,
-          Boolean.class, monitor);
+      Boolean multiReleaseOutput = execution.getMojoParameterValue(MULTI_RELEASE_OUTPUT, Boolean.class, monitor);
       if(!Boolean.TRUE.equals(multiReleaseOutput)) {
         continue;
       }
-      String release = projectFacade.getMojoParameterValue(execution, "release", String.class, monitor);
+      String release = execution.getMojoParameterValue("release", String.class, monitor);
       if(release == null) {
         continue;
       }
       String sanitizedRelease = sanitizeJavaVersion(release);
       @SuppressWarnings("unchecked")
-      List<String> compileSourceRoots = projectFacade.getMojoParameterValue(execution, "compileSourceRoots",
-          List.class, monitor);
+      List<String> compileSourceRoots = execution.getMojoParameterValue("compileSourceRoots", List.class, monitor);
       if(compileSourceRoots == null || compileSourceRoots.isEmpty()) {
         continue;
       }
@@ -731,17 +719,16 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    MojoExecution execution = getDefaultCompileExecution(getCompilerMojoExecutions(request, monitor));
-    IMavenProjectFacade projectFacade = request.mavenProjectFacade();
-    String release = getCompilerLevel(projectFacade, execution, "release", null, RELEASES, monitor);
+    IMojoExecutionFacade execution = getDefaultCompileExecution(getCompilerMojoExecutions(request, monitor));
+    String release = getCompilerLevel(execution, "release", null, RELEASES, monitor);
     //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
-    String source = getCompilerLevel(projectFacade, execution, "source", null, SOURCES, monitor); //$NON-NLS-1$
-    String target = getCompilerLevel(projectFacade, execution, "target", null, TARGETS, monitor); //$NON-NLS-1$
-    boolean generateParameters = isGenerateParameters(projectFacade, execution, monitor);
-    boolean enablePreviewFeatures = isEnablePreviewFeatures(projectFacade, execution, monitor);
+    String source = getCompilerLevel(execution, "source", null, SOURCES, monitor); //$NON-NLS-1$
+    String target = getCompilerLevel(execution, "target", null, TARGETS, monitor); //$NON-NLS-1$
+    boolean generateParameters = isGenerateParameters(execution, monitor);
+    boolean enablePreviewFeatures = isEnablePreviewFeatures(execution, monitor);
 
     // process -err:+deprecation , -warn:-serial ...
-    List<?> value = projectFacade.getMojoParameterValue(execution, "compilerArgs", List.class, monitor);
+    List<?> value = execution == null ? null : execution.getMojoParameterValue("compilerArgs", List.class, monitor);
     if(value != null) {
       for(Object o : value) {
         if(o instanceof String compilerArg) {
@@ -811,12 +798,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   }
 
-  private MojoExecution getDefaultCompileExecution(List<MojoExecution> executions) {
+  private IMojoExecutionFacade getDefaultCompileExecution(List<IMojoExecutionFacade> executions) {
     if(executions.isEmpty()) {
       return null;
     }
-    for(MojoExecution execution : executions) {
-      String id = execution.getExecutionId();
+    for(IMojoExecutionFacade execution : executions) {
+      String id = execution.getKey().executionId();
       if("default-compile".equals(id)) {
         //Maven can have many but JDT only supports one config so we prefer the default one
         return execution;
@@ -838,11 +825,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     };
   }
 
-  private boolean isGenerateParameters(IMavenProjectFacade projectFacade, MojoExecution execution, IProgressMonitor monitor) {
+  private boolean isGenerateParameters(IMojoExecutionFacade execution, IProgressMonitor monitor) {
+    if(execution == null) {
+      return false;
+    }
     Boolean generateParameters = null;
     //1st, check the parameters option
     try {
-      generateParameters = projectFacade.getMojoParameterValue(execution, "parameters", Boolean.class, monitor);//$NON-NLS-1$
+      generateParameters = execution.getMojoParameterValue("parameters", Boolean.class, monitor);//$NON-NLS-1$
     } catch(Exception ex) {
       //ignore
     }
@@ -850,7 +840,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //2nd, check the parameters flag in the compilerArgs list
     if(!Boolean.TRUE.equals(generateParameters)) {
       try {
-        List<?> args = projectFacade.getMojoParameterValue(execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+        List<?> args = execution.getMojoParameterValue("compilerArgs", List.class, monitor);//$NON-NLS-1$
         if(args != null) {
           generateParameters = args.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
         }
@@ -862,7 +852,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //3rd, check the parameters flag in the compilerArgument String
     if(!Boolean.TRUE.equals(generateParameters)) {
       try {
-        String compilerArgument = projectFacade.getMojoParameterValue(execution, "compilerArgument", String.class, //$NON-NLS-1$
+        String compilerArgument = execution.getMojoParameterValue("compilerArgument", String.class, //$NON-NLS-1$
             monitor);
         if(compilerArgument != null) {
           generateParameters = compilerArgument.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);
@@ -875,11 +865,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return Boolean.TRUE.equals(generateParameters);
   }
 
-  private boolean isEnablePreviewFeatures(IMavenProjectFacade projectFacade, MojoExecution execution,
-      IProgressMonitor monitor) {
+  private boolean isEnablePreviewFeatures(IMojoExecutionFacade execution, IProgressMonitor monitor) {
+    if(execution == null) {
+      return false;
+    }
     //1st, check the --enable-preview flag in the compilerArgs list
     try {
-      List<?> args = projectFacade.getMojoParameterValue(execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      List<?> args = execution.getMojoParameterValue("compilerArgs", List.class, monitor);//$NON-NLS-1$
       if(args != null && args.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
       }
@@ -889,7 +881,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     //2nd, check the --enable-preview flag in the compilerArgument String
     try {
-      String compilerArgument = projectFacade.getMojoParameterValue(execution, "compilerArgument", String.class, //$NON-NLS-1$
+      String compilerArgument = execution.getMojoParameterValue("compilerArgument", String.class, //$NON-NLS-1$
           monitor);
       if(compilerArgument != null && compilerArgument.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {
         return true;
@@ -900,7 +892,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     //3nd, check the --enable-preview flag in the ${maven.compiler.enablePreview}
     try {
-      Boolean enablePreview = projectFacade.getMojoParameterValue(execution, "enablePreview", Boolean.class, //$NON-NLS-1$
+      Boolean enablePreview = execution.getMojoParameterValue("enablePreview", Boolean.class, //$NON-NLS-1$
           monitor);
       if(Boolean.TRUE.equals(enablePreview)) {
         return true;
@@ -937,16 +929,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return DEFAULT_COMPILER_LEVEL;
   }
 
-  protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
-      throws CoreException {
-    return request.mavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+  protected List<IMojoExecutionFacade> getCompilerMojoExecutions(ProjectConfigurationRequest request,
+      IProgressMonitor monitor) throws CoreException {
+    return request.mavenProjectFacade().getMojoExecutionFacades(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
-  private String getCompilerLevel(IMavenProjectFacade projectFacade, MojoExecution execution, String parameter,
+  private String getCompilerLevel(IMojoExecutionFacade execution, String parameter,
       String prevVersion, List<String> supportedVersions, IProgressMonitor monitor) {
+    if(execution == null) {
+      return prevVersion;
+    }
     try {
-      String version = projectFacade.getMojoParameterValue(execution, parameter, String.class, monitor);
+      String version = execution.getMojoParameterValue(parameter, String.class, monitor);
       if(version == null) {
         return prevVersion;
       }
@@ -1097,21 +1092,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   /**
-   * get all the arguments provided to the compiler for the provided {@link MojoExecution}
+   * get all the arguments provided to the compiler for the provided {@link IMojoExecutionFacade}
    * 
-   * @param projectFacade the current maven project facade
    * @param execution the plugin execution
    * @param monitor the progress monitor
    * @return the arguments
    */
-  private List<String> getCompilerArguments(IMavenProjectFacade projectFacade, MojoExecution execution,
-      IProgressMonitor monitor) {
+  private List<String> getCompilerArguments(IMojoExecutionFacade execution, IProgressMonitor monitor) {
 
     List<String> arguments = new ArrayList<>();
 
     //1st, get the arguments in the compilerArgs list
     try {
-      List<?> args = projectFacade.getMojoParameterValue(execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      List<?> args = execution.getMojoParameterValue("compilerArgs", List.class, monitor);//$NON-NLS-1$
       if(args != null) {//$NON-NLS-1$
         args.stream().filter(a -> a != null).forEach(a -> arguments.add(a.toString()));
       }
@@ -1141,14 +1134,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IProgressMonitor monitor) throws CoreException {
     List<String> compilerArgs = new ArrayList<>();
 
-    List<MojoExecution> executions = facade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
-        monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
+    List<IMojoExecutionFacade> executions = facade.getMojoExecutionFacades(COMPILER_PLUGIN_GROUP_ID,
+        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
 
     //facade.getProject().get
-    for(MojoExecution compile : executions) {
-      if(isCompileExecution(compile, facade, options, monitor)
-          || isTestCompileExecution(compile, facade, options, monitor)) {
-        List<String> args = getCompilerArguments(facade, compile, monitor);
+    for(IMojoExecutionFacade compile : executions) {
+      if(isCompileExecution(compile, options, monitor) || isTestCompileExecution(compile, options, monitor)) {
+        List<String> args = getCompilerArguments(compile, monitor);
         if(args != null) {
           compilerArgs.addAll(args);
         }

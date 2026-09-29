@@ -52,11 +52,12 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMojoExecutionFacade;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.jdt.MavenExecutionJre;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 
@@ -328,13 +329,13 @@ public class UnitTestSupport {
       MavenProject mavenProject = facade.getMavenProject();
 
       // find test executions
-      List<MojoExecution> executions = new ArrayList<>();
+      List<IMojoExecutionFacade> executions = new ArrayList<>();
       for(ExecutionId id : TEST_EXECUTIONS) {
-        executions.addAll(facade.getMojoExecutions(id.groupId(), id.artifactId(), monitor, id.goal()));
+        executions.addAll(facade.getMojoExecutionFacades(id.groupId(), id.artifactId(), monitor, id.goal()));
       }
 
       // find which mojo execution is the most relevant for the tested resource
-      Optional<MojoExecution> mostRelevantExecution = executions.stream()
+      Optional<IMojoExecutionFacade> mostRelevantExecution = executions.stream()
           .filter(e -> isResourceHandledByMojoExecution(facade, monitor, e, resource)).findFirst()
           .or(() -> Optional.ofNullable(executions.isEmpty() ? null : executions.getFirst()));
 
@@ -342,9 +343,8 @@ public class UnitTestSupport {
         LOG.debug("No surefire/failsafe execution found for resource: {}", resource.getFullPath());
         return null;
       }
-      LOG.debug("Using mojo execution {} to populate test launch arguments",
-          mostRelevantExecution.get().getExecutionId());
-      return getTestLaunchArguments(facade, mavenProject, mostRelevantExecution.get(), monitor);
+      LOG.debug("Using mojo execution {} to populate test launch arguments", mostRelevantExecution.get().getKey());
+      return getTestLaunchArguments(mavenProject, mostRelevantExecution.get(), monitor);
     }
 
     /**
@@ -354,7 +354,7 @@ public class UnitTestSupport {
      * @throws CoreException
      */
     private boolean isResourceHandledByMojoExecution(IMavenProjectFacade facade, IProgressMonitor monitor,
-        MojoExecution execution, IResource resource) {
+        IMojoExecutionFacade execution, IResource resource) {
 
       switch(resource.getType()) {
         case IResource.FILE:
@@ -376,7 +376,7 @@ public class UnitTestSupport {
     }
 
     private boolean isFileHandledByMojoExecution(IMavenProjectFacade facade, IProgressMonitor monitor,
-        MojoExecution execution, IFile javaTestSourceFile) {
+        IMojoExecutionFacade execution, IFile javaTestSourceFile) {
       IJavaProject javaProject = JavaCore.create(facade.getProject());
       IClasspathEntry classpathEntry = javaProject.findContainingClasspathEntry(javaTestSourceFile);
       if(classpathEntry == null) {
@@ -389,7 +389,7 @@ public class UnitTestSupport {
       String testClassFile = javaTestSourceFile.getFullPath().makeRelativeTo(classpathEntry.getPath()).toString()
           .replace(".java", ".class");
       // get a configured mojo instance for failsafe/surefire
-      Optional<Mojo> mojo = getMojoInstance(facade, execution, monitor);
+      Optional<Mojo> mojo = getMojoInstance(execution, monitor);
       // get an instance of org.apache.maven.surefire.api.testset.TestListResolver directly from the mojo
       Optional<Object> testResolverInstance = mojo.map(o -> uncheckedInvoke(o, GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD));
       // check if the test is handled by the mojo
@@ -428,18 +428,15 @@ public class UnitTestSupport {
     }
 
     /** Execution cache */
-    private final Map<MojoExecution, Mojo> mojoCache = new HashMap<>();
+    private final Map<MojoExecutionKey, Mojo> mojoCache = new HashMap<>();
 
     /**
      * Get a configured mojo instance
      */
-    public Optional<Mojo> getMojoInstance(IMavenProjectFacade facade, MojoExecution execution,
-        IProgressMonitor monitor) {
-      return Optional.ofNullable(mojoCache.computeIfAbsent(execution, exe -> {
+    public Optional<Mojo> getMojoInstance(IMojoExecutionFacade execution, IProgressMonitor monitor) {
+      return Optional.ofNullable(mojoCache.computeIfAbsent(execution.getKey(), key -> {
         try {
-          return facade.createExecutionContext().execute(facade.getMavenProject(),
-              (context, pm) -> MavenPlugin.getMaven().getConfiguredMojo(context.getSession(), exe, Mojo.class),
-              monitor);
+          return execution.getConfiguredMojo(Mojo.class, monitor);
         } catch(CoreException ex) {
           LOG.error("Unable to instanciate mojo instance", ex);
           return null;
@@ -448,7 +445,7 @@ public class UnitTestSupport {
     }
 
     /**
-     * Get all the arguments provided to the plugin for the provided {@link MojoExecution}.
+     * Get all the arguments provided to the plugin for the provided {@link IMojoExecutionFacade}.
      * 
      * @param mavenProject the current maven project
      * @param execution the plugin execution
@@ -456,24 +453,25 @@ public class UnitTestSupport {
      * @return the arguments
      */
     @SuppressWarnings("unchecked")
-    private TestLaunchArguments getTestLaunchArguments(IMavenProjectFacade facade, MavenProject mavenProject,
-        MojoExecution execution, IProgressMonitor monitor) {
+    private TestLaunchArguments getTestLaunchArguments(MavenProject mavenProject, IMojoExecutionFacade execution,
+        IProgressMonitor monitor) {
       try {
-        String argLine = facade.getMojoParameterValue(execution, PLUGIN_ARGLINE, String.class, monitor);
+        String argLine = execution.getMojoParameterValue(PLUGIN_ARGLINE, String.class, monitor);
         argLine = resolveDeferredVariables(mavenProject, argLine);
         // resolve all placeholders which were not resolved previously by the empty string
         argLine = removeStandardVariablePlaceholders(argLine);
 
         return new TestLaunchArguments(argLine,
-            facade.getMojoParameterValue(execution, PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
-            facade.getMojoParameterValue(execution, PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
-            facade.getMojoParameterValue(execution, PLUGIN_WORKING_DIRECTORY, File.class, monitor),
-            facade.getMojoParameterValue(execution, PLUGIN_ENABLE_ASSERTIONS, Boolean.class, monitor));
+            execution.getMojoParameterValue(PLUGIN_SYSPROP_VARIABLES, Map.class, monitor),
+            execution.getMojoParameterValue(PLUGIN_ENVIRONMENT_VARIABLES, Map.class, monitor),
+            execution.getMojoParameterValue(PLUGIN_WORKING_DIRECTORY, File.class, monitor),
+            execution.getMojoParameterValue(PLUGIN_ENABLE_ASSERTIONS, Boolean.class, monitor));
       } catch(Exception e) {
         LOG.error(e.getMessage(), e);
       }
       return null;
     }
+
 
     /**
      * This method is used to resolve deferred variables introduced by failsafe/surefire plugins in a given string
