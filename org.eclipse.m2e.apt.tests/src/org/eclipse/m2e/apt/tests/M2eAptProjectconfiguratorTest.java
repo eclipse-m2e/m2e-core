@@ -92,12 +92,13 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/workspace-processor/1.0.0");
 		Path localJar = localArtifactDirectory.resolve("workspace-processor-1.0.0.jar");
 		assertFalse("Test annotation processor JAR already exists: " + localJar, Files.exists(localJar));
+		IProject consumer = null;
 
 		try {
 			IProject[] projects = importProjects("projects/workspaceProcessor",
 					new String[] { "processor/pom.xml", "consumer/pom.xml" }, new ResolverConfiguration());
 			IProject processor = projects[0];
-			IProject consumer = projects[1];
+			consumer = projects[1];
 			waitForJobsToComplete();
 
 			IMarker[] missingJarMarkers = getWorkspaceProcessorMarkers(consumer);
@@ -147,6 +148,9 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 			updateProject(consumer);
 			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
 		} finally {
+			if (consumer != null) {
+				deleteProject(consumer);
+			}
 			deleteRecursively(localArtifactDirectory);
 		}
 	}
