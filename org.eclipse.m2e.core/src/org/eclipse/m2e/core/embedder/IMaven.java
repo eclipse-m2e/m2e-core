@@ -32,7 +32,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -134,8 +133,6 @@ public interface IMaven extends IComponentLookup {
 
   /** @provisional */
   void removeLocalRepositoryListener(ILocalRepositoryListener listener);
-
-  ProxyInfo getProxyInfo(String protocol) throws CoreException;
 
   /**
    * Sort projects by build order
