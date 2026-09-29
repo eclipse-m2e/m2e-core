@@ -48,7 +48,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -396,7 +395,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 					// Invoke the manifest generation API via reflection
 					reflectManifestGeneration(mavenFacade, mojoExecution, innerContext.getSession(),
-							new File(manifest.getLocation().toOSString()));
+							new File(manifest.getLocation().toOSString()), monitor);
 				} catch (Exception e) {
 					throw new CoreException(Status.error("Something goes wrong!", e));
 				} finally {
@@ -420,11 +419,12 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 	}
 
 	private void reflectManifestGeneration(IMavenProjectFacade facade, MojoExecution mojoExecution,
-			MavenSession session, File manifestFile) throws CoreException, ReflectiveOperationException, IOException {
+			MavenSession session, File manifestFile, IProgressMonitor monitor)
+			throws CoreException, ReflectiveOperationException, IOException {
 
 		ClassLoader loader = null;
-		Class<? extends Mojo> mojoClass;
-		Mojo mojo = null;
+		Class<?> mojoClass;
+		Object mojo = null;
 
 		Xpp3Dom originalConfig = mojoExecution.getConfiguration();
 		Xpp3Dom customConfig = Xpp3DomUtils.mergeXpp3Dom(new Xpp3Dom("configuration"), originalConfig);
@@ -436,7 +436,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 
 		mojoExecution.setConfiguration(customConfig);
 
-		mojo = maven.getConfiguredMojo(session, mojoExecution, Mojo.class);
+		mojo = facade.getConfiguredMojo(mojoExecution, monitor);
 		mojoClass = mojo.getClass();
 		loader = mojoClass.getClassLoader();
 		try {
@@ -460,7 +460,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		} finally {
 			mojoExecution.setConfiguration(originalConfig);
 
-			maven.releaseMojo(mojo, mojoExecution);
+			facade.releaseMojo(mojo, mojoExecution);
 		}
 	}
 
@@ -497,7 +497,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
 		return manifest;
 	}
 
-	private Object getArchiverInstance(Class<? extends Mojo> mojoClass, Mojo mojo, IProject project)
+	private Object getArchiverInstance(Class<?> mojoClass, Object mojo, IProject project)
 			throws IllegalAccessException {
 		Field archiverField = findField(getArchiverFieldName(), mojoClass);
 		if (archiverField == null) {

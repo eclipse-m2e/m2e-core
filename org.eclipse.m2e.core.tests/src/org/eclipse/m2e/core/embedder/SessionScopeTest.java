@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -62,7 +61,6 @@ public class SessionScopeTest extends AbstractMavenProjectTestCase {
     assertNotNull("Maven facade should exist", facade);
     
     // Get the jar mojo execution from the execution plan
-    IMaven maven = MavenPlugin.getMaven();
     IMavenExecutionContext context = facade.createExecutionContext();
     
     context.execute((ctx, monitor) -> {
@@ -88,11 +86,11 @@ public class SessionScopeTest extends AbstractMavenProjectTestCase {
       // This call should NOT throw OutOfScopeException
       // Before the fix, this would fail with:
       // "OutOfScopeException: Cannot access session scope outside of a scoping block"
-      Mojo configuredMojo = maven.getConfiguredMojo(session, jarExecution, Mojo.class);
+      Object configuredMojo = facade.getConfiguredMojo(jarExecution, monitor);
       assertNotNull("Configured mojo should be created", configuredMojo);
       
       // Clean up
-      maven.releaseMojo(configuredMojo, jarExecution);
+      facade.releaseMojo(configuredMojo, jarExecution);
       
       return null;
     }, monitor);
@@ -114,7 +112,6 @@ public class SessionScopeTest extends AbstractMavenProjectTestCase {
     assertNotNull("Maven facade should exist", facade);
     
     // Verify that getConfiguredMojo still works for normal projects
-    IMaven maven = MavenPlugin.getMaven();
     IMavenExecutionContext context = facade.createExecutionContext();
     
     context.execute((ctx, monitor) -> {

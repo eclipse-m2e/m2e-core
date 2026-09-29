@@ -190,6 +190,31 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException;
 
+  /**
+   * Returns a new mojo instance configured according to the given {@code mojoExecution}. Callers must release the
+   * returned mojo with {@link #releaseMojo(Object, MojoExecution)}. This method is intended to allow introspection of
+   * mojo configuration parameters, therefore it deliberately returns {@link Object} instead of a Maven {@code Mojo}
+   * type to not bind clients to the Maven plugin API. If access to a concrete mojo implementation is required, use an
+   * <code>instanceof</code> check, or fall back to reflection.
+   *
+   * @param mojoExecution the mojo execution to create a configured mojo instance for
+   * @param monitor the progress monitor
+   * @return the configured mojo instance, never <code>null</code>
+   * @throws CoreException
+   * @since 3.0
+   */
+  Object getConfiguredMojo(MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Releases resources used by a mojo acquired with {@link #getConfiguredMojo(MojoExecution, IProgressMonitor)}.
+   *
+   * @param mojo the mojo instance to release
+   * @param mojoExecution the mojo execution the mojo instance was created for
+   * @throws CoreException
+   * @since 3.0
+   */
+  void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException;
+
   // lifecycle mapping
 
   String getLifecycleMappingId();

@@ -51,7 +51,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -389,7 +388,7 @@ public class UnitTestSupport {
       String testClassFile = javaTestSourceFile.getFullPath().makeRelativeTo(classpathEntry.getPath()).toString()
           .replace(".java", ".class");
       // get a configured mojo instance for failsafe/surefire
-      Optional<Mojo> mojo = getMojoInstance(facade, execution, monitor);
+      Optional<Object> mojo = getMojoInstance(facade, execution, monitor);
       // get an instance of org.apache.maven.surefire.api.testset.TestListResolver directly from the mojo
       Optional<Object> testResolverInstance = mojo.map(o -> uncheckedInvoke(o, GET_INCLUDED_AND_EXCLUDED_TESTS_METHOD));
       // check if the test is handled by the mojo
@@ -428,18 +427,16 @@ public class UnitTestSupport {
     }
 
     /** Execution cache */
-    private final Map<MojoExecution, Mojo> mojoCache = new HashMap<>();
+    private final Map<MojoExecution, Object> mojoCache = new HashMap<>();
 
     /**
      * Get a configured mojo instance
      */
-    public Optional<Mojo> getMojoInstance(IMavenProjectFacade facade, MojoExecution execution,
+    public Optional<Object> getMojoInstance(IMavenProjectFacade facade, MojoExecution execution,
         IProgressMonitor monitor) {
       return Optional.ofNullable(mojoCache.computeIfAbsent(execution, exe -> {
         try {
-          return facade.createExecutionContext().execute(facade.getMavenProject(),
-              (context, pm) -> MavenPlugin.getMaven().getConfiguredMojo(context.getSession(), exe, Mojo.class),
-              monitor);
+          return facade.getConfiguredMojo(exe, monitor);
         } catch(CoreException ex) {
           LOG.error("Unable to instanciate mojo instance", ex);
           return null;
