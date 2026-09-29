@@ -133,11 +133,6 @@ public interface IMaven extends IComponentLookup {
   /** @provisional */
   void removeLocalRepositoryListener(ILocalRepositoryListener listener);
 
-  /**
-   * Sort projects by build order
-   */
-  List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException;
-
   String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException;
 
   /**
