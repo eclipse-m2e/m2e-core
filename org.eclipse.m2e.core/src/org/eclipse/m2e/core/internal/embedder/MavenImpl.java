@@ -108,7 +108,6 @@ import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
@@ -123,7 +122,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
-import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
@@ -810,24 +808,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     } catch(Exception ex) {
       throw new CoreException(Status.error(Messages.MavenImpl_error_init_maven, ex));
     }
-  }
-
-  @Override
-  public ProxyInfo getProxyInfo(String protocol) throws CoreException {
-    for(Proxy proxy : getSettings().getProxies()) {
-      if(proxy.isActive() && protocol.equalsIgnoreCase(proxy.getProtocol())) {
-        ProxyInfo proxyInfo = new ProxyInfo();
-        proxyInfo.setType(proxy.getProtocol());
-        proxyInfo.setHost(proxy.getHost());
-        proxyInfo.setPort(proxy.getPort());
-        proxyInfo.setNonProxyHosts(proxy.getNonProxyHosts());
-        proxyInfo.setUserName(proxy.getUsername());
-        proxyInfo.setPassword(proxy.getPassword());
-        return proxyInfo;
-      }
-    }
-
-    return null;
   }
 
   @Override
