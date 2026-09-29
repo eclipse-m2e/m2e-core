@@ -59,9 +59,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
 
+import org.codehaus.plexus.util.dag.CycleDetectedException;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectSorter;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -286,8 +290,17 @@ public class ProjectConfigurationManager
       mavenProjectToFacadeMap.put(facade.getMavenProject(monitor), facade);
     }
     facades.clear();
-    for(MavenProject mavenProject : maven.getSortedProjects(new ArrayList<>(mavenProjectToFacadeMap.keySet()))) {
+    for(MavenProject mavenProject : getSortedProjects(new ArrayList<>(mavenProjectToFacadeMap.keySet()))) {
       facades.add(mavenProjectToFacadeMap.get(mavenProject));
+    }
+  }
+
+  private static List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException {
+    try {
+      ProjectSorter rm = new ProjectSorter(projects);
+      return rm.getSortedProjects();
+    } catch(CycleDetectedException | DuplicateProjectException ex) {
+      throw new CoreException(Status.error(Messages.MavenImpl_error_sort, ex));
     }
   }
 
