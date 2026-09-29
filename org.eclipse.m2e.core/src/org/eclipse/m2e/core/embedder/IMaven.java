@@ -25,7 +25,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
@@ -140,19 +139,6 @@ public interface IMaven extends IComponentLookup {
   List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException;
 
   String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException;
-
-  /**
-   * Returns new mojo instances configured according to provided mojoExecution. Caller must release returned mojo with
-   * {@link #releaseMojo(Object, MojoExecution)}. This method is intended to allow introspection of mojo configuration
-   * parameters
-   */
-  <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
-      throws CoreException;
-
-  /**
-   * Releases resources used by Mojo acquired with {@link #getConfiguredMojo(MavenSession, MojoExecution, Class)}
-   */
-  void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException;
 
   /**
    * Either joins existing session or starts new session with default configuration and executes the callable in the

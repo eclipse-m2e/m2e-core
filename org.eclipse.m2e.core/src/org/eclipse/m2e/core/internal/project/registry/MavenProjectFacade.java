@@ -590,6 +590,16 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
         monitor);
   }
 
+  @Override
+  public Object getConfiguredMojo(MojoExecution mojoExecution, IProgressMonitor monitor) throws CoreException {
+    return ((MavenImpl) manager.maven).getConfiguredMojo(getMavenProject(monitor), mojoExecution, monitor);
+  }
+
+  @Override
+  public void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException {
+    ((MavenImpl) manager.maven).releaseMojo(mojo, mojoExecution);
+  }
+
   /**
    * Returns cached list of MojoExecutions bound to project's clean, default and site lifecycles. Returned
    * MojoExecutions are not fully setup. Similarly to {@link #getMavenProject()}, return value is null after workspace

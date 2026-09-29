@@ -183,9 +183,19 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return this.mavenConfiguration;
   }
 
-  @Override
-  public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
+  /**
+   * Returns a new mojo instance configured according to the given {@code mojoExecution} in the context of the given
+   * {@code project}. Caller must release returned mojo with {@link #releaseMojo(Object, MojoExecution)}.
+   *
+   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#getConfiguredMojo(MojoExecution, IProgressMonitor)
+   */
+  public Object getConfiguredMojo(MavenProject project, MojoExecution mojoExecution, IProgressMonitor monitor)
       throws CoreException {
+    return getExecutionContext().execute(project,
+        (context, pm) -> getConfiguredMojo(context.getSession(), mojoExecution), monitor);
+  }
+
+  private Object getConfiguredMojo(MavenSession session, MojoExecution mojoExecution) throws CoreException {
     try {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
       // getPluginRealm creates plugin realm and populates pluginDescriptor.classRealm field
@@ -217,7 +227,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           mojoScope.enter();
           mojoScope.seed(MavenProject.class, session.getCurrentProject());
           mojoScope.seed(MojoExecution.class, mojoExecution);
-          return clazz.cast(lookup(MavenPluginManager.class).getConfiguredMojo(Mojo.class, session, mojoExecution));
+          return lookup(MavenPluginManager.class).getConfiguredMojo(Mojo.class, session, mojoExecution);
         } finally {
           mojoScope.exit();
         }
@@ -226,13 +236,15 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           sessionScope.exit();
         }
       }
-    } catch(PluginManagerException | PluginConfigurationException | ClassCastException | PluginResolutionException
+    } catch(PluginManagerException | PluginConfigurationException | PluginResolutionException
         | MojoExecutionException ex) {
       throw new CoreException(Status.error(NLS.bind(Messages.MavenImpl_error_mojo, mojoExecution), ex));
     }
   }
 
-  @Override
+  /**
+   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#releaseMojo(Object, MojoExecution)
+   */
   public void releaseMojo(Object mojo, MojoExecution mojoExecution) throws CoreException {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
