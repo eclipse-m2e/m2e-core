@@ -12,10 +12,12 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.target;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.eclipse.aether.graph.DependencyNode;
 
 public final class MavenTargetDependency extends Dependency {
@@ -66,7 +68,13 @@ public final class MavenTargetDependency extends Dependency {
 	}
 
 	public MavenTargetDependency copy() {
-		return new MavenTargetDependency(getGroupId(), getArtifactId(), getVersion(), getType(), getClassifier());
+		MavenTargetDependency copy = new MavenTargetDependency(getGroupId(), getArtifactId(), getVersion(), getType(),
+				getClassifier());
+		List<Exclusion> exclusions = getExclusions();
+		if (!exclusions.isEmpty()) {
+			copy.setExclusions(new ArrayList<>(exclusions));
+		}
+		return copy;
 	}
 
 	public boolean matches(Dependency other) {
