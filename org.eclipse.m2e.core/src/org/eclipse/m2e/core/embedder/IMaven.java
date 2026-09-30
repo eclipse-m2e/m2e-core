@@ -45,7 +45,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface IMaven extends IComponentLookup {
+public interface IMaven extends IComponentLookup, IMavenExecutionContextFactory {
 
   // artifact resolution
 
@@ -136,19 +136,12 @@ public interface IMaven extends IComponentLookup {
   String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException;
 
   /**
-   * Either joins existing session or starts new session with default configuration and executes the callable in the
-   * context of the session.
-   *
-   * @deprecated replaced with direct usage of {@link IMavenExecutionContext}.
-   * @since 1.4
-   */
-  @Deprecated(forRemoval = true)
-  default <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    return IMavenExecutionContext.getThreadContext().orElseGet(this::createExecutionContext).execute(callable, monitor);
-  }
-
-  /**
-   * Creates and returns new, possibly nested, maven execution context for this Maven embedder.
+   * Creates and returns a new maven execution context for this Maven embedder.
+   * <p>
+   * This context only has access to <b>globally</b> configured repositories, mirrors and settings. It is <b>not</b>
+   * tied to any particular project and therefore might lack project-specific configuration (for example project
+   * scoped repositories or extensions).
+   * </p>
    * <p>
    * <b>IMPORTANT:</b> When in the context of a particular project, it's usually better to use
    * {@link IMavenProjectFacade#createExecutionContext()} which will include more project-specific configuration and
@@ -158,6 +151,7 @@ public interface IMaven extends IComponentLookup {
    * @since 1.4
    * @see IMavenProjectFacade#createExecutionContext()
    */
+  @Override
   IMavenExecutionContext createExecutionContext();
 
 }

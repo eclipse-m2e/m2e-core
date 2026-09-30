@@ -35,6 +35,7 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutableLocation;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContextFactory;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -45,7 +46,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
-public interface IMavenProjectFacade extends IMavenExecutableLocation {
+public interface IMavenProjectFacade extends IMavenExecutableLocation, IMavenExecutionContextFactory {
 
   /**
    * Returns project relative paths of resource directories
@@ -222,9 +223,18 @@ public interface IMavenProjectFacade extends IMavenExecutableLocation {
   Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
 
   /**
+   * Creates and returns a new maven execution context for this project.
+   * <p>
+   * Unlike {@link org.eclipse.m2e.core.embedder.IMaven#createExecutionContext() IMaven.createExecutionContext()},
+   * this context is <b>project-specific</b>: it includes the project's repositories, mirrors, settings and
+   * (project-scoped) extensions, so results are as close as possible to what an actual build of this project would
+   * produce.
+   * </p>
+   *
    * @return a project-specific Maven execution context.
    * @since 2.0
    */
+  @Override
   IMavenExecutionContext createExecutionContext();
 
   /**
