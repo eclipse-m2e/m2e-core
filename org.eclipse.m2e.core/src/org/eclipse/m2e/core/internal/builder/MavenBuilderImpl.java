@@ -86,7 +86,7 @@ public class MavenBuilderImpl {
 
   private final Map<IProject, ProjectBuildState> deltaState = new ConcurrentHashMap<>();
 
-  private enum DeltaType {
+  enum DeltaType {
     INCREMENTAL, IRRELEVANT, FULL_BUILD, UNKOWN;
   }
 
@@ -205,7 +205,7 @@ public class MavenBuilderImpl {
     return dependencies;
   }
 
-  private DeltaType hasRelevantDelta(IMavenProjectFacade projectFacade, IResourceDelta resourceDelta)
+  DeltaType hasRelevantDelta(IMavenProjectFacade projectFacade, IResourceDelta resourceDelta)
       throws CoreException {
     if(resourceDelta == null) {
       return DeltaType.FULL_BUILD;
