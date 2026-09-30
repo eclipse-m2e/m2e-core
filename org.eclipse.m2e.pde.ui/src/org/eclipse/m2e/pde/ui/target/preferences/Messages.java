@@ -18,8 +18,8 @@ public class Messages extends NLS {
 	private static final String BUNDLE_NAME = Messages.class.getPackageName() + ".messages"; //$NON-NLS-1$
 	public static String MavenRuleSetPreferencePage_RuleSet;
 	public static String RuleSetViewer_Artifact;
-	public static String RuleSetViewer_IgnoredVersions;
-	public static String RuleSetViewer_Rules;
+	public static String RuleSetViewer_GlobalRules;
+	public static String RuleSetViewer_ArtifactRules;
 	public static String RuleSetViewer_Type;
 	public static String RuleSetViewer_Value;
 	static {
