@@ -35,7 +35,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -109,38 +108,48 @@ public class ProfileSelectionHandler extends AbstractHandler {
   }
 
   public IStatus execute(Shell shell, IProject... projects) {
-    Set<IMavenProjectFacade> facades = getMavenProjects(projects);
-    if(facades.isEmpty()) {
+    List<IProject> mavenProjects = getMavenProjects(projects);
+    if(mavenProjects.isEmpty()) {
       display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
       return null;
     }
-    GetProfilesJob getProfilesJob = new GetProfilesJob(facades, profileManager);
-    getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, profileManager, shell));
+    // Creating the Maven project facades may require reading the projects and resolving their dependencies, which can
+    // take a long time: do it in the background job, not in the UI thread.
+    GetProfilesJob getProfilesJob = new GetProfilesJob(mavenProjects, profileManager);
+    getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, profileManager, shell));
     getProfilesJob.setUser(true);
     getProfilesJob.schedule();
     return Status.OK_STATUS;
   }
 
   private IJobChangeListener onProfilesFetched(final GetProfilesJob getProfilesJob,
-      final Set<IMavenProjectFacade> facades, final IProfileManager profileManager, final Shell shell) {
+      final IProfileManager profileManager, final Shell shell) {
 
     return new JobChangeAdapter() {
 
       @Override
       public void done(IJobChangeEvent event) {
-        if(getProfilesJob.getResult().isOK()) {
-          shell.getDisplay().syncExec(() -> {
-            List<ProfileSelection> sharedProfiles = getProfilesJob.getSharedProfiles();
-            Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
-            final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
-            if(dialog.open() == Window.OK) {
-              Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
-              job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
-              job.schedule();
-            }
-          });
-
+        if(!getProfilesJob.getResult().isOK() || shell.isDisposed()) {
+          return;
         }
+        shell.getDisplay().syncExec(() -> {
+          if(shell.isDisposed()) {
+            return;
+          }
+          Set<IMavenProjectFacade> facades = getProfilesJob.getFacades();
+          if(facades.isEmpty()) {
+            display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
+            return;
+          }
+          List<ProfileSelection> sharedProfiles = getProfilesJob.getSharedProfiles();
+          Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
+          final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
+          if(dialog.open() == Window.OK) {
+            Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
+            job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+            job.schedule();
+          }
+        });
       }
     };
   }
@@ -150,30 +159,43 @@ public class ProfileSelectionHandler extends AbstractHandler {
   }
 
   /**
-   * Returns an IMavenProjectFacade from the selected IResource, or from the active editor
-   *
-   * @param event
-   * @return the selected IMavenProjectFacade
+   * Returns the accessible projects having the Maven nature. This is a cheap operation that can be done in the UI
+   * thread.
    */
   @SuppressWarnings("restriction")
-  private Set<IMavenProjectFacade> getMavenProjects(IProject[] projects) {
+  private static List<IProject> getMavenProjects(IProject[] projects) {
     if(projects == null || projects.length == 0) {
-      return Collections.emptySet();
+      return Collections.emptyList();
     }
-    Set<IMavenProjectFacade> facades = new HashSet<>(projects.length);
-    try {
-      IProgressMonitor monitor = new NullProgressMonitor();
-      for(IProject p : projects) {
+    List<IProject> mavenProjects = new ArrayList<>(projects.length);
+    for(IProject p : projects) {
+      try {
         if(p != null && p.isAccessible() && p.hasNature(org.eclipse.m2e.core.internal.IMavenConstants.NATURE_ID)) {
-          IFile pom = p.getFile(org.eclipse.m2e.core.internal.IMavenConstants.POM_FILE_NAME);
-          IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, monitor);
-          facades.add(facade);
+          mavenProjects.add(p);
         }
+      } catch(CoreException e) {
+        log.error("Unable to select Maven project " + p.getName(), e);
       }
-    } catch(CoreException e) {
-      log.error("Unable to select Maven projects", e);
     }
+    return mavenProjects;
+  }
 
+  /**
+   * Returns the IMavenProjectFacades of the given projects. This is a potentially long running operation (the
+   * projects may need to be read and their dependencies resolved) that must not be run in the UI thread.
+   */
+  @SuppressWarnings("restriction")
+  private static Set<IMavenProjectFacade> getMavenProjectFacades(List<IProject> projects, IProgressMonitor monitor)
+      throws CoreException {
+    SubMonitor progress = SubMonitor.convert(monitor, projects.size());
+    Set<IMavenProjectFacade> facades = new HashSet<>(projects.size());
+    for(IProject p : projects) {
+      IFile pom = p.getFile(org.eclipse.m2e.core.internal.IMavenConstants.POM_FILE_NAME);
+      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, progress.split(1));
+      if(facade != null) {
+        facades.add(facade);
+      }
+    }
     return facades;
   }
 
@@ -181,23 +203,29 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
     private final IProfileManager profileManager;
 
-    private final Set<IMavenProjectFacade> facades;
+    private final List<IProject> projects;
+
+    private Set<IMavenProjectFacade> facades = Collections.emptySet();
 
     private Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
 
     private List<ProfileSelection> sharedProfiles;
 
-    private GetProfilesJob(final Set<IMavenProjectFacade> facades, IProfileManager profileManager) {
+    private GetProfilesJob(final List<IProject> projects, IProfileManager profileManager) {
       super(Messages.ProfileSelectionHandler_Loading_maven_profiles);
-      this.facades = facades;
+      this.projects = projects;
       this.profileManager = profileManager;
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
+      SubMonitor progress = SubMonitor.convert(monitor, Messages.ProfileSelectionHandler_Loading_maven_profiles, 2);
       try {
-        this.allProfiles = getAllProfiles(facades, profileManager);
+        this.facades = getMavenProjectFacades(projects, progress.split(1));
+        this.allProfiles = getAllProfiles(facades, profileManager, progress.split(1));
         this.sharedProfiles = getSharedProfiles(allProfiles);
+      } catch(OperationCanceledException e) {
+        return Status.CANCEL_STATUS;
       } catch(CoreException e) {
         return Status.error(Messages.ProfileSelectionHandler_Unable_to_open_profile_dialog, e);
       }
@@ -276,13 +304,17 @@ public class ProfileSelectionHandler extends AbstractHandler {
     }
 
     private Map<IMavenProjectFacade, List<ProfileData>> getAllProfiles(final Set<IMavenProjectFacade> facades,
-        final IProfileManager profileManager) throws CoreException {
+        final IProfileManager profileManager, IProgressMonitor monitor) throws CoreException {
       Map<IMavenProjectFacade, List<ProfileData>> allProfiles = new HashMap<>(facades.size());
-      IProgressMonitor monitor = new NullProgressMonitor();
+      SubMonitor progress = SubMonitor.convert(monitor, facades.size());
       for(IMavenProjectFacade facade : facades) {
-        allProfiles.put(facade, profileManager.getProfileDatas(facade, monitor));
+        allProfiles.put(facade, profileManager.getProfileDatas(facade, progress.split(1)));
       }
       return allProfiles;
+    }
+
+    public Set<IMavenProjectFacade> getFacades() {
+      return facades;
     }
 
     public List<ProfileSelection> getSharedProfiles() {
