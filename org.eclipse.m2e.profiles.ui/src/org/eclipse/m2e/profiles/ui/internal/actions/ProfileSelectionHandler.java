@@ -185,8 +185,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
    * projects may need to be read and their dependencies resolved) that must not be run in the UI thread.
    */
   @SuppressWarnings("restriction")
-  private static Set<IMavenProjectFacade> getMavenProjectFacades(List<IProject> projects, IProgressMonitor monitor)
-      throws CoreException {
+  private static Set<IMavenProjectFacade> getMavenProjectFacades(List<IProject> projects, IProgressMonitor monitor) {
     SubMonitor progress = SubMonitor.convert(monitor, projects.size());
     Set<IMavenProjectFacade> facades = new HashSet<>(projects.size());
     for(IProject p : projects) {
