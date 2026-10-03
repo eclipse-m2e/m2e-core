@@ -198,6 +198,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     return facades;
   }
 
+  @SuppressWarnings("restriction")
   class GetProfilesJob extends MavenJob {
 
     private final IProfileManager profileManager;
