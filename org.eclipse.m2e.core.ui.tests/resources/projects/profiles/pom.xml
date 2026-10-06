@@ -1,0 +1,14 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.eclipse.m2e.tests.projects</groupId>
+	<artifactId>profiles</artifactId>
+	<version>1</version>
+	<profiles>
+		<profile>
+			<id>profile1</id>
+		</profile>
+		<profile>
+			<id>profile2</id>
+		</profile>
+	</profiles>
+</project>
