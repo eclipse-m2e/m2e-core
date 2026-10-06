@@ -60,6 +60,21 @@
          <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
        </enablement>
      </decorator>
+
+     <decorator id="org.eclipse.m2e.core.mavenProfileDecorator"
+                adaptable="true"
+                label="%m2.decorator.profile.name"
+                lightweight="true"
+                class="org.eclipse.m2e.core.ui.internal.MavenProfileDecorator"
+                state="false">
+       <description>%m2.decorator.profile.description</description>
+       <enablement>
+         <and>
+           <objectClass name="org.eclipse.core.resources.IProject"/>
+           <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+         </and>
+       </enablement>
+     </decorator>
    </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
