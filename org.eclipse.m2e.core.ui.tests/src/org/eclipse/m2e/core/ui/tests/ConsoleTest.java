@@ -76,6 +76,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsoleListener;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.TextConsole;
@@ -310,6 +311,13 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		IConsole mavenConsole = consoleAfterStartSupplier.get(30, TimeUnit.SECONDS);
 		IDocument document = ((TextConsole) mavenConsole).getDocument();
 
+		CountDownLatch outputComplete = new CountDownLatch(1);
+		mavenConsole.addPropertyChangeListener(event -> {
+			if (IConsoleConstants.P_CONSOLE_OUTPUT_COMPLETE.equals(event.getProperty())) {
+				outputComplete.countDown();
+			}
+		});
+
 		CountDownLatch finishedRead = new CountDownLatch(1);
 		document.addDocumentListener(new IDocumentListener() {
 			@Override
@@ -329,6 +337,12 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		String consoleText = display.syncCall(document::get);
 		if (!isBuildFinished(consoleText) && !finishedRead.await(120, TimeUnit.SECONDS)) {
 			fail("Build timed out.");
+		}
+		// The hyper-links are added to the document by a background job, some time
+		// after the text they are computed from. Wait until the console has processed
+		// all its output, otherwise some links may still be missing.
+		if (!outputComplete.await(30, TimeUnit.SECONDS)) {
+			fail("Console output has not been completely processed.");
 		}
 		return document;
 	}
