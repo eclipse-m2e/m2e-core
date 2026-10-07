@@ -22,6 +22,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
 import org.eclipse.m2e.pde.target.MavenTargetLocationFactory;
 import org.eclipse.m2e.pde.ui.target.editor.MavenTargetLocationWizard;
+import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -199,6 +200,27 @@ public class MavenTargetDependencyEditorTest {
 	}
 
 	/**
+	 * Processes the pending UI events. The dialog updates its table asynchronously
+	 * when its model changes, and a cell that is edited while such an update is
+	 * still pending may lose its new value.
+	 */
+	@SuppressWarnings("restriction")
+	private void waitForUiUpdates() {
+		workbench.getDisplay().syncExec(AbstractMavenProjectTestCase::driveEvents);
+	}
+
+	/**
+	 * Activates the editor of the given cell and sets its text.
+	 */
+	private void editCell(SWTBotTable table, int row, int column, String text) {
+		waitForUiUpdates();
+		table.click(row, column);
+		// The cell editor is a child of the table. Looking it up in the whole dialog
+		// would silently return another text field if the editor is not active.
+		new SWTBot(table.widget).text().setText(text);
+	}
+
+	/**
 	 * Checks whether the initial "enablement" state of all buttons in the Maven
 	 * dependency editor is set correctly.
 	 */
@@ -236,15 +258,12 @@ public class MavenTargetDependencyEditorTest {
 
 		assertFalse("Expected \"Update\" button to be disabled", robot.button("Update").isEnabled());
 		assertFalse("Expected \"Finish\" button to be disabled", robot.button("Finish").isEnabled());
-		// There is no elegant way to select the cell editor, but we
-		// know that it will be the first text widget in the dialog.
-		table.click(19, 0);
-		robot.text(0).setText("org.apache.commons");
-		table.click(19, 1);
-		robot.text(0).setText("commons-lang3");
-		table.click(19, 2);
-		robot.text(0).setText("3.12.0");
+		editCell(table, 19, 0, "org.apache.commons");
+		editCell(table, 19, 1, "commons-lang3");
+		editCell(table, 19, 2, "3.12.0");
+		waitForUiUpdates();
 		table.click(19, 3); // Close cell editor
+		waitForUiUpdates();
 
 		assertEquals(table.cell(19, 0), "org.apache.commons");
 		assertEquals(table.cell(19, 1), "commons-lang3");
