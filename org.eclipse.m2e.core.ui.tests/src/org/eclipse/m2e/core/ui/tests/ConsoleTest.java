@@ -153,10 +153,10 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		assertLinkTextAndOpenedEditor(1, "simple.\u001B[1mSimpleTest", //
 				TestRunnerViewPart.class, "JUnit (simple.SimpleTest)", document);
 
-		assertLinkTextAndOpenedEditor(0, "\u001B[0;36morg.eclipse.m2e.tests:" + MAVEN_PROJECT, //
+		assertLinkTextAndOpenedEditor(0, "\u001B[36;22morg.eclipse.m2e.tests:" + MAVEN_PROJECT, //
 				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
-		assertLinkTextAndOpenedEditor(3, "\u001B[36msimple.projectWithJUnit-5_Test", //
+		assertLinkTextAndOpenedEditor(3, "simple.projectWithJUnit-5_Test", //
 				MavenPomEditor.class, MAVEN_PROJECT + "/pom.xml", document);
 
 		assertDebugeePrintOutAndDebuggerLaunch(document, MAVEN_PROJECT, "5005");
@@ -349,7 +349,7 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 
 	private static boolean isBuildFinished(String text) {
 		return lines(text).anyMatch(
-				l -> l.startsWith("[INFO] Finished at: ") || l.startsWith("[\u001B[1;34mINFO\u001B[m] Finished at: "));
+				l -> l.startsWith("[INFO] Finished at: ") || l.startsWith("[\u001B[34;1mINFO\u001B[0m] Finished at: "));
 	}
 
 	private static final Pattern LINE_SEPARATOR = Pattern.compile("\\R");
