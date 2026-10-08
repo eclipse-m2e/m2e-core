@@ -26,4 +26,6 @@ public interface IMavenAptConstants {
 
   public static final String INVALID_ARGUMENT_MARKER_ID = PLUGIN_ID + ".problem.invalidArgument"; //$NON-NLS-1$
 
+  public static final String WORKSPACE_PROCESSOR_MARKER_ID = PLUGIN_ID + ".problem.workspaceProcessor"; //$NON-NLS-1$
+
 }
