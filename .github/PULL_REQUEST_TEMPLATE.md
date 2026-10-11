@@ -26,11 +26,11 @@ thread history (not just the latest comment) before pushing follow-up commits.
 - [ ] I have personally reviewed all code, tests, and text in this PR and understand and stand behind
       every change, per the [Eclipse GenAI contribution guidelines](https://www.eclipse.org/projects/handbook/#genai).
 - [ ] I will personally review and confirm any AI-assisted follow-up changes made in response to review
-      comments before pushing them (see [AGENTS.md](../AGENTS.md) rule on reading full thread history).
+      comments before pushing them (see [AGENTS.md](https://github.com/eclipse-m2e/m2e-core/blob/main/AGENTS.md) rule on reading full thread history).
 
 ## Checklist
 
 - [ ] I have searched existing PRs/issues and this is not a duplicate.
 - [ ] `mvn clean verify` (add `-Pits` for integration tests) passes locally.
-- [ ] Bundle versions are bumped where required (see "Version bump" in [CONTRIBUTING.md](../CONTRIBUTING.md)).
+- [ ] Bundle versions are bumped where required (see "Version bump" in [CONTRIBUTING.md](https://github.com/eclipse-m2e/m2e-core/blob/main/CONTRIBUTING.md)).
 - [ ] I have signed the [Eclipse Contributor Agreement (ECA)](http://www.eclipse.org/legal/ECA.php).
