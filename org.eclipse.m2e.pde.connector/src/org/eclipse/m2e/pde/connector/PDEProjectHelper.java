@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -202,12 +203,34 @@ public class PDEProjectHelper {
 				.getFile(org.eclipse.pde.internal.core.ICoreConstants.MANIFEST_PATH);
 	}
 
-	private static void setClasspath(IProject project, IPluginModelBase model, IProgressMonitor monitor)
+	/**
+	 * PDE computes the classpath from scratch, so the Maven classpath container of
+	 * the project is not part of it. If the classpath is updated after the project
+	 * has been configured, which happens if the plug-in model was not available
+	 * yet at that time, the container must not get lost.
+	 */
+	private static IClasspathEntry[] keepMavenClasspathContainer(IJavaProject javaProject, IClasspathEntry[] entries)
 			throws CoreException {
+		if (!javaProject.exists() || Arrays.stream(entries).anyMatch(PDEProjectHelper::isMavenClasspathContainer)) {
+			return entries;
+		}
+		Stream<IClasspathEntry> mavenContainer = Arrays.stream(javaProject.getRawClasspath())
+				.filter(PDEProjectHelper::isMavenClasspathContainer);
+		return Stream.concat(Arrays.stream(entries), mavenContainer).toArray(IClasspathEntry[]::new);
+	}
+
+	private static boolean isMavenClasspathContainer(IClasspathEntry entry) {
+		return entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+				&& IClasspathManager.CONTAINER_ID.equals(entry.getPath().segment(0));
+	}
+
+	static void setClasspath(IProject project, IPluginModelBase model, IProgressMonitor monitor)
+			throws CoreException {
+		IJavaProject javaProject = JavaCore.create(project);
 		@SuppressWarnings("restriction")
 		IClasspathEntry[] entries = org.eclipse.pde.internal.core.ClasspathComputer.getClasspath(project, model, null,
 				true /* clear existing entries */, true);
-		JavaCore.create(project).setRawClasspath(entries, null);
+		javaProject.setRawClasspath(keepMavenClasspathContainer(javaProject, entries), null);
 		// workaround PDE sloppy model management during the first multimodule project
 		// import in eclipse session
 		// 1. m2e creates all modules as simple workspace projects without JDT or PDE
