@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!--	<parent>-->
+	<!--		<groupId>org.eclipse.m2e</groupId>-->
+	<!--		<artifactId>m2e-core</artifactId>-->
+	<!--		<version>2.1.0-SNAPSHOT</version>-->
+	<!--	</parent>-->
+	<groupId>org.eclipse.m2e.lemminx.bnd</groupId>
+	<artifactId>org.eclipse.m2e.lemminx.bnd</artifactId>
+	<version>2.1.0-SNAPSHOT</version>
+	<name>M2E bnd lemminx extension</name>
+
+	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+	</properties>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.lemminx</groupId>
+			<artifactId>org.eclipse.lemminx</artifactId>
+			<version>0.28.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>biz.aQute.bnd</groupId>
+			<artifactId>biz.aQute.bndlib</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>lemminx-releases</id>
+			<url>https://repo.eclipse.org/content/repositories/lemminx-releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+</project>
