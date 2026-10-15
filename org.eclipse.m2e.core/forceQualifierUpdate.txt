@@ -1,3 +1,4 @@
 # To force a version qualifier update add the bug here
 Update build-qualifier because the compiled byte-code has changed, probably due to newer JDK minor version used in the CI
 Update build-qualifier to pick-up changes in source bundle generation in new Tycho 5.0.3
+Prevent deadlock during Plexus container creation (#1749, #2008)
