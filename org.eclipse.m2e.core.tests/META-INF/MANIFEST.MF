@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.m2e.tests.common,
 Import-Package: org.apache.commons.io,
  org.junit,
  org.mockito,
+ org.mockito.invocation,
  org.mockito.stubbing
 Eclipse-BundleShape: dir
 Automatic-Module-Name: org.eclipse.m2e.core.tests
