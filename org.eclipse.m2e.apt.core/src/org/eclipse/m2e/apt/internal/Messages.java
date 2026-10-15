@@ -26,6 +26,10 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.apt.internal.messages"; //$NON-NLS-1$
 
   public static String ProjectUtils_error_invalid_option_name;
+
+  public static String WorkspaceProcessor_missing_jar;
+
+  public static String WorkspaceProcessor_stale_jar;
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
