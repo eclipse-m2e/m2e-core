@@ -35,10 +35,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.console.IConsoleConstants;
 
 import org.codehaus.plexus.util.FileUtils;
 
@@ -152,6 +159,18 @@ public class ArchetypeGenerator {
       mavenRun = mavenLauncher.runMaven(workingDir[0], goals, userProperties, interactive);
       subMonitor.worked(1);
       Display current = Display.getCurrent();
+      if(interactive) {
+        Display.getDefault().asyncExec(() -> {
+          IWorkbench workbench = PlatformUI.getWorkbench();
+          IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
+          IWorkbenchPage page = activeWindow.getActivePage();
+          try {
+            page.showView(IConsoleConstants.ID_CONSOLE_VIEW);
+          } catch(PartInitException ex) {
+            Platform.getLog(ArchetypeGenerator.class).error("Cannot open console", ex);
+          }
+        });
+      }
       while(!mavenRun.isDone()) {
         if(current != null) {
           while(!current.isDisposed() && current.readAndDispatch()) {
