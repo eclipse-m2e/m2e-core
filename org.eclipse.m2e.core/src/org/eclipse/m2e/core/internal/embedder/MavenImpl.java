@@ -333,7 +333,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       try {
         lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
-        configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        setMinimalValidationLevel(configuration);
         configuration.setRepositorySession(
             MavenExecutionContext.createRepositorySession(request, getMavenConfiguration(), this));
         return lookup(ProjectBuilder.class).build(pomFile, configuration).getProject();
@@ -355,7 +355,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     log.debug("Reading Maven project: {}", pomFile.getAbsoluteFile()); //$NON-NLS-1$
     MavenExecutionResult result = new DefaultMavenExecutionResult();
     try {
-      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      setMinimalValidationLevel(configuration);
       ProjectBuildingResult projectBuildingResult = lookup(ProjectBuilder.class).build(pomFile, configuration);
       result.setProject(projectBuildingResult.getProject());
       result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
@@ -376,7 +376,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private MavenProject resolveParentProject(RepositorySystemSession repositorySession, MavenProject child,
       ProjectBuildingRequest configuration) throws CoreException {
-    configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+    setMinimalValidationLevel(configuration);
     configuration.setRepositorySession(repositorySession);
 
     try {
@@ -408,6 +408,13 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
 
     return null;
+  }
+
+  public static void setMinimalValidationLevel(ProjectBuildingRequest configuration) {
+    configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+    // See AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY in Maven 3.10.0 
+    // respectively org.apache.maven.api.Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL in Maven 4.0.0
+    configuration.getSystemProperties().setProperty("maven.model.dependencyInterpolation.full", "true");
   }
 
   public MavenProject resolveParentProject(MavenProject child, IProgressMonitor monitor) throws CoreException {

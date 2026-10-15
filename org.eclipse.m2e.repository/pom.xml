@@ -43,7 +43,12 @@
 							<requirement>
 								<type>eclipse-plugin</type>
 								<id>org.eclipse.m2e.maven.runtime</id>
-								<versionRange>[3.9.0, 4)</versionRange>
+								<versionRange>[3.9.0,3.10)</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.eclipse.m2e.maven.runtime</id>
+								<versionRange>[3.10.0,4)</versionRange>
 							</requirement>
 						</extraRequirements>
 					</dependency-resolution>
