@@ -87,27 +87,36 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
           return null;
         }
 
-        MavenProject mavenProject;
-        try {
-          // make sure projectFacade has MavenProject instance loaded
-          mavenProject = projectFacade.getMavenProject(monitor2);
-        } catch(CoreException ce) {
-          //unable to read the project facade
-          addErrorMarker(project, ce);
-          return null;
-        }
+        boolean releaseRetention = kind != CLEAN_BUILD
+          && builder.hasRelevantDelta(
+              projectFacade,
+              getDelta(projectFacade.getProject())) != MavenBuilderImpl.DeltaType.IRRELEVANT;
 
-        return context2.execute(mavenProject, (context1, monitor1) -> {
-          ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
-          if(lifecycleMapping == null) {
+        try {
+          MavenProject mavenProject;
+          try {
+            // make sure projectFacade has MavenProject instance loaded
+            mavenProject = projectFacade.getMavenProject(monitor2);
+          } catch(CoreException ce) {
+            //unable to read the project facade
+            addErrorMarker(project, ce);
             return null;
           }
 
-          Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-              .getBuildParticipants(projectFacade, monitor1);
+          return context2.execute(mavenProject, (context1, monitor1) -> {
+            ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
+            if(lifecycleMapping == null) {
+              return null;
+            }
 
-          return method(context1, projectFacade, buildParticipantsByMojoExecutionKey, kind, args, monitor1);
-        }, monitor2);
+            Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
+                .getBuildParticipants(projectFacade, monitor1);
+
+            return method(context1, projectFacade, buildParticipantsByMojoExecutionKey, kind, args, monitor1);
+          }, monitor2);
+        } finally {
+          projectManager.releaseInitialBuildRetention(projectFacade, releaseRetention);
+        }
       }, monitor);
     }
 
