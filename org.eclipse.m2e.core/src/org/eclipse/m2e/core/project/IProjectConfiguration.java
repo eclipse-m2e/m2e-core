@@ -54,6 +54,10 @@ public interface IProjectConfiguration {
 
   File getMultiModuleProjectDirectory();
 
+  String getGlobalSettingsFile();
+
+  String getUserSettingsFile();
+
   /**
    * Computes a hashcode over the contents of the given configuration, that is a semantic hash-code that can be used in
    * combination of {@link #contentsEquals(IProjectConfiguration, IProjectConfiguration)}
@@ -65,7 +69,8 @@ public interface IProjectConfiguration {
     return Objects.hash(configuration.isResolveWorkspaceProjects(), configuration.getActiveProfileList(),
         configuration.getInactiveProfileList(), configuration.getLifecycleMappingId(),
         configuration.getConfigurationProperties(), configuration.getUserProperties(),
-        configuration.getMultiModuleProjectDirectory());
+        configuration.getMultiModuleProjectDirectory(), configuration.getGlobalSettingsFile(),
+        configuration.getUserSettingsFile());
   }
 
   public static boolean contentsEquals(IProjectConfiguration configuration, IProjectConfiguration other) {
@@ -81,7 +86,9 @@ public interface IProjectConfiguration {
         && Objects.equals(configuration.getInactiveProfileList(), other.getInactiveProfileList())
         && Objects.equals(configuration.getConfigurationProperties(), other.getConfigurationProperties())
         && Objects.equals(configuration.getUserProperties(), other.getUserProperties())
-        && Objects.equals(configuration.getMultiModuleProjectDirectory(), other.getMultiModuleProjectDirectory());
+        && Objects.equals(configuration.getMultiModuleProjectDirectory(), other.getMultiModuleProjectDirectory())
+        && Objects.equals(configuration.getGlobalSettingsFile(), other.getGlobalSettingsFile())
+        && Objects.equals(configuration.getUserSettingsFile(), other.getUserSettingsFile());
   }
 
 }
