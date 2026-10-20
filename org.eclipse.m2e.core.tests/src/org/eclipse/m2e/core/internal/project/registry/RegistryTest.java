@@ -146,6 +146,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     assertPhase2RevisitsRequeueOnlyOnChange(false);
   }
 
+  @SuppressWarnings("restriction")
   private void assertPhase2RevisitsRequeueOnlyOnChange(boolean changeCapabilities) throws Exception {
     IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
     IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
