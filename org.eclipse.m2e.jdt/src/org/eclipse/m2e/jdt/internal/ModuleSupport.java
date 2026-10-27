@@ -124,6 +124,10 @@ public class ModuleSupport {
       return;
     }
 
+    if(moduleInfo.requiredModuleNames.isEmpty() && moduleInfo.usedServiceNames.isEmpty()) {
+      return;
+    }
+
     Map<String, InternalModuleInfo> entryModuleInfos = new LinkedHashMap<>();
     Map<String, IClasspathEntryDescriptor> entryDescriptors = new LinkedHashMap<>();
     for(IClasspathEntryDescriptor entryDescriptor : classpath.getEntryDescriptors()) {
