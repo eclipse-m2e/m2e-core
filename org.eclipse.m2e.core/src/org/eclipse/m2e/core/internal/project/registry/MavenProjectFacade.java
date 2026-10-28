@@ -13,8 +13,13 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,15 +30,23 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -52,11 +65,15 @@ import org.eclipse.m2e.core.embedder.IComponentLookup;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
+import org.eclipse.m2e.core.internal.MavenArtifactIdentifier;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.builder.MavenBuilderImpl;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.embedder.PlexusContainerManager;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
@@ -77,6 +94,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public static final String PROP_LIFECYCLE_MAPPING = MavenProjectFacade.class.getName() + "/lifecycleMapping";
 
   public static final String PROP_CONFIGURATORS = MavenProjectFacade.class.getName() + "/configurators";
+
+  private static Logger log = LoggerFactory.getLogger(MavenBuilderImpl.class);
 
   private final ProjectRegistryManager manager;
 
@@ -128,6 +147,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private transient Map<String, Object> sessionProperties;
 
+  private Properties propertiesFromBuild;
+
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       IProjectConfiguration resolverConfiguration) {
     this.manager = manager;
@@ -172,6 +193,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       i++ ;
     }
     timestamp[timestamp.length - 1] = getModificationStamp(pom);
+
+    loadPropertiesFromCache(project);
   }
 
   private Set<ArtifactRepositoryRef> toRepositoryReferences(List<ArtifactRepository> artifactRepositories) {
@@ -209,6 +232,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.pluginArtifactRepositories = new LinkedHashSet<>(other.pluginArtifactRepositories);
 
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
+
+    if(other.propertiesFromBuild == null) {
+      loadPropertiesFromCache(getProject());
+    } else {
+      this.propertiesFromBuild = new Properties();
+      this.propertiesFromBuild.putAll(other.propertiesFromBuild);
+    }
   }
 
   /**
@@ -586,8 +616,21 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   @Override
   public <T> T getMojoParameterValue(MojoExecution mojoExecution, String parameter, Class<T> asType,
       IProgressMonitor monitor) throws CoreException {
-    return ((MavenImpl) manager.maven).getMojoParameterValue(getMavenProject(monitor), mojoExecution, parameter, asType,
-        monitor);
+    MavenProject mavenProject = getMavenProject(monitor);
+    MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
+    try {
+      if(propertiesFromBuild != null && shouldUsePropertiesFromBuild()) {
+        Properties projectProperties = mavenProject.getProperties();
+        for(String name : propertiesFromBuild.stringPropertyNames()) {
+          if(!projectProperties.containsKey(name)) {
+            projectProperties.setProperty(name, propertiesFromBuild.getProperty(name));
+          }
+        }
+      }
+      return ((MavenImpl) manager.maven).getMojoParameterValue(mavenProject, mojoExecution, parameter, asType, monitor);
+    } finally {
+      snapshot.restore(mavenProject);
+    }
   }
 
   @Override
@@ -752,5 +795,61 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   }
 
+  public void setPropertiesFromBuild(Properties properties) {
+    Properties copy = new Properties();
+    copy.putAll(properties);
+    this.propertiesFromBuild = copy;
+    savePropertiesFromPreferences(getProject());
+  }
 
+  public Properties getPropertiesFromBuild() {
+    if(propertiesFromBuild == null) {
+      return null;
+    }
+    if(!shouldUsePropertiesFromBuild()) {
+      return null;
+    }
+    Properties copy = new Properties();
+    copy.putAll(propertiesFromBuild);
+    return copy;
+  }
+
+  private void loadPropertiesFromCache(IProject project) {
+    Path cacheFile = getPropertiesFromBuildDataPath(project);
+
+    if(!Files.exists(cacheFile)) {
+      return;
+    }
+    try (BufferedReader sr = Files.newBufferedReader(cacheFile)) {
+      Properties propertiesFromBuild = new Properties();
+      propertiesFromBuild.load(sr);
+      this.propertiesFromBuild = propertiesFromBuild;
+    } catch(IOException ex) {
+      log.warn("Cannot load properties for project {}", project.getName(), ex);
+    }
+  }
+
+  private void savePropertiesFromPreferences(IProject project) {
+    Path cacheFile = getPropertiesFromBuildDataPath(project);
+    try {
+      Files.createDirectories(cacheFile.getParent());
+      try (BufferedWriter bw = Files.newBufferedWriter(cacheFile)) {
+        propertiesFromBuild.store(bw, null);
+      }
+    } catch(IOException ex) {
+      log.warn("Cannot save properties for project {}", project.getName(), ex);
+    }
+  }
+
+  private Path getPropertiesFromBuildDataPath(IProject project) {
+    Bundle bundle = FrameworkUtil.getBundle(MavenArtifactIdentifier.class);
+    Path cacheFile = Platform.getStateLocation(bundle).append("propertiesFromBuild").append(project.getName() + ".xml")
+        .toFile().toPath();
+    return cacheFile;
+  }
+
+  private boolean shouldUsePropertiesFromBuild() {
+    return InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID)
+        .getBoolean(MavenPreferenceConstants.P_USE_PROPERTIES_FROM_BUILD, true);
+  }
 }

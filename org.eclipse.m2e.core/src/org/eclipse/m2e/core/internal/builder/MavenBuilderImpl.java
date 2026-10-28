@@ -66,6 +66,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
@@ -182,6 +183,9 @@ public class MavenBuilderImpl {
               diff(debugRefreshFiles, participantResults.getFiles()), monitor);
         }
       });
+      if(projectFacade instanceof MavenProjectFacade facade && kind == FULL_BUILD) {
+        facade.setPropertiesFromBuild(mavenProject.getProperties());
+      }
     } catch(Exception e) {
       log.debug("Unexpected build exception", e);
       buildErrors.put(e, null);
