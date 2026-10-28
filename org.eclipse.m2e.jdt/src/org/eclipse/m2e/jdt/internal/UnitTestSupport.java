@@ -55,6 +55,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.MavenExecutionJre;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
@@ -457,7 +458,7 @@ public class UnitTestSupport {
         MojoExecution execution, IProgressMonitor monitor) {
       try {
         String argLine = facade.getMojoParameterValue(execution, PLUGIN_ARGLINE, String.class, monitor);
-        argLine = resolveDeferredVariables(mavenProject, argLine);
+        argLine = resolveDeferredVariables(facade, mavenProject, argLine);
         // resolve all placeholders which were not resolved previously by the empty string
         argLine = removeStandardVariablePlaceholders(argLine);
 
@@ -478,13 +479,15 @@ public class UnitTestSupport {
      * project's properties. The placeholders are in the format @{...}, where ... is the key of the property. If a
      * placeholder's corresponding property does not exist the full placeholder is replaced by the empty string.
      *
+     * @param facade the {@link IMavenProjectFacade} to retrieve the properties obtained during the build if possible
      * @param mavenProject the Maven project from which to retrieve the properties
      * @param value the string containing the placeholders to be replaced
      * @return the string with all resolvable placeholders replaced with their corresponding property values (or empty
      *         strings)
      */
-    private static String resolveDeferredVariables(MavenProject mavenProject, String value) {
-      Properties properties = mavenProject.getProperties();
+    private static String resolveDeferredVariables(IMavenProjectFacade facade, MavenProject mavenProject,
+        String value) {
+      Properties properties = getProperties(facade, mavenProject);
       if(properties.isEmpty() || value == null) {
         return "";
       }
@@ -493,6 +496,19 @@ public class UnitTestSupport {
         String replacement = properties.getProperty(key);
         return replacement != null ? replacement : "";
       });
+    }
+
+    private static Properties getProperties(IMavenProjectFacade facade, MavenProject mavenProject) {
+      Properties properties = mavenProject.getProperties();
+      if(facade instanceof MavenProjectFacade f) {
+        Properties propertiesFromBuild = f.getPropertiesFromBuild();
+        if(propertiesFromBuild != null && !propertiesFromBuild.isEmpty()) {
+          // "normal" properties can overwrite properties from the last full build as they may be more up-to-date
+          propertiesFromBuild.putAll(properties);
+          properties = propertiesFromBuild;
+        }
+      }
+      return properties;
     }
 
     /**

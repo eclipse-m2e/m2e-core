@@ -14,7 +14,9 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,8 +27,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -34,6 +40,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -53,6 +61,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.builder.MavenBuilderImpl;
 import org.eclipse.m2e.core.internal.embedder.IMavenPlexusContainer;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -77,6 +86,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public static final String PROP_LIFECYCLE_MAPPING = MavenProjectFacade.class.getName() + "/lifecycleMapping";
 
   public static final String PROP_CONFIGURATORS = MavenProjectFacade.class.getName() + "/configurators";
+
+  private static Logger log = LoggerFactory.getLogger(MavenBuilderImpl.class);
 
   private final ProjectRegistryManager manager;
 
@@ -128,6 +139,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private transient Map<String, Object> sessionProperties;
 
+  private Properties propertiesFromBuild;
+
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       IProjectConfiguration resolverConfiguration) {
     this.manager = manager;
@@ -172,6 +185,23 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       i++ ;
     }
     timestamp[timestamp.length - 1] = getModificationStamp(pom);
+
+    loadPropertiesFromPreferences(project);
+  }
+
+  private void loadPropertiesFromPreferences(IProject project) {
+    IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID + ".properties");
+    String prefValue = prefs.get(project.getName(), "");
+    if(prefValue.isEmpty()) {
+      return;
+    }
+    try (StringReader sr = new StringReader(prefValue)) {
+      Properties propertiesFromBuild = new Properties();
+      propertiesFromBuild.load(sr);
+      this.propertiesFromBuild = propertiesFromBuild;
+    } catch(IOException ex) {
+      log.warn("Cannot load preferences for project {}", project.getName(), ex);
+    }
   }
 
   private Set<ArtifactRepositoryRef> toRepositoryReferences(List<ArtifactRepository> artifactRepositories) {
@@ -209,6 +239,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.pluginArtifactRepositories = new LinkedHashSet<>(other.pluginArtifactRepositories);
 
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
+
+    if(other.propertiesFromBuild == null) {
+      loadPropertiesFromPreferences(getProject());
+    } else {
+      this.propertiesFromBuild = new Properties();
+      this.propertiesFromBuild.putAll(other.propertiesFromBuild);
+    }
   }
 
   /**
@@ -752,5 +789,18 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   }
 
+  public void setPropertiesFromBuild(Properties properties) {
+    Properties copy = new Properties();
+    copy.putAll(properties);
+    this.propertiesFromBuild = copy;
+  }
 
+  public Properties getPropertiesFromBuild() {
+    if(propertiesFromBuild == null) {
+      return null;
+    }
+    Properties copy = new Properties();
+    copy.putAll(propertiesFromBuild);
+    return copy;
+  }
 }
