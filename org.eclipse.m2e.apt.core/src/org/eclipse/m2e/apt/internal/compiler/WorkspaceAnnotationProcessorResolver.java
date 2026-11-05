@@ -13,6 +13,9 @@ package org.eclipse.m2e.apt.internal.compiler;
 import java.io.File;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -44,6 +47,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 @SuppressWarnings("restriction")
 final class WorkspaceAnnotationProcessorResolver extends PluginDependencyResolver {
+
+  private static final Logger log = LoggerFactory.getLogger(WorkspaceAnnotationProcessorResolver.class);
 
   private final Collection<Dependency> dependencies;
 
@@ -90,20 +95,34 @@ final class WorkspaceAnnotationProcessorResolver extends PluginDependencyResolve
     String workspaceProjectName = workspaceFacade.getProject().getName();
 
     if(!localJar.isFile()) {
-      markerManager.addMarker(consumerProject, IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID,
+      IMarker marker = markerManager.addMarker(consumerProject, IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID,
           NLS.bind(Messages.WorkspaceProcessor_missing_jar,
               new Object[] {artifactCoordinates, workspaceProjectName}),
           1, IMarker.SEVERITY_WARNING);
+      setMarkerAttributes(marker, artifactCoordinates, workspaceProjectName);
       return resolvedFile;
     }
 
     if(hasNewerJavaSource(workspaceFacade, localJar.lastModified())) {
-      markerManager.addMarker(consumerProject, IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID,
+      IMarker marker = markerManager.addMarker(consumerProject, IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID,
           NLS.bind(Messages.WorkspaceProcessor_stale_jar,
               new Object[] {artifactCoordinates, workspaceProjectName}),
           1, IMarker.SEVERITY_WARNING);
+      setMarkerAttributes(marker, artifactCoordinates, workspaceProjectName);
     }
     return localJar;
+  }
+
+  private static void setMarkerAttributes(IMarker marker, String artifactCoordinates, String workspaceProjectName) {
+    if(marker == null) {
+      return;
+    }
+    try {
+      marker.setAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_ARTIFACT_ATTRIBUTE, artifactCoordinates);
+      marker.setAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_PROJECT_ATTRIBUTE, workspaceProjectName);
+    } catch(CoreException ex) {
+      log.warn("Could not add workspace annotation processor details to marker", ex); //$NON-NLS-1$
+    }
   }
 
   private static boolean sameLocation(File first, File second) {
