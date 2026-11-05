@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
@@ -41,6 +42,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
@@ -55,6 +57,8 @@ import org.eclipse.m2e.apt.preferences.AnnotationProcessingMode;
 import org.eclipse.m2e.apt.preferences.IPreferencesManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.ide.IDE;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -89,13 +93,15 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 
 	@Test
 	public void testWorkspaceAnnotationProcessorUsesLocalRepositoryJar() throws Exception {
-		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/workspace-processor/1.0.0");
-		Path localJar = localArtifactDirectory.resolve("workspace-processor-1.0.0.jar");
+		String artifactId = "workspace-processor-" + UUID.randomUUID();
+		Path fixture = createWorkspaceProcessorFixture(artifactId);
+		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/" + artifactId);
+		Path localJar = localArtifactDirectory.resolve("1.0.0/" + artifactId + "-1.0.0.jar");
 		assertFalse("Test annotation processor JAR already exists: " + localJar, Files.exists(localJar));
 		IProject consumer = null;
 
 		try {
-			IProject[] projects = importProjects("projects/workspaceProcessor",
+			IProject[] projects = importProjects(fixture.toString(),
 					new String[] { "processor/pom.xml", "consumer/pom.xml" }, new ResolverConfiguration());
 			IProject processor = projects[0];
 			consumer = projects[1];
@@ -104,9 +110,10 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 			IMarker[] missingJarMarkers = getWorkspaceProcessorMarkers(consumer);
 			assertEquals(1, missingJarMarkers.length);
 			String missingJarMessage = missingJarMarkers[0].getAttribute(IMarker.MESSAGE, "");
-			assertTrue(missingJarMessage.contains("org.eclipse.m2e.tests:workspace-processor:1.0.0"));
+			assertTrue(missingJarMessage.contains("org.eclipse.m2e.tests:" + artifactId + ":1.0.0"));
 			assertTrue(missingJarMessage.contains(processor.getName()));
 			assertTrue(missingJarMessage.contains("Maven Install"));
+			assertWorkspaceProcessorMarkerAttributes(missingJarMarkers[0], processor, artifactId);
 
 			processor.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 			waitForJobsToComplete();
@@ -124,10 +131,10 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 							&& processor.getFullPath().equals(entry.getPath())));
 
 			FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaConsumer);
-			assertFactoryContainerContains(factoryPath, "workspace-processor:1.0.0");
+			assertFactoryContainerContains(factoryPath, artifactId + ":1.0.0");
 			assertTrue(factoryPath.getEnabledContainers().keySet().stream() //
 					.anyMatch(container -> container.getType() == FactoryType.VARJAR
-							&& container.getId().endsWith("workspace-processor-1.0.0.jar")));
+						&& container.getId().endsWith(artifactId + "-1.0.0.jar")));
 			assertTrue(consumer.getFile(COMPILER_OUTPUT_DIR + "/generated/WorkspaceGenerated.java").exists());
 			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
 
@@ -139,20 +146,92 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 			IMarker[] staleJarMarkers = getWorkspaceProcessorMarkers(consumer);
 			assertEquals(1, staleJarMarkers.length);
 			String staleJarMessage = staleJarMarkers[0].getAttribute(IMarker.MESSAGE, "");
-			assertTrue(staleJarMessage.contains("org.eclipse.m2e.tests:workspace-processor:1.0.0"));
+			assertTrue(staleJarMessage.contains("org.eclipse.m2e.tests:" + artifactId + ":1.0.0"));
 			assertTrue(staleJarMessage.contains(processor.getName()));
 			assertTrue(staleJarMessage.contains("older than Java source"));
+			assertWorkspaceProcessorMarkerAttributes(staleJarMarkers[0], processor, artifactId);
 
 			createJar(processor.getFolder("target/classes").getLocation().toFile().toPath(), localJar);
 			Files.setLastModifiedTime(localJar, FileTime.fromMillis(processorSource.getLocalTimeStamp() + 2000));
 			updateProject(consumer);
 			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
 		} finally {
+			cleanupWorkspaceProcessorFixture(consumer, localArtifactDirectory, fixture);
+		}
+		assertFalse("Test artifact directory was not removed", Files.exists(localArtifactDirectory));
+	}
+
+	@Test
+	public void testWorkspaceAnnotationProcessorQuickFixInstallsAndUpdatesConsumer() throws Exception {
+		String artifactId = "workspace-processor-" + UUID.randomUUID();
+		Path fixture = createWorkspaceProcessorFixture(artifactId);
+		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/" + artifactId);
+		Path localJar = localArtifactDirectory.resolve("1.0.0/" + artifactId + "-1.0.0.jar");
+		assertFalse("Test annotation processor JAR already exists: " + localJar, Files.exists(localJar));
+		IProject consumer = null;
+
+		try {
+			IProject[] projects = importProjects(fixture.toString(),
+					new String[] { "processor/pom.xml", "consumer/pom.xml" }, new ResolverConfiguration());
+			IProject processor = projects[0];
+			consumer = projects[1];
+			waitForJobsToComplete();
+
+			IMarker[] markers = getWorkspaceProcessorMarkers(consumer);
+			assertEquals(1, markers.length);
+			assertWorkspaceProcessorMarkerAttributes(markers[0], processor, artifactId);
+
+			IMarkerResolution quickFix = Arrays.stream(IDE.getMarkerHelpRegistry().getResolutions(markers[0]))
+					.filter(resolution -> resolution.getLabel().contains(processor.getName()))
+					.findFirst()
+					.orElseThrow(() -> new AssertionError("Workspace processor Maven Install quick fix is missing"));
+			quickFix.run(markers[0]);
+			Job.getJobManager().join(IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID, monitor);
+			waitForJobsToComplete();
+
+			assertTrue("Quick fix did not install annotation processor JAR", Files.isRegularFile(localJar));
+			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
+			assertTrue(consumer.getFile(COMPILER_OUTPUT_DIR + "/generated/WorkspaceGenerated.java").exists());
+		} finally {
+			cleanupWorkspaceProcessorFixture(consumer, localArtifactDirectory, fixture);
+		}
+		assertFalse("Test artifact directory including Maven metadata was not removed",
+				Files.exists(localArtifactDirectory));
+	}
+
+	private void cleanupWorkspaceProcessorFixture(IProject consumer, Path artifactDirectory, Path fixture)
+			throws Exception {
+		try {
 			if (consumer != null) {
 				deleteProject(consumer);
 			}
-			deleteRecursively(localArtifactDirectory);
+		} finally {
+			try {
+				deleteRecursively(artifactDirectory);
+			} finally {
+				deleteRecursively(fixture);
+			}
 		}
+	}
+
+	private static Path createWorkspaceProcessorFixture(String artifactId) throws IOException {
+		// Each invocation owns its coordinates, including when CI restores a Maven repository cache.
+		Path fixture = Files.createTempDirectory("workspaceProcessor-");
+		copyDir(new File("projects/workspaceProcessor"), fixture.toFile());
+		for (String module : List.of("processor", "consumer")) {
+			Path pom = fixture.resolve(module).resolve("pom.xml");
+			Files.writeString(pom, Files.readString(pom).replace("<artifactId>workspace-processor</artifactId>",
+					"<artifactId>" + artifactId + "</artifactId>"));
+		}
+		return fixture;
+	}
+
+	private static void assertWorkspaceProcessorMarkerAttributes(IMarker marker, IProject processor, String artifactId)
+			throws CoreException {
+		assertEquals("org.eclipse.m2e.tests:" + artifactId + ":1.0.0",
+				marker.getAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_ARTIFACT_ATTRIBUTE));
+		assertEquals(processor.getName(),
+				marker.getAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_PROJECT_ATTRIBUTE));
 	}
 
 	@Test
