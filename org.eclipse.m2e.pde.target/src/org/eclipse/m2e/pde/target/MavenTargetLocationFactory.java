@@ -15,6 +15,7 @@ package org.eclipse.m2e.pde.target;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -130,7 +131,19 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 		String version = getText(MavenTargetLocation.ELEMENT_VERSION, element);
 		String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, element);
 		String classifier = getText(MavenTargetLocation.ELEMENT_CLASSIFIER, element);
-		return new MavenTargetDependency(groupId, artifactId, version, artifactType, classifier);
+		MavenTargetDependency dependency = new MavenTargetDependency(groupId, artifactId, version, artifactType,
+				classifier);
+		List<org.apache.maven.model.Exclusion> exclusions = descendants(element,
+				MavenTargetLocation.ELEMENT_EXCLUSION).map(exclusionElement -> {
+					org.apache.maven.model.Exclusion exclusion = new org.apache.maven.model.Exclusion();
+					exclusion.setGroupId(getText(MavenTargetLocation.ELEMENT_GROUP_ID, exclusionElement));
+					exclusion.setArtifactId(getText(MavenTargetLocation.ELEMENT_ARTIFACT_ID, exclusionElement));
+					return exclusion;
+				}).toList();
+		if (!exclusions.isEmpty()) {
+			dependency.setExclusions(new ArrayList<>(exclusions));
+		}
+		return dependency;
 	}
 
 	private static String getText(String tagName, Element location) {
