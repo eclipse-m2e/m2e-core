@@ -50,6 +50,15 @@ The variable `<version-under-development>` has to be replaced by the current ver
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
+### m2e 3 (under development)
+
+The next evolution of the Eclipse Maven integration, named m2e 3, is currently under development and has to goal to prepare for Maven 4.
+Interested parties can obtain the latest development snapshot at:
+- `https://download.eclipse.org/technology/m2e/snapshots/3.0.0`
+
+See also the discussion at
+- https://github.com/eclipse-m2e/m2e-core/discussions/2010
+
 ## ⌨️ Contributing
 [![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
 &nbsp;&nbsp;&nbsp;or just&nbsp;&nbsp;&nbsp;
