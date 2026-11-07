@@ -43,4 +43,11 @@
       <pattern>&lt;m2e.apt.activation&gt;${cursor}${jdt_apt}&lt;/m2e.apt.activation&gt;</pattern>
     </template>
    </extension> 
+
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.m2e.apt.ui.internal.markers.WorkspaceProcessorMarkerResolutionGenerator"
+            markerType="org.eclipse.m2e.apt.problem.workspaceProcessor">
+      </markerResolutionGenerator>
+   </extension>
 </plugin>
