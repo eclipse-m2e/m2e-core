@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.internal.builder;
 import static org.eclipse.core.resources.IncrementalProjectBuilder.FULL_BUILD;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +48,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -66,6 +69,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
@@ -182,6 +186,15 @@ public class MavenBuilderImpl {
               diff(debugRefreshFiles, participantResults.getFiles()), monitor);
         }
       });
+      if(projectFacade instanceof MavenProjectFacade facade && kind == FULL_BUILD) {
+        facade.setPropertiesFromBuild(mavenProject.getProperties());
+        IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID + ".properties");
+        try (StringWriter sw = new StringWriter()) {
+          mavenProject.getProperties().store(sw, null);
+          prefs.put(project.getName(), sw.toString());
+        }
+        prefs.flush();
+      }
     } catch(Exception e) {
       log.debug("Unexpected build exception", e);
       buildErrors.put(e, null);
