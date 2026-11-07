@@ -21,7 +21,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -29,6 +37,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -41,6 +50,7 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 
 public class RegistryTest extends AbstractMavenProjectTestCase {
@@ -123,6 +133,95 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
         assertArrayEquals(new IMarker[0], markers);
     } finally {
         setAutoBuilding(isAutoBuilding());
+    }
+  }
+
+  @Test
+  public void testPhase2CapabilityRevisitsRequeueOnlyOnChange() throws Exception {
+    assertPhase2RevisitsRequeueOnlyOnChange(true);
+  }
+
+  @Test
+  public void testPhase2RequirementRevisitsRequeueOnlyOnChange() throws Exception {
+    assertPhase2RevisitsRequeueOnlyOnChange(false);
+  }
+
+  @SuppressWarnings("restriction")
+  private void assertPhase2RevisitsRequeueOnlyOnChange(boolean changeCapabilities) throws Exception {
+    IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
+    IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
+    IProject unrelatedProject = createExisting("unrelated", "resources/projects/simplePomOK", true);
+    waitForJobsToComplete(monitor);
+    ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+    ProjectRegistryManager refreshManager = Mockito.spy(registryManager);
+    IFile dependencyPom = dependencyProject.getFile("pom.xml");
+    IFile dependentPom = dependentProject.getFile("pom.xml");
+    ArtifactKey dependencyKey = registryManager.create(dependencyProject, monitor).getArtifactKey();
+    ArtifactKey changedKey = new ArtifactKey(dependencyKey.groupId(), dependencyKey.artifactId(), "0.0.2", null);
+    ArtifactKey parentKey = new ArtifactKey("test", "parent", "1", null);
+    List<Boolean> firstVisits = new ArrayList<>();
+
+    try(MutableProjectRegistry state = registryManager.newMutableProjectRegistry()) {
+      if(changeCapabilities) {
+        state.setCapabilities(dependencyPom,
+            Set.of(MavenCapability.createMavenArtifact(changedKey), MavenCapability.createMavenParent(changedKey)));
+      } else {
+        state.setRequirements(dependencyPom, Set.of(MavenRequiredCapability.createResolvedMavenParent(parentKey)));
+      }
+
+      Mockito.doAnswer(invocation -> {
+        DependencyResolutionContext context = invocation.getArgument(1);
+        Map<IFile, Set<Capability>> originalCapabilities = invocation.getArgument(2);
+        Map<IFile, Set<RequiredCapability>> originalRequirements = invocation.getArgument(3);
+        IFile pom = invocation.getArgument(4);
+        MavenProjectFacade facade = invocation.getArgument(5);
+        boolean firstVisit = invocation.getArgument(6);
+        IProgressMonitor progress = invocation.getArgument(7);
+        if(!dependencyPom.equals(pom)) {
+          return invocation.callRealMethod();
+        }
+
+        firstVisits.add(firstVisit);
+        int visit = firstVisits.size();
+        Assert.assertTrue("The forced revisits must converge", visit <= 3);
+        Assert.assertFalse("The dependent must have been processed before this visit",
+            context.getCurrent().contains(dependentPom));
+        MavenProject mavenProject = refreshManager.getMavenProject(facade);
+        Artifact parentArtifact = mavenProject.getParentArtifact();
+        if(visit == 3) {
+          if(changeCapabilities) {
+            facade = Mockito.spy(facade);
+            Mockito.doReturn(changedKey).when(facade).getArtifactKey();
+            refreshManager.putMavenProject(facade, mavenProject);
+          } else {
+            mavenProject.setParentArtifact(new DefaultArtifact(parentKey.groupId(), parentKey.artifactId(),
+                parentKey.version(), null, "pom", null, new DefaultArtifactHandler("pom")));
+          }
+        }
+
+        try {
+          registryManager.refreshPhase2(state, context, originalCapabilities, originalRequirements, pom, facade,
+              firstVisit, progress);
+        } finally {
+          mavenProject.setParentArtifact(parentArtifact);
+        }
+        assertEquals("Only a changed phase-2 result should re-enqueue the dependent on visit " + visit,
+            visit != 2, context.getCurrent().contains(dependentPom));
+        if(visit < 3) {
+          context.forcePomFile(pom);
+        }
+        return null;
+      }).when(refreshManager).refreshPhase2(Mockito.eq(state), Mockito.any(), Mockito.anyMap(), Mockito.anyMap(),
+          Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any());
+
+      // The unrelated project lets ProjectProcessingTracker make progress and retry the forced revisit
+      List<IFile> poms = List.of(dependentPom, dependencyPom, unrelatedProject.getFile("pom.xml"));
+      MavenImpl.execute(MavenPlugin.getMaven(), false, false, (context, progress) -> {
+        refreshManager.refresh(state, poms, progress);
+        return null;
+      }, monitor);
+      assertEquals("Exercise the actual first-visit tracking across three phase-2 iterations",
+          List.of(true, false, false), firstVisits);
     }
   }
 }
