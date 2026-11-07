@@ -1,2 +1,3 @@
 # To force a version qualifier update add the bug here
 Update build-qualifier because maven-runtime update
+Update build-qualifier due to removal (and instead reference) of ASM from maven-runtime
