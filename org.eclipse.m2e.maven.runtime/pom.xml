@@ -37,7 +37,12 @@
 		<buildqualifier.format>%Y%m%d-%H%M</buildqualifier.format>
 	</properties>
 	<dependencies>
-		<!-- Excluded dependencies (or those that are 'provided' to effectivly remove
+		<!-- In general the goal is to replicate the jar files of a standard
+		Maven installation of the same version.
+		I.e. the jars in the 'target/jars' folder of this project should be the same as
+		in the 'lib' folder of a corresponding installation, with a few exceptions of
+		additions for m2e specific use-cases and for exclusions:
+		Excluded dependencies (or those that are 'provided' to effectively remove
 		them from the bundle) are fulfilled via the OSGi requirements specified below
 		as Import-Package/Require-Bundle and therefore don't have to be
 		embedded. Or they are not required. -->
@@ -158,6 +163,11 @@
 			<artifactId>javax.inject</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -178,7 +188,7 @@
 				<plugin>
 					<groupId>biz.aQute.bnd</groupId>
 					<artifactId>bnd-maven-plugin</artifactId>
-					<version>7.3.0</version>
+					<version>7.4.0</version>
 					<extensions>true</extensions>
 					<configuration>
 						<bnd><![CDATA[
@@ -209,16 +219,19 @@
 								javax.inject;version="[1.0.0,2.0.0)",\
 								javax.annotation;version="[1.2.0,2.0.0)", \
 								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
-								org.apache.commons.codec*
+								org.apache.commons.codec*, \
+								org.objectweb.asm, \
+							
 							Require-Bundle: \
-								com.google.guava;bundle-version="32.2.1"
-
+								com.google.guava;bundle-version="33.6"
+							
 							-failok: true
 							-nouses: true
 							-nodefaultversion: true
 							-noextraheaders: true
 							-snapshot: ${def;buildQualifier;qualifier}
 							-removeheaders: Private-Package
+							-check 'ALL'
 
 							Automatic-Module-Name: ${bsn}
 							Eclipse-BundleShape: dir
