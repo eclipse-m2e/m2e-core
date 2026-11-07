@@ -10,24 +10,36 @@
 
 package org.eclipse.m2e.jdt.tests;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IModuleDescription;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.jdt.IClasspathDescriptor;
+import org.eclipse.m2e.jdt.internal.ModuleSupport;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 
 @SuppressWarnings("restriction")
@@ -169,6 +181,94 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     assertFalse(m2eAttributes.containsKey(ADD_READS_ATTR));
     assertFalse(m2eAttributes.containsKey(PATCH_MODULE_ATTR));
   }
-  
-  
+
+  @Test
+  public void testNonModularProjectSkipsDependencyModuleInspection() throws Exception {
+    IJavaProject project = createModuleProject(null);
+    assertNull(project.getModuleDescription());
+    IClasspathDescriptor classpath = Mockito.mock(IClasspathDescriptor.class);
+
+    configureModuleClasspath(project, classpath);
+
+    Mockito.verifyNoInteractions(classpath);
+  }
+
+  @Test
+  public void testImplicitJavaBaseKeepsDependencyModuleInspection() throws Exception {
+    IJavaProject project = createModuleProject("module example.app {}");
+    assertArrayEquals(new String[] {"java.base"}, project.getModuleDescription().getRequiredModuleNames());
+    IClasspathDescriptor classpath = Mockito.mock(IClasspathDescriptor.class);
+    Mockito.when(classpath.getEntryDescriptors()).thenReturn(List.of());
+
+    configureModuleClasspath(project, classpath);
+
+    Mockito.verify(classpath).getEntryDescriptors();
+  }
+
+  @Test
+  public void testRequiredModuleKeepsDependencyModuleInspection() throws Exception {
+    IJavaProject project = createModuleProject("module example.app { requires java.logging; }");
+    IClasspathDescriptor classpath = Mockito.mock(IClasspathDescriptor.class);
+    Mockito.when(classpath.getEntryDescriptors()).thenReturn(List.of());
+
+    configureModuleClasspath(project, classpath);
+
+    Mockito.verify(classpath).getEntryDescriptors();
+  }
+
+  @Test
+  public void testServiceUseKeepsDependencyModuleInspection() throws Exception {
+    IJavaProject project = createModuleProject("module example.app { uses java.lang.Runnable; }");
+    assertArrayEquals(new String[] {"java.lang.Runnable"}, project.getModuleDescription().getUsedServiceNames());
+    IModuleDescription module = Mockito.mock(IModuleDescription.class);
+    Mockito.when(module.getElementName()).thenReturn("example.app");
+    Mockito.when(module.getRequiredModuleNames()).thenReturn(new String[0]);
+    Mockito.when(module.getUsedServiceNames()).thenReturn(new String[] {"java.lang.Runnable"});
+    Mockito.when(module.getProvidedServiceNames()).thenReturn(new String[0]);
+    IJavaProject serviceOnlyProject = Mockito.mock(IJavaProject.class);
+    Mockito.when(serviceOnlyProject.exists()).thenReturn(true);
+    Mockito.when(serviceOnlyProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true))
+        .thenReturn(JavaCore.VERSION_17);
+    Mockito.when(serviceOnlyProject.getModuleDescription()).thenReturn(module);
+    IClasspathDescriptor classpath = Mockito.mock(IClasspathDescriptor.class);
+    Mockito.when(classpath.getEntryDescriptors()).thenReturn(List.of());
+
+    try(var javaCore = Mockito.mockStatic(JavaCore.class, Mockito.CALLS_REAL_METHODS)) {
+      javaCore.when(() -> JavaCore.create(project.getProject())).thenReturn(serviceOnlyProject);
+      configureModuleClasspath(project, classpath);
+    }
+
+    Mockito.verify(classpath).getEntryDescriptors();
+  }
+
+  private IJavaProject createModuleProject(String moduleDeclaration) throws CoreException {
+    IProject project = workspace.getRoot().getProject("module-metadata");
+    project.create(monitor);
+    project.open(monitor);
+    var description = project.getDescription();
+    description.setNatureIds(new String[] {JavaCore.NATURE_ID});
+    project.setDescription(description, monitor);
+    project.getFolder("src").create(true, true, monitor);
+    IJavaProject javaProject = JavaCore.create(project);
+    Map<String, String> options = javaProject.getOptions(false);
+    JavaCore.setComplianceOptions(JavaCore.VERSION_17, options);
+    javaProject.setOptions(options);
+    javaProject.setRawClasspath(new IClasspathEntry[] {
+        JavaCore.newSourceEntry(project.getFullPath().append("src")),
+        JavaCore.newContainerEntry(JavaRuntime.newDefaultJREContainerPath())},
+        project.getFullPath().append("bin"), monitor);
+    if(moduleDeclaration != null) {
+      project.getFile("src/module-info.java").create(
+          new ByteArrayInputStream(moduleDeclaration.getBytes(StandardCharsets.UTF_8)), true, monitor);
+      assertNotNull(javaProject.getModuleDescription());
+    }
+    return javaProject;
+  }
+
+  private void configureModuleClasspath(IJavaProject project, IClasspathDescriptor classpath) {
+    IMavenProjectFacade facade = Mockito.mock(IMavenProjectFacade.class);
+    Mockito.when(facade.getProject()).thenReturn(project.getProject());
+    ModuleSupport.configureClasspath(facade, classpath, monitor);
+  }
+
 }
