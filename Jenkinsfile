@@ -81,8 +81,9 @@ pipeline {
 							echo Failed to read M2E_VERSION. Abort deployment.
 							exit 1
 						fi
-						# m2e-2.x is a maintenance branch: keep its own versioned snapshot path, don't touch the "latest" pointer (that's main's)
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
+						# Continue to deyploe m2e-2.x as latest as long as m2e-3 is not ready.
+						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 					'''
 				}
 			}
