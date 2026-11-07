@@ -79,7 +79,6 @@ pipeline {
 							exit 1
 						fi
 						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}
-						deployM2ERepository /home/data/httpd/download.eclipse.org/technology/m2e/snapshots/latest
 					'''
 				}
 			}
