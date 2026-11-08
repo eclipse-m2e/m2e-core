@@ -79,6 +79,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   public static final String JDT_JAVA_APPLICATION = "org.eclipse.jdt.launching.localJavaApplication"; //$NON-NLS-1$
 
+  public static final String JDT_JAVA_REMOTE_APPLICATION = "org.eclipse.jdt.launching.remoteJavaApplication"; //$NON-NLS-1$
+
   public static final String JDT_TESTNG_TEST = "org.testng.eclipse.launchconfig"; //$NON-NLS-1$
 
   private static final String ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND = "org.eclipse.jdt.junit.TEST_KIND"; //$NON-NLS-1$
@@ -105,6 +107,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   static {
     // not exactly nice, but works with eclipse 3.2, 3.3 and 3.4M3
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JAVA_APPLICATION);
+    supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JAVA_REMOTE_APPLICATION);
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
   }
