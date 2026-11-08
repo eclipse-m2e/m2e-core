@@ -21,7 +21,7 @@
 	</parent>
 
 	<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-	<version>3.9.1601-SNAPSHOT</version>
+	<version>3.9.1602-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>M2E Embedded Maven Runtime (includes Incubating components)</name>
@@ -31,6 +31,8 @@
 		<maven-core.version>3.9.16</maven-core.version>
 		<!-- below are m2e-specific addons -->
 		<plexus-build-api.version>1.2.0</plexus-build-api.version>
+		<slf4j.version>2.0.18</slf4j.version>
+
 		<jars.directory>target/jars</jars.directory>
 		<outputDirectory.sources>${project.build.directory}/classes-source</outputDirectory.sources>
 		<failIfMacSigningFailed>false</failIfMacSigningFailed>
@@ -59,12 +61,6 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-embedder</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-cli</groupId>
-					<artifactId>commons-cli</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -124,6 +120,7 @@
 			<artifactId>maven-slf4j-provider</artifactId>
 		</dependency>
 		<!-- globally excluded transitive dependencies (set their scope to 'provided') -->
+		<!-- In contrast to excluded dependencies, those that are provided get their requirement version generated and thus automatically updated. -->
 		<dependency>
 			<!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project -->
 			<!-- http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
@@ -145,13 +142,18 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>2.0.18</version>
+			<version>${slf4j.version}</version><!--$NO-MVN-MAN-VER$-->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
-			<version>2.0.18</version>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>
@@ -217,10 +219,10 @@
 								org.slf4j;version="[1.7.31,3.0.0)",\
 								org.slf4j.*;version="[1.7.31,3.0.0)",\
 								javax.inject;version="[1.0.0,2.0.0)",\
-								javax.annotation;version="[1.2.0,2.0.0)", \
-								org.apache.commons.cli;version="[1.4.0,2.0.0)", \
-								org.apache.commons.codec*, \
-								org.objectweb.asm, \
+								javax.annotation;version="[1.2.0,2.0.0)",\
+								org.apache.commons.cli*, \
+								org.apache.commons.codec*;version="[1.21,2)",\
+								org.objectweb.asm,\
 							
 							Require-Bundle: \
 								com.google.guava;bundle-version="33.6"
@@ -245,7 +247,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.15.0</version>
+					<version>3.16.0</version>
 					<configuration>
 						<release>8</release>
 						<proc>none</proc>
@@ -280,7 +282,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>animal-sniffer-maven-plugin</artifactId>
-				<version>1.27</version>
+				<version>1.29</version>
 				<executions>
 					<execution>
 						<goals>
@@ -370,7 +372,7 @@
 			<plugin>
 				<groupId>org.eclipse.sisu</groupId>
 				<artifactId>sisu-maven-plugin</artifactId>
-				<version>1.0.1</version>
+				<version>1.1.1</version>
 				<executions>
 					<execution>
 						<?m2e execute onIncremental?>
@@ -385,7 +387,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.5.1</version>
 				<configuration>
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
