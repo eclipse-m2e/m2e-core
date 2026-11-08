@@ -26,5 +26,6 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.put(MavenJdtPlugin.PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION,
         JreSystemVersion.EXECUTION_ENVIRONMENT_FROM_PLUGIN_CONFIG.name());
 
+    store.putBoolean(MavenJdtPlugin.PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING, true);
   }
 }
