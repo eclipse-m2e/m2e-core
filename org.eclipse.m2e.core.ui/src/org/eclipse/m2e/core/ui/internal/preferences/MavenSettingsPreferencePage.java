@@ -283,8 +283,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     String globalSettings = getGlobalSettings();
     String userSettings = getUserSettings();
     try {
-      Settings settings = maven
-          .getSettings(new MavenSettingsLocations(new File(globalSettings), new File(userSettings)));
+      Settings settings = maven.getSettings(new MavenSettingsLocations(
+        globalSettings == null ? null : new File(globalSettings),
+        userSettings == null ? SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE : new File(userSettings)));
       String localRepository = settings.getLocalRepository();
       if(localRepository == null) {
         localRepository = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
