@@ -13,9 +13,10 @@
 
 package org.eclipse.m2e.core.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,16 +45,16 @@ public class Bundles {
 
   private static final Logger log = LoggerFactory.getLogger(Bundles.class);
 
-  public static List<String> getClasspathEntries(Bundle bundle) {
+  public static List<Path> getClasspathEntries(Bundle bundle) {
     log.info("getClasspathEntries(Bundle={})", bundle);
     Set<String> cp = new LinkedHashSet<>();
     if(inDevelopmentMode()) {
       Collections.addAll(cp, getDevClassPath(bundle.getSymbolicName()));
     }
     cp.addAll(parseBundleClasspath(bundle));
-    List<String> entries = new ArrayList<>();
+    List<Path> entries = new ArrayList<>();
     for(String cpe : cp) {
-      String entry = getClasspathEntryPath(bundle, cpe);
+      Path entry = getClasspathEntryPath(bundle, cpe);
       if(entry != null) {
         log.info("\tEntry: {}", entry);
         entries.add(entry);
@@ -75,16 +76,16 @@ public class Bundles {
     return List.of(".");
   }
 
-  public static String getClasspathEntryPath(Bundle bundle, String cp) {
+  public static Path getClasspathEntryPath(Bundle bundle, String cp) {
     // try embedded entries first
     try {
       if(".".equals(cp)) {
-        return FileLocator.getBundleFileLocation(bundle).orElseThrow().getCanonicalPath();
+        return FileLocator.getBundleFileLocation(bundle).orElseThrow().toPath().toRealPath();
       }
       URL url = bundle.getEntry(cp);
       if(url != null) {
         String path = FileLocator.toFileURL(url).getFile();
-        return IPath.fromOSString(path).toOSString();
+        return IPath.fromOSString(path).toPath();
       }
     } catch(IOException | NoSuchElementException ex) {
       log.warn("Could not get entry {} for bundle {}", cp, bundle, ex);
@@ -92,9 +93,9 @@ public class Bundles {
 
     // in development mode entries can be absolute paths outside of bundle basedir
     if(inDevelopmentMode()) {
-      File file = new File(cp);
-      if(file.exists() && file.isAbsolute()) {
-        return file.getAbsolutePath();
+      Path file = Path.of(cp);
+      if(Files.exists(file) && file.isAbsolute()) {
+        return file;
       }
     }
 
