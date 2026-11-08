@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.internal.launch;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -105,20 +106,25 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
+  public Set<Path> collectMavenRuntimeClasspath(boolean addMavenRuntimeExtensions) {
+    Set<Path> allEntries = new LinkedHashSet<>();
+
+    addBundleClasspathEntries(allEntries, mavenRuntimeBundle, addMavenRuntimeExtensions);
+    allEntries.add(getEmbeddedSLF4JBinding(mavenRuntimeBundle));
+
+    Set<String> noDependencyBundles = Set.of("org.slf4j.api", "slf4j.api");
+    // Don't include dependencies of slf4j bundle to ensure no other than the slf4j-binding embedded into m2e.maven.runtime is available.
+    Set<Bundle> bundles = getRequiredBundles(mavenRuntimeBundle, noDependencyBundles);
+
+    for(Bundle bundle : bundles) {
+      addBundleClasspathEntries(allEntries, bundle, false);
+    }
+    return allEntries;
+  }
+
   private synchronized void initClasspath() {
     if(classpath == null) {
-      Set<String> allEntries = new LinkedHashSet<>();
-
-      addBundleClasspathEntries(allEntries, mavenRuntimeBundle, true);
-      allEntries.add(getEmbeddedSLF4JBinding(mavenRuntimeBundle));
-
-      Set<String> noDependencyBundles = Set.of("org.slf4j.api", "slf4j.api");
-      // Don't include dependencies of slf4j bundle to ensure no other than the slf4j-binding embedded into m2e.maven.runtime is available.
-      Set<Bundle> bundles = getRequiredBundles(mavenRuntimeBundle, noDependencyBundles);
-
-      for(Bundle bundle : bundles) {
-        addBundleClasspathEntries(allEntries, bundle, false);
-      }
+      List<String> allEntries = collectMavenRuntimeClasspath(true).stream().map(Path::toString).toList();
 
       List<String> cp = new ArrayList<>();
       List<String> lcp = new ArrayList<>();
@@ -132,7 +138,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private void addBundleClasspathEntries(Set<String> entries, Bundle bundle, boolean addFragments) {
+  private void addBundleClasspathEntries(Set<Path> entries, Bundle bundle, boolean addFragments) {
     entries.addAll(Bundles.getClasspathEntries(bundle));
     Bundle[] fragments;
     if(addFragments && (fragments = Platform.getFragments(bundle)) != null) {
@@ -142,11 +148,11 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
   }
 
-  private static String getEmbeddedSLF4JBinding(Bundle mavenBundle) {
+  private static Path getEmbeddedSLF4JBinding(Bundle mavenBundle) {
     String bindingPath = mavenBundle.getHeaders().get(M2E_SL4J_BINDING_HEADER);
     Objects.requireNonNull(bindingPath,
         () -> "Missing '" + M2E_SL4J_BINDING_HEADER + "' header in embedded Maven-runtime bundle");
-    String bindingJarPath = Bundles.getClasspathEntryPath(mavenBundle, bindingPath);
+    Path bindingJarPath = Bundles.getClasspathEntryPath(mavenBundle, bindingPath);
     return Objects.requireNonNull(bindingJarPath, () -> M2E_SL4J_BINDING_HEADER + " '" + bindingPath + "' not found");
   }
 

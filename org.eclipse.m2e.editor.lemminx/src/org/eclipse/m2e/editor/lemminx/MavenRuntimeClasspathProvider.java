@@ -11,22 +11,12 @@
 package org.eclipse.m2e.editor.lemminx;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-import org.apache.commons.cli.CommandLine;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
+
 import org.eclipse.lsp4e.LanguageServers;
 import org.eclipse.lsp4e.LanguageServersRegistry;
 import org.eclipse.lsp4e.LanguageServersRegistry.LanguageServerDefinition;
@@ -34,13 +24,13 @@ import org.eclipse.lsp4j.DidChangeConfigurationParams;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.wildwebdeveloper.xml.LemminxClasspathExtensionProvider;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 @SuppressWarnings("restriction")
 public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionProvider {
-	private static final ILog LOG = Platform.getLog(MavenRuntimeClasspathProvider.class);
 
 	private static IMavenConfigurationChangeListener mavenConfigurationlistener;
 	private static final String LANGUAGE_SERVER = "org.eclipse.wildwebdeveloper.xml";
@@ -66,26 +56,11 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 
 	@Override
 	public List<File> get() {
-		List<File> mavenRuntimeJars = new ArrayList<>();
-		// Add all jars from org.eclipse.m2e.maven.runtime
-		addJarsFromBundle(FrameworkUtil.getBundle(org.apache.maven.Maven.class), "/jars/", mavenRuntimeJars);
-		// Libraries that are also required and not included in
-		// org.eclipse.m2e.maven.runtime
-		Stream.of(javax.inject.Inject.class, org.slf4j.Logger.class, CommandLine.class)//
-				.map(FrameworkUtil::getBundle).map(FileLocator::getBundleFileLocation)//
-				.flatMap(Optional::stream).forEach(mavenRuntimeJars::add);
-		return mavenRuntimeJars;
+		MavenRuntimeManagerImpl mavenRuntimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
+		MavenEmbeddedRuntime runtime = (MavenEmbeddedRuntime) mavenRuntimeManager
+				.getRuntime(MavenRuntimeManagerImpl.EMBEDDED);
+		Set<Path> collectMavenRuntimeClasspath = runtime.collectMavenRuntimeClasspath(false);
+		return collectMavenRuntimeClasspath.stream().map(Path::toFile).sorted().toList();
 	}
 
-	private static void addJarsFromBundle(Bundle bundle, String folder, List<File> jarFiles) {
-		try {
-			URL fileURL = FileLocator.toFileURL(bundle.getResource(folder));
-			Path jarDir = Path.of(URIUtil.toURI(fileURL));
-			try (Stream<Path> paths = Files.walk(jarDir, 1)) {
-				paths.filter(Files::isRegularFile).map(Path::toFile).forEach(jarFiles::add);
-			}
-		} catch (IOException | URISyntaxException e) {
-			LOG.error(e.getMessage(), e);
-		}
-	}
 }
