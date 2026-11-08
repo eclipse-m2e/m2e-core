@@ -50,14 +50,48 @@ The variable `<version-under-development>` has to be replaced by the current ver
 
 See [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
-### m2e 3 (under development)
+### m2e 3 and Maven 4 support (under development)
 
-The next evolution of the Eclipse Maven integration, named m2e 3, is currently under development and has to goal to prepare for Maven 4.
+The next evolution of the Eclipse Maven integration, named m2e 3, is currently under development and has the goal to prepare for Maven 4.
+Maven 4 is not supported by the current m2e releases.
+Decoupling m2e from the concrete Maven runtime is substantial work, and **the main blocker is currently a lack of funding and contributors**, not a lack of interest.
+
 Interested parties can obtain the latest development snapshot at:
 - `https://download.eclipse.org/technology/m2e/snapshots/3.0.0`
 
-See also the discussion at
-- https://github.com/eclipse-m2e/m2e-core/discussions/2010
+Status and discussion:
+- [Open issues and pull requests labeled `Maven 4`](https://github.com/eclipse-m2e/m2e-core/issues?q=is%3Aopen+label%3A%22Maven+4%22)
+- [Discussion: Maven 4 support](https://github.com/eclipse-m2e/m2e-core/discussions/2010)
+- [Funding proposal to the IDE-WG Development Funding Initiative](https://gitlab.eclipse.org/eclipse-wg/ide-wg/ide-wg-dev-funded-efforts/ide-wg-dev-funded-program-planning-council-top-issues/-/work_items/47) (voicing your interest there helps)
+
+m2e is not only used by the Eclipse IDE, it is also the foundation for Maven support in JDT-LS and therefore in many other Java tools.
+If Maven 4 matters to you or your organization, please consider:
+- [sponsoring the work](https://github.com/sponsors/laeubi), or contact us first if the funding should go to a concrete goal or issue (see also [sponsored issues](https://github.com/eclipse-m2e/m2e-core/issues?q=is%3Aissue+label%3Asponsored))
+- joining the [IDE-WG](https://eclipseide.org/working-group/#about) to have a say in prioritizing funded efforts
+- contributing code, testing the snapshots, or reviewing pull requests
+
+## 🙋 Getting support
+
+Just get in contact with us through the [discussions](https://github.com/eclipse-m2e/m2e-core/discussions) and share your [ideas](https://github.com/eclipse-m2e/m2e-core/discussions/new) or report [issues](https://github.com/eclipse-m2e/m2e-core/issues).
+
+Please bear in mind that this is a community project and not a product you contracted support for.
+Some contributors may or may not look at your support requests on demand, and if you do not provide the fix/implementation yourself, the issue might even never get fixed.
+
+If you require dedicated help with m2e or want to make sure a bugfix or feature is handled with priority, the following individuals and companies offer commercial support:
+* [Christoph Läubrich](https://github.com/sponsors/laeubi)
+* [Läubisoft GmbH](https://xn--lubisoft-0za.gmbh/en/)
+
+Others who offer support for m2e are welcome to be listed here, just open a pull request.
+
+## 🤝 Help wanted
+
+m2e is looking for help!
+The project depends on the time and contributions of a small number of people, and more contributors are needed to keep it healthy and moving forward, especially for the upcoming m2e 3 (see the [discussion](https://github.com/eclipse-m2e/m2e-core/discussions/2010)).
+If m2e is a key technology for you or your organization, you can help with the following:
+
+* **Help testing:** try the latest [snapshot builds](#-installation) early and often, so regressions are found before a release.
+* **Donate some time:** fix bugs, improve documentation, review open pull requests, answer questions in the [discussions](https://github.com/eclipse-m2e/m2e-core/discussions), or provide tests/sample projects for the features that are important to you.
+* **Sponsor contributors:** if you can't contribute time, you can sponsor individual contributors, e.g. [Christoph Läubrich](https://github.com/sponsors/laeubi).
 
 ## ⌨️ Contributing
 [![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
