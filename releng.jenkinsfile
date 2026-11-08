@@ -1,0 +1,56 @@
+pipeline {
+	options {
+		skipDefaultCheckout()
+		timestamps()
+		timeout(time: 10, unit: 'MINUTES')
+		buildDiscarder(logRotator(numToKeepStr: '10'))
+		disableConcurrentBuilds(abortPrevious: false)
+	}
+	parameters {
+		choice(name: 'TASK', choices: ['promote-to-release', 'set-latest-release', 'take-snapshot'], description: 'The task to perform.')
+		string(name: 'VERSION', description: 'The version on which the task is performed')
+	}
+	agent {
+		label 'basic'
+	}
+	environment {
+		M2E_HOME = '/home/data/httpd/download.eclipse.org/technology/m2e'
+		SSH = 'ssh genie.m2e@projects-storage.eclipse.org'
+	}
+	stages {
+		stage('Run') {
+			steps {
+				sshagent(['projects-storage.eclipse.org-bot-ssh']) {
+					script {
+						switch(params.TASK) {
+						case 'promote-to-release':
+							sh '''#!/bin/bash -xe
+								releasePath="${M2E_HOME}/releases/${VERSION}"
+								if $SSH -q test -e "${releasePath}"; then
+									echo "Release ${VERSION} already exists"
+									exit 1
+								fi
+								$SSH mv "${M2E_HOME}/snapshots/${VERSION}" "${releasePath}"
+							'''
+						break;
+						case 'set-latest-release':
+							sh '''#!/bin/bash -xe
+								$SSH rm -rf ${M2E_HOME}/releases/latest
+								$SSH ln -s ${VERSION} ${M2E_HOME}/releases/latest
+							'''
+						break;
+						case 'take-snapshot':
+							def snapshotVersion = params.VERSION.split('-')[0]
+							sh """#!/bin/bash -xe
+								$SSH cp -r ${M2E_HOME}/snapshots/${snapshotVersion} ${M2E_HOME}/snapshots/${VERSION}
+							"""
+						break;
+						default:
+							error("Unknown task: ${params.TASK}")
+						}
+					}
+				}
+			}
+		}
+	}
+}
