@@ -17,3 +17,4 @@ jobs:
     with:
       botName: Eclipse M2E Bot
       botMail: m2e-bot@eclipse.org
+      stream-version-property: m2e.version
