@@ -16,7 +16,6 @@ package org.eclipse.m2e.logback.configuration;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -87,19 +86,6 @@ public class M2ELogbackConfigurator extends BasicConfigurator implements Configu
       }
       loadConfiguration(lc, configFile.toUri().toURL());
 
-      //Delete old logs in legacy logback plug-in's state location. Can sum up to 1GB of disk-space. 
-      // TODO: can be removed when some time has passed and it is unlikely old workspaces that need clean-up are used.
-      Path legacyLogbackState = stateDir.resolveSibling("org.eclipse.m2e.logback.configuration");
-      if(Files.isDirectory(legacyLogbackState)) {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(legacyLogbackState)) {
-          for(Path path : stream) {
-            if(Files.isRegularFile(path)) {
-              Files.delete(path);
-            }
-          }
-        }
-        Files.delete(legacyLogbackState);
-      }
     } catch(Exception e) {
       LOG.log(Status.warning("Exception while setting up logging:" + e.getMessage(), e)); //$NON-NLS-1$
     }
