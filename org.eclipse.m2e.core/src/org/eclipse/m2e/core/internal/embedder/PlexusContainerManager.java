@@ -16,18 +16,14 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
@@ -83,19 +79,9 @@ public class PlexusContainerManager {
 
   private static final String PLEXUS_CORE_REALM = "plexus.core";
 
-  private final Object containerLock = new Object();
-
-  private final PlexusContainerFactory containerFactory;
-
-  private boolean active = true;
-
   private IMavenPlexusContainer nonRootedContainer;
 
-  private CompletableFuture<IMavenPlexusContainer> nonRootedContainerCreation;
-
   private final Map<File, IMavenPlexusContainer> containerMap = new HashMap<>();
-
-  private final Map<File, CompletableFuture<IMavenPlexusContainer>> containerCreations = new HashMap<>();
 
   @Reference
   private LoggerManager loggerManager;
@@ -106,54 +92,31 @@ public class PlexusContainerManager {
   @Reference
   private IWorkspace workspace;
 
-  public PlexusContainerManager() {
-    this(PlexusContainerManager::newPlexusContainer);
-  }
-
-  PlexusContainerManager(PlexusContainerFactory containerFactory) {
-    this.containerFactory = Objects.requireNonNull(containerFactory);
-  }
-
   @Deactivate
   void dispose() {
-    List<IMavenPlexusContainer> containers;
-    IllegalStateException deactivated = new IllegalStateException("Plexus container manager is deactivated");
-    synchronized(containerLock) {
-      if(!active) {
-        return;
-      }
-      active = false;
-      containers = new ArrayList<>(containerMap.values());
+    synchronized(containerMap) {
+      containerMap.values().forEach(PlexusContainerManager::disposeContainer);
       containerMap.clear();
       if(nonRootedContainer != null) {
-        containers.add(nonRootedContainer);
+        disposeContainer(nonRootedContainer);
         nonRootedContainer = null;
       }
-      containerCreations.values().forEach(creation -> creation.completeExceptionally(deactivated));
-      containerCreations.clear();
-      if(nonRootedContainerCreation != null) {
-        nonRootedContainerCreation.completeExceptionally(deactivated);
-        nonRootedContainerCreation = null;
-      }
     }
-    containers.forEach(PlexusContainerManager::disposeContainer);
   }
 
   /**
    * Performs a cleanup cycle by disposing (and removing) container that are no longer referencing a valid maven root
    */
   void cleanup() {
-    List<IMavenPlexusContainer> staleContainers = new ArrayList<>();
-    synchronized(containerLock) {
+    synchronized(containerMap) {
       containerMap.entrySet().removeIf(entry -> {
         if(!new File(entry.getKey(), IMavenPlexusContainer.MVN_FOLDER).isDirectory()) {
-          staleContainers.add(entry.getValue());
+          disposeContainer(entry.getValue());
           return true;
         }
         return false;
       });
     }
-    staleContainers.forEach(PlexusContainerManager::disposeContainer);
   }
 
   private static void disposeContainer(IMavenPlexusContainer mavenPlexusContainer) {
@@ -170,23 +133,13 @@ public class PlexusContainerManager {
   }
 
   public IMavenPlexusContainer aquire() throws Exception {
-    cleanup();
-    CompletableFuture<IMavenPlexusContainer> creation;
-    boolean creator = false;
-    synchronized(containerLock) {
-      checkActive();
+    synchronized(containerMap) {
+      cleanup();
       if(nonRootedContainer == null) {
-        creation = nonRootedContainerCreation;
-        if(creation == null) {
-          creation = new CompletableFuture<>();
-          nonRootedContainerCreation = creation;
-          creator = true;
-        }
-      } else {
-        return nonRootedContainer;
+        nonRootedContainer = newPlexusContainer(null, loggerManager, mavenConfiguration);
       }
+      return nonRootedContainer;
     }
-    return creator ? createContainer(null, creation) : awaitContainer(creation);
   }
 
   public IMavenPlexusContainer aquire(IResource basedir) throws Exception {
@@ -209,99 +162,19 @@ public class PlexusContainerManager {
       return aquire();
     }
     File canonicalDirectory = directory.getCanonicalFile();
-    cleanup();
-    CompletableFuture<IMavenPlexusContainer> creation;
-    boolean creator = false;
-    synchronized(containerLock) {
-      checkActive();
+    synchronized(containerMap) {
+      cleanup();
       IMavenPlexusContainer plexusContainer = containerMap.get(canonicalDirectory);
-      if(plexusContainer != null) {
-        return plexusContainer;
-      }
-      creation = containerCreations.get(canonicalDirectory);
-      if(creation == null) {
-        creation = new CompletableFuture<>();
-        containerCreations.put(canonicalDirectory, creation);
-        creator = true;
-      }
-    }
-    try {
-      return creator ? createContainer(canonicalDirectory, creation) : awaitContainer(creation);
-    } catch(ExtensionResolutionException e) {
-      //TODO how can we create an error marker on the extension file?
-      ExtensionResolutionExceptionFacade.throwForFile(e,
-          new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME));
-      return null;
-    }
-  }
-
-  private IMavenPlexusContainer createContainer(File directory,
-      CompletableFuture<IMavenPlexusContainer> creation) throws Exception {
-    IMavenPlexusContainer plexusContainer;
-    try {
-      plexusContainer = Objects.requireNonNull(containerFactory.create(directory, loggerManager, mavenConfiguration));
-    } catch(Throwable failure) {
-      synchronized(containerLock) {
-        clearCreation(directory, creation);
-        creation.completeExceptionally(failure);
-      }
-      return awaitContainer(creation);
-    }
-
-    boolean published;
-    synchronized(containerLock) {
-      published = active && isCurrentCreation(directory, creation);
-      clearCreation(directory, creation);
-      if(published) {
-        if(directory == null) {
-          nonRootedContainer = plexusContainer;
-        } else {
-          containerMap.put(directory, plexusContainer);
+      if(plexusContainer == null) {
+        try {
+          plexusContainer = newPlexusContainer(canonicalDirectory, loggerManager, mavenConfiguration);
+          containerMap.put(canonicalDirectory, plexusContainer);
+        } catch(ExtensionResolutionException e) {
+          //TODO how can we create an error marker on the extension file?
+          ExtensionResolutionExceptionFacade.throwForFile(e, new File(directory, IMavenPlexusContainer.EXTENSIONS_FILENAME));
         }
-        creation.complete(plexusContainer);
-      } else {
-        creation.completeExceptionally(new IllegalStateException("Plexus container manager is deactivated"));
       }
-    }
-    if(!published) {
-      disposeContainer(plexusContainer);
-    }
-    return awaitContainer(creation);
-  }
-
-  private boolean isCurrentCreation(File directory, CompletableFuture<IMavenPlexusContainer> creation) {
-    return directory == null ? nonRootedContainerCreation == creation : containerCreations.get(directory) == creation;
-  }
-
-  private void clearCreation(File directory, CompletableFuture<IMavenPlexusContainer> creation) {
-    if(directory == null) {
-      if(nonRootedContainerCreation == creation) {
-        nonRootedContainerCreation = null;
-      }
-    } else {
-      containerCreations.remove(directory, creation);
-    }
-  }
-
-  private void checkActive() {
-    if(!active) {
-      throw new IllegalStateException("Plexus container manager is deactivated");
-    }
-  }
-
-  private static IMavenPlexusContainer awaitContainer(CompletableFuture<IMavenPlexusContainer> creation)
-      throws Exception {
-    try {
-      return creation.get();
-    } catch(ExecutionException e) {
-      Throwable cause = e.getCause();
-      if(cause instanceof Exception exception) {
-        throw exception;
-      }
-      if(cause instanceof Error error) {
-        throw error;
-      }
-      throw new IllegalStateException(cause);
+      return plexusContainer;
     }
   }
 
