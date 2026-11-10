@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2024 Patrick Ziegler and others.
+ * Copyright (c) 2024, 2026 Patrick Ziegler and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -26,10 +26,15 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -214,10 +219,45 @@ public class MavenTargetDependencyEditorTest {
 	 */
 	private void editCell(SWTBotTable table, int row, int column, String text) {
 		waitForUiUpdates();
+		revealCell(table, row, column);
 		table.click(row, column);
 		// The cell editor is a child of the table. Looking it up in the whole dialog
 		// would silently return another text field if the editor is not active.
 		new SWTBot(table.widget).text().setText(text);
+	}
+
+	/**
+	 * Scrolls the given cell into view and waits until the table has stopped
+	 * scrolling. {@link SWTBotTable#click(int, int)} computes the position to
+	 * click before it selects the row, and selecting a row that is not visible
+	 * scrolls the table. The click then hits another row or no row at all, so the
+	 * wrong cell editor or none is activated.
+	 */
+	private void revealCell(SWTBotTable table, int row, int column) {
+		Table swtTable = table.widget;
+		robot.waitUntil(new DefaultCondition() {
+			private int lastTopIndex = -1;
+
+			@Override
+			public boolean test() throws Exception {
+				waitForUiUpdates();
+				return workbench.getDisplay().syncCall(() -> {
+					TableItem item = swtTable.getItem(row);
+					swtTable.showItem(item);
+					Rectangle bounds = item.getBounds(column);
+					Point center = new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+					int topIndex = swtTable.getTopIndex();
+					boolean revealed = topIndex == lastTopIndex && item.equals(swtTable.getItem(center));
+					lastTopIndex = topIndex;
+					return revealed;
+				});
+			}
+
+			@Override
+			public String getFailureMessage() {
+				return "Cell (" + row + ", " + column + ") could not be scrolled into view";
+			}
+		});
 	}
 
 	/**
