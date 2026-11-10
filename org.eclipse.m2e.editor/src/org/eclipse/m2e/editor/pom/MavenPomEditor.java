@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2026 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -46,8 +46,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -83,9 +81,7 @@ import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.util.DocumentInputStream;
-import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.contenttype.ContentTypeIdForXML;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
@@ -787,28 +783,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     projectRegistry.addMavenProjectChangedListener(this);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
-  }
-
-  public void showInSourceEditor(EObject o) {
-    IDOMElement element = getElement(o);
-    if(element != null) {
-      int start = element.getStartOffset();
-      int lenght = element.getLength();
-      setActivePage(sourcePageIndex);
-      sourcePage.selectAndReveal(start, lenght);
-    }
-  }
-
-  public IDOMElement getElement(EObject o) {
-    for(Adapter adapter : o.eAdapters()) {
-      if(adapter instanceof EMF2DOMSSEAdapter a) {
-        if(a.getNode() instanceof IDOMElement element) {
-          return element;
-        }
-        break;
-      }
-    }
-    return null;
   }
 
   // IShowEditorInput
