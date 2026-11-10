@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -119,7 +120,7 @@ public class PluginDependencyResolver {
             .getArtifactResults();
 
         for(ArtifactResult artifactResult : artifactResults) {
-          files.add(artifactResult.getArtifact().getFile());
+          files.add(getArtifactFile(artifactResult, session));
         }
       } catch(DependencyResolutionException e) {
         String msg = "Unable to collect dependencies for plugin";
@@ -144,6 +145,14 @@ public class PluginDependencyResolver {
       }
     }
     return classLoader;
+  }
+
+  /**
+   * Returns the file to put on the plug-in dependency classpath. Subclasses can override this to adapt workspace
+   * artifacts while retaining the dependency graph resolved by Aether.
+   */
+  protected File getArtifactFile(ArtifactResult artifactResult, RepositorySystemSession session) {
+    return artifactResult.getArtifact().getFile();
   }
 
   protected Collection<Dependency> getDependencies(Plugin plugin) {
