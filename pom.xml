@@ -244,42 +244,5 @@
 				<module>m2e-core-tests</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>modello</id>
-			<activation>
-				<file>
-					<exists>mdo/lifecycle-mapping-metadata-model.xml</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.modello</groupId>
-						<artifactId>modello-maven-plugin</artifactId>
-						<version>2.7.0</version>
-						<executions>
-							<execution>
-								<?m2e execute?>
-								<id>generate-modello-java-sources</id>
-								<goals>
-									<goal>java</goal>
-									<goal>xpp3-reader</goal>
-									<goal>xpp3-writer</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.basedir}/src-gen</outputDirectory>
-									<version>1.0.0</version>
-									<javaSource>21</javaSource>
-									<models>
-										<model>
-											mdo/lifecycle-mapping-metadata-model.xml</model>
-									</models>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 </project>
