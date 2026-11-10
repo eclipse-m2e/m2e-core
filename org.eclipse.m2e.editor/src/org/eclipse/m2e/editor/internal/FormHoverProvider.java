@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,6 @@ import org.eclipse.jface.text.IInformationControlExtension3;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.Geometry;
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.pom.PomTextHover;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -40,12 +38,12 @@ public final class FormHoverProvider {
       final ISourceViewer sourceViewer) {
     if(markers.length > 0) {
       return position -> {
-        PomTextHover.CompoundRegion compound = new PomTextHover.CompoundRegion(sourceViewer, 0);
+        CompoundRegion compound = new CompoundRegion(sourceViewer, 0);
         Iterator<Annotation> it = sourceViewer.getAnnotationModel().getAnnotationIterator();
         while(it.hasNext()) {
           Annotation ann = it.next();
           if(ann instanceof MarkerAnnotation mann) {
-            compound.addRegion(new PomHyperlinkDetector.MarkerRegion(0, 0, mann));
+            compound.addRegion(new MarkerRegion(0, 0, mann));
           }
         }
         final MarkerHoverControl mhc = new MarkerHoverControl(parentShell);
