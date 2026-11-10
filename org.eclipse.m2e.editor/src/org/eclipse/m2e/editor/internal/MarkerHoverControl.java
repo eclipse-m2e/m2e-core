@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2015 Sonatype, Inc. and others
+ * Copyright (c) 2008-2026 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,6 @@ import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -69,12 +68,6 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
 import org.eclipse.m2e.core.ui.internal.markers.MavenProblemResolution;
 import org.eclipse.m2e.editor.MavenEditorImages;
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ExpressionRegion;
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ManagedArtifactRegion;
-import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.MarkerRegion;
-import org.eclipse.m2e.editor.pom.PomTextHover;
-import org.eclipse.m2e.editor.pom.PomTextHover.CompoundRegion;
 import org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator;
 
 
@@ -205,7 +198,7 @@ public class MarkerHoverControl extends AbstractInformationControl
 
       boolean lifecycleMarkers = false;
       for(IRegion reg : region.getRegions()) {
-        if(reg instanceof PomHyperlinkDetector.MarkerRegion markerReg) {
+        if(reg instanceof MarkerRegion markerReg) {
           IMarker mark = markerReg.getAnnotation().getMarker();
           if(MavenDiscoveryMarkerResolutionGenerator.canResolve(mark)) {
             lifecycleMarkers = true;
@@ -216,36 +209,13 @@ public class MarkerHoverControl extends AbstractInformationControl
       fillToolbar(lifecycleMarkers);
 
       for(IRegion reg : region.getRegions()) {
-        if(reg instanceof PomHyperlinkDetector.MarkerRegion markerReg) {
+        if(reg instanceof MarkerRegion markerReg) {
           createAnnotationInformation(composite, markerReg);
           final IMarker mark = markerReg.getAnnotation().getMarker();
 
           if(MavenProblemResolution.hasResolutions(mark)) {
             List<IMarkerResolution> resolutions = MavenProblemResolution.getResolutions(mark);
             createResolutionsControl(composite, mark, resolutions);
-          }
-        }
-        if(reg instanceof ManagedArtifactRegion man) {
-          Composite comp = createTooltipComposite(composite, PomTextHover.getLabelForRegion(man));
-          //only create the hyperlink when the origin location for jumping is present.
-          //in some cases (managed version comes from imported dependencies) we don't have the location and have nowhere to jump)
-          if(PomHyperlinkDetector.canCreateHyperLink(man)) {
-            Link link = createHyperlink(comp);
-            link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-              dispose();
-              PomHyperlinkDetector.createHyperlink(man).open();
-            }));
-          }
-
-        }
-        if(reg instanceof ExpressionRegion expr) {
-          Composite tooltipComposite = createTooltipComposite(composite, PomTextHover.getLabelForRegion(expr));
-          if(PomHyperlinkDetector.canCreateHyperLink(expr)) {
-            Link link = createHyperlink(tooltipComposite);
-            link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-              dispose();
-              PomHyperlinkDetector.createHyperlink(expr).open();
-            }));
           }
         }
         if(region.getRegions().indexOf(reg) < region.getRegions().size() - 1) {
@@ -282,44 +252,6 @@ public class MarkerHoverControl extends AbstractInformationControl
           "org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage")); //$NON-NLS-1$
     }
     toolBarManager.update(true);
-  }
-
-  private Link createHyperlink(Composite parent) {
-    Link link = new Link(parent, SWT.NONE);
-    GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
-    data2.horizontalIndent = 18;
-    link.setLayoutData(data2);
-    link.setText(Messages.PomTextHover_jump_to);
-    return link;
-  }
-
-  private Composite createTooltipComposite(Composite parent, StyledString text) {
-    Composite composite = new Composite(parent, SWT.NONE);
-    composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-    GridLayout layout = new GridLayout(2, false);
-    layout.marginHeight = 2;
-    layout.marginWidth = 2;
-    layout.horizontalSpacing = 0;
-    composite.setLayout(layout);
-
-    //this paints the icon..
-    final Canvas canvas = new Canvas(composite, SWT.NO_FOCUS);
-    GridData gridData = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-    gridData.widthHint = 17;
-    gridData.heightHint = 16;
-    canvas.setLayoutData(gridData);
-
-    //and now comes the text
-    StyledText styledtext = new StyledText(composite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-    GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-
-    styledtext.setLayoutData(data);
-    styledtext.setText(text.getString());
-    styledtext.setStyleRanges(text.getStyleRanges());
-
-    new Label(composite, SWT.NONE);
-
-    return composite;
   }
 
   private void setColorAndFont(Control control, Color foreground, Color background, Font font) {
@@ -372,7 +304,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       link.setLayoutData(data2);
       link.setText(Messages.MarkerHoverControl_openParentDefinition);
       link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-        PomHyperlinkDetector.createHyperlink(annotation).open();
+        annotation.openDefinitionInParent();
         dispose();
       }));
     }
