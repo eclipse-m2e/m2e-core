@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -293,14 +293,6 @@ public abstract class FormUtils {
     }
   }
 
-  /**
-   * copy pas
-   *
-   * @param project
-   * @param text
-   * @return
-   */
-  //TODO copy pasted from PomTemplateContext
   static String simpleInterpolate(MavenProject project, String text) {
     if(text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around
