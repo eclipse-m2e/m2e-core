@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2022 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -71,7 +71,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -1109,10 +1108,6 @@ public class OverviewPage extends MavenPomEditorPage {
 
     toolkit.paintBordersFor(ciManagementComposite);
     ciManagementComposite.setTabList(new Control[] {ciManagementSystemCombo, ciManagementUrlCombo});
-  }
-
-  public void updateView(final Notification notification) {
-    //noop now
   }
 
   @Override
