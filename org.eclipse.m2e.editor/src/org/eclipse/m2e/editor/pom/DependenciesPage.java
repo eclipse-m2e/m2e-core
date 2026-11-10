@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
@@ -94,9 +93,6 @@ public class DependenciesPage extends MavenPomEditorPage {
   @Override
   public void loadData() {
     dependenciesComposite.loadData();
-  }
-
-  public void updateView(final Notification notification) {
   }
 
   /* (non-Javadoc)
