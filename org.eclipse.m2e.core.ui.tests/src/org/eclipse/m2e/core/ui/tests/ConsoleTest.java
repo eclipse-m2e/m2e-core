@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021-2022 Red Hat, Inc.
+ * Copyright (c) 2021, 2026 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -287,6 +287,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		}
 	}
 
+	private static final int BUILD_TIMEOUT_SECONDS = 120;
+
 	@SafeVarargs
 	private static IDocument runMavenBuild(String pomDir, String mode, int attrColorValue,
 			Entry<String, String>... properties) throws Exception {
@@ -314,7 +316,8 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		document.addDocumentListener(new IDocumentListener() {
 			@Override
 			public void documentChanged(DocumentEvent event) {
-				if (isBuildFinished(event.getText())) {
+				// Check the whole document, the last line may be split across several updates.
+				if (isBuildFinished(event.getDocument().get())) {
 					finishedRead.countDown(); // called from UI-Thread where the document updates are performed too
 				}
 			}
@@ -327,8 +330,15 @@ public class ConsoleTest extends AbstractMavenProjectTestCase {
 		// First check if the full build print-out was already written. If not, wait
 		// for the document-listener's signal
 		String consoleText = display.syncCall(document::get);
-		if (!isBuildFinished(consoleText) && !finishedRead.await(120, TimeUnit.SECONDS)) {
-			fail("Build timed out.");
+		if (!isBuildFinished(consoleText) && !finishedRead.await(BUILD_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+			consoleText = display.syncCall(document::get);
+			// Stop the still running build, so that its files can be deleted in tearDown
+			for (ILaunch launch : launchManager.getLaunches()) {
+				if (launch.canTerminate()) {
+					launch.terminate();
+				}
+			}
+			fail("Build timed out after " + BUILD_TIMEOUT_SECONDS + " seconds. Console output:\n" + consoleText);
 		}
 		return document;
 	}
