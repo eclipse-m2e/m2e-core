@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2018 Sonatype, Inc. and others.
+ * Copyright (c) 2011, 2026 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -23,14 +23,11 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElement;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
-
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,16 +191,6 @@ public final class PomHelper {
     }
     format(dep);
     return dep;
-  }
-
-  /**
-   * node is expected to be the node containing <dependencies> node, so <project>, <dependencyManagement> etc..
-   *
-   * @param node
-   * @return
-   */
-  public static List<Element> findDependencies(Element node) {
-    return findChilds(findChild(node, DEPENDENCIES), DEPENDENCY);
   }
 
   /**
