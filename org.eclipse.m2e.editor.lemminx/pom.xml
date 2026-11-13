@@ -24,7 +24,6 @@
 	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
 	<name>M2E Maven POM File Editor (Wild Web Developer, LemMinX, LS)</name>
 	<packaging>eclipse-plugin</packaging>
-	<version>3.0.0-SNAPSHOT</version>
 
 	<build>
 		<plugins>
