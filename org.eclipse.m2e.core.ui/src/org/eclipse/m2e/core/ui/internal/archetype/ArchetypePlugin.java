@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -34,22 +35,30 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
+import com.google.inject.util.Types;
 
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.sisu.space.BeanScanning;
+import org.eclipse.sisu.space.BundleClassSpace;
+import org.eclipse.sisu.space.ClassSpace;
+import org.eclipse.sisu.space.SpaceModule;
+import org.eclipse.sisu.wire.WireModule;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.LogEnabled;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
@@ -57,10 +66,10 @@ import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.cli.logging.Slf4jLogger;
 
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IArchetype;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
@@ -94,8 +103,6 @@ public class ArchetypePlugin {
 
   private Map<String, ArchetypeDataSource> archetypeDataSourceMap;
 
-  private DefaultPlexusContainer container;
-
   public ArchetypePlugin() {
     this.configFile = new File(MavenPluginActivator.getDefault().getStateLocation().toFile(),
         M2EUIPluginActivator.PREFS_ARCHETYPES);
@@ -103,21 +110,33 @@ public class ArchetypePlugin {
   }
 
   @Activate
-  void activate() throws PlexusContainerException, ComponentLookupException {
-    final Module logginModule = new AbstractModule() {
+  void activate() {
+    Module localBindings = new AbstractModule() {
       @Override
       protected void configure() {
         bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
+        try {
+          bind(RepositorySystem.class).toInstance(MavenPluginActivator.getDefault().getRepositorySystem());
+        } catch(CoreException ex) {
+          ex.printStackTrace();
+        }
       }
     };
-    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld("plexus.core", ArchetypeArtifactManager.class.getClassLoader())) //$NON-NLS-1$
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setName("plexus"); //$NON-NLS-1$
-    container = new DefaultPlexusContainer(cc, logginModule);
-    archetypeArtifactManager = container.lookup(ArchetypeArtifactManager.class);
-    archetypeDataSourceMap = container.lookupMap(ArchetypeDataSource.class);
+    ClassSpace space = new BundleClassSpace(FrameworkUtil.getBundle(ArchetypeArtifactManager.class));
+    WireModule wireModule = new WireModule(new SpaceModule(space, BeanScanning.INDEX));
+    Injector injector = Guice.createInjector(Modules.override(wireModule).with(localBindings));
+    @SuppressWarnings("unchecked")
+    TypeLiteral<Map<String, ArchetypeDataSource>> mapOfDataSourcesType = (TypeLiteral<Map<String, ArchetypeDataSource>>) TypeLiteral
+        .get(Types.mapOf(String.class, ArchetypeDataSource.class));
+    archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
+    archetypeDataSourceMap = injector.getInstance(Key.get(mapOfDataSourcesType));
+
+    if(archetypeArtifactManager instanceof LogEnabled logEnabled) {
+      logEnabled.enableLogging(new Slf4jLogger(LoggerFactory.getLogger(archetypeArtifactManager.getClass())));
+    }
+    archetypeDataSourceMap.values().stream().filter(LogEnabled.class::isInstance).map(LogEnabled.class::cast)
+        .forEach(d -> d.enableLogging(new Slf4jLogger(LoggerFactory.getLogger(d.getClass()))));
+
     addArchetypeCatalogFactory(
         new ArchetypeCatalogFactory.InternalCatalogFactory(archetypeDataSourceMap.get("internal-catalog")));
     addArchetypeCatalogFactory(
@@ -135,7 +154,6 @@ public class ArchetypePlugin {
   @Deactivate
   void shutdown() throws IOException {
     saveCatalogs();
-    container.dispose();
   }
 
   public LocalCatalogFactory newLocalCatalogFactory(String path, String description, boolean editable,
@@ -219,20 +237,16 @@ public class ArchetypePlugin {
     final String artifactId = archetype.getArtifactId();
     final String version = archetype.getVersion();
 
-    final List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
-
     return maven.createExecutionContext().execute((context, monitor1) -> {
-      ArtifactRepository localRepository = context.getLocalRepository();
-      if(archetypeArtifactManager.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories,
-          context.newProjectBuildingRequest())) {
-        ArchetypeDescriptor descriptor;
-        try {
-          descriptor = archetypeArtifactManager.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
-              localRepository, repositories, context.newProjectBuildingRequest());
-        } catch(UnknownArchetype ex) {
-          throw new CoreException(Status.error("UnknownArchetype", ex));
+      try {
+        File archetypeFile = archetypeArtifactManager.getArchetypeFile(groupId, artifactId, version,
+            getRemoteRepositories(context), context.getRepositorySession());
+        if(archetypeArtifactManager.isFileSetArchetype(archetypeFile)) {
+          ArchetypeDescriptor descriptor = archetypeArtifactManager.getFileSetArchetypeDescriptor(archetypeFile);
+          return descriptor.getRequiredProperties();
         }
-        return descriptor.getRequiredProperties();
+      } catch(UnknownArchetype ex) {
+        throw new CoreException(Status.error("UnknownArchetype", ex));
       }
       return null;
     }, monitor);
@@ -240,15 +254,16 @@ public class ArchetypePlugin {
 
   public void updateLocalCatalog(Archetype archetype) throws CoreException {
     maven.createExecutionContext().execute((ctx, m) -> {
-      ProjectBuildingRequest request = ctx.newProjectBuildingRequest();
       try {
         ArchetypeDataSource source = archetypeDataSourceMap.get("catalog");
-
-        source.updateCatalog(request, archetype);
+        source.updateCatalog(ctx.getRepositorySession(), archetype);
       } catch(ArchetypeDataSourceException e) {
       }
       return null;
     }, null);
   }
 
+  static List<RemoteRepository> getRemoteRepositories(IMavenExecutionContext ctx) throws CoreException {
+    return RepositoryUtils.toRepos(ctx.getExecutionRequest().getRemoteRepositories());
+  }
 }
