@@ -20,7 +20,10 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.27.0,4.0.0)",
  org.eclipse.ui.editors,
  org.eclipse.ui.genericeditor;bundle-version="1.1.500",
  org.eclipse.core.filesystem;bundle-version="1.7.500",
- org.eclipse.m2e.discovery;bundle-version="[3.0.0,4.0.0)"
+ org.eclipse.m2e.discovery;bundle-version="[3.0.0,4.0.0)",
+ org.eclipse.wst.sse.core,
+ org.eclipse.wst.xml.core,
+ org.eclipse.emf.ecore
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: %Bundle-Vendor
@@ -29,7 +32,6 @@ Export-Package: org.eclipse.m2e.editor;x-internal:=true,
  org.eclipse.m2e.editor.dialogs;x-internal:=true,
  org.eclipse.m2e.editor.internal.lifecycle;x-internal:=true,
  org.eclipse.m2e.editor.internal.markers;x-internal:=true,
- org.eclipse.m2e.editor.mojo;x-internal:=true,
  org.eclipse.m2e.editor.pom;x-internal:=true
 Import-Package: com.google.common.cache;version="30.0.0",
  com.google.common.reflect;version="30.0.0",

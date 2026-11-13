@@ -24,14 +24,14 @@
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.47.0"/>
-			<unit id="org.eclipse.emf.edit.ui.feature.group"/>
 			<unit id="org.eclipse.emf.ecore.edit.feature.group"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.43.0/R-3.43.0-20260901114550/repository"/>
 			<unit id="org.eclipse.wst.common.uriresolver"/>
 			<unit id="org.eclipse.wst.common.emf"/>
-			<unit id="org.eclipse.wst.xsd.core"/>
+			<unit id="org.eclipse.wst.sse.core"/>
+			<unit id="org.eclipse.wst.xml.core"/>
 		</location>
 		<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 			<repository location="https://download.eclipse.org/lsp4e/releases/0.30.9"/>
