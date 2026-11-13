@@ -115,17 +115,20 @@ public class ModuleSupport {
       return;
     }
 
+    InternalModuleInfo moduleInfo;
+    try {
+      IModuleDescription moduleDescription = javaProject.getModuleDescription();
+      if(moduleDescription == null) {
+        return;
+      }
+      moduleInfo = InternalModuleInfo.fromDescription(moduleDescription);
+    } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
+        return;
+    }
+
     if(monitor == null) {
       monitor = new NullProgressMonitor();
-    }
-
-    InternalModuleInfo moduleInfo = getModuleInfo(javaProject, monitor);
-    if(moduleInfo == null) {
-      return;
-    }
-
-    if(moduleInfo.requiredModuleNames.isEmpty() && moduleInfo.usedServiceNames.isEmpty()) {
-      return;
     }
 
     Map<String, InternalModuleInfo> entryModuleInfos = new LinkedHashMap<>();

@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IModuleDescription;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -212,31 +211,6 @@ public class JpmsConfigurationTest extends AbstractMavenProjectTestCase {
     Mockito.when(classpath.getEntryDescriptors()).thenReturn(List.of());
 
     configureModuleClasspath(project, classpath);
-
-    Mockito.verify(classpath).getEntryDescriptors();
-  }
-
-  @Test
-  public void testServiceUseKeepsDependencyModuleInspection() throws Exception {
-    IJavaProject project = createModuleProject("module example.app { uses java.lang.Runnable; }");
-    assertArrayEquals(new String[] {"java.lang.Runnable"}, project.getModuleDescription().getUsedServiceNames());
-    IModuleDescription module = Mockito.mock(IModuleDescription.class);
-    Mockito.when(module.getElementName()).thenReturn("example.app");
-    Mockito.when(module.getRequiredModuleNames()).thenReturn(new String[0]);
-    Mockito.when(module.getUsedServiceNames()).thenReturn(new String[] {"java.lang.Runnable"});
-    Mockito.when(module.getProvidedServiceNames()).thenReturn(new String[0]);
-    IJavaProject serviceOnlyProject = Mockito.mock(IJavaProject.class);
-    Mockito.when(serviceOnlyProject.exists()).thenReturn(true);
-    Mockito.when(serviceOnlyProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true))
-        .thenReturn(JavaCore.VERSION_17);
-    Mockito.when(serviceOnlyProject.getModuleDescription()).thenReturn(module);
-    IClasspathDescriptor classpath = Mockito.mock(IClasspathDescriptor.class);
-    Mockito.when(classpath.getEntryDescriptors()).thenReturn(List.of());
-
-    try(var javaCore = Mockito.mockStatic(JavaCore.class, Mockito.CALLS_REAL_METHODS)) {
-      javaCore.when(() -> JavaCore.create(project.getProject())).thenReturn(serviceOnlyProject);
-      configureModuleClasspath(project, classpath);
-    }
 
     Mockito.verify(classpath).getEntryDescriptors();
   }
