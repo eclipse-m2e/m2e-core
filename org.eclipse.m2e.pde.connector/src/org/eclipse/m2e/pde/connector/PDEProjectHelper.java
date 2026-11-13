@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2022 Sonatype, Inc. and others
+ * Copyright (c) 2011, 2026 Sonatype, Inc. and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -64,13 +65,16 @@ public class PDEProjectHelper {
 		PROJECTS_FOR_UPDATE_CLASSPATH.removeIf(project -> {
 			IPluginModelBase model = PluginRegistry.findModel(project);
 			if (model != null) {
-				new WorkspaceJob("Updating classpath") {
+				WorkspaceJob job = new WorkspaceJob("Updating classpath") {
 					@Override
 					public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 						setClasspath(project, model, monitor);
 						return Status.OK_STATUS;
 					}
-				}.schedule();
+				};
+				// run after m2e has finished configuring the project, not concurrently
+				job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+				job.schedule();
 				return true;
 			}
 			return false;
@@ -204,10 +208,23 @@ public class PDEProjectHelper {
 
 	private static void setClasspath(IProject project, IPluginModelBase model, IProgressMonitor monitor)
 			throws CoreException {
+		IJavaProject javaProject = JavaCore.create(project);
+		// JDT's default classpath has the project itself as source folder, which
+		// overlaps with the source folders of the plug-in
+		IClasspathEntry[] rawClasspath = javaProject.getRawClasspath();
+		IClasspathEntry[] withoutProjectSource = Arrays.stream(rawClasspath)
+				.filter(e -> !(e.getEntryKind() == IClasspathEntry.CPE_SOURCE
+						&& e.getPath().equals(project.getFullPath())))
+				.toArray(IClasspathEntry[]::new);
+		if (withoutProjectSource.length != rawClasspath.length) {
+			javaProject.setRawClasspath(withoutProjectSource, null);
+		}
+		// Like PDE's own classpath updates, keep the existing entries, e.g. the Maven
+		// classpath container, and only update the ones PDE manages
 		@SuppressWarnings("restriction")
 		IClasspathEntry[] entries = org.eclipse.pde.internal.core.ClasspathComputer.getClasspath(project, model, null,
-				true /* clear existing entries */, true);
-		JavaCore.create(project).setRawClasspath(entries, null);
+				false, true);
+		javaProject.setRawClasspath(entries, null);
 		// workaround PDE sloppy model management during the first multimodule project
 		// import in eclipse session
 		// 1. m2e creates all modules as simple workspace projects without JDT or PDE
