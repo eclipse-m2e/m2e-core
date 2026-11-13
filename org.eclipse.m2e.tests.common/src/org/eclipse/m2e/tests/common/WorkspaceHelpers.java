@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -48,6 +49,12 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 @SuppressWarnings("restriction")
 public class WorkspaceHelpers {
+
+  /**
+   * How long {@link #assertMarker(String, int, String, Integer, String, IProject)} waits for an expected marker.
+   */
+  private static final long MARKER_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
+
   public static String getModelId(MavenProject mavenProject) {
     return mavenProject.getGroupId() + ":" + mavenProject.getArtifactId() + ":" + mavenProject.getVersion();
   }
@@ -119,6 +126,9 @@ public class WorkspaceHelpers {
       return "Type=" + marker.getType() + ":Message=" + marker.getAttribute(IMarker.MESSAGE) + ":LineNumber="
           + marker.getAttribute(IMarker.LINE_NUMBER);
     } catch(CoreException ex) {
+      if(!marker.exists()) {
+        return "Deleted marker " + marker.getId();
+      }
       throw new IllegalStateException(ex);
     }
   }
@@ -216,15 +226,31 @@ public class WorkspaceHelpers {
 
   public static IMarker assertMarker(String type, int severity, String message, Integer lineNumber,
       String resourceRelativePath, IProject project) throws Exception {
-    List<IMarker> markers = findMarkers(project, severity);
-    IMarker marker = findMarker(type, message, lineNumber, resourceRelativePath, markers);
-    if(marker == null) {
-      Assert.fail(
-          "Expected marker not found. Found " + (markers.isEmpty() ? "no markers" : "markers :") + toString(markers));
+    // markers are often deleted and created again by background jobs, so a marker can disappear while it is looked at
+    // and the expected one can (re)appear late
+    long deadline = System.currentTimeMillis() + MARKER_TIMEOUT;
+    while(true) {
+      List<IMarker> markers = findMarkers(project, severity);
+      try {
+        IMarker marker = findMarker(type, message, lineNumber, resourceRelativePath, markers);
+        if(marker != null) {
+          Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
+              marker.isSubtypeOf(IMarker.PROBLEM));
+          return marker;
+        }
+        if(System.currentTimeMillis() > deadline) {
+          Assert.fail("Expected marker not found. Found " + (markers.isEmpty() ? "no markers" : "markers :")
+              + toString(markers));
+        }
+      } catch(CoreException ex) {
+        // a marker was deleted while it was looked at
+        if(System.currentTimeMillis() > deadline) {
+          throw ex;
+        }
+      }
+      // callers already waited for the jobs that create the markers, only bridge the time until a marker is recreated
+      Thread.sleep(100);
     }
-    Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
-        marker.isSubtypeOf(IMarker.PROBLEM));
-    return marker;
   }
 
   public static void assertLifecycleIdErrorMarkerAttributes(IProject project, String lifecycleId) throws CoreException {
