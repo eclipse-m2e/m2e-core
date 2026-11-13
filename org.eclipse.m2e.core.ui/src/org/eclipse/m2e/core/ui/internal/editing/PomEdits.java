@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -32,10 +32,8 @@ import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
-import org.eclipse.wst.xml.core.internal.provisional.document.IDOMDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 
@@ -133,10 +131,6 @@ public class PomEdits {
   public static final String PACKAGING = "packaging"; //$NON-NLS-1$
 
   public static final String PROPERTIES = "properties"; //$NON-NLS-1$
-
-  public static final String EXTENSION = "extension"; //$NON-NLS-1$
-
-  public static final String EXTENSIONS = "extensions"; //$NON-NLS-1$
 
   public static final String PROFILES = "profiles";//$NON-NLS-1$
 
@@ -360,62 +354,6 @@ public class PomEdits {
     }
   }
 
-  public static Element insertAt(Element newElement, int offset) {
-    Document doc = newElement.getOwnerDocument();
-    if(doc instanceof IDOMDocument domDoc) {
-      IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
-      Node parent = ((Node) ir).getParentNode();
-      if(ir instanceof Text txt) {
-        String data = txt.getData();
-        int dataSplitIndex = offset - ir.getStartOffset();
-        String beforeText = data.substring(0, dataSplitIndex);
-        String afterText = data.substring(dataSplitIndex);
-        Text after = doc.createTextNode(afterText);
-        Text before = doc.createTextNode(beforeText);
-        parent.replaceChild(after, txt);
-        parent.insertBefore(newElement, after);
-        parent.insertBefore(before, newElement);
-      } else if(ir instanceof Element element) {
-        if(ir.getStartOffset() == offset) {
-          // caret is before the tag, not within its bounds
-          parent.insertBefore(newElement, element);
-        } else {
-          element.appendChild(newElement);
-        }
-      } else {
-        throw new IllegalArgumentException();
-      }
-    } else {
-      throw new IllegalArgumentException();
-    }
-    return newElement;
-  }
-
-  /**
-   * finds the element at offset, if other type of node at offset, will return it's parent element (if any)
-   *
-   * @param doc
-   * @param offset
-   * @return
-   */
-  public static Element elementAtOffset(Document doc, int offset) {
-    if(doc instanceof IDOMDocument domDoc) {
-      IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
-      if(ir instanceof Element elem) {
-        if(ir.getStartOffset() == offset) {
-          // caret is before the tag, not within its bounds
-          elem = (Element) elem.getParentNode();
-        }
-        return elem;
-      }
-      Node parent = ((Node) ir).getParentNode();
-      if(parent instanceof Element parentElement) {
-        return parentElement;
-      }
-    }
-    return null;
-  }
-
   /**
    * formats the node (and content). please make sure to only format the node you have created..
    *
@@ -597,13 +535,6 @@ public class PomEdits {
       this.model = model;
       document = null;
       file = null;
-    }
-
-    /**
-     * force saving the document after performing the operation
-     */
-    public void setForceSave() {
-      forceSave = true;
     }
 
     public boolean isForceSave() {
