@@ -55,6 +55,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
 
     store.putBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR, true);
     store.putBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT, false);
+    store.putBoolean(MavenPreferenceConstants.P_USE_PROPERTIES_FROM_BUILD, true);
 
     store.put(MavenPreferenceConstants.P_DUP_OF_PARENT_GROUPID_PB, ProblemSeverity.warning.toString());
     store.put(MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB, ProblemSeverity.warning.toString());

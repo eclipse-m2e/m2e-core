@@ -104,6 +104,11 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_QUERY_CENTRAL_TO_IDENTIFY_ARTIFACT, //
         Messages.MavenPreferencePage_queryCentralToIdentifyArtifacts, getFieldEditorParent()));
 
+    addField(
+        new BooleanFieldEditor(
+            MavenPreferenceConstants.P_USE_PROPERTIES_FROM_BUILD, //
+        Messages.MavenPreferencePage_usePropertiesFromBuild, getFieldEditorParent()));
+
     String[][] checksumPolicies = new String[][] {new String[] {Messages.preferencesGlobalChecksumPolicy_default, null},
         new String[] {Messages.preferencesGlobalChecksumPolicy_ignore, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE},
         new String[] {Messages.preferencesGlobalChecksumPolicy_warn, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN},

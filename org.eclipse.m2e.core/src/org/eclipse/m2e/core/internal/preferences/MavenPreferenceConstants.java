@@ -178,4 +178,11 @@ public interface MavenPreferenceConstants {
    */
   String P_ENABLE_SNAPSHOT_ARCHETYPES = "enableSnapshotArchetypes";
 
+  /**
+   * Use properties from a previous builds for resolving expressions when creating launch configurations (boolean).
+   * 
+   * @since 3.0
+   */
+  String P_USE_PROPERTIES_FROM_BUILD = "usePropertiesFromBuild";
+
 }

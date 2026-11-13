@@ -415,6 +415,8 @@ public class Messages extends NLS {
 
   public static String MavenPreferencePage_updateProjectRequired_title;
 
+  public static String MavenPreferencePage_usePropertiesFromBuild;
+
   public static String MavenProjectPreferencePage_btnResolve;
 
   public static String MavenProjectPreferencePage_dialog_message;
