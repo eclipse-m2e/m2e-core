@@ -153,6 +153,74 @@ public class DependencyExclusionTest extends AbstractMavenTargetTest {
 		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
 	}
 
+	@Test
+	public void testMavenExclusionSyntaxOnDependency() throws Exception {
+		ITargetLocation target = resolveMavenTarget(String.format(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>1.9.3</version>
+									<type>jar</type>
+									<exclusions>
+										<exclusion>
+											<groupId>org.apiguardian</groupId>
+											<artifactId>apiguardian-api</artifactId>
+										</exclusion>
+									</exclusions>
+								</dependency>
+							</dependencies>
+						</location>
+						""",
+				includeSource));
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(junitPlatformCommons("1.9.3"));
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
+	}
+
+	@Test
+	public void testMavenExclusionOnOneDependencyExcludesGlobally() throws Exception {
+		// Per-dependency <exclusion> feeds into the same excludedArtifacts set as the
+		// location-level <exclude>, so once an artifact is excluded it is excluded from
+		// the whole target location even if another root dependency would bring it in.
+		ITargetLocation target = resolveMavenTarget(String.format(
+				"""
+						<location includeDependencyDepth="infinite" includeDependencyScopes="compile" includeSource="%s" missingManifest="error" type="Maven">
+							<dependencies>
+								<dependency>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-api</artifactId>
+									<version>5.9.3</version>
+									<type>jar</type>
+									<exclusions>
+										<exclusion>
+											<groupId>org.apiguardian</groupId>
+											<artifactId>apiguardian-api</artifactId>
+										</exclusion>
+									</exclusions>
+								</dependency>
+								<dependency>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>1.9.3</version>
+									<type>jar</type>
+								</dependency>
+							</dependencies>
+						</location>
+						""",
+				includeSource));
+		assertStatusOk(target.getStatus());
+		assertArrayEquals(EMPTY, target.getFeatures());
+		List<ExpectedBundle> expectedBundles = List.of(//
+				junitJupiterAPI(), //
+				junitPlatformCommons("1.9.3"), //
+				opentest4j());
+		assertTargetBundles(target, includeSource ? withSourceBundles(expectedBundles) : expectedBundles);
+	}
+
 	private static ExpectedBundle junitPlatformCommons(String version) {
 		return originalOSGiBundle("junit-platform-commons", version, "org.junit.platform:junit-platform-commons");
 	}
