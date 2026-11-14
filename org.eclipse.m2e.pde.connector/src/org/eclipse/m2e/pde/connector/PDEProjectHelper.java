@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2022 Sonatype, Inc. and others
+ * Copyright (c) 2011, 2026 Sonatype, Inc. and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -35,9 +35,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -64,18 +66,31 @@ public class PDEProjectHelper {
 		PROJECTS_FOR_UPDATE_CLASSPATH.removeIf(project -> {
 			IPluginModelBase model = PluginRegistry.findModel(project);
 			if (model != null) {
-				new WorkspaceJob("Updating classpath") {
-					@Override
-					public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-						setClasspath(project, model, monitor);
-						return Status.OK_STATUS;
-					}
-				}.schedule();
+				scheduleClasspathUpdate(project, model);
 				return true;
 			}
 			return false;
 		});
 	};
+
+	static Job scheduleClasspathUpdate(IProject project, IPluginModelBase model) {
+		Job job = new WorkspaceJob("Updating classpath") {
+			@Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+				// m2e has set up the project's classpath by now (see the scheduling rule).
+				// Like PDE's own classpath updates (e.g. UpdateClasspathJob), keep the
+				// existing entries, like the Maven classpath container, and only refresh the
+				// ones PDE manages.
+				setClasspath(project, model, false, monitor);
+				return Status.OK_STATUS;
+			}
+		};
+		// Use the rule m2e configures projects with, so this job runs after m2e has
+		// finished configuring the project, not concurrently.
+		job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+		job.schedule();
+		return job;
+	}
 
 	static void configurePDEBundleProject(IProject project, MavenProject mavenProject, IProgressMonitor monitor)
 			throws CoreException {
@@ -102,7 +117,10 @@ public class PDEProjectHelper {
 		// events.
 		IPluginModelBase model = PluginRegistry.findModel(project);
 		if (model != null) {
-			setClasspath(project, model, monitor);
+			// Runs before m2e's configurators set up the classpath. The project still has
+			// JDT's default classpath here, whose project root source folder conflicts
+			// with the plug-in's source folders, so start from scratch.
+			setClasspath(project, model, true, monitor);
 		} else {
 			addProjectForUpdateClasspath(project);
 		}
@@ -202,11 +220,11 @@ public class PDEProjectHelper {
 				.getFile(org.eclipse.pde.internal.core.ICoreConstants.MANIFEST_PATH);
 	}
 
-	private static void setClasspath(IProject project, IPluginModelBase model, IProgressMonitor monitor)
-			throws CoreException {
+	private static void setClasspath(IProject project, IPluginModelBase model, boolean clearExistingEntries,
+			IProgressMonitor monitor) throws CoreException {
 		@SuppressWarnings("restriction")
 		IClasspathEntry[] entries = org.eclipse.pde.internal.core.ClasspathComputer.getClasspath(project, model, null,
-				true /* clear existing entries */, true);
+				clearExistingEntries, true);
 		JavaCore.create(project).setRawClasspath(entries, null);
 		// workaround PDE sloppy model management during the first multimodule project
 		// import in eclipse session
