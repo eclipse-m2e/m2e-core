@@ -115,13 +115,20 @@ public class ModuleSupport {
       return;
     }
 
-    if(monitor == null) {
-      monitor = new NullProgressMonitor();
+    InternalModuleInfo moduleInfo;
+    try {
+      IModuleDescription moduleDescription = javaProject.getModuleDescription();
+      if(moduleDescription == null) {
+        return;
+      }
+      moduleInfo = InternalModuleInfo.fromDescription(moduleDescription);
+    } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
+        return;
     }
 
-    InternalModuleInfo moduleInfo = getModuleInfo(javaProject, monitor);
-    if(moduleInfo == null) {
-      return;
+    if(monitor == null) {
+      monitor = new NullProgressMonitor();
     }
 
     Map<String, InternalModuleInfo> entryModuleInfos = new LinkedHashMap<>();
