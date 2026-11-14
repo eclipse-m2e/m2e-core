@@ -16,12 +16,22 @@ package org.eclipse.m2e.core.internal.project.registry;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -32,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenToolbox;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -41,6 +52,7 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 
 public class RegistryTest extends AbstractMavenProjectTestCase {
@@ -123,6 +135,85 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
         assertArrayEquals(new IMarker[0], markers);
     } finally {
         setAutoBuilding(isAutoBuilding());
+    }
+  }
+
+  @Test
+  @SuppressWarnings("restriction")
+  public void testPhase2RevisitsStopWhenNothingChanges() throws Exception {
+    IProject transitive = createExisting("transitive", "resources/projects/dependency/transitive", true);
+    IProject dependent = createExisting("dependent", "resources/projects/dependency/dependent", true);
+    IProject dependency = createExisting("dependency", "resources/projects/dependency/dependency", true);
+    waitForJobsToComplete(monitor);
+    ProjectRegistryManager manager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+    IFile transitivePom = transitive.getFile("pom.xml");
+    IFile dependentPom = dependent.getFile("pom.xml");
+    IFile dependencyPom = dependency.getFile("pom.xml");
+
+    try(MutableProjectRegistry state = Mockito.spy(manager.newMutableProjectRegistry())) {
+      state.clear();
+      MavenImpl.execute(MavenPlugin.getMaven(), false, false, (context, progress) -> {
+        manager.refresh(state, List.of(transitivePom, dependentPom, dependencyPom), progress);
+        return null;
+      }, monitor);
+
+      Mockito.verify(state, Mockito.times(3)).setCapabilities(Mockito.eq(transitivePom), Mockito.any());
+      Mockito.verify(state, Mockito.times(3)).setCapabilities(Mockito.eq(dependentPom), Mockito.any());
+      Mockito.verify(state, Mockito.times(2)).setCapabilities(Mockito.eq(dependencyPom), Mockito.any());
+      ArtifactKey key = state.getProjectFacade(dependencyPom).getArtifactKey();
+      assertEquals(Set.of(transitivePom, dependentPom),
+          state.getDependents(MavenCapability.createMavenArtifact(key), false));
+    }
+  }
+
+  @Test
+  @SuppressWarnings("restriction")
+  public void testPhase2DependencyChangeUpdatesTransitiveDependents() throws Exception {
+    IProject transitive = createExisting("transitive", "resources/projects/dependency/transitive", true);
+    IProject dependent = createExisting("dependent", "resources/projects/dependency/dependent", true);
+    IProject dependency = createExisting("dependency", "resources/projects/dependency/dependency", true);
+    IProject replacement = createExisting("replacement", "resources/projects/simplePomOK", true);
+    waitForJobsToComplete(monitor);
+    ProjectRegistryManager manager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+    IFile transitivePom = transitive.getFile("pom.xml");
+    IFile dependentPom = dependent.getFile("pom.xml");
+    IFile dependencyPom = dependency.getFile("pom.xml");
+
+    try(MutableProjectRegistry state = manager.newMutableProjectRegistry()) {
+      state.clear();
+      MavenImpl.execute(MavenPlugin.getMaven(), false, false, (context, progress) -> {
+        manager.refresh(state, List.of(transitivePom, dependentPom, dependencyPom, replacement.getFile("pom.xml")),
+            progress);
+        return null;
+      }, monitor);
+      ArtifactKey oldKey = state.getProjectFacade(dependencyPom).getArtifactKey();
+      ArtifactKey replacementKey = state.getProjectFacade(replacement.getFile("pom.xml")).getArtifactKey();
+      assertEquals(Set.of(transitivePom, dependentPom), state.getDependents(MavenCapability.createMavenArtifact(oldKey), false));
+
+      Model model;
+      try(var input = dependentPom.getContents()) {
+        model = IMavenToolbox.of(MavenPlugin.getMaven()).readModel(input);
+      }
+      var changedDependency = model.getDependencies().getFirst();
+      changedDependency.setGroupId(replacementKey.groupId());
+      changedDependency.setArtifactId(replacementKey.artifactId());
+      changedDependency.setVersion(replacementKey.version());
+      StringWriter xml = new StringWriter();
+      new MavenXpp3Writer().write(xml, model);
+      try(var input = new ByteArrayInputStream(xml.toString().getBytes(StandardCharsets.UTF_8))) {
+        dependentPom.setContents(input, IResource.FORCE, monitor);
+      }
+      MavenImpl.execute(MavenPlugin.getMaven(), false, false, (context, progress) -> {
+        manager.refresh(state, List.of(dependentPom), progress);
+        return null;
+      }, monitor);
+
+      assertEquals(Set.of(), state.getDependents(MavenCapability.createMavenArtifact(oldKey), false));
+      assertEquals(Set.of(transitivePom, dependentPom),
+          state.getDependents(MavenCapability.createMavenArtifact(replacementKey), false));
+      assertEquals(Set.of("dependent", replacementKey.artifactId()),
+          manager.getMavenProject(state.getProjectFacade(transitivePom)).getArtifacts().stream()
+              .map(Artifact::getArtifactId).collect(Collectors.toSet()));
     }
   }
 }
