@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2022 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,7 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -111,6 +112,7 @@ import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
 
 @SuppressWarnings("restriction")
+@RunWith(MavenTestRunner.class)
 public abstract class AbstractMavenProjectTestCase {
 
   private static final boolean STOP_ON_FAILED_TEST = Boolean.getBoolean("m2e.stopOnFailedTest");

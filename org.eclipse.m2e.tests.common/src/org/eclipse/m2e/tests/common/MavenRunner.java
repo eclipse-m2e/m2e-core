@@ -25,7 +25,12 @@ import org.eclipse.m2e.core.MavenPlugin;
 
 /**
  * MavenRunner
+ *
+ * @deprecated does not run the test methods, only their {@code @Before} and {@code @After} methods. Tests extending
+ *             {@link AbstractMavenProjectTestCase} are run with {@link MavenTestRunner}; use
+ *             {@link RequireMavenExecutionContext} to run them inside a Maven execution context.
  */
+@Deprecated(forRemoval = true)
 public class MavenRunner extends BlockJUnit4ClassRunner {
 
   public MavenRunner(Class<?> klass) throws InitializationError {
