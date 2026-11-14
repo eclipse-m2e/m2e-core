@@ -40,7 +40,6 @@ import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
-import org.eclipse.wildwebdeveloper.xml.internal.Activator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,8 +50,6 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 
 	private static final String GENERIC_EDITOR = "org.eclipse.ui.genericeditor.GenericEditor";
 
-	private static final String XML_PREFERENCES_DOWNLOAD_EXTERNAL_RESOURCES = "org.eclipse.wildwebdeveloper.xml.downloadExternalResources.enabled";
-
 	private static final long WAIT_TIMEOUT = 15000;
 
 	private IWorkbenchPage page;
@@ -60,7 +57,6 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 
 	@Before
 	public void setPage() {
-		Activator.getDefault().getPreferenceStore().setValue(XML_PREFERENCES_DOWNLOAD_EXTERNAL_RESOURCES, true);
 		page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 	}
 
@@ -122,11 +118,9 @@ public class EditorTest extends AbstractMavenProjectTestCase {
 		Display display = page.getWorkbenchWindow().getShell().getDisplay();
 		assertTrue("Expected marker not published", DisplayHelper.waitForCondition(display, WAIT_TIMEOUT, () -> {
 			try {
-				IMarker[] markers = pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO);
-				if (markers.length == 0) {
-					return false;
-				}
-				return markers[0].getAttribute(IMarker.MESSAGE, "").contains("packaging");
+				// other diagnostics, e.g. about the schema, can be reported too and before it
+				return Arrays.stream(pomFile.findMarkers("org.eclipse.lsp4e.diagnostic", false, IResource.DEPTH_ZERO))
+						.anyMatch(marker -> marker.getAttribute(IMarker.MESSAGE, "").contains("packaging"));
 			} catch (CoreException e) {
 				return false;
 			}
