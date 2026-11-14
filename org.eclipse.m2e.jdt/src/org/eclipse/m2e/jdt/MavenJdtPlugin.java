@@ -69,6 +69,7 @@ public class MavenJdtPlugin extends Plugin {
   public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 
   public static final String PREFERENCES_JRE_SYSTEM_LIBRARY_VERSION = "jreSystemLibraryVersion"; //$NON-NLS-1$
+  public static final String PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING = "removeTextSurroundingPlaceholders"; // $NON-NLS-1$
   private static final String PREFERENCE_LOOKUP_JVM_IN_TOOLCHAINS = "lookupJVMInToolchains"; //$NON-NLS-1$
 
   private static MavenJdtPlugin instance;
