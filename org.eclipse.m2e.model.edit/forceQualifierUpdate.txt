@@ -1,2 +1,0 @@
-# To force a version qualifier update add the bug here
-Update build-qualifier because the compiled byte-code has changed, probably due to newer JDK minor version used in the CI

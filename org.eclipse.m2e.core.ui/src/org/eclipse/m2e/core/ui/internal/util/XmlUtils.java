@@ -38,7 +38,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
-import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 
 
 /**
