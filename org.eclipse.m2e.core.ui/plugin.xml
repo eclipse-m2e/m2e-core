@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2007, 2008 Sonatype, Inc.
+  Copyright (c) 2007, 2026 Sonatype, Inc.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License 2.0
   which accompanies this distribution, and is available at
@@ -313,14 +313,6 @@
       <objectContribution id="org.eclipse.m2e.core.openAetherPomDependencyNode"
           objectClass="org.eclipse.aether.graph.DependencyNode"
           adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomDependency"
-                class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
-                label="%openpomaction.label"
-                enablesFor="1"/>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.core.openPomDependency"
-            objectClass="org.eclipse.m2e.model.edit.pom.Dependency"
-            adaptable="false">
         <action id="org.eclipse.m2e.core.ui.openPomDependency"
                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
                 label="%openpomaction.label"
