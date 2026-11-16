@@ -31,11 +31,16 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -86,7 +91,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   @Override
   public void findLocationForMarker(final IMarker marker) {
-    IDOMModel domModel = null;
+    IFile resource = (IFile) marker.getResource();
+    ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+    boolean connected = false;
     try {
       Integer lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
       if(lineNumber == null) {
@@ -101,13 +108,14 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         return;
       }
 
-      IFile resource = (IFile) marker.getResource();
-      domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
-      if(domModel == null) {
-        log.debug("Document is not structured: " + resource);
+      bufferManager.connect(resource.getFullPath(), LocationKind.IFILE, null);
+      connected = true;
+      ITextFileBuffer buffer = bufferManager.getTextFileBuffer(resource.getFullPath(), LocationKind.IFILE);
+      if(buffer == null) {
+        log.debug("Document is not a text file: " + resource);
         return;
       }
-      IStructuredDocument document = domModel.getStructuredDocument();
+      IDocument document = buffer.getDocument();
       int charStart = document.getLineOffset(lineNumber - 1) + columnStart - 1;
       marker.setAttribute(IMarker.CHAR_START, charStart);
       int charEnd;
@@ -121,8 +129,12 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     } finally {
-      if(domModel != null) {
-        domModel.releaseFromRead();
+      if(connected) {
+        try {
+          bufferManager.disconnect(resource.getFullPath(), LocationKind.IFILE, null);
+        } catch(CoreException e) {
+          log.error(e.getMessage(), e);
+        }
       }
     }
   }
