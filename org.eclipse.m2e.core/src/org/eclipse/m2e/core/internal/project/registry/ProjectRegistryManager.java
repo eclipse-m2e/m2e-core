@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2022 Sonatype, Inc.
+ * Copyright (c) 2008-2026 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,12 @@ package org.eclipse.m2e.core.internal.project.registry;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -388,12 +391,20 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
     Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<>();
 
+    // children read during this refresh by the key of their parent, with the parent pom at their relativePath if any,
+    // to read them again if that parent is registered in the workspace only afterwards
+    Map<ArtifactKey, Map<IFile, Path>> childrenByParent = new HashMap<>();
+    Map<IFile, ArtifactKey> readKeys = new HashMap<>();
+
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
       List<IFile> pomsForUpdate = calculateFacadesForUpdate(newState, context, allProcessedPoms::add,
           allNewFacades::contains, monitor);
       context.clearErrors(pomsForUpdate);
       Map<IFile, MavenProjectFacade> newFacades = readMavenProjectFacades(pomsForUpdate, newState, context, monitor);
+      // projects registered in the workspace for the first time, projects read so far could not resolve them
+      List<MavenProjectFacade> newlyRegistered = newFacades.values().stream().filter(Objects::nonNull)
+          .filter(f -> !isWorkspaceArtifact(newState, f)).toList();
       for(Entry<IFile, MavenProjectFacade> entry : newFacades.entrySet()) {
         IFile pom = entry.getKey();
         MavenProjectFacade newFacade = entry.getValue();
@@ -419,16 +430,30 @@ public class ProjectRegistryManager implements ISaveParticipant {
           capabilities.add(mavenParentCapability);
           capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
           Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-          originalCapabilities.putIfAbsent(pom, oldCapabilities);
+          // keep the state before the refresh, also when it is null, if the pom is read again
+          if(!originalCapabilities.containsKey(pom)) {
+            originalCapabilities.put(pom, oldCapabilities);
+          }
 
           MavenProject mavenProject = getMavenProject(newFacade);
           Set<RequiredCapability> requirements = new LinkedHashSet<>();
           DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, mavenProject);
           Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-          originalRequirements.putIfAbsent(pom, oldRequirements);
+          if(!originalRequirements.containsKey(pom)) {
+            originalRequirements.put(pom, oldRequirements);
+          }
+
+          readKeys.put(pom, newFacade.getArtifactKey());
+          if(mavenProject.getParentArtifact() != null && newFacade.getConfiguration().isResolveWorkspaceProjects()) {
+            childrenByParent.computeIfAbsent(new ArtifactKey(mavenProject.getParentArtifact()), k -> new HashMap<>())
+                .put(pom, getParentAtRelativePath(mavenProject));
+          }
         }
       }
+      Set<IFile> childrenToReread = getChildrenToReread(newlyRegistered, childrenByParent, readKeys);
       allNewFacades.addAll(newFacades.keySet());
+      allNewFacades.removeAll(childrenToReread);
+      context.forcePomFiles(childrenToReread);
       List<IFile> erroneousPoms = new ArrayList<>(pomsForUpdate);
       erroneousPoms.removeAll(newFacades.keySet());
       erroneousPoms.forEach(pom -> newState.setProject(pom, null));
@@ -499,6 +524,49 @@ public class ProjectRegistryManager implements ISaveParticipant {
         }
       }
     } while(tracker.needsImprovement());
+  }
+
+  private static boolean isWorkspaceArtifact(IProjectRegistry state, MavenProjectFacade facade) {
+    MavenProjectFacade registered = state.getProjectFacade(facade.getPom());
+    return registered != null && registered.getArtifactKey().equals(facade.getArtifactKey());
+  }
+
+  /**
+   * Returns the children read so far that could not resolve the given newly registered parents from the workspace,
+   * because they did not find them at their relativePath, together with all their descendants read so far, which
+   * inherited the same values.
+   */
+  private static Set<IFile> getChildrenToReread(List<MavenProjectFacade> newlyRegistered,
+      Map<ArtifactKey, Map<IFile, Path>> childrenByParent, Map<IFile, ArtifactKey> readKeys) {
+    Set<IFile> childrenToReread = new HashSet<>();
+    for(MavenProjectFacade parent : newlyRegistered) {
+      Path parentPom = parent.getPomFile().toPath().normalize();
+      childrenByParent.getOrDefault(parent.getArtifactKey(), Map.of()).forEach((child, parentAtRelativePath) -> {
+        if(!child.equals(parent.getPom()) && !parentPom.equals(parentAtRelativePath)) {
+          childrenToReread.add(child);
+        }
+      });
+    }
+    Deque<IFile> descendantsOf = new ArrayDeque<>(childrenToReread);
+    while(!descendantsOf.isEmpty()) {
+      ArtifactKey key = readKeys.get(descendantsOf.pop());
+      for(IFile child : childrenByParent.getOrDefault(key, Map.of()).keySet()) {
+        if(childrenToReread.add(child)) {
+          descendantsOf.add(child);
+        }
+      }
+    }
+    return childrenToReread;
+  }
+
+  private static Path getParentAtRelativePath(MavenProject mavenProject) {
+    String relativePath = mavenProject.getOriginalModel().getParent().getRelativePath();
+    if(relativePath == null || relativePath.isBlank()) {
+      return null;
+    }
+    File parentPom = new File(mavenProject.getBasedir(), relativePath);
+    parentPom = parentPom.isDirectory() ? new File(parentPom, IMavenConstants.POM_FILE_NAME) : parentPom;
+    return parentPom.toPath().normalize();
   }
 
   private List<IFile> calculateFacadesForUpdate(MutableProjectRegistry registry, DependencyResolutionContext context,
