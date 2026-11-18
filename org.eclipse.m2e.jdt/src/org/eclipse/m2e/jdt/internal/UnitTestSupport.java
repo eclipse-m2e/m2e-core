@@ -40,6 +40,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -57,6 +58,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.MavenExecutionJre;
+import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 
 
@@ -142,6 +144,8 @@ public class UnitTestSupport {
    * standard variable pattern
    */
   private static final Pattern STANDARD_VAR_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
+
+  private static final Pattern WORD_WITH_STANDARD_VAR_PATTERN = Pattern.compile("\\S*?\\$\\{[^{}]*\\}\\S*+");
 
   /**
    * maven group id for the maven plugins
@@ -506,7 +510,10 @@ public class UnitTestSupport {
       if(value == null) {
         return value;
       }
-      return STANDARD_VAR_PATTERN.matcher(value).replaceAll("");
+      boolean includeSurrounding = InstanceScope.INSTANCE.getNode(MavenJdtPlugin.PLUGIN_ID)
+          .getBoolean(MavenJdtPlugin.PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING, true);
+      Pattern patternToClean = includeSurrounding ? WORD_WITH_STANDARD_VAR_PATTERN : STANDARD_VAR_PATTERN;
+      return patternToClean.matcher(value).replaceAll("");
     }
 
   }
