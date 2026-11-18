@@ -919,7 +919,16 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       this.lookup = lookup;
     }
 
-    private synchronized Settings getSettings() throws CoreException {
+    private Settings getSettings() throws CoreException {
+      Settings cached = getSettings(null);
+      if(cached != null) {
+        return cached;
+      }
+      // Container creation can request settings, so never look up components while holding this monitor.
+      return getSettings(lookup.lookup(SettingsBuilder.class));
+    }
+
+    private synchronized Settings getSettings(SettingsBuilder settingsBuilder) {
       File global = locations.globalSettings();
       long gs;
       long gt;
@@ -943,6 +952,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       boolean reload = settings == null || gs != globalSettingsLength || gt != globalSettingsTimestamp
           || us != userSettingsLength || ut != userSettingsTimestamp;
       if(reload) {
+        // A null builder only checks the cache. Recheck it after looking up the builder outside this monitor.
+        if(settingsBuilder == null) {
+          return null;
+        }
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         Properties systemProperties = new Properties();
         M2EUtils.copyProperties(systemProperties, System.getProperties());
@@ -954,7 +967,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           request.setUserSettingsFile(user);
         }
         try {
-          settings = lookup.lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
+          settings = settingsBuilder.build(request).getEffectiveSettings();
         } catch(SettingsBuildingException ex) {
           log.error("Could not read settingsCacheMap.xml, assuming default values", ex);
           /*
