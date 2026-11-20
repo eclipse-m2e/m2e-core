@@ -283,7 +283,7 @@ public abstract class ArchetypeCatalogFactory {
       ArchetypeCatalog catalog = maven.createExecutionContext().execute((ctx, m) -> {
         try {
           RemoteRepository archetypeRepo = new RemoteRepository.Builder(
-              RemoteCatalogArchetypeDataSource.ARCHETYPE_REPOSITORY_ID, "", remoteUrl).build();
+              RemoteCatalogArchetypeDataSource.ARCHETYPE_REPOSITORY_ID, "default", remoteUrl).build();
           List<RemoteRepository> remoteRepositories = new ArrayList<>(ArchetypePlugin.getRemoteRepositories(ctx));
           remoteRepositories.add(0, archetypeRepo);
           return source.getArchetypeCatalog(ctx.getRepositorySession(), remoteRepositories);
