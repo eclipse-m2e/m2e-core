@@ -56,8 +56,6 @@ import org.eclipse.sisu.space.ClassSpace;
 import org.eclipse.sisu.space.SpaceModule;
 import org.eclipse.sisu.wire.WireModule;
 
-import org.codehaus.plexus.logging.LogEnabled;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
@@ -66,7 +64,6 @@ import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
-import org.apache.maven.cli.logging.Slf4jLogger;
 
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -130,12 +127,6 @@ public class ArchetypePlugin {
         .get(Types.mapOf(String.class, ArchetypeDataSource.class));
     archetypeArtifactManager = injector.getInstance(ArchetypeArtifactManager.class);
     archetypeDataSourceMap = injector.getInstance(Key.get(mapOfDataSourcesType));
-
-    if(archetypeArtifactManager instanceof LogEnabled logEnabled) {
-      logEnabled.enableLogging(new Slf4jLogger(LoggerFactory.getLogger(archetypeArtifactManager.getClass())));
-    }
-    archetypeDataSourceMap.values().stream().filter(LogEnabled.class::isInstance).map(LogEnabled.class::cast)
-        .forEach(d -> d.enableLogging(new Slf4jLogger(LoggerFactory.getLogger(d.getClass()))));
 
     addArchetypeCatalogFactory(
         new ArchetypeCatalogFactory.InternalCatalogFactory(archetypeDataSourceMap.get("internal-catalog")));
