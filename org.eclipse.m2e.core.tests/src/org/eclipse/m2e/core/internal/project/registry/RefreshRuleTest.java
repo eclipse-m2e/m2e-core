@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.junit.After;
 import org.junit.Test;
 
 
@@ -27,11 +30,19 @@ import org.junit.Test;
  * Tests that {@link ProjectRegistryManager#refresh(java.util.Collection, org.eclipse.core.runtime.IProgressMonitor)}
  * releases the workspace rule also when it cannot get it.
  */
-public class RefreshRuleTest extends AbstractMavenProjectTestCase {
+public class RefreshRuleTest {
+
+  private final IProgressMonitor monitor = new NullProgressMonitor();
+
+  private final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("refreshRuleTest");
+
+  @After
+  public void deleteProject() throws CoreException {
+    project.delete(true, monitor);
+  }
 
   @Test
   public void testRefreshInsideProjectRuleKeepsNoRule() throws Exception {
-    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("refreshRuleTest");
     project.create(monitor);
     project.open(monitor);
     ProjectRegistryManager manager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
