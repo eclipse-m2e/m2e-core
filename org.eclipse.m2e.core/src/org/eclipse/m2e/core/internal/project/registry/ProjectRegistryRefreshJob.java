@@ -157,8 +157,8 @@ public class ProjectRegistryRefreshJob extends MavenJob
         }
 
         ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-        getJobManager().beginRule(rule, monitor);
         try {
+          getJobManager().beginRule(rule, monitor);
           manager.applyMutableProjectRegistry(newState, monitor);
         } finally {
           getJobManager().endRule(rule);

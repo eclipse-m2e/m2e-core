@@ -188,8 +188,9 @@ class DownloadSourcesJob extends MavenJob implements IBackgroundProcessingQueue 
     SubMonitor updateMonitor = SubMonitor.convert(monitor, Messages.DownloadSourcesJob_job_associateWithClasspath,
         1 + toUpdateMavenProjects.size() + toUpdateAttachments.size());
     ISchedulingRule schedulingRule = ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
-    getJobManager().beginRule(schedulingRule, updateMonitor.split(1));
+    SubMonitor ruleMonitor = updateMonitor.split(1);
     try {
+      getJobManager().beginRule(schedulingRule, ruleMonitor);
       for(IProject mavenProject : toUpdateMavenProjects) {
         updateMonitor
             .setTaskName(Messages.DownloadSourcesJob_job_associateWithClasspath + " - " + mavenProject.getName());
