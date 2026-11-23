@@ -85,13 +85,14 @@ Others who offer support for m2e are welcome to be listed here, just open a pull
 
 ## 🤝 Help wanted
 
-m2e is looking for help!
+m2e is an essential part of the Eclipse IDE and the foundation for Maven support in many other Java tools.
 The project depends on the time and contributions of a small number of people, and more contributors are needed to keep it healthy and moving forward, especially for the upcoming m2e 3 (see the [discussion](https://github.com/eclipse-m2e/m2e-core/discussions/2010)).
 If m2e is a key technology for you or your organization, you can help with the following:
 
 * **Help testing:** try the latest [snapshot builds](#-installation) early and often, so regressions are found before a release.
 * **Donate some time:** fix bugs, improve documentation, review open pull requests, answer questions in the [discussions](https://github.com/eclipse-m2e/m2e-core/discussions), or provide tests/sample projects for the features that are important to you.
-* **Sponsor contributors:** if you can't contribute time, you can sponsor individual contributors, e.g. [Christoph Läubrich](https://github.com/sponsors/laeubi).
+* **Sponsor the Eclipse IDE:** support the IDE ecosystem including m2e from €5 via the [Eclipse IDE sponsorship program](https://www.eclipse.org/sponsor/ide/?campaign=m2e). Organizations can also pool resources through the IDE-WG [Development Funding Initiative](https://eclipseide.org/working-group/development-funding-initiative/).
+* **Sponsor contributors:** fund individual contributors directly, e.g. [Christoph Läubrich](https://github.com/sponsors/laeubi). For corporate support see [Getting support](#-getting-support).
 
 ## ⌨️ Contributing
 [![Create Eclipse Development Environment for m2e](https://download.eclipse.org/oomph/www/setups/svg/m2e.svg)](https://www.eclipse.org/setups/installer/?url=https://raw.githubusercontent.com/eclipse-m2e/m2e-core/main/setup/m2eDevelopmentEnvironmentConfiguration.setup&show=true "Click to open Eclipse-Installer Auto Launch or drag into your running installer")
