@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2022 Hannes Wellmann and others
+ * Copyright (c) 2022, 2026 Hannes Wellmann and others
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -14,6 +14,7 @@
 package org.eclipse.m2e.pde.connector.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,12 +42,17 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.pde.connector.PDEProjectHelper;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -78,6 +85,64 @@ public class TychoConnectorTest extends AbstractMavenProjectTestCase {
 		assertErrorFreeProjectWithBuildersAndNatures(project, PLUGIN_NATURES, PLUGIN_BUILDERS);
 		assertPluginProjectExists(project, "pde.tycho.plugin");
 		assertClasspathContainer(project);
+	}
+
+	@Test
+	public void importTychoPluginWithDeferredClasspathUpdate() throws Exception {
+		assertEquals("Workspace must be empty before initializing PDE", 0,
+				ResourcesPlugin.getWorkspace().getRoot().getProjects().length);
+		// Initialize before import, so PDE discovers the new model from the resource
+		// delta after m2e's batched import, rather than scanning it during configuration.
+		assertEquals(0, PluginRegistry.getWorkspaceModels().length);
+
+		AtomicReference<Job> deferredUpdate = new AtomicReference<>();
+		CountDownLatch completed = new CountDownLatch(1);
+		JobChangeAdapter listener = new JobChangeAdapter() {
+			@Override
+			public void scheduled(IJobChangeEvent event) {
+				Job job = event.getJob();
+				// Observe the real deferred writer without depending on its display name
+				// or the compiler-generated anonymous class number.
+				if (job.getClass().getEnclosingClass() == PDEProjectHelper.class) {
+					deferredUpdate.compareAndSet(null, job);
+				}
+			}
+
+			@Override
+			public void done(IJobChangeEvent event) {
+				if (event.getJob() == deferredUpdate.get()) {
+					completed.countDown();
+				}
+			}
+		};
+		Job.getJobManager().addJobChangeListener(listener);
+		try {
+			IProject project = importTychoProject("pde.tycho.plugin/pom.xml");
+			assertTrue("Deferred PDE classpath update was not observed completing",
+					completed.await(30, TimeUnit.SECONDS));
+			Job job = deferredUpdate.get();
+			assertNotNull(job);
+			assertNotNull(job.getResult());
+			assertTrue("Deferred PDE classpath update failed: " + job.getResult(), job.getResult().isOK());
+			assertNotNull("Deferred update must have a scheduling rule", job.getRule());
+			assertTrue("Deferred update must not run concurrently with m2e configuration",
+					job.getRule().isConflicting(MavenPlugin.getProjectConfigurationManager().getRule()));
+
+			waitForJobsToComplete(monitor);
+			assertClasspathContainer(project);
+			IClasspathEntry[] entries = JavaCore.create(project).getRawClasspath();
+			assertTrue("PDE container missing after deferred update", Arrays.stream(entries)
+					.anyMatch(e -> e.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+							&& e.getPath().toString().equals("org.eclipse.pde.core.requiredPlugins")));
+			assertTrue("Plug-in source folder missing after deferred update", Arrays.stream(entries)
+					.anyMatch(e -> e.getEntryKind() == IClasspathEntry.CPE_SOURCE
+							&& e.getPath().equals(project.getFullPath().append("src"))));
+			assertFalse("JDT's default project-root source folder must not remain", Arrays.stream(entries)
+					.anyMatch(e -> e.getEntryKind() == IClasspathEntry.CPE_SOURCE
+							&& e.getPath().equals(project.getFullPath())));
+		} finally {
+			Job.getJobManager().removeJobChangeListener(listener);
+		}
 	}
 
 	@Test
