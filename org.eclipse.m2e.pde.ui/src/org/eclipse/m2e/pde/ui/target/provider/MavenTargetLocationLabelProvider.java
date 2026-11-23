@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2021 Christoph Läubrich
+ * Copyright (c) 2018, 2026 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -15,19 +15,21 @@ package org.eclipse.m2e.pde.ui.target.provider;
 import java.text.MessageFormat;
 import java.util.List;
 
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceLocator;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.m2e.pde.target.MavenTargetDependency;
 import org.eclipse.m2e.pde.target.MavenTargetLocation;
-import org.eclipse.m2e.pde.ui.target.adapter.MavenTargetAdapterFactory;
 import org.eclipse.m2e.pde.ui.target.editor.Messages;
 import org.eclipse.pde.internal.core.ifeature.IFeature;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 
 @SuppressWarnings("restriction")
 public class MavenTargetLocationLabelProvider implements ILabelProvider {
-	private Image image;
+	private final ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	@Override
 	public String getText(Object element) {
@@ -61,11 +63,8 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-		Display current = Display.getCurrent();
-		if (image == null && current != null) {
-			image = new Image(current, MavenTargetAdapterFactory.class.getResourceAsStream("/icons/m2.gif"));
-		}
-		return image;
+		return resourceManager.create(
+				ResourceLocator.imageDescriptorFromBundle("org.eclipse.m2e.pde.ui", "icons/m2.gif").orElseThrow());
 	}
 
 	@Override
@@ -75,9 +74,7 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 
 	@Override
 	public void dispose() {
-		if (image != null) {
-			image.dispose();
-		}
+		resourceManager.dispose();
 	}
 
 	@Override
