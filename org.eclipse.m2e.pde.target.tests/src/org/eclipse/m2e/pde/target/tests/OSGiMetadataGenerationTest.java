@@ -516,6 +516,70 @@ public class OSGiMetadataGenerationTest extends AbstractMavenTargetTest {
 		}
 	}
 
+	private static final String OJDBC_DEPENDENCY = """
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>ojdbc11</artifactId>
+					<version>23.26.3.0.0</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+			""";
+
+	/**
+	 * A maven version with five numeric segments is not an OSGi version. bnd's
+	 * {@code version_cleanup} only keeps three numeric segments and strips the
+	 * leading numeric parts of the remainder, so 23.26.3.0.0 becomes 23.26.3.0
+	 * (and e.g. 23.26.3.4.5 and 23.26.3.9.5 would both become 23.26.3.5).
+	 */
+	@Test
+	public void testFiveSegmentMavenVersion_defaultInstructions() throws Exception {
+		ITargetLocation target = resolveMavenTarget(
+				"""
+				<location includeDependencyDepth="none" includeSource="false" missingManifest="generate" type="Maven">
+				"""
+						+ OJDBC_DEPENDENCY + "</location>");
+		assertStatusOk(getTargetStatus(target));
+		TargetBundle bundle = getGeneratedBundle(target);
+		assertEquals("wrapped.com.oracle.database.jdbc.ojdbc11", bundle.getBundleInfo().getSymbolicName());
+		assertEquals("23.26.3.0", bundle.getBundleInfo().getVersion());
+		Attributes attributes = getManifestMainAttributes(bundle);
+		assertEquals("Bundle derived from maven artifact com.oracle.database.jdbc:ojdbc11:23.26.3.0.0",
+				attributes.getValue(Constants.BUNDLE_NAME));
+		ManifestElement[] exports = parseHeader(Constants.EXPORT_PACKAGE, attributes.getValue(Constants.EXPORT_PACKAGE));
+		ManifestElement jdbc = Arrays.stream(exports).filter(e -> e.getValue().equals("oracle.jdbc")).findFirst()
+				.orElseThrow();
+		assertEquals("23.26.3.0", jdbc.getAttribute(Constants.VERSION_ATTRIBUTE));
+	}
+
+	/**
+	 * The lossless mapping can be enforced with custom instructions. Instructions
+	 * are read as Java properties, so backslashes are consumed: use character
+	 * classes instead of {@code \d}.
+	 */
+	@Test
+	public void testFiveSegmentMavenVersion_customInstructions() throws Exception {
+		ITargetLocation target = resolveMavenTarget(
+				"""
+				<location includeDependencyDepth="none" includeSource="false" missingManifest="generate" type="Maven">
+				"""
+						+ OJDBC_DEPENDENCY + """
+						<instructions><![CDATA[
+							Bundle-SymbolicName:   m2e.custom.test.${mvnArtifactId}
+							version:               ${replacestring;${mvnVersion};([0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)[.]([0-9]+);$1_$2}
+							Bundle-Version:        ${version}
+							Export-Package:        *;version="${version}";-noimport:=true
+							Import-Package:        *;resolution:=optional
+							-noextraheaders: true
+						]]></instructions>
+						</location>""");
+		assertStatusOk(getTargetStatus(target));
+		TargetBundle bundle = getGeneratedBundle(target);
+		assertEquals("m2e.custom.test.ojdbc11", bundle.getBundleInfo().getSymbolicName());
+		assertEquals("23.26.3.0_0", bundle.getBundleInfo().getVersion());
+	}
+
 	private static TargetBundle getGeneratedBundle(ITargetLocation target) {
 		return Arrays.stream(target.getBundles()).filter(b -> !b.isSourceBundle()).findFirst().orElseThrow();
 	}
