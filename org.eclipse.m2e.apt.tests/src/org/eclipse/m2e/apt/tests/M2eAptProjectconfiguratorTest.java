@@ -20,17 +20,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.apt.MavenJdtAptPlugin;
@@ -443,5 +447,24 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 		assertNoErrors(p);
+	}
+
+	@Test
+	public void testNestedSourceFolders() throws Exception {
+		IProject project = importProject("projects/nested/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(project);
+		assertNotNull(javaProject);
+		assertNoErrors(project);
+		IClasspathEntry[] classpath = javaProject.getRawClasspath();
+		Set<IClasspathEntry> entries = new HashSet<>(classpath.length);
+		for (IClasspathEntry entry: classpath) {
+			assertTrue(entries.add(entry));
+			if ("/nested-test/target/generated-sources".equals(entry.getPath().toString())) {
+				IPath[] exclusions = entry.getExclusionPatterns();
+				assertEquals(1, exclusions.length);
+				assertEquals("annotations/", exclusions[0].toString());
+			}
+		}
 	}
 }
