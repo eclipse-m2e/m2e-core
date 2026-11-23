@@ -316,15 +316,19 @@ public class ProjectRegistryManager implements ISaveParticipant {
   public Map<IFile, IStatus> refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectRegistryManager_task_refreshing, 100);
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-    Job.getJobManager().beginRule(rule, progress);
-    syncRefreshThread = Thread.currentThread();
-    try (MutableProjectRegistry newState = newMutableProjectRegistry()) {
-      Map<IFile, IStatus> result = refresh(newState, pomFiles, progress.newChild(95));
+    // endRule must follow beginRule also when beginRule fails, or the thread keeps the rule
+    try {
+      Job.getJobManager().beginRule(rule, progress);
+      syncRefreshThread = Thread.currentThread();
+      try (MutableProjectRegistry newState = newMutableProjectRegistry()) {
+        Map<IFile, IStatus> result = refresh(newState, pomFiles, progress.newChild(95));
 
-      applyMutableProjectRegistry(newState, progress.newChild(5));
-      return result;
+        applyMutableProjectRegistry(newState, progress.newChild(5));
+        return result;
+      } finally {
+        syncRefreshThread = null;
+      }
     } finally {
-      syncRefreshThread = null;
       Job.getJobManager().endRule(rule);
     }
   }
