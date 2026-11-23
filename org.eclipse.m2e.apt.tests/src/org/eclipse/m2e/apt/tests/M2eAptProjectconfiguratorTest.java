@@ -19,25 +19,46 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.apt.MavenJdtAptPlugin;
+import org.eclipse.m2e.apt.internal.IMavenAptConstants;
 import org.eclipse.m2e.apt.internal.Messages;
 import org.eclipse.m2e.apt.preferences.AnnotationProcessingMode;
 import org.eclipse.m2e.apt.preferences.IPreferencesManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.ide.IDE;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
@@ -68,6 +89,149 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 	@Test
 	public void testMavenCompilerPluginDependencies() throws Exception {
 		defaultTest("p2", "target/generated-sources/m2e-apt", "target/generated-test-sources/m2e-apt");
+	}
+
+	@Test
+	public void testWorkspaceAnnotationProcessorUsesLocalRepositoryJar() throws Exception {
+		String artifactId = "workspace-processor-" + UUID.randomUUID();
+		Path fixture = createWorkspaceProcessorFixture(artifactId);
+		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/" + artifactId);
+		Path localJar = localArtifactDirectory.resolve("1.0.0/" + artifactId + "-1.0.0.jar");
+		assertFalse("Test annotation processor JAR already exists: " + localJar, Files.exists(localJar));
+		IProject consumer = null;
+
+		try {
+			IProject[] projects = importProjects(fixture.toString(),
+					new String[] { "processor/pom.xml", "consumer/pom.xml" }, new ResolverConfiguration());
+			IProject processor = projects[0];
+			consumer = projects[1];
+			waitForJobsToComplete();
+
+			IMarker[] missingJarMarkers = getWorkspaceProcessorMarkers(consumer);
+			assertEquals(1, missingJarMarkers.length);
+			String missingJarMessage = missingJarMarkers[0].getAttribute(IMarker.MESSAGE, "");
+			assertTrue(missingJarMessage.contains("org.eclipse.m2e.tests:" + artifactId + ":1.0.0"));
+			assertTrue(missingJarMessage.contains(processor.getName()));
+			assertTrue(missingJarMessage.contains("Maven Install"));
+			assertWorkspaceProcessorMarkerAttributes(missingJarMarkers[0], processor, artifactId);
+
+			processor.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+			waitForJobsToComplete();
+			createJar(processor.getFolder("target/classes").getLocation().toFile().toPath(), localJar);
+
+			updateProject(consumer);
+			consumer.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+			waitForJobsToComplete();
+
+			IJavaProject javaConsumer = JavaCore.create(consumer);
+			assertTrue(AptConfig.isEnabled(javaConsumer));
+			assertTrue("Regular dependency is not workspace-resolved",
+					Arrays.stream(javaConsumer.getResolvedClasspath(true)) //
+					.anyMatch(entry -> entry.getEntryKind() == IClasspathEntry.CPE_PROJECT
+							&& processor.getFullPath().equals(entry.getPath())));
+
+			FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaConsumer);
+			assertFactoryContainerContains(factoryPath, artifactId + ":1.0.0");
+			assertTrue(factoryPath.getEnabledContainers().keySet().stream() //
+					.anyMatch(container -> container.getType() == FactoryType.VARJAR
+						&& container.getId().endsWith(artifactId + "-1.0.0.jar")));
+			assertTrue(consumer.getFile(COMPILER_OUTPUT_DIR + "/generated/WorkspaceGenerated.java").exists());
+			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
+
+			IFile processorSource = processor //
+					.getFile("src/processor/java/org/eclipse/m2e/tests/apt/WorkspaceProcessor.java");
+			assertTrue(processorSource.getLocation().toFile().setLastModified(localJar.toFile().lastModified() + 2000));
+			processorSource.refreshLocal(IResource.DEPTH_ZERO, monitor);
+			updateProject(consumer);
+			IMarker[] staleJarMarkers = getWorkspaceProcessorMarkers(consumer);
+			assertEquals(1, staleJarMarkers.length);
+			String staleJarMessage = staleJarMarkers[0].getAttribute(IMarker.MESSAGE, "");
+			assertTrue(staleJarMessage.contains("org.eclipse.m2e.tests:" + artifactId + ":1.0.0"));
+			assertTrue(staleJarMessage.contains(processor.getName()));
+			assertTrue(staleJarMessage.contains("older than Java source"));
+			assertWorkspaceProcessorMarkerAttributes(staleJarMarkers[0], processor, artifactId);
+
+			createJar(processor.getFolder("target/classes").getLocation().toFile().toPath(), localJar);
+			Files.setLastModifiedTime(localJar, FileTime.fromMillis(processorSource.getLocalTimeStamp() + 2000));
+			updateProject(consumer);
+			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
+		} finally {
+			cleanupWorkspaceProcessorFixture(consumer, localArtifactDirectory, fixture);
+		}
+		assertFalse("Test artifact directory was not removed", Files.exists(localArtifactDirectory));
+	}
+
+	@Test
+	public void testWorkspaceAnnotationProcessorQuickFixInstallsAndUpdatesConsumer() throws Exception {
+		String artifactId = "workspace-processor-" + UUID.randomUUID();
+		Path fixture = createWorkspaceProcessorFixture(artifactId);
+		Path localArtifactDirectory = repo.toPath().resolve("org/eclipse/m2e/tests/" + artifactId);
+		Path localJar = localArtifactDirectory.resolve("1.0.0/" + artifactId + "-1.0.0.jar");
+		assertFalse("Test annotation processor JAR already exists: " + localJar, Files.exists(localJar));
+		IProject consumer = null;
+
+		try {
+			IProject[] projects = importProjects(fixture.toString(),
+					new String[] { "processor/pom.xml", "consumer/pom.xml" }, new ResolverConfiguration());
+			IProject processor = projects[0];
+			consumer = projects[1];
+			waitForJobsToComplete();
+
+			IMarker[] markers = getWorkspaceProcessorMarkers(consumer);
+			assertEquals(1, markers.length);
+			assertWorkspaceProcessorMarkerAttributes(markers[0], processor, artifactId);
+
+			IMarkerResolution quickFix = Arrays.stream(IDE.getMarkerHelpRegistry().getResolutions(markers[0]))
+					.filter(resolution -> resolution.getLabel().contains(processor.getName()))
+					.findFirst()
+					.orElseThrow(() -> new AssertionError("Workspace processor Maven Install quick fix is missing"));
+			quickFix.run(markers[0]);
+			Job.getJobManager().join(IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID, monitor);
+			waitForJobsToComplete();
+
+			assertTrue("Quick fix did not install annotation processor JAR", Files.isRegularFile(localJar));
+			assertEquals(0, getWorkspaceProcessorMarkers(consumer).length);
+			assertTrue(consumer.getFile(COMPILER_OUTPUT_DIR + "/generated/WorkspaceGenerated.java").exists());
+		} finally {
+			cleanupWorkspaceProcessorFixture(consumer, localArtifactDirectory, fixture);
+		}
+		assertFalse("Test artifact directory including Maven metadata was not removed",
+				Files.exists(localArtifactDirectory));
+	}
+
+	private void cleanupWorkspaceProcessorFixture(IProject consumer, Path artifactDirectory, Path fixture)
+			throws Exception {
+		try {
+			if (consumer != null) {
+				deleteProject(consumer);
+			}
+		} finally {
+			try {
+				deleteRecursively(artifactDirectory);
+			} finally {
+				deleteRecursively(fixture);
+			}
+		}
+	}
+
+	private static Path createWorkspaceProcessorFixture(String artifactId) throws IOException {
+		// Each invocation owns its coordinates, including when CI restores a Maven repository cache.
+		Path fixture = Files.createTempDirectory("workspaceProcessor-");
+		copyDir(new File("projects/workspaceProcessor"), fixture.toFile());
+		for (String module : List.of("processor", "consumer")) {
+			Path pom = fixture.resolve(module).resolve("pom.xml");
+			Files.writeString(pom, Files.readString(pom).replace("<artifactId>workspace-processor</artifactId>",
+					"<artifactId>" + artifactId + "</artifactId>"));
+		}
+		return fixture;
+	}
+
+	private static void assertWorkspaceProcessorMarkerAttributes(IMarker marker, IProject processor, String artifactId)
+			throws CoreException {
+		assertEquals("org.eclipse.m2e.tests:" + artifactId + ":1.0.0",
+				marker.getAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_ARTIFACT_ATTRIBUTE));
+		assertEquals(processor.getName(),
+				marker.getAttribute(IMavenAptConstants.WORKSPACE_PROCESSOR_PROJECT_ATTRIBUTE));
 	}
 
 	@Test
@@ -443,5 +607,45 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 		assertNoErrors(p);
+	}
+
+	private static IMarker[] getWorkspaceProcessorMarkers(IProject project) throws CoreException {
+		return project.findMarkers(IMavenAptConstants.WORKSPACE_PROCESSOR_MARKER_ID, false, IResource.DEPTH_ZERO);
+	}
+
+	private static void createJar(Path classesDirectory, Path jar) throws IOException {
+		Files.createDirectories(jar.getParent());
+		try (JarOutputStream output = new JarOutputStream(Files.newOutputStream(jar));
+				Stream<Path> files = Files.walk(classesDirectory)) {
+			files.filter(Files::isRegularFile).sorted().forEach(file -> {
+				String entryName = classesDirectory.relativize(file).toString().replace(File.separatorChar, '/');
+				try {
+					output.putNextEntry(new JarEntry(entryName));
+					Files.copy(file, output);
+					output.closeEntry();
+				} catch (IOException ex) {
+					throw new UncheckedIOException(ex);
+				}
+			});
+		} catch (UncheckedIOException ex) {
+			throw ex.getCause();
+		}
+	}
+
+	private static void deleteRecursively(Path path) throws IOException {
+		if (!Files.exists(path)) {
+			return;
+		}
+		try (Stream<Path> files = Files.walk(path)) {
+			files.sorted(Comparator.reverseOrder()).forEach(file -> {
+				try {
+					Files.deleteIfExists(file);
+				} catch (IOException ex) {
+					throw new UncheckedIOException(ex);
+				}
+			});
+		} catch (UncheckedIOException ex) {
+			throw ex.getCause();
+		}
 	}
 }
