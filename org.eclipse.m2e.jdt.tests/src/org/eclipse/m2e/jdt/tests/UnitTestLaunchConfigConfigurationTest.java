@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -37,10 +38,12 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
+import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.UnitTestSupport;
 import org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -103,12 +106,20 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 	// Define the parameters to be used in the test
 	@Parameters
-	public static Collection<Object> data() {
-		return List.of(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST, MavenRuntimeClasspathProvider.JDT_JUNIT_TEST);
+	public static Collection<Object[]> data() {
+		return List.of(
+			new Object[] { MavenRuntimeClasspathProvider.JDT_TESTNG_TEST, true },
+			new Object[] { MavenRuntimeClasspathProvider.JDT_TESTNG_TEST, false },
+			new Object[] { MavenRuntimeClasspathProvider.JDT_JUNIT_TEST, true },
+			new Object[] { MavenRuntimeClasspathProvider.JDT_JUNIT_TEST, false }
+		);
 	}
 
 	@Parameter(0)
 	public String testType;
+	
+	@Parameter(1)
+	public boolean cleanEntireParameters;
 
 	@Override
 	@Before
@@ -116,6 +127,14 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		super.setUp();
 		((MavenConfigurationImpl) MavenPlugin.getMavenConfiguration()).setAutomaticallyUpdateConfiguration(true);
 		setAutoBuilding(true);
+		InstanceScope.INSTANCE.getNode(MavenJdtPlugin.PLUGIN_ID).putBoolean(MavenJdtPlugin.PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING, cleanEntireParameters);
+	}
+	
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+		InstanceScope.INSTANCE.getNode(MavenJdtPlugin.PLUGIN_ID).remove(MavenJdtPlugin.PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING);
 	}
 
 	@Test
@@ -152,8 +171,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
-		assertThat(argLine, Matchers.containsString("--argLineItem=surefireArgLineValue --undefinedArgLineItem="));
-		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
+		assertArgLine(argLine, "surefireArgLineValue");
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -212,8 +230,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
-		assertThat(argLine, Matchers.containsString("--argLineItem=failsafeArgLineValue --undefinedArgLineItem="));
-		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
+		assertArgLine(argLine, "failsafeArgLineValue");
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -265,8 +282,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
-		assertThat(argLine, Matchers.containsString("--argLineItem=surefireArgLineValue --undefinedArgLineItem="));
-		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
+		assertArgLine(argLine, "surefireArgLineValue");
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -315,8 +331,7 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 
 		// check argLine
 		String argLine = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_ARGUMENTS, "");
-		assertThat(argLine, Matchers.containsString("--argLineItem=failsafeArgLineValue --undefinedArgLineItem="));
-		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
+		assertArgLine(argLine, "failsafeArgLineValue");
 
 		// check environmentVariables
 		Map<String, String> envVars = config.getAttribute(UnitTestSupport.LAUNCH_CONFIG_ENVIRONMENT_VARIABLES,
@@ -336,6 +351,16 @@ public class UnitTestLaunchConfigConfigurationTest extends AbstractMavenProjectT
 		assertThat(argLine, Matchers.containsString("-DfailsafePropWithCR=\"has\rCR\""));
 		assertThat(argLine, Matchers.containsString("-DfailsafePropWithLF=\"has\nLF\""));
 
+	}
+
+	private void assertArgLine(String argLine, String expectedArgLineItem) {
+		String undefinedItemSuffix = " --undefinedArgLineItem=";
+		String suffix = cleanEntireParameters ? "" : undefinedItemSuffix;
+		assertThat(argLine, Matchers.containsString("--argLineItem=" + expectedArgLineItem + suffix));
+		assertThat(argLine, Matchers.not(Matchers.containsString("${undefinedProperty}")));
+		if(cleanEntireParameters){
+			assertThat(argLine, Matchers.not(Matchers.containsString(undefinedItemSuffix)));
+		}
 	}
 
 	@Test

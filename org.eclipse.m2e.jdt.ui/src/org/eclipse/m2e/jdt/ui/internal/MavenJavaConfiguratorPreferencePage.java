@@ -9,6 +9,8 @@
 
 package org.eclipse.m2e.jdt.ui.internal;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
@@ -19,6 +21,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.jdt.JreSystemVersion;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
@@ -36,7 +39,7 @@ public class MavenJavaConfiguratorPreferencePage extends FieldEditorPreferencePa
 
   public MavenJavaConfiguratorPreferencePage() {
     super(GRID);
-    setPreferenceStore(MavenJdtUiPlugin.getDefault().getPreferenceStore());
+    setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, MavenJdtPlugin.PLUGIN_ID));
   }
 
   @Override
@@ -69,6 +72,12 @@ public class MavenJavaConfiguratorPreferencePage extends FieldEditorPreferencePa
             {Messages.MavenPreferencePage_useWorkspaceDefault, JreSystemVersion.WORKSPACE_DEFAULT.name()}},
         getFieldEditorParent(), true);
     addField(field);
+    addField(
+        new BooleanFieldEditor(
+            MavenJdtPlugin.PREFERENCES_PLACEHOLDERS_REMOVE_SURROUNDING,
+            Messages.MavenPreferencePage_removeTextSurroundingPlaceholders, getFieldEditorParent()
+        )
+    );
   }
 
   private void createLink(final Composite parent, final String text, String target) {
