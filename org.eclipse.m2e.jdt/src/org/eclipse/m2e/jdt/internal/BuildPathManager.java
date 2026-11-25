@@ -305,7 +305,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           File srcFile = srcPath != null ? srcPath.toFile() : null;
           boolean downloadSources = (srcPath == null && mavenConfiguration.isDownloadSources())
               || (isSnapshot && isLastModifiedBefore(srcFile, mainFile));
-          File javaDocFile = javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
+          File javaDocFile = isSnapshot && javaDocUrl != null ? getAttachedArtifactFile(aKey, CLASSIFIER_JAVADOC) : null;
           boolean downloadJavaDoc = (javaDocUrl == null && mavenConfiguration.isDownloadJavaDoc())
               || (isSnapshot && isLastModifiedBefore(javaDocFile, mainFile));
           scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
@@ -693,9 +693,9 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       ArtifactRepository localRepository = maven.getLocalRepository();
       String relPath = maven.getArtifactPath(localRepository, a.groupId(), a.artifactId(), a.version(), "jar", //$NON-NLS-1$
           classifier);
-      File file = new File(localRepository.getBasedir(), relPath).getCanonicalFile();
+      File file = new File(localRepository.getBasedir(), relPath);
       if(file.canRead()) {
-        return file;
+        return file.getCanonicalFile();
       }
     } catch(CoreException ex) {
       // fall through
