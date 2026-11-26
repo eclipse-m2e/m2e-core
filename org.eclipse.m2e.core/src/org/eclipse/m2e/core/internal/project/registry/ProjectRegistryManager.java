@@ -385,8 +385,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
     Set<IFile> allProcessedPoms = new LinkedHashSet<>();
     Set<IFile> allNewFacades = new HashSet<>();
 
-    Map<IFile, Set<Capability>> originalCapabilities = new HashMap<>();
-    Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<>();
+    Map<IFile, Set<Capability>> baselineCapabilities = new HashMap<>();
+    Map<IFile, Set<RequiredCapability>> baselineRequirements = new HashMap<>();
 
     // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) { // context may be augmented, so we need to keep processing
@@ -419,13 +419,13 @@ public class ProjectRegistryManager implements ISaveParticipant {
           capabilities.add(mavenParentCapability);
           capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
           Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-          originalCapabilities.putIfAbsent(pom, oldCapabilities);
+          baselineCapabilities.putIfAbsent(pom, oldCapabilities);
 
           MavenProject mavenProject = getMavenProject(newFacade);
           Set<RequiredCapability> requirements = new LinkedHashSet<>();
           DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, mavenProject);
           Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-          originalRequirements.putIfAbsent(pom, oldRequirements);
+          baselineRequirements.putIfAbsent(pom, oldRequirements);
         }
       }
       allNewFacades.addAll(newFacades.keySet());
@@ -489,11 +489,11 @@ public class ProjectRegistryManager implements ISaveParticipant {
             IProjectConfiguration resolverConfiguration = facade.getConfiguration();
             createExecutionContext(newState, pom, resolverConfiguration).execute(getMavenProject(newFacade),
                 (executionContext, pm) -> {
-                  refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, facade, pm);
+                  refreshPhase2(newState, context, baselineCapabilities, baselineRequirements, pom, facade, pm);
                   return null;
                 }, monitor);
           } else {
-            refreshPhase2(newState, context, originalCapabilities, originalRequirements, pom, newFacade, monitor);
+            refreshPhase2(newState, context, baselineCapabilities, baselineRequirements, pom, newFacade, monitor);
           }
           monitor.worked(1);
         }
@@ -557,7 +557,7 @@ public class ProjectRegistryManager implements ISaveParticipant {
   }
 
   void refreshPhase2(MutableProjectRegistry newState, DependencyResolutionContext context,
-      Map<IFile, Set<Capability>> originalCapabilities, Map<IFile, Set<RequiredCapability>> originalRequirements,
+      Map<IFile, Set<Capability>> baselineCapabilities, Map<IFile, Set<RequiredCapability>> baselineRequirements,
       IFile pom, MavenProjectFacade newFacade, IProgressMonitor monitor) throws CoreException {
     Set<Capability> capabilities = null;
     Set<RequiredCapability> requirements = null;
@@ -610,10 +610,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
       }
     }
 
-    Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-    if(originalCapabilities.containsKey(pom)) {
-      oldCapabilities = originalCapabilities.get(pom);
-    }
+    Set<Capability> previousCapabilities = newState.setCapabilities(pom, capabilities);
+    Set<Capability> oldCapabilities = baselineCapabilities.getOrDefault(pom, previousCapabilities);
     // if our capabilities changed, recalculate everyone who depends on new/changed/removed capabilities
     Set<Capability> changedCapabilities = diff(oldCapabilities, capabilities);
 
@@ -630,10 +628,8 @@ public class ProjectRegistryManager implements ISaveParticipant {
           : newState.getDependents(capability, true));
     }
 
-    Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-    if(originalRequirements.containsKey(pom)) {
-      oldRequirements = originalRequirements.get(pom);
-    }
+    Set<RequiredCapability> previousRequirements = newState.setRequirements(pom, requirements);
+    Set<RequiredCapability> oldRequirements = baselineRequirements.getOrDefault(pom, previousRequirements);
     // if our dependencies changed, recalculate everyone who depends on us
     // this is needed to deal with transitive dependency resolution in maven
     if(oldCapabilities != null && hasDiff(oldRequirements, requirements)) {
@@ -641,6 +637,9 @@ public class ProjectRegistryManager implements ISaveParticipant {
         context.forcePomFiles(newState.getVersionedDependents(capability, true));
       }
     }
+
+    baselineCapabilities.put(pom, capabilities);
+    baselineRequirements.put(pom, requirements);
   }
 
   private void setupLifecycleMapping(IProgressMonitor monitor, MavenProjectFacade newFacade) throws CoreException {
